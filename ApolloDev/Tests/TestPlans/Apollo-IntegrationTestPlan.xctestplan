@@ -15,12 +15,8 @@
   },
   "testTargets" : [
     {
-      "parallelizable" : true,
-      "skippedTests" : [
-        "StarWarsSubscriptionTests\/testConcurrentSubscribing()"
-      ],
       "target" : {
-        "containerPath" : "container:Apollo.xcodeproj",
+        "containerPath" : "container:ApolloDev.xcodeproj",
         "identifier" : "DE6B15AB26152BE10068D642",
         "name" : "ApolloServerIntegrationTests"
       }
