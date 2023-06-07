@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-  name: "Apollo",
+  name: "ApolloCodegen",
   platforms: [
     .iOS(.v12),
     .macOS(.v10_14),
@@ -14,7 +14,6 @@ let package = Package(
   products: [
     .library(name: "ApolloCodegenLib", targets: ["ApolloCodegenLib"]),
     .executable(name: "apollo-ios-cli", targets: ["apollo-ios-cli"]),
-    .plugin(name: "InstallCLI", targets: ["Install CLI"]),
   ],
   dependencies: [
     .package(
@@ -55,18 +54,5 @@ let package = Package(
       exclude: [
         "Info.plist",
       ]),
-    .plugin(
-      name: "Install CLI",
-      capability: .command(
-        intent: .custom(
-          verb: "apollo-cli-install",
-          description: "Installs the Apollo iOS Command line interface."),
-        permissions: [
-          .writeToPackageDirectory(reason: "Creates a symbolic link to the CLI executable in your project directory.")
-        ]),
-      dependencies: [
-        "apollo-ios-cli"
-      ],
-      path: "Plugins/InstallCLI"),
   ]
 )
