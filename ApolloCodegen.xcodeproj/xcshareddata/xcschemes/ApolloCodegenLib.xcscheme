@@ -17,7 +17,7 @@
                BlueprintIdentifier = "9B7B6F46233C26D100F32205"
                BuildableName = "ApolloCodegenLib.framework"
                BlueprintName = "ApolloCodegenLib"
-               ReferencedContainer = "container:Apollo.xcodeproj">
+               ReferencedContainer = "container:ApolloCodegen.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -29,16 +29,8 @@
       shouldUseLaunchSchemeArgsEnv = "NO"
       enableThreadSanitizer = "YES"
       codeCoverageEnabled = "YES"
-      onlyGenerateCoverageForSpecifiedTargets = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9B7B6F46233C26D100F32205"
-            BuildableName = "ApolloCodegenLib.framework"
-            BlueprintName = "ApolloCodegenLib"
-            ReferencedContainer = "container:Apollo.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
+      onlyGenerateCoverageForSpecifiedTargets = "YES"
+      shouldAutocreateTestPlan = "YES">
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "SRCROOT"
@@ -55,15 +47,6 @@
             ReferencedContainer = "container:Apollo.xcodeproj">
          </BuildableReference>
       </CodeCoverageTargets>
-      <TestPlans>
-         <TestPlanReference
-            reference = "container:Tests/TestPlans/Apollo-CodegenTestPlan.xctestplan"
-            default = "YES">
-         </TestPlanReference>
-         <TestPlanReference
-            reference = "container:Tests/TestPlans/Apollo-Codegen-CITestPlan.xctestplan">
-         </TestPlanReference>
-      </TestPlans>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -82,15 +65,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9B7B6F46233C26D100F32205"
-            BuildableName = "ApolloCodegenLib.framework"
-            BlueprintName = "ApolloCodegenLib"
-            ReferencedContainer = "container:Apollo.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
