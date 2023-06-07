@@ -2,10 +2,10 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:apollo-ios/Apollo.xcodeproj">
+      location = "group:apollo-ios">
    </FileRef>
    <FileRef
-      location = "group:apollo-ios-codegen/ApolloCodegen.xcodeproj">
+      location = "group:apollo-ios-codegen">
    </FileRef>
    <FileRef
       location = "group:ApolloDev/ApolloDev.xcodeproj">
