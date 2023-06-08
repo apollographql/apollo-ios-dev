@@ -13,6 +13,7 @@ let package = Package(
   ],
   products: [
     .library(name: "ApolloCodegenLib", targets: ["ApolloCodegenLib"]),
+    .library(name: "CodegenCLI", targets: ["CodegenCLI"]),
     .executable(name: "apollo-ios-cli", targets: ["apollo-ios-cli"]),
   ],
   dependencies: [
