@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -21,8 +21,120 @@
 		660B350C2A3105AA00E18542 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 660B350B2A3105AA00E18542 /* Apollo */; };
 		660B350E2A3105AA00E18542 /* ApolloTestSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 660B350D2A3105AA00E18542 /* ApolloTestSupport */; };
 		660B35162A310B5500E18542 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 660B35152A310B5500E18542 /* Apollo */; };
+		660B351F2A31132000E18542 /* ApolloCodegenInternalTestHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 660B351E2A31132000E18542 /* ApolloCodegenInternalTestHelpers.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		660B35412A31151000E18542 /* ApolloCodegenLib in Frameworks */ = {isa = PBXBuildFile; productRef = 660B35402A31151000E18542 /* ApolloCodegenLib */; };
+		660B35422A31152400E18542 /* starwars-graphql in Resources */ = {isa = PBXBuildFile; fileRef = DECFEFE3286A3C8800DBE83C /* starwars-graphql */; settings = {ASSET_TAGS = ("starwars-graphql", ); }; };
+		660B35432A31153300E18542 /* animalkingdom-graphql in Resources */ = {isa = PBXBuildFile; fileRef = 96F32D3A27CCD16B00F3383C /* animalkingdom-graphql */; };
+		660B35562A3115A200E18542 /* MockGraphQLType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B35442A3115A100E18542 /* MockGraphQLType.swift */; };
+		660B35572A3115A200E18542 /* Resources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B35452A3115A100E18542 /* Resources.swift */; };
+		660B35582A3115A200E18542 /* MockFileGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B35462A3115A100E18542 /* MockFileGenerator.swift */; };
+		660B35592A3115A200E18542 /* MockIRSubscripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B35472A3115A100E18542 /* MockIRSubscripts.swift */; };
+		660B355A2A3115A200E18542 /* GraphQLJSFrontend+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B35482A3115A100E18542 /* GraphQLJSFrontend+TestHelpers.swift */; };
+		660B355B2A3115A200E18542 /* CodegenTestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B35492A3115A100E18542 /* CodegenTestHelper.swift */; };
+		660B355C2A3115A200E18542 /* MockJavaScriptObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B354A2A3115A100E18542 /* MockJavaScriptObject.swift */; };
+		660B355D2A3115A200E18542 /* IR+Mocking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B354B2A3115A100E18542 /* IR+Mocking.swift */; };
+		660B355F2A3115A200E18542 /* MockApolloCodegenConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B354D2A3115A100E18542 /* MockApolloCodegenConfiguration.swift */; };
+		660B35602A3115A200E18542 /* MockFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B354E2A3115A100E18542 /* MockFileManager.swift */; };
+		660B35612A3115A200E18542 /* MockTemplateRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B354F2A3115A100E18542 /* MockTemplateRenderer.swift */; };
+		660B35622A3115A200E18542 /* MockValidationOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B35502A3115A200E18542 /* MockValidationOptions.swift */; };
+		660B35632A3115A200E18542 /* MockNetworkSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B35512A3115A200E18542 /* MockNetworkSession.swift */; };
+		660B35642A3115A200E18542 /* MockCompilationResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B35522A3115A200E18542 /* MockCompilationResult.swift */; };
+		660B35652A3115A200E18542 /* MockFileTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B35532A3115A200E18542 /* MockFileTemplate.swift */; };
+		660B35662A3115A200E18542 /* MockMergedSelections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B35542A3115A200E18542 /* MockMergedSelections.swift */; };
+		660B35672A3115A200E18542 /* IR+InclusionConditionsMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660B35552A3115A200E18542 /* IR+InclusionConditionsMock.swift */; };
 		66B18E872A15367300525DFB /* URLSessionClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4F4542244A2AD300C2CF7D /* URLSessionClientTests.swift */; };
 		66B18E902A16BF9B00525DFB /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B18E8E2A16BF9B00525DFB /* MockURLProtocol.swift */; };
+		66F3A05B2A31210D00141EB3 /* ApolloCodegenLib in Frameworks */ = {isa = PBXBuildFile; productRef = 66F3A05A2A31210D00141EB3 /* ApolloCodegenLib */; };
+		66F3A05D2A31210D00141EB3 /* Nimble in Frameworks */ = {isa = PBXBuildFile; productRef = 66F3A05C2A31210D00141EB3 /* Nimble */; };
+		66F3A05E2A31210D00141EB3 /* ApolloCodegenInternalTestHelpers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 660B351C2A31131F00E18542 /* ApolloCodegenInternalTestHelpers.framework */; platformFilters = (macos, ); };
+		66F3A05F2A31210D00141EB3 /* ApolloInternalTestHelpers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F8A95781EC0FC1200304A2D /* ApolloInternalTestHelpers.framework */; };
+		66F3A0642A31212C00141EB3 /* introspection_response.json in Resources */ = {isa = PBXBuildFile; fileRef = E6C4267A26F16CB400904AD2 /* introspection_response.json */; };
+		66F3A0BF2A31217300141EB3 /* ApolloSchemaPublicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0652A31217200141EB3 /* ApolloSchemaPublicTests.swift */; };
+		66F3A0C02A31217300141EB3 /* PluralizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0662A31217200141EB3 /* PluralizerTests.swift */; };
+		66F3A0C12A31217300141EB3 /* ApolloSchemaDownloadConfigurationCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0672A31217200141EB3 /* ApolloSchemaDownloadConfigurationCodableTests.swift */; };
+		66F3A0C22A31217300141EB3 /* GraphQLNamedType+SwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0692A31217200141EB3 /* GraphQLNamedType+SwiftTests.swift */; };
+		66F3A0C32A31217300141EB3 /* String+Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A06A2A31217200141EB3 /* String+Data.swift */; };
+		66F3A0C52A31217300141EB3 /* URLDownloaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A06D2A31217200141EB3 /* URLDownloaderTests.swift */; };
+		66F3A0C82A31217300141EB3 /* LineByLineComparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0722A31217200141EB3 /* LineByLineComparison.swift */; };
+		66F3A0C92A31217300141EB3 /* IRMatchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0732A31217200141EB3 /* IRMatchers.swift */; };
+		66F3A0CA2A31217300141EB3 /* AnimalKingdomIRCreationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0752A31217200141EB3 /* AnimalKingdomIRCreationTests.swift */; };
+		66F3A0CB2A31217300141EB3 /* ApolloCodegenConfigurationCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0762A31217200141EB3 /* ApolloCodegenConfigurationCodableTests.swift */; };
+		66F3A0CC2A31217300141EB3 /* SchemaIntrospectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0782A31217200141EB3 /* SchemaIntrospectionTests.swift */; };
+		66F3A0CD2A31217300141EB3 /* SchemaLoadingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0792A31217200141EB3 /* SchemaLoadingTests.swift */; };
+		66F3A0CE2A31217300141EB3 /* DocumentParsingAndValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A07A2A31217200141EB3 /* DocumentParsingAndValidationTests.swift */; };
+		66F3A0CF2A31217300141EB3 /* CompilationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A07B2A31217200141EB3 /* CompilationTests.swift */; };
+		66F3A0D02A31217300141EB3 /* CompilationResultSchemaDocumentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A07C2A31217200141EB3 /* CompilationResultSchemaDocumentationTests.swift */; };
+		66F3A0D12A31217300141EB3 /* ApolloSchemaInternalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A07D2A31217200141EB3 /* ApolloSchemaInternalTests.swift */; };
+		66F3A0D22A31217300141EB3 /* MockInterfacesTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0852A31217300141EB3 /* MockInterfacesTemplateTests.swift */; };
+		66F3A0D32A31217300141EB3 /* OperationDefinitionTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0862A31217300141EB3 /* OperationDefinitionTemplateTests.swift */; };
+		66F3A0D42A31217300141EB3 /* TemplateString_DeprecationMessage_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0872A31217300141EB3 /* TemplateString_DeprecationMessage_Tests.swift */; };
+		66F3A0D52A31217300141EB3 /* ObjectTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0882A31217300141EB3 /* ObjectTemplateTests.swift */; };
+		66F3A0D62A31217300141EB3 /* LocalCacheMutationDefinitionTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0892A31217300141EB3 /* LocalCacheMutationDefinitionTemplateTests.swift */; };
+		66F3A0D72A31217300141EB3 /* OperationDefinitionTemplate_DocumentType_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A08A2A31217300141EB3 /* OperationDefinitionTemplate_DocumentType_Tests.swift */; };
+		66F3A0D82A31217300141EB3 /* SchemaModuleNamespaceTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A08B2A31217300141EB3 /* SchemaModuleNamespaceTemplateTests.swift */; };
+		66F3A0D92A31217300141EB3 /* MockUnionsTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A08C2A31217300141EB3 /* MockUnionsTemplateTests.swift */; };
+		66F3A0DA2A31217300141EB3 /* MockObjectTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A08D2A31217300141EB3 /* MockObjectTemplateTests.swift */; };
+		66F3A0DB2A31217300141EB3 /* FragmentTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A08E2A31217300141EB3 /* FragmentTemplateTests.swift */; };
+		66F3A0DC2A31217300141EB3 /* SelectionSetTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0902A31217300141EB3 /* SelectionSetTemplateTests.swift */; };
+		66F3A0DD2A31217300141EB3 /* SelectionSetTemplate_Initializers_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0912A31217300141EB3 /* SelectionSetTemplate_Initializers_Tests.swift */; };
+		66F3A0DE2A31217300141EB3 /* SelectionSetTemplate_LocalCacheMutation_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0922A31217300141EB3 /* SelectionSetTemplate_LocalCacheMutation_Tests.swift */; };
+		66F3A0DF2A31217300141EB3 /* InputObjectTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0932A31217300141EB3 /* InputObjectTemplateTests.swift */; };
+		66F3A0E02A31217300141EB3 /* UnionTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0942A31217300141EB3 /* UnionTemplateTests.swift */; };
+		66F3A0E12A31217300141EB3 /* TemplateRenderer_OperationFile_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0952A31217300141EB3 /* TemplateRenderer_OperationFile_Tests.swift */; };
+		66F3A0E22A31217300141EB3 /* TemplateRenderer_TestMockFile_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0962A31217300141EB3 /* TemplateRenderer_TestMockFile_Tests.swift */; };
+		66F3A0E32A31217300141EB3 /* OperationDefinition_VariableDefinition_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0972A31217300141EB3 /* OperationDefinition_VariableDefinition_Tests.swift */; };
+		66F3A0E42A31217300141EB3 /* InterfaceTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0982A31217300141EB3 /* InterfaceTemplateTests.swift */; };
+		66F3A0E52A31217300141EB3 /* CustomScalarTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0992A31217300141EB3 /* CustomScalarTemplateTests.swift */; };
+		66F3A0E62A31217300141EB3 /* EnumTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A09A2A31217300141EB3 /* EnumTemplateTests.swift */; };
+		66F3A0E72A31217300141EB3 /* SwiftPackageManagerModuleTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A09B2A31217300141EB3 /* SwiftPackageManagerModuleTemplateTests.swift */; };
+		66F3A0E82A31217300141EB3 /* SchemaMetadataTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A09C2A31217300141EB3 /* SchemaMetadataTemplateTests.swift */; };
+		66F3A0E92A31217300141EB3 /* OperationIdentifiersTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A09D2A31217300141EB3 /* OperationIdentifiersTemplateTests.swift */; };
+		66F3A0EA2A31217300141EB3 /* TemplateString_Documentation_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A09E2A31217300141EB3 /* TemplateString_Documentation_Tests.swift */; };
+		66F3A0EB2A31217300141EB3 /* SchemaConfigurationTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A09F2A31217300141EB3 /* SchemaConfigurationTemplateTests.swift */; };
+		66F3A0EC2A31217300141EB3 /* TemplateRenderer_SchemaFile_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0A02A31217300141EB3 /* TemplateRenderer_SchemaFile_Tests.swift */; };
+		66F3A0ED2A31217300141EB3 /* InterfaceFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0A22A31217300141EB3 /* InterfaceFileGeneratorTests.swift */; };
+		66F3A0EE2A31217300141EB3 /* MockUnionsFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0A32A31217300141EB3 /* MockUnionsFileGeneratorTests.swift */; };
+		66F3A0EF2A31217300141EB3 /* SchemaMetadataFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0A42A31217300141EB3 /* SchemaMetadataFileGeneratorTests.swift */; };
+		66F3A0F02A31217300141EB3 /* MockObjectFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0A52A31217300141EB3 /* MockObjectFileGeneratorTests.swift */; };
+		66F3A0F12A31217300141EB3 /* EnumFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0A62A31217300141EB3 /* EnumFileGeneratorTests.swift */; };
+		66F3A0F22A31217300141EB3 /* MockInterfacesFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0A72A31217300141EB3 /* MockInterfacesFileGeneratorTests.swift */; };
+		66F3A0F32A31217300141EB3 /* SchemaModuleFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0A82A31217300141EB3 /* SchemaModuleFileGeneratorTests.swift */; };
+		66F3A0F42A31217300141EB3 /* InputObjectFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0A92A31217300141EB3 /* InputObjectFileGeneratorTests.swift */; };
+		66F3A0F52A31217300141EB3 /* CustomScalarFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0AA2A31217300141EB3 /* CustomScalarFileGeneratorTests.swift */; };
+		66F3A0F62A31217300141EB3 /* OperationIdentifiersFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0AB2A31217300141EB3 /* OperationIdentifiersFileGeneratorTests.swift */; };
+		66F3A0F72A31217300141EB3 /* OperationFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0AC2A31217300141EB3 /* OperationFileGeneratorTests.swift */; };
+		66F3A0F82A31217300141EB3 /* FileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0AD2A31217300141EB3 /* FileGeneratorTests.swift */; };
+		66F3A0F92A31217300141EB3 /* FileGenerator_ResolvePath_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0AE2A31217300141EB3 /* FileGenerator_ResolvePath_Tests.swift */; };
+		66F3A0FA2A31217300141EB3 /* FragmentFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0AF2A31217300141EB3 /* FragmentFileGeneratorTests.swift */; };
+		66F3A0FB2A31217300141EB3 /* UnionFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0B02A31217300141EB3 /* UnionFileGeneratorTests.swift */; };
+		66F3A0FC2A31217300141EB3 /* ObjectFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0B12A31217300141EB3 /* ObjectFileGeneratorTests.swift */; };
+		66F3A0FD2A31217300141EB3 /* SchemaConfigurationFileGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0B22A31217300141EB3 /* SchemaConfigurationFileGeneratorTests.swift */; };
+		66F3A0FE2A31217300141EB3 /* FileManagerExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0B32A31217300141EB3 /* FileManagerExtensionTests.swift */; };
+		66F3A0FF2A31217300141EB3 /* URLExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0B42A31217300141EB3 /* URLExtensionsTests.swift */; };
+		66F3A1002A31217300141EB3 /* GlobTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0B52A31217300141EB3 /* GlobTests.swift */; };
+		66F3A1012A31217300141EB3 /* ApolloCodegenConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0B62A31217300141EB3 /* ApolloCodegenConfigurationTests.swift */; };
+		66F3A1022A31217300141EB3 /* ApolloCodegenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0B72A31217300141EB3 /* ApolloCodegenTests.swift */; };
+		66F3A1032A31217300141EB3 /* IRRootFieldBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0B92A31217300141EB3 /* IRRootFieldBuilderTests.swift */; };
+		66F3A1042A31217300141EB3 /* IRSelectionSet_IncludeSkip_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0BA2A31217300141EB3 /* IRSelectionSet_IncludeSkip_Tests.swift */; };
+		66F3A1052A31217300141EB3 /* IRFieldCollectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0BB2A31217300141EB3 /* IRFieldCollectorTests.swift */; };
+		66F3A1062A31217300141EB3 /* IROperationBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0BC2A31217300141EB3 /* IROperationBuilderTests.swift */; };
+		66F3A1072A31217300141EB3 /* IRNamedFragmentBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0BD2A31217300141EB3 /* IRNamedFragmentBuilderTests.swift */; };
+		66F3A1082A31217300141EB3 /* IRCustomScalarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A0BE2A31217300141EB3 /* IRCustomScalarTests.swift */; };
+		66F3A10C2A32547400141EB3 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 66F3A10B2A32547400141EB3 /* Apollo */; };
+		66F3A10E2A32547400141EB3 /* Nimble in Frameworks */ = {isa = PBXBuildFile; productRef = 66F3A10D2A32547400141EB3 /* Nimble */; };
+		66F3A10F2A32547400141EB3 /* ApolloInternalTestHelpers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F8A95781EC0FC1200304A2D /* ApolloInternalTestHelpers.framework */; };
+		66F3A1112A3254C100141EB3 /* CodegenCLI in Frameworks */ = {isa = PBXBuildFile; productRef = 66F3A1102A3254C100141EB3 /* CodegenCLI */; };
+		66F3A1202A32551900141EB3 /* ErrorMatchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A1132A32551900141EB3 /* ErrorMatchers.swift */; };
+		66F3A1212A32551900141EB3 /* MockApolloCodegen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A1152A32551900141EB3 /* MockApolloCodegen.swift */; };
+		66F3A1222A32551900141EB3 /* MockApolloCodegenConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A1162A32551900141EB3 /* MockApolloCodegenConfiguration.swift */; };
+		66F3A1232A32551900141EB3 /* TestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A1172A32551900141EB3 /* TestSupport.swift */; };
+		66F3A1242A32551900141EB3 /* MockApolloSchemaDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A1182A32551900141EB3 /* MockApolloSchemaDownloader.swift */; };
+		66F3A1252A32551900141EB3 /* MockFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A1192A32551900141EB3 /* MockFileManager.swift */; };
+		66F3A1262A32551900141EB3 /* MockLogLevelSetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A11A2A32551900141EB3 /* MockLogLevelSetter.swift */; };
+		66F3A1272A32551900141EB3 /* InitializeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A11C2A32551900141EB3 /* InitializeTests.swift */; };
+		66F3A1282A32551900141EB3 /* GenerateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A11D2A32551900141EB3 /* GenerateTests.swift */; };
+		66F3A1292A32551900141EB3 /* FetchSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A11E2A32551900141EB3 /* FetchSchemaTests.swift */; };
+		66F3A12C2A32555500141EB3 /* VersionCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F3A12B2A32555500141EB3 /* VersionCheckerTests.swift */; };
 		96F32D3B27CCD16B00F3383C /* animalkingdom-graphql in Resources */ = {isa = PBXBuildFile; fileRef = 96F32D3A27CCD16B00F3383C /* animalkingdom-graphql */; };
 		9B21FD752422C29D00998B5C /* GraphQLFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B21FD742422C29D00998B5C /* GraphQLFileTests.swift */; };
 		9B2B66F42513FAFE00B53ABF /* CancellationHandlingInterceptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B2B66F32513FAFE00B53ABF /* CancellationHandlingInterceptor.swift */; };
@@ -496,6 +608,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		66F3A0602A31211800141EB3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9FC7503B1D2A532C00458D91 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 660B351B2A31131F00E18542;
+			remoteInfo = ApolloCodegenInternalTestHelpers;
+		};
+		66F3A0622A31211800141EB3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9FC7503B1D2A532C00458D91 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9F8A95771EC0FC1200304A2D;
+			remoteInfo = ApolloInternalTestHelpers;
+		};
+		66F3A1092A32545900141EB3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9FC7503B1D2A532C00458D91 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9F8A95771EC0FC1200304A2D;
+			remoteInfo = ApolloInternalTestHelpers;
+		};
 		9B2DFBCB24E201A000ED3AE6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9FC7503B1D2A532C00458D91 /* Project object */;
@@ -572,7 +705,120 @@
 		19E9F6AA26D58A92003AB80E /* OperationMessageIdCreatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationMessageIdCreatorTests.swift; sourceTree = "<group>"; };
 		2EE7FFCF276802E30035DC39 /* CacheKeyConstructionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheKeyConstructionTests.swift; sourceTree = "<group>"; };
 		5BB2C0222380836100774170 /* VersionNumberTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionNumberTests.swift; sourceTree = "<group>"; };
+		660B351C2A31131F00E18542 /* ApolloCodegenInternalTestHelpers.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ApolloCodegenInternalTestHelpers.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		660B351E2A31132000E18542 /* ApolloCodegenInternalTestHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ApolloCodegenInternalTestHelpers.h; sourceTree = "<group>"; };
+		660B35282A31134000E18542 /* ApolloCodegenTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ApolloCodegenTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		660B352A2A31134000E18542 /* ApolloCodegenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApolloCodegenTests.swift; sourceTree = "<group>"; };
+		660B35342A31134E00E18542 /* CodegenCLITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodegenCLITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		660B353C2A31141900E18542 /* Apollo-Target-CodegenCLITests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Apollo-Target-CodegenCLITests.xcconfig"; sourceTree = "<group>"; };
+		660B353D2A31141900E18542 /* Apollo-Target-CodegenTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Apollo-Target-CodegenTests.xcconfig"; sourceTree = "<group>"; };
+		660B353E2A31141A00E18542 /* Apollo-Target-CodegenInternalTestHelpers.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Apollo-Target-CodegenInternalTestHelpers.xcconfig"; sourceTree = "<group>"; };
+		660B353F2A31147400E18542 /* Workspace-Target-Codegen.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Workspace-Target-Codegen.xcconfig"; sourceTree = "<group>"; };
+		660B35442A3115A100E18542 /* MockGraphQLType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockGraphQLType.swift; path = Tests/ApolloCodegenInternalTestHelpers/MockGraphQLType.swift; sourceTree = SOURCE_ROOT; };
+		660B35452A3115A100E18542 /* Resources.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Resources.swift; path = Tests/ApolloCodegenInternalTestHelpers/Resources.swift; sourceTree = SOURCE_ROOT; };
+		660B35462A3115A100E18542 /* MockFileGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockFileGenerator.swift; path = Tests/ApolloCodegenInternalTestHelpers/MockFileGenerator.swift; sourceTree = SOURCE_ROOT; };
+		660B35472A3115A100E18542 /* MockIRSubscripts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockIRSubscripts.swift; path = Tests/ApolloCodegenInternalTestHelpers/MockIRSubscripts.swift; sourceTree = SOURCE_ROOT; };
+		660B35482A3115A100E18542 /* GraphQLJSFrontend+TestHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "GraphQLJSFrontend+TestHelpers.swift"; path = "Tests/ApolloCodegenInternalTestHelpers/GraphQLJSFrontend+TestHelpers.swift"; sourceTree = SOURCE_ROOT; };
+		660B35492A3115A100E18542 /* CodegenTestHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CodegenTestHelper.swift; path = Tests/ApolloCodegenInternalTestHelpers/CodegenTestHelper.swift; sourceTree = SOURCE_ROOT; };
+		660B354A2A3115A100E18542 /* MockJavaScriptObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockJavaScriptObject.swift; path = Tests/ApolloCodegenInternalTestHelpers/MockJavaScriptObject.swift; sourceTree = SOURCE_ROOT; };
+		660B354B2A3115A100E18542 /* IR+Mocking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "IR+Mocking.swift"; path = "Tests/ApolloCodegenInternalTestHelpers/IR+Mocking.swift"; sourceTree = SOURCE_ROOT; };
+		660B354C2A3115A100E18542 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = Tests/ApolloCodegenInternalTestHelpers/Info.plist; sourceTree = SOURCE_ROOT; };
+		660B354D2A3115A100E18542 /* MockApolloCodegenConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockApolloCodegenConfiguration.swift; path = Tests/ApolloCodegenInternalTestHelpers/MockApolloCodegenConfiguration.swift; sourceTree = SOURCE_ROOT; };
+		660B354E2A3115A100E18542 /* MockFileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockFileManager.swift; path = Tests/ApolloCodegenInternalTestHelpers/MockFileManager.swift; sourceTree = SOURCE_ROOT; };
+		660B354F2A3115A100E18542 /* MockTemplateRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockTemplateRenderer.swift; path = Tests/ApolloCodegenInternalTestHelpers/MockTemplateRenderer.swift; sourceTree = SOURCE_ROOT; };
+		660B35502A3115A200E18542 /* MockValidationOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockValidationOptions.swift; path = Tests/ApolloCodegenInternalTestHelpers/MockValidationOptions.swift; sourceTree = SOURCE_ROOT; };
+		660B35512A3115A200E18542 /* MockNetworkSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockNetworkSession.swift; path = Tests/ApolloCodegenInternalTestHelpers/MockNetworkSession.swift; sourceTree = SOURCE_ROOT; };
+		660B35522A3115A200E18542 /* MockCompilationResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockCompilationResult.swift; path = Tests/ApolloCodegenInternalTestHelpers/MockCompilationResult.swift; sourceTree = SOURCE_ROOT; };
+		660B35532A3115A200E18542 /* MockFileTemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockFileTemplate.swift; path = Tests/ApolloCodegenInternalTestHelpers/MockFileTemplate.swift; sourceTree = SOURCE_ROOT; };
+		660B35542A3115A200E18542 /* MockMergedSelections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockMergedSelections.swift; path = Tests/ApolloCodegenInternalTestHelpers/MockMergedSelections.swift; sourceTree = SOURCE_ROOT; };
+		660B35552A3115A200E18542 /* IR+InclusionConditionsMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "IR+InclusionConditionsMock.swift"; path = "Tests/ApolloCodegenInternalTestHelpers/IR+InclusionConditionsMock.swift"; sourceTree = SOURCE_ROOT; };
 		66B18E8E2A16BF9B00525DFB /* MockURLProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
+		66F3A0652A31217200141EB3 /* ApolloSchemaPublicTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ApolloSchemaPublicTests.swift; path = Tests/ApolloCodegenTests/ApolloSchemaPublicTests.swift; sourceTree = SOURCE_ROOT; };
+		66F3A0662A31217200141EB3 /* PluralizerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PluralizerTests.swift; path = Tests/ApolloCodegenTests/PluralizerTests.swift; sourceTree = SOURCE_ROOT; };
+		66F3A0672A31217200141EB3 /* ApolloSchemaDownloadConfigurationCodableTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ApolloSchemaDownloadConfigurationCodableTests.swift; path = Tests/ApolloCodegenTests/ApolloSchemaDownloadConfigurationCodableTests.swift; sourceTree = SOURCE_ROOT; };
+		66F3A0692A31217200141EB3 /* GraphQLNamedType+SwiftTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GraphQLNamedType+SwiftTests.swift"; sourceTree = "<group>"; };
+		66F3A06A2A31217200141EB3 /* String+Data.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Data.swift"; sourceTree = "<group>"; };
+		66F3A06C2A31217200141EB3 /* .keep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .keep; sourceTree = "<group>"; };
+		66F3A06D2A31217200141EB3 /* URLDownloaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = URLDownloaderTests.swift; path = Tests/ApolloCodegenTests/URLDownloaderTests.swift; sourceTree = SOURCE_ROOT; };
+		66F3A06F2A31217200141EB3 /* introspection_response.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = introspection_response.json; sourceTree = "<group>"; };
+		66F3A0702A31217200141EB3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = Tests/ApolloCodegenTests/Info.plist; sourceTree = SOURCE_ROOT; };
+		66F3A0722A31217200141EB3 /* LineByLineComparison.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LineByLineComparison.swift; sourceTree = "<group>"; };
+		66F3A0732A31217200141EB3 /* IRMatchers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IRMatchers.swift; sourceTree = "<group>"; };
+		66F3A0752A31217200141EB3 /* AnimalKingdomIRCreationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimalKingdomIRCreationTests.swift; sourceTree = "<group>"; };
+		66F3A0762A31217200141EB3 /* ApolloCodegenConfigurationCodableTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ApolloCodegenConfigurationCodableTests.swift; path = Tests/ApolloCodegenTests/ApolloCodegenConfigurationCodableTests.swift; sourceTree = SOURCE_ROOT; };
+		66F3A0782A31217200141EB3 /* SchemaIntrospectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaIntrospectionTests.swift; sourceTree = "<group>"; };
+		66F3A0792A31217200141EB3 /* SchemaLoadingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaLoadingTests.swift; sourceTree = "<group>"; };
+		66F3A07A2A31217200141EB3 /* DocumentParsingAndValidationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentParsingAndValidationTests.swift; sourceTree = "<group>"; };
+		66F3A07B2A31217200141EB3 /* CompilationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompilationTests.swift; sourceTree = "<group>"; };
+		66F3A07C2A31217200141EB3 /* CompilationResultSchemaDocumentationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompilationResultSchemaDocumentationTests.swift; sourceTree = "<group>"; };
+		66F3A07D2A31217200141EB3 /* ApolloSchemaInternalTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ApolloSchemaInternalTests.swift; path = Tests/ApolloCodegenTests/ApolloSchemaInternalTests.swift; sourceTree = SOURCE_ROOT; };
+		66F3A0852A31217300141EB3 /* MockInterfacesTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockInterfacesTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A0862A31217300141EB3 /* OperationDefinitionTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationDefinitionTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A0872A31217300141EB3 /* TemplateString_DeprecationMessage_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateString_DeprecationMessage_Tests.swift; sourceTree = "<group>"; };
+		66F3A0882A31217300141EB3 /* ObjectTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A0892A31217300141EB3 /* LocalCacheMutationDefinitionTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalCacheMutationDefinitionTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A08A2A31217300141EB3 /* OperationDefinitionTemplate_DocumentType_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationDefinitionTemplate_DocumentType_Tests.swift; sourceTree = "<group>"; };
+		66F3A08B2A31217300141EB3 /* SchemaModuleNamespaceTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaModuleNamespaceTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A08C2A31217300141EB3 /* MockUnionsTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockUnionsTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A08D2A31217300141EB3 /* MockObjectTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockObjectTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A08E2A31217300141EB3 /* FragmentTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FragmentTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A0902A31217300141EB3 /* SelectionSetTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionSetTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A0912A31217300141EB3 /* SelectionSetTemplate_Initializers_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionSetTemplate_Initializers_Tests.swift; sourceTree = "<group>"; };
+		66F3A0922A31217300141EB3 /* SelectionSetTemplate_LocalCacheMutation_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionSetTemplate_LocalCacheMutation_Tests.swift; sourceTree = "<group>"; };
+		66F3A0932A31217300141EB3 /* InputObjectTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputObjectTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A0942A31217300141EB3 /* UnionTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnionTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A0952A31217300141EB3 /* TemplateRenderer_OperationFile_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateRenderer_OperationFile_Tests.swift; sourceTree = "<group>"; };
+		66F3A0962A31217300141EB3 /* TemplateRenderer_TestMockFile_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateRenderer_TestMockFile_Tests.swift; sourceTree = "<group>"; };
+		66F3A0972A31217300141EB3 /* OperationDefinition_VariableDefinition_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationDefinition_VariableDefinition_Tests.swift; sourceTree = "<group>"; };
+		66F3A0982A31217300141EB3 /* InterfaceTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InterfaceTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A0992A31217300141EB3 /* CustomScalarTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomScalarTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A09A2A31217300141EB3 /* EnumTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnumTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A09B2A31217300141EB3 /* SwiftPackageManagerModuleTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftPackageManagerModuleTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A09C2A31217300141EB3 /* SchemaMetadataTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaMetadataTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A09D2A31217300141EB3 /* OperationIdentifiersTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationIdentifiersTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A09E2A31217300141EB3 /* TemplateString_Documentation_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateString_Documentation_Tests.swift; sourceTree = "<group>"; };
+		66F3A09F2A31217300141EB3 /* SchemaConfigurationTemplateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaConfigurationTemplateTests.swift; sourceTree = "<group>"; };
+		66F3A0A02A31217300141EB3 /* TemplateRenderer_SchemaFile_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateRenderer_SchemaFile_Tests.swift; sourceTree = "<group>"; };
+		66F3A0A22A31217300141EB3 /* InterfaceFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InterfaceFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0A32A31217300141EB3 /* MockUnionsFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockUnionsFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0A42A31217300141EB3 /* SchemaMetadataFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaMetadataFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0A52A31217300141EB3 /* MockObjectFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockObjectFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0A62A31217300141EB3 /* EnumFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnumFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0A72A31217300141EB3 /* MockInterfacesFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockInterfacesFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0A82A31217300141EB3 /* SchemaModuleFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaModuleFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0A92A31217300141EB3 /* InputObjectFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputObjectFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0AA2A31217300141EB3 /* CustomScalarFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomScalarFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0AB2A31217300141EB3 /* OperationIdentifiersFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationIdentifiersFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0AC2A31217300141EB3 /* OperationFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0AD2A31217300141EB3 /* FileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0AE2A31217300141EB3 /* FileGenerator_ResolvePath_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileGenerator_ResolvePath_Tests.swift; sourceTree = "<group>"; };
+		66F3A0AF2A31217300141EB3 /* FragmentFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FragmentFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0B02A31217300141EB3 /* UnionFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnionFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0B12A31217300141EB3 /* ObjectFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0B22A31217300141EB3 /* SchemaConfigurationFileGeneratorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaConfigurationFileGeneratorTests.swift; sourceTree = "<group>"; };
+		66F3A0B32A31217300141EB3 /* FileManagerExtensionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FileManagerExtensionTests.swift; path = Tests/ApolloCodegenTests/FileManagerExtensionTests.swift; sourceTree = SOURCE_ROOT; };
+		66F3A0B42A31217300141EB3 /* URLExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = URLExtensionsTests.swift; path = Tests/ApolloCodegenTests/URLExtensionsTests.swift; sourceTree = SOURCE_ROOT; };
+		66F3A0B52A31217300141EB3 /* GlobTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GlobTests.swift; path = Tests/ApolloCodegenTests/GlobTests.swift; sourceTree = SOURCE_ROOT; };
+		66F3A0B62A31217300141EB3 /* ApolloCodegenConfigurationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ApolloCodegenConfigurationTests.swift; path = Tests/ApolloCodegenTests/ApolloCodegenConfigurationTests.swift; sourceTree = SOURCE_ROOT; };
+		66F3A0B72A31217300141EB3 /* ApolloCodegenTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ApolloCodegenTests.swift; path = Tests/ApolloCodegenTests/ApolloCodegenTests.swift; sourceTree = SOURCE_ROOT; };
+		66F3A0B92A31217300141EB3 /* IRRootFieldBuilderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IRRootFieldBuilderTests.swift; sourceTree = "<group>"; };
+		66F3A0BA2A31217300141EB3 /* IRSelectionSet_IncludeSkip_Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IRSelectionSet_IncludeSkip_Tests.swift; sourceTree = "<group>"; };
+		66F3A0BB2A31217300141EB3 /* IRFieldCollectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IRFieldCollectorTests.swift; sourceTree = "<group>"; };
+		66F3A0BC2A31217300141EB3 /* IROperationBuilderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IROperationBuilderTests.swift; sourceTree = "<group>"; };
+		66F3A0BD2A31217300141EB3 /* IRNamedFragmentBuilderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IRNamedFragmentBuilderTests.swift; sourceTree = "<group>"; };
+		66F3A0BE2A31217300141EB3 /* IRCustomScalarTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IRCustomScalarTests.swift; sourceTree = "<group>"; };
+		66F3A1132A32551900141EB3 /* ErrorMatchers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorMatchers.swift; sourceTree = "<group>"; };
+		66F3A1152A32551900141EB3 /* MockApolloCodegen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockApolloCodegen.swift; sourceTree = "<group>"; };
+		66F3A1162A32551900141EB3 /* MockApolloCodegenConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockApolloCodegenConfiguration.swift; sourceTree = "<group>"; };
+		66F3A1172A32551900141EB3 /* TestSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestSupport.swift; sourceTree = "<group>"; };
+		66F3A1182A32551900141EB3 /* MockApolloSchemaDownloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockApolloSchemaDownloader.swift; sourceTree = "<group>"; };
+		66F3A1192A32551900141EB3 /* MockFileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockFileManager.swift; sourceTree = "<group>"; };
+		66F3A11A2A32551900141EB3 /* MockLogLevelSetter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockLogLevelSetter.swift; sourceTree = "<group>"; };
+		66F3A11C2A32551900141EB3 /* InitializeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitializeTests.swift; sourceTree = "<group>"; };
+		66F3A11D2A32551900141EB3 /* GenerateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenerateTests.swift; sourceTree = "<group>"; };
+		66F3A11E2A32551900141EB3 /* FetchSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchSchemaTests.swift; sourceTree = "<group>"; };
+		66F3A11F2A32551900141EB3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = Tests/CodegenCLITests/Info.plist; sourceTree = SOURCE_ROOT; };
+		66F3A12B2A32555500141EB3 /* VersionCheckerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VersionCheckerTests.swift; path = Tests/CodegenCLITests/VersionCheckerTests.swift; sourceTree = SOURCE_ROOT; };
 		90690D05224333DA00FC2E54 /* Apollo-Project-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Apollo-Project-Debug.xcconfig"; sourceTree = "<group>"; };
 		90690D07224333DA00FC2E54 /* Apollo-Project-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Apollo-Project-Release.xcconfig"; sourceTree = "<group>"; };
 		90690D08224333DA00FC2E54 /* Apollo-Project-Performance-Testing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Apollo-Project-Performance-Testing.xcconfig"; sourceTree = "<group>"; };
@@ -1209,6 +1455,36 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		660B35192A31131F00E18542 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				660B35412A31151000E18542 /* ApolloCodegenLib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		660B35252A31134000E18542 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66F3A05E2A31210D00141EB3 /* ApolloCodegenInternalTestHelpers.framework in Frameworks */,
+				66F3A05F2A31210D00141EB3 /* ApolloInternalTestHelpers.framework in Frameworks */,
+				66F3A05B2A31210D00141EB3 /* ApolloCodegenLib in Frameworks */,
+				66F3A05D2A31210D00141EB3 /* Nimble in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		660B35312A31134D00E18542 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66F3A10F2A32547400141EB3 /* ApolloInternalTestHelpers.framework in Frameworks */,
+				66F3A10C2A32547400141EB3 /* Apollo in Frameworks */,
+				66F3A10E2A32547400141EB3 /* Nimble in Frameworks */,
+				66F3A1112A3254C100141EB3 /* CodegenCLI in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9B2DFBB324E1FA0D00ED3AE6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1299,6 +1575,73 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		660B351D2A31132000E18542 /* ApolloCodegenInternalTestHelpers */ = {
+			isa = PBXGroup;
+			children = (
+				660B351E2A31132000E18542 /* ApolloCodegenInternalTestHelpers.h */,
+				660B35492A3115A100E18542 /* CodegenTestHelper.swift */,
+				660B35482A3115A100E18542 /* GraphQLJSFrontend+TestHelpers.swift */,
+				660B354C2A3115A100E18542 /* Info.plist */,
+				660B35552A3115A200E18542 /* IR+InclusionConditionsMock.swift */,
+				660B354B2A3115A100E18542 /* IR+Mocking.swift */,
+				660B354D2A3115A100E18542 /* MockApolloCodegenConfiguration.swift */,
+				660B35522A3115A200E18542 /* MockCompilationResult.swift */,
+				660B35462A3115A100E18542 /* MockFileGenerator.swift */,
+				660B354E2A3115A100E18542 /* MockFileManager.swift */,
+				660B35532A3115A200E18542 /* MockFileTemplate.swift */,
+				660B35442A3115A100E18542 /* MockGraphQLType.swift */,
+				660B35472A3115A100E18542 /* MockIRSubscripts.swift */,
+				660B354A2A3115A100E18542 /* MockJavaScriptObject.swift */,
+				660B35542A3115A200E18542 /* MockMergedSelections.swift */,
+				660B35512A3115A200E18542 /* MockNetworkSession.swift */,
+				660B354F2A3115A100E18542 /* MockTemplateRenderer.swift */,
+				660B35502A3115A200E18542 /* MockValidationOptions.swift */,
+				660B35452A3115A100E18542 /* Resources.swift */,
+			);
+			path = ApolloCodegenInternalTestHelpers;
+			sourceTree = "<group>";
+		};
+		660B35292A31134000E18542 /* ApolloCodegenTests */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A0742A31217200141EB3 /* AnimalKingdomAPI */,
+				66F3A0762A31217200141EB3 /* ApolloCodegenConfigurationCodableTests.swift */,
+				66F3A0B62A31217300141EB3 /* ApolloCodegenConfigurationTests.swift */,
+				66F3A0B72A31217300141EB3 /* ApolloCodegenTests.swift */,
+				66F3A0672A31217200141EB3 /* ApolloSchemaDownloadConfigurationCodableTests.swift */,
+				66F3A07D2A31217200141EB3 /* ApolloSchemaInternalTests.swift */,
+				66F3A0652A31217200141EB3 /* ApolloSchemaPublicTests.swift */,
+				66F3A0832A31217300141EB3 /* CodeGeneration */,
+				66F3A0B82A31217300141EB3 /* CodeGenIR */,
+				66F3A0682A31217200141EB3 /* Extensions */,
+				66F3A0B32A31217300141EB3 /* FileManagerExtensionTests.swift */,
+				66F3A0772A31217200141EB3 /* Frontend */,
+				66F3A0B52A31217300141EB3 /* GlobTests.swift */,
+				66F3A0702A31217200141EB3 /* Info.plist */,
+				66F3A07E2A31217200141EB3 /* Output */,
+				66F3A0662A31217200141EB3 /* PluralizerTests.swift */,
+				66F3A06E2A31217200141EB3 /* Resources */,
+				66F3A06B2A31217200141EB3 /* SourcePackages */,
+				66F3A0712A31217200141EB3 /* TestHelpers */,
+				66F3A06D2A31217200141EB3 /* URLDownloaderTests.swift */,
+				66F3A0B42A31217300141EB3 /* URLExtensionsTests.swift */,
+				660B352A2A31134000E18542 /* ApolloCodegenTests.swift */,
+			);
+			path = ApolloCodegenTests;
+			sourceTree = "<group>";
+		};
+		660B35352A31134E00E18542 /* CodegenCLITests */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A12B2A32555500141EB3 /* VersionCheckerTests.swift */,
+				66F3A11B2A32551900141EB3 /* Commands */,
+				66F3A11F2A32551900141EB3 /* Info.plist */,
+				66F3A1122A32551900141EB3 /* Matchers */,
+				66F3A1142A32551900141EB3 /* Support */,
+			);
+			path = CodegenCLITests;
+			sourceTree = "<group>";
+		};
 		66B18E862A15366400525DFB /* Network */ = {
 			isa = PBXGroup;
 			children = (
@@ -1307,10 +1650,237 @@
 			path = Network;
 			sourceTree = "<group>";
 		};
+		66F3A0682A31217200141EB3 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A0692A31217200141EB3 /* GraphQLNamedType+SwiftTests.swift */,
+				66F3A06A2A31217200141EB3 /* String+Data.swift */,
+			);
+			name = Extensions;
+			path = Tests/ApolloCodegenTests/Extensions;
+			sourceTree = SOURCE_ROOT;
+		};
+		66F3A06B2A31217200141EB3 /* SourcePackages */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A06C2A31217200141EB3 /* .keep */,
+			);
+			name = SourcePackages;
+			path = Tests/ApolloCodegenTests/SourcePackages;
+			sourceTree = SOURCE_ROOT;
+		};
+		66F3A06E2A31217200141EB3 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A06F2A31217200141EB3 /* introspection_response.json */,
+			);
+			name = Resources;
+			path = Tests/ApolloCodegenTests/Resources;
+			sourceTree = SOURCE_ROOT;
+		};
+		66F3A0712A31217200141EB3 /* TestHelpers */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A0722A31217200141EB3 /* LineByLineComparison.swift */,
+				66F3A0732A31217200141EB3 /* IRMatchers.swift */,
+			);
+			name = TestHelpers;
+			path = Tests/ApolloCodegenTests/TestHelpers;
+			sourceTree = SOURCE_ROOT;
+		};
+		66F3A0742A31217200141EB3 /* AnimalKingdomAPI */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A0752A31217200141EB3 /* AnimalKingdomIRCreationTests.swift */,
+			);
+			name = AnimalKingdomAPI;
+			path = Tests/ApolloCodegenTests/AnimalKingdomAPI;
+			sourceTree = SOURCE_ROOT;
+		};
+		66F3A0772A31217200141EB3 /* Frontend */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A0782A31217200141EB3 /* SchemaIntrospectionTests.swift */,
+				66F3A0792A31217200141EB3 /* SchemaLoadingTests.swift */,
+				66F3A07A2A31217200141EB3 /* DocumentParsingAndValidationTests.swift */,
+				66F3A07B2A31217200141EB3 /* CompilationTests.swift */,
+				66F3A07C2A31217200141EB3 /* CompilationResultSchemaDocumentationTests.swift */,
+			);
+			name = Frontend;
+			path = Tests/ApolloCodegenTests/Frontend;
+			sourceTree = SOURCE_ROOT;
+		};
+		66F3A07E2A31217200141EB3 /* Output */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A07F2A31217200141EB3 /* Configuration */,
+				66F3A0802A31217200141EB3 /* Sources */,
+			);
+			name = Output;
+			path = Tests/ApolloCodegenTests/Output;
+			sourceTree = SOURCE_ROOT;
+		};
+		66F3A07F2A31217200141EB3 /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Configuration;
+			sourceTree = "<group>";
+		};
+		66F3A0802A31217200141EB3 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A0812A31217200141EB3 /* Schema */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		66F3A0812A31217200141EB3 /* Schema */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A0822A31217200141EB3 /* Objects */,
+			);
+			path = Schema;
+			sourceTree = "<group>";
+		};
+		66F3A0822A31217200141EB3 /* Objects */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Objects;
+			sourceTree = "<group>";
+		};
+		66F3A0832A31217300141EB3 /* CodeGeneration */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A0842A31217300141EB3 /* Templates */,
+				66F3A0A12A31217300141EB3 /* FileGenerators */,
+			);
+			name = CodeGeneration;
+			path = Tests/ApolloCodegenTests/CodeGeneration;
+			sourceTree = SOURCE_ROOT;
+		};
+		66F3A0842A31217300141EB3 /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A0852A31217300141EB3 /* MockInterfacesTemplateTests.swift */,
+				66F3A0862A31217300141EB3 /* OperationDefinitionTemplateTests.swift */,
+				66F3A0872A31217300141EB3 /* TemplateString_DeprecationMessage_Tests.swift */,
+				66F3A0882A31217300141EB3 /* ObjectTemplateTests.swift */,
+				66F3A0892A31217300141EB3 /* LocalCacheMutationDefinitionTemplateTests.swift */,
+				66F3A08A2A31217300141EB3 /* OperationDefinitionTemplate_DocumentType_Tests.swift */,
+				66F3A08B2A31217300141EB3 /* SchemaModuleNamespaceTemplateTests.swift */,
+				66F3A08C2A31217300141EB3 /* MockUnionsTemplateTests.swift */,
+				66F3A08D2A31217300141EB3 /* MockObjectTemplateTests.swift */,
+				66F3A08E2A31217300141EB3 /* FragmentTemplateTests.swift */,
+				66F3A08F2A31217300141EB3 /* SelectionSet */,
+				66F3A0932A31217300141EB3 /* InputObjectTemplateTests.swift */,
+				66F3A0942A31217300141EB3 /* UnionTemplateTests.swift */,
+				66F3A0952A31217300141EB3 /* TemplateRenderer_OperationFile_Tests.swift */,
+				66F3A0962A31217300141EB3 /* TemplateRenderer_TestMockFile_Tests.swift */,
+				66F3A0972A31217300141EB3 /* OperationDefinition_VariableDefinition_Tests.swift */,
+				66F3A0982A31217300141EB3 /* InterfaceTemplateTests.swift */,
+				66F3A0992A31217300141EB3 /* CustomScalarTemplateTests.swift */,
+				66F3A09A2A31217300141EB3 /* EnumTemplateTests.swift */,
+				66F3A09B2A31217300141EB3 /* SwiftPackageManagerModuleTemplateTests.swift */,
+				66F3A09C2A31217300141EB3 /* SchemaMetadataTemplateTests.swift */,
+				66F3A09D2A31217300141EB3 /* OperationIdentifiersTemplateTests.swift */,
+				66F3A09E2A31217300141EB3 /* TemplateString_Documentation_Tests.swift */,
+				66F3A09F2A31217300141EB3 /* SchemaConfigurationTemplateTests.swift */,
+				66F3A0A02A31217300141EB3 /* TemplateRenderer_SchemaFile_Tests.swift */,
+			);
+			path = Templates;
+			sourceTree = "<group>";
+		};
+		66F3A08F2A31217300141EB3 /* SelectionSet */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A0902A31217300141EB3 /* SelectionSetTemplateTests.swift */,
+				66F3A0912A31217300141EB3 /* SelectionSetTemplate_Initializers_Tests.swift */,
+				66F3A0922A31217300141EB3 /* SelectionSetTemplate_LocalCacheMutation_Tests.swift */,
+			);
+			path = SelectionSet;
+			sourceTree = "<group>";
+		};
+		66F3A0A12A31217300141EB3 /* FileGenerators */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A0A22A31217300141EB3 /* InterfaceFileGeneratorTests.swift */,
+				66F3A0A32A31217300141EB3 /* MockUnionsFileGeneratorTests.swift */,
+				66F3A0A42A31217300141EB3 /* SchemaMetadataFileGeneratorTests.swift */,
+				66F3A0A52A31217300141EB3 /* MockObjectFileGeneratorTests.swift */,
+				66F3A0A62A31217300141EB3 /* EnumFileGeneratorTests.swift */,
+				66F3A0A72A31217300141EB3 /* MockInterfacesFileGeneratorTests.swift */,
+				66F3A0A82A31217300141EB3 /* SchemaModuleFileGeneratorTests.swift */,
+				66F3A0A92A31217300141EB3 /* InputObjectFileGeneratorTests.swift */,
+				66F3A0AA2A31217300141EB3 /* CustomScalarFileGeneratorTests.swift */,
+				66F3A0AB2A31217300141EB3 /* OperationIdentifiersFileGeneratorTests.swift */,
+				66F3A0AC2A31217300141EB3 /* OperationFileGeneratorTests.swift */,
+				66F3A0AD2A31217300141EB3 /* FileGeneratorTests.swift */,
+				66F3A0AE2A31217300141EB3 /* FileGenerator_ResolvePath_Tests.swift */,
+				66F3A0AF2A31217300141EB3 /* FragmentFileGeneratorTests.swift */,
+				66F3A0B02A31217300141EB3 /* UnionFileGeneratorTests.swift */,
+				66F3A0B12A31217300141EB3 /* ObjectFileGeneratorTests.swift */,
+				66F3A0B22A31217300141EB3 /* SchemaConfigurationFileGeneratorTests.swift */,
+			);
+			path = FileGenerators;
+			sourceTree = "<group>";
+		};
+		66F3A0B82A31217300141EB3 /* CodeGenIR */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A0B92A31217300141EB3 /* IRRootFieldBuilderTests.swift */,
+				66F3A0BA2A31217300141EB3 /* IRSelectionSet_IncludeSkip_Tests.swift */,
+				66F3A0BB2A31217300141EB3 /* IRFieldCollectorTests.swift */,
+				66F3A0BC2A31217300141EB3 /* IROperationBuilderTests.swift */,
+				66F3A0BD2A31217300141EB3 /* IRNamedFragmentBuilderTests.swift */,
+				66F3A0BE2A31217300141EB3 /* IRCustomScalarTests.swift */,
+			);
+			name = CodeGenIR;
+			path = Tests/ApolloCodegenTests/CodeGenIR;
+			sourceTree = SOURCE_ROOT;
+		};
+		66F3A1122A32551900141EB3 /* Matchers */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A1132A32551900141EB3 /* ErrorMatchers.swift */,
+			);
+			name = Matchers;
+			path = Tests/CodegenCLITests/Matchers;
+			sourceTree = SOURCE_ROOT;
+		};
+		66F3A1142A32551900141EB3 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A1152A32551900141EB3 /* MockApolloCodegen.swift */,
+				66F3A1162A32551900141EB3 /* MockApolloCodegenConfiguration.swift */,
+				66F3A1172A32551900141EB3 /* TestSupport.swift */,
+				66F3A1182A32551900141EB3 /* MockApolloSchemaDownloader.swift */,
+				66F3A1192A32551900141EB3 /* MockFileManager.swift */,
+				66F3A11A2A32551900141EB3 /* MockLogLevelSetter.swift */,
+			);
+			name = Support;
+			path = Tests/CodegenCLITests/Support;
+			sourceTree = SOURCE_ROOT;
+		};
+		66F3A11B2A32551900141EB3 /* Commands */ = {
+			isa = PBXGroup;
+			children = (
+				66F3A11C2A32551900141EB3 /* InitializeTests.swift */,
+				66F3A11D2A32551900141EB3 /* GenerateTests.swift */,
+				66F3A11E2A32551900141EB3 /* FetchSchemaTests.swift */,
+			);
+			name = Commands;
+			path = Tests/CodegenCLITests/Commands;
+			sourceTree = SOURCE_ROOT;
+		};
 		90690D04224333DA00FC2E54 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
 				DE6B15F926152D210068D642 /* Shared */,
+				660B353C2A31141900E18542 /* Apollo-Target-CodegenCLITests.xcconfig */,
+				660B353E2A31141A00E18542 /* Apollo-Target-CodegenInternalTestHelpers.xcconfig */,
+				660B353D2A31141900E18542 /* Apollo-Target-CodegenTests.xcconfig */,
 				90690D05224333DA00FC2E54 /* Apollo-Project-Debug.xcconfig */,
 				90690D08224333DA00FC2E54 /* Apollo-Project-Performance-Testing.xcconfig */,
 				90690D07224333DA00FC2E54 /* Apollo-Project-Release.xcconfig */,
@@ -1554,6 +2124,9 @@
 				9B2DFBC424E1FA3E00ED3AE6 /* UploadAPI */,
 				DE3C79A8260A6ACD00D2F4FF /* AnimalKingdomAPI */,
 				E66B836728093D7C001B3F2D /* SubscriptionAPI */,
+				660B351D2A31132000E18542 /* ApolloCodegenInternalTestHelpers */,
+				660B35292A31134000E18542 /* ApolloCodegenTests */,
+				660B35352A31134E00E18542 /* CodegenCLITests */,
 				9B7BDAF923FDEE8A00ACD198 /* Frameworks */,
 				90690D04224333DA00FC2E54 /* Configuration */,
 				9FC750451D2A532C00458D91 /* Products */,
@@ -1575,6 +2148,9 @@
 				DE3C7A11260A6B9800D2F4FF /* AnimalKingdomAPI.framework */,
 				DE6B15AC26152BE10068D642 /* ApolloServerIntegrationTests.xctest */,
 				E66B836628093D7C001B3F2D /* SubscriptionAPI.framework */,
+				660B351C2A31131F00E18542 /* ApolloCodegenInternalTestHelpers.framework */,
+				660B35282A31134000E18542 /* ApolloCodegenTests.xctest */,
+				660B35342A31134E00E18542 /* CodegenCLITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2485,6 +3061,7 @@
 		DE6B15F926152D210068D642 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				660B353F2A31147400E18542 /* Workspace-Target-Codegen.xcconfig */,
 				DE6B15FB26152D210068D642 /* Workspace-Deployment-Targets.xcconfig */,
 				DEC2EA8C291D9C960088D3BB /* Workspace-Test-Deployment-Targets.xcconfig */,
 				DE6B15FC26152D210068D642 /* Workspace-Analysis.xcconfig */,
@@ -2705,6 +3282,14 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		660B35172A31131F00E18542 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				660B351F2A31132000E18542 /* ApolloCodegenInternalTestHelpers.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9B2DFBB124E1FA0D00ED3AE6 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -2751,6 +3336,73 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		660B351B2A31131F00E18542 /* ApolloCodegenInternalTestHelpers */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 660B35202A31132000E18542 /* Build configuration list for PBXNativeTarget "ApolloCodegenInternalTestHelpers" */;
+			buildPhases = (
+				660B35172A31131F00E18542 /* Headers */,
+				660B35182A31131F00E18542 /* Sources */,
+				660B35192A31131F00E18542 /* Frameworks */,
+				660B351A2A31131F00E18542 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ApolloCodegenInternalTestHelpers;
+			packageProductDependencies = (
+				660B35402A31151000E18542 /* ApolloCodegenLib */,
+			);
+			productName = ApolloCodegenInternalTestHelpers;
+			productReference = 660B351C2A31131F00E18542 /* ApolloCodegenInternalTestHelpers.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		660B35272A31134000E18542 /* ApolloCodegenTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 660B352C2A31134000E18542 /* Build configuration list for PBXNativeTarget "ApolloCodegenTests" */;
+			buildPhases = (
+				660B35242A31134000E18542 /* Sources */,
+				660B35252A31134000E18542 /* Frameworks */,
+				660B35262A31134000E18542 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				66F3A0612A31211800141EB3 /* PBXTargetDependency */,
+				66F3A0632A31211800141EB3 /* PBXTargetDependency */,
+			);
+			name = ApolloCodegenTests;
+			packageProductDependencies = (
+				66F3A05A2A31210D00141EB3 /* ApolloCodegenLib */,
+				66F3A05C2A31210D00141EB3 /* Nimble */,
+			);
+			productName = ApolloCodegenTests;
+			productReference = 660B35282A31134000E18542 /* ApolloCodegenTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		660B35332A31134D00E18542 /* CodegenCLITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 660B35382A31134E00E18542 /* Build configuration list for PBXNativeTarget "CodegenCLITests" */;
+			buildPhases = (
+				660B35302A31134D00E18542 /* Sources */,
+				660B35312A31134D00E18542 /* Frameworks */,
+				660B35322A31134D00E18542 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				66F3A10A2A32545900141EB3 /* PBXTargetDependency */,
+			);
+			name = CodegenCLITests;
+			packageProductDependencies = (
+				66F3A10B2A32547400141EB3 /* Apollo */,
+				66F3A10D2A32547400141EB3 /* Nimble */,
+				66F3A1102A3254C100141EB3 /* CodegenCLI */,
+			);
+			productName = CodegenCLITests;
+			productReference = 660B35342A31134E00E18542 /* CodegenCLITests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		9B2DFBB524E1FA0D00ED3AE6 /* UploadAPI */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9B2DFBBE24E1FA0D00ED3AE6 /* Build configuration list for PBXNativeTarget "UploadAPI" */;
@@ -2961,10 +3613,20 @@
 				KnownAssetTags = (
 					"starwars-graphql",
 				);
-				LastSwiftUpdateCheck = 1340;
+				LastSwiftUpdateCheck = 1430;
 				LastUpgradeCheck = 1430;
 				ORGANIZATIONNAME = "Apollo GraphQL";
 				TargetAttributes = {
+					660B351B2A31131F00E18542 = {
+						CreatedOnToolsVersion = 14.3.1;
+						LastSwiftMigration = 1430;
+					};
+					660B35272A31134000E18542 = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
+					660B35332A31134D00E18542 = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
 					9B2DFBB524E1FA0D00ED3AE6 = {
 						CreatedOnToolsVersion = 11.6;
 						LastSwiftMigration = 1160;
@@ -3032,11 +3694,38 @@
 				9FACA9B71F42E67200AE2DBD /* GitHubAPI */,
 				9B2DFBB524E1FA0D00ED3AE6 /* UploadAPI */,
 				E66B836528093D7C001B3F2D /* SubscriptionAPI */,
+				660B351B2A31131F00E18542 /* ApolloCodegenInternalTestHelpers */,
+				660B35272A31134000E18542 /* ApolloCodegenTests */,
+				660B35332A31134D00E18542 /* CodegenCLITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		660B351A2A31131F00E18542 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				660B35432A31153300E18542 /* animalkingdom-graphql in Resources */,
+				660B35422A31152400E18542 /* starwars-graphql in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		660B35262A31134000E18542 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66F3A0642A31212C00141EB3 /* introspection_response.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		660B35322A31134D00E18542 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9B2DFBB424E1FA0D00ED3AE6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3103,6 +3792,126 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		660B35182A31131F00E18542 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				660B35612A3115A200E18542 /* MockTemplateRenderer.swift in Sources */,
+				660B35632A3115A200E18542 /* MockNetworkSession.swift in Sources */,
+				660B355C2A3115A200E18542 /* MockJavaScriptObject.swift in Sources */,
+				660B355F2A3115A200E18542 /* MockApolloCodegenConfiguration.swift in Sources */,
+				660B35622A3115A200E18542 /* MockValidationOptions.swift in Sources */,
+				660B355D2A3115A200E18542 /* IR+Mocking.swift in Sources */,
+				660B35592A3115A200E18542 /* MockIRSubscripts.swift in Sources */,
+				660B35672A3115A200E18542 /* IR+InclusionConditionsMock.swift in Sources */,
+				660B355B2A3115A200E18542 /* CodegenTestHelper.swift in Sources */,
+				660B35652A3115A200E18542 /* MockFileTemplate.swift in Sources */,
+				660B35642A3115A200E18542 /* MockCompilationResult.swift in Sources */,
+				660B35562A3115A200E18542 /* MockGraphQLType.swift in Sources */,
+				660B35582A3115A200E18542 /* MockFileGenerator.swift in Sources */,
+				660B35662A3115A200E18542 /* MockMergedSelections.swift in Sources */,
+				660B35572A3115A200E18542 /* Resources.swift in Sources */,
+				660B355A2A3115A200E18542 /* GraphQLJSFrontend+TestHelpers.swift in Sources */,
+				660B35602A3115A200E18542 /* MockFileManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		660B35242A31134000E18542 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66F3A1022A31217300141EB3 /* ApolloCodegenTests.swift in Sources */,
+				66F3A0D92A31217300141EB3 /* MockUnionsTemplateTests.swift in Sources */,
+				66F3A1042A31217300141EB3 /* IRSelectionSet_IncludeSkip_Tests.swift in Sources */,
+				66F3A1002A31217300141EB3 /* GlobTests.swift in Sources */,
+				66F3A0EA2A31217300141EB3 /* TemplateString_Documentation_Tests.swift in Sources */,
+				66F3A0FF2A31217300141EB3 /* URLExtensionsTests.swift in Sources */,
+				66F3A0CE2A31217300141EB3 /* DocumentParsingAndValidationTests.swift in Sources */,
+				66F3A1072A31217300141EB3 /* IRNamedFragmentBuilderTests.swift in Sources */,
+				66F3A0C52A31217300141EB3 /* URLDownloaderTests.swift in Sources */,
+				66F3A0F32A31217300141EB3 /* SchemaModuleFileGeneratorTests.swift in Sources */,
+				66F3A0F82A31217300141EB3 /* FileGeneratorTests.swift in Sources */,
+				66F3A0DE2A31217300141EB3 /* SelectionSetTemplate_LocalCacheMutation_Tests.swift in Sources */,
+				66F3A0CF2A31217300141EB3 /* CompilationTests.swift in Sources */,
+				66F3A0D72A31217300141EB3 /* OperationDefinitionTemplate_DocumentType_Tests.swift in Sources */,
+				66F3A0E12A31217300141EB3 /* TemplateRenderer_OperationFile_Tests.swift in Sources */,
+				66F3A0F02A31217300141EB3 /* MockObjectFileGeneratorTests.swift in Sources */,
+				66F3A0D32A31217300141EB3 /* OperationDefinitionTemplateTests.swift in Sources */,
+				66F3A0C22A31217300141EB3 /* GraphQLNamedType+SwiftTests.swift in Sources */,
+				66F3A0BF2A31217300141EB3 /* ApolloSchemaPublicTests.swift in Sources */,
+				66F3A0F52A31217300141EB3 /* CustomScalarFileGeneratorTests.swift in Sources */,
+				66F3A0E32A31217300141EB3 /* OperationDefinition_VariableDefinition_Tests.swift in Sources */,
+				66F3A0E72A31217300141EB3 /* SwiftPackageManagerModuleTemplateTests.swift in Sources */,
+				66F3A0D22A31217300141EB3 /* MockInterfacesTemplateTests.swift in Sources */,
+				66F3A0C82A31217300141EB3 /* LineByLineComparison.swift in Sources */,
+				66F3A0FE2A31217300141EB3 /* FileManagerExtensionTests.swift in Sources */,
+				66F3A0E02A31217300141EB3 /* UnionTemplateTests.swift in Sources */,
+				66F3A0D02A31217300141EB3 /* CompilationResultSchemaDocumentationTests.swift in Sources */,
+				66F3A0EE2A31217300141EB3 /* MockUnionsFileGeneratorTests.swift in Sources */,
+				66F3A0FA2A31217300141EB3 /* FragmentFileGeneratorTests.swift in Sources */,
+				66F3A1032A31217300141EB3 /* IRRootFieldBuilderTests.swift in Sources */,
+				66F3A0C02A31217300141EB3 /* PluralizerTests.swift in Sources */,
+				66F3A0ED2A31217300141EB3 /* InterfaceFileGeneratorTests.swift in Sources */,
+				66F3A0E92A31217300141EB3 /* OperationIdentifiersTemplateTests.swift in Sources */,
+				66F3A0DD2A31217300141EB3 /* SelectionSetTemplate_Initializers_Tests.swift in Sources */,
+				66F3A1082A31217300141EB3 /* IRCustomScalarTests.swift in Sources */,
+				66F3A0F72A31217300141EB3 /* OperationFileGeneratorTests.swift in Sources */,
+				66F3A1012A31217300141EB3 /* ApolloCodegenConfigurationTests.swift in Sources */,
+				66F3A0DB2A31217300141EB3 /* FragmentTemplateTests.swift in Sources */,
+				66F3A0E42A31217300141EB3 /* InterfaceTemplateTests.swift in Sources */,
+				66F3A0E22A31217300141EB3 /* TemplateRenderer_TestMockFile_Tests.swift in Sources */,
+				66F3A0D42A31217300141EB3 /* TemplateString_DeprecationMessage_Tests.swift in Sources */,
+				66F3A0DA2A31217300141EB3 /* MockObjectTemplateTests.swift in Sources */,
+				66F3A0DF2A31217300141EB3 /* InputObjectTemplateTests.swift in Sources */,
+				66F3A0CC2A31217300141EB3 /* SchemaIntrospectionTests.swift in Sources */,
+				66F3A0D82A31217300141EB3 /* SchemaModuleNamespaceTemplateTests.swift in Sources */,
+				66F3A1062A31217300141EB3 /* IROperationBuilderTests.swift in Sources */,
+				66F3A0E52A31217300141EB3 /* CustomScalarTemplateTests.swift in Sources */,
+				66F3A0CD2A31217300141EB3 /* SchemaLoadingTests.swift in Sources */,
+				66F3A0D62A31217300141EB3 /* LocalCacheMutationDefinitionTemplateTests.swift in Sources */,
+				66F3A0F92A31217300141EB3 /* FileGenerator_ResolvePath_Tests.swift in Sources */,
+				66F3A0C32A31217300141EB3 /* String+Data.swift in Sources */,
+				66F3A0FC2A31217300141EB3 /* ObjectFileGeneratorTests.swift in Sources */,
+				66F3A0F62A31217300141EB3 /* OperationIdentifiersFileGeneratorTests.swift in Sources */,
+				66F3A0D52A31217300141EB3 /* ObjectTemplateTests.swift in Sources */,
+				66F3A0FB2A31217300141EB3 /* UnionFileGeneratorTests.swift in Sources */,
+				66F3A0CA2A31217300141EB3 /* AnimalKingdomIRCreationTests.swift in Sources */,
+				66F3A0FD2A31217300141EB3 /* SchemaConfigurationFileGeneratorTests.swift in Sources */,
+				66F3A0EC2A31217300141EB3 /* TemplateRenderer_SchemaFile_Tests.swift in Sources */,
+				66F3A0F12A31217300141EB3 /* EnumFileGeneratorTests.swift in Sources */,
+				66F3A0DC2A31217300141EB3 /* SelectionSetTemplateTests.swift in Sources */,
+				66F3A0EF2A31217300141EB3 /* SchemaMetadataFileGeneratorTests.swift in Sources */,
+				66F3A0CB2A31217300141EB3 /* ApolloCodegenConfigurationCodableTests.swift in Sources */,
+				66F3A0EB2A31217300141EB3 /* SchemaConfigurationTemplateTests.swift in Sources */,
+				66F3A0E62A31217300141EB3 /* EnumTemplateTests.swift in Sources */,
+				66F3A1052A31217300141EB3 /* IRFieldCollectorTests.swift in Sources */,
+				66F3A0D12A31217300141EB3 /* ApolloSchemaInternalTests.swift in Sources */,
+				66F3A0F42A31217300141EB3 /* InputObjectFileGeneratorTests.swift in Sources */,
+				66F3A0C92A31217300141EB3 /* IRMatchers.swift in Sources */,
+				66F3A0F22A31217300141EB3 /* MockInterfacesFileGeneratorTests.swift in Sources */,
+				66F3A0C12A31217300141EB3 /* ApolloSchemaDownloadConfigurationCodableTests.swift in Sources */,
+				66F3A0E82A31217300141EB3 /* SchemaMetadataTemplateTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		660B35302A31134D00E18542 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66F3A1212A32551900141EB3 /* MockApolloCodegen.swift in Sources */,
+				66F3A1292A32551900141EB3 /* FetchSchemaTests.swift in Sources */,
+				66F3A1282A32551900141EB3 /* GenerateTests.swift in Sources */,
+				66F3A1262A32551900141EB3 /* MockLogLevelSetter.swift in Sources */,
+				66F3A1252A32551900141EB3 /* MockFileManager.swift in Sources */,
+				66F3A1232A32551900141EB3 /* TestSupport.swift in Sources */,
+				66F3A1242A32551900141EB3 /* MockApolloSchemaDownloader.swift in Sources */,
+				66F3A1272A32551900141EB3 /* InitializeTests.swift in Sources */,
+				66F3A12C2A32555500141EB3 /* VersionCheckerTests.swift in Sources */,
+				66F3A1222A32551900141EB3 /* MockApolloCodegenConfiguration.swift in Sources */,
+				66F3A1202A32551900141EB3 /* ErrorMatchers.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9B2DFBB224E1FA0D00ED3AE6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3623,6 +4432,24 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		66F3A0612A31211800141EB3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilters = (
+				macos,
+			);
+			target = 660B351B2A31131F00E18542 /* ApolloCodegenInternalTestHelpers */;
+			targetProxy = 66F3A0602A31211800141EB3 /* PBXContainerItemProxy */;
+		};
+		66F3A0632A31211800141EB3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9F8A95771EC0FC1200304A2D /* ApolloInternalTestHelpers */;
+			targetProxy = 66F3A0622A31211800141EB3 /* PBXContainerItemProxy */;
+		};
+		66F3A10A2A32545900141EB3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9F8A95771EC0FC1200304A2D /* ApolloInternalTestHelpers */;
+			targetProxy = 66F3A1092A32545900141EB3 /* PBXContainerItemProxy */;
+		};
 		9B2DFBCC24E201A000ED3AE6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9B2DFBB524E1FA0D00ED3AE6 /* UploadAPI */;
@@ -3680,6 +4507,317 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		660B35212A31132000E18542 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 660B353E2A31141A00E18542 /* Apollo-Target-CodegenInternalTestHelpers.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1.2.1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = "$(CLANG_MODULES_ENABLE_VERIFIER_TOOL)";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "@rpath";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.5;
+				MARKETING_VERSION = "";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "";
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.apollographql.ApolloCodegenInternalTestHelpers;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		660B35222A31132000E18542 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 660B353E2A31141A00E18542 /* Apollo-Target-CodegenInternalTestHelpers.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = YES;
+				CURRENT_PROJECT_VERSION = 1.2.1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = "$(CLANG_MODULES_ENABLE_VERIFIER_TOOL)";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "@rpath";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.5;
+				MARKETING_VERSION = "";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.apollographql.ApolloCodegenInternalTestHelpers;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		660B35232A31132000E18542 /* PerformanceTesting */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 660B353E2A31141A00E18542 /* Apollo-Target-CodegenInternalTestHelpers.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1.2.1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = "$(CLANG_MODULES_ENABLE_VERIFIER_TOOL)";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "@rpath";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.5;
+				MARKETING_VERSION = "";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.apollographql.ApolloCodegenInternalTestHelpers;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = PerformanceTesting;
+		};
+		660B352D2A31134000E18542 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 660B353D2A31141900E18542 /* Apollo-Target-CodegenTests.xcconfig */;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		660B352E2A31134000E18542 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 660B353D2A31141900E18542 /* Apollo-Target-CodegenTests.xcconfig */;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		660B352F2A31134000E18542 /* PerformanceTesting */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 660B353D2A31141900E18542 /* Apollo-Target-CodegenTests.xcconfig */;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
+				SWIFT_VERSION = 5.0;
+			};
+			name = PerformanceTesting;
+		};
+		660B35392A31134E00E18542 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 660B353C2A31141900E18542 /* Apollo-Target-CodegenCLITests.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		660B353A2A31134E00E18542 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 660B353C2A31141900E18542 /* Apollo-Target-CodegenCLITests.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		660B353B2A31134E00E18542 /* PerformanceTesting */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 660B353C2A31141900E18542 /* Apollo-Target-CodegenCLITests.xcconfig */;
+			buildSettings = {
+			};
+			name = PerformanceTesting;
+		};
 		9B2DFBBB24E1FA0D00ED3AE6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9B2DFBC824E1FA7E00ED3AE6 /* Apollo-Target-UploadAPI.xcconfig */;
@@ -3893,6 +5031,36 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		660B35202A31132000E18542 /* Build configuration list for PBXNativeTarget "ApolloCodegenInternalTestHelpers" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				660B35212A31132000E18542 /* Debug */,
+				660B35222A31132000E18542 /* Release */,
+				660B35232A31132000E18542 /* PerformanceTesting */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		660B352C2A31134000E18542 /* Build configuration list for PBXNativeTarget "ApolloCodegenTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				660B352D2A31134000E18542 /* Debug */,
+				660B352E2A31134000E18542 /* Release */,
+				660B352F2A31134000E18542 /* PerformanceTesting */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		660B35382A31134E00E18542 /* Build configuration list for PBXNativeTarget "CodegenCLITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				660B35392A31134E00E18542 /* Debug */,
+				660B353A2A31134E00E18542 /* Release */,
+				660B353B2A31134E00E18542 /* PerformanceTesting */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9B2DFBBE24E1FA0D00ED3AE6 /* Build configuration list for PBXNativeTarget "UploadAPI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -4082,6 +5250,32 @@
 		660B35152A310B5500E18542 /* Apollo */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Apollo;
+		};
+		660B35402A31151000E18542 /* ApolloCodegenLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ApolloCodegenLib;
+		};
+		66F3A05A2A31210D00141EB3 /* ApolloCodegenLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ApolloCodegenLib;
+		};
+		66F3A05C2A31210D00141EB3 /* Nimble */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DE5EB9C326EFD4D10004176A /* XCRemoteSwiftPackageReference "Nimble" */;
+			productName = Nimble;
+		};
+		66F3A10B2A32547400141EB3 /* Apollo */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Apollo;
+		};
+		66F3A10D2A32547400141EB3 /* Nimble */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DE5EB9C326EFD4D10004176A /* XCRemoteSwiftPackageReference "Nimble" */;
+			productName = Nimble;
+		};
+		66F3A1102A3254C100141EB3 /* CodegenCLI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CodegenCLI;
 		};
 		DE5EB9C426EFD4D10004176A /* Nimble */ = {
 			isa = XCSwiftPackageProductDependency;

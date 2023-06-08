@@ -13,10 +13,9 @@
   },
   "testTargets" : [
     {
-      "parallelizable" : true,
       "target" : {
-        "containerPath" : "container:Apollo.xcodeproj",
-        "identifier" : "E6DC0ABD28B3AB890064A68F",
+        "containerPath" : "container:ApolloDev.xcodeproj",
+        "identifier" : "660B35332A31134D00E18542",
         "name" : "CodegenCLITests"
       }
     }
