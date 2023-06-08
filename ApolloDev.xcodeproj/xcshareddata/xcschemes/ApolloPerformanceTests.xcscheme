@@ -66,8 +66,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9F54C8B3255D760B0065AFD6"
+            BuildableName = "ApolloPerformanceTests.xctest"
             BlueprintName = "ApolloPerformanceTests"
-            ReferencedContainer = "container:Apollo.xcodeproj">
+            ReferencedContainer = "container:ApolloDev.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

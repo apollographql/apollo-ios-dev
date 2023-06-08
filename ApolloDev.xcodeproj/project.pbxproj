@@ -9,13 +9,11 @@
 /* Begin PBXBuildFile section */
 		19E9F6AC26D58A9A003AB80E /* OperationMessageIdCreatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E9F6AA26D58A92003AB80E /* OperationMessageIdCreatorTests.swift */; };
 		2EE7FFD0276802E30035DC39 /* CacheKeyConstructionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE7FFCF276802E30035DC39 /* CacheKeyConstructionTests.swift */; };
-		5BB2C0232380836100774170 /* VersionNumberTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB2C0222380836100774170 /* VersionNumberTests.swift */; };
 		660B34FA2A3102FA00E18542 /* ApolloAPI in Frameworks */ = {isa = PBXBuildFile; productRef = 660B34F92A3102FA00E18542 /* ApolloAPI */; };
 		660B34FC2A31032700E18542 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 660B34FB2A31032700E18542 /* Apollo */; };
 		660B34FE2A3103CB00E18542 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 660B34FD2A3103CB00E18542 /* Apollo */; };
 		660B35002A31045600E18542 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 660B34FF2A31045600E18542 /* Apollo */; };
 		660B35022A31049100E18542 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 660B35012A31049100E18542 /* Apollo */; };
-		660B35042A31054200E18542 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 660B35032A31054200E18542 /* Apollo */; };
 		660B35082A31054200E18542 /* ApolloWebSocket in Frameworks */ = {isa = PBXBuildFile; productRef = 660B35072A31054200E18542 /* ApolloWebSocket */; };
 		660B350A2A31056700E18542 /* ApolloSQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 660B35092A31056700E18542 /* ApolloSQLite */; };
 		660B350C2A3105AA00E18542 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 660B350B2A3105AA00E18542 /* Apollo */; };
@@ -136,6 +134,7 @@
 		66F3A1932A32599100141EB3 /* SelectionSetTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE296536279B3B8200BF9B49 /* SelectionSetTemplateTests.swift */; };
 		66F3A1942A32599100141EB3 /* SelectionSetTemplate_Initializers_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1696D3298C51CF00345E1A /* SelectionSetTemplate_Initializers_Tests.swift */; };
 		66F3A1952A32599100141EB3 /* SelectionSetTemplate_LocalCacheMutation_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE71FDC32853D681005FA9CC /* SelectionSetTemplate_LocalCacheMutation_Tests.swift */; };
+		66F3A19F2A3262EB00141EB3 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 66F3A19E2A3262EB00141EB3 /* Apollo */; };
 		96F32D3B27CCD16B00F3383C /* animalkingdom-graphql in Resources */ = {isa = PBXBuildFile; fileRef = 96F32D3A27CCD16B00F3383C /* animalkingdom-graphql */; };
 		9B21FD752422C29D00998B5C /* GraphQLFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B21FD742422C29D00998B5C /* GraphQLFileTests.swift */; };
 		9B2B66F42513FAFE00B53ABF /* CancellationHandlingInterceptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B2B66F32513FAFE00B53ABF /* CancellationHandlingInterceptor.swift */; };
@@ -152,7 +151,6 @@
 		9BCF0CE323FC9CA50031D2A2 /* XCTAssertHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCF0CDC23FC9CA50031D2A2 /* XCTAssertHelpers.swift */; };
 		9BCF0CE423FC9CA50031D2A2 /* MockURLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCF0CDD23FC9CA50031D2A2 /* MockURLSession.swift */; };
 		9BCF0CE523FC9CA50031D2A2 /* MockNetworkTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCF0CDF23FC9CA50031D2A2 /* MockNetworkTransport.swift */; };
-		9BCF0CE623FC9D7B0031D2A2 /* ApolloInternalTestHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BCF0CDA23FC9CA50031D2A2 /* ApolloInternalTestHelpers.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9BEEDC2B24E61995001D1294 /* TestURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BEEDC2A24E61995001D1294 /* TestURLs.swift */; };
 		9BF6C94325194DE2000D5B93 /* MultipartFormData+Testing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF6C91725194D7B000D5B93 /* MultipartFormData+Testing.swift */; };
 		9BF6C97025194ED7000D5B93 /* MultipartFormDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF6C95225194EA5000D5B93 /* MultipartFormDataTests.swift */; };
@@ -616,14 +614,14 @@
 			remoteGlobalIDString = 660B351B2A31131F00E18542;
 			remoteInfo = ApolloCodegenInternalTestHelpers;
 		};
-		66F3A0622A31211800141EB3 /* PBXContainerItemProxy */ = {
+		66F3A1092A32545900141EB3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9FC7503B1D2A532C00458D91 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 9F8A95771EC0FC1200304A2D;
 			remoteInfo = ApolloInternalTestHelpers;
 		};
-		66F3A1092A32545900141EB3 /* PBXContainerItemProxy */ = {
+		66F3A1982A3262D300141EB3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9FC7503B1D2A532C00458D91 /* Project object */;
 			proxyType = 1;
@@ -705,7 +703,6 @@
 /* Begin PBXFileReference section */
 		19E9F6AA26D58A92003AB80E /* OperationMessageIdCreatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationMessageIdCreatorTests.swift; sourceTree = "<group>"; };
 		2EE7FFCF276802E30035DC39 /* CacheKeyConstructionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheKeyConstructionTests.swift; sourceTree = "<group>"; };
-		5BB2C0222380836100774170 /* VersionNumberTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionNumberTests.swift; sourceTree = "<group>"; };
 		660B351C2A31131F00E18542 /* ApolloCodegenInternalTestHelpers.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ApolloCodegenInternalTestHelpers.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		660B35282A31134000E18542 /* ApolloCodegenTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ApolloCodegenTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		660B35342A31134E00E18542 /* CodegenCLITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodegenCLITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -770,7 +767,6 @@
 		9BC139A524EDCAD900876D29 /* BlindRetryingTestInterceptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlindRetryingTestInterceptor.swift; sourceTree = "<group>"; };
 		9BC139A724EDCE4F00876D29 /* RetryToCountThenSucceedInterceptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RetryToCountThenSucceedInterceptor.swift; sourceTree = "<group>"; };
 		9BCF0CD923FC9CA50031D2A2 /* TestCacheProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestCacheProvider.swift; sourceTree = "<group>"; };
-		9BCF0CDA23FC9CA50031D2A2 /* ApolloInternalTestHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApolloInternalTestHelpers.h; sourceTree = "<group>"; };
 		9BCF0CDC23FC9CA50031D2A2 /* XCTAssertHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XCTAssertHelpers.swift; sourceTree = "<group>"; };
 		9BCF0CDD23FC9CA50031D2A2 /* MockURLSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockURLSession.swift; sourceTree = "<group>"; };
 		9BCF0CDE23FC9CA50031D2A2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1247,7 +1243,6 @@
 		DEC2EA89291D5E2E0088D3BB /* TestIsolatedFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestIsolatedFileManager.swift; sourceTree = "<group>"; };
 		DEC2EA8C291D9C960088D3BB /* Workspace-Test-Deployment-Targets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Workspace-Test-Deployment-Targets.xcconfig"; sourceTree = "<group>"; };
 		DECD46CF262F64D000924527 /* StarWarsApolloSchemaDownloaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarWarsApolloSchemaDownloaderTests.swift; sourceTree = "<group>"; };
-		DECD490D262F81BF00924527 /* ApolloCodegenInternalTestHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ApolloCodegenInternalTestHelpers.h; sourceTree = "<group>"; };
 		DECD490E262F81BF00924527 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DECD4930262F824B00924527 /* Workspace-Target-TestHelpers.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Workspace-Target-TestHelpers.xcconfig"; sourceTree = "<group>"; };
 		DECFEFE3286A3C8800DBE83C /* starwars-graphql */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "starwars-graphql"; sourceTree = "<group>"; };
@@ -1406,8 +1401,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				660B35042A31054200E18542 /* Apollo in Frameworks */,
 				660B35082A31054200E18542 /* ApolloWebSocket in Frameworks */,
+				66F3A19F2A3262EB00141EB3 /* Apollo in Frameworks */,
 				660B350A2A31056700E18542 /* ApolloSQLite in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1641,7 +1636,6 @@
 		9BCF0CD823FC9CA50031D2A2 /* ApolloInternalTestHelpers */ = {
 			isa = PBXGroup;
 			children = (
-				9BCF0CDA23FC9CA50031D2A2 /* ApolloInternalTestHelpers.h */,
 				9BCF0CDE23FC9CA50031D2A2 /* Info.plist */,
 				9BE071AE2368D34D00FA5952 /* Matchable.swift */,
 				66B18E8E2A16BF9B00525DFB /* MockURLProtocol.swift */,
@@ -1794,7 +1788,6 @@
 				9B96500824BE6201003C29C0 /* RequestChainTests.swift */,
 				E61DD76426D60C1800C41614 /* SQLiteDotSwiftDatabaseBehaviorTests.swift */,
 				9B9BBB1A24DB75E60021C30F /* UploadRequestTests.swift */,
-				5BB2C0222380836100774170 /* VersionNumberTests.swift */,
 				E6057F8A287D7E24007D84EC /* ResponsePathTests.swift */,
 				DE2FCF4826E94D150057EA67 /* TestMockTests.swift */,
 				DE5EB9C626EFE0F80004176A /* JSONValueMatcher.swift */,
@@ -2706,7 +2699,6 @@
 		DECD490C262F81BF00924527 /* ApolloCodegenInternalTestHelpers */ = {
 			isa = PBXGroup;
 			children = (
-				DECD490D262F81BF00924527 /* ApolloCodegenInternalTestHelpers.h */,
 				9BAEEC11234BBA9200808306 /* CodegenTestHelper.swift */,
 				DE363CB227640FBA001EC05B /* GraphQLJSFrontend+TestHelpers.swift */,
 				E6D79AB926EC05290094434A /* MockNetworkSession.swift */,
@@ -2903,7 +2895,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9BCF0CE623FC9D7B0031D2A2 /* ApolloInternalTestHelpers.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2971,8 +2962,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				66F3A1992A3262D300141EB3 /* PBXTargetDependency */,
 				66F3A0612A31211800141EB3 /* PBXTargetDependency */,
-				66F3A0632A31211800141EB3 /* PBXTargetDependency */,
 			);
 			name = ApolloCodegenTests;
 			packageProductDependencies = (
@@ -3068,9 +3059,9 @@
 			);
 			name = ApolloInternalTestHelpers;
 			packageProductDependencies = (
-				660B35032A31054200E18542 /* Apollo */,
 				660B35072A31054200E18542 /* ApolloWebSocket */,
 				660B35092A31056700E18542 /* ApolloSQLite */,
+				66F3A19E2A3262EB00141EB3 /* Apollo */,
 			);
 			productName = ApolloTestSupport;
 			productReference = 9F8A95781EC0FC1200304A2D /* ApolloInternalTestHelpers.framework */;
@@ -3816,7 +3807,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				DE5144B12A04703F00D991E9 /* NetworkResponseExecutionSource_OpaqueObjectDataWrapper_Tests.swift in Sources */,
-				5BB2C0232380836100774170 /* VersionNumberTests.swift in Sources */,
 				DED45EC3261BA0ED0086EF63 /* WebSocketTransportTests.swift in Sources */,
 				DE8F7B7129FC24A8005F3902 /* SelectionSetModelExecutionSource_OpaqueObjectDataWrapper_Tests.swift in Sources */,
 				DE299E962A0D7916000F71D2 /* SelectionField_CacheKeyForFieldTests.swift in Sources */,
@@ -4044,15 +4034,15 @@
 			target = 660B351B2A31131F00E18542 /* ApolloCodegenInternalTestHelpers */;
 			targetProxy = 66F3A0602A31211800141EB3 /* PBXContainerItemProxy */;
 		};
-		66F3A0632A31211800141EB3 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 9F8A95771EC0FC1200304A2D /* ApolloInternalTestHelpers */;
-			targetProxy = 66F3A0622A31211800141EB3 /* PBXContainerItemProxy */;
-		};
 		66F3A10A2A32545900141EB3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9F8A95771EC0FC1200304A2D /* ApolloInternalTestHelpers */;
 			targetProxy = 66F3A1092A32545900141EB3 /* PBXContainerItemProxy */;
+		};
+		66F3A1992A3262D300141EB3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9F8A95771EC0FC1200304A2D /* ApolloInternalTestHelpers */;
+			targetProxy = 66F3A1982A3262D300141EB3 /* PBXContainerItemProxy */;
 		};
 		9B2DFBCC24E201A000ED3AE6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -4196,6 +4186,7 @@
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -4281,6 +4272,7 @@
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -4366,6 +4358,7 @@
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -4408,6 +4401,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 660B353C2A31141900E18542 /* Apollo-Target-CodegenCLITests.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Debug;
 		};
@@ -4415,6 +4409,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 660B353C2A31141900E18542 /* Apollo-Target-CodegenCLITests.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Release;
 		};
@@ -4422,6 +4417,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 660B353C2A31141900E18542 /* Apollo-Target-CodegenCLITests.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = PerformanceTesting;
 		};
@@ -4429,6 +4425,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9B2DFBC824E1FA7E00ED3AE6 /* Apollo-Target-UploadAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Debug;
 		};
@@ -4436,6 +4433,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9B2DFBC824E1FA7E00ED3AE6 /* Apollo-Target-UploadAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Release;
 		};
@@ -4443,6 +4441,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9B2DFBC824E1FA7E00ED3AE6 /* Apollo-Target-UploadAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = PerformanceTesting;
 		};
@@ -4450,6 +4449,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D2422433C8000FC2E54 /* Apollo-Target-PerformanceTests.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Debug;
 		};
@@ -4457,6 +4457,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D2422433C8000FC2E54 /* Apollo-Target-PerformanceTests.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Release;
 		};
@@ -4464,6 +4465,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D2422433C8000FC2E54 /* Apollo-Target-PerformanceTests.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = PerformanceTesting;
 		};
@@ -4471,6 +4473,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D2522433CAF00FC2E54 /* Apollo-Target-InternalTestHelpers.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
 			};
 			name = Debug;
 		};
@@ -4478,6 +4482,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D2522433CAF00FC2E54 /* Apollo-Target-InternalTestHelpers.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
 			};
 			name = Release;
 		};
@@ -4485,6 +4491,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D2522433CAF00FC2E54 /* Apollo-Target-InternalTestHelpers.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
 			};
 			name = PerformanceTesting;
 		};
@@ -4492,6 +4500,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D2222433C2800FC2E54 /* Apollo-Target-GitHubAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Debug;
 		};
@@ -4499,6 +4508,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D2222433C2800FC2E54 /* Apollo-Target-GitHubAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Release;
 		};
@@ -4506,6 +4516,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D2222433C2800FC2E54 /* Apollo-Target-GitHubAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = PerformanceTesting;
 		};
@@ -4527,6 +4538,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D0B2243345500FC2E54 /* Apollo-Target-Tests.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Debug;
 		};
@@ -4534,6 +4546,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D0B2243345500FC2E54 /* Apollo-Target-Tests.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Release;
 		};
@@ -4541,6 +4554,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D2122433C1900FC2E54 /* Apollo-Target-StarWarsAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Debug;
 		};
@@ -4548,6 +4562,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D2122433C1900FC2E54 /* Apollo-Target-StarWarsAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Release;
 		};
@@ -4562,6 +4577,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D0B2243345500FC2E54 /* Apollo-Target-Tests.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = PerformanceTesting;
 		};
@@ -4569,6 +4585,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90690D2122433C1900FC2E54 /* Apollo-Target-StarWarsAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = PerformanceTesting;
 		};
@@ -4576,6 +4593,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DEA34AF6260E821F00F95F86 /* Apollo-Target-AnimalKingdomAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Debug;
 		};
@@ -4583,6 +4601,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DEA34AF6260E821F00F95F86 /* Apollo-Target-AnimalKingdomAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Release;
 		};
@@ -4590,6 +4609,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DEA34AF6260E821F00F95F86 /* Apollo-Target-AnimalKingdomAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = PerformanceTesting;
 		};
@@ -4597,6 +4617,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DE6B15E826152CD80068D642 /* Apollo-Target-ServerIntegrationTests.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Debug;
 		};
@@ -4604,6 +4625,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DE6B15E826152CD80068D642 /* Apollo-Target-ServerIntegrationTests.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Release;
 		};
@@ -4611,6 +4633,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DE6B15E826152CD80068D642 /* Apollo-Target-ServerIntegrationTests.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = PerformanceTesting;
 		};
@@ -4618,6 +4641,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E6180AA928093F76004EC2A3 /* Apollo-Target-SubscriptionAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Debug;
 		};
@@ -4625,6 +4649,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E6180AA928093F76004EC2A3 /* Apollo-Target-SubscriptionAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = Release;
 		};
@@ -4632,6 +4657,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E6180AA928093F76004EC2A3 /* Apollo-Target-SubscriptionAPI.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.2.1;
 			};
 			name = PerformanceTesting;
 		};
@@ -4834,10 +4860,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = Apollo;
 		};
-		660B35032A31054200E18542 /* Apollo */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Apollo;
-		};
 		660B35072A31054200E18542 /* ApolloWebSocket */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ApolloWebSocket;
@@ -4893,6 +4915,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DEAFB784270652AF00BE02F3 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = OrderedCollections;
+		};
+		66F3A19E2A3262EB00141EB3 /* Apollo */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Apollo;
 		};
 		DE5EB9C426EFD4D10004176A /* Nimble */ = {
 			isa = XCSwiftPackageProductDependency;
