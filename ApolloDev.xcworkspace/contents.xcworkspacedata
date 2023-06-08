@@ -8,6 +8,6 @@
       location = "group:apollo-ios-codegen">
    </FileRef>
    <FileRef
-      location = "group:ApolloDev/ApolloDev.xcodeproj">
+      location = "group:ApolloDev.xcodeproj">
    </FileRef>
 </Workspace>
