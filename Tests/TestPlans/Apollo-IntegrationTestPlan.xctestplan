@@ -15,6 +15,7 @@
   },
   "testTargets" : [
     {
+      "parallelizable" : true,
       "target" : {
         "containerPath" : "container:ApolloDev.xcodeproj",
         "identifier" : "DE6B15AB26152BE10068D642",
