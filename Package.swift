@@ -35,9 +35,9 @@ let package = Package(
         .product(name: "OrderedCollections", package: "swift-collections")
       ],
       exclude: [
-        "Info.plist",
         "Frontend/JavaScript",
-      ]),
+      ]
+    ),
     .executableTarget(
       name: "apollo-ios-cli",
       dependencies: [
@@ -45,15 +45,14 @@ let package = Package(
       ],
       exclude: [
         "README.md",
-      ]),
+      ]
+    ),
     .target(
       name: "CodegenCLI",
       dependencies: [
         "ApolloCodegenLib",
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
-      ],
-      exclude: [
-        "Info.plist",
-      ]),
+      ]
+    ),
   ]
 )
