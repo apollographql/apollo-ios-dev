@@ -1,5 +1,5 @@
 import Foundation
-@_spi(Tests) import ApolloWebSocket
+@_spi(Testable) import ApolloWebSocket
 
 public class MockWebSocket: WebSocketClient {
   
