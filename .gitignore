@@ -20,6 +20,7 @@ xcuserdata/
 *.xccheckout
 *.xcscmblueprint
 .DS_Store
+*.tar.gz
 
 ## Obj-C/Swift specific
 *.hmap
