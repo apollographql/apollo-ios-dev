@@ -23,7 +23,7 @@ CodeGenConfigsDirectory="./Tests/TestCodeGenConfigurations"
 for dir in `ls $CodeGenConfigsDirectory`;
 do
   echo "-- Generating code for project: $dir --"
-  swift run apollo-ios-cli generate -p $CodeGenConfigsDirectory/$dir/apollo-codegen-config.json
+  (cd apollo-ios-codegen && swift run apollo-ios-cli generate -p ../$CodeGenConfigsDirectory/$dir/apollo-codegen-config.json)
 
   if [ "$test_projects" = true ]
   then
