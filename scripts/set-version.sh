@@ -13,14 +13,14 @@ NEW_VERSION="$1"
      exit 1
  fi
 
-echo "$VERSION_CONFIG_VAR = $NEW_VERSION" > $VERSION_CONFIG_FILE
+echo "$VERSION_CONFIG_VAR = $NEW_VERSION" > $(dirname "$0")/../$VERSION_CONFIG_FILE
 
 # Set CLI version constant
 
 MATCH_TEXT='CLIVersion: String = "'
 SEARCH_TEXT="$MATCH_TEXT$CURRENT_VERSION"
 REPLACE_TEXT="$MATCH_TEXT$NEW_VERSION"
-sed -i '' -e "s/$SEARCH_TEXT/$REPLACE_TEXT/" $CLI_CONSTANTS_FILE
+sed -i '' -e "s/$SEARCH_TEXT/$REPLACE_TEXT/" $(dirname "$0")/../$CLI_CONSTANTS_FILE
 
 # Feedback
 echo "Committing change from version $CURRENT_VERSION to $NEW_VERSION"
