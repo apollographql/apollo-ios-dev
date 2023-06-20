@@ -3,7 +3,7 @@ import Nimble
 import ApolloInternalTestHelpers
 @testable import CodegenCLI
 import ArgumentParser
-import Apollo
+@testable import Apollo
 
 class VerifyCLIVersionUpdateTest: XCTestCase {
   /// This test verifies that the `Constants/CLIVersion` is updated when the version of Apollo
@@ -11,7 +11,7 @@ class VerifyCLIVersionUpdateTest: XCTestCase {
   /// This version number uses the project configurations `CURRENT_PROJECT_VERSION`.
   func test__cliVersion__matchesApolloProjectVersion() {
     // given
-    let codegenLibVersion = ApolloLibraryVersion
+    let codegenLibVersion = Apollo.Constants.ApolloVersion
 
     // when
     let cliVersion = CodegenCLI.Constants.CLIVersion
