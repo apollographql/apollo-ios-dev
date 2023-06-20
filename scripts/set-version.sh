@@ -1,10 +1,13 @@
 #!/bin/bash
 
-CURRENT_VERSION=$($(dirname "$0")/get-version.sh)
+directory=$(dirname "$0")
+apolloDirectory="$directory/../apollo-ios"
+codegenDirectory="$directory/../apollo-ios-codegen"
 
-# Set configuration file version constant
+# Validate input version number
 
-source "$(dirname "$0")/version-constants.sh"
+source "$apolloDirectory/scripts/version-constants.sh"
+source "$codegenDirectory/scripts/version-constants.sh"
 
 NEW_VERSION="$1"
 
@@ -13,14 +16,21 @@ NEW_VERSION="$1"
      exit 1
  fi
 
-echo "$VERSION_CONFIG_VAR = $NEW_VERSION" > $(dirname "$0")/../$VERSION_CONFIG_FILE
+# Set Apollo version constant
+
+CURRENT_APOLLO_VERSION=$($apolloDirectory/scripts/get-version.sh)
+MATCH_TEXT='ApolloVersion: String = "'
+SEARCH_TEXT="$MATCH_TEXT$CURRENT_APOLLO_VERSION"
+REPLACE_TEXT="$MATCH_TEXT$NEW_VERSION"
+sed -i '' -e "s/$SEARCH_TEXT/$REPLACE_TEXT/" $apolloDirectory/$APOLLO_CONSTANTS_FILE
 
 # Set CLI version constant
 
+CURRENT_CODEGEN_VERSION=$($codegenDirectory/scripts/get-version.sh)
 MATCH_TEXT='CLIVersion: String = "'
-SEARCH_TEXT="$MATCH_TEXT$CURRENT_VERSION"
+SEARCH_TEXT="$MATCH_TEXT$CURRENT_CODEGEN_VERSION"
 REPLACE_TEXT="$MATCH_TEXT$NEW_VERSION"
-sed -i '' -e "s/$SEARCH_TEXT/$REPLACE_TEXT/" $(dirname "$0")/../$CLI_CONSTANTS_FILE
+sed -i '' -e "s/$SEARCH_TEXT/$REPLACE_TEXT/" $codegenDirectory/$CLI_CONSTANTS_FILE
 
 # Feedback
 echo "Committing change from version $CURRENT_VERSION to $NEW_VERSION"
