@@ -1,5 +1,4 @@
 @testable import ApolloCodegenLib
-import Foundation
 
 public final class MockNetworkSession: NetworkSession {
   let statusCode: Int

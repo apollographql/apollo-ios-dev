@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-import Apollo
+@testable import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
 import AnimalKingdomAPI

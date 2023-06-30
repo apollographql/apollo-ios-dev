@@ -1,13 +1,12 @@
 import Apollo
-import Foundation
 
 /// Use this interceptor tester to isolate a single `ApolloInterceptor` vs. having to create an
 /// `InterceptorRequestChain` and end the interceptor list with `JSONResponseParsingInterceptor`
 /// to get a parsed `GraphQLResult` for the standard request chain callback.
 public class InterceptorTester {
-  let interceptor: ApolloInterceptor
+  let interceptor: any ApolloInterceptor
 
-  public init(interceptor: ApolloInterceptor) {
+  public init(interceptor: any ApolloInterceptor) {
     self.interceptor = interceptor
   }
 
@@ -44,6 +43,15 @@ fileprivate class ResponseCaptureRequestChain: RequestChain {
     request: Apollo.HTTPRequest<Operation>,
     response: Apollo.HTTPResponse<Operation>?,
     completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, Error>) -> Void
+  ) {
+    self.completion(.success(response?.rawData))
+  }
+
+  func proceedAsync<Operation>(
+    request: HTTPRequest<Operation>,
+    response: HTTPResponse<Operation>?,
+    interceptor: any ApolloInterceptor,
+    completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
   ) {
     self.completion(.success(response?.rawData))
   }

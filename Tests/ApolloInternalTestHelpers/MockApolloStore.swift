@@ -1,5 +1,5 @@
-import Apollo
-import ApolloAPI
+@testable import Apollo
+@testable import ApolloAPI
 
 extension ApolloStore {
 

@@ -1,5 +1,5 @@
 import XCTest
-import Apollo
+@testable import Apollo
 
 public func XCTAssertEqual<T, U>(_ expression1: @autoclosure () throws -> [T : U]?, _ expression2: @autoclosure () throws -> [T : U]?, file: StaticString = #filePath, line: UInt = #line) rethrows {
   let optionalValue1 = try expression1()

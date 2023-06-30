@@ -1,5 +1,5 @@
 import Foundation
-@_spi(Testable) import ApolloWebSocket
+@testable import ApolloWebSocket
 
 public class MockWebSocket: WebSocketClient {
   
@@ -34,4 +34,8 @@ public class MockWebSocket: WebSocketClient {
   
   public func connect() {
   }
+}
+
+public class ProxyableMockWebSocket: MockWebSocket, SOCKSProxyable {
+  public var enableSOCKSProxy: Bool = false
 }

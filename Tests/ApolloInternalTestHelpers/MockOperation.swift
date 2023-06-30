@@ -1,4 +1,4 @@
-import ApolloAPI
+@testable import ApolloAPI
 
 open class MockOperation<SelectionSet: RootSelectionSet>: GraphQLOperation {
   public typealias Data = SelectionSet
@@ -7,8 +7,8 @@ open class MockOperation<SelectionSet: RootSelectionSet>: GraphQLOperation {
 
   open class var operationName: String { "MockOperationName" }
 
-  open class var document: DocumentType {
-    .notPersisted(definition: .init("Mock Operation Definition"))
+  open class var operationDocument: OperationDocument {
+    .init(definition: .init("Mock Operation Definition"))
   }
 
   open var __variables: Variables?

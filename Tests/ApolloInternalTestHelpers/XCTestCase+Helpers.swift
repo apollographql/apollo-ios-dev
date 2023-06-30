@@ -40,8 +40,8 @@ public extension XCTestCase {
   }
 }
 
-import Apollo
-import ApolloAPI
+@testable import Apollo
+@testable import ApolloAPI
 
 public extension XCTestCase {
   /// Make  an `AsyncResultObserver` for receiving results of the specified GraphQL operation.

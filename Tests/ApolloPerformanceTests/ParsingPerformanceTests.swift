@@ -1,5 +1,5 @@
 import XCTest
-import Apollo
+@testable import Apollo
 import ApolloInternalTestHelpers
 import GitHubAPI
 
