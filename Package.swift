@@ -36,6 +36,7 @@ let package = Package(
       ],
       exclude: [
         "Frontend/JavaScript",
+        "Frontend/auto_rollup.sh",
       ]
     ),
     .executableTarget(

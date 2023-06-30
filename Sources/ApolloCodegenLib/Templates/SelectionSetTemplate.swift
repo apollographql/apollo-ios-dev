@@ -84,7 +84,7 @@ struct SelectionSetTemplate {
           pluralizer: config.pluralizer))
     \(if: config.options.schemaDocumentation == .include, """
       ///
-      /// Parent Type: `\(selectionSet.parentType.name.firstUppercased)`
+      /// Parent Type: `\(selectionSet.parentType.formattedName)`
       """)
     """
   }
@@ -162,7 +162,7 @@ struct SelectionSetTemplate {
   }
 
   private func GeneratedSchemaTypeReference(_ type: GraphQLCompositeType) -> TemplateString {
-    "\(config.schemaNamespace.firstUppercased).\(type.schemaTypesNamespace).\(type.name.firstUppercased)"
+    "\(config.schemaNamespace.firstUppercased).\(type.schemaTypesNamespace).\(type.formattedName)"
   }
 
   // MARK: - Selections
@@ -285,7 +285,7 @@ struct SelectionSetTemplate {
 
   private func FragmentSelectionTemplate(_ fragment: IR.FragmentSpread) -> TemplateString {
     """
-    .fragment(\(fragment.definition.name.firstUppercased).self)
+    .fragment(\(fragment.definition.name.asFragmentName).self)
     """
   }
 
@@ -380,7 +380,7 @@ struct SelectionSetTemplate {
   ) -> TemplateString {
     let name = fragment.definition.name
     let propertyName = name.firstLowercased
-    let typeName = name.firstUppercased
+    let typeName = name.asFragmentName
     let isOptional = fragment.inclusionConditions != nil &&
     !scope.matches(fragment.inclusionConditions.unsafelyUnwrapped)
 
@@ -483,15 +483,15 @@ struct SelectionSetTemplate {
   private func InitializerFulfilledFragments(
     _ selectionSet: IR.SelectionSet
   ) -> TemplateString {
-    var fulfilledFragments: [String] = ["Self"]
+    var fulfilledFragments: OrderedSet<String> = []
 
-    var next = selectionSet.scopePath.last.value.scopePath.head
-    while next.next != nil {
-      defer { next = next.next.unsafelyUnwrapped }
+    var currentNode = Optional(selectionSet.scopePath.last.value.scopePath.head)
+    while let node = currentNode {
+      defer { currentNode = node.next }
 
       let selectionSetName = SelectionSetNameGenerator.generatedSelectionSetName(
         for: selectionSet,
-        to: next,
+        to: node,
         format: .fullyQualified,
         pluralizer: config.pluralizer
       )
@@ -499,13 +499,11 @@ struct SelectionSetTemplate {
       fulfilledFragments.append(selectionSetName)
     }
 
-    let allFragments = IteratorSequence(selectionSet.selections.makeFragmentIterator())
-    for fragment in allFragments {
-      if let conditions = fragment.inclusionConditions,
-         !selectionSet.typeInfo.scope.matches(conditions) {
-        continue
-      }
-      fulfilledFragments.append(fragment.definition.name.firstUppercased)
+    for source in selectionSet.selections.merged.mergedSources {
+      fulfilledFragments
+        .append(contentsOf: source.generatedSelectionSetNamesOfFullfilledFragments(
+          pluralizer: config.pluralizer
+        ))
     }
 
     return """
@@ -586,8 +584,8 @@ fileprivate class SelectionSetNameCache {
     } else {
       return selectionSet.selections.merged.mergedSources
         .first.unsafelyUnwrapped
-        .generatedSelectionSetName(
-          for: selectionSet.typeInfo,
+        .generatedSelectionSetNamePath(
+          from: selectionSet.typeInfo,
           pluralizer: config.pluralizer
         )
     }
@@ -623,8 +621,8 @@ fileprivate extension IR.SelectionSet {
 
 fileprivate extension IR.MergedSelections.MergedSource {
 
-  func generatedSelectionSetName(
-    for targetTypeInfo: IR.SelectionSet.TypeInfo,
+  func generatedSelectionSetNamePath(
+    from targetTypeInfo: IR.SelectionSet.TypeInfo,
     pluralizer: Pluralizer
   ) -> String {
     if let fragment = fragment {
@@ -649,14 +647,30 @@ fileprivate extension IR.MergedSelections.MergedSource {
       nodesToSharedRoot += 1
     }
 
+    let sharedRootIndex =
+      typeInfo.entity.location.fieldPath!.count - (nodesToSharedRoot + 1)
+
+    /// We should remove the first component if the shared root is the previous scope and that
+    /// scope is not the root of the entity.
+    ///
+    /// This is because the selection set will be a direct sibling of the current selection set.
+    ///
+    /// Example: The `height` field on `AllAnimals.AsPet` can reference the `AllAnimals.Height`
+    /// object as just `Height`.
+    ///
+    /// However, if the shared root is the root of the definition, the component that would be
+    /// removed is the location's `source`. This is not included in the field path and is already
+    /// omitted by this function. In this case, the `sharedRootIndex` is `-1`.
+    let removeFirstComponent = nodesToSharedRoot <= 1 && !(sharedRootIndex < 0)
+
     let fieldPath = typeInfo.entity.location.fieldPath!.node(
-      at: typeInfo.entity.location.fieldPath!.count - (nodesToSharedRoot + 1)
+      at: max(0, sharedRootIndex)
     )
 
     let selectionSetName = SelectionSetNameGenerator.generatedSelectionSetName(
       from: sourceTypePathCurrentNode,
       withFieldPath: fieldPath,
-      removingFirst: nodesToSharedRoot <= 1,
+      removingFirst: removeFirstComponent,
       pluralizer: pluralizer
     )
 
@@ -693,6 +707,34 @@ fileprivate extension IR.MergedSelections.MergedSource {
     return selectionSetNameComponents.joined(separator: ".")
   }
 
+  func generatedSelectionSetNamesOfFullfilledFragments(
+    pluralizer: Pluralizer
+  ) -> [String] {
+    let entityRootNameInFragment = SelectionSetNameGenerator
+      .generatedSelectionSetName(
+        for: self,
+        to: typeInfo.scopePath.last.value.scopePath.head,
+        format: .fullyQualified,
+        pluralizer: pluralizer
+      )
+
+    var fulfilledFragments: [String] = [entityRootNameInFragment]
+
+    var selectionSetNameComponents: [String] = [entityRootNameInFragment]
+
+    var mergedFragmentEntityConditionPathNode = typeInfo.scopePath.last.value.scopePath.head
+    while let node = mergedFragmentEntityConditionPathNode.next {
+      defer {
+        mergedFragmentEntityConditionPathNode = node
+      }
+      selectionSetNameComponents.append(
+        SelectionSetNameGenerator.ConditionPath.path(for: node)
+      )
+      fulfilledFragments.append(selectionSetNameComponents.joined(separator: "."))
+    }
+    return fulfilledFragments
+  }
+
 }
 
 fileprivate struct SelectionSetNameGenerator {
@@ -722,11 +764,13 @@ fileprivate struct SelectionSetNameGenerator {
 
   static func generatedSelectionSetName(
     for mergedSource: IR.MergedSelections.MergedSource,
+    to toNode: LinkedList<IR.ScopeCondition>.Node? = nil,
     format: Format,
     pluralizer: Pluralizer
   ) -> String {
     generatedSelectionSetName(
       for: mergedSource.typeInfo,
+      to: toNode,
       format: format,
       pluralizer: pluralizer
     )
@@ -838,7 +882,7 @@ fileprivate extension IR.ScopeCondition {
 
   var selectionSetNameComponent: String {
     return TemplateString("""
-    \(ifLet: type, { "As\($0.name.firstUppercased)" })\
+    \(ifLet: type, { "As\($0.formattedName)" })\
     \(ifLet: conditions, { "If\($0.typeNameComponents)"})
     """).description
   }
