@@ -10,7 +10,7 @@ extension Target {
             platform: .macOS,
             product: .framework,
             bundleId: "com.apollographql.\(target.name.lowercased())",
-            deploymentTarget: .macOSApollo,
+            deploymentTarget: target.deploymentTarget,
             infoPlist: .file(path: "Tests/\(target.name)/Info.plist"),
             sources: [
                 "Tests/\(target.name)/**",

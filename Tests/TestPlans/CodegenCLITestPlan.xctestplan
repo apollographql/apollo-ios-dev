@@ -15,8 +15,8 @@
     {
       "parallelizable" : true,
       "target" : {
-        "containerPath" : "container:ApolloDev.xcodeproj",
-        "identifier" : "660B35332A31134D00E18542",
+        "containerPath" : "container:ApolloDevTuist.xcodeproj",
+        "identifier" : "5FAC10925CAD7219557DCC50",
         "name" : "CodegenCLITests"
       }
     }

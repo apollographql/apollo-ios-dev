@@ -10,7 +10,7 @@ extension Target {
             platform: .macOS,
             product: .framework,
             bundleId: "com.apollographql.\(target.name.lowercased())",
-            deploymentTarget: .macOSApollo,
+            deploymentTarget: target.deploymentTarget,
             infoPlist: .file(path: "Sources/\(target.name)/Info.plist"),
             sources: [
                 "Sources/\(target.name)/\(target.name)/Sources/**",
@@ -18,7 +18,7 @@ extension Target {
             ],
             resources: ResourceFileElements(
                 resources: [
-                    .glob(pattern: "Sources/\(target.name)/animalkingdom-graphql/**")
+                    .folderReference(path: "Sources/\(target.name)/animalkingdom-graphql")
                 ]
             ),
             dependencies: [

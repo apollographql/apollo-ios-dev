@@ -20,8 +20,8 @@
         "StoreConcurrencyTests"
       ],
       "target" : {
-        "containerPath" : "container:ApolloDev.xcodeproj",
-        "identifier" : "9FC7504D1D2A532D00458D91",
+        "containerPath" : "container:ApolloDevTuist.xcodeproj",
+        "identifier" : "C1631B505700BB7E50329F81",
         "name" : "ApolloTests"
       }
     }

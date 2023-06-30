@@ -7,8 +7,6 @@ let project = Project(
     name: "ApolloDevTuist",
     organizationName: "apollographql",
     packages: [
-        .package(path: "./apollo-ios"),
-        .package(path: "./apollo-ios-codegen"),
         .package(url: "https://github.com/Quick/Nimble.git", from: "10.0.0")
     ],
     settings: Settings.settings(configurations: [
@@ -40,6 +38,9 @@ let project = Project(
         .codegenCLITests()
     ],
     additionalFiles: [
-        .glob(pattern: "Tests/TestPlans/**")
+        .glob(pattern: "Tests/TestPlans/**"),
+        .folderReference(path: "Sources/\(ApolloTarget.gitHubAPI.name)/graphql"),
+        .folderReference(path: "Sources/\(ApolloTarget.subscriptionAPI.name)/graphql"),
+        .folderReference(path: "Sources/\(ApolloTarget.uploadAPI.name)/graphql")
     ]
 )

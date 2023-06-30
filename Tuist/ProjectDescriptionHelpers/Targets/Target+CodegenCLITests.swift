@@ -10,10 +10,13 @@ extension Target {
             platform: .macOS,
             product: .unitTests,
             bundleId: "com.apollographql.\(target.name.lowercased())",
-            deploymentTarget: .macOSApollo,
+            deploymentTarget: target.deploymentTarget,
             infoPlist: .file(path: "Tests/\(target.name)/Info.plist"),
             sources: [
-                "Tests/\(target.name)/**",
+                "Tests/\(target.name)/*.swift",
+                "Tests/\(target.name)/Commands/**",
+                "Tests/\(target.name)/Matchers/**",
+                "Tests/\(target.name)/Support/**"
             ],
             dependencies: [
                 .target(name: ApolloTarget.apolloInternalTestHelpers.name),

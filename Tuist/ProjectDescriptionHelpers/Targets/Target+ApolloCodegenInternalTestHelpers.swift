@@ -10,15 +10,15 @@ extension Target {
             platform: .macOS,
             product: .framework,
             bundleId: "com.apollographql.\(target.name.lowercased())",
-            deploymentTarget: .macOSApollo,
+            deploymentTarget: target.deploymentTarget,
             infoPlist: .file(path: "Tests/\(target.name)/Info.plist"),
             sources: [
                 "Tests/\(target.name)/**",
             ],
             resources: ResourceFileElements(
                 resources: [
-                    .glob(pattern: "Sources/\(ApolloTarget.animalKingdomAPI.name)/animalkingdom-graphql/**"),
-                    .glob(pattern: "Sources/\(ApolloTarget.starWarsAPI.name)/starwars-graphql/**")
+                    .folderReference(path: "Sources/\(ApolloTarget.animalKingdomAPI.name)/animalkingdom-graphql"),
+                    .folderReference(path: "Sources/\(ApolloTarget.starWarsAPI.name)/starwars-graphql")
                 ]
             ),
             dependencies: [

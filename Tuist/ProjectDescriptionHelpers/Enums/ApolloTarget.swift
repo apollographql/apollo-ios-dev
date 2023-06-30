@@ -1,6 +1,7 @@
 import Foundation
+import ProjectDescription
 
-enum ApolloTarget {
+public enum ApolloTarget {
     case animalKingdomAPI
     case apolloCodegenInternalTestHelpers
     case apolloCodegenLibWrapper
@@ -16,7 +17,7 @@ enum ApolloTarget {
     case subscriptionAPI
     case uploadAPI
     
-    var name: String {
+    public var name: String {
         switch self {
         case .animalKingdomAPI:
             return "AnimalKingdomAPI"
@@ -49,7 +50,7 @@ enum ApolloTarget {
         }
     }
     
-    var xcconfigName: String {
+    public var xcconfigName: String {
         switch self {
         case .animalKingdomAPI:
             return "Apollo-Target-AnimalKingdomAPI"
@@ -80,5 +81,28 @@ enum ApolloTarget {
         case .uploadAPI:
             return "Apollo-Target-UploadAPI"
         }
+    }
+    
+    public var deploymentTarget: DeploymentTarget {
+        var version = "10.15"
+        switch self {
+        case .animalKingdomAPI,
+             .apolloCodegenLibWrapper,
+             .apolloWrapper,
+             .gitHubAPI,
+             .starWarsAPI,
+             .subscriptionAPI,
+             .uploadAPI:
+            version = "10.15"
+        case .apolloCodegenInternalTestHelpers,
+             .apolloCodegenTests,
+             .apolloInternalTestHelpers,
+             .apolloPerformanceTests,
+             .apolloServerIntegrationTests,
+             .apolloTests,
+             .codegenCLITests:
+            version = "12.5"
+        }
+        return .macOS(targetVersion: version)
     }
 }

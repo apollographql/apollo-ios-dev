@@ -14,8 +14,8 @@
   "testTargets" : [
     {
       "target" : {
-        "containerPath" : "container:ApolloDev.xcodeproj",
-        "identifier" : "9F54C8B3255D760B0065AFD6",
+        "containerPath" : "container:ApolloDevTuist.xcodeproj",
+        "identifier" : "C7B32D50C852A07C03AE35B0",
         "name" : "ApolloPerformanceTests"
       }
     }
