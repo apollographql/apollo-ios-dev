@@ -45,7 +45,9 @@ extension Scheme {
             ]),
             testAction: .testPlans([
                 ApolloTestPlan.performanceTest.path
-            ])
+            ],
+            configuration: .performanceTesting
+            )
         )
     }
     

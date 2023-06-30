@@ -17,8 +17,8 @@
     {
       "parallelizable" : true,
       "target" : {
-        "containerPath" : "container:ApolloDevTuist.xcodeproj",
-        "identifier" : "F551FD381211F84F7649B513",
+        "containerPath" : "container:ApolloDev.xcodeproj",
+        "identifier" : "C750F8D98AEA19949D4C5F6E",
         "name" : "ApolloServerIntegrationTests"
       }
     }

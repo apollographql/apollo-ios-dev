@@ -4,7 +4,7 @@ import ProjectDescriptionHelpers
 // MARK: - Project
 
 let project = Project(
-    name: "ApolloDevTuist",
+    name: "ApolloDev",
     organizationName: "apollographql",
     packages: [
         .package(url: "https://github.com/Quick/Nimble.git", from: "10.0.0")
