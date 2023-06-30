@@ -15,6 +15,10 @@ apollo-ios-cli
 !default.perspectivev3
 xcuserdata/
 
+# Xcode project and workspace files
+*.xcodeproj
+*.xcworkspace
+
 ## Other
 *.moved-aside
 *.xccheckout
