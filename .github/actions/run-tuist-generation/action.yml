@@ -1,0 +1,10 @@
+name: "Run Tuist Generation"
+description: Installs and run Tuist to generate Xcode projects
+runs:
+  using: "composite"
+  steps:
+    - name: Run Tuist
+      shell: bash
+      run: |
+        curl -Ls https://install.tuist.io | bash
+        tuist generate

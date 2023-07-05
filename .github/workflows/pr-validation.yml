@@ -1,0 +1,21 @@
+name: "PR CI Validation"
+
+on: push
+
+jobs:
+  test-macos:
+    name: Run CI Test plan on against macOS
+    runs-on: macos-latest
+    steps:
+    - name: Setup Repo
+      id: setup-repo
+      uses: ./.github/actions/setup-repo
+    - name: Run Tuist Generation
+      id: run-tuist-generation
+      uses: ./.github/actions/run-tuist-generation
+    - name: Run CI Test Plan
+      id: run-ci-test-plan
+      shell: bash
+      run: |
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
+        xcodebuild clean test -resultBundlePath ~/TestResults/ResultBundle.xcresult -workspace "ApolloDev.xcworkspace" -scheme "ApolloTests" -destination "platform=macOS,arch=x86_64" -testPlan "Apollo-CITestPlan" | xcbeautify
