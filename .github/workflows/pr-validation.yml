@@ -16,6 +16,7 @@ jobs:
       uses: tuist/tuist-action@0.13.0
       with:
           command: 'generate'
+          arguments: ''
     - name: Run CI Test Plan
       id: run-ci-test-plan
       shell: bash
