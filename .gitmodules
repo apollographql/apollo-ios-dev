@@ -1,6 +1,6 @@
 [submodule "apollo-ios-codegen"]
 	path = apollo-ios-codegen
-	url = ./apollo-ios-codegen
+	url = https://github.com/apollographql/apollo-ios-codegen
 [submodule "apollo-ios"]
 	path = apollo-ios
-	url = ./apollo-ios
+	url = https://github.com/apollographql/apollo-ios
