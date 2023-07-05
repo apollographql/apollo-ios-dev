@@ -13,8 +13,9 @@ jobs:
       id: setup-repo
       uses: ./.github/actions/setup-repo
     - name: Run Tuist Generation
-      id: run-tuist-generation
-      uses: ./.github/actions/run-tuist-generation
+      uses: tuist/tuist-action@0.13.0
+      with:
+          command: 'generate'
     - name: Run CI Test Plan
       id: run-ci-test-plan
       shell: bash
