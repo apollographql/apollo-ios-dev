@@ -10,29 +10,39 @@ env:
 on: push
 
 jobs:
-  setup:
-    name: Run CI Test plan on against macOS
-    runs-on: macos-latest
-    steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
-    - name: Run Tuist Generation
-      uses: tuist/tuist-action@0.13.0
-      with:
-          command: 'generate'
-          arguments: ''
-    - name: Cache Repo Setup
-      id: cache-repo
-      uses: actions/cache@v3
-      with:
-        path: ${{ github.workspace }}
-        key: apollo-ios-dev-${{ github.sha }}
+  # setup:
+  #   name: Run CI Test plan on against macOS
+  #   runs-on: macos-latest
+  #   steps:
+  #   - name: Checkout Repo
+  #     uses: actions/checkout@v3
+  #   - name: Setup Repo
+  #     id: setup-repo
+  #     uses: ./.github/actions/setup-repo
+  #   # Caching for apollo-ios SPM dependencies
+  #   - uses: actions/cache@v3
+  #     with:
+  #       path: apollo-ios/.build
+  #       key: ${{ runner.os }}-spm-${{ hashFiles('apollo-ios/Package.resolved') }}
+  #   # Caching for apollo-ios-codegen SPM dependencies
+  #   - uses: actions/cache@v3
+  #     with:
+  #       path: apollo-ios-codegen/.build
+  #       key: ${{ runner.os }}-spm-${{ hashFiles('apollo-ios-codegen/Package.resolved') }}
+  #   - name: Run Tuist Generation
+  #     uses: tuist/tuist-action@0.13.0
+  #     with:
+  #         command: 'generate'
+  #         arguments: ''
+  #   - name: Cache Repo Setup
+  #     id: cache-repo
+  #     uses: actions/cache@v3
+  #     with:
+  #       path: ${{ github.workspace }}
+  #       key: apollo-ios-dev-${{ github.sha }}
   
   build-and-test:
-    needs: setup
+    # needs: setup
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -43,19 +53,39 @@ jobs:
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
           # iOS_current
-          - destination: platform=iOS Simulator,OS=$ios_current_version,name=iPhone 14
+          - destination: platform=iOS Simulator,OS=16.4,name=iPhone 14
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
           # iOS_previous
-          - destination: platform=iOS Simulator,OS=$ios_previous_version,name=iPhone 13
+          - destination: platform=iOS Simulator,OS=15.5,name=iPhone 13
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
           # tvOS_current
-          - destination: platform=tvOS Simulator,OS=$tvos_version,name=Apple TV
+          - destination: platform=tvOS Simulator,OS=16.4,name=Apple TV
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
     name: Build and Test Xcode Scheme/Testplan
     steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup Repo
+      id: setup-repo
+      uses: ./.github/actions/setup-repo
+    # Caching for apollo-ios SPM dependencies
+    - uses: actions/cache@v3
+      with:
+        path: apollo-ios/.build
+        key: ${{ runner.os }}-spm-${{ hashFiles('apollo-ios/Package.resolved') }}
+    # Caching for apollo-ios-codegen SPM dependencies
+    - uses: actions/cache@v3
+      with:
+        path: apollo-ios-codegen/.build
+        key: ${{ runner.os }}-spm-${{ hashFiles('apollo-ios-codegen/Package.resolved') }}
+    - name: Run Tuist Generation
+      uses: tuist/tuist-action@0.13.0
+      with:
+          command: 'generate'
+          arguments: ''
     - name: Cache Repo Setup
       id: cache-repo
       uses: actions/cache@v3
