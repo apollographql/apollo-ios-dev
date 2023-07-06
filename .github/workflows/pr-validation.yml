@@ -66,6 +66,9 @@ jobs:
             test-plan: Apollo-CITestPlan
     name: Build and Test Xcode Scheme/Testplan
     steps:
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '14.3.1'
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Setup Repo
@@ -86,12 +89,12 @@ jobs:
       with:
           command: 'generate'
           arguments: ''
-    - name: Cache Repo Setup
-      id: cache-repo
-      uses: actions/cache@v3
-      with:
-        path: ${{ github.workspace }}
-        key: apollo-ios-dev-${{ github.sha }}
+    # - name: Cache Repo Setup
+    #   id: cache-repo
+    #   uses: actions/cache@v3
+    #   with:
+    #     path: ${{ github.workspace }}
+    #     key: apollo-ios-dev-${{ github.sha }}
     - name: Build and Test
       uses: ./.github/actions/build-and-run-xcode-tests
       with:
