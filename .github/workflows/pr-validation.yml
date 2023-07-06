@@ -1,9 +1,16 @@
 name: "PR CI Validation"
 
+env:
+    xcode-version: 14.3.1
+    ios-current-version: 16.4
+    ios-previous-version: 15.5
+    macos-version: 13.2
+    tvos-version: 16.4
+
 on: push
 
 jobs:
-  test-macos:
+  setup:
     name: Run CI Test plan on against macOS
     runs-on: macos-latest
     steps:
@@ -17,9 +24,34 @@ jobs:
       with:
           command: 'generate'
           arguments: ''
-    - name: Run CI Test Plan
-      id: run-ci-test-plan
-      shell: bash
-      run: |
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
-        xcodebuild clean test -resultBundlePath ~/TestResults/ResultBundle.xcresult -workspace "ApolloDev.xcworkspace" -scheme "ApolloTests" -destination "platform=macOS,arch=x86_64" -testPlan "Apollo-CITestPlan" | xcbeautify
+  
+  build-and-test:
+    needs: setup
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        include:
+          # macOS_current
+          - destination: platform=macOS,arch=x86_64
+            scheme: ApolloTests
+            test-plan: Apollo-CITestPlan
+          # iOS_current
+          - destination: platform=iOS Simulator,OS=$ios-current-version,name=iPhone 14
+            scheme: ApolloTests
+            test-plan: Apollo-CITestPlan
+          # iOS_previous
+          - destination: platform=iOS Simulator,OS=$ios-previous-version,name=iPhone 13
+            scheme: ApolloTests
+            test-plan: Apollo-CITestPlan
+          # tvOS_current
+          - destination: platform=tvOS Simulator,OS=$tvos-version,name=Apple TV
+            scheme: ApolloTests
+            test-plan: Apollo-CITestPlan
+    name: Build and Test Xcode Scheme/Testplan
+    steps:
+    - name: Build and Test
+      uses: ./.github/actions/build-and-run-xcode-tests
+      with:
+        destination: ${{ matrix.destination }}
+        scheme: ${{ matrix.scheme }}
+        test-plan: ${{ matrix.test-plan }}

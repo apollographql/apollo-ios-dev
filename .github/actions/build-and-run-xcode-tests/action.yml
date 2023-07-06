@@ -1,0 +1,25 @@
+name: "Build and Run Xcode Tests"
+description: Builds and runs tests for given scheme and test plan
+inputs:
+  destination:
+    description: "The destination of the build, can include things like platform, architecture, OS, name etc."
+    required: true
+  scheme:
+    description: "The Xcode scheme to build and test against."
+    required: true
+  test-plan:
+    description: " The test plan to use for testing."
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # Look into caching the xcbeautify installation to instead of installing for each test
+    - name: Install XCBeautify
+      shell: bash
+      run: |
+         HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
+    - name: Build and Test
+      shell: bash
+      run: |
+        xcodebuild clean test -resultBundlePath ~/TestResults/ResultBundle.xcresult -workspace "ApolloDev.xcworkspace" -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}" -testPlan "${{ inputs.test-plan }}" | xcbeautify
+    # Add step for saving build/test artifacts
