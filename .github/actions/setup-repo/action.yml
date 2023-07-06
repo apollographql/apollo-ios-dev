@@ -3,8 +3,6 @@ description: Checkouts the repo and initializes submodules
 runs:
   using: "composite"
   steps:
-  - name: Checkout Repo
-    uses: actions/checkout@v3
   - name: Init submodules
     shell: bash
     run: |
