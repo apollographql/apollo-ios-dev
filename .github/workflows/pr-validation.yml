@@ -1,11 +1,11 @@
 name: "PR CI Validation"
 
 env:
-    xcode_version: 14.3.1
-    ios_current_version: 16.4
-    ios_previous_version: 15.5
-    macos_version: 13.2
-    tvos_version: 16.4
+    xcode_version: "14.3.1"
+    ios_current_version: "16.4"
+    ios_previous_version: "15.5"
+    macos_version: "13.2"
+    tvos_version: "16.4"
 
 on: push
 
