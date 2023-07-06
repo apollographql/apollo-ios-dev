@@ -1,11 +1,11 @@
 name: "PR CI Validation"
 
 env:
-    xcode-version: 14.3.1
-    ios-current-version: 16.4
-    ios-previous-version: 15.5
-    macos-version: 13.2
-    tvos-version: 16.4
+    xcode_version: 14.3.1
+    ios_current_version: 16.4
+    ios_previous_version: 15.5
+    macos_version: 13.2
+    tvos_version: 16.4
 
 on: push
 
@@ -43,15 +43,15 @@ jobs:
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
           # iOS_current
-          - destination: platform=iOS Simulator,OS=$ios-current-version,name=iPhone 14
+          - destination: platform=iOS Simulator,OS=$ios_current_version,name=iPhone 14
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
           # iOS_previous
-          - destination: platform=iOS Simulator,OS=$ios-previous-version,name=iPhone 13
+          - destination: platform=iOS Simulator,OS=$ios_previous_version,name=iPhone 13
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
           # tvOS_current
-          - destination: platform=tvOS Simulator,OS=$tvos-version,name=Apple TV
+          - destination: platform=tvOS Simulator,OS=$tvos_version,name=Apple TV
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
     name: Build and Test Xcode Scheme/Testplan
