@@ -19,6 +19,11 @@ jobs:
     - name: Setup Repo
       id: setup-repo
       uses: ./.github/actions/setup-repo
+    - name: Run Tuist Generation
+      uses: tuist/tuist-action@0.13.0
+      with:
+          command: 'generate'
+          arguments: ''
     - name: Cache Repo Setup
       id: cache-repo
       uses: actions/cache@v3

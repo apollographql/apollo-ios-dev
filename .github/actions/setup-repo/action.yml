@@ -7,9 +7,4 @@ runs:
     shell: bash
     run: |
         git submodule update --init
-  - name: Run Tuist Generation
-      uses: tuist/tuist-action@0.13.0
-      with:
-          command: 'generate'
-          arguments: ''
     
