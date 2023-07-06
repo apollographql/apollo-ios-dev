@@ -3,8 +3,15 @@ description: Checkouts the repo and initializes submodules
 runs:
   using: "composite"
   steps:
-    - name: Init submodules
-      shell: bash
-      run: |
-         git submodule update --init
+  - name: Checkout Repo
+    uses: actions/checkout@v3
+  - name: Init submodules
+    shell: bash
+    run: |
+        git submodule update --init
+  - name: Run Tuist Generation
+      uses: tuist/tuist-action@0.13.0
+      with:
+          command: 'generate'
+          arguments: ''
     

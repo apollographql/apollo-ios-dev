@@ -14,21 +14,22 @@ jobs:
     name: Run CI Test plan on against macOS
     runs-on: macos-latest
     steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-    - name: Setup Repo
+    - name: Cache Repo Setup
+      id: cache-repo
+      uses: actions/cache@v3
+      with:
+        path: ../apollo-ios-dev
+        key: apollo-ios-dev-${{ github.sha }}
+    - if: ${{ steps.cache-repo.outputs.cache-hit != 'true' }}
+      name: Setup Repo
       id: setup-repo
       uses: ./.github/actions/setup-repo
-    - name: Run Tuist Generation
-      uses: tuist/tuist-action@0.13.0
-      with:
-          command: 'generate'
-          arguments: ''
   
   build-and-test:
     needs: setup
     runs-on: macos-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           # macOS_current
