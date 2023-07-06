@@ -14,16 +14,15 @@ jobs:
     name: Run CI Test plan on against macOS
     runs-on: macos-latest
     steps:
+    - name: Setup Repo
+      id: setup-repo
+      uses: ./.github/actions/setup-repo
     - name: Cache Repo Setup
       id: cache-repo
       uses: actions/cache@v3
       with:
         path: ../apollo-ios-dev
         key: apollo-ios-dev-${{ github.sha }}
-    - if: ${{ steps.cache-repo.outputs.cache-hit != 'true' }}
-      name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
   
   build-and-test:
     needs: setup
