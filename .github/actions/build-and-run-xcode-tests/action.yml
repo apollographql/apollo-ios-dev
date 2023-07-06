@@ -13,12 +13,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - name: Cache Repo Setup
-      id: cache-repo
-      uses: actions/cache@v3
-      with:
-        path: ../apollo-ios-dev
-        key: apollo-ios-dev-${{ github.sha }}
   # Look into caching the xcbeautify installation to instead of installing for each test
   - name: Install XCBeautify
     shell: bash

@@ -28,7 +28,7 @@ jobs:
       id: cache-repo
       uses: actions/cache@v3
       with:
-        path: ../apollo-ios-dev
+        path: ${{ github.workspace }}/apollo-ios-dev
         key: apollo-ios-dev-${{ github.sha }}
   
   build-and-test:
@@ -56,6 +56,12 @@ jobs:
             test-plan: Apollo-CITestPlan
     name: Build and Test Xcode Scheme/Testplan
     steps:
+    - name: Cache Repo Setup
+      id: cache-repo
+      uses: actions/cache@v3
+      with:
+        path: ../apollo-ios-dev
+        key: apollo-ios-dev-${{ github.sha }}
     - name: Build and Test
       uses: ./.github/actions/build-and-run-xcode-tests
       with:
