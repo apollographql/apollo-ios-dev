@@ -60,7 +60,7 @@ jobs:
       id: cache-repo
       uses: actions/cache@v3
       with:
-        path: ../apollo-ios-dev
+        path: ${{ github.workspace }}
         key: apollo-ios-dev-${{ github.sha }}
     - name: Build and Test
       uses: ./.github/actions/build-and-run-xcode-tests
