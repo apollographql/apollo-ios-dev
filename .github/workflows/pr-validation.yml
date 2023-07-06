@@ -28,7 +28,7 @@ jobs:
       id: cache-repo
       uses: actions/cache@v3
       with:
-        path: ${{ github.workspace }}/apollo-ios-dev
+        path: ${{ github.workspace }}
         key: apollo-ios-dev-${{ github.sha }}
   
   build-and-test:
