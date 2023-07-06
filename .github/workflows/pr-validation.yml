@@ -77,13 +77,13 @@ jobs:
     # Caching for apollo-ios SPM dependencies
     - uses: actions/cache@v3
       with:
-        path: apollo-ios/.build
-        key: ${{ runner.os }}-spm-${{ hashFiles('apollo-ios/Package.resolved') }}
+        path: ./apollo-ios/.build
+        key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}
     # Caching for apollo-ios-codegen SPM dependencies
     - uses: actions/cache@v3
       with:
-        path: apollo-ios-codegen/.build
-        key: ${{ runner.os }}-spm-${{ hashFiles('apollo-ios-codegen/Package.resolved') }}
+        path: ./apollo-ios-codegen/.build
+        key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
     - name: Run Tuist Generation
       uses: tuist/tuist-action@0.13.0
       with:
