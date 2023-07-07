@@ -13,7 +13,7 @@ let package = Package(
     .library(name: "TestMocks", targets: ["TestMocks"]),
   ],
   dependencies: [
-    .package(name: "apollo-ios", path: "../../../..")
+    .package(name: "apollo-ios", path: "../../../../apollo-ios")
   ],
   targets: [
     // Targets are the basic building blocks of a package. A target can define a module or a test suite.

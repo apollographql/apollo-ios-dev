@@ -14,7 +14,7 @@ let package = Package(
     .library(name: "TestApp", targets: ["TestApp"]),
   ],
   dependencies: [
-    .package(name: "apollo-ios", path: "../../../"),
+    .package(name: "apollo-ios", path: "../../../apollo-ios"),
     .package(name: "AnimalKingdomAPI", path: "./AnimalKingdomAPI")
   ],
   targets: [

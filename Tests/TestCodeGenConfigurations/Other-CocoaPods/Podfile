@@ -6,8 +6,8 @@ target 'CocoaPodsProject' do
   use_frameworks!
 
   # Pods for CocoaPodsProject
-  pod 'Apollo', :path => '../../../'
-  pod 'Apollo/ApolloTestSupport', :path => '../../../'
+  pod 'Apollo', :path => '../../../apollo-ios'
+  pod 'ApolloTestSupport', :path => '../../../apollo-ios'
 
   target 'CocoaPodsProjectTests' do
     inherit! :search_paths

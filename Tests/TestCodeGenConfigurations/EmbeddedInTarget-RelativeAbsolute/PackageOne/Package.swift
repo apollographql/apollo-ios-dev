@@ -16,7 +16,7 @@ let package = Package(
       targets: ["PackageOne"]),
   ],
   dependencies: [
-    .package(name: "apollo-ios", path: "../../../.."),
+    .package(name: "apollo-ios", path: "../../../../apollo-ios"),
     .package(name: "PackageTwo", path: "../PackageTwo")
   ],
   targets: [

@@ -103,9 +103,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		663EB6712A58B3C300A63215 /* apollo-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "apollo-ios"; path = "../../../apollo-ios"; sourceTree = "<group>"; };
 		DE454BC928B43262009DC80E /* CustomTargetProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CustomTargetProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE454BCB28B43262009DC80E /* CustomTargetProject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomTargetProject.h; sourceTree = "<group>"; };
-		DE454BD028B43280009DC80E /* apollo-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "apollo-ios"; path = ../../..; sourceTree = "<group>"; };
 		E6BACC1329FC8C8B008B46F2 /* apollo-codegen-config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "apollo-codegen-config.json"; sourceTree = "<group>"; };
 		E6BACC1929FC909F008B46F2 /* AnimalKingdomAPI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AnimalKingdomAPI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6BACC1B29FC909F008B46F2 /* AnimalKingdomAPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimalKingdomAPI.h; sourceTree = "<group>"; };
@@ -237,7 +237,7 @@
 		DEA31E5D28A6CA6F00971813 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				DE454BD028B43280009DC80E /* apollo-ios */,
+				663EB6712A58B3C300A63215 /* apollo-ios */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
