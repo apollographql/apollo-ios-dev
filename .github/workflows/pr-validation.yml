@@ -74,16 +74,16 @@ jobs:
     - name: Setup Repo
       id: setup-repo
       uses: ./.github/actions/setup-repo
-    # Caching for apollo-ios SPM dependencies
+    # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
     - uses: actions/cache@v3
       with:
-        path: ./apollo-ios/.build
-        key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}
+        path: ../DerivedData/SourcePackages
+        key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
     # Caching for apollo-ios-codegen SPM dependencies
-    - uses: actions/cache@v3
-      with:
-        path: ./apollo-ios-codegen/.build
-        key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
+    # - uses: actions/cache@v3
+    #   with:
+    #     path: ./apollo-ios-codegen/.build
+    #     key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
     - name: Run Tuist Generation
       uses: tuist/tuist-action@0.13.0
       with:
