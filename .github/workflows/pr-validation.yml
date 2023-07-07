@@ -9,38 +9,7 @@ env:
 
 on: push
 
-jobs:
-  # setup:
-  #   name: Run CI Test plan on against macOS
-  #   runs-on: macos-latest
-  #   steps:
-  #   - name: Checkout Repo
-  #     uses: actions/checkout@v3
-  #   - name: Setup Repo
-  #     id: setup-repo
-  #     uses: ./.github/actions/setup-repo
-  #   # Caching for apollo-ios SPM dependencies
-  #   - uses: actions/cache@v3
-  #     with:
-  #       path: apollo-ios/.build
-  #       key: ${{ runner.os }}-spm-${{ hashFiles('apollo-ios/Package.resolved') }}
-  #   # Caching for apollo-ios-codegen SPM dependencies
-  #   - uses: actions/cache@v3
-  #     with:
-  #       path: apollo-ios-codegen/.build
-  #       key: ${{ runner.os }}-spm-${{ hashFiles('apollo-ios-codegen/Package.resolved') }}
-  #   - name: Run Tuist Generation
-  #     uses: tuist/tuist-action@0.13.0
-  #     with:
-  #         command: 'generate'
-  #         arguments: ''
-  #   - name: Cache Repo Setup
-  #     id: cache-repo
-  #     uses: actions/cache@v3
-  #     with:
-  #       path: ${{ github.workspace }}
-  #       key: apollo-ios-dev-${{ github.sha }}
-  
+jobs:  
   build-and-test:
     # needs: setup
     runs-on: macos-13
@@ -79,22 +48,11 @@ jobs:
       with:
         path: ./DerivedData/SourcePackages
         key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
-    # Caching for apollo-ios-codegen SPM dependencies
-    # - uses: actions/cache@v3
-    #   with:
-    #     path: ./apollo-ios-codegen/.build
-    #     key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
     - name: Run Tuist Generation
       uses: tuist/tuist-action@0.13.0
       with:
           command: 'generate'
           arguments: ''
-    # - name: Cache Repo Setup
-    #   id: cache-repo
-    #   uses: actions/cache@v3
-    #   with:
-    #     path: ${{ github.workspace }}
-    #     key: apollo-ios-dev-${{ github.sha }}
     - name: Build and Test
       uses: ./.github/actions/build-and-run-xcode-tests
       with:
