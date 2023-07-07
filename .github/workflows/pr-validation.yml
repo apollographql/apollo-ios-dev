@@ -9,10 +9,33 @@ env:
 
 on: push
 
-jobs:  
-  build-and-test:
+jobs:
+  run-swift-builds:
+    runs-on: macos-13-xl
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: apollo-ios
+          - package: apollo-ios-codegen
+    name: Run swift build for SPM packages
+    steps:
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '14.3.1'
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup Repo
+      id: setup-repo
+      uses: ./.github/actions/setup-repo
+    - name: Run Swift Build
+      shell: bash
+      run: |
+        cd ${{ matrix.package }} && swift build
+
+  build-and-unit-test:
     # needs: setup
-    runs-on: macos-13
+    runs-on: macos-13-xl
     strategy:
       fail-fast: false
       matrix:
@@ -33,7 +56,11 @@ jobs:
           - destination: platform=tvOS Simulator,OS=16.4,name=Apple TV
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
-    name: Build and Test Xcode Scheme/Testplan
+          # Codegen CLI Test
+          - destination: platform=macOS,arch=x86_64
+            scheme: CodegenCLITests
+            test-plan: CodegenCLITestPlan
+    name: Build and Test Xcode Unit Test Scheme/Testplan
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
@@ -44,18 +71,39 @@ jobs:
       id: setup-repo
       uses: ./.github/actions/setup-repo
     # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
-    - uses: actions/cache@v3
-      with:
-        path: ./DerivedData/SourcePackages
-        key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
+    # - uses: actions/cache@v3
+    #   with:
+    #     path: ./DerivedData/SourcePackages
+    #     key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
     - name: Run Tuist Generation
       uses: tuist/tuist-action@0.13.0
       with:
           command: 'generate'
           arguments: ''
     - name: Build and Test
-      uses: ./.github/actions/build-and-run-xcode-tests
+      uses: ./.github/actions/build-and-run-unit-tests
       with:
         destination: ${{ matrix.destination }}
         scheme: ${{ matrix.scheme }}
         test-plan: ${{ matrix.test-plan }}
+
+  run-codegen-test-configurations:
+    runs-on: macos-13-xl
+    name: Run Codegen Test Configurations
+    steps:
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '14.3.1'
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup Repo
+      id: setup-repo
+      uses: ./.github/actions/setup-repo
+    - name: Install XCBeautify
+      shell: bash
+      run: |
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
+    - name: Test Codegen Configurations
+      shell: bash
+      run: |
+        ./scripts/run-test-codegen-configurations.sh -t

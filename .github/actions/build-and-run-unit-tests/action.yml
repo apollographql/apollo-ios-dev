@@ -1,5 +1,5 @@
-name: "Build and Run Xcode Tests"
-description: Builds and runs tests for given scheme and test plan
+name: "Build and Run Unit Tests"
+description: Builds and runs unit tests for given scheme and test plan
 inputs:
   destination:
     description: "The destination of the build, can include things like platform, architecture, OS, name etc."
@@ -8,7 +8,7 @@ inputs:
     description: "The Xcode scheme to build and test against."
     required: true
   test-plan:
-    description: " The test plan to use for testing."
+    description: "The test plan to use for testing."
     required: true
 runs:
   using: "composite"
@@ -21,5 +21,5 @@ runs:
   - name: Build and Test
     shell: bash
     run: |
-      xcodebuild clean test -resultBundlePath ~/TestResults/ResultBundle.xcresult -workspace "ApolloDev.xcworkspace" -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}" -testPlan "${{ inputs.test-plan }}" -derivedDataPath ./DerivedData | xcbeautify
+      xcodebuild clean test -resultBundlePath ~/TestResults/ResultBundle.xcresult -workspace "ApolloDev.xcworkspace" -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}" -testPlan "${{ inputs.test-plan }}" | xcbeautify
   # Add step for saving build/test artifacts
