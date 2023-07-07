@@ -60,7 +60,7 @@ jobs:
           - destination: platform=macOS,arch=x86_64
             scheme: CodegenCLITests
             test-plan: CodegenCLITestPlan
-    name: Build and Test Xcode Unit Test Scheme/Testplan
+    name: Build and Test ${{ matrix.test-plan }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
