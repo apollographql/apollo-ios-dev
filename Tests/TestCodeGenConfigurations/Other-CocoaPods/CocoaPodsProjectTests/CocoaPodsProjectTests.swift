@@ -1,4 +1,5 @@
 import XCTest
+import ApolloTestSupport
 @testable import CocoaPodsProject
 
 final class CocoaPodsProjectTests: XCTestCase {
