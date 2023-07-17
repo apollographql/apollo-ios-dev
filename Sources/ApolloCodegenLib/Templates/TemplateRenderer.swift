@@ -290,7 +290,7 @@ struct ImportStatementTemplate {
   enum TestMock {
     static func template(for config: ApolloCodegen.ConfigurationContext) -> TemplateString {
       return """
-      import \(config.options.cocoapodsCompatibleImportStatements ? "Apollo" : "ApolloTestSupport")
+      import ApolloTestSupport
       import \(config.schemaModuleName)
       """
     }
