@@ -1,3 +1,4 @@
+import Foundation
 @testable import ApolloCodegenLib
 
 public final class MockNetworkSession: NetworkSession {
