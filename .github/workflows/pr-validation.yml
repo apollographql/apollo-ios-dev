@@ -102,8 +102,8 @@ jobs:
         destination: ${{ matrix.destination }}
         scheme: ${{ matrix.scheme }}
         test-plan: ${{ matrix.test-plan }}
-    - if: ${{ matrix.run-js-tests }} == true
-      name: Run-JS-Tests
+    - name: Run-JS-Tests
+      if: ${{ matrix.run-js-tests == true }}
       shell: bash
       working-directory: Sources/ApolloCodegenLib/Frontend/JavaScript/
       run: |
