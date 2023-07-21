@@ -6,7 +6,7 @@ target 'pod-install-test' do
   use_frameworks!
 
   # Pods for codegen-cli-issue
-  if ENV['GITHUB_REPOSITORY'] != 'apollographql/apollo-ios'
+  if ENV['GITHUB_REPOSITORY'] != 'apollographql/apollo-ios-dev'
     pod 'Apollo', :git => "https://github.com/#{ENV['GITHUB_REPOSITORY']}.git", :commit => ENV['APOLLO_IOS_SHA']
     pod 'ApolloTestSupport', :git => "https://github.com/#{ENV['GITHUB_REPOSITORY']}.git", :commit => ENV['APOLLO_IOS_SHA']
   else
