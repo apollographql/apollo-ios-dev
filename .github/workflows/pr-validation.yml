@@ -86,6 +86,29 @@ jobs:
         destination: ${{ matrix.destination }}
         scheme: ${{ matrix.scheme }}
         test-plan: ${{ matrix.test-plan }}
+    - name: Save xcodebuild logs
+      uses: actions/upload-artifact@v3
+      with:
+        name: logs
+        path: |
+          logs
+    - name: Save crash logs
+      uses: actions/upload-artifact@v3
+      with:
+        name: crashes
+        path: |
+          ~/Library/Logs/DiagnosticReports
+    - name: Zip Result Bundle
+      shell: bash
+      working-directory: ~/TestResults
+      run: |
+        zip -r ResultBundle.zip ResultBundle.xcresult
+    - name: Save test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: results
+        path: |
+          ~/TestResults/ResultBundle.zip
 
   run-codegen-test-configurations:
     runs-on: macos-13-xl
