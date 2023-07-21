@@ -45,26 +45,37 @@ jobs:
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
             name: macOS_current
+            run-js-tests: false
           # iOS_current
           - destination: platform=iOS Simulator,OS=16.4,name=iPhone 14
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
             name: iOS_current
+            run-js-tests: false
           # iOS_previous
           - destination: platform=iOS Simulator,OS=15.5,name=iPhone 13
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
             name: iOS_previous
+            run-js-tests: false
           # tvOS_current
           - destination: platform=tvOS Simulator,OS=16.4,name=Apple TV
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
             name: tvOS_current
+            run-js-tests: false
           # Codegen CLI Test
           - destination: platform=macOS,arch=x86_64
             scheme: CodegenCLITests
             test-plan: CodegenCLITestPlan
             name: Codegen_CLI
+            run-js-tests: false
+          # CodegenLib Test
+          - destination: platform=macOS,arch=x86_64
+            scheme: ApolloCodegenLib
+            test-plan: Apollo-Codegen-CITestPlan
+            name: CodegenLib
+            run-js-tests: true
     name: Build and Test ${{ matrix.test-plan }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
@@ -91,6 +102,12 @@ jobs:
         destination: ${{ matrix.destination }}
         scheme: ${{ matrix.scheme }}
         test-plan: ${{ matrix.test-plan }}
+    - if: ${{ matrix.run-js-tests }} == true
+      name: Run-JS-Tests
+      shell: bash
+      working-directory: Sources/ApolloCodegenLib/Frontend/JavaScript/
+      run: |
+        npm install && npm test
     - name: Save xcodebuild logs
       uses: actions/upload-artifact@v3
       with:
