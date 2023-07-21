@@ -35,6 +35,7 @@ let package = Package(
         .product(name: "OrderedCollections", package: "swift-collections")
       ],
       exclude: [
+        "Frontend/dist",
         "Frontend/JavaScript",
         "Frontend/auto_rollup.sh",
       ]
