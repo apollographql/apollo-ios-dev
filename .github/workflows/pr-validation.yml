@@ -100,7 +100,7 @@ jobs:
           ~/Library/Logs/DiagnosticReports
     - name: Zip Result Bundle
       shell: bash
-      working-directory: ~/TestResults
+      working-directory: TestResults
       run: |
         zip -r ResultBundle.zip ResultBundle.xcresult
     - name: Save test results
@@ -108,7 +108,7 @@ jobs:
       with:
         name: results
         path: |
-          ~/TestResults/ResultBundle.zip
+          TestResults/ResultBundle.zip
 
   run-codegen-test-configurations:
     runs-on: macos-13-xl

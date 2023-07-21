@@ -21,5 +21,5 @@ runs:
   - name: Build and Test
     shell: bash
     run: |
-      xcodebuild clean test -resultBundlePath ~/TestResults/ResultBundle.xcresult -workspace "ApolloDev.xcworkspace" -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}" -testPlan "${{ inputs.test-plan }}" | xcbeautify
+      xcodebuild clean test -resultBundlePath TestResults/ResultBundle.xcresult -workspace "ApolloDev.xcworkspace" -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}" -testPlan "${{ inputs.test-plan }}" | xcbeautify
   # Add step for saving build/test artifacts
