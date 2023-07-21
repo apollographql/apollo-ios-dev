@@ -152,3 +152,29 @@ jobs:
   #     shell: bash
   #     run: |
   #       ./scripts/run-test-codegen-configurations.sh -t
+
+  run-cocoapods-integration-tests:
+    runs-on: macos-13-xl
+    name: Run Cocoapods Integration Tests
+    steps:
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '14.3.1'
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup Repo
+      id: setup-repo
+      uses: ./.github/actions/setup-repo
+    # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
+    # - uses: actions/cache@v3
+    #   with:
+    #     path: ./DerivedData/SourcePackages
+    #     key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
+    - name: Run Tuist Generation
+      uses: tuist/tuist-action@0.13.0
+      with:
+          command: 'generate'
+          arguments: ''
+    - name: Run CocoaPods Integration Tests
+      id: run-cocoapods-integration-tests
+      uses: ./.github/actions/run-cocoapods-integration-tests

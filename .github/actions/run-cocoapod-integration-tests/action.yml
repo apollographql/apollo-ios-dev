@@ -1,0 +1,21 @@
+name: "Run CocoaPods Integration Tests"
+description: Runs CocoaPods Integration Tests against the apollo-ios repo
+runs:
+  using: "composite"
+  steps:
+  - name: CocoaPods - Install
+    shell: bash
+    working-directory: apollo-ios
+    run: |
+      pod install --verbose
+  - name: CocoaPods - CLI Test (init)
+    shell: bash
+    working-directory: apollo-ios
+    run: |
+      ./Pods/Apollo/apollo-ios-cli init --schema-name NewTestSchema --module-type other
+  - name: CocoaPods - CLI TEst (generate)
+    shell: bash
+    working-directory: apollo-ios
+    run: |
+      ./Pods/Apollo/apollo-ios-cli generate
+    
