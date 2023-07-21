@@ -5,17 +5,17 @@ runs:
   steps:
   - name: CocoaPods - Install
     shell: bash
-    working-directory: apollo-ios
+    working-directory: Tests/CodegenCLITests/pod-install-test/
     run: |
       pod install --verbose
   - name: CocoaPods - CLI Test (init)
     shell: bash
-    working-directory: apollo-ios
+    working-directory: Tests/CodegenCLITests/pod-install-test/
     run: |
       ./Pods/Apollo/apollo-ios-cli init --schema-name NewTestSchema --module-type other
   - name: CocoaPods - CLI TEst (generate)
     shell: bash
-    working-directory: apollo-ios
+    working-directory: Tests/CodegenCLITests/pod-install-test/
     run: |
       ./Pods/Apollo/apollo-ios-cli generate
     
