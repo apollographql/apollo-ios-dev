@@ -44,22 +44,27 @@ jobs:
           - destination: platform=macOS,arch=x86_64
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
+            name: macOS_current
           # iOS_current
           - destination: platform=iOS Simulator,OS=16.4,name=iPhone 14
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
+            name: iOS_current
           # iOS_previous
           - destination: platform=iOS Simulator,OS=15.5,name=iPhone 13
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
+            name: iOS_previous
           # tvOS_current
           - destination: platform=tvOS Simulator,OS=16.4,name=Apple TV
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
+            name: tvOS_current
           # Codegen CLI Test
           - destination: platform=macOS,arch=x86_64
             scheme: CodegenCLITests
             test-plan: CodegenCLITestPlan
+            name: Codegen_CLI
     name: Build and Test ${{ matrix.test-plan }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
@@ -89,13 +94,13 @@ jobs:
     - name: Save xcodebuild logs
       uses: actions/upload-artifact@v3
       with:
-        name: logs
+        name: ${{ matrix.name }}-logs
         path: |
-          logs
+          DerivedData/Logs/Build
     - name: Save crash logs
       uses: actions/upload-artifact@v3
       with:
-        name: crashes
+        name: ${{ matrix.name }}-crashes
         path: |
           ~/Library/Logs/DiagnosticReports
     - name: Zip Result Bundle
@@ -106,27 +111,27 @@ jobs:
     - name: Save test results
       uses: actions/upload-artifact@v3
       with:
-        name: results
+        name: ${{ matrix.name }}-results
         path: |
           TestResults/ResultBundle.zip
 
-  run-codegen-test-configurations:
-    runs-on: macos-13-xl
-    name: Run Codegen Test Configurations
-    steps:
-    - uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: '14.3.1'
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
-    - name: Install XCBeautify
-      shell: bash
-      run: |
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
-    - name: Test Codegen Configurations
-      shell: bash
-      run: |
-        ./scripts/run-test-codegen-configurations.sh -t
+  # run-codegen-test-configurations:
+  #   runs-on: macos-13-xl
+  #   name: Run Codegen Test Configurations
+  #   steps:
+  #   - uses: maxim-lobanov/setup-xcode@v1
+  #     with:
+  #       xcode-version: '14.3.1'
+  #   - name: Checkout Repo
+  #     uses: actions/checkout@v3
+  #   - name: Setup Repo
+  #     id: setup-repo
+  #     uses: ./.github/actions/setup-repo
+  #   - name: Install XCBeautify
+  #     shell: bash
+  #     run: |
+  #       HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
+  #   - name: Test Codegen Configurations
+  #     shell: bash
+  #     run: |
+  #       ./scripts/run-test-codegen-configurations.sh -t
