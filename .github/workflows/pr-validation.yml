@@ -170,9 +170,65 @@ jobs:
       working-directory: apollo-ios
       run: |
         apollo_ios_sha=$(git rev-parse HEAD)
-        apollo_ios_branch=$(git branch --show-current)
         echo "APOLLO_IOS_SHA=$apollo_ios_sha" >> ${GITHUB_ENV}
-        echo "APOLLO_IOS_BRANCH=$apollo_ios_branch" >> ${GITHUB_ENV}
     - name: Run CocoaPods Integration Tests
       id: run-cocoapods-integration-tests
       uses: ./.github/actions/run-cocoapods-integration-tests
+
+  run-integration-tests:
+    runs-on: mcos-13-xl
+    name: Run Integration Tests
+    steps:
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '14.3.1'
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup Repo
+      id: setup-repo
+      uses: ./.github/actions/setup-repo
+    - name: Setup Star Wars Server
+      shell: bash
+      run: |
+        ./scripts/install-node-v12.sh
+        ./scripts/install-or-update-starwars-server.sh
+        cd ../starwars-server && npm start
+    - name: Setup Upload Server
+      shell: bash
+      run: |
+        cd SimpleUploadServer && nvm use && npm install && npm start
+        sudo chmod -R +rwx SimpleUploadServer
+    - name: Setup Subscription Server
+      shell: bash
+      run: |
+        ./scripts/install-apollo-server-docs-example-server.sh
+        cd ../docs-examples/apollo-server/v3/subscriptions-graphql-ws && npm start
+    - name: Build and Test
+      uses: ./.github/actions/build-and-run-unit-tests
+      with:
+        destination: platform=macOS,arch=x86_64
+        scheme: ApolloServerIntegrationTests
+        test-plan: Apollo-IntegrationTestPlan
+    - name: Save xcodebuild logs
+      uses: actions/upload-artifact@v3
+      with:
+        name: macOS-Integration-logs
+        path: |
+          DerivedData/Logs/Build
+    - name: Save crash logs
+      uses: actions/upload-artifact@v3
+      with:
+        name: macOS-Integration-crashes
+        path: |
+          ~/Library/Logs/DiagnosticReports
+    - name: Zip Result Bundle
+      shell: bash
+      working-directory: TestResults
+      run: |
+        zip -r ResultBundle.zip ResultBundle.xcresult
+    - name: Save test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: macOS-Integration-results
+        path: |
+          TestResults/ResultBundle.zip
