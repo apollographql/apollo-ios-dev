@@ -190,6 +190,7 @@ jobs:
     - name: Setup Servers
       shell: bash
       run: |
+        sh ./scripts/install-node-v12.sh
         cd SimpleUploadServer && nvm use && npm install && npm start &
         sudo chmod -R +rwx SimpleUploadServer
     # - name: Setup Upload Server
