@@ -190,7 +190,7 @@ jobs:
     - name: Setup Servers
       shell: bash
       run: |
-        cd SimpleUploadServer && npm install && npm start &
+        cd SimpleUploadServer && nvm use && npm install && npm start &
         sudo chmod -R +rwx SimpleUploadServer
     # - name: Setup Upload Server
     #   shell: bash
