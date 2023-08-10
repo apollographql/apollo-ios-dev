@@ -190,7 +190,6 @@ jobs:
     - name: Setup Servers
       shell: bash
       run: |
-        sh ./scripts/install-node-v12.sh
         sh ./scripts/install-or-update-starwars-server.sh
         cd ../starwars-server && npm start &
     # - name: Setup Upload Server
