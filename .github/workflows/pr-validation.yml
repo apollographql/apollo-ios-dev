@@ -192,6 +192,10 @@ jobs:
       run: |
         sh ./scripts/install-or-update-starwars-server.sh
         cd ../starwars-server && npm start &
+        cd SimpleUploadServer && nvm use && npm install && npm start &
+        sudo chmod -R +rwx SimpleUploadServer
+        sh ./scripts/install-apollo-server-docs-example-server.sh
+        cd ../docs-examples/apollo-server/v3/subscriptions-graphql-ws && npm start &
     # - name: Setup Upload Server
     #   shell: bash
     #   run: |
@@ -202,6 +206,11 @@ jobs:
     #   run: |
     #     sh ./scripts/install-apollo-server-docs-example-server.sh
     #     cd ../docs-examples/apollo-server/v3/subscriptions-graphql-ws && npm start
+    - name: Run Tuist Generation
+      uses: tuist/tuist-action@0.13.0
+      with:
+          command: 'generate'
+          arguments: ''
     - name: Build and Test
       uses: ./.github/actions/build-and-run-unit-tests
       with:
