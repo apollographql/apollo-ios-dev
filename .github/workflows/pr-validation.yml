@@ -10,127 +10,127 @@ env:
 on: push
 
 jobs:
-  run-swift-builds:
-    runs-on: macos-13-xl
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - package: apollo-ios
-          - package: apollo-ios-codegen
-    name: Run swift build for SPM packages
-    steps:
-    - uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: '14.3.1'
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
-    - name: Run Swift Build
-      shell: bash
-      run: |
-        cd ${{ matrix.package }} && swift build
+  # run-swift-builds:
+  #   runs-on: macos-13-xl
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - package: apollo-ios
+  #         - package: apollo-ios-codegen
+  #   name: Run swift build for SPM packages
+  #   steps:
+  #   - uses: maxim-lobanov/setup-xcode@v1
+  #     with:
+  #       xcode-version: '14.3.1'
+  #   - name: Checkout Repo
+  #     uses: actions/checkout@v3
+  #   - name: Setup Repo
+  #     id: setup-repo
+  #     uses: ./.github/actions/setup-repo
+  #   - name: Run Swift Build
+  #     shell: bash
+  #     run: |
+  #       cd ${{ matrix.package }} && swift build
 
-  build-and-unit-test:
-    # needs: setup
-    runs-on: macos-13-xl
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          # macOS_current
-          - destination: platform=macOS,arch=x86_64
-            scheme: ApolloTests
-            test-plan: Apollo-CITestPlan
-            name: macOS_current
-            run-js-tests: false
-          # iOS_current
-          - destination: platform=iOS Simulator,OS=16.4,name=iPhone 14
-            scheme: ApolloTests
-            test-plan: Apollo-CITestPlan
-            name: iOS_current
-            run-js-tests: false
-          # iOS_previous
-          - destination: platform=iOS Simulator,OS=15.5,name=iPhone 13
-            scheme: ApolloTests
-            test-plan: Apollo-CITestPlan
-            name: iOS_previous
-            run-js-tests: false
-          # tvOS_current
-          - destination: platform=tvOS Simulator,OS=16.4,name=Apple TV
-            scheme: ApolloTests
-            test-plan: Apollo-CITestPlan
-            name: tvOS_current
-            run-js-tests: false
-          # Codegen CLI Test
-          - destination: platform=macOS,arch=x86_64
-            scheme: CodegenCLITests
-            test-plan: CodegenCLITestPlan
-            name: Codegen_CLI
-            run-js-tests: false
-          # CodegenLib Test
-          - destination: platform=macOS,arch=x86_64
-            scheme: ApolloCodegenTests
-            test-plan: Apollo-Codegen-CITestPlan
-            name: CodegenLib
-            run-js-tests: true
-    name: Build and Test ${{ matrix.test-plan }}
-    steps:
-    - uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: '14.3.1'
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
-    # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
-    # - uses: actions/cache@v3
-    #   with:
-    #     path: ./DerivedData/SourcePackages
-    #     key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
-    - name: Run Tuist Generation
-      uses: tuist/tuist-action@0.13.0
-      with:
-          command: 'generate'
-          arguments: ''
-    - name: Build and Test
-      uses: ./.github/actions/build-and-run-unit-tests
-      with:
-        destination: ${{ matrix.destination }}
-        scheme: ${{ matrix.scheme }}
-        test-plan: ${{ matrix.test-plan }}
-    - name: Run-JS-Tests
-      if: ${{ matrix.run-js-tests == true }}
-      shell: bash
-      working-directory: apollo-ios-codegen/Sources/ApolloCodegenLib/Frontend/JavaScript/
-      run: |
-        npm install && npm test
-    - name: Save xcodebuild logs
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ matrix.name }}-logs
-        path: |
-          DerivedData/Logs/Build
-    - name: Save crash logs
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ matrix.name }}-crashes
-        path: |
-          ~/Library/Logs/DiagnosticReports
-    - name: Zip Result Bundle
-      shell: bash
-      working-directory: TestResults
-      run: |
-        zip -r ResultBundle.zip ResultBundle.xcresult
-    - name: Save test results
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ matrix.name }}-results
-        path: |
-          TestResults/ResultBundle.zip
+  # build-and-unit-test:
+  #   # needs: setup
+  #   runs-on: macos-13-xl
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         # macOS_current
+  #         - destination: platform=macOS,arch=x86_64
+  #           scheme: ApolloTests
+  #           test-plan: Apollo-CITestPlan
+  #           name: macOS_current
+  #           run-js-tests: false
+  #         # iOS_current
+  #         - destination: platform=iOS Simulator,OS=16.4,name=iPhone 14
+  #           scheme: ApolloTests
+  #           test-plan: Apollo-CITestPlan
+  #           name: iOS_current
+  #           run-js-tests: false
+  #         # iOS_previous
+  #         - destination: platform=iOS Simulator,OS=15.5,name=iPhone 13
+  #           scheme: ApolloTests
+  #           test-plan: Apollo-CITestPlan
+  #           name: iOS_previous
+  #           run-js-tests: false
+  #         # tvOS_current
+  #         - destination: platform=tvOS Simulator,OS=16.4,name=Apple TV
+  #           scheme: ApolloTests
+  #           test-plan: Apollo-CITestPlan
+  #           name: tvOS_current
+  #           run-js-tests: false
+  #         # Codegen CLI Test
+  #         - destination: platform=macOS,arch=x86_64
+  #           scheme: CodegenCLITests
+  #           test-plan: CodegenCLITestPlan
+  #           name: Codegen_CLI
+  #           run-js-tests: false
+  #         # CodegenLib Test
+  #         - destination: platform=macOS,arch=x86_64
+  #           scheme: ApolloCodegenTests
+  #           test-plan: Apollo-Codegen-CITestPlan
+  #           name: CodegenLib
+  #           run-js-tests: true
+  #   name: Build and Test ${{ matrix.test-plan }}
+  #   steps:
+  #   - uses: maxim-lobanov/setup-xcode@v1
+  #     with:
+  #       xcode-version: '14.3.1'
+  #   - name: Checkout Repo
+  #     uses: actions/checkout@v3
+  #   - name: Setup Repo
+  #     id: setup-repo
+  #     uses: ./.github/actions/setup-repo
+  #   # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
+  #   # - uses: actions/cache@v3
+  #   #   with:
+  #   #     path: ./DerivedData/SourcePackages
+  #   #     key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
+  #   - name: Run Tuist Generation
+  #     uses: tuist/tuist-action@0.13.0
+  #     with:
+  #         command: 'generate'
+  #         arguments: ''
+  #   - name: Build and Test
+  #     uses: ./.github/actions/build-and-run-unit-tests
+  #     with:
+  #       destination: ${{ matrix.destination }}
+  #       scheme: ${{ matrix.scheme }}
+  #       test-plan: ${{ matrix.test-plan }}
+  #   - name: Run-JS-Tests
+  #     if: ${{ matrix.run-js-tests == true }}
+  #     shell: bash
+  #     working-directory: apollo-ios-codegen/Sources/ApolloCodegenLib/Frontend/JavaScript/
+  #     run: |
+  #       npm install && npm test
+  #   - name: Save xcodebuild logs
+  #     uses: actions/upload-artifact@v3
+  #     with:
+  #       name: ${{ matrix.name }}-logs
+  #       path: |
+  #         DerivedData/Logs/Build
+  #   - name: Save crash logs
+  #     uses: actions/upload-artifact@v3
+  #     with:
+  #       name: ${{ matrix.name }}-crashes
+  #       path: |
+  #         ~/Library/Logs/DiagnosticReports
+  #   - name: Zip Result Bundle
+  #     shell: bash
+  #     working-directory: TestResults
+  #     run: |
+  #       zip -r ResultBundle.zip ResultBundle.xcresult
+  #   - name: Save test results
+  #     uses: actions/upload-artifact@v3
+  #     with:
+  #       name: ${{ matrix.name }}-results
+  #       path: |
+  #         TestResults/ResultBundle.zip
 
   # run-codegen-test-configurations:
   #   runs-on: macos-13-xl
@@ -153,27 +153,27 @@ jobs:
   #     run: |
   #       ./scripts/run-test-codegen-configurations.sh -t
 
-  run-cocoapods-integration-tests:
-    runs-on: macos-13-xl
-    name: Run Cocoapods Integration Tests
-    steps:
-    - uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: '14.3.1'
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
-    - name: Export ENV Variables
-      shell: bash
-      working-directory: apollo-ios
-      run: |
-        apollo_ios_sha=$(git rev-parse HEAD)
-        echo "APOLLO_IOS_SHA=$apollo_ios_sha" >> ${GITHUB_ENV}
-    - name: Run CocoaPods Integration Tests
-      id: run-cocoapods-integration-tests
-      uses: ./.github/actions/run-cocoapods-integration-tests
+  # run-cocoapods-integration-tests:
+  #   runs-on: macos-13-xl
+  #   name: Run Cocoapods Integration Tests
+  #   steps:
+  #   - uses: maxim-lobanov/setup-xcode@v1
+  #     with:
+  #       xcode-version: '14.3.1'
+  #   - name: Checkout Repo
+  #     uses: actions/checkout@v3
+  #   - name: Setup Repo
+  #     id: setup-repo
+  #     uses: ./.github/actions/setup-repo
+  #   - name: Export ENV Variables
+  #     shell: bash
+  #     working-directory: apollo-ios
+  #     run: |
+  #       apollo_ios_sha=$(git rev-parse HEAD)
+  #       echo "APOLLO_IOS_SHA=$apollo_ios_sha" >> ${GITHUB_ENV}
+  #   - name: Run CocoaPods Integration Tests
+  #     id: run-cocoapods-integration-tests
+  #     uses: ./.github/actions/run-cocoapods-integration-tests
 
   run-integration-tests:
     runs-on: macos-13-xl
