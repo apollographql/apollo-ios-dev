@@ -187,22 +187,26 @@ jobs:
     - name: Setup Repo
       id: setup-repo
       uses: ./.github/actions/setup-repo
-    - name: Setup Star Wars Server
+    - name: Setup Servers
       shell: bash
       run: |
         sh ./scripts/install-node-v12.sh
         sh ./scripts/install-or-update-starwars-server.sh
-        cd ../starwars-server && npm start
-    - name: Setup Upload Server
-      shell: bash
-      run: |
-        cd SimpleUploadServer && nvm use && npm install && npm start
+        cd ../starwars-server && npm start &
+        cd SimpleUploadServer && nvm use && npm install && npm start &
         sudo chmod -R +rwx SimpleUploadServer
-    - name: Setup Subscription Server
-      shell: bash
-      run: |
         sh ./scripts/install-apollo-server-docs-example-server.sh
-        cd ../docs-examples/apollo-server/v3/subscriptions-graphql-ws && npm start
+        cd ../docs-examples/apollo-server/v3/subscriptions-graphql-ws && npm start &
+    # - name: Setup Upload Server
+    #   shell: bash
+    #   run: |
+    #     cd SimpleUploadServer && nvm use && npm install && npm start
+    #     sudo chmod -R +rwx SimpleUploadServer
+    # - name: Setup Subscription Server
+    #   shell: bash
+    #   run: |
+    #     sh ./scripts/install-apollo-server-docs-example-server.sh
+    #     cd ../docs-examples/apollo-server/v3/subscriptions-graphql-ws && npm start
     - name: Build and Test
       uses: ./.github/actions/build-and-run-unit-tests
       with:
