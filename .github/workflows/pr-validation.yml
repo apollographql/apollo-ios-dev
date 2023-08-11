@@ -177,6 +177,8 @@ jobs:
 
   run-integration-tests:
     runs-on: macos-13-xl
+    strategy:
+      fail-fast: false
     name: Run Integration Tests
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
@@ -212,7 +214,6 @@ jobs:
           command: 'generate'
           arguments: ''
     - name: Build and Test
-      continue-on-error: true
       uses: ./.github/actions/build-and-run-unit-tests
       with:
         destination: platform=macOS,arch=x86_64
