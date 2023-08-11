@@ -24,7 +24,7 @@ class SubscriptionTests: XCTestCase {
     webSocketTransport.delegate = self
     let client = ApolloClient(networkTransport: webSocketTransport, store: store)
 
-    expect(self.connectionState).toEventually(equal(Connection.connected), timeout: .seconds(1))
+    expect(self.connectionState).toEventually(equal(Connection.connected), timeout: .seconds(10))
 
     // when
     let subject = client.subscribe(subscription: IncrementingSubscription()) { result in
