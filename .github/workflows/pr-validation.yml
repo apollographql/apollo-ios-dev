@@ -194,7 +194,6 @@ jobs:
         export NVM_DIR="$HOME/.nvm"
         [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
         [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-        nvm install v12.22.10
         nvm install v18.15.0
         nvm use v18.15.0
         cd SimpleUploadServer && nvm use && npm install && npm start &
