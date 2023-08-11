@@ -196,12 +196,8 @@ jobs:
         [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
         nvm install v18.15.0
         nvm use v18.15.0
-        sh ./scripts/install-or-update-starwars-server.sh
-        cd ../starwars-server && npm start &
         cd SimpleUploadServer && nvm use && npm install && npm start &
         sudo chmod -R +rwx SimpleUploadServer
-        sh ./scripts/install-apollo-server-docs-example-server.sh
-        cd ../docs-examples/apollo-server/v3/subscriptions-graphql-ws && npm start &
     # - name: Setup Upload Server
     #   shell: bash
     #   run: |
