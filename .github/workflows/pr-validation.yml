@@ -196,7 +196,7 @@ jobs:
         [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
         nvm install v18.15.0
         nvm use v18.15.0
-        cd SimpleUploadServer && npm install && npm start &
+        cd SimpleUploadServer && npm start &
         sudo chmod -R +rwx SimpleUploadServer
     # - name: Setup Upload Server
     #   shell: bash
