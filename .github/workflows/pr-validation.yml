@@ -189,10 +189,13 @@ jobs:
     - name: Setup Repo
       id: setup-repo
       uses: ./.github/actions/setup-repo
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 12.22.10
     - name: Setup Upload Server
       shell: bash
       run: |
-        nvm install v12.22.10
         sudo chmod -R +rwx SimpleUploadServer
         cd SimpleUploadServer && npm install && npm start &
     - name: Setup Node
