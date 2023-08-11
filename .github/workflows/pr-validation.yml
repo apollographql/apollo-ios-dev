@@ -191,12 +191,17 @@ jobs:
       shell: bash
       run: |
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-        echo 'export NVM_DIR="$HOME/.nvm"' >> $GITHUB_ENV
-        echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $GITHUB_ENV
-        echo nvm install v12.22.10 >> $GITHUB_ENV
-        echo nvm use v18.15.0 >> $GITHUB_ENV
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+        nvm install v12.22.10
+        nvm use v18.15.0
+        sh ./scripts/install-or-update-starwars-server.sh
+        cd ../starwars-server && npm start &
         cd SimpleUploadServer && nvm use && npm install && npm start &
         sudo chmod -R +rwx SimpleUploadServer
+        sh ./scripts/install-apollo-server-docs-example-server.sh
+        cd ../docs-examples/apollo-server/v3/subscriptions-graphql-ws && npm start &
     # - name: Setup Upload Server
     #   shell: bash
     #   run: |
