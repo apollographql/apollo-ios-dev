@@ -189,6 +189,12 @@ jobs:
     - name: Setup Repo
       id: setup-repo
       uses: ./.github/actions/setup-repo
+    - name: Setup Upload Server
+      shell: bash
+      run: |
+        nvm install v12.22.10
+        sudo chmod -R +rwx SimpleUploadServer
+        cd SimpleUploadServer && npm install && npm start &
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
@@ -198,16 +204,11 @@ jobs:
       run: |
         sh ./scripts/install-apollo-server-docs-example-server.sh
         cd ../docs-examples/apollo-server/v3/subscriptions-graphql-ws && npm start &
-    # - name: Setup Star Wars Server
-    #   shell: bash
-    #   run: |
-    #     sh ./scripts/install-or-update-starwars-server.sh
-    #     cd ../starwars-server && npm start &
-    # - name: Setup Upload Server
-    #   shell: bash
-    #   run: |
-    #     sudo chmod -R +rwx SimpleUploadServer
-    #     cd SimpleUploadServer && npm install && npm start &
+    - name: Setup Star Wars Server
+      shell: bash
+      run: |
+        sh ./scripts/install-or-update-starwars-server.sh
+        cd ../starwars-server && npm start &
     - name: Run Tuist Generation
       uses: tuist/tuist-action@0.13.0
       with:
