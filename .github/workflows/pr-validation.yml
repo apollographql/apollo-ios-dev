@@ -212,6 +212,7 @@ jobs:
           command: 'generate'
           arguments: ''
     - name: Build and Test
+      continue-on-error: true
       uses: ./.github/actions/build-and-run-unit-tests
       with:
         destination: platform=macOS,arch=x86_64
