@@ -200,7 +200,7 @@ jobs:
       shell: bash
       run: |
         sudo chmod -R +rwx SimpleUploadServer
-        cd SimpleUploadServer && nvm use && npm install && npm start &
+        cd SimpleUploadServer && npm install && npm start &
     - name: Setup Subscription Server
       shell: bash
       run: |
