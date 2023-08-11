@@ -192,22 +192,22 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
-        node-version: 12.22.10
+        node-version: 18.15.0
     - name: Setup Subscription Server
       shell: bash
       run: |
         sh ./scripts/install-apollo-server-docs-example-server.sh
         cd ../docs-examples/apollo-server/v3/subscriptions-graphql-ws && npm start &
-    - name: Setup Star Wars Server
-      shell: bash
-      run: |
-        sh ./scripts/install-or-update-starwars-server.sh
-        cd ../starwars-server && npm start &
-    - name: Setup Upload Server
-      shell: bash
-      run: |
-        sudo chmod -R +rwx SimpleUploadServer
-        cd SimpleUploadServer && npm install && npm start &
+    # - name: Setup Star Wars Server
+    #   shell: bash
+    #   run: |
+    #     sh ./scripts/install-or-update-starwars-server.sh
+    #     cd ../starwars-server && npm start &
+    # - name: Setup Upload Server
+    #   shell: bash
+    #   run: |
+    #     sudo chmod -R +rwx SimpleUploadServer
+    #     cd SimpleUploadServer && npm install && npm start &
     - name: Run Tuist Generation
       uses: tuist/tuist-action@0.13.0
       with:
