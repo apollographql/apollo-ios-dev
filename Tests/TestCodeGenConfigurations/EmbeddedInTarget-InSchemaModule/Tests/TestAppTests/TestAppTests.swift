@@ -26,6 +26,7 @@ final class TestAppTests: XCTestCase {
     
     store.publish(records: records!) { _ in
       store.withinReadTransaction { transaction in
+        print("**Transaction Start**")
         let dog = try! transaction.readObject(
           ofType: AnimalKingdomAPI.DogQuery.Data.AllAnimal.self,
           withKey: "Dog:1")
