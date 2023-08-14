@@ -133,7 +133,7 @@ jobs:
   #         TestResults/ResultBundle.zip
 
   run-codegen-test-configurations:
-    runs-on: macos-13-xl
+    runs-on: macos-13
     name: Run Codegen Test Configurations
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
