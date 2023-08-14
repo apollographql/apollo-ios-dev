@@ -2,10 +2,10 @@ name: "PR CI Validation"
 
 env:
     XCODE_VERSION: "14.3.1"
-    ios_current_version: "16.4"
-    ios_previous_version: "15.5"
-    macos_version: "13.2"
-    tvos_version: "16.4"
+    IOS_CURRENT_VERSION: "16.4"
+    IOS_PREVIOUS_VERSION: "15.5"
+    MACOS_VERSION: "13.2"
+    TVOS_VERSION: "16.4"
 
 on: push
 
@@ -44,39 +44,39 @@ jobs:
           - destination: platform=macOS,arch=x86_64
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
-            name: macOS_current
+            name: Apollo Unit Tests - macOS ${{ env.MACOS_VERSION }}
             run-js-tests: false
           # iOS_current
-          - destination: platform=iOS Simulator,OS=16.4,name=iPhone 14
+          - destination: platform=iOS Simulator,OS=${{ env.IOS_CURRENT_VERSION }},name=iPhone 14
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
-            name: iOS_current
+            name: Apollo Unit Tests - iOS ${{ env.IOS_CURRENT_VERSION }}
             run-js-tests: false
           # iOS_previous
-          - destination: platform=iOS Simulator,OS=15.5,name=iPhone 13
+          - destination: platform=iOS Simulator,OS=${{ env.IOS_PREVIOUS_VERSION }},name=iPhone 13
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
-            name: iOS_previous
+            name: Apollo Unit Tests - iOS ${{ env.IOS_PREVIOUS_VERSION }}
             run-js-tests: false
           # tvOS_current
-          - destination: platform=tvOS Simulator,OS=16.4,name=Apple TV
+          - destination: platform=tvOS Simulator,OS=${{ env.TVOS_VERSION }},name=Apple TV
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
-            name: tvOS_current
+            name: Apollo Unit Tests - tvOS ${{ env.TVOS_VERSION }}
             run-js-tests: false
           # Codegen CLI Test
           - destination: platform=macOS,arch=x86_64
             scheme: CodegenCLITests
             test-plan: CodegenCLITestPlan
-            name: Codegen_CLI
+            name: Codegen CLI Unit Tests - macOS ${{ env.MACOS_VERSION }}
             run-js-tests: false
           # CodegenLib Test
           - destination: platform=macOS,arch=x86_64
             scheme: ApolloCodegenTests
             test-plan: Apollo-Codegen-CITestPlan
-            name: CodegenLib
+            name: Codegen Lib Unit Tests - macOS ${{ env.MACOS_VERSION }}
             run-js-tests: true
-    name: Build and Test ${{ matrix.test-plan }}
+    name: ${{ matrix.name }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
@@ -134,7 +134,7 @@ jobs:
 
   run-codegen-test-configurations:
     runs-on: macos-13-xl
-    name: Run Codegen Test Configurations
+    name: Codegen Test Configurations - macOS ${{ env.MACOS_VERSION }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
@@ -155,7 +155,7 @@ jobs:
 
   run-cocoapods-integration-tests:
     runs-on: macos-13
-    name: Run Cocoapods Integration Tests
+    name: Cocoapods Integration Tests - macOS ${{ env.MACOS_VERSION }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
@@ -179,7 +179,7 @@ jobs:
     runs-on: macos-13-xl
     strategy:
       fail-fast: false
-    name: Run Integration Tests
+    name: Apollo Integration Tests - macOS ${{ env.MACOS_VERSION }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
