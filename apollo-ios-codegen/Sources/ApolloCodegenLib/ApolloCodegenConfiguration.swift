@@ -979,6 +979,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   
   let ApolloAPITargetName: String
     // TEST LINE 1
+    // TEST LINE 2
   // MARK: Initializers
 
   /// Designated initializer.
