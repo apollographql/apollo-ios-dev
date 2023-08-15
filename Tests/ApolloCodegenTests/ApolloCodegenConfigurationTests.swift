@@ -13,7 +13,7 @@ class ApolloCodegenConfigurationTests: XCTestCase {
   var config: ApolloCodegenConfiguration!
 
   // MARK: Lifecycle
-
+// TEST LINE 1
   override func setUpWithError() throws {
     try super.setUpWithError()
     directoryURL = CodegenTestHelper.outputFolderURL()
