@@ -22,7 +22,8 @@ runs:
   - name: Split and Push ${{ inputs.subtree }}
     shell: bash
     run: |
-      splitResult=$(git subtree -P ${{ inputs.subtree }} split --squash --rejoin -m “split: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - ${{ inputs.pr-title }}”)
+      splitResult=$(git subtree -P ${{ inputs.subtree }} split --squash --rejoin -m "split: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - ${{ inputs.pr-title }}")
       if [ ! -z "$splitResult" ]
       then
         git subtree push -P ${{ inputs.subtree }} ${{ inputs.remote }} ${{ inputs.target-branch }}
+      fi
