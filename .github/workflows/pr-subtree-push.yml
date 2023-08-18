@@ -22,6 +22,7 @@ jobs:
         ssh-private-key: |
           ${{ secrets.APOLLO_IOS_DEPLOY_KEY }}
           ${{ secrets.APOLLO_IOS_CODEGEN_DEPLOY_KEY }}
+          ${{ secrets.APOLLO_IOS_DEV_DEPLOY_KEY }}
     - name: Subtree - Apollo iOS
       uses: ./.github/actions/subtree-split-push
       with:
