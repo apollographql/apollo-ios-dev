@@ -952,7 +952,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   // MARK: - Properties
-
+// SAMPLE CHANGE 1
+// SAMPLE CHANGE 2
   /// Name used to scope the generated schema type files.
   public let schemaNamespace: String
   /// The input files required for code generation.

@@ -11,7 +11,8 @@ public protocol ApolloInterceptor {
   /// need to be uniquely identifiable between each and every request, only unique between the
   /// list of interceptors in a single request.
   var id: String { get set }
-  
+  // SAMPLE CHANGE 1
+  // SAMPLE CHANGE 2
   /// Called when this interceptor should do its work.
   ///
   /// - Parameters:
