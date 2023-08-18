@@ -1,0 +1,44 @@
+name: "PR Subtree Push"
+
+on:
+  pull_request:
+    branches:
+        - test-subtree-merge
+    types: [closed]
+
+jobs:
+  split-subtrees:
+    if: ${{ github.event.pull_request.merged }}
+    runs-on: macos-13
+    name: ${{ matrix.subtree }} Split and Push
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+      with:
+        ref: test-subtree-merge
+    - name: Setup SSH Keys
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: |
+          ${{ secrets.APOLLO_IOS_DEPLOY_KEY }}
+          ${{ secrets.APOLLO_IOS_CODEGEN_DEPLOY_KEY }}
+    - name: Subtree - Apollo iOS
+      uses: ./.github/actions/subtree-split-push
+      with:
+        subtree: apollo-ios
+        remote: git@github.com:apollographql/apollo-ios.git
+        target-branch: test-subtree-merge
+        pr-number: ${{ github.event.pull_request.number }}
+        pr-title: ${{ github.event.pull_request.title }}
+    - name: Subtree - Apollo iOS Codegen
+      uses: ./.github/actions/subtree-split-push
+      with:
+        subtree: apollo-ios-codegen
+        remote: git@github.com:apollographql/apollo-ios-codegen.git
+        target-branch: test-subtree-merge
+        pr-number: ${{ github.event.pull_request.number }}
+        pr-title: ${{ github.event.pull_request.title }}
+    - name: Push Updated History
+      shell: bash
+      run: |
+        git push
