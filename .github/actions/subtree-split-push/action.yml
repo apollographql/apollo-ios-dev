@@ -16,6 +16,9 @@ inputs:
   pr-title: 
     description: "The title of the PR that triggered this action."
     required: true
+  pr-url:
+    description: "The URL to the PR that triggers this action."
+    required: true
 runs:
   using: "composite"
   steps:
@@ -25,5 +28,5 @@ runs:
       splitResult=$(git subtree -P ${{ inputs.subtree }} split --squash --rejoin -m "split: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - ${{ inputs.pr-title }}")
       if [ ! -z "$splitResult" ]
       then
-        git subtree push -P ${{ inputs.subtree }} ${{ inputs.remote }} ${{ inputs.target-branch }}
+        git subtree push -P ${{ inputs.subtree }} ${{ inputs.remote }} ${{ inputs.target-branch }} -m "subtree-push: ${{ inputs.pr-title }} (${{ inputs.pr-url }})"
       fi
