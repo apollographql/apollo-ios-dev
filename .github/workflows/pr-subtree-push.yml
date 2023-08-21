@@ -23,6 +23,10 @@ jobs:
           ${{ secrets.APOLLO_IOS_DEPLOY_KEY }}
           ${{ secrets.APOLLO_IOS_CODEGEN_DEPLOY_KEY }}
           ${{ secrets.APOLLO_IOS_DEV_DEPLOY_KEY }}
+    - name: Update Merge Commit Message
+      shell: bash
+      run: |
+        git commit --amend -m "${{ github.event.pull_request.title }} (apollographql/apollo-ios-dev#${{ github.event.pull_request.number }})"
     - name: Subtree - Apollo iOS
       uses: ./.github/actions/subtree-split-push
       with:
