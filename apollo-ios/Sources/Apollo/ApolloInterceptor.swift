@@ -12,6 +12,7 @@ public protocol ApolloInterceptor {
   /// list of interceptors in a single request.
   var id: String { get set }
   // SAMPLE CHANGE 1
+    // SAMPLE CHANGE 2
   /// Called when this interceptor should do its work.
   ///
   /// - Parameters:
