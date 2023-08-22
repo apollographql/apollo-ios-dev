@@ -15,7 +15,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v3
       with:
-        ref: test-subtree-merge
+        ref: project-breakup
         fetch-depth: 0
     - name: Setup SSH Keys
       uses: webfactory/ssh-agent@v0.7.0
@@ -34,7 +34,7 @@ jobs:
       with:
         subtree: apollo-ios
         remote: git@github.com:apollographql/apollo-ios.git
-        target-branch: test-subtree-merge
+        target-branch: project-breakup
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Subtree - Apollo iOS Codegen
@@ -42,7 +42,7 @@ jobs:
       with:
         subtree: apollo-ios-codegen
         remote: git@github.com:apollographql/apollo-ios-codegen.git
-        target-branch: test-subtree-merge
+        target-branch: project-breakup
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Push Updated History
