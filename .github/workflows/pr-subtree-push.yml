@@ -16,6 +16,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         ref: test-subtree-merge
+        fetch-depth: 0
     - name: Setup SSH Keys
       uses: webfactory/ssh-agent@v0.7.0
       with:
