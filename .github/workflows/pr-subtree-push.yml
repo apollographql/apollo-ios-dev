@@ -27,6 +27,7 @@ jobs:
       shell: bash
       run: |
         git commit --amend -m "${{ github.event.pull_request.title }} (apollographql/apollo-ios-dev#${{ github.event.pull_request.number }})"
+        git push
     - name: Subtree - Apollo iOS
       uses: ./.github/actions/subtree-split-push
       with:
