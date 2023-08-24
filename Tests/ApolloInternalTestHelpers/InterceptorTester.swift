@@ -1,4 +1,5 @@
 import Apollo
+import Foundation
 
 /// Use this interceptor tester to isolate a single `ApolloInterceptor` vs. having to create an
 /// `InterceptorRequestChain` and end the interceptor list with `JSONResponseParsingInterceptor`

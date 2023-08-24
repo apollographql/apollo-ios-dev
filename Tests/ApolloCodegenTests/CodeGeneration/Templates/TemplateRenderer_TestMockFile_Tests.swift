@@ -136,7 +136,7 @@ class TemplateRenderer_TestMockFile_Tests: XCTestCase {
   func test__renderTargetSchemaFile__given_cocoapodsCompatibleImportStatements_true_importTargetNameIsApollo() {
     // given
     let expected = """
-    import Apollo
+    import ApolloTestSupport
     import TestSchema
 
     """
