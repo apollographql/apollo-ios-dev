@@ -1,4 +1,6 @@
+import Foundation
 import ArgumentParser
+import ApolloCodegenLib
 
 /// Shared group of common arguments used in commands for input parameters.
 struct InputOptions: ParsableArguments {
@@ -22,4 +24,22 @@ struct InputOptions: ParsableArguments {
     help: "Increase verbosity to include debug output."
   )
   var verbose: Bool = false
+  
+  @Flag(
+    name: .long,
+    help: "Ignore Apollo version mismatch errors. Warning: This may lead to incompatible generated objects."
+  )
+  var ignoreVersionMismatch: Bool = false
+
+  func getCodegenConfiguration(fileManager: FileManager) throws -> ApolloCodegenConfiguration {
+    var data: Data
+    switch (string, path) {
+    case let (.some(string), _):
+      data = try string.asData()
+
+    case let (nil, path):
+      data = try fileManager.unwrappedContents(atPath: path)
+    }
+    return try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: data)
+  }
 }

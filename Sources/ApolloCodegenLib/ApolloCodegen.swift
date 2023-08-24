@@ -67,6 +67,29 @@ public class ApolloCodegen {
       }
     }
   }
+  
+  /// OptionSet used to configure what items should be generated during code generation.
+  public struct ItemsToGenerate: OptionSet {
+    public var rawValue: Int
+    
+    /// Only generate your code (Operations, Fragments, Enums, etc), this option maintains the codegen functionality
+    /// from before this option set was created.
+    public static let code = ItemsToGenerate(rawValue: 1 << 0)
+    
+    /// Only generate the operation manifest used for persisted queries and automatic persisted queries.
+    public static let operationManifest = ItemsToGenerate(rawValue: 1 << 1)
+    
+    /// Generate all available items during code generation.
+    public static let all: ItemsToGenerate = [
+      .code,
+      .operationManifest
+    ]
+    
+    public init(rawValue: Int) {
+      self.rawValue = rawValue
+    }
+    
+  }
 
   /// Executes the code generation engine with a specified configuration.
   ///
@@ -75,17 +98,21 @@ public class ApolloCodegen {
   ///     during code generation.
   ///   - rootURL: The root `URL` to resolve relative `URL`s in the configuration's paths against.
   ///     If `nil`, the current working directory of the executing process will be used.
+  ///   - itemsToGenerate: Uses the `ItemsToGenerate` option set to determine what items should be generated during codegen.
+  ///     By default this will use [.code] which maintains how codegen functioned prior to these options being added.
   public static func build(
     with configuration: ApolloCodegenConfiguration,
-    withRootURL rootURL: URL? = nil
+    withRootURL rootURL: URL? = nil,
+    itemsToGenerate: ItemsToGenerate = [.code]
   ) throws {
-    try build(with: configuration, rootURL: rootURL)
+    try build(with: configuration, rootURL: rootURL, itemsToGenerate: itemsToGenerate)
   }
 
   internal static func build(
     with configuration: ApolloCodegenConfiguration,
     rootURL: URL? = nil,
-    fileManager: ApolloFileManager = .default
+    fileManager: ApolloFileManager = .default,
+    itemsToGenerate: ItemsToGenerate
   ) throws {
 
     let configContext = ConfigurationContext(
@@ -103,25 +130,41 @@ public class ApolloCodegen {
     try validate(configContext, with: compilationResult)
 
     let ir = IR(compilationResult: compilationResult)
+    
+    if itemsToGenerate == .operationManifest {
+      var operationIDsFileGenerator = OperationManifestFileGenerator(config: configContext)
+      
+      for operation in compilationResult.operations {
+        autoreleasepool {
+          let irOperation = ir.build(operation: operation)
+          operationIDsFileGenerator?.collectOperationIdentifier(irOperation)
+        }
+      }
+      
+      try operationIDsFileGenerator?.generate(fileManager: fileManager)
+    }
 
-    var existingGeneratedFilePaths = configuration.options.pruneGeneratedFiles ?
-    try findExistingGeneratedFilePaths(
-      config: configContext,
-      fileManager: fileManager
-    ) : []
+    if itemsToGenerate.contains(.code) {
+      var existingGeneratedFilePaths = configuration.options.pruneGeneratedFiles ?
+      try findExistingGeneratedFilePaths(
+        config: configContext,
+        fileManager: fileManager
+      ) : []
 
-    try generateFiles(
-      compilationResult: compilationResult,
-      ir: ir,
-      config: configContext,
-      fileManager: fileManager
-    )
-
-    if configuration.options.pruneGeneratedFiles {
-      try deleteExtraneousGeneratedFiles(
-        from: &existingGeneratedFilePaths,
-        afterCodeGenerationUsing: fileManager
+      try generateFiles(
+        compilationResult: compilationResult,
+        ir: ir,
+        config: configContext,
+        fileManager: fileManager,
+        itemsToGenerate: itemsToGenerate
       )
+
+      if configuration.options.pruneGeneratedFiles {
+        try deleteExtraneousGeneratedFiles(
+          from: &existingGeneratedFilePaths,
+          afterCodeGenerationUsing: fileManager
+        )
+      }
     }
   }
 
@@ -261,10 +304,10 @@ public class ApolloCodegen {
       )
     }
     
-    var fragments: [IR.NamedFragment] = selectionSet.selections.direct?.fragments.values.map { $0.fragment } ?? []
-    fragments.append(contentsOf: selectionSet.selections.merged.fragments.values.map { $0.fragment })
+    var namedFragments: [IR.NamedFragment] = selectionSet.selections.direct?.namedFragments.values.map(\.fragment) ?? []
+    namedFragments.append(contentsOf: selectionSet.selections.merged.namedFragments.values.map(\.fragment))
     
-    try fragments.forEach { fragment in
+    try namedFragments.forEach { fragment in
       if let existingTypeName = combinedTypeNames[fragment.generatedDefinitionName] {
         throw Error.typeNameConflict(
           name: existingTypeName,
@@ -274,9 +317,9 @@ public class ApolloCodegen {
       }
     }
     
-    // gather nested fragments to loop through and check as well
-    var nestedSelectionSets: [IR.SelectionSet] = selectionSet.selections.direct?.inlineFragments.values.elements ?? []
-    nestedSelectionSets.append(contentsOf: selectionSet.selections.merged.inlineFragments.values)
+    // gather nested fragments to loop through and check as well    
+    var nestedSelectionSets: [IR.SelectionSet] = selectionSet.selections.direct?.inlineFragments.values.map(\.selectionSet) ?? []
+    nestedSelectionSets.append(contentsOf: selectionSet.selections.merged.inlineFragments.values.map(\.selectionSet))
     
     try nestedSelectionSets.forEach { nestedSet in
       try validateTypeConflicts(
@@ -305,8 +348,14 @@ public class ApolloCodegen {
     )
 
     guard graphqlErrors.isEmpty else {
-      let errorlines = graphqlErrors.flatMap({ $0.logLines })
-      CodegenLogger.log(String(describing: errorlines), logLevel: .error)
+      let errorlines = graphqlErrors.flatMap({
+        if let logLines = $0.logLines {
+          return logLines
+        } else {
+          return ["\($0.name ?? "unknown"): \($0.message ?? "")"]
+        }
+      })
+      CodegenLogger.log(errorlines.joined(separator: "\n"), logLevel: .error)
       throw Error.graphQLSourceValidationFailure(atLines: errorlines)
     }
 
@@ -374,7 +423,8 @@ public class ApolloCodegen {
     compilationResult: CompilationResult,
     ir: IR,
     config: ConfigurationContext,
-    fileManager: ApolloFileManager = .default
+    fileManager: ApolloFileManager = .default,
+    itemsToGenerate: ItemsToGenerate
   ) throws {
     for fragment in compilationResult.fragments {
       try autoreleasepool {
@@ -394,11 +444,15 @@ public class ApolloCodegen {
         try OperationFileGenerator(irOperation: irOperation, config: config)
           .generate(forConfig: config, fileManager: fileManager)
 
-        operationIDsFileGenerator?.collectOperationIdentifier(irOperation)
+        if itemsToGenerate.contains(.operationManifest) {
+          operationIDsFileGenerator?.collectOperationIdentifier(irOperation)
+        }
       }
     }
 
-    try operationIDsFileGenerator?.generate(fileManager: fileManager)
+    if itemsToGenerate.contains(.operationManifest) {
+      try operationIDsFileGenerator?.generate(fileManager: fileManager)
+    }
     operationIDsFileGenerator = nil
 
     for graphQLObject in ir.schema.referencedTypes.objects {
