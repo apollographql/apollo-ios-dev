@@ -204,8 +204,8 @@ struct SelectionSetTemplate {
     _ deprecatedArguments: inout [DeprecatedArgument]?
   ) -> [TemplateString] {
     selections.fields.values.map { FieldSelectionTemplate($0, &deprecatedArguments) } +
-    selections.inlineFragments.values.map { InlineFragmentSelectionTemplate($0) } +
-    selections.fragments.values.map { FragmentSelectionTemplate($0) }
+    selections.inlineFragments.values.map { InlineFragmentSelectionTemplate($0.selectionSet) } +
+    selections.namedFragments.values.map { FragmentSelectionTemplate($0) }
   }
 
   private func renderedConditionalSelectionGroup(
@@ -283,7 +283,7 @@ struct SelectionSetTemplate {
     """
   }
 
-  private func FragmentSelectionTemplate(_ fragment: IR.FragmentSpread) -> TemplateString {
+  private func FragmentSelectionTemplate(_ fragment: IR.NamedFragmentSpread) -> TemplateString {
     """
     .fragment(\(fragment.definition.name.asFragmentName).self)
     """
@@ -309,7 +309,7 @@ struct SelectionSetTemplate {
     return """
     \(documentation: field.underlyingField.documentation, config: config)
     \(deprecationReason: field.underlyingField.deprecationReason, config: config)
-    \(renderAccessControl())var \(field.responseKey.asFieldPropertyName): \
+    \(renderAccessControl())var \(field.responseKey.renderAsFieldPropertyName(config: config.config)): \
     \(typeName(for: field, forceOptional: field.isConditionallyIncluded(in: scope))) {\
     \(if: isMutable,
       """
@@ -329,9 +329,9 @@ struct SelectionSetTemplate {
   ) -> TemplateString {
     """
     \(ifLet: selections.direct?.inlineFragments.values, {
-        "\($0.map { InlineFragmentAccessorTemplate($0) }, separator: "\n")"
+      "\($0.map { InlineFragmentAccessorTemplate($0.selectionSet) }, separator: "\n")"
       })
-    \(selections.merged.inlineFragments.values.map { InlineFragmentAccessorTemplate($0) }, separator: "\n")
+    \(selections.merged.inlineFragments.values.map { InlineFragmentAccessorTemplate($0.selectionSet) }, separator: "\n")
     """
   }
 
@@ -355,8 +355,8 @@ struct SelectionSetTemplate {
     _ selections: IR.SelectionSet.Selections,
     in scope: IR.ScopeDescriptor
   ) -> TemplateString {
-    guard !(selections.direct?.fragments.isEmpty ?? true) ||
-            !selections.merged.fragments.isEmpty else {
+    guard !(selections.direct?.namedFragments.isEmpty ?? true) ||
+            !selections.merged.namedFragments.isEmpty else {
       return ""
     }
 
@@ -364,18 +364,18 @@ struct SelectionSetTemplate {
     \(renderAccessControl())struct Fragments: FragmentContainer {
       \(DataFieldAndInitializerTemplate())
 
-      \(ifLet: selections.direct?.fragments.values, {
-        "\($0.map { FragmentAccessorTemplate($0, in: scope) }, separator: "\n")"
+      \(ifLet: selections.direct?.namedFragments.values, {
+        "\($0.map { NamedFragmentAccessorTemplate($0, in: scope) }, separator: "\n")"
         })
-      \(selections.merged.fragments.values.map {
-          FragmentAccessorTemplate($0, in: scope)
+      \(selections.merged.namedFragments.values.map {
+          NamedFragmentAccessorTemplate($0, in: scope)
         }, separator: "\n")
     }
     """
   }
 
-  private func FragmentAccessorTemplate(
-    _ fragment: IR.FragmentSpread,
+  private func NamedFragmentAccessorTemplate(
+    _ fragment: IR.NamedFragmentSpread,
     in scope: IR.ScopeDescriptor
   ) -> TemplateString {
     let name = fragment.definition.name
@@ -443,7 +443,7 @@ struct SelectionSetTemplate {
   ) -> TemplateString {
     let isOptional: Bool = field.type.isNullable || field.isConditionallyIncluded(in: scope)
     return """
-    \(field.responseKey.asFieldPropertyName): \(typeName(for: field, forceOptional: isOptional))\
+    \(field.responseKey.renderAsFieldPropertyName(config: config.config)): \(typeName(for: field, forceOptional: isOptional))\
     \(if: isOptional, " = nil")
     """
   }
@@ -475,7 +475,7 @@ struct SelectionSetTemplate {
     }()
 
     return """
-    "\(field.responseKey)": \(field.responseKey.asFieldPropertyName)\
+    "\(field.responseKey)": \(field.responseKey.renderAsFieldPropertyName(config: config.config))\
     \(if: isEntityField, "._fieldData")
     """
   }
@@ -532,9 +532,9 @@ struct SelectionSetTemplate {
   private func ChildTypeCaseSelectionSets(_ selections: IR.SelectionSet.Selections) -> TemplateString {
     """
     \(ifLet: selections.direct?.inlineFragments.values, {
-        "\($0.map { render(inlineFragment: $0) }, separator: "\n\n")"
+      "\($0.map { render(inlineFragment: $0.selectionSet) }, separator: "\n\n")"
       })
-    \(selections.merged.inlineFragments.values.map { render(inlineFragment: $0) }, separator: "\n\n")
+    \(selections.merged.inlineFragments.values.map { render(inlineFragment: $0.selectionSet) }, separator: "\n\n")
     """    
   }
 
@@ -647,6 +647,14 @@ fileprivate extension IR.MergedSelections.MergedSource {
       nodesToSharedRoot += 1
     }
 
+    /// If the shared root is the root of the definition, we should just generate the fully
+    /// qualified name.
+    if sourceTypePathCurrentNode.isHead {
+      return SelectionSetNameGenerator.generatedSelectionSetName(
+        for: self, format: .fullyQualified, pluralizer: pluralizer
+      )
+    }
+
     let sharedRootIndex =
       typeInfo.entity.location.fieldPath!.count - (nodesToSharedRoot + 1)
 
@@ -657,11 +665,7 @@ fileprivate extension IR.MergedSelections.MergedSource {
     ///
     /// Example: The `height` field on `AllAnimals.AsPet` can reference the `AllAnimals.Height`
     /// object as just `Height`.
-    ///
-    /// However, if the shared root is the root of the definition, the component that would be
-    /// removed is the location's `source`. This is not included in the field path and is already
-    /// omitted by this function. In this case, the `sharedRootIndex` is `-1`.
-    let removeFirstComponent = nodesToSharedRoot <= 1 && !(sharedRootIndex < 0)
+    let removeFirstComponent = nodesToSharedRoot <= 1
 
     let fieldPath = typeInfo.entity.location.fieldPath!.node(
       at: max(0, sharedRootIndex)
@@ -728,7 +732,7 @@ fileprivate extension IR.MergedSelections.MergedSource {
         mergedFragmentEntityConditionPathNode = node
       }
       selectionSetNameComponents.append(
-        SelectionSetNameGenerator.ConditionPath.path(for: node)
+        node.value.selectionSetNameComponent
       )
       fulfilledFragments.append(selectionSetNameComponents.joined(separator: "."))
     }
@@ -946,8 +950,8 @@ extension IR.SelectionSet.Selections {
     SelectionsIterator(direct: direct?.fields, merged: merged.fields)
   }
 
-  fileprivate func makeFragmentIterator() -> SelectionsIterator<IR.FragmentSpread> {
-    SelectionsIterator(direct: direct?.fragments, merged: merged.fragments)
+  fileprivate func makeFragmentIterator() -> SelectionsIterator<IR.NamedFragmentSpread> {
+    SelectionsIterator(direct: direct?.namedFragments, merged: merged.namedFragments)
   }
 
   fileprivate struct SelectionsIterator<SelectionType>: IteratorProtocol {
