@@ -1,4 +1,4 @@
-@testable import ApolloAPI
+import ApolloAPI
 
 open class MockOperation<SelectionSet: RootSelectionSet>: GraphQLOperation {
   public typealias Data = SelectionSet

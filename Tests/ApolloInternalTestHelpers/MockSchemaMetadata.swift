@@ -1,5 +1,5 @@
-@testable import Apollo
-@testable import ApolloAPI
+import Apollo
+import ApolloAPI
 
 extension Object {
   public static let mock = Object(typename: "Mock", implementedInterfaces: [])
