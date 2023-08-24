@@ -18,12 +18,6 @@ public struct Generate: ParsableCommand {
   )
   var fetchSchema: Bool = false
 
-  @Flag(
-    name: .long,
-    help: "Ignore Apollo version mismatch errors. Warning: This may lead to incompatible generated objects."
-  )
-  var ignoreVersionMismatch: Bool = false
-
   // MARK: - Implementation
 
   public init() { }
@@ -40,81 +34,51 @@ public struct Generate: ParsableCommand {
   ) throws {
     logger.SetLoggingLevel(verbose: inputs.verbose)
 
-    try checkForCLIVersionMismatch()
+    try checkForCLIVersionMismatch(
+      with: inputs
+    )
 
-    switch (inputs.string, inputs.path) {
-    case let (.some(string), _):
-      try generate(
-        data: try string.asData(),
-        codegenProvider: codegenProvider,
-        schemaDownloadProvider: schemaDownloadProvider
-      )
-
-    case let (nil, path):
-      let data = try fileManager.unwrappedContents(atPath: path)
-      try generate(
-        data: data,
-        codegenProvider: codegenProvider,
-        schemaDownloadProvider: schemaDownloadProvider
-      )
-    }
-  }
-
-  private func checkForCLIVersionMismatch() throws {
-    if case let .versionMismatch(cliVersion, apolloVersion) =
-        try VersionChecker.matchCLIVersionToApolloVersion(projectRootURL: rootOutputURL(for: inputs)) {
-      let errorMessage = """
-        Apollo Version Mismatch
-        We've detected that the version of the Apollo Codegen CLI does not match the version of the
-        Apollo library used in your project. This may lead to incompatible generated objects.
-
-        Please update your version of the Codegen CLI by following the instructions at:
-        https://www.apollographql.com/docs/ios/code-generation/codegen-cli/#installation
-
-        CLI version: \(cliVersion)
-        Apollo version: \(apolloVersion)
-        """
-
-      if ignoreVersionMismatch {
-        print("""
-          Warning: \(errorMessage)
-          """)
-      } else {
-
-        throw Error(errorDescription: """
-          Error: \(errorMessage)
-
-          To ignore this error during code generation, use the argument: --ignore-version-mismatch.
-          """)
-      }
-    }
+    try generate(
+      configuration: inputs.getCodegenConfiguration(fileManager: fileManager),
+      codegenProvider: codegenProvider,
+      schemaDownloadProvider: schemaDownloadProvider
+    )
   }
 
   private func generate(
-    data: Data,
+    configuration: ApolloCodegenConfiguration,
     codegenProvider: CodegenProvider.Type,
     schemaDownloadProvider: SchemaDownloadProvider.Type
   ) throws {
-    let configuration = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: data)
-
     if fetchSchema {
       guard
-        let schemaDownloadConfiguration = configuration.schemaDownloadConfiguration
+        let schemaDownload = configuration.schemaDownload
       else {
         throw Error(errorDescription: """
-          Missing schema download configuration. Hint: check the `schemaDownloadConfiguration` \
+          Missing schema download configuration. Hint: check the `schemaDownload` \
           property of your configuration.
           """
         )
       }
 
       try fetchSchema(
-        configuration: schemaDownloadConfiguration,
+        configuration: schemaDownload,
         schemaDownloadProvider: schemaDownloadProvider
       )
     }
+    
+    var itemsToGenerate: ApolloCodegen.ItemsToGenerate = .code
+        
+    if let operationManifest = configuration.operationManifest,
+        operationManifest.generateManifestOnCodeGeneration {
+      itemsToGenerate.insert(.operationManifest)
+    }
 
-    try codegenProvider.build(with: configuration, withRootURL: rootOutputURL(for: inputs))
+    try codegenProvider.build(
+      with: configuration,
+      withRootURL: rootOutputURL(for: inputs),
+      itemsToGenerate: itemsToGenerate
+    )
   }
 
   private func fetchSchema(

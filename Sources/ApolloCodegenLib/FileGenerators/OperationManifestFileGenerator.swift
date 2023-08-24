@@ -12,9 +12,9 @@ struct OperationManifestItem {
     self.identifier = operation.operationIdentifier
     self.type = operation.definition.operationType
 
-    var source = operation.definition.source
+    var source = operation.definition.source.convertedToSingleLine()
     for fragment in operation.referencedFragments {
-      source += "\n\(fragment.definition.source)"
+      source += #"\n\#(fragment.definition.source.convertedToSingleLine())"#
     }
     self.source = source
   }
@@ -37,7 +37,7 @@ struct OperationManifestFileGenerator {
   /// Parameters:
   ///  - config: A configuration object specifying output behavior.
   init?(config: ApolloCodegen.ConfigurationContext) {
-    guard config.output.operationManifest != nil else {
+    guard config.operationManifest != nil else {
       return nil
     }
 
@@ -57,18 +57,33 @@ struct OperationManifestFileGenerator {
   func generate(fileManager: ApolloFileManager = .default) throws {
     let rendered: String = try template.render(operations: operationManifest)
 
+    var manifestPath = config.operationManifest.unsafelyUnwrapped.path
+    let relativePrefix = "./"
+      
+    // if path begins with './' the path should be relative to the config.rootURL
+    if manifestPath.hasPrefix(relativePrefix) {
+      let fileURL = URL(fileURLWithPath: String(manifestPath.dropFirst(relativePrefix.count)), relativeTo: config.rootURL)
+      manifestPath = fileURL
+          .resolvingSymlinksInPath()
+          .path
+    }
+    
+    if !manifestPath.hasSuffix(".json") {
+      manifestPath.append(".json")
+    }
+      
     try fileManager.createFile(
-      atPath: config.output.operationManifest.unsafelyUnwrapped.path,
+      atPath: manifestPath,
       data: rendered.data(using: .utf8),
       overwrite: true
     )
   }
 
   var template: any OperationManifestTemplate {
-    switch config.output.operationManifest.unsafelyUnwrapped.version {
+    switch config.operationManifest.unsafelyUnwrapped.version {
     case .persistedQueries:
       return PersistedQueriesOperationManifestTemplate(config: config)
-    case .legacyAPQ:
+    case .legacy:
       return LegacyAPQOperationManifestTemplate()
     }
   }
