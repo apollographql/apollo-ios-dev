@@ -22,9 +22,9 @@ class OperationManifestFileGeneratorTests: XCTestCase {
 
   private func buildSubject(
     path: String? = nil,
-    version: ApolloCodegenConfiguration.OperationManifestFileOutput.Version = .legacyAPQ
+    version: ApolloCodegenConfiguration.OperationManifestConfiguration.Version = .legacy
   ) throws {
-    let manifest: ApolloCodegenConfiguration.OperationManifestFileOutput? = {
+    let manifest: ApolloCodegenConfiguration.OperationManifestConfiguration? = {
       guard let path else { return nil }
       return .init(path: path, version: version)
     }()
@@ -32,9 +32,9 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     subject = try OperationManifestFileGenerator(
       config: ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(
         output: .init(
-          schemaTypes: .init(path: "", moduleType: .swiftPackageManager),
-          operationManifest: manifest
-        )
+          schemaTypes: .init(path: "", moduleType: .swiftPackageManager)
+        ),
+        operationManifest: manifest
       ))
     ).xctUnwrapped()
   }
@@ -43,10 +43,14 @@ class OperationManifestFileGeneratorTests: XCTestCase {
 
   func test__initializer__givenPath_shouldReturnInstance() {
     // given
-    let config = ApolloCodegenConfiguration.mock(output: .init(
-      schemaTypes: .init(path: "", moduleType: .swiftPackageManager),
-      operationManifest: .init(path: "a/file/path")
-    ))
+    let config = ApolloCodegenConfiguration.mock(
+      output: .init(
+        schemaTypes: .init(path: "", moduleType: .swiftPackageManager)
+      ),
+      operationManifest: .init(
+        path: "a/file/path"
+      )
+    )
 
     // when
     let instance = OperationManifestFileGenerator(config: .init(config: config))
@@ -57,10 +61,12 @@ class OperationManifestFileGeneratorTests: XCTestCase {
 
   func test__initializer__givenNilPath_shouldReturnNil() {
     // given
-    let config = ApolloCodegenConfiguration.mock(output: .init(
-      schemaTypes: .init(path: "", moduleType: .swiftPackageManager),
+    let config = ApolloCodegenConfiguration.mock(
+      output: .init(
+        schemaTypes: .init(path: "", moduleType: .swiftPackageManager)
+      ),
       operationManifest: nil
-    ))
+    )
 
     // when
     let instance = OperationManifestFileGenerator(config: .init(config: config))
@@ -71,7 +77,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
 
   // MARK: Generate Tests
 
-  func test__generate__givenOperation_shouldWriteToPath() throws {
+  func test__generate__givenOperation_shouldWriteToAbsolutePath() throws {
     // given
     let filePath = "path/to/match"
     try buildSubject(path: filePath)
@@ -95,7 +101,120 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     fileManager.mock(closure: .createFile({ path, data, attributes in
-      expect(path).to(equal(filePath))
+      expect(path).to(equal("\(filePath).json"))
+
+      return true
+    }))
+
+    // when
+    try subject.generate(fileManager: fileManager)
+
+    expect(self.fileManager.allClosuresCalled).to(beTrue())
+  }
+  
+  func test__generate__givenOperation_withPathExtension_shouldWriteToAbsolutePathWithSinglePathExtension() throws {
+    // given
+    let filePath = "path/to/match"
+    try buildSubject(path: "\(filePath).json")
+
+    subject.collectOperationIdentifier(.mock(
+      name: "TestQuery",
+      type: .query,
+      source: """
+        query TestQuery {
+          test
+        }
+        """
+    ))
+
+    fileManager.mock(closure: .fileExists({ path, isDirectory in
+      return false
+    }))
+
+    fileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
+      // no-op
+    }))
+
+    fileManager.mock(closure: .createFile({ path, data, attributes in
+      expect(path).to(equal("\(filePath).json"))
+
+      return true
+    }))
+
+    // when
+    try subject.generate(fileManager: fileManager)
+
+    expect(self.fileManager.allClosuresCalled).to(beTrue())
+  }
+  
+  func test__generate__givenOperation_shouldWriteToRelativePath() throws {
+    // given
+    let filePath = "./path/to/match"
+    try buildSubject(path: filePath)
+
+    subject.collectOperationIdentifier(.mock(
+      name: "TestQuery",
+      type: .query,
+      source: """
+        query TestQuery {
+          test
+        }
+        """
+    ))
+
+    fileManager.mock(closure: .fileExists({ path, isDirectory in
+      return false
+    }))
+
+    fileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
+      // no-op
+    }))
+
+    fileManager.mock(closure: .createFile({ path, data, attributes in
+      let expectedPath = URL(fileURLWithPath: String(filePath.dropFirst(2)), relativeTo: self.subject.config.rootURL)
+        .resolvingSymlinksInPath()
+        .appendingPathExtension("json")
+        .path
+      expect(path).to(equal(expectedPath))
+
+      return true
+    }))
+
+    // when
+    try subject.generate(fileManager: fileManager)
+
+    expect(self.fileManager.allClosuresCalled).to(beTrue())
+  }
+  
+  func test__generate__givenOperation_withPathExtension_shouldWriteToRelativePathWithSinglePathExtension() throws {
+    // given
+    let filePath = "./path/to/match"
+    try buildSubject(path: "\(filePath).json")
+
+    subject.collectOperationIdentifier(.mock(
+      name: "TestQuery",
+      type: .query,
+      source: """
+        query TestQuery {
+          test
+        }
+        """
+    ))
+
+    fileManager.mock(closure: .fileExists({ path, isDirectory in
+      return false
+    }))
+
+    fileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
+      // no-op
+    }))
+
+    fileManager.mock(closure: .createFile({ path, data, attributes in
+      let expectedPath = URL(fileURLWithPath: String(filePath.dropFirst(2)), relativeTo: self.subject.config.rootURL)
+        .resolvingSymlinksInPath()
+        .appendingPathExtension("json")
+        .path
+      expect(path).to(equal(expectedPath))
 
       return true
     }))
@@ -130,14 +249,14 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     fileManager.mock(closure: .createFile({ path, data, attributes in
-      expect(path).to(equal(filePath))
+      expect(path).to(equal("\(filePath).json"))
 
       expect(String(data: data!, encoding: .utf8)).to(equal(
         """
         {
-          "b02d2d734060114f64b24338486748f4f1f00838e07a293cc4e0f73f98fe3dad" : {
-            "name" : "TestQuery",
-            "source" : "query TestQuery {\\n  test\\n}"
+          "8ed9fcbb8ef3c853ad0ecdc920eb8216608bd7c3b32258744e9289ec0372eb30" : {
+            "name": "TestQuery",
+            "source": "query TestQuery { test }"
           }
         }
         """
@@ -154,9 +273,9 @@ class OperationManifestFileGeneratorTests: XCTestCase {
 
   // MARK: - Template Type Selection Tests
 
-  func test__template__givenOperationManifestVersion_apqLegacy__isLegacyAPQTemplate() throws {
+  func test__template__givenOperationManifestVersion_legacy__isLegacyTemplate() throws {
     // given
-    try buildSubject(path: "a/path", version: .legacyAPQ)
+    try buildSubject(path: "a/path", version: .legacy)
 
     // when
     let actual = subject.template

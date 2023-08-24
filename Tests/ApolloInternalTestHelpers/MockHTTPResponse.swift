@@ -1,6 +1,5 @@
 import Apollo
 import ApolloAPI
-import Foundation
 
 extension HTTPResponse {
   public static func mock(

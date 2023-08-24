@@ -9,7 +9,6 @@ import ApolloAPI
 
 enum SchemaConfiguration: ApolloAPI.SchemaConfiguration {
   static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
-      print("**CacheKeyInfo** - \(String(describing: object["id"]))")
-      return try? CacheKeyInfo(jsonValue: object["id"])
+    try? CacheKeyInfo(jsonValue: object["id"])
   }
 }
