@@ -9,3 +9,8 @@ target 'pod-install-test' do
   pod 'Apollo', :path => "../../../apollo-ios/"
   pod 'ApolloTestSupport', :path => "../../../apollo-ios/"
 end
+
+post_install do |installer|
+    system('mkdir Pods/Apollo')
+    system('cp "../../../../../apollo-ios/apollo-ios-cli" ./Pods/Apollo')
+end
