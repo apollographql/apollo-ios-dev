@@ -1,6 +1,6 @@
 @testable import Apollo
 import Foundation
-
+// SAMPLE CHANGE 1
 /// An accumulator that converts data from a `Mock` to the correct values to create a `SelectionSet`.
 final class TestMockSelectionSetMapper<T: SelectionSet>: GraphQLResultAccumulator {
 
