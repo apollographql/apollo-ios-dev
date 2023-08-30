@@ -22,6 +22,9 @@ xcuserdata/
 .DS_Store
 *.tar.gz
 
+## Visual Studio Code
+.vscode/launch.json
+
 ## Obj-C/Swift specific
 *.hmap
 *.ipa

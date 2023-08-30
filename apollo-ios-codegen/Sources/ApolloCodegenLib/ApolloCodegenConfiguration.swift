@@ -896,6 +896,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
      * - Note: This feature is experimental and may change or be removed in the
      * future.
      */
+
+    /// TODO: Deprecate this property if #3114 will not be done
+
     public let clientControlledNullability: Bool
 
     /**
