@@ -3,7 +3,7 @@ name: "PR Subtree Push"
 on:
   pull_request:
     branches:
-        - test-subtree-merge
+        - project-breakup
     types: [closed]
 
 jobs:
