@@ -42,6 +42,10 @@ If you are new to Apollo iOS we recommend our [Getting Started](https://www.apol
 
 There is also [comprehensive documentation](https://www.apollographql.com/docs/ios/) including an [API reference](https://www.apollographql.com/docs/ios/docc/documentation/index).
 
+### Carthage/XCFramework Support
+
+The Apollo iOS repo no longer contains an Xcode project, as a result if you are using Carthage or need to build XCFrameworks for use in your development environment you will want to use the [apollo-ios-xcframework](https://github.com/apollographql/apollo-ios-xcframework) repo we have created that contains an Xcode project generated with Tuist that can be used for this purpose and is tagged to match the releases of Apollo iOS.
+
 ## Releases and changelog
 
 [All releases](https://github.com/apollographql/apollo-ios/releases) are catalogued and we maintain a [changelog](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) which details all changes to the library.
