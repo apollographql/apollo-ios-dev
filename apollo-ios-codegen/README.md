@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/license-MIT-lightgrey.svg?maxAge=2592000" alt="MIT license">
   </a>
   <a href="Platforms">
-    <img src="https://img.shields.io/badge/platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS-333333.svg" alt="Supported Platforms: iOS, macOS, tvOS, watchOS" />
+    <img src="https://img.shields.io/badge/platforms-macOS-333333.svg" alt="Supported Platforms: macOS" />
   </a>
 </p>
 
@@ -21,28 +21,17 @@
   <a href="https://swift.org/package-manager/">
     <img src="https://img.shields.io/badge/Swift_Package_Manager-compatible-orange?style=flat-square" alt="Swift Package Manager compatible">
   </a>
-  <a href="https://cocoapods.org/pods/Apollo">
-    <img src="https://img.shields.io/cocoapods/v/Apollo.svg" alt="CocoaPods compatible">
-  </a>
 </p>
 
-### Apollo iOS is a strongly-typed, caching GraphQL client, written in Swift
+### Apollo iOS Codegen
 
-It allows you to execute queries and mutations against a GraphQL server, and returns results as query-specific Swift types. This means you don’t have to deal with parsing JSON, or passing around dictionaries and making clients cast values to the right type manually. You also don't have to write model types yourself, because these are generated from the GraphQL definitions your UI uses.
+This repo provides the code necessary to do GraphQL code generation for the [Apollo iOS](https://github.com/apollographql/apollo-ios) library. The codegen cli is available as part of the Apollo iOS package, so if you plan to use the cli for doing code generation you will only need that package.
 
-As the generated types are query-specific, you're only able to access data you actually specify as part of a query. If you don't ask for a field, you won't be able to access the corresponding property. In effect, this means you can now rely on the Swift type checker to make sure errors in data access show up at compile time. With our Xcode integration, you can conveniently work with your UI code and corresponding GraphQL definitions side by side, and it will even validate your query documents, and show errors inline.
-
-Apollo iOS does more than simply run your queries against a GraphQL server: It normalizes query results to construct a client-side cache of your data, which is kept up to date as further queries and mutations are run. This means your UI is always internally consistent, and can be kept fully up-to-date with the state on the server with the minimum number of queries required.
-
-This combination of models with value semantics, one way data flow, and automatic consistency management, leads to a very powerful and elegant programming model that allows you to eliminate common glue code and greatly simplifies app development.
-
-## Getting started
-
-If you are new to Apollo iOS we recommend our [Getting Started](https://www.apollographql.com/docs/ios/get-started) guide.
-
-There is also [comprehensive documentation](https://www.apollographql.com/docs/ios/) including an [API reference](https://www.apollographql.com/docs/ios/docc/documentation/index).
+However, if you plan to handle your code generation through Swift scripting, you will now need to include the `apollo-ios-codegen` package as a dependency as it is no longer packaged as part of `apollo-ios`. In order to get start with scripting your code generation check out our guide [here](https://www.apollographql.com/docs/ios/code-generation/run-codegen-in-swift-code).
 
 ## Releases and changelog
+
+Release of the Apollo iOS Codegen repo are tied to the releases of the [Apollo iOS](https://github.com/apollographql/apollo-ios) repo.
 
 [All releases](https://github.com/apollographql/apollo-ios/releases) are catalogued and we maintain a [changelog](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) which details all changes to the library.
 
