@@ -141,7 +141,7 @@ Deferred fragment fields will **not** be merged into the enclosing selection set
 
 **Selection set initializers**
 
-In the preview release of `@defer`, operations with deferred fragments will **not** be able to have generated selection set initilizers. This is due to the complexities of field merging which is dependent on work being done by other members of the team. Once we can support this the fields will be optional properties on the initializer and fragment fullfillment will be determined at access time, in a lightweight version of the GraphQL executor, to determine if all deferred fragment field values were provided.   
+In the preview release of `@defer`, operations with deferred fragments will **not** be able to have generated selection set initializers. This is due to the complexities of field merging which is dependent on work being done by other members of the team. Once we can support this the fields will be optional properties on the initializer and fragment fulfillment will be determined at access time, in a lightweight version of the GraphQL executor, to determine if all deferred fragment field values were provided.   
 
 ## Networking 
 
