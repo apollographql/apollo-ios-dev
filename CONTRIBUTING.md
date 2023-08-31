@@ -80,7 +80,7 @@ The folder [`TestCodeGenConfigurations`](https://github.com/apollographql/apollo
 
 # Apollo iOS
 
-The [apollo-ios](https://github.com/apollographql/apollo-ios) repository contains the main Apollo SDK that is used when developing client applications. This includes code for handling network calls, caching, and working with your data models.
+The [apollo-ios](https://github.com/apollographql/apollo-ios) repository contains the main Apollo SDK that is used when developing client applications. This includes code for handling network calls, caching, and working with your generated data models.
 
 ## Issues
 
