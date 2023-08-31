@@ -16,7 +16,12 @@
 
 ### Apollo iOS Dev
 
-This repo contains the development environment for working on and contributing to the Apollo iOS Ecosystem. This repo uses a subtree setup to include the various other repos such as [apollo-ios](https://github.com/apollographql/apollo-ios) for development. All code changes are pushed out to their respective repos whenever a PR is merged. This allows us to provide a cohesive development environment while also providing packages to users that contain less overall files and dependencies, such as things only really used for development and testing.
+This repo contains the development environment for working on and contributing to the Apollo iOS ecosystem. This repo uses a git subtree setup to include the following repos for development:
+
+- [apollo-ios](https://github.com/apollographql/apollo-ios)
+- [apollo-ios-codegen](https://github.com/apollographql/apollo-ios-codegen)
+
+All code changes are pushed out to their respective repos whenever a PR is merged. This allows us to provide a cohesive development environment while also providing packages to users that contain less overall files and dependencies, such as things only really used for development and testing.
 
 ## Getting Started
 
