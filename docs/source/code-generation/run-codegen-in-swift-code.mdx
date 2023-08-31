@@ -8,7 +8,7 @@ To enable advanced use, the `ApolloCodegenLib` can be included as a dependency o
 
 ## Installing `ApolloCodegenLib`
 
-The `ApolloCodegenLib` is included as a product in the Apollo iOS SPM Package.
+The `ApolloCodegenLib` is included as a product in the [Apollo iOS Codegen](https://github.com/apollographql/apollo-ios-codegen) SPM Package.
 
 > At this time, `ApolloCodegenLib` only supports `macOS`. You cannot run code generation scripts on other platforms.
 
@@ -18,12 +18,12 @@ To use it within your own Swift project, just include it as a dependency.
 .target(
     name: "MyApp",
     dependencies: [
-        .product(name: "ApolloCodegenLib", package: "apollo-ios"),
+        .product(name: "ApolloCodegenLib", package: "apollo-ios-codegen"),
     ]
 )
 ```
 
-> **Important:** Because code generation is tied to its usage in the Apollo iOS SDK, you make sure you are using the `ApolloCodegenLib` from the same version of the package as the application that uses your generated code.
+> **Important:** Because code generation is tied to its usage in the Apollo iOS SDK, make sure you are using the same versions of both the `apollo-ios` and `apollo-ios-codegen` packages.
 
 ## Usage
 
