@@ -503,7 +503,8 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
         let data = try XCTUnwrap(graphQLResult.data)
         XCTAssertEqual(data.hero.name, "Artoo")
-        XCTAssertNil(data.hero.nickname)
+        expect(data.hero.nickname).to(beNil())
+        expect(data.hero.hasNullValue(forKey: "nickname")).to(beTrue())
       }
     }
   }
@@ -1694,6 +1695,73 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
         XCTAssertEqual(data.hero.name, "Artoo")
       }
     }
+  }
+
+  // MARK: - Write w/Selection Set Initializers
+
+  func test_writeDataForOperation_givenSelectionSetManuallyInitialized_withNullValueForField_fieldHasNullValue() throws {
+    // given
+    struct Types {
+      static let Query = Object(typename: "Query", implementedInterfaces: [])
+    }
+
+    MockSchemaMetadata.stub_objectTypeForTypeName = {
+      switch $0 {
+      case "Query": return Types.Query
+      default: XCTFail(); return nil
+      }
+    }
+
+    class Data: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __parentType: ParentType { Types.Query }
+      override class var __selections: [Selection] {[
+        .field("name", String?.self)
+      ]}
+
+      public var name: String? { __data["name"] }
+
+      convenience init(
+        name: String? = nil
+      ) {
+        self.init(_dataDict: DataDict(data: [
+          "__typename": Types.Query.typename,
+          "name": name
+        ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
+      }
+    }
+
+    // when
+    let writeCompletedExpectation = expectation(description: "Write completed")
+
+    store.withinReadWriteTransaction({ transaction in
+      let data = Data(name: nil)
+      let query = MockQuery<Data>()
+      try transaction.write(data: data, for: query)
+
+    }, completion: { result in
+      defer { writeCompletedExpectation.fulfill() }
+      XCTAssertSuccessResult(result)
+    })
+
+    self.wait(for: [writeCompletedExpectation], timeout: Self.defaultWaitTimeout)
+
+    let readCompletedExpectation = expectation(description: "Read completed")
+
+    store.withinReadTransaction({ transaction in
+      let query = MockQuery<Data>()
+      let resultData = try transaction.read(query: query)
+
+      expect(resultData.name).to(beNil())
+      expect(resultData.hasNullValue(forKey: "name")).to(beTrue())
+
+    }, completion: { result in
+      defer { readCompletedExpectation.fulfill() }
+      XCTAssertSuccessResult(result)
+    })
+
+    self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 
   func test_writeDataForOperation_givenSelectionSetManuallyInitializedWithInclusionConditions_writesFieldsForInclusionConditions() throws {
