@@ -9,6 +9,7 @@ import {
   VariableDefinitionNode,
   InlineFragmentNode,
   GraphQLDeferDirective,
+  FragmentSpreadNode,
 } from "graphql";
 
 const specifiedRulesToBeRemoved: [ValidationRule] = [NoUnusedFragmentsRule];
@@ -32,6 +33,7 @@ export function defaultValidationRules(options: ValidationOptions): ValidationRu
     NoAnonymousQueries,
     NoTypenameAlias,
     DeferredInlineFragmentNoTypeCondition,
+    DeferDirectiveMissingLabelArgument,
     ...(disallowedFieldNamesRule ? [disallowedFieldNamesRule] : []),
     ...(disallowedInputParameterNamesRule ? [disallowedInputParameterNamesRule] : []),
     ...specifiedRules.filter((rule) => !specifiedRulesToBeRemoved.includes(rule)),
@@ -85,6 +87,43 @@ export function DeferredInlineFragmentNoTypeCondition(context: ValidationContext
       }
     },
   };
+}
+
+export function DeferDirectiveMissingLabelArgument(context: ValidationContext) {
+  function ValidateDeferDirectiveLabelArgument(node: InlineFragmentNode | FragmentSpreadNode, error: GraphQLError) {
+    if (node.directives) {
+      for (const directive of node.directives) {
+        if (directive.name.value == GraphQLDeferDirective.name && !(directive.arguments?.find(
+          function(element) {
+            return element.name.value == 'label'
+          }) ? true: false)
+        ) {
+          context.reportError(error)
+        }
+      }
+    }
+  }
+
+  return {
+    InlineFragment(node: InlineFragmentNode) {
+      ValidateDeferDirectiveLabelArgument(
+        node, 
+        new GraphQLError(
+          "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment.",
+          { nodes: node }
+        )
+      )
+    },
+    FragmentSpread(node: FragmentSpreadNode) {
+      ValidateDeferDirectiveLabelArgument(
+        node,
+        new GraphQLError(
+          "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this fragment spread.",
+          { nodes: node }
+        )
+      )
+    }
+  }
 }
 
 function ApolloIOSDisallowedFieldNames(fieldNames?: Array<string>) {
