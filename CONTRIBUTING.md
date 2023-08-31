@@ -4,7 +4,7 @@ Excited about the Apollo iOS ecosystem and want to make it better? We’re excit
 
 Apollo is a community of developers just like you, striving to create the best tools and libraries around GraphQL. We welcome anyone who wants to contribute or provide constructive feedback, no matter your age or level of experience. If you want to help but don't know where to start, let us know, and we'll find something for you.
 
-Oh, and if you haven't already, stop by our [community forums!](https://community.apollographql.com)!
+Oh, and if you haven't already, stop by our [Discord server](https://discord.gg/graphos) and [community forums](https://community.apollographql.com)!
 
 Here are sthe different repositories associated with Apollo iOS along with what purpose they serve:
 
