@@ -6,7 +6,7 @@ import Foundation
 
 @dynamicMemberLookup
 public class Mock<O: MockObject>: AnyMock, Hashable {
-
+// Sample Change
   public var _data: [String: AnyHashable]
 
   public init() {

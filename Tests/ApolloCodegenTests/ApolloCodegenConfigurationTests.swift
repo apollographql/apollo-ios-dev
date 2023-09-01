@@ -4,7 +4,7 @@ import XCTest
 import Nimble
 
 class ApolloCodegenConfigurationTests: XCTestCase {
-
+// Sample Change
   var directoryURL: URL!
   var filename: String!
   var fileURL: URL!

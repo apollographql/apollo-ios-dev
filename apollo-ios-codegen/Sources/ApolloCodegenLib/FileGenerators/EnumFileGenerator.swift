@@ -14,3 +14,4 @@ struct EnumFileGenerator: FileGenerator {
   var target: FileTarget { .enum }
   var fileName: String { graphqlEnum.name }
 }
+// Sample Change
