@@ -1,0 +1,50 @@
+name: "PR Subtree Push"
+
+on:
+  pull_request:
+    branches:
+        - subtree-ci-testing
+    types: [closed]
+
+jobs:
+  split-subtrees:
+    runs-on: macos-13
+    name: Split and Push Subtrees
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+      with:
+        ref: subtree-ci-testing
+        fetch-depth: 0
+    - name: Setup SSH Keys
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: |
+          ${{ secrets.APOLLO_IOS_DEPLOY_KEY }}
+          ${{ secrets.APOLLO_IOS_CODEGEN_DEPLOY_KEY }}
+          ${{ secrets.APOLLO_IOS_DEV_DEPLOY_KEY }}
+    - name: Update Merge Commit Message
+      shell: bash
+      run: |
+        git commit --amend -m "${{ github.event.pull_request.title }} (apollographql/apollo-ios-dev#${{ github.event.pull_request.number }})"
+        git push --force-with-lease
+    - name: Subtree - Apollo iOS
+      uses: ./.github/actions/subtree-test
+      with:
+        subtree: apollo-ios
+        remote: git@github.com:apollographql/apollo-ios.git
+        target-branch: subtree-ci-testing
+        pr-number: ${{ github.event.pull_request.number }}
+        pr-title: ${{ github.event.pull_request.title }}
+    - name: Subtree - Apollo iOS Codegen
+      uses: ./.github/actions/subtree-test
+      with:
+        subtree: apollo-ios-codegen
+        remote: git@github.com:apollographql/apollo-ios-codegen.git
+        target-branch: subtree-ci-testing
+        pr-number: ${{ github.event.pull_request.number }}
+        pr-title: ${{ github.event.pull_request.title }}
+    - name: Push Updated History
+      shell: bash
+      run: |
+        git push
