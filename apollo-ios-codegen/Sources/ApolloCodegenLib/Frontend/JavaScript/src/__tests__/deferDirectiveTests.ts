@@ -30,9 +30,16 @@ describe("given schema", () => {
     species: String!
     friend: Animal!
   }
+
+  type Dog implements Animal {
+    species: String!
+    friend: Animal!
+  }
   `;
 
   const schema: GraphQLSchema = loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
+
+  // Compilation Tests
 
   describe("query has inline fragment with @defer directive", () => {
     const documentString: string = `
@@ -154,11 +161,13 @@ describe("given schema", () => {
     });
   });
 
+  // Validation Tests
+
   describe("query has inline fragment with @defer directive and no type condition", () => {
     const documentString: string = `
     query Test {
       allAnimals {
-        ... @defer {
+        ... @defer(label: "custom") {
           species
         }
       }
@@ -169,10 +178,141 @@ describe("given schema", () => {
       new Source(documentString, "Test Query", { line: 1, column: 1 })
     );
 
-    it("should throw error", () => {
+    it("should fail validation", () => {
       const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
+
       expect(validationErrors.length).toEqual(1)
+      expect(validationErrors[0].message).toEqual(
+        "Apollo does not support deferred inline fragments without a type condition. Please add a type condition to this inline fragment."
+      )
     });
   });
+
+  describe("query has inline fragment with @defer directive and no label argument", () => {
+    const documentString: string = `
+    query Test {
+      allAnimals {
+        ... on Dog @defer {
+          species
+        }
+      }
+    }
+    `;
+
+    const document: DocumentNode = parseOperationDocument(
+      new Source(documentString, "Test Query", { line: 1, column: 1 })
+    );
+
+    it("should fail validation", () => {
+      const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
+
+      expect(validationErrors.length).toEqual(1)
+      expect(validationErrors[0].message).toEqual(
+        "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment."
+      )
+    })
+  })
+
+  describe("query has fragment spread with @defer directive and no label argument", () => {
+    const documentString: string = `
+    query Test {
+      allAnimals {
+        ...DogFragment @defer
+      }
+    }
+
+    fragment DogFragment on Dog {
+      species
+    }
+    `;
+
+    const document: DocumentNode = parseOperationDocument(
+      new Source(documentString, "Test Query", { line: 1, column: 1 })
+    );
+
+    it("should fail validation", () => {
+      const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
+
+      expect(validationErrors.length).toEqual(1)
+      expect(validationErrors[0].message).toEqual(
+        "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this fragment spread."
+      )
+    })
+  })
+
+  describe("query has fragment spread, with @defer directive and if argument and no label argument on fragment inner type condition", () => {
+    const documentString: string = `
+    query Test {
+      allAnimals {
+        ...AnimalFragment
+      }
+    }
+
+    fragment AnimalFragment on Animal {
+      ... on Dog @defer(if: true) {
+        species
+      }
+    }
+    `;
+
+    const document: DocumentNode = parseOperationDocument(
+      new Source(documentString, "Test Query", { line: 1, column: 1 })
+    );
+
+    it("should fail validation", () => {
+      const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
+
+      expect(validationErrors.length).toEqual(1)
+      expect(validationErrors[0].message).toEqual(
+        "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment."
+      )
+    })
+  })
+
+  describe("query has inline fragment with @defer directive and label argument", () => {
+    const documentString: string = `
+    query Test {
+      allAnimals {
+        ... on Dog @defer(label: "custom") {
+          species
+        }
+      }
+    }
+    `;
+
+    const document: DocumentNode = parseOperationDocument(
+      new Source(documentString, "Test Query", { line: 1, column: 1 })
+    );
+
+    it("should pass validation", () => {
+      const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
+
+      expect(validationErrors.length).toEqual(0)
+    })
+  })
+
+  describe("query has fragment spread with @defer directive and label argument", () => {
+    const documentString: string = `
+    query Test {
+      allAnimals {
+        ...AnimalFragment @defer(label: "custom")
+      }
+    }
+
+    fragment AnimalFragment on Animal {
+      species
+    }
+    `;
+
+    const document: DocumentNode = parseOperationDocument(
+      new Source(documentString, "Test Query", { line: 1, column: 1 })
+    );
+
+    it("should pass validation", () => {
+      const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
+
+      expect(validationErrors.length).toEqual(0)
+    })
+  })
 
 });
