@@ -23,7 +23,7 @@ runs:
     shell: bash
     run: |
       git fetch ${{ inputs.remote }} ${{ inputs.target-branch }}
-      splitResult=$(git subtree -P ${{ inputs.subtree }} split --squash --rejoin --annotate="split: " -m "${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - ${{ inputs.pr-title }}")
+      splitResult=$(git subtree -P ${{ inputs.subtree }} split --squash --rejoin --annotate="split: ${{ inputs.subtree }} - " -m "PR #${{ inputs.pr-number }} - ${{ inputs.pr-title }}")
       if [ ! -z "$splitResult" ]
       then
         git subtree push -P ${{ inputs.subtree }} ${{ inputs.remote }} ${{ inputs.target-branch }}
