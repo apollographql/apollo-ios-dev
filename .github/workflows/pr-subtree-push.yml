@@ -10,7 +10,7 @@ jobs:
   split-subtrees:
     if: ${{ github.event.pull_request.merged }}
     runs-on: macos-13
-    name: ${{ matrix.subtree }} Split and Push
+    name: Split and Push Subtrees
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
