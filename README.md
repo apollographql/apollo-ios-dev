@@ -43,7 +43,7 @@ There is also a githook setup to auto-run `tuist generate` whenever a branch is 
 make repo-setup
 ```
 
-> Note: This will run the following command updating your git config `git config core.hooksPath .githooks`
+> Note: This will update the local git config in your checkout of the repo by running the following command: `git config core.hooksPath .githooks`
 
 A [Get started](https://docs.tuist.io/tutorial/get-started) guide for Tuist along with [other documentation](https://tuist.github.io/tuist/main/documentation/projectdescription/project) is also available for reference.
 
