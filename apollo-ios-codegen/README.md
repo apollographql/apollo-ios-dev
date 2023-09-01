@@ -9,49 +9,31 @@
   <a href="https://raw.githubusercontent.com/apollographql/apollo-ios/main/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-lightgrey.svg?maxAge=2592000" alt="MIT license">
   </a>
-  <a href="https://github.com/apple/swift">
-    <img src="https://img.shields.io/badge/Swift-5.7-orange.svg" alt="Swift 5.7 supported">
+  <a href="Platforms">
+    <img src="https://img.shields.io/badge/platforms-macOS-333333.svg" alt="Supported Platforms: macOS" />
   </a>
 </p>
 
-### Apollo iOS Dev
+<p align="center">
+  <a href="https://github.com/apple/swift">
+    <img src="https://img.shields.io/badge/Swift-5.7-orange.svg" alt="Swift 5.7 supported">
+  </a>
+  <a href="https://swift.org/package-manager/">
+    <img src="https://img.shields.io/badge/Swift_Package_Manager-compatible-orange?style=flat-square" alt="Swift Package Manager compatible">
+  </a>
+</p>
 
-This repo contains the development environment for working on and contributing to the Apollo iOS ecosystem. This repo uses a git subtree setup to include the following repos for development:
+### Apollo iOS Codegen
 
-- [apollo-ios](https://github.com/apollographql/apollo-ios)
-- [apollo-ios-codegen](https://github.com/apollographql/apollo-ios-codegen)
+This repo provides the code necessary to do GraphQL code generation for the [Apollo iOS](https://github.com/apollographql/apollo-ios) library. The codegen cli is available as part of the Apollo iOS package, so if you plan to use the cli for doing code generation you will only need that package.
 
-All code changes are pushed out to their respective repos whenever a PR is merged. This allows us to provide a cohesive development environment while also providing packages to users that contain less overall files and dependencies, such as things only really used for development and testing.
+However, if you plan to handle your code generation through Swift scripting, you will now need to include the `apollo-ios-codegen` package as a dependency as it is no longer packaged as part of `apollo-ios`. In order to get start with scripting your code generation check out our guide [here](https://www.apollographql.com/docs/ios/code-generation/run-codegen-in-swift-code).
 
-## Getting Started
+## Releases and changelog
 
-To get started contributing to Apollo iOS, the first step you need to take is to fork this (apollo-ios-dev) repo. Once you have forked and cloned the repo the next step is to generate the Xcode Workspace that you will use for development.
+Release of the Apollo iOS Codegen repo are tied to the releases of the [Apollo iOS](https://github.com/apollographql/apollo-ios) repo.
 
-### Tuist
-
-This project uses [Tuist](https://tuist.io/) to handle generation of the Xcode workspace for development. In order to use Tuist run the following command in terminal to ensure you have it installed:
-
-```
-curl -Ls https://install.tuist.io | bash
-```
-
-In order to generate the project/workspace you will need to run the [tuist generate](https://docs.tuist.io/commands/generate) command from the project root.
-
-There is also a githook setup to auto-run `tuist generate` whenever a branch is checked out, in order for git to find and use the hook run the following make command to ensure the git config is pointing to the correct location:
-
-```
-make repo-setup
-```
-
-> Note: This will update the local git config in your checkout of the repo by running the following command: `git config core.hooksPath .githooks`
-
-A [Get started](https://docs.tuist.io/tutorial/get-started) guide for Tuist along with [other documentation](https://tuist.github.io/tuist/main/documentation/projectdescription/project) is also available for reference.
-
-After you have run the `tuist generate` command you should see both an `ApolloDev.xcodeproj` and `ApolloDev.xcworkspace` in the projects root directory. You should only use the Xcode Workspace for development as it includes the `ApolloDev.xcodeproj` as well as the SPM packages for the subtree projects so that everything can be developed in the same workspace.
-
-### Submitting Changes
-
-After working and making changes in the `ApolloDev.xcworkspace` you can commit your changes as normal and submit a PR to the `main` branch of the `apollo-ios-dev` repo for review.
+[All releases](https://github.com/apollographql/apollo-ios/releases) are catalogued and we maintain a [changelog](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) which details all changes to the library.
 
 ## Roadmap
 
@@ -59,11 +41,7 @@ The [roadmap](https://github.com/apollographql/apollo-ios/blob/main/ROADMAP.md) 
 
 ## Contributing
 
-This project is being developed using Xcode 14 and Swift 5.7.
-
-Some of the tests run against [a simple GraphQL server serving the Star Wars example schema](https://github.com/apollographql/starwars-server) (see installation instructions there).
-
-For further information on contributing, reporting issues, suggesting features, etc please see our [Apollo Contributor Guide](https://github.com/apollographql/apollo-ios-dev/blob/main/CONTRIBUTING.md) guide.
+If you'd like to contribute, please refer to the [Apollo Contributor Guide](https://github.com/apollographql/apollo-ios-dev/blob/main/CONTRIBUTING.md).
 
 ## Maintainers
 
