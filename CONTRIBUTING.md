@@ -6,9 +6,19 @@ Apollo is a community of developers just like you, striving to create the best t
 
 Oh, and if you haven't already, stop by our [Discord server](https://discord.gg/graphos) and [community forums](https://community.apollographql.com)!
 
+## Overview
+
+Apollo iOS is comprised of multiple repositories. To contribute to our projects, follow these guidelines:
+
+- Issues (bug reports, feature suggestions, etc.)
+  -  Create an issue in the [apollo-ios](https://github.com/apollographql/apollo-ios) repository.
+- Pull Requests
+  - Write code and submit a pull request in the [apollo-ios-dev](https://github.com/apollographql/apollo-ios-dev) repository.
+
 Here are the different repositories associated with Apollo iOS along with what purpose they serve:
 
 - [Apollo iOS Ecosystem Contributor Guide](#apollo-ios-ecosystem-contributor-guide)
+  - [Overview](#overview)
 - [Apollo iOS Dev](#apollo-ios-dev)
   - [Pull requests](#pull-requests)
     - [Submitting](#submitting)
@@ -43,13 +53,13 @@ For a small bug fix change (less than 20 lines of code changed), feel free to op
 
 For significant changes to a repository, it’s important to settle on a design before starting on the implementation. This way, we can ensure that major improvements get the care and attention they deserve. Since big changes can be risky and might not always get merged, it’s good to reduce the amount of possible wasted effort by agreeing on an implementation design/plan first.
 
-A good way to propose a design or implementation, and have discussion about it, is with a Request for Comments (RFC) pull request. This is a pull request in which you describe the changes to be made with enough technical detail that suggestions, comments and updates can be made. The approved pull request can then be merged as a technical document or closed for posterity and referenced to in the actual code implementation.
+A good way to propose a design or implementation, and have discussion about it, is with a Request for Comments (RFC) pull request. This is a pull request in which you describe the changes to be made with enough technical detail that suggestions, comments and updates can be made. The approved pull request can then be merged as a technical document or closed for posterity and referenced in the actual code implementation.
 
 ### Review
 
 It’s important that every piece of code in Apollo packages is reviewed by at least one core contributor familiar with that codebase. If you want to expedite the code being merged, try to review your own code first! Here are some things we look for:
 
-1. **All GitHub checks pass.** This is a prerequisite for the review, and it is the PR author's responsibility. The PR will not be reviewed until all the author has signed the Apollo CLA and all tests pass.
+1. **All GitHub checks pass.** This is a prerequisite for the review, and it is the PR author's responsibility. The PR will not be reviewed until the author has signed the Apollo CLA and all tests pass.
 2. **Simplicity.** Is this the simplest way to achieve the intended goal? If there are too many files, redundant functions, or complex lines of code, suggest a simpler way to do the same thing. In particular, avoid implementing an overly general solution when a simple, small, and pragmatic fix will do. Please also note that large pull requests take additional time to review. If your PR could be broken down into several smaller, more focused changes, please do that instead.
 3. **Testing.** Do the tests ensure this code won’t break when other stuff changes around it? When it does break, will the tests added help us identify which part of the library has the problem? Did we cover an appropriate set of edge cases? Look at the test coverage report if there is one. Are all significant code paths in the new code exercised at least once?
 4. **No unnecessary or unrelated changes.** PRs shouldn’t come with random formatting changes, especially in unrelated parts of the code. If there is some refactoring that needs to be done, it should be in a separate PR from a bug fix or feature, if possible.
