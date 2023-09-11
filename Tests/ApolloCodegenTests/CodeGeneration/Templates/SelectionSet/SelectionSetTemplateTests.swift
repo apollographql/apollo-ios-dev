@@ -1749,6 +1749,273 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
+  // MARK: Selections - Deferred Named Fragment
+
+  func test__render_selections__givenDeferredNamedFragment_rendersDeferredFragmentSelection() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ...DogFragment @defer
+      }
+    }
+
+    fragment DogFragment on Dog {
+      species
+    }
+    """
+
+    let expected = """
+      public static var __selections: [ApolloAPI.Selection] { [
+        .deferred(DogFragment.self)
+      ] }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.render(inlineFragment: allAnimals_asDog)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
+  }
+
+  func test__render_selections__givenDeferredNamedFragmentWithLabel_rendersDeferredFragmentSelectionUsingNamedFragmentType() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ...DogFragment @defer(label: "root")
+      }
+    }
+
+    fragment DogFragment on Dog {
+      species
+    }
+    """
+
+    let expected = """
+      public static var __selections: [ApolloAPI.Selection] { [
+        .deferred(DogFragment.self, label: "root")
+      ] }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.render(inlineFragment: allAnimals_asDog)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
+  }
+
+  func test__render_selections__givenDeferredNamedFragmentWithCondition_rendersDeferredFragmentSelectionWithCondition() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ...DogFragment @defer(if: "a")
+      }
+    }
+
+    fragment DogFragment on Dog {
+      species
+    }
+    """
+
+    let expected = """
+      public static var __selections: [ApolloAPI.Selection] { [
+        .deferred(if: "a", DogFragment.self),
+      ] }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.render(inlineFragment: allAnimals_asDog)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
+  }
+
+  func test__render_selections__givenDeferredNamedFragmentWithTrueCondition_rendersDeferredFragmentSelection() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ...DogFragment @defer(if: true)
+      }
+    }
+
+    fragment DogFragment on Dog {
+      species
+    }
+    """
+
+    let expected = """
+      public static var __selections: [ApolloAPI.Selection] { [
+        .deferred(DogFragment.self),
+      ] }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.render(inlineFragment: allAnimals_asDog)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
+  }
+
+  func test__render_selections__givenDeferredNamedFragmentWithFalseCondition_doesNotRenderDeferredFragmentSelection() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ...DogFragment @defer(if: false)
+      }
+    }
+
+    fragment DogFragment on Dog {
+      species
+    }
+    """
+
+    let expected = """
+      public static var __selections: [ApolloAPI.Selection] { [
+        .fragment(DogFragment.self),
+      ] }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.render(inlineFragment: allAnimals_asDog)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
+  }
+
   // MARK: Selections - Include/Skip
 
   func test__render_selections__givenFieldWithIncludeCondition_rendersFieldSelections() throws {
@@ -5268,7 +5535,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: - Fragment Accessors - Deferred Inline Fragment
 
-  func test__render_fragmentAccessor__givenDeferredInlineFragment_rendersConvenienceFragmentAccessorAsOptional() throws {
+  func test__render_fragmentAccessor__givenDeferredInlineFragment_rendersConvenienceDeferredFragmentAccessorAsOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5325,7 +5592,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
-  func test__render_fragmentAccessor__givenDeferredInlineFragment_rendersTypeCaseFragmentAccessorAsOptional() throws {
+  func test__render_fragmentAccessor__givenDeferredInlineFragment_rendersTypeCaseDeferredFragmentAccessorAsOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5372,17 +5639,17 @@ class SelectionSetTemplateTests: XCTestCase {
 
     // when
     try buildSubjectAndOperation()
-    let allAnimals_AsDog = try XCTUnwrap(
+    let allAnimals_asDog = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_AsDog)
+    let actual = subject.render(inlineFragment: allAnimals_asDog)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentsWithDifferentLabels_rendersBothConvenienceFragmentAccessorsAsOptional() throws {
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentsWithDifferentLabels_rendersBothConvenienceDeferredFragmentAccessorsAsOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5444,7 +5711,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentsWithDifferentLabels_rendersBothTypeCaseFragmentAccessorsAsOptional() throws {
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentsWithDifferentLabels_rendersBothTypeCaseDeferredFragmentAccessorsAsOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5491,6 +5758,572 @@ class SelectionSetTemplateTests: XCTestCase {
 
         @Deferred public var one: One?
         @Deferred public var two: Two?
+      }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.render(inlineFragment: allAnimals_asDog)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
+  }
+
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithCondition_rendersConvenienceDeferredFragmentAccessorAsOptional() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: "a", label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred public var root: AsDog.Root?
+      }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+    )
+
+    let actual = subject.render(field: allAnimals)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
+  }
+
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithCondition_rendersTypeCaseDeferredFragmentAccessorAsOptional() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: "a", label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred public var root: Root?
+      }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.render(inlineFragment: allAnimals_asDog)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
+  }
+
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithTrueCondition_rendersConvenienceDeferredFragmentAccessorAsOptional() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: true, label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred public var root: AsDog.Root?
+      }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+    )
+
+    let actual = subject.render(field: allAnimals)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
+  }
+
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithTrueCondition_rendersTypeCaseDeferredFragmentAccessorAsOptional() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: true, label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred public var root: Root?
+      }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.render(inlineFragment: allAnimals_asDog)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
+  }
+
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithFalseCondition_doesNotRenderConvenienceDeferredFragmentAccessor() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: false, label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public var asDog: AsDog? { _asInlineFragment() }
+
+      /// Parent Type: `Dog`
+      public struct AsDog: TestSchema.InlineFragment {
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+    )
+
+    let actual = subject.render(field: allAnimals)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
+  }
+
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithFalseCondition_doesNotRenderTypeCaseDeferredFragmentAccessor() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: false, label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+        public var species: String? { __data["species"] }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.render(inlineFragment: allAnimals_asDog)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  // MARK: - Fragment Accessors - Deferred Named Fragment
+
+  func test__render_fragmentAccessor__givenDeferredNamedFragment_rendersDeferredFragmentAccessorAsOptional() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ...DogFragment @defer
+      }
+    }
+
+    fragment DogFragment on Dog {
+      species
+    }
+    """
+
+    let expected = """
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) {
+          __data = _dataDict
+          _dogFragment = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred public var dogFragment: DogFragment?
+      }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.render(inlineFragment: allAnimals_asDog)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
+  }
+
+  func test__render_fragmentAccessor__givenDeferredNamedFragmentWithCondition_rendersDeferredFragmentAccessorAsOptional() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ...DogFragment @defer(if: "a")
+      }
+    }
+
+    fragment DogFragment on Dog {
+      species
+    }
+    """
+
+    let expected = """
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) {
+          __data = _dataDict
+          _dogFragment = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred public var dogFragment: DogFragment?
+      }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.render(inlineFragment: allAnimals_asDog)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
+  }
+
+  func test__render_fragmentAccessor__givenDeferredNamedFragmentWithTrueCondition_rendersDeferredFragmentAccessorAsOptional() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ...DogFragment @defer(if: true)
+      }
+    }
+
+    fragment DogFragment on Dog {
+      species
+    }
+    """
+
+    let expected = """
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) {
+          __data = _dataDict
+          _dogFragment = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred public var dogFragment: DogFragment?
+      }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.render(inlineFragment: allAnimals_asDog)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
+  }
+
+  func test__render_fragmentAccessor__givenDeferredNamedFragmentWithFalseCondition_doesNotRenderDeferredFragmentAccessor() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ...DogFragment @defer(if: true)
+      }
+    }
+
+    fragment DogFragment on Dog {
+      species
+    }
+    """
+
+    let expected = """
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public var dogFragment: DogFragment { _toFragment() }
       }
     """
 
