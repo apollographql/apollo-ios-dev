@@ -361,6 +361,48 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }
 
+  func test__generate__givenQueryWithNamedFragment_withDeferredTypeCase_generatesDeferredPropertyTrue() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+    }
+
+    type Dog implements Animal {
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... DogFragment
+      }
+    }
+
+    fragment DogFragment on Animal {
+      ... on Dog @defer(label: "root") {
+        species
+      }
+    }
+    """
+
+    let expected = """
+      public static let hasDeferredFragments: Bool = true
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
+  }
+
   // MARK: - Selection Set Declaration
 
   func test__generate__givenOperationSelectionSet_rendersDeclaration() throws {
