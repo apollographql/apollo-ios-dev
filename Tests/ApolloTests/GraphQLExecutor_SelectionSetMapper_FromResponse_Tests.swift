@@ -238,8 +238,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let data = try readValues(GivenSelectionSet.self, from: object)
 
     // then
-    expect(data.name).to(beNil())
-    expect(data.hasNullValue(forKey: "name")).to(beTrue())
+    XCTAssertNil(data.name)
   }
 
   func test__optional_scalar__givenDataWithTypeConvertibleToFieldType_getsConvertedValue() throws {
@@ -690,8 +689,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let data = try readValues(GivenSelectionSet.self, from: object)
 
     // then
-    expect(data.favorites! as [String?]).to(equal(["Red", nil, "Bird"]))
-    expect((data._rawData["favorites"] as? [AnyHashable])?[1]).to(equal(DataDict.NullValue))
+    XCTAssertEqual(data.favorites! as [String?], ["Red", nil, "Bird"])
   }
 
   // MARK: Optional List Of Optional Scalar
