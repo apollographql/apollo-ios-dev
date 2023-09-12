@@ -1749,6 +1749,78 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
+  func test__render_selections__givenNestedDeferredInlineFragments_rendersNestedDeferredFragmentSelections() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+      friend: Animal
+    }
+
+    type Cat implements Animal {
+      id: String
+      species: String
+      genus: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "one") {
+          friend {
+            ... on Cat @defer(label: "two") {
+              species
+            }
+          }
+        }
+      }
+    }
+    """
+
+    let expectedOne = """
+      public static var __selections: [ApolloAPI.Selection] { [
+        .deferred(One.self, label: "one"),
+      ] }
+    """
+    let expectedTwo = """
+      public static var __selections: [ApolloAPI.Selection] { [
+        .deferred(Two.self, label: "two"),
+      ] }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+    let allAnimals_asDog_asCat = try XCTUnwrap(
+      allAnimals_asDog[as: "One"]?[field: "Friend"]?[as: "Cat"]
+    )
+
+    let actualOne = subject.render(inlineFragment: allAnimals_asDog)
+    let actualTwo = subject.render(inlineFragment: allAnimals_asDog_asCat)
+
+    // then
+    expect(actualOne).to(equalLineByLine(expectedOne, atLine: 11, ignoringExtraLines: true))
+    expect(actualTwo).to(equalLineByLine(expectedTwo, atLine: 11, ignoringExtraLines: true))
+  }
+
   // MARK: Selections - Deferred Named Fragment
 
   func test__render_selections__givenDeferredNamedFragment_rendersDeferredFragmentSelection() throws {
