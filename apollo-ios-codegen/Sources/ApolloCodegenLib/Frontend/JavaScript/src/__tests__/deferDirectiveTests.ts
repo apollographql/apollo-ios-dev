@@ -230,13 +230,10 @@ describe("given schema", () => {
       new Source(documentString, "Test Query", { line: 1, column: 1 })
     );
 
-    it("should fail validation", () => {
+    it("should pass validation", () => {
       const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
 
-      expect(validationErrors.length).toEqual(1)
-      expect(validationErrors[0].message).toEqual(
-        "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this fragment spread."
-      )
+      expect(validationErrors.length).toEqual(0)
     })
   })
 
