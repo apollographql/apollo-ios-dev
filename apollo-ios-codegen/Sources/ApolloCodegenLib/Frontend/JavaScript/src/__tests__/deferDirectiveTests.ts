@@ -233,7 +233,7 @@ describe("given schema", () => {
     it("should pass validation", () => {
       const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
 
-      expect(validationErrors.length).toEqual(0)
+      expect(validationErrors).to(beEmpty())
     })
   })
 
