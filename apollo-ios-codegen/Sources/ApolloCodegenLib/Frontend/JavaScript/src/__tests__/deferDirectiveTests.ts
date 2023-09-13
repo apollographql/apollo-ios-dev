@@ -62,7 +62,7 @@ describe("given schema", () => {
       const allAnimals = operation.selectionSet.selections[0] as Field;
       const inlineFragment = allAnimals?.selectionSet?.selections?.[0] as InlineFragment;
 
-      expect(inlineFragment.directives?.length).toEqual(1);
+      expect(inlineFragment.directives).toHaveLength(1);
 
       expect(inlineFragment.directives?.[0].name).toEqual("defer");
     });
@@ -89,11 +89,11 @@ describe("given schema", () => {
       const allAnimals = operation.selectionSet.selections[0] as Field;
       const inlineFragment = allAnimals?.selectionSet?.selections?.[0] as InlineFragment;
 
-      expect(inlineFragment.directives?.length).toEqual(1);
+      expect(inlineFragment.directives).toHaveLength(1);
 
       expect(inlineFragment.directives?.[0].name).toEqual("defer");
       
-      expect(inlineFragment.directives?.[0].arguments?.length).toEqual(2);
+      expect(inlineFragment.directives?.[0].arguments).toHaveLength(2);
       expect(inlineFragment.directives?.[0].arguments?.[0].name).toEqual("if");
       expect(inlineFragment.directives?.[0].arguments?.[1].name).toEqual("label");
     });
@@ -122,7 +122,7 @@ describe("given schema", () => {
       const allAnimals = operation.selectionSet.selections[0] as Field;
       const inlineFragment = allAnimals?.selectionSet?.selections?.[0] as FragmentSpread;
 
-      expect(inlineFragment.directives?.length).toEqual(1);
+      expect(inlineFragment.directives).toHaveLength(1);
 
       expect(inlineFragment.directives?.[0].name).toEqual("defer");
     });
@@ -151,11 +151,11 @@ describe("given schema", () => {
       const allAnimals = operation.selectionSet.selections[0] as Field;
       const inlineFragment = allAnimals?.selectionSet?.selections?.[0] as FragmentSpread;
 
-      expect(inlineFragment.directives?.length).toEqual(1);
+      expect(inlineFragment.directives).toHaveLength(1);
       
       expect(inlineFragment.directives?.[0].name).toEqual("defer");
       
-      expect(inlineFragment.directives?.[0].arguments?.length).toEqual(2);
+      expect(inlineFragment.directives?.[0].arguments).toHaveLength(2);
       expect(inlineFragment.directives?.[0].arguments?.[0].name).toEqual("if");
       expect(inlineFragment.directives?.[0].arguments?.[1].name).toEqual("label");
     });
@@ -181,7 +181,7 @@ describe("given schema", () => {
     it("should fail validation", () => {
       const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
 
-      expect(validationErrors.length).toEqual(1)
+      expect(validationErrors).toHaveLength(1)
       expect(validationErrors[0].message).toEqual(
         "Apollo does not support deferred inline fragments without a type condition. Please add a type condition to this inline fragment."
       )
@@ -206,9 +206,9 @@ describe("given schema", () => {
     it("should fail validation", () => {
       const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
 
-      expect(validationErrors.length).toEqual(1)
+      expect(validationErrors).toHaveLength(1)
       expect(validationErrors[0].message).toEqual(
-        "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment."
+        "Apollo does not support deferred inline fragments without a 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment."
       )
     })
   })
@@ -230,13 +230,10 @@ describe("given schema", () => {
       new Source(documentString, "Test Query", { line: 1, column: 1 })
     );
 
-    it("should fail validation", () => {
+    it("should pass validation", () => {
       const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
 
-      expect(validationErrors.length).toEqual(1)
-      expect(validationErrors[0].message).toEqual(
-        "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this fragment spread."
-      )
+      expect(validationErrors).toHaveLength(0)
     })
   })
 
@@ -262,9 +259,9 @@ describe("given schema", () => {
     it("should fail validation", () => {
       const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
 
-      expect(validationErrors.length).toEqual(1)
+      expect(validationErrors).toHaveLength(1)
       expect(validationErrors[0].message).toEqual(
-        "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment."
+        "Apollo does not support deferred inline fragments without a 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment."
       )
     })
   })
@@ -287,7 +284,7 @@ describe("given schema", () => {
     it("should pass validation", () => {
       const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
 
-      expect(validationErrors.length).toEqual(0)
+      expect(validationErrors).toHaveLength(0)
     })
   })
 
@@ -311,7 +308,7 @@ describe("given schema", () => {
     it("should pass validation", () => {
       const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
 
-      expect(validationErrors.length).toEqual(0)
+      expect(validationErrors).toHaveLength(0)
     })
   })
 

@@ -9,7 +9,6 @@ import {
   VariableDefinitionNode,
   InlineFragmentNode,
   GraphQLDeferDirective,
-  FragmentSpreadNode,
 } from "graphql";
 
 const specifiedRulesToBeRemoved: [ValidationRule] = [NoUnusedFragmentsRule];
@@ -33,7 +32,7 @@ export function defaultValidationRules(options: ValidationOptions): ValidationRu
     NoAnonymousQueries,
     NoTypenameAlias,
     DeferredInlineFragmentNoTypeCondition,
-    DeferDirectiveMissingLabelArgument,
+    DeferredInlineFragmentMissingLabelArgument,
     ...(disallowedFieldNamesRule ? [disallowedFieldNamesRule] : []),
     ...(disallowedInputParameterNamesRule ? [disallowedInputParameterNamesRule] : []),
     ...specifiedRules.filter((rule) => !specifiedRulesToBeRemoved.includes(rule)),
@@ -89,39 +88,23 @@ export function DeferredInlineFragmentNoTypeCondition(context: ValidationContext
   };
 }
 
-export function DeferDirectiveMissingLabelArgument(context: ValidationContext) {
-  function ValidateDeferDirectiveLabelArgument(node: InlineFragmentNode | FragmentSpreadNode, error: GraphQLError) {
-    if (node.directives) {
-      for (const directive of node.directives) {
-        if (directive.name.value == GraphQLDeferDirective.name && !(directive.arguments?.find(
-          function(element) {
-            return element.name.value == 'label'
-          }) ? true: false)
-        ) {
-          context.reportError(error)
-        }
-      }
-    }
-  }
-
+export function DeferredInlineFragmentMissingLabelArgument(context: ValidationContext) {
   return {
     InlineFragment(node: InlineFragmentNode) {
-      ValidateDeferDirectiveLabelArgument(
-        node, 
-        new GraphQLError(
-          "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment.",
-          { nodes: node }
-        )
-      )
-    },
-    FragmentSpread(node: FragmentSpreadNode) {
-      ValidateDeferDirectiveLabelArgument(
-        node,
-        new GraphQLError(
-          "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this fragment spread.",
-          { nodes: node }
-        )
-      )
+      if (node.directives) {
+        for (const directive of node.directives) {
+          if (directive.name.value == GraphQLDeferDirective.name && !(directive.arguments?.find((element) =>
+            element.name.value == 'label'
+          ))) {
+            context.reportError(
+              new GraphQLError(
+                "Apollo does not support deferred inline fragments without a 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment.",
+                { nodes: node }
+              )
+            )
+          }
+        }
+      }
     }
   }
 }
