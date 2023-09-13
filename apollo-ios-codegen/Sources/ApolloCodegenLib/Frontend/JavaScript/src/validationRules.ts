@@ -98,7 +98,7 @@ export function DeferredInlineFragmentMissingLabelArgument(context: ValidationCo
           ))) {
             context.reportError(
               new GraphQLError(
-                "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment.",
+                "Apollo does not support deferred inline fragments without a 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment.",
                 { nodes: node }
               )
             )

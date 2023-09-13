@@ -208,7 +208,7 @@ describe("given schema", () => {
 
       expect(validationErrors.length).toEqual(1)
       expect(validationErrors[0].message).toEqual(
-        "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment."
+        "Apollo does not support deferred inline fragments without a 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment."
       )
     })
   })
@@ -261,7 +261,7 @@ describe("given schema", () => {
 
       expect(validationErrors.length).toEqual(1)
       expect(validationErrors[0].message).toEqual(
-        "Apollo requires all @defer directives to use the 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment."
+        "Apollo does not support deferred inline fragments without a 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment."
       )
     })
   })
