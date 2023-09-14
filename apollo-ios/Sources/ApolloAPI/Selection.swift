@@ -5,7 +5,7 @@ public enum Selection {
   case fragment(any Fragment.Type)
   /// An inline fragment with a child selection set nested in a parent selection set.
   case inlineFragment(any InlineFragment.Type)
-
+  /// A fragment spread or inline fragment marked with the `@defer` directive.
   case deferred(if: Condition? = nil, any Deferrable.Type, label: String?)
   /// A group of selections that have `@include/@skip` directives.
   case conditional(Conditions, [Selection])
