@@ -6381,7 +6381,7 @@ class SelectionSetTemplateTests: XCTestCase {
       allAnimals {
         __typename
         id
-        ...DogFragment @defer(if: true)
+        ...DogFragment @defer(if: false)
       }
     }
 
