@@ -1,4 +1,6 @@
 import Foundation
+import GraphQLCompiler
+import TemplateString
 
 /// Provides the format to convert a [GraphQL Input Object](https://spec.graphql.org/draft/#sec-Input-Objects)
 /// into Swift code.

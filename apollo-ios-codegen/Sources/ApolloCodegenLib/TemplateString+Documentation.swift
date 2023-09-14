@@ -1,7 +1,9 @@
+import TemplateString
+
 extension TemplateString.StringInterpolation {
 
   mutating func appendInterpolation(
-    documentation: String?,
+    documentation: @autoclosure () -> String?,
     config: ApolloCodegen.ConfigurationContext
   ) {
     guard config.options.schemaDocumentation == .include else {
@@ -9,7 +11,7 @@ extension TemplateString.StringInterpolation {
       return
     }
 
-    appendInterpolation(forceDocumentation: documentation)
+    appendInterpolation(documentation: documentation())
   }
 
 }

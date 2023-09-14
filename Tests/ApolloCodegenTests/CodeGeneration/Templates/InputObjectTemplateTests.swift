@@ -2,6 +2,7 @@ import XCTest
 import Nimble
 @testable import ApolloCodegenLib
 import Apollo
+import GraphQLCompiler
 
 class InputObjectTemplateTests: XCTestCase {
   var subject: InputObjectTemplate!

@@ -1,5 +1,6 @@
 @testable import ApolloCodegenLib
 @testable import JavaScriptCore
+@testable import GraphQLCompiler
 
 private var mockJavaScriptBridge = try! JavaScriptBridge()
 
@@ -10,4 +11,10 @@ extension JavaScriptObject {
     return Self.fromJSValue(object, bridge: mockJavaScriptBridge)
   }
   
+}
+
+extension JavaScriptWrapper {
+  public class func emptyMockObject() -> Self {
+    return self.init(.emptyMockObject())
+  }
 }

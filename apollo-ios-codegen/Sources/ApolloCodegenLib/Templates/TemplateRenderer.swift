@@ -1,3 +1,5 @@
+import TemplateString
+
 // MARK: TemplateRenderer
 
 /// Defines the file target of the template.

@@ -1,5 +1,6 @@
 @testable import ApolloCodegenLib
 import OrderedCollections
+import GraphQLCompiler
 
 extension IR {
 

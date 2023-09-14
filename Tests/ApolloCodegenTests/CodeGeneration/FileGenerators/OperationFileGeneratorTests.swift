@@ -64,10 +64,8 @@ class OperationFileGeneratorTests: XCTestCase {
     // given
     try buildSubject()
 
-    let expected = irOperation.definition.nameWithSuffix
-
     // then
-    expect(self.subject.fileName).to(equal(expected))
+    expect(self.subject.fileName).to(equal("AllAnimalsQuery"))
   }
 
   func test__properties__givenIrOperation_shouldOverwrite() throws {

@@ -1,4 +1,6 @@
 import OrderedCollections
+import GraphQLCompiler
+import TemplateString
 
 protocol InputVariableRenderable {
   var type: GraphQLType { get }

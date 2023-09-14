@@ -1,5 +1,6 @@
 import Foundation
 import OrderedCollections
+import GraphQLCompiler
 
 extension IR {
 

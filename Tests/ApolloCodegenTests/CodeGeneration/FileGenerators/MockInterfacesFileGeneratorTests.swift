@@ -1,6 +1,7 @@
 import XCTest
 import Nimble
 import OrderedCollections
+import GraphQLCompiler
 @testable import ApolloCodegenLib
 
 class MockInterfacesFileGeneratorTests: XCTestCase {

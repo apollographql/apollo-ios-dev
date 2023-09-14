@@ -37,7 +37,7 @@ public class GraphQLError: JavaScriptError {
   
   /// Log lines for this error in a format that allows Xcode to show errors inline at the correct location.
   /// See https://shazronatadobe.wordpress.com/2010/12/04/xcode-shell-build-phase-reporting-of-errors/
-  var logLines: [String]? {
+  public var logLines: [String]? {
     return sourceLocations?.map {
       return [$0.filePath, String($0.lineNumber), "error", message ?? "?"].joined(separator: ":")
     }

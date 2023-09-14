@@ -1,4 +1,6 @@
 import OrderedCollections
+import GraphQLCompiler
+import TemplateString
 
 /// Provides the format to convert a [GraphQL Operation](https://spec.graphql.org/draft/#sec-Language.Operations)
 /// into Swift code.

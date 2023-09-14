@@ -1,6 +1,7 @@
 import XCTest
 import Nimble
 @testable import ApolloCodegenLib
+import GraphQLCompiler
 
 class OperationDefinition_VariableDefinition_Tests: XCTestCase {
 

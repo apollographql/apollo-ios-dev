@@ -1,3 +1,5 @@
+import GraphQLCompiler
+
 extension GraphQLEnumValue.Name {
 
   enum RenderContext {

@@ -1,4 +1,5 @@
 @testable import ApolloCodegenLib
+import GraphQLCompiler
 
 public extension CompilationResult {
 
@@ -109,7 +110,7 @@ public extension CompilationResult.Field {
     selectionSet: CompilationResult.SelectionSet = .mock(),
     deprecationReason: String? = nil
   ) -> Self {
-    let mock = Self(nil)
+    let mock = Self.emptyMockObject()
     mock.name = name
     mock.alias = alias
     mock.arguments = arguments

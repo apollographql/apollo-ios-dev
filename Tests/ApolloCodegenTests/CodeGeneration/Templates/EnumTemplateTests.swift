@@ -2,6 +2,7 @@ import XCTest
 import Nimble
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
+import GraphQLCompiler
 
 class EnumTemplateTests: XCTestCase {
   var subject: EnumTemplate!

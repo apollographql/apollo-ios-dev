@@ -1,5 +1,6 @@
 import XCTest
 import Nimble
+import GraphQLCompiler
 import ApolloInternalTestHelpers
 import ApolloCodegenInternalTestHelpers
 @testable import ApolloCodegenLib

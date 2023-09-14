@@ -1,5 +1,6 @@
 import Foundation
 import OrderedCollections
+import GraphQLCompiler
 
 // Only available on macOS
 #if os(macOS)

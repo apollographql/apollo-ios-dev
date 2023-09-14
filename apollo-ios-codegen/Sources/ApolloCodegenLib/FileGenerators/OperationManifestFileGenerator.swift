@@ -1,4 +1,5 @@
 import Foundation
+import GraphQLCompiler
 
 /// Representation of an operation that supports Automatic Persisted Queries
 struct OperationManifestItem {

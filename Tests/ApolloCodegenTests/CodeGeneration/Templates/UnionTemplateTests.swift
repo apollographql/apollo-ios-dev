@@ -2,6 +2,7 @@ import XCTest
 import Nimble
 @testable import ApolloCodegenLib
 import ApolloAPI
+import GraphQLCompiler
 
 class UnionTemplateTests: XCTestCase {
   var subject: UnionTemplate!
