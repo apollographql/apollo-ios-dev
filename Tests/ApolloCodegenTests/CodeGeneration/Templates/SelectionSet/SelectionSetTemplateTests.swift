@@ -1810,7 +1810,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
     )
     let allAnimals_asDog_asCat = try XCTUnwrap(
-      allAnimals_asDog[as: "One"]?[field: "Friend"]?[as: "Cat"]
+      allAnimals_asDog[as: "One"]?[field: "friend"]?[as: "Cat"]
     )
 
     let actualOne = subject.render(inlineFragment: allAnimals_asDog)
