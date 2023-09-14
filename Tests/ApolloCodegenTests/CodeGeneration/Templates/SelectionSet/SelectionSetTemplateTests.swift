@@ -7439,6 +7439,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
 
         public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
       }
     """
 
@@ -7490,22 +7491,28 @@ class SelectionSetTemplateTests: XCTestCase {
     }
     """
 
-    let expectedOne = """
+    let expected = """
       public struct One: TestSchema.InlineFragment, ApolloAPI.Deferrable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public typealias RootEntityType = InlineFragment2.Data.AllAnimal
+        public typealias RootEntityType = TestOperation.Data.AllAnimal
         public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
-    """
 
-    let expectedTwo = """
+        public var species: String { __data["species"] }
+        public var id: String? { __data["id"] }
+      }
+
       public struct Two: TestSchema.InlineFragment, ApolloAPI.Deferrable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public typealias RootEntityType = InlineFragment2.Data.AllAnimal
+        public typealias RootEntityType = TestOperation.Data.AllAnimal
         public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
+
+        public var genus: String { __data["genus"] }
+        public var id: String? { __data["id"] }
+      }
     """
 
     // when
@@ -7517,8 +7524,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let actual = subject.render(inlineFragment: allAnimals_asDog)
 
     // then
-    expect(actual).to(equalLineByLine(expectedOne, atLine: 30, ignoringExtraLines: true))
-    expect(actual).to(equalLineByLine(expectedTwo, atLine: 43, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 30, ignoringExtraLines: true))
   }
 
   // MARK: - InlineFragment RootEntityType Tests
