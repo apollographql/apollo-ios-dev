@@ -1,5 +1,6 @@
 import XCTest
 import Nimble
+@testable import IR
 @testable import ApolloCodegenLib
 
 class SchemaConfigurationFileGeneratorTests: XCTestCase {

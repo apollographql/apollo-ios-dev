@@ -1,4 +1,5 @@
 import Foundation
+import IR
 
 /// Generates a file containing the Swift representation of a [GraphQL Fragment](https://spec.graphql.org/draft/#sec-Language.Fragments).
 struct FragmentFileGenerator: FileGenerator {

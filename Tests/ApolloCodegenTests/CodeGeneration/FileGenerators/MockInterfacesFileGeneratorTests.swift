@@ -1,6 +1,7 @@
 import XCTest
 import Nimble
 import OrderedCollections
+import IR
 import GraphQLCompiler
 @testable import ApolloCodegenLib
 
@@ -19,7 +20,7 @@ class MockInterfacesFileGeneratorTests: XCTestCase {
     let compilationResult = CompilationResult.mock()
     compilationResult.referencedTypes.append(contentsOf: interfaces.elements)
 
-    let ir = IR.mock(compilationResult: compilationResult)
+    let ir = IRBuilder.mock(compilationResult: compilationResult)
 
     subject = MockInterfacesFileGenerator(
       ir: ir,

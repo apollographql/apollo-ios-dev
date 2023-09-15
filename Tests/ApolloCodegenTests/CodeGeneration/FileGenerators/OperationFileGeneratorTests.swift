@@ -1,7 +1,8 @@
 import XCTest
 import Nimble
-@testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
+@testable import ApolloCodegenLib
+import IR
 
 class OperationFileGeneratorTests: XCTestCase {
   var irOperation: IR.Operation!
@@ -40,7 +41,7 @@ class OperationFileGeneratorTests: XCTestCase {
     }
     """
 
-    let ir = try IR.mock(schema: schemaSDL, document: operationDocument)
+    let ir = try IRBuilder.mock(schema: schemaSDL, document: operationDocument)
     irOperation = ir.build(operation: ir.compilationResult.operations[0])
 
     let config = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock())

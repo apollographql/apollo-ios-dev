@@ -2,6 +2,7 @@ import XCTest
 import Nimble
 import OrderedCollections
 import GraphQLCompiler
+@testable import IR
 @testable import ApolloCodegenLib
 import ApolloInternalTestHelpers
 import ApolloCodegenInternalTestHelpers
@@ -11,7 +12,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IR!
+  var ir: IRBuilder!
   var operation: CompilationResult.OperationDefinition!
   var subject: IR.EntityField!
 

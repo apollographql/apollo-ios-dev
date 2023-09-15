@@ -1,5 +1,6 @@
 import TemplateString
 import GraphQLCompiler
+import IR
 
 extension IR.Definition {
 

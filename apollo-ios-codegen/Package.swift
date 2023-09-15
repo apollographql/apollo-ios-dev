@@ -32,6 +32,7 @@ let package = Package(
       name: "ApolloCodegenLib",
       dependencies: [
         "GraphQLCompiler",
+        "IR",
         "TemplateString",
         .product(name: "InflectorKit", package: "InflectorKit"),
         .product(name: "OrderedCollections", package: "swift-collections")
@@ -48,7 +49,19 @@ let package = Package(
       ]
     ),
     .target(
+      name: "IR",
+      dependencies: [
+        "TemplateString",
+        "Utilities",
+        .product(name: "OrderedCollections", package: "swift-collections")        
+      ]
+    ),
+    .target(
       name: "TemplateString",
+      dependencies: []
+    ),
+    .target(
+      name: "Utilities",
       dependencies: []
     ),
     .executableTarget(

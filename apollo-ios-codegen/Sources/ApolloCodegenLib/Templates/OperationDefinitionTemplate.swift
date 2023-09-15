@@ -1,6 +1,7 @@
-import OrderedCollections
+import IR
 import GraphQLCompiler
 import TemplateString
+import OrderedCollections
 
 /// Provides the format to convert a [GraphQL Operation](https://spec.graphql.org/draft/#sec-Language.Operations)
 /// into Swift code.
@@ -20,7 +21,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
     \(OperationDeclaration())
       \(DocumentType.render(
         operation.definition,
-        identifier: operation.operationIdentifier,
+        identifier: config.operationIdentifierFactory.identifier(for: operation),
         fragments: operation.referencedFragments,
         config: config,
         accessControlRenderer: { accessControlModifier(for: .member) }()

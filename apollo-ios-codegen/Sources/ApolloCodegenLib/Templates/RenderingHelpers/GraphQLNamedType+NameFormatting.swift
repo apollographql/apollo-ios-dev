@@ -16,17 +16,6 @@ extension GraphQLNamedType {
 
 extension GraphQLScalarType {
 
-  var isCustomScalar: Bool {
-    guard self.specifiedByURL == nil else { return true }
-
-    switch name {
-    case "String", "Int", "Float", "Boolean", "ID":
-      return false
-    default:
-      return true
-    }
-  }
-
   var isSwiftType: Bool {
     switch name {
     case "String", "Int", "Float", "Boolean":

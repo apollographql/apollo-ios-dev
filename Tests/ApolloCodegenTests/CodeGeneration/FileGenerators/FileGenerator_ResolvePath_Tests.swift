@@ -1,5 +1,6 @@
 import XCTest
 import Nimble
+import IR
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
 
@@ -45,7 +46,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     }
     """
 
-    let ir = try IR.mock(schema: schemaSDL, document: operationDocument)
+    let ir = try IRBuilder.mock(schema: schemaSDL, document: operationDocument)
 
     irFragment = ir.build(fragment: ir.compilationResult.fragments[0])
     irFragment.definition.filePath = directoryURL
