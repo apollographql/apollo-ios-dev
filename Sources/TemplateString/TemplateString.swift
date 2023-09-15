@@ -1,34 +1,34 @@
 import Foundation
 
-struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible {
+public struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible {
 
   private let value: String
   private let lastLineWasRemoved: Bool
 
-  init(_ string: String) {
+  public init(_ string: String) {
     self.value = string
     lastLineWasRemoved = false
   }
 
-  init(stringLiteral: String) {
+  public init(stringLiteral: String) {
     self.init(stringLiteral)
   }
 
-  init(stringInterpolation: StringInterpolation) {
+  public init(stringInterpolation: StringInterpolation) {
     self.value = stringInterpolation.output
     self.lastLineWasRemoved = stringInterpolation.lastLineWasRemoved
   }
 
-  init(_ stringInterpolation: StringInterpolation) {
+  public init(_ stringInterpolation: StringInterpolation) {
     self.value = stringInterpolation.output
     self.lastLineWasRemoved = stringInterpolation.lastLineWasRemoved
   }
 
-  var description: String { value }
+  public var description: String { value }
 
-  var isEmpty: Bool { description.isEmpty }
+  public var isEmpty: Bool { description.isEmpty }
 
-  struct StringInterpolation: StringInterpolationProtocol {
+  public struct StringInterpolation: StringInterpolationProtocol {
 
     fileprivate var lastLineWasRemoved = false
     private var buffer: String
@@ -40,13 +40,13 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
       return buffer
     }
 
-    init(literalCapacity: Int, interpolationCount: Int) {
+    public init(literalCapacity: Int, interpolationCount: Int) {
       var string = String()
       string.reserveCapacity(literalCapacity)
       self.buffer = string
     }
 
-    mutating func appendLiteral(_ literal: StringLiteralType) {
+    public mutating func appendLiteral(_ literal: StringLiteralType) {
       guard !literal.isEmpty else { return }
       defer { lastLineWasRemoved = false }
 
@@ -57,11 +57,11 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
       }
     }
 
-    mutating func appendInterpolation(_ string: StaticString) {
+    public mutating func appendInterpolation(_ string: StaticString) {
       appendInterpolation(string.description)
     }
 
-    mutating func appendInterpolation(_ template: TemplateString) {
+    public mutating func appendInterpolation(_ template: TemplateString) {
       if template.isEmpty {
         removeLineIfEmpty()
 
@@ -70,7 +70,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
       }
     }
 
-    mutating func appendInterpolation(section: TemplateString) {
+    public mutating func appendInterpolation(section: TemplateString) {
       appendInterpolation(section)
 
       if section.isEmpty && buffer.hasSuffix("\n") {
@@ -80,7 +80,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
 
     private static let whitespaceNotNewline = Set(" \t")
 
-    mutating func appendInterpolation(_ string: String) {
+    public mutating func appendInterpolation(_ string: String) {
       let indent = getCurrentIndent()
 
       if indent.isEmpty {
@@ -102,7 +102,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
       })
     }
 
-    mutating func appendInterpolation<T>(
+    public mutating func appendInterpolation<T>(
       _ sequence: T,
       separator: String = ",\n",
       terminator: String? = nil
@@ -115,7 +115,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
     }
 
     @_disfavoredOverload
-    mutating func appendInterpolation<T>(
+    public mutating func appendInterpolation<T>(
       _ sequence: T,
       separator: String = ",\n",
       terminator: String? = nil
@@ -127,7 +127,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
       )
     }
 
-    mutating func appendInterpolation<T>(
+    public mutating func appendInterpolation<T>(
       _ sequence: T,
       separator: String = ",\n",
       terminator: String? = nil
@@ -140,7 +140,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
       )
     }
 
-    mutating func appendInterpolation<T>(
+    public mutating func appendInterpolation<T>(
       list: T,
       separator: String = ",\n",
       terminator: String? = nil
@@ -152,7 +152,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
     }
 
     @_disfavoredOverload
-    mutating func appendInterpolation<T>(
+    public mutating func appendInterpolation<T>(
       list: T,
       separator: String = ",\n",
       terminator: String? = nil
@@ -169,7 +169,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
 
     // MARK: For Each
 
-    mutating func appendInterpolation<T>(
+    public mutating func appendInterpolation<T>(
       forEachIn sequence: T,
       separator: String = ",\n",
       terminator: String? = nil,
@@ -199,7 +199,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
 
     // MARK: While
 
-    mutating func appendInterpolation(
+    public mutating func appendInterpolation(
       while whileBlock: @autoclosure () -> Bool,
       _ template: () -> TemplateString,
       separator: String = ",\n",
@@ -214,7 +214,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
 
     // MARK: If
 
-    mutating func appendInterpolation(
+    public mutating func appendInterpolation(
       if bool: Bool,
       _ template: @autoclosure () -> TemplateString,
       else: @autoclosure () -> TemplateString? = nil
@@ -230,7 +230,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
 
     /// MARK: If Let
 
-    mutating func appendInterpolation<T>(
+    public mutating func appendInterpolation<T>(
       ifLet optional: Optional<T>,
       _ includeBlock: (T) -> TemplateString
     ) {
@@ -242,7 +242,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
     }
 
     @_disfavoredOverload
-    mutating func appendInterpolation<T>(
+    public mutating func appendInterpolation<T>(
       ifLet optional: Optional<T>,
       where whereBlock: ((T) -> Bool)? = nil,
       _ includeBlock: (T) -> TemplateString,
@@ -258,7 +258,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
     }
 
     @_disfavoredOverload
-    mutating func appendInterpolation<T>(
+    public mutating func appendInterpolation<T>(
       ifLet optional: Optional<T>,
       where whereBlock: @autoclosure @escaping () -> Bool = true,
       _ includeBlock: (T) -> TemplateString,
@@ -273,7 +273,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
     }
 
     @_disfavoredOverload
-    mutating func appendInterpolation<T>(
+    public mutating func appendInterpolation<T>(
       ifLet optional: Optional<T>,
       where whereBlock: ((T) -> Bool)? = nil,
       _ includeBlock: @autoclosure () -> TemplateString,
@@ -288,7 +288,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
     }
 
     @_disfavoredOverload
-    mutating func appendInterpolation<T>(
+    public mutating func appendInterpolation<T>(
       ifLet optional: Optional<T>,
       _ includeBlock: (T) -> TemplateString,
       else: @autoclosure () -> TemplateString? = nil
@@ -301,16 +301,12 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
       )
     }
 
-    mutating func appendInterpolation(
+    // MARK: Comments
+
+    public mutating func appendInterpolation(
       comment: String?
     ) {
       appendInterpolation(comment: comment, withLinePrefix: "//")
-    }
-
-    mutating func appendInterpolation(
-      forceDocumentation documentation: String?
-    ) {
-      appendInterpolation(comment: documentation, withLinePrefix: "///")
     }
 
     private mutating func appendInterpolation(
@@ -329,6 +325,12 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
       appendInterpolation(components)
     }
 
+    public mutating func appendInterpolation(
+      documentation: String?
+    ) {
+      appendInterpolation(comment: documentation, withLinePrefix: "///")
+    }
+
     // MARK: JSON
 
     mutating func appendInterpolation(json jsonData: Data) {
@@ -337,7 +339,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
 
     // MARK: - Helpers
 
-    mutating func removeLineIfEmpty() {
+    public mutating func removeLineIfEmpty() {
       let slice = substringToStartOfLine()
       if slice.allSatisfy(\.isWhitespace) {
         buffer.removeLast(slice.count)
@@ -355,7 +357,7 @@ struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible
 
 /// Can be used to concatenate a `TemplateString` and `String` directly.
 /// This bypasses `TemplateString` interpolation logic such as indentation calculation.
-func +(lhs: String, rhs: TemplateString) -> TemplateString {
+public func +(lhs: String, rhs: TemplateString) -> TemplateString {
   TemplateString(lhs + rhs.description)
 }
 
@@ -395,33 +397,5 @@ extension Array where Element == Substring {
     }
 
     return string
-  }
-}
-
-extension String {
-  var firstUppercased: String {
-    guard let indexToChangeCase = firstIndex(where: \.isCased) else {
-      return self
-    }
-    return prefix(through: indexToChangeCase).uppercased() +
-    suffix(from: index(after: indexToChangeCase))
-  }
-
-  var firstLowercased: String {
-    guard let indexToChangeCase = firstIndex(where: \.isCased) else {
-      return self
-    }
-    return prefix(through: indexToChangeCase).lowercased() +
-    suffix(from: index(after: indexToChangeCase))
-  }
-  
-  var isAllUppercased: Bool {
-    return self == self.uppercased()
-  }
-
-  func convertedToSingleLine() -> String {
-    return components(separatedBy: .newlines)
-      .map { $0.trimmingCharacters(in: .whitespaces) }
-      .joined(separator: " ")
   }
 }

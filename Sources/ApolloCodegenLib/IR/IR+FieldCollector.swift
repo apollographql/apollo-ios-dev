@@ -1,3 +1,5 @@
+import GraphQLCompiler
+
 extension IR {
 
   class FieldCollector {

@@ -2,7 +2,7 @@ import Foundation
 import JavaScriptCore
 import OrderedCollections
 
-indirect enum GraphQLValue: Hashable {
+public indirect enum GraphQLValue: Hashable {
   case variable(String)
   case int(Int)
   case float(Double)

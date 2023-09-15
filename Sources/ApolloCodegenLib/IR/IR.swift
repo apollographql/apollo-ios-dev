@@ -1,4 +1,5 @@
 import OrderedCollections
+import GraphQLCompiler
 import CryptoKit
 
 class IR {

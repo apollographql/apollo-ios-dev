@@ -1,3 +1,5 @@
+import GraphQLCompiler
+
 extension GraphQLCompositeType {
   var schemaTypesNamespace: String {
     switch self {

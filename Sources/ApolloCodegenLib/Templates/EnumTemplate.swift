@@ -1,4 +1,6 @@
 import Foundation
+import GraphQLCompiler
+import TemplateString
 
 /// Provides the format to convert a [GraphQL Enum](https://spec.graphql.org/draft/#sec-Enums) into
 /// Swift code.
@@ -34,10 +36,10 @@ struct EnumTemplate: TemplateRenderer {
     config.options.schemaDocumentation == .include
 
     return """
-    \(if: shouldRenderDocumentation, "\(forceDocumentation: graphqlEnumValue.documentation)")
+    \(if: shouldRenderDocumentation, "\(documentation: graphqlEnumValue.documentation)")
     \(ifLet: graphqlEnumValue.deprecationReason, { """
       \(if: shouldRenderDocumentation, "///")
-      \(forceDocumentation: "**Deprecated**: \($0.escapedSwiftStringSpecialCharacters())")
+      \(documentation: "**Deprecated**: \($0.escapedSwiftStringSpecialCharacters())")
       """ })
     \(caseDefinition(for: graphqlEnumValue))
     """
