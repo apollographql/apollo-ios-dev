@@ -1,3 +1,5 @@
+import TemplateString
+
 extension TemplateString.StringInterpolation {
 
   mutating func appendInterpolation(

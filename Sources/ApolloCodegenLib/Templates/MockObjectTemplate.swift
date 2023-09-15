@@ -1,4 +1,6 @@
 import Foundation
+import GraphQLCompiler
+import TemplateString
 
 struct MockObjectTemplate: TemplateRenderer {
   /// IR representation of source [GraphQL Object](https://spec.graphql.org/draft/#sec-Objects).

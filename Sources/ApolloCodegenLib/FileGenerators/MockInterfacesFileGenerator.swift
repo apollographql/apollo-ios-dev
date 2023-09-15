@@ -1,5 +1,6 @@
 import Foundation
 import OrderedCollections
+import GraphQLCompiler
 
 /// Generates a file providing the ability to mock the GraphQLInterfaceTypes in a schema
 /// for testing purposes.

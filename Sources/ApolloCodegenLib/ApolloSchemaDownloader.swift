@@ -1,4 +1,6 @@
 import Foundation
+import GraphQLCompiler
+
 // Only available on macOS
 #if os(macOS)
 

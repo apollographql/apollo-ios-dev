@@ -1,4 +1,6 @@
 import OrderedCollections
+import GraphQLCompiler
+import TemplateString
 
 extension IR {
 

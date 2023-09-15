@@ -31,14 +31,25 @@ let package = Package(
     .target(
       name: "ApolloCodegenLib",
       dependencies: [
+        "GraphQLCompiler",
+        "TemplateString",
         .product(name: "InflectorKit", package: "InflectorKit"),
+        .product(name: "OrderedCollections", package: "swift-collections")
+      ]
+    ),
+    .target(
+      name: "GraphQLCompiler",
+      dependencies: [
+        "TemplateString",
         .product(name: "OrderedCollections", package: "swift-collections")
       ],
       exclude: [
-        "Frontend/dist",
-        "Frontend/JavaScript",
-        "Frontend/auto_rollup.sh",
+        "JavaScript"
       ]
+    ),
+    .target(
+      name: "TemplateString",
+      dependencies: []
     ),
     .executableTarget(
       name: "apollo-ios-cli",
