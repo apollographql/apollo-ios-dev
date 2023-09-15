@@ -103,7 +103,7 @@ jobs:
     - name: Run-JS-Tests
       if: ${{ matrix.run-js-tests == true }}
       shell: bash
-      working-directory: apollo-ios-codegen/Sources/ApolloCodegenLib/Frontend/JavaScript/
+      working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript/
       run: |
         npm install && npm test
     - name: Save xcodebuild logs
