@@ -2,6 +2,7 @@ import XCTest
 import ApolloInternalTestHelpers
 @testable import ApolloCodegenInternalTestHelpers
 @testable import ApolloCodegenLib
+import GraphQLCompiler
 import Nimble
 
 class ApolloCodegenTests: XCTestCase {

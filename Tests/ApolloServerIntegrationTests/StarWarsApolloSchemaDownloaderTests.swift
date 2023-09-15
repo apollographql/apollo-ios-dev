@@ -3,6 +3,7 @@ import XCTest
 import ApolloInternalTestHelpers
 import ApolloCodegenInternalTestHelpers
 @testable import ApolloCodegenLib
+@testable import GraphQLCompiler
 
 class StarWarsApolloSchemaDownloaderTests: XCTestCase {
 

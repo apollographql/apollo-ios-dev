@@ -1,5 +1,6 @@
 import Foundation
 @testable import ApolloCodegenLib
+import TemplateString
 
 public struct MockFileTemplate: TemplateRenderer {
   public var target: TemplateTarget

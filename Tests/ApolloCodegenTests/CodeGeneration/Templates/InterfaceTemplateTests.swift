@@ -2,6 +2,7 @@ import XCTest
 import Nimble
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
+import GraphQLCompiler
 
 class InterfaceTemplateTests: XCTestCase {
   var subject: InterfaceTemplate!

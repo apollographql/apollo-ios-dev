@@ -1,3 +1,5 @@
+import GraphQLCompiler
+
 extension GraphQLType {
 
   enum RenderContext {

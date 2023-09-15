@@ -1,5 +1,6 @@
 import XCTest
 import Nimble
+import TemplateString
 @testable import ApolloCodegenLib
 
 final class TemplateString_DeprecationMessage_Tests: XCTestCase {

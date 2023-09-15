@@ -1,6 +1,7 @@
 import XCTest
 import Nimble
 @testable import ApolloCodegenLib
+import GraphQLCompiler
 
 class UnionFileGeneratorTests: XCTestCase {
   let graphqlUnion = GraphQLUnionType.mock("MockUnion", types: [])

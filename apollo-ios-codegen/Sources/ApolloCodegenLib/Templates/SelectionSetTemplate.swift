@@ -1,5 +1,7 @@
 import InflectorKit
 import OrderedCollections
+import GraphQLCompiler
+import TemplateString
 
 struct SelectionSetTemplate {
 

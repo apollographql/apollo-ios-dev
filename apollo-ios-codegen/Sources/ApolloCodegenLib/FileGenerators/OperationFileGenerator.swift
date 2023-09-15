@@ -20,5 +20,5 @@ struct OperationFileGenerator: FileGenerator {
   }
 
   var target: FileTarget { .operation(irOperation.definition) }
-  var fileName: String { irOperation.definition.nameWithSuffix }
+  var fileName: String { irOperation.definition.generatedDefinitionName }
 }

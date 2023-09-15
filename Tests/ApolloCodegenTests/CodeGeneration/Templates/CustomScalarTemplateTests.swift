@@ -3,6 +3,7 @@ import Nimble
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
 import ApolloAPI
+import GraphQLCompiler
 
 class CustomScalarTemplateTests: XCTestCase {
   var subject: CustomScalarTemplate!

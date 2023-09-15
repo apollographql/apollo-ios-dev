@@ -1,3 +1,6 @@
+import TemplateString
+import GraphQLCompiler
+
 extension IR.Definition {
 
   func renderedSelectionSetType(_ config: ApolloCodegen.ConfigurationContext) -> TemplateString {
@@ -27,6 +30,28 @@ extension IR.Definition {
 extension CompilationResult.OperationDefinition {
   var generatedDefinitionName: String {
     nameWithSuffix.firstUppercased
+  }
+
+  private var nameWithSuffix: String {
+    func getSuffix() -> String {
+      if isLocalCacheMutation {
+        return "LocalCacheMutation"
+      }
+
+      switch operationType {
+        case .query: return "Query"
+        case .mutation: return "Mutation"
+        case .subscription: return "Subscription"
+      }
+    }
+
+    let suffix = getSuffix()
+
+    guard !name.hasSuffix(suffix) else {
+      return name
+    }
+
+    return name+suffix
   }
 }
 

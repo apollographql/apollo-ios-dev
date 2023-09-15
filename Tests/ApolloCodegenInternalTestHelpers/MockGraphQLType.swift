@@ -1,6 +1,7 @@
 @testable import ApolloCodegenLib
 import OrderedCollections
 import AppKit
+import GraphQLCompiler
 
 public extension GraphQLCompositeType {
   @objc class func mock(

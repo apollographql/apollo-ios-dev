@@ -1,3 +1,6 @@
+import GraphQLCompiler
+import TemplateString
+
 extension IR {
   @dynamicMemberLookup
   class SelectionSet: Hashable, CustomDebugStringConvertible {

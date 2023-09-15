@@ -723,6 +723,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case fieldAccessors
     }
 
+    @available(*, deprecated) // Deprecation attribute added to supress warning.
     public init(from decoder: Decoder) throws {
       let values = try decoder.container(keyedBy: CodingKeys.self)
       guard values.allKeys.first != nil else {
@@ -1461,6 +1462,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
 extension ApolloCodegenConfiguration.ConversionStrategies {
   
   @available(*, deprecated, renamed: "init(enumCases:fieldAccessors:)")
+  @_disfavoredOverload
   public init(
     enumCases: CaseConversionStrategy
   ) {

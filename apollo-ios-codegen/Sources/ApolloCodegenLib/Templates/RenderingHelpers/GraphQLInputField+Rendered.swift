@@ -1,4 +1,4 @@
-import JavaScriptCore
+import GraphQLCompiler
 
 extension GraphQLInputField {
   func renderInputValueType(
