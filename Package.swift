@@ -43,7 +43,7 @@ let package = Package(
       ],
       exclude: [
         "JavaScript"
-      ]      
+      ]
     ),
     .target(
       name: "IR",
