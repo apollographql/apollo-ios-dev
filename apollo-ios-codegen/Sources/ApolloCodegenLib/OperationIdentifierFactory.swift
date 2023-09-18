@@ -18,30 +18,25 @@ class OperationIdentifierFactory {
   }
 
   private func computeIdentifier(for operation: IR.Operation) -> String {
-    if #available(macOS 10.15, *) {
-      var hasher = SHA256()
-      func updateHash(with source: inout String) {
-        source.withUTF8({ buffer in
-          hasher.update(bufferPointer: UnsafeRawBufferPointer(buffer))
-        })
-      }
-      var definitionSource = operation.definition.source.convertedToSingleLine()
-      updateHash(with: &definitionSource)
-
-      var newline: String
-      for fragment in operation.referencedFragments {
-        newline = "\n"
-        updateHash(with: &newline)
-        var fragmentSource = fragment.definition.source.convertedToSingleLine()
-        updateHash(with: &fragmentSource)
-      }
-
-      let digest = hasher.finalize()
-      return digest.compactMap { String(format: "%02x", $0) }.joined()
-
-    } else {
-      fatalError("Code Generation must be run on macOS 10.15+.")
+    var hasher = SHA256()
+    func updateHash(with source: inout String) {
+      source.withUTF8({ buffer in
+        hasher.update(bufferPointer: UnsafeRawBufferPointer(buffer))
+      })
     }
-  }
+    var definitionSource = operation.definition.source.convertedToSingleLine()
+    updateHash(with: &definitionSource)
 
+    var newline: String
+    for fragment in operation.referencedFragments {
+      newline = "\n"
+      updateHash(with: &newline)
+      var fragmentSource = fragment.definition.source.convertedToSingleLine()
+      updateHash(with: &fragmentSource)
+    }
+
+    let digest = hasher.finalize()
+    return digest.compactMap { String(format: "%02x", $0) }.joined()
+
+  }
 }

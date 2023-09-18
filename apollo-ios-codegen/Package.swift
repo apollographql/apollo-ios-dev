@@ -6,10 +6,7 @@ import PackageDescription
 let package = Package(
   name: "ApolloCodegen",
   platforms: [
-    .iOS(.v12),
-    .macOS(.v10_15),
-    .tvOS(.v12),
-    .watchOS(.v5)
+    .macOS(.v10_15)    
   ],
   products: [
     .library(name: "ApolloCodegenLib", targets: ["ApolloCodegenLib"]),
