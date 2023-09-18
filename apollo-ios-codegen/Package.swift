@@ -43,11 +43,12 @@ let package = Package(
       ],
       exclude: [
         "JavaScript"
-      ]
+      ]      
     ),
     .target(
       name: "IR",
       dependencies: [
+        "GraphQLCompiler",
         "TemplateString",
         "Utilities",
         .product(name: "OrderedCollections", package: "swift-collections")        
