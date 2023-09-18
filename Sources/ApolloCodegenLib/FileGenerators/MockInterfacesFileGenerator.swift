@@ -1,4 +1,5 @@
 import Foundation
+import IR
 import OrderedCollections
 import GraphQLCompiler
 
@@ -10,7 +11,7 @@ struct MockInterfacesFileGenerator: FileGenerator {
 
   let config: ApolloCodegen.ConfigurationContext
 
-  init?(ir: IR, config: ApolloCodegen.ConfigurationContext) {
+  init?(ir: IRBuilder, config: ApolloCodegen.ConfigurationContext) {
     let interfaces = ir.schema.referencedTypes.interfaces
     guard !interfaces.isEmpty else { return nil }
     self.graphQLInterfaces = interfaces

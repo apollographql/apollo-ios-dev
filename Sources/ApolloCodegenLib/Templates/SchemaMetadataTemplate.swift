@@ -1,4 +1,5 @@
 import Foundation
+import IR
 import TemplateString
 
 /// Provides the format to define a schema in Swift code. The schema represents metadata used by
