@@ -1,4 +1,5 @@
 import Foundation
+import IR
 
 /// A configuration object that defines behavior for code generation.
 public struct ApolloCodegenConfiguration: Codable, Equatable {

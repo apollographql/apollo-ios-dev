@@ -14,7 +14,7 @@ protocol ScopedSelectionSetHashable {
   var hashForSelectionSetScope: String { get }
 }
 
-extension IR.Field: ScopedSelectionSetHashable {
+extension Field: ScopedSelectionSetHashable {
   var hashForSelectionSetScope: String {
     underlyingField.responseKey
   }
@@ -26,7 +26,7 @@ extension CompilationResult.FragmentSpread: ScopedSelectionSetHashable {
   }
 }
 
-extension IR.NamedFragmentSpread: ScopedSelectionSetHashable {
+extension NamedFragmentSpread: ScopedSelectionSetHashable {
   var hashForSelectionSetScope: String {
     fragment.definition.name
   }

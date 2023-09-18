@@ -1,4 +1,5 @@
 import Foundation
+import IR
 
 /// Generates a file containing the Swift representation of a [GraphQL Operation](https://spec.graphql.org/draft/#sec-Language.Operations).
 struct OperationFileGenerator: FileGenerator {
