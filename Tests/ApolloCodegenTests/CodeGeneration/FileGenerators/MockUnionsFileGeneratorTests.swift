@@ -1,6 +1,7 @@
 import XCTest
 import Nimble
 import OrderedCollections
+import IR
 import GraphQLCompiler
 @testable import ApolloCodegenLib
 
@@ -19,7 +20,7 @@ class MockUnionsFileGeneratorTests: XCTestCase {
     let compilationResult = CompilationResult.mock()
     compilationResult.referencedTypes.append(contentsOf: unions.elements)
 
-    let ir = IR.mock(compilationResult: compilationResult)
+    let ir = IRBuilder.mock(compilationResult: compilationResult)
 
     subject = MockUnionsFileGenerator(
       ir: ir,

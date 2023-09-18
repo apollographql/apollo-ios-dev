@@ -1,5 +1,6 @@
 import XCTest
 import Nimble
+import IR
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
 
@@ -44,7 +45,7 @@ class FragmentFileGeneratorTests: XCTestCase {
     }
     """
 
-    let ir = try IR.mock(schema: schemaSDL, document: operationDocument)
+    let ir = try IRBuilder.mock(schema: schemaSDL, document: operationDocument)
     irFragment = ir.build(fragment: ir.compilationResult.fragments[0])
     
     subject = FragmentFileGenerator(

@@ -2,11 +2,12 @@ import XCTest
 import Nimble
 import OrderedCollections
 import GraphQLCompiler
+import IR
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
 
 class MockUnionsTemplateTests: XCTestCase {
-  var ir: IR!
+  var ir: IRBuilder!
   var subject: MockUnionsTemplate!
 
   override func tearDown() {

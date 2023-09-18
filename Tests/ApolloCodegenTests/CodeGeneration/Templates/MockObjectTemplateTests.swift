@@ -1,12 +1,13 @@
 import XCTest
 import Nimble
 import GraphQLCompiler
+@testable import IR
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
 
 class MockObjectTemplateTests: XCTestCase {
 
-  var ir: IR!
+  var ir: IRBuilder!
   var subject: MockObjectTemplate!
 
   override func tearDown() {
@@ -31,7 +32,7 @@ class MockObjectTemplateTests: XCTestCase {
       output: .mock(moduleType: moduleType, testMocks: testMocks),
       options: .init(warningsOnDeprecatedUsage: warningsOnDeprecatedUsage)
     )
-    ir = IR.mock(compilationResult: .mock())
+    ir = IRBuilder.mock(compilationResult: .mock())
 
     subject = MockObjectTemplate(
       graphqlObject: GraphQLObjectType.mock(name, interfaces: interfaces),

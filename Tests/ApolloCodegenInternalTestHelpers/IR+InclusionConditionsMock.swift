@@ -1,4 +1,5 @@
 @testable import ApolloCodegenLib
+@testable import IR
 import OrderedCollections
 
 extension IR.InclusionConditions {

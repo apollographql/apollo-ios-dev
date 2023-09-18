@@ -1,5 +1,6 @@
 import XCTest
 import Nimble
+import IR
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
 
@@ -7,7 +8,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IR!
+  var ir: IRBuilder!
   var operation: IR.Operation!
   var subject: SelectionSetTemplate!
 

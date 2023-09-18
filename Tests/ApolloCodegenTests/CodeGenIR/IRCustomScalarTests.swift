@@ -1,6 +1,7 @@
 import XCTest
 import Nimble
 import GraphQLCompiler
+@testable import IR
 @testable import ApolloCodegenLib
 
 class IRCustomScalarTests: XCTestCase {

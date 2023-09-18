@@ -1,6 +1,7 @@
 import XCTest
 import Nimble
 import OrderedCollections
+import IR
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
 
@@ -8,7 +9,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IR!
+  var ir: IRBuilder!
   var operation: IR.Operation!
   var config: ApolloCodegenConfiguration!
   var subject: OperationDefinitionTemplate!

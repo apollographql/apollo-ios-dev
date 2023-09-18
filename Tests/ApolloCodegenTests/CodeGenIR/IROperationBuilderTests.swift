@@ -2,6 +2,8 @@ import XCTest
 import Nimble
 import OrderedCollections
 import GraphQLCompiler
+@testable import IR
+import Utilities
 @testable import ApolloCodegenLib
 import ApolloInternalTestHelpers
 import ApolloCodegenInternalTestHelpers
@@ -11,7 +13,7 @@ class IROperationBuilderTests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IR!
+  var ir: IRBuilder!
   var operation: CompilationResult.OperationDefinition!
   var subject: IR.Operation!
 
@@ -173,46 +175,6 @@ class IROperationBuilderTests: XCTestCase {
       .to(equal(LinkedList(Object_Mutation)))
     expect(self.subject.rootField.selectionSet.entity.location)
       .to(equal(.init(source: .operation(self.subject.definition), fieldPath: nil)))
-  }
-
-  // MARK: - Operation Identifier Computation
-
-  func test__buildOperation__givenOperationWithNoFragments__hasCorrectOperationIdentifier() throws {
-    // given
-    document = try String(
-      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroAndFriendsNames")
-    )
-
-    schemaSDL = try String(
-      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema)
-
-    let expected = "1e36c3331171b74c012b86caa04fbb01062f37c61227655d9c0729a62c6f7285"
-
-    // when
-    try buildSubjectOperation(named: "HeroAndFriendsNames", fromJSONSchema: true)
-
-    // then
-    expect(self.subject.operationIdentifier).to(equal(expected))
-  }
-
-  func test__buildOperation__givenOperationWithFragment__hasCorrectOperationIdentifier() throws {
-    // given
-    document = try String(
-      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroAndFriendsNamesWithFragment")
-    ) + "\n" + String(
-      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroName")
-    )
-
-    schemaSDL = try String(
-      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema)
-
-    let expected = "599cd7d91ede7a5508cdb26b424e3b8e99e6c2c5575b799f6090695289ff8e99"
-
-    // when
-    try buildSubjectOperation(named: "HeroAndFriendsNamesWithFragment", fromJSONSchema: true)
-
-    // then
-    expect(self.subject.operationIdentifier).to(equal(expected))
   }
   
 }

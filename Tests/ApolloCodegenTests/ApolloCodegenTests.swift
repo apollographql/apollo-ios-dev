@@ -2,6 +2,7 @@ import XCTest
 import ApolloInternalTestHelpers
 @testable import ApolloCodegenInternalTestHelpers
 @testable import ApolloCodegenLib
+import IR
 import GraphQLCompiler
 import Nimble
 
@@ -666,7 +667,7 @@ class ApolloCodegenTests: XCTestCase {
     // when
     let compilationResult = try ApolloCodegen.compileGraphQLResult(config)
 
-    let ir = IR(compilationResult: compilationResult)
+    let ir = IRBuilder(compilationResult: compilationResult)
 
     try ApolloCodegen.generateFiles(
       compilationResult: compilationResult,
@@ -764,7 +765,7 @@ class ApolloCodegenTests: XCTestCase {
     // when
     let compilationResult = try ApolloCodegen.compileGraphQLResult(config)
 
-    let ir = IR(compilationResult: compilationResult)
+    let ir = IRBuilder(compilationResult: compilationResult)
 
     try ApolloCodegen.generateFiles(
       compilationResult: compilationResult,
@@ -868,7 +869,7 @@ class ApolloCodegenTests: XCTestCase {
       experimentalFeatures: .init(clientControlledNullability: true)
     )
 
-    let ir = IR(compilationResult: compilationResult)
+    let ir = IRBuilder(compilationResult: compilationResult)
 
     try ApolloCodegen.generateFiles(
       compilationResult: compilationResult,
@@ -933,7 +934,7 @@ class ApolloCodegenTests: XCTestCase {
       experimentalFeatures: .init(clientControlledNullability: true)
     )
 
-    let ir = IR(compilationResult: compilationResult)
+    let ir = IRBuilder(compilationResult: compilationResult)
 
     try ApolloCodegen.generateFiles(
       compilationResult: compilationResult,
@@ -1036,7 +1037,7 @@ class ApolloCodegenTests: XCTestCase {
     // when
     let compilationResult = try ApolloCodegen.compileGraphQLResult(config)
 
-    let ir = IR(compilationResult: compilationResult)
+    let ir = IRBuilder(compilationResult: compilationResult)
 
     try ApolloCodegen.generateFiles(
       compilationResult: compilationResult,
@@ -1137,7 +1138,7 @@ class ApolloCodegenTests: XCTestCase {
     // when
     let compilationResult = try ApolloCodegen.compileGraphQLResult(config)
 
-    let ir = IR(compilationResult: compilationResult)
+    let ir = IRBuilder(compilationResult: compilationResult)
 
     try ApolloCodegen.generateFiles(
       compilationResult: compilationResult,

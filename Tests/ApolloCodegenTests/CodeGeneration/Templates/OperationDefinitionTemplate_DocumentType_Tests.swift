@@ -2,6 +2,7 @@ import XCTest
 import Nimble
 import OrderedCollections
 import GraphQLCompiler
+import IR
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
 
