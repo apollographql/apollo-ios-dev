@@ -4,8 +4,8 @@ import Apollo
 @testable import ApolloWebSocket
 import ApolloAPI
 
-public func equalMessage(payload: JSONEncodableDictionary? = nil, id: String? = nil, type: OperationMessage.Types) -> Predicate<String> {
-  return Predicate.define { actualExpression in
+public func equalMessage(payload: JSONEncodableDictionary? = nil, id: String? = nil, type: OperationMessage.Types) -> Nimble.Predicate<String> {
+  return Nimble.Predicate.define { actualExpression in
     guard let actualValue = try actualExpression.evaluate() else {
       return PredicateResult(
         status: .fail,
