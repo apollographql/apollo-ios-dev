@@ -558,7 +558,7 @@ class IRFieldCollectorTests: XCTestCase {
   /// MARK: - Custom Matchers
   func equal(
     _ expected: ReferencedFields
-  ) -> Predicate<ReferencedFields> {
+  ) -> Nimble.Predicate<ReferencedFields> {
     return Predicate.define { actual in
       let message: ExpectationMessage = .expectedActualValueTo("have fields equal to \(expected)")
 

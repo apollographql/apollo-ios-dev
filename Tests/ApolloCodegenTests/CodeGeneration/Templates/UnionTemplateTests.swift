@@ -263,7 +263,7 @@ class UnionTemplateTests: XCTestCase {
   
   func test_render_usingReservedKeyword_shouldHaveSuffixedType() throws {
     let keywords = ["Type", "type"]
-    
+
     keywords.forEach { keyword in
       // given
       buildSubject(name: keyword)
