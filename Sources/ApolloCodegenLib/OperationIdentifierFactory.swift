@@ -2,12 +2,12 @@ import Foundation
 import IR
 import CryptoKit
 
-typealias OperationIdentifierProvider = (_ operation: IR.Operation) async -> String
+typealias OperationIdentifierProvider = (_ operation: IR.Operation) async throws -> String
 
 actor OperationIdentifierFactory {
 
   private enum CacheEntry {
-    case inProgress(Task<String, Never>)
+    case inProgress(Task<String, Error>)
     case ready(String)
   }
 
@@ -20,22 +20,22 @@ actor OperationIdentifierFactory {
     self.idProvider = idProvider
   }
 
-  func identifier(for operation: IR.Operation) async -> String {
+  func identifier(for operation: IR.Operation) async throws -> String {
     let operationObjectID = ObjectIdentifier(operation)
     if let cached = computedIdentifiersCache[operationObjectID] {
       switch cached {
       case let .ready(identifier): return identifier
-      case let .inProgress(task): return await task.value
+      case let .inProgress(task): return try await task.value
       }
     }
 
     let task = Task {
-      await idProvider(operation)
+      try await idProvider(operation)
     }
 
     computedIdentifiersCache[operationObjectID] = .inProgress(task)
 
-    let identifier = await task.value
+    let identifier = try await task.value
     computedIdentifiersCache[operationObjectID] = .ready(identifier)
     return identifier
   }
@@ -43,7 +43,7 @@ actor OperationIdentifierFactory {
 }
 
 private let DefaultOperationIdentifierProvider =
-{ (operation: IR.Operation) async -> String in
+{ (operation: IR.Operation) -> String in
     var hasher = SHA256()
     func updateHash(with source: inout String) {
       source.withUTF8({ buffer in

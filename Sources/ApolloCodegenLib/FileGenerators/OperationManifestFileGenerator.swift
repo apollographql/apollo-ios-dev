@@ -47,11 +47,11 @@ struct OperationManifestFileGenerator {
   }
 
   /// Appends the operation to the collection of identifiers to be written to be serialized.
-  mutating func collectOperationIdentifier(_ operation: IR.Operation) {
+  mutating func collectOperationIdentifier(_ operation: IR.Operation) async {
     operationManifest.append(
       OperationManifestItem(
         operation: operation,
-        identifier: config.operationIdentifierFactory.identifier(for: operation)
+        identifier: await config.operationIdentifierFactory.identifier(for: operation)
       )
     )
   }
