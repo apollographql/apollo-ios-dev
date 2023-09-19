@@ -2,22 +2,48 @@ import Foundation
 import IR
 import CryptoKit
 
-class OperationIdentifierFactory {
+typealias OperationIdentifierProvider = (_ operation: IR.Operation) async -> String
 
-  private var computedIdentifiers: [ObjectIdentifier: String] = [:]
+actor OperationIdentifierFactory {
 
-  func identifier(for operation: IR.Operation) -> String {
+  private enum CacheEntry {
+    case inProgress(Task<String, Never>)
+    case ready(String)
+  }
+
+  let idProvider: OperationIdentifierProvider
+
+  private var computedIdentifiersCache: [ObjectIdentifier: CacheEntry] = [:]
+
+  init(
+    idProvider: @escaping OperationIdentifierProvider = DefaultOperationIdentifierProvider) {
+    self.idProvider = idProvider
+  }
+
+  func identifier(for operation: IR.Operation) async -> String {
     let operationObjectID = ObjectIdentifier(operation)
-    if let identifier = computedIdentifiers[operationObjectID] {
-      return identifier
+    if let cached = computedIdentifiersCache[operationObjectID] {
+      switch cached {
+      case let .ready(identifier): return identifier
+      case let .inProgress(task): return await task.value
+      }
     }
 
-    let identifier = computeIdentifier(for: operation)
-    computedIdentifiers[operationObjectID] = identifier
+    let task = Task {
+      await idProvider(operation)
+    }
+
+    computedIdentifiersCache[operationObjectID] = .inProgress(task)
+
+    let identifier = await task.value
+    computedIdentifiersCache[operationObjectID] = .ready(identifier)
     return identifier
   }
 
-  private func computeIdentifier(for operation: IR.Operation) -> String {
+}
+
+private let DefaultOperationIdentifierProvider =
+{ (operation: IR.Operation) async -> String in
     var hasher = SHA256()
     func updateHash(with source: inout String) {
       source.withUTF8({ buffer in
@@ -37,6 +63,4 @@ class OperationIdentifierFactory {
 
     let digest = hasher.finalize()
     return digest.compactMap { String(format: "%02x", $0) }.joined()
-
-  }
 }
