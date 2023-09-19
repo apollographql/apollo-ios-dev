@@ -1,4 +1,6 @@
 import Foundation
+import IR
+import GraphQLCompiler
 
 /// Representation of an operation that supports Automatic Persisted Queries
 struct OperationManifestItem {
@@ -7,10 +9,10 @@ struct OperationManifestItem {
   let source: String
   let type: CompilationResult.OperationType
 
-  init(operation: IR.Operation) {
+  init(operation: IR.Operation, identifier: String) {
     self.name = operation.definition.name
-    self.identifier = operation.operationIdentifier
     self.type = operation.definition.operationType
+    self.identifier = identifier
 
     var source = operation.definition.source.convertedToSingleLine()
     for fragment in operation.referencedFragments {
@@ -46,7 +48,12 @@ struct OperationManifestFileGenerator {
 
   /// Appends the operation to the collection of identifiers to be written to be serialized.
   mutating func collectOperationIdentifier(_ operation: IR.Operation) {
-    operationManifest.append(OperationManifestItem(operation: operation))
+    operationManifest.append(
+      OperationManifestItem(
+        operation: operation,
+        identifier: config.operationIdentifierFactory.identifier(for: operation)
+      )
+    )
   }
 
   /// Generates a file containing the operation identifiers.

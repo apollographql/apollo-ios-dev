@@ -1,7 +1,8 @@
 import XCTest
+import Nimble
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
-import Nimble
+import GraphQLCompiler
 
 class GraphQLNamedType_SwiftTests: XCTestCase {
   func test_swiftName_givenGraphQLScalar_boolean_providesCompatibleSwiftName() {

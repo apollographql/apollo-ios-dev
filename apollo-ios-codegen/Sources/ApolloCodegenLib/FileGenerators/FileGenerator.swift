@@ -1,4 +1,5 @@
 import Foundation
+import GraphQLCompiler
 
 // MARK: FileGenerator (protocol and extension)
 

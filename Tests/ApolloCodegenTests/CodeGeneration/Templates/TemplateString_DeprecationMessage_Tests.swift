@@ -1,5 +1,7 @@
 import XCTest
 import Nimble
+import TemplateString
+import IR
 @testable import ApolloCodegenLib
 
 final class TemplateString_DeprecationMessage_Tests: XCTestCase {
@@ -265,7 +267,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       }
       """
 
-    let ir = try IR.mock(schema: schemaSDL, document: document)
+    let ir = try IRBuilder.mock(schema: schemaSDL, document: document)
     let operation = ir.build(operation: try XCTUnwrap(ir.compilationResult[operation: "GetAnimal"]))
     let subject = SelectionSetTemplate(
       definition: .operation(operation),
@@ -312,7 +314,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       }
       """
 
-    let ir = try IR.mock(schema: schemaSDL, document: document)
+    let ir = try IRBuilder.mock(schema: schemaSDL, document: document)
     let inputObject = ir.schema.referencedTypes.inputObjects[0]
 
     let subject = InputObjectTemplate(graphqlInputObject: inputObject, config: config)
@@ -355,7 +357,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       }
       """
 
-    let ir = try IR.mock(schema: schemaSDL, document: document)
+    let ir = try IRBuilder.mock(schema: schemaSDL, document: document)
     let `enum` = ir.schema.referencedTypes.enums[0]
 
     let subject = EnumTemplate(graphqlEnum: `enum`, config: config)
@@ -394,7 +396,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       }
       """
 
-    let ir = try IR.mock(schema: schemaSDL, document: document)
+    let ir = try IRBuilder.mock(schema: schemaSDL, document: document)
     let operation = ir.build(operation: try XCTUnwrap(ir.compilationResult[operation: "GetAnimal"]))
     let subject = SelectionSetTemplate(
       definition: .operation(operation),

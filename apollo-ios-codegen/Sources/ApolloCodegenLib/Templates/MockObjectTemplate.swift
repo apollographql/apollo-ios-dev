@@ -1,4 +1,7 @@
 import Foundation
+import IR
+import GraphQLCompiler
+import TemplateString
 
 struct MockObjectTemplate: TemplateRenderer {
   /// IR representation of source [GraphQL Object](https://spec.graphql.org/draft/#sec-Objects).
@@ -6,7 +9,7 @@ struct MockObjectTemplate: TemplateRenderer {
 
   let config: ApolloCodegen.ConfigurationContext
 
-  let ir: IR
+  let ir: IRBuilder
 
   let target: TemplateTarget = .testMockFile
 

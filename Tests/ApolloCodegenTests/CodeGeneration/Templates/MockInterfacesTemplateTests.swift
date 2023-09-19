@@ -1,11 +1,13 @@
 import XCTest
 import Nimble
 import OrderedCollections
+import GraphQLCompiler
+import IR
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
 
 class MockInterfacesTemplateTests: XCTestCase {
-  var ir: IR!
+  var ir: IRBuilder!
   var subject: MockInterfacesTemplate!
 
   override func tearDown() {

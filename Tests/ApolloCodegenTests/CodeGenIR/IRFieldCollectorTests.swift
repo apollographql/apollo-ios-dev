@@ -1,6 +1,8 @@
 import XCTest
 import Nimble
 import OrderedCollections
+import GraphQLCompiler
+import IR
 @testable import ApolloCodegenLib
 
 class IRFieldCollectorTests: XCTestCase {
@@ -9,7 +11,7 @@ class IRFieldCollectorTests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IR!
+  var ir: IRBuilder!
   var subject: IR.FieldCollector!
 
   var schema: IR.Schema { ir.schema }

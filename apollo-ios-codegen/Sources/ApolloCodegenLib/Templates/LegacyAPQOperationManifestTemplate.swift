@@ -1,4 +1,5 @@
 import Foundation
+import TemplateString
 
 /// Provides the format to output an operation manifest file used for APQ registration.
 struct LegacyAPQOperationManifestTemplate: OperationManifestTemplate {

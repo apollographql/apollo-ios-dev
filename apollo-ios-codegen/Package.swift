@@ -6,10 +6,7 @@ import PackageDescription
 let package = Package(
   name: "ApolloCodegen",
   platforms: [
-    .iOS(.v12),
-    .macOS(.v10_15),
-    .tvOS(.v12),
-    .watchOS(.v5)
+    .macOS(.v10_15)    
   ],
   products: [
     .library(name: "ApolloCodegenLib", targets: ["ApolloCodegenLib"]),
@@ -31,14 +28,39 @@ let package = Package(
     .target(
       name: "ApolloCodegenLib",
       dependencies: [
+        "GraphQLCompiler",
+        "IR",
+        "TemplateString",
         .product(name: "InflectorKit", package: "InflectorKit"),
+        .product(name: "OrderedCollections", package: "swift-collections")
+      ]
+    ),
+    .target(
+      name: "GraphQLCompiler",
+      dependencies: [
+        "TemplateString",
         .product(name: "OrderedCollections", package: "swift-collections")
       ],
       exclude: [
-        "Frontend/dist",
-        "Frontend/JavaScript",
-        "Frontend/auto_rollup.sh",
+        "JavaScript"
       ]
+    ),
+    .target(
+      name: "IR",
+      dependencies: [
+        "GraphQLCompiler",
+        "TemplateString",
+        "Utilities",
+        .product(name: "OrderedCollections", package: "swift-collections")        
+      ]
+    ),
+    .target(
+      name: "TemplateString",
+      dependencies: []
+    ),
+    .target(
+      name: "Utilities",
+      dependencies: []
     ),
     .executableTarget(
       name: "apollo-ios-cli",

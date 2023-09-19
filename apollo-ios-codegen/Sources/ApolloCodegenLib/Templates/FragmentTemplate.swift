@@ -1,4 +1,6 @@
 import Foundation
+import IR
+import TemplateString
 
 /// Provides the format to convert a [GraphQL Fragment](https://spec.graphql.org/draft/#sec-Language.Fragments)
 /// into Swift code.

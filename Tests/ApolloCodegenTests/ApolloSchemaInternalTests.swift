@@ -2,6 +2,7 @@ import XCTest
 import ApolloInternalTestHelpers
 import ApolloCodegenInternalTestHelpers
 @testable import ApolloCodegenLib
+@testable import GraphQLCompiler
 
 class ApolloSchemaInternalTests: XCTestCase {
   let mockFileManager = MockApolloFileManager(strict: true)

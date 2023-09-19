@@ -1,19 +1,23 @@
 import XCTest
 import Nimble
+import IR
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
 
 class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
   var subject: PersistedQueriesOperationManifestTemplate!
+  var operationIdentiferFactory: OperationIdentifierFactory!
 
   override func setUp() {
     super.setUp()
 
     subject = PersistedQueriesOperationManifestTemplate(config: .init(config: .mock()))
+    operationIdentiferFactory = OperationIdentifierFactory()
   }
 
   override func tearDown() {
     subject = nil
+    operationIdentiferFactory = nil
 
     super.tearDown()
   }
@@ -47,7 +51,12 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
       }
       """
 
-    let operations = [operation].map(OperationManifestItem.init)
+    let operations = [operation].map {
+      OperationManifestItem(
+        operation: $0,
+        identifier: self.operationIdentiferFactory.identifier(for: $0)
+      )
+    }
 
     // when
     let rendered = subject.render(operations: operations)
@@ -87,7 +96,12 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
         }
         """
       )
-    ].map(OperationManifestItem.init)
+    ].map {
+      OperationManifestItem(
+        operation: $0,
+        identifier: self.operationIdentiferFactory.identifier(for: $0)
+      )
+    }
 
     let expected = """
       {
@@ -147,7 +161,12 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
           )
         ]
       )
-    ].map(OperationManifestItem.init)
+    ].map {
+      OperationManifestItem(
+        operation: $0,
+        identifier: self.operationIdentiferFactory.identifier(for: $0)
+      )
+    }
 
     let expected = #"""
       {
@@ -199,7 +218,12 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
           )
         ]
       )
-    ].map(OperationManifestItem.init)
+    ].map {
+      OperationManifestItem(
+        operation: $0,
+        identifier: self.operationIdentiferFactory.identifier(for: $0)
+      )
+    }
 
     let expected = #"""
       {

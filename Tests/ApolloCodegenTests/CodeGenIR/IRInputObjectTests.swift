@@ -2,6 +2,9 @@ import Foundation
 import XCTest
 import Nimble
 import OrderedCollections
+import GraphQLCompiler
+import IR
+import Utilities
 @testable import ApolloCodegenLib
 
 class IRInputObjectTests: XCTestCase {
@@ -21,7 +24,7 @@ class IRInputObjectTests: XCTestCase {
   // MARK: - Helpers
 
   func buildSubject() throws {
-    let ir: IR = try .mock(schema: schemaSDL, document: document)
+    let ir: IRBuilder = try .mock(schema: schemaSDL, document: document)
     subject = ir.schema.referencedTypes.inputObjects.first!
   }
 

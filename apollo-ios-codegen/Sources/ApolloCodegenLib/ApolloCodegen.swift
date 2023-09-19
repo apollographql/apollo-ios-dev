@@ -1,4 +1,6 @@
 import Foundation
+import IR
+import GraphQLCompiler
 import OrderedCollections
 
 // Only available on macOS
@@ -129,7 +131,7 @@ public class ApolloCodegen {
 
     try validate(configContext, with: compilationResult)
 
-    let ir = IR(compilationResult: compilationResult)
+    let ir = IRBuilder(compilationResult: compilationResult)
     
     if itemsToGenerate.contains(.operationManifest) {
       var operationIDsFileGenerator = OperationManifestFileGenerator(config: configContext)
@@ -174,6 +176,7 @@ public class ApolloCodegen {
   class ConfigurationContext {
     let config: ApolloCodegenConfiguration
     let pluralizer: Pluralizer
+    let operationIdentifierFactory: OperationIdentifierFactory
     let rootURL: URL?
 
     init(
@@ -182,6 +185,7 @@ public class ApolloCodegen {
     ) {
       self.config = config
       self.pluralizer = Pluralizer(rules: config.options.additionalInflectionRules)
+      self.operationIdentifierFactory = OperationIdentifierFactory()
       self.rootURL = rootURL?.standardizedFileURL
     }
 
@@ -421,7 +425,7 @@ public class ApolloCodegen {
   /// Generates Swift files for the compiled schema, ir and configured output structure.
   static func generateFiles(
     compilationResult: CompilationResult,
-    ir: IR,
+    ir: IRBuilder,
     config: ConfigurationContext,
     fileManager: ApolloFileManager = .default,
     itemsToGenerate: ItemsToGenerate

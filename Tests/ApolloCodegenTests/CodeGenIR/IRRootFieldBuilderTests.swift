@@ -1,6 +1,9 @@
 import XCTest
 import Nimble
 import OrderedCollections
+import Utilities
+import GraphQLCompiler
+@testable import IR
 @testable import ApolloCodegenLib
 import ApolloInternalTestHelpers
 import ApolloCodegenInternalTestHelpers
@@ -10,7 +13,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IR!
+  var ir: IRBuilder!
   var operation: CompilationResult.OperationDefinition!
   var subject: IR.EntityField!
   var computedReferencedFragments: IR.RootFieldBuilder.ReferencedFragments!

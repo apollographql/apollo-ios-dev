@@ -1,6 +1,9 @@
 import Foundation
 import Nimble
 import OrderedCollections
+import GraphQLCompiler
+@testable import IR
+import TemplateString
 @testable import ApolloCodegenLib
 import ApolloInternalTestHelpers
 

@@ -1,19 +1,23 @@
 import XCTest
 import Nimble
+import IR
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
 
 class LegacyAPQOperationManifestTemplateTests: XCTestCase {
   var subject: LegacyAPQOperationManifestTemplate!
+  var operationIdentiferFactory: OperationIdentifierFactory!
 
   override func setUp() {
     super.setUp()
 
     subject = LegacyAPQOperationManifestTemplate()
+    operationIdentiferFactory = OperationIdentifierFactory()
   }
 
   override func tearDown() {
     subject = nil
+    operationIdentiferFactory = nil
 
     super.tearDown()
   }
@@ -41,7 +45,12 @@ class LegacyAPQOperationManifestTemplateTests: XCTestCase {
       }
       """
 
-    let operations = [operation].map(OperationManifestItem.init)
+    let operations = [operation].map {
+      OperationManifestItem(
+        operation: $0,
+        identifier: self.operationIdentiferFactory.identifier(for: $0)
+      )
+    }
 
     // when
     let rendered = subject.render(operations: operations)
@@ -81,7 +90,12 @@ class LegacyAPQOperationManifestTemplateTests: XCTestCase {
         }
         """
       )
-    ].map(OperationManifestItem.init)
+    ].map {
+      OperationManifestItem(
+        operation: $0,
+        identifier: self.operationIdentiferFactory.identifier(for: $0)
+      )
+    }
 
     let expected = """
       {
@@ -131,7 +145,12 @@ class LegacyAPQOperationManifestTemplateTests: XCTestCase {
           )
         ]
       )
-    ].map(OperationManifestItem.init)
+    ].map {
+      OperationManifestItem(
+        operation: $0,
+        identifier: self.operationIdentiferFactory.identifier(for: $0)
+      )
+    }
 
     let expected = #"""
       {

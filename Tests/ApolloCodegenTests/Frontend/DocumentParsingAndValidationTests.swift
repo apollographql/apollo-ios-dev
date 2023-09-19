@@ -1,6 +1,7 @@
 import XCTest
 import ApolloInternalTestHelpers
 import ApolloCodegenInternalTestHelpers
+@testable import GraphQLCompiler
 @testable import ApolloCodegenLib
 
 class DocumentParsingAndValidationTests: XCTestCase {

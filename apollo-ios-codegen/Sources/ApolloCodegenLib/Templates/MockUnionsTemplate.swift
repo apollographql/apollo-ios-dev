@@ -1,5 +1,7 @@
 import Foundation
 import OrderedCollections
+import GraphQLCompiler
+import TemplateString
 
 struct MockUnionsTemplate: TemplateRenderer {
 

@@ -1,5 +1,6 @@
 import Foundation
 @testable import ApolloCodegenLib
+import GraphQLCompiler
 
 extension ValidationOptions {
 

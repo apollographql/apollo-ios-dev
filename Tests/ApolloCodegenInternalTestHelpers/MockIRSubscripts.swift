@@ -1,4 +1,6 @@
 @testable import ApolloCodegenLib
+@testable import IR
+import GraphQLCompiler
 
 public protocol ScopeConditionalSubscriptAccessing {
 

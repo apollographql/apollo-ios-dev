@@ -1,6 +1,8 @@
 import Foundation
+import GraphQLCompiler
+import IR
 
-extension GraphQLType {
+extension GraphQLCompiler.GraphQLType {
 
   var isListType: Bool {
     switch self {

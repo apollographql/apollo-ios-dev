@@ -1,13 +1,16 @@
 @testable import ApolloCodegenLib
+@testable import IR
+import GraphQLCompiler
 import OrderedCollections
+import Utilities
 
-extension IR {
+extension IRBuilder {
 
   public static func mock(
     schema: String,
     document: String,
     enableCCN: Bool = false
-  ) throws -> IR {
+  ) throws -> IRBuilder {
     let frontend = try GraphQLJSFrontend()
     let compilationResult = try frontend.compile(
       schema: schema,
@@ -21,7 +24,7 @@ extension IR {
     schema: String,
     documents: [String],
     enableCCN: Bool = false
-  ) throws -> IR {
+  ) throws -> IRBuilder {
     let frontend = try GraphQLJSFrontend()
     let compilationResult = try frontend.compile(
       schema: schema,
@@ -35,7 +38,7 @@ extension IR {
     schemaJSON: String,
     document: String,
     enableCCN: Bool = false
-  ) throws -> IR {
+  ) throws -> IRBuilder {
     let frontend = try GraphQLJSFrontend()
     let compilationResult = try frontend.compile(
       schemaJSON: schemaJSON,
@@ -48,8 +51,8 @@ extension IR {
   public static func mock(
     schemaNamespace: String = "TestSchema",
     compilationResult: CompilationResult
-  ) -> IR {
-    return IR(compilationResult: compilationResult)
+  ) -> IRBuilder {
+    return IRBuilder(compilationResult: compilationResult)
   }
 
 }

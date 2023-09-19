@@ -1,11 +1,13 @@
 import Foundation
+import IR
+import GraphQLCompiler
 
 /// Generates a file providing the ability to mock a GraphQLObject for testing purposes.
 struct MockObjectFileGenerator: FileGenerator {
   /// Source GraphQL object.
   let graphqlObject: GraphQLObjectType
 
-  let ir: IR
+  let ir: IRBuilder
 
   let config: ApolloCodegen.ConfigurationContext
 

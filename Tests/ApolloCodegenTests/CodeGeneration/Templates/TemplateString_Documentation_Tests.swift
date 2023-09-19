@@ -1,5 +1,6 @@
 import XCTest
 import Nimble
+import TemplateString
 @testable import ApolloCodegenLib
 
 class TemplateString_Documentation_Tests: XCTestCase {
@@ -21,7 +22,7 @@ class TemplateString_Documentation_Tests: XCTestCase {
 
     // when
     let actual = TemplateString("""
-    \(forceDocumentation: documentation)
+    \(documentation: documentation)
     var test: String = "Test"
     """).description
 
@@ -40,7 +41,7 @@ class TemplateString_Documentation_Tests: XCTestCase {
 
     // when
     let actual = TemplateString("""
-      \(forceDocumentation: documentation)
+      \(documentation: documentation)
     var test: String = "Test"
     """).description
 
@@ -58,7 +59,7 @@ class TemplateString_Documentation_Tests: XCTestCase {
     // when
     let actual = TemplateString("""
     var testA: String = "TestA"
-    \(forceDocumentation: nil)
+    \(documentation: nil)
     var testB: String = "TestB"
     """).description
 
@@ -76,7 +77,7 @@ class TemplateString_Documentation_Tests: XCTestCase {
     // when
     let actual = TemplateString("""
     var testA: String = "TestA"
-    \(forceDocumentation: "")
+    \(documentation: "")
     var testB: String = "TestB"
     """).description
 
@@ -96,7 +97,7 @@ class TemplateString_Documentation_Tests: XCTestCase {
 
     // when
     let actual = TemplateString("""
-    \(forceDocumentation: documentation)
+    \(documentation: documentation)
     var test: String = "Test"
     """).description
 
@@ -119,7 +120,7 @@ class TemplateString_Documentation_Tests: XCTestCase {
 
     // when
     let actual = TemplateString("""
-    \(forceDocumentation: documentation)
+    \(documentation: documentation)
     var test: String = "Test"
     """).description
 
@@ -142,7 +143,7 @@ class TemplateString_Documentation_Tests: XCTestCase {
 
     // when
     let actual = TemplateString("""
-    \(forceDocumentation: documentation)
+    \(documentation: documentation)
     var test: String = "Test"
     """).description
 
@@ -167,7 +168,7 @@ class TemplateString_Documentation_Tests: XCTestCase {
 
     // when
     let actual = TemplateString("""
-    \(forceDocumentation: documentation)
+    \(documentation: documentation)
     var test: String = "Test"
     """).description
 

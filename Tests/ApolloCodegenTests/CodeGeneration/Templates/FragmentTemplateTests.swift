@@ -1,13 +1,14 @@
 import XCTest
 import Nimble
 @testable import ApolloCodegenLib
+import IR
 import ApolloCodegenInternalTestHelpers
 
 class FragmentTemplateTests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IR!
+  var ir: IRBuilder!
   var fragment: IR.NamedFragment!
   var subject: FragmentTemplate!
 

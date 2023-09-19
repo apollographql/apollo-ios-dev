@@ -1,4 +1,5 @@
 import Foundation
+import GraphQLCompiler
 @testable import ApolloCodegenLib
 
 extension GraphQLJSFrontend {

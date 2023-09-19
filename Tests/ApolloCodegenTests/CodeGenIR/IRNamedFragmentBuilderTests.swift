@@ -1,6 +1,9 @@
 import XCTest
 import Nimble
 import OrderedCollections
+import Utilities
+import GraphQLCompiler
+@testable import IR
 @testable import ApolloCodegenLib
 import ApolloInternalTestHelpers
 import ApolloCodegenInternalTestHelpers
@@ -10,7 +13,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IR!
+  var ir: IRBuilder!
   var fragment: CompilationResult.FragmentDefinition!
   var subject: IR.NamedFragment!
 

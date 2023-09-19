@@ -1,5 +1,9 @@
 import InflectorKit
 import OrderedCollections
+import IR
+import GraphQLCompiler
+import TemplateString
+import Utilities
 
 struct SelectionSetTemplate {
 
@@ -44,7 +48,7 @@ struct SelectionSetTemplate {
   }
 
   // MARK: - Inline Fragment
-  func render(inlineFragment: IR.SelectionSet) -> String {
+  func render(inlineFragment: SelectionSet) -> String {
     TemplateString(
     """
     \(SelectionSetNameDocumentation(inlineFragment))

@@ -1,9 +1,10 @@
 import Foundation
 @testable import ApolloCodegenLib
+import TemplateString
 
 public struct MockTemplateRenderer: TemplateRenderer {
   public var target: ApolloCodegenLib.TemplateTarget
-  public var template: ApolloCodegenLib.TemplateString
+  public var template: TemplateString
   public var config: ApolloCodegenLib.ApolloCodegen.ConfigurationContext
 
   public init(

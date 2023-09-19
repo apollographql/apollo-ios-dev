@@ -1,7 +1,8 @@
 import XCTest
 import Nimble
-@testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
+@testable import ApolloCodegenLib
+import IR
 
 class OperationFileGeneratorTests: XCTestCase {
   var irOperation: IR.Operation!
@@ -40,7 +41,7 @@ class OperationFileGeneratorTests: XCTestCase {
     }
     """
 
-    let ir = try IR.mock(schema: schemaSDL, document: operationDocument)
+    let ir = try IRBuilder.mock(schema: schemaSDL, document: operationDocument)
     irOperation = ir.build(operation: ir.compilationResult.operations[0])
 
     let config = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock())
@@ -64,10 +65,8 @@ class OperationFileGeneratorTests: XCTestCase {
     // given
     try buildSubject()
 
-    let expected = irOperation.definition.nameWithSuffix
-
     // then
-    expect(self.subject.fileName).to(equal(expected))
+    expect(self.subject.fileName).to(equal("AllAnimalsQuery"))
   }
 
   func test__properties__givenIrOperation_shouldOverwrite() throws {

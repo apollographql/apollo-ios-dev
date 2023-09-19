@@ -1,4 +1,5 @@
 import Foundation
+import IR
 import OrderedCollections
 
 /// Generates a file containing schema metadata used by the GraphQL executor at runtime.

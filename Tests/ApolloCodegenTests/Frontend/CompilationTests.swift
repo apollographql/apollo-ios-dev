@@ -1,5 +1,6 @@
 import XCTest
 import Nimble
+import GraphQLCompiler
 import ApolloInternalTestHelpers
 import ApolloCodegenInternalTestHelpers
 @testable import ApolloCodegenLib
@@ -382,7 +383,7 @@ class CompilationTests: XCTestCase {
 
     // then
     XCTAssertThrowsError(try compileFrontend(schemaNamespace: "height")) { error in
-      XCTAssertTrue((error as! ApolloCodegenLib.JavaScriptError).description.contains("""
+      XCTAssertTrue((error as! GraphQLCompiler.JavaScriptError).description.contains("""
         Schema name "height" conflicts with name of a generated object API. \
         Please choose a different schema name.
         """
@@ -423,7 +424,7 @@ class CompilationTests: XCTestCase {
 
     // then
     XCTAssertThrowsError(try compileFrontend(schemaNamespace: "predator")) { error in
-      XCTAssertTrue((error as! ApolloCodegenLib.JavaScriptError).description.contains("""
+      XCTAssertTrue((error as! GraphQLCompiler.JavaScriptError).description.contains("""
         Schema name "predator" conflicts with name of a generated object API. \
         Please choose a different schema name.
         """
@@ -464,7 +465,7 @@ class CompilationTests: XCTestCase {
 
     // then
     XCTAssertThrowsError(try compileFrontend(schemaNamespace: "predator")) { error in
-      XCTAssertTrue((error as! ApolloCodegenLib.JavaScriptError).description.contains("""
+      XCTAssertTrue((error as! GraphQLCompiler.JavaScriptError).description.contains("""
         Schema name "predator" conflicts with name of a generated object API. \
         Please choose a different schema name.
         """

@@ -1,4 +1,6 @@
 import Foundation
+import IR
+import TemplateString
 
 /// Provides the format to define a schema in Swift code. The schema represents metadata used by
 /// the GraphQL executor at runtime to convert response data into corresponding Swift types.
