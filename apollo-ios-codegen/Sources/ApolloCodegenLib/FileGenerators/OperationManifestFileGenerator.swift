@@ -1,29 +1,17 @@
 import Foundation
+import OrderedCollections
 import IR
 import GraphQLCompiler
 
-/// Representation of an operation that supports Automatic Persisted Queries
-struct OperationManifestItem {
-  let name: String
-  let identifier: String
-  let source: String
-  let type: CompilationResult.OperationType
-
-  init(operation: IR.Operation, identifier: String) {
-    self.name = operation.definition.name
-    self.type = operation.definition.operationType
-    self.identifier = identifier
-
-    var source = operation.definition.source.convertedToSingleLine()
-    for fragment in operation.referencedFragments {
-      source += #"\n\#(fragment.definition.source.convertedToSingleLine())"#
-    }
-    self.source = source
-  }
-}
-
 protocol OperationManifestTemplate {
-  func render(operations: [OperationManifestItem]) throws -> String
+  /// A tuple representing an operation in an operation manifest.
+  /// It contains an operation and its persisted query identifier.
+  typealias OperationManifestItem = (operation: OperationDescription, identifier: String)
+
+  /// An array of ``OperationManifestItem``s
+  typealias OperationManifest = [OperationManifestItem]
+
+  func render(operations: OperationManifest) throws -> String
 }
 
 /// File generator to create an operation manifest file.
@@ -32,7 +20,7 @@ struct OperationManifestFileGenerator {
   let config: ApolloCodegen.ConfigurationContext
 
   /// Collection of operation identifiers to be serialized.
-  private var operationManifest: [OperationManifestItem] = []
+  private var operationManifest: OperationManifestTemplate.OperationManifest = []
 
   /// Designated initializer.
   ///
@@ -47,13 +35,8 @@ struct OperationManifestFileGenerator {
   }
 
   /// Appends the operation to the collection of identifiers to be written to be serialized.
-  mutating func collectOperationIdentifier(_ operation: IR.Operation) async {
-    operationManifest.append(
-      OperationManifestItem(
-        operation: operation,
-        identifier: await config.operationIdentifierFactory.identifier(for: operation)
-      )
-    )
+  mutating func collectOperationIdentifier(_ operation: OperationManifestTemplate.OperationManifestItem) {
+    operationManifest.append(operation)
   }
 
   /// Generates a file containing the operation identifiers.
