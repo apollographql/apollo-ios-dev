@@ -2,7 +2,7 @@ import Foundation
 import IR
 import CryptoKit
 
-typealias OperationIdentifierProvider = (_ operation: IR.Operation) async throws -> String
+typealias OperationIdentifierProvider = (_ operation: OperationDescription) async throws -> String
 
 actor OperationIdentifierFactory {
 
@@ -20,8 +20,8 @@ actor OperationIdentifierFactory {
     self.idProvider = idProvider
   }
 
-  func identifier(for operation: IR.Operation) async throws -> String {
-    let operationObjectID = ObjectIdentifier(operation)
+  func identifier(for operation: OperationDescription) async throws -> String {
+    let operationObjectID = ObjectIdentifier(operation.underlyingOperation)
     if let cached = computedIdentifiersCache[operationObjectID] {
       switch cached {
       case let .ready(identifier): return identifier
@@ -29,7 +29,7 @@ actor OperationIdentifierFactory {
       }
     }
 
-    let task = Task {
+    let task = Task {      
       try await idProvider(operation)
     }
 
@@ -43,24 +43,16 @@ actor OperationIdentifierFactory {
 }
 
 private let DefaultOperationIdentifierProvider =
-{ (operation: IR.Operation) -> String in
-    var hasher = SHA256()
-    func updateHash(with source: inout String) {
-      source.withUTF8({ buffer in
-        hasher.update(bufferPointer: UnsafeRawBufferPointer(buffer))
-      })
-    }
-    var definitionSource = operation.definition.source.convertedToSingleLine()
-    updateHash(with: &definitionSource)
+{ (operation: OperationDescription) -> String in
+  var hasher = SHA256()
+  func updateHash(with source: inout String) {
+    source.withUTF8({ buffer in
+      hasher.update(bufferPointer: UnsafeRawBufferPointer(buffer))
+    })
+  }
+  var definitionSource = operation.rawSourceText
+  updateHash(with: &definitionSource)
 
-    var newline: String
-    for fragment in operation.referencedFragments {
-      newline = "\n"
-      updateHash(with: &newline)
-      var fragmentSource = fragment.definition.source.convertedToSingleLine()
-      updateHash(with: &fragmentSource)
-    }
-
-    let digest = hasher.finalize()
-    return digest.compactMap { String(format: "%02x", $0) }.joined()
+  let digest = hasher.finalize()
+  return digest.compactMap { String(format: "%02x", $0) }.joined()
 }
