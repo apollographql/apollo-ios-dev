@@ -220,7 +220,7 @@ class CustomScalarTemplateTests: XCTestCase {
   
   func test__render__givenCustomScalar_usingReservedKeyword_shouldRenderAsEscaped() throws {
     let keywords = ["Type", "type"]
-    
+
     keywords.forEach { keyword in
       // given
       buildSubject(name: keyword)

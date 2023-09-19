@@ -16,7 +16,7 @@ public func equalLineByLine(
   _ expectedValue: String,
   atLine startLine: Int = 1,
   ignoringExtraLines: Bool = false
-) -> Predicate<String> {
+) -> Nimble.Predicate<String> {
   return Predicate.define() { actual in
     let actualString = try actual.evaluate()
 
@@ -102,7 +102,7 @@ extension String {
 public func equalLineByLine(
   toFileAt expectedFileURL: URL,
   trimmingImports trimImports: Bool = false
-) -> Predicate<String> {
+) -> Nimble.Predicate<String> {
   return Predicate.define() { actual in
     guard ApolloFileManager.default.doesFileExist(atPath: expectedFileURL.path) else {
       return PredicateResult(

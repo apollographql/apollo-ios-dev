@@ -270,7 +270,7 @@ extension IR.Entity.Location.FieldComponent {
 
 fileprivate func match(
   _ expectedValue: [IR.Entity.Location: IR.Entity]
-) -> Predicate<[IR.Entity.Location: IR.Entity]> {
+) -> Nimble.Predicate<[IR.Entity.Location: IR.Entity]> {
   return Predicate.define { actual in
     let message: ExpectationMessage = .expectedActualValueTo("equal \(expectedValue)")
     guard var actual = try actual.evaluate(),

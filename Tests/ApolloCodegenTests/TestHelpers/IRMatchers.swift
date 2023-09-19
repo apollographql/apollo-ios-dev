@@ -32,7 +32,7 @@ typealias SelectionMatcherTuple = (fields: [ShallowFieldMatcher],
 
 // MARK - Custom Matchers
 
-func beEmpty<T: SelectionShallowMatchable>() -> Predicate<T> {
+func beEmpty<T: SelectionShallowMatchable>() -> Nimble.Predicate<T> {
     return Predicate.simple("be empty") { actualExpression in
       guard let actual = try actualExpression.evaluate() else { return .fail }
       return PredicateStatus(bool: actual.isEmpty)
@@ -44,7 +44,7 @@ func beEmpty<T: SelectionShallowMatchable>() -> Predicate<T> {
 /// checking the `MergedSelections` without having to mock out the entire nested selection sets.
 func shallowlyMatch<T: SelectionShallowMatchable>(
   _ expectedValue: SelectionMatcherTuple
-) -> Predicate<T> {
+) -> Nimble.Predicate<T> {
   return satisfyAllOf([
     shallowlyMatch(expectedValue.fields).mappingActualTo { $0?.fields.values },
     shallowlyMatch(expectedValue.typeCases).mappingActualTo { $0?.inlineFragments.values.map(\.selectionSet) },
@@ -54,7 +54,7 @@ func shallowlyMatch<T: SelectionShallowMatchable>(
 
 func shallowlyMatch<T: SelectionShallowMatchable>(
   _ expectedValue: [ShallowSelectionMatcher]
-) -> Predicate<T> {
+) -> Nimble.Predicate<T> {
   var expectedFields: [ShallowFieldMatcher] = []
   var expectedTypeCases: [ShallowInlineFragmentMatcher] = []
   var expectedFragments: [ShallowFragmentSpreadMatcher] = []
@@ -95,12 +95,12 @@ struct SelectionsMatcher {
 
 func shallowlyMatch(
   _ expectedValue: SelectionsMatcher
-) -> Predicate<IR.SelectionSet> {
-  let directPredicate: Predicate<IR.DirectSelections> = expectedValue.direct == nil
+) -> Nimble.Predicate<IR.SelectionSet> {
+  let directPredicate: Nimble.Predicate<IR.DirectSelections> = expectedValue.direct == nil
   ? beNil()
   : shallowlyMatch(expectedValue.direct!)
 
-  var matchers: [Predicate<IR.SelectionSet>] = [
+  var matchers: [Nimble.Predicate<IR.SelectionSet>] = [
     directPredicate.mappingActualTo { $0?.selections.direct },
   ]
 
@@ -174,12 +174,12 @@ struct SelectionSetMatcher {
 
 func shallowlyMatch(
   _ expectedValue: SelectionSetMatcher
-) -> Predicate<IR.SelectionSet> {
+) -> Nimble.Predicate<IR.SelectionSet> {
   let expectedInclusionConditions = IR.InclusionConditions.allOf(
     expectedValue.inclusionConditions ?? []
   ).conditions
 
-  let inclusionPredicate: Predicate<IR.InclusionConditions> = expectedInclusionConditions == nil
+  let inclusionPredicate: Nimble.Predicate<IR.InclusionConditions> = expectedInclusionConditions == nil
   ? beNil()
   : equal(expectedInclusionConditions!)
 
@@ -287,7 +287,7 @@ public struct ShallowFieldMatcher: Equatable, CustomDebugStringConvertible {
 
 public func shallowlyMatch<T: Collection>(
   _ expectedValue: [ShallowFieldMatcher]
-) -> Predicate<T> where T.Element == IR.Field {
+) -> Nimble.Predicate<T> where T.Element == IR.Field {
   return Predicate.define { actual in
     return shallowlyMatch(expected: expectedValue, actual: try actual.evaluate())
   }
@@ -295,7 +295,7 @@ public func shallowlyMatch<T: Collection>(
 
 public func shallowlyMatch<T: Collection>(
   _ expectedValue: [ShallowSelectionMatcher]
-) -> Predicate<T> where T.Element == IR.Field {
+) -> Nimble.Predicate<T> where T.Element == IR.Field {
   return Predicate.define { actual in
     let expectedAsFields: [ShallowFieldMatcher] = try expectedValue.map {
       guard case let .shallowField(field) = $0 else {
@@ -378,7 +378,7 @@ public struct ShallowInlineFragmentMatcher: Equatable, CustomDebugStringConverti
 
 public func shallowlyMatch<T: Collection>(
   _ expectedValue: [ShallowInlineFragmentMatcher]
-) -> Predicate<T> where T.Element == IR.SelectionSet {
+) -> Nimble.Predicate<T> where T.Element == IR.SelectionSet {
   return Predicate.define { actual in
     return shallowlyMatch(expected: expectedValue, actual: try actual.evaluate())
   }
@@ -471,7 +471,7 @@ public struct ShallowFragmentSpreadMatcher: Equatable, CustomDebugStringConverti
 
 public func shallowlyMatch<T: Collection>(
   _ expectedValue: [ShallowFragmentSpreadMatcher]
-) -> Predicate<T> where T.Element == IR.NamedFragmentSpread {
+) -> Nimble.Predicate<T> where T.Element == IR.NamedFragmentSpread {
   return Predicate.define { actual in
     return shallowlyMatch(expected: expectedValue, actual: try actual.evaluate())
   }
@@ -479,7 +479,7 @@ public func shallowlyMatch<T: Collection>(
 
 public func shallowlyMatch<T: Collection>(
   _ expectedValue: [CompilationResult.FragmentDefinition]
-) -> Predicate<T> where T.Element == IR.NamedFragmentSpread {
+) -> Nimble.Predicate<T> where T.Element == IR.NamedFragmentSpread {
   return Predicate.define { actual in
     return shallowlyMatch(expected: expectedValue.map { .mock($0) }, actual: try actual.evaluate())
   }
@@ -520,8 +520,8 @@ fileprivate func shallowlyMatch(expected: ShallowFragmentSpreadMatcher, actual: 
 extension Nimble.Predicate {
   func mappingActualTo<U>(
     _ actualMapper: @escaping ((U?) throws -> T?)
-  ) -> Predicate<U> {
-    Predicate<U>.define { (actual: Expression<U>) in
+  ) -> Nimble.Predicate<U> {
+    Nimble.Predicate<U>.define { (actual: Expression<U>) in
       let newActual = actual.cast(actualMapper)
       return try self.satisfies(newActual)
     }
