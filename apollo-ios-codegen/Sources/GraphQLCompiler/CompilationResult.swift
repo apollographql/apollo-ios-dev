@@ -164,7 +164,7 @@ public class CompilationResult: JavaScriptObject {
 
     lazy var directives: [Directive]? = self["directives"]
 
-    lazy var isDeferred: IsDeferred = getIsDeferred()
+    public lazy var isDeferred: IsDeferred = getIsDeferred()
 
     public override var debugDescription: String {
       selectionSet.debugDescription

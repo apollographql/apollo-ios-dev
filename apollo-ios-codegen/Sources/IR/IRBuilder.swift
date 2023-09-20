@@ -53,7 +53,8 @@ public class IRBuilder {
     return Operation(
       definition: operationDefinition,
       rootField: result.rootField,
-      referencedFragments: result.referencedFragments
+      referencedFragments: result.referencedFragments,
+      hasDeferredFragments: result.hasDeferredFragments
     )
   }
 

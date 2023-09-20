@@ -69,6 +69,7 @@ class RootFieldBuilder {
     let rootField: EntityField
     let referencedFragments: ReferencedFragments
     let entities: [Entity.Location: Entity]
+    let hasDeferredFragments: Bool
   }
 
   typealias ReferencedFragments = OrderedSet<NamedFragment>
@@ -86,6 +87,7 @@ class RootFieldBuilder {
   private let rootEntity: Entity
   private let entityStorage: RootFieldEntityStorage
   private var referencedFragments: ReferencedFragments = []
+  @IsEverTrue private var hasDeferredFragments: Bool
 
   private var schema: Schema { ir.schema }
 
@@ -122,7 +124,8 @@ class RootFieldBuilder {
     return Result(
       rootField: EntityField(rootField, selectionSet: rootIrSelectionSet),
       referencedFragments: referencedFragments,
-      entities: entityStorage.entitiesForFields
+      entities: entityStorage.entitiesForFields,
+      hasDeferredFragments: hasDeferredFragments
     )
   }
 
@@ -182,9 +185,17 @@ class RootFieldBuilder {
         let irTypeCase = buildInlineFragmentSpread(
           from: inlineSelectionSet,
           with: scope,
-          inParentTypePath: typeInfo
+          inParentTypePath: typeInfo,
+          isDeferred: .init(inlineFragment.isDeferred)
         )
         target.mergeIn(irTypeCase)
+
+        switch irTypeCase.typeInfo.scopePath.last.value.IsDeferred {
+        case .value(false):
+          hasDeferredFragments = false
+        case .value(true), .if(_):
+          hasDeferredFragments = true
+        }
       }
 
     case let .fragmentSpread(fragmentSpread):
@@ -316,10 +327,11 @@ class RootFieldBuilder {
   private func buildInlineFragmentSpread(
     from selectionSet: CompilationResult.SelectionSet?,
     with scopeCondition: ScopeCondition,
-    inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo
+    inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo,
+    isDeferred: IsDeferred = false
   ) -> InlineFragmentSpread {
     let typePath = enclosingTypeInfo.scopePath.mutatingLast {
-      $0.appending(scopeCondition)
+      $0.appending(scopeCondition, isDeferred: isDeferred)
     }
 
     let irSelectionSet = SelectionSet(

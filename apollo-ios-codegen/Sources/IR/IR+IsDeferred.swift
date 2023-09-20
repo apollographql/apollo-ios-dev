@@ -1,3 +1,5 @@
+import GraphQLCompiler
+
 // TODO: Documentation for this to be completed in issue #3141
 public enum IsDeferred: Hashable, ExpressibleByBooleanLiteral {
   case value(Bool)
@@ -9,6 +11,16 @@ public enum IsDeferred: Hashable, ExpressibleByBooleanLiteral {
       self = .value(true)
     case false:
       self = .value(false)
+    }
+  }
+
+  init(_ compilationResult: CompilationResult.IsDeferred) {
+    switch compilationResult {
+    case let .value(value):
+      self = .value(value)
+
+    case let .variable(variable):
+      self = .if(variable)
     }
   }
 
