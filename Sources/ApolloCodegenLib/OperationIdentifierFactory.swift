@@ -1,8 +1,9 @@
 import Foundation
 import IR
+import GraphQLCompiler
 import CryptoKit
 
-typealias OperationIdentifierProvider = (_ operation: OperationDescription) async throws -> String
+typealias OperationIdentifierProvider = (_ operation: OperationDescriptor) async throws -> String
 
 actor OperationIdentifierFactory {
 
@@ -20,8 +21,11 @@ actor OperationIdentifierFactory {
     self.idProvider = idProvider
   }
 
-  func identifier(for operation: OperationDescription) async throws -> String {
-    let operationObjectID = ObjectIdentifier(operation.underlyingDefinition)
+  func identifier(
+    for operation: CompilationResult.OperationDefinition
+  ) async throws -> String {
+    let operationObjectID = ObjectIdentifier(operation)
+    let descriptor = OperationDescriptor(operation)
     if let cached = computedIdentifiersCache[operationObjectID] {
       switch cached {
       case let .ready(identifier): return identifier
@@ -30,7 +34,7 @@ actor OperationIdentifierFactory {
     }
 
     let task = Task {      
-      try await idProvider(operation)
+      try await idProvider(descriptor)
     }
 
     computedIdentifiersCache[operationObjectID] = .inProgress(task)
@@ -43,7 +47,7 @@ actor OperationIdentifierFactory {
 }
 
 private let DefaultOperationIdentifierProvider =
-{ (operation: OperationDescription) -> String in
+{ (operation: OperationDescriptor) -> String in
   var hasher = SHA256()
   func updateHash(with source: inout String) {
     source.withUTF8({ buffer in

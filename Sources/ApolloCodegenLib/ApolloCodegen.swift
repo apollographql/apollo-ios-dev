@@ -163,7 +163,7 @@ public class ApolloCodegen {
     self.itemsToGenerate = itemsToGenerate
   }
 
-  internal func build(fileManager: ApolloFileManager = .default) throws {
+  internal func build(fileManager: ApolloFileManager = .default) async throws {
     try config.validateConfigValues()
 
     let compilationResult = try compileGraphQLResult()
@@ -171,6 +171,19 @@ public class ApolloCodegen {
     try config.validate(compilationResult)
 
     let ir = IRBuilder(compilationResult: compilationResult)
+
+    try await withThrowingDiscardingTaskGroup { group in
+      if itemsToGenerate.contains(.operationManifest) {
+        group.addTask {
+          try await self.generateOperationManifest(
+            operations: compilationResult.operations,
+            fileManager: fileManager
+          )
+        }
+      }
+
+
+    }
 
     if itemsToGenerate.contains(.code) {
       var existingGeneratedFilePaths = config.options.pruneGeneratedFiles ?
@@ -303,28 +316,42 @@ public class ApolloCodegen {
   }
 
   private func generateOperationManifest(
-    operations: [OperationDescription],
+    operations: [CompilationResult.OperationDefinition],
     fileManager: ApolloFileManager
   ) async throws {
-    var operationIDsFileGenerator = OperationManifestFileGenerator(config: config)
+    let idFactory = self.operationIdentifierFactory
 
-    withThrowingDiscardingTaskGroup { group in
+    let operationManifest = try await withThrowingTaskGroup(
+      of: OperationManifestTemplate.OperationManifestItem.self,
+      returning: OperationManifestTemplate.OperationManifest.self
+    ) { group in
       for operation in operations {
         group.addTask {
-          let operationManifestItem = await
-          operationIDsFileGenerator?.collectOperationIdentifier(irOperation)
+          return (
+            OperationDescriptor(operation),
+            try await idFactory.identifier(for: operation)
+          )
         }
       }
-      #warning("TODO: minimize running task count")
+
+      var operationManifest: OperationManifestTemplate.OperationManifest = []
+      for try await item in group {
+        operationManifest.append(item)
+      }
+      return operationManifest
     }
 
-    try operationIDsFileGenerator?.generate(fileManager: fileManager)
+    try OperationManifestFileGenerator(config: config)
+      .generate(
+        operationManifest: operationManifest,
+        fileManager: fileManager
+      )
   }
 
   /// Generates the files for the GraphQL fragments and operation definitions provided.
   private func generateGraphQLDefinitionFiles(
     fragments: [CompilationResult.FragmentDefinition],
-    operations: [OperationDescription],
+    operations: [OperationDescriptor],
     ir: IRBuilder,
     fileManager: ApolloFileManager
   ) throws {
