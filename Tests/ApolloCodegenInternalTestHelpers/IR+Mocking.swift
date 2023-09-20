@@ -95,7 +95,8 @@ extension IR.Operation {
 
   public static func mock(
     definition: CompilationResult.OperationDefinition? = nil,
-    referencedFragments: OrderedSet<IR.NamedFragment> = []
+    referencedFragments: OrderedSet<IR.NamedFragment> = [],
+    hasDeferredFragments: Bool = false
   ) -> IR.Operation {
     let definition = definition ?? .mock()
     return IR.Operation.init(
@@ -114,7 +115,8 @@ extension IR.Operation {
             givenAllTypesInSchema: .init([]))
           ])
       ),
-      referencedFragments: referencedFragments
+      referencedFragments: referencedFragments,
+      hasDeferredFragments: hasDeferredFragments
     )
   }
 
