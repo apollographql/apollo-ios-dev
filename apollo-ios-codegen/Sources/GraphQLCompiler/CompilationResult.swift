@@ -36,7 +36,9 @@ public class CompilationResult: JavaScriptObject {
     public lazy var selectionSet: SelectionSet = self["selectionSet"]
 
     public lazy var directives: [Directive]? = self["directives"]
-    
+
+    public lazy var referencedFragments: [FragmentDefinition] = self["referencedFragments"]
+
     public lazy var source: String = self["source"]
     
     public lazy var filePath: String = self["filePath"]
@@ -93,6 +95,8 @@ public class CompilationResult: JavaScriptObject {
     public lazy var filePath: String = self["filePath"]
 
     public lazy var directives: [Directive]? = self["directives"]
+
+    public lazy var referencedFragments: [FragmentDefinition] = self["referencedFragments"]
 
     public lazy var isLocalCacheMutation: Bool = {
       directives?.contains { $0.name == Constants.LocalCacheMutationDirectiveName } ?? false
