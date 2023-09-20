@@ -21,7 +21,7 @@ actor OperationIdentifierFactory {
   }
 
   func identifier(for operation: OperationDescription) async throws -> String {
-    let operationObjectID = ObjectIdentifier(operation.underlyingOperation)
+    let operationObjectID = ObjectIdentifier(operation.underlyingDefinition)
     if let cached = computedIdentifiersCache[operationObjectID] {
       switch cached {
       case let .ready(identifier): return identifier

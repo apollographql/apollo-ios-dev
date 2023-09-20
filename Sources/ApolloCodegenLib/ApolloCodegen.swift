@@ -107,34 +107,73 @@ public class ApolloCodegen {
     withRootURL rootURL: URL? = nil,
     itemsToGenerate: ItemsToGenerate = [.code]
   ) throws {
-    try build(with: configuration, rootURL: rootURL, itemsToGenerate: itemsToGenerate)
+    let codegen = ApolloCodegen(
+      config: ConfigurationContext(
+        config: configuration,
+        rootURL: rootURL
+      ),
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: itemsToGenerate
+    )
+    try codegen.build()
   }
 
-  internal static func build(
-    with configuration: ApolloCodegenConfiguration,
-    rootURL: URL? = nil,
-    fileManager: ApolloFileManager = .default,
+  /// Validates the configuration against deterministic errors that will cause code generation to
+  /// fail. This validation step does not take into account schema and operation specific types, it
+  /// is only a static analysis of the configuration.
+  ///
+  /// - Parameter config: Code generation configuration settings.
+  public static func _validate(config: ApolloCodegenConfiguration) throws {
+    try ConfigurationContext(config: config).validateConfigValues()
+  }
+
+  // MARK: - Internal
+
+  @dynamicMemberLookup
+  class ConfigurationContext {
+    let config: ApolloCodegenConfiguration
+    let pluralizer: Pluralizer
+    let rootURL: URL?
+
+    init(
+      config: ApolloCodegenConfiguration,
+      rootURL: URL? = nil
+    ) {
+      self.config = config
+      self.pluralizer = Pluralizer(rules: config.options.additionalInflectionRules)
+      self.rootURL = rootURL?.standardizedFileURL
+    }
+
+    subscript<T>(dynamicMember keyPath: KeyPath<ApolloCodegenConfiguration, T>) -> T {
+      config[keyPath: keyPath]
+    }
+  }
+
+  let config: ConfigurationContext
+  let operationIdentifierFactory: OperationIdentifierFactory
+  let itemsToGenerate: ItemsToGenerate
+
+  init(
+    config: ConfigurationContext,
+    operationIdentifierFactory: OperationIdentifierFactory,
     itemsToGenerate: ItemsToGenerate
-  ) throws {
+  ) {
+    self.config = config
+    self.operationIdentifierFactory = operationIdentifierFactory
+    self.itemsToGenerate = itemsToGenerate
+  }
 
-    let configContext = ConfigurationContext(
-      config: configuration,
-      rootURL: rootURL
-    )
+  internal func build(fileManager: ApolloFileManager = .default) throws {
+    try config.validateConfigValues()
 
-    try validate(configContext)
+    let compilationResult = try compileGraphQLResult()
 
-    let compilationResult = try compileGraphQLResult(
-      configContext,
-      experimentalFeatures: configuration.experimentalFeatures
-    )
-
-    try validate(configContext, with: compilationResult)
+    try config.validate(compilationResult)
 
     let ir = IRBuilder(compilationResult: compilationResult)
 
     if itemsToGenerate.contains(.code) {
-      var existingGeneratedFilePaths = configuration.options.pruneGeneratedFiles ?
+      var existingGeneratedFilePaths = config.options.pruneGeneratedFiles ?
       try findExistingGeneratedFilePaths(
         config: configContext,
         fileManager: fileManager
@@ -143,7 +182,7 @@ public class ApolloCodegen {
       try generateFiles(
         compilationResult: compilationResult,
         ir: ir,
-        config: configContext,
+        config: config,
         fileManager: fileManager,
         itemsToGenerate: itemsToGenerate
       )
@@ -166,176 +205,8 @@ public class ApolloCodegen {
     }
   }
 
-  // MARK: Internal
-
-  @dynamicMemberLookup
-  class ConfigurationContext {
-    let config: ApolloCodegenConfiguration
-    let pluralizer: Pluralizer
-    let operationIdentifierFactory: OperationIdentifierFactory
-    let rootURL: URL?
-
-    init(
-      config: ApolloCodegenConfiguration,
-      rootURL: URL? = nil
-    ) {
-      self.config = config
-      self.pluralizer = Pluralizer(rules: config.options.additionalInflectionRules)
-      self.operationIdentifierFactory = OperationIdentifierFactory()
-      self.rootURL = rootURL?.standardizedFileURL
-    }
-
-    subscript<T>(dynamicMember keyPath: KeyPath<ApolloCodegenConfiguration, T>) -> T {
-      config[keyPath: keyPath]
-    }
-  }
-
-  /// Validates the configuration against deterministic errors that will cause code generation to
-  /// fail. This validation step does not take into account schema and operation specific types, it
-  /// is only a static analysis of the configuration.
-  ///
-  /// - Parameter config: Code generation configuration settings.
-  public static func _validate(config: ApolloCodegenConfiguration) throws {
-    try validate(ConfigurationContext(config: config))
-  }
-
-  static private func validate(_ context: ConfigurationContext) throws {
-    guard
-      !context.schemaNamespace.isEmpty,
-      !context.schemaNamespace.contains(where: { $0.isWhitespace })
-    else {
-      throw Error.invalidSchemaName(context.schemaNamespace, message: """
-        Cannot be empty nor contain spaces. If your schema namespace has spaces consider \
-        replacing them with the underscore character.
-        """)
-    }
-
-    guard
-      !SwiftKeywords.DisallowedSchemaNamespaceNames.contains(context.schemaNamespace.lowercased())
-    else {
-      throw Error.schemaNameConflict(name: context.schemaNamespace)
-    }
-
-    if case .swiftPackage = context.output.testMocks,
-        context.output.schemaTypes.moduleType != .swiftPackageManager {
-      throw Error.testMocksInvalidSwiftPackageConfiguration
-    }
-
-    if case .swiftPackageManager = context.output.schemaTypes.moduleType,
-       context.options.cocoapodsCompatibleImportStatements == true {
-      throw Error.invalidConfiguration(message: """
-        cocoapodsCompatibleImportStatements cannot be set to 'true' when the output schema types \
-        module type is Swift Package Manager. Change the cocoapodsCompatibleImportStatements \
-        value to 'false', or choose a different module type, to resolve the conflict.
-        """)
-    }
-    
-    if case let .embeddedInTarget(targetName, _) = context.output.schemaTypes.moduleType,
-       SwiftKeywords.DisallowedEmbeddedTargetNames.contains(targetName.lowercased()) {
-      throw Error.targetNameConflict(name: targetName)
-    }
-
-    for searchPath in context.input.schemaSearchPaths {
-      try validate(inputSearchPath: searchPath)
-    }
-    for searchPath in context.input.operationSearchPaths {
-      try validate(inputSearchPath: searchPath)
-    }
-  }
-
-  static private func validate(inputSearchPath: String) throws {
-    guard inputSearchPath.contains(".") && !inputSearchPath.hasSuffix(".") else {
-      throw Error.inputSearchPathInvalid(path: inputSearchPath)
-    }
-  }
-
-  /// Validates the configuration context against the GraphQL compilation result, checking for
-  /// configuration errors that are dependent on the schema and operations.
-  static func validate(_ context: ConfigurationContext, with compilationResult: CompilationResult) throws {
-    guard
-      !compilationResult.referencedTypes.contains(where: { namedType in
-        namedType.swiftName == context.schemaNamespace.firstUppercased
-      }),
-      !compilationResult.fragments.contains(where: { fragmentDefinition in
-        fragmentDefinition.name == context.schemaNamespace.firstUppercased
-      })
-    else {
-      throw Error.schemaNameConflict(name: context.schemaNamespace)
-    }
-  }
-  
-  /// Validates that there are no type conflicts within a SelectionSet
-  static private func validateTypeConflicts(
-    for selectionSet: IR.SelectionSet,
-    with context: ConfigurationContext,
-    in containingObject: String,
-    including parentTypes: [String: String] = [:]
-  ) throws {
-    // Check for type conflicts resulting from singularization/pluralization of fields
-    var typeNamesByFormattedTypeName = [String: String]()
-    
-    var fields: [IR.EntityField] = selectionSet.selections.direct?.fields.values.compactMap { $0 as? IR.EntityField } ?? []
-    fields.append(contentsOf: selectionSet.selections.merged.fields.values.compactMap { $0 as? IR.EntityField } )
-
-    try fields.forEach { field in
-      let formattedTypeName = field.formattedSelectionSetName(with: context.pluralizer)
-      if let existingFieldName = typeNamesByFormattedTypeName[formattedTypeName] {
-        throw Error.typeNameConflict(
-          name: existingFieldName,
-          conflictingName: field.name,
-          containingObject: containingObject
-        )
-      }
-      typeNamesByFormattedTypeName[formattedTypeName] = field.name
-    }
-    
-    // Combine `parentTypes` and `typeNamesByFormattedTypeName` to check against fragment names and
-    // pass into recursive function calls
-    var combinedTypeNames = parentTypes
-    combinedTypeNames.merge(typeNamesByFormattedTypeName) { (current, _) in current }
-    
-    // passing each fields selection set for validation after we have fully built our `typeNamesByFormattedTypeName` dictionary
-    try fields.forEach { field in
-      try validateTypeConflicts(
-        for: field.selectionSet,
-        with: context,
-        in: containingObject,
-        including: combinedTypeNames
-      )
-    }
-    
-    var namedFragments: [IR.NamedFragment] = selectionSet.selections.direct?.namedFragments.values.map(\.fragment) ?? []
-    namedFragments.append(contentsOf: selectionSet.selections.merged.namedFragments.values.map(\.fragment))
-    
-    try namedFragments.forEach { fragment in
-      if let existingTypeName = combinedTypeNames[fragment.generatedDefinitionName] {
-        throw Error.typeNameConflict(
-          name: existingTypeName,
-          conflictingName: fragment.name,
-          containingObject: containingObject
-        )
-      }
-    }
-    
-    // gather nested fragments to loop through and check as well    
-    var nestedSelectionSets: [IR.SelectionSet] = selectionSet.selections.direct?.inlineFragments.values.map(\.selectionSet) ?? []
-    nestedSelectionSets.append(contentsOf: selectionSet.selections.merged.inlineFragments.values.map(\.selectionSet))
-    
-    try nestedSelectionSets.forEach { nestedSet in
-      try validateTypeConflicts(
-        for: nestedSet,
-        with: context,
-        in: containingObject,
-        including: combinedTypeNames
-      )
-    }
-  }
-
   /// Performs GraphQL source validation and compiles the schema and operation source documents.
-  static func compileGraphQLResult(
-    _ config: ConfigurationContext,
-    experimentalFeatures: ApolloCodegenConfiguration.ExperimentalFeatures = .init()
-  ) throws -> CompilationResult {
+  func compileGraphQLResult() throws -> CompilationResult {
     let frontend = try GraphQLJSFrontend()
     let graphQLSchema = try createSchema(config, frontend)
     let operationsDocument = try createOperationsDocument(config, frontend, experimentalFeatures)
@@ -362,16 +233,15 @@ public class ApolloCodegen {
     return try frontend.compile(
       schema: graphQLSchema,
       document: operationsDocument,
-      experimentalLegacySafelistingCompatibleOperations: experimentalFeatures.legacySafelistingCompatibleOperations,
+      experimentalLegacySafelistingCompatibleOperations:
+        config.experimentalFeatures.legacySafelistingCompatibleOperations,
       validationOptions: validationOptions
     )
   }
 
-  static func createSchema(
-    _ config: ConfigurationContext,
+  func createSchema(
     _ frontend: GraphQLJSFrontend
   ) throws -> GraphQLSchema {
-
     let matches = try match(
       searchPaths: config.input.schemaSearchPaths,
       relativeTo: config.rootURL
@@ -385,12 +255,9 @@ public class ApolloCodegen {
     return try frontend.loadSchema(from: sources)
   }
 
-  static func createOperationsDocument(
-    _ config: ConfigurationContext,
-    _ frontend: GraphQLJSFrontend,
-    _ experimentalFeatures: ApolloCodegenConfiguration.ExperimentalFeatures
+  func createOperationsDocument(
+    _ frontend: GraphQLJSFrontend
   ) throws -> GraphQLDocument {
-
     let matches = try match(
       searchPaths: config.input.operationSearchPaths,
       relativeTo: config.rootURL)
@@ -402,13 +269,14 @@ public class ApolloCodegen {
     let documents = try matches.map({ path in
       return try frontend.parseDocument(
         from: URL(fileURLWithPath: path),
-        experimentalClientControlledNullability: experimentalFeatures.clientControlledNullability
+        experimentalClientControlledNullability:
+          config.experimentalFeatures.clientControlledNullability
       )
     })
     return try frontend.mergeDocuments(documents)
   }
 
-  static func match(searchPaths: [String], relativeTo relativeURL: URL?) throws -> OrderedSet<String> {
+  private func match(searchPaths: [String], relativeTo relativeURL: URL?) throws -> OrderedSet<String> {
     let excludedDirectories = [
       ".build",
       ".swiftpm",
@@ -419,44 +287,77 @@ public class ApolloCodegen {
   }
 
   /// Generates Swift files for the compiled schema, ir and configured output structure.
-  static func generateFiles(
+  private func generateFiles(
     compilationResult: CompilationResult,
     ir: IRBuilder,
-    config: ConfigurationContext,
-    fileManager: ApolloFileManager = .default,
-    itemsToGenerate: ItemsToGenerate
+    fileManager: ApolloFileManager
   ) throws {
-    for fragment in compilationResult.fragments {
+    try generateGraphQLDefinitionFiles(
+      fragments: compilationResult.fragments,
+      operations: <#T##[OperationDescription]#>,
+      ir: ir,
+      fileManager: fileManager
+    )
+
+    try generateSchemaFiles(ir: ir, config: config, fileManager: fileManager)
+  }
+
+  private func generateOperationManifest(
+    operations: [OperationDescription],
+    fileManager: ApolloFileManager
+  ) async throws {
+    var operationIDsFileGenerator = OperationManifestFileGenerator(config: config)
+
+    withThrowingDiscardingTaskGroup { group in
+      for operation in operations {
+        group.addTask {
+          let operationManifestItem = await
+          operationIDsFileGenerator?.collectOperationIdentifier(irOperation)
+        }
+      }
+      #warning("TODO: minimize running task count")
+    }
+
+    try operationIDsFileGenerator?.generate(fileManager: fileManager)
+  }
+
+  /// Generates the files for the GraphQL fragments and operation definitions provided.
+  private func generateGraphQLDefinitionFiles(
+    fragments: [CompilationResult.FragmentDefinition],
+    operations: [OperationDescription],
+    ir: IRBuilder,
+    fileManager: ApolloFileManager
+  ) throws {
+    for fragment in fragments {
       try autoreleasepool {
         let irFragment = ir.build(fragment: fragment)
-        try validateTypeConflicts(for: irFragment.rootField.selectionSet, with: config, in: irFragment.definition.name)
+        try config.validateTypeConflicts(
+          for: irFragment.rootField.selectionSet,
+          in: irFragment.definition.name
+        )
         try FragmentFileGenerator(irFragment: irFragment, config: config)
           .generate(forConfig: config, fileManager: fileManager)
       }
     }
 
-    var operationIDsFileGenerator: OperationManifestFileGenerator?
-    if itemsToGenerate.contains(.operationManifest) {
-      operationIDsFileGenerator = OperationManifestFileGenerator(config: config)
-    }
-
-    for operation in compilationResult.operations {
+    for operation in operations {
       try autoreleasepool {
-        let irOperation = ir.build(operation: operation)
-        try validateTypeConflicts(for: irOperation.rootField.selectionSet, with: config, in: irOperation.definition.name)
+        let irOperation = ir.build(operation: operation.underlyingDefinition)
+        try config.validateTypeConflicts(
+          for: irOperation.rootField.selectionSet,
+          in: irOperation.definition.name
+        )
         try OperationFileGenerator(irOperation: irOperation, config: config)
           .generate(forConfig: config, fileManager: fileManager)
-
-        if itemsToGenerate.contains(.operationManifest) {
-          operationIDsFileGenerator?.collectOperationIdentifier(irOperation)
-        }
       }
     }
+  }
 
-    if itemsToGenerate.contains(.operationManifest) {
-      try operationIDsFileGenerator?.generate(fileManager: fileManager)
-    }
-
+  /// Generates the schema types and schema metadata files for the `ir`'s compiled schema.
+  private func generateSchemaFiles(
+    ir: IRBuilder,
+    fileManager: ApolloFileManager
+  ) throws {
     for graphQLObject in ir.schema.referencedTypes.objects {
       try autoreleasepool {
         try ObjectFileGenerator(
@@ -550,8 +451,9 @@ public class ApolloCodegen {
     try SchemaModuleFileGenerator.generate(config, fileManager: fileManager)
   }
 
-  private static func findExistingGeneratedFilePaths(
-    config: ConfigurationContext,
+  /// MARK: - Generated File Pruning
+
+  private func findExistingGeneratedFilePaths(
     fileManager: ApolloFileManager = .default
   ) throws -> Set<String> {
     var globs: [Glob] = []
@@ -600,7 +502,7 @@ public class ApolloCodegen {
     }
   }
 
-  static func deleteExtraneousGeneratedFiles(
+  func deleteExtraneousGeneratedFiles(
     from oldGeneratedFilePaths: inout Set<String>,
     afterCodeGenerationUsing fileManager: ApolloFileManager
   ) throws {
