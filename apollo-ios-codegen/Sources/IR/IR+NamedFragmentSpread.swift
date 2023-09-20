@@ -22,34 +22,28 @@ public class NamedFragmentSpread: Hashable, CustomDebugStringConvertible {
 
   public internal(set) var inclusionConditions: AnyOf<InclusionConditions>?
 
-  let isDeferred: IsDeferred
-
   public var definition: CompilationResult.FragmentDefinition { fragment.definition }
 
   init(
     fragment: NamedFragment,
     typeInfo: SelectionSet.TypeInfo,
-    inclusionConditions: AnyOf<InclusionConditions>?,
-    isDeferred: IsDeferred
+    inclusionConditions: AnyOf<InclusionConditions>?
   ) {
     self.fragment = fragment
     self.typeInfo = typeInfo
     self.inclusionConditions = inclusionConditions
-    self.isDeferred = isDeferred
   }
 
   public static func == (lhs: NamedFragmentSpread, rhs: NamedFragmentSpread) -> Bool {
     lhs.fragment === rhs.fragment &&
     lhs.typeInfo == rhs.typeInfo &&
-    lhs.inclusionConditions == rhs.inclusionConditions &&
-    lhs.isDeferred == rhs.isDeferred
+    lhs.inclusionConditions == rhs.inclusionConditions
   }
 
   public func hash(into hasher: inout Hasher) {
     hasher.combine(ObjectIdentifier(fragment))
     hasher.combine(typeInfo)
     hasher.combine(inclusionConditions)
-    hasher.combine(isDeferred)
   }
 
   public var debugDescription: String {
@@ -57,7 +51,7 @@ public class NamedFragmentSpread: Hashable, CustomDebugStringConvertible {
     if let inclusionConditions = inclusionConditions {
       description += " \(inclusionConditions.debugDescription)"
     }
-    description += isDeferred.definitionDirectiveDescription
+
     return description
   }
 }

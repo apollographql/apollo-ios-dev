@@ -335,10 +335,7 @@ class RootFieldBuilder {
       )
     }
 
-    return InlineFragmentSpread(
-      selectionSet: irSelectionSet,
-      isDeferred: scopeCondition.isDeferred
-    )
+    return InlineFragmentSpread(selectionSet: irSelectionSet)
   }
 
   private func buildNamedFragmentSpread(
@@ -364,8 +361,7 @@ class RootFieldBuilder {
     let fragmentSpread = NamedFragmentSpread(
       fragment: fragment,
       typeInfo: typeInfo,
-      inclusionConditions: AnyOf(scopeCondition.conditions),
-      isDeferred: scopeCondition.isDeferred
+      inclusionConditions: AnyOf(scopeCondition.conditions)
     )
 
     entityStorage.mergeAllSelectionsIntoEntitySelectionTrees(from: fragmentSpread)
