@@ -8,24 +8,25 @@ public struct OperationDescription {
     case subscription
   }
 
+  #warning("TODO: Document")
   public let rawSourceText: String
   public let type: OperationType
 
-  public var name: String { underlyingOperation.definition.name }
-  public var filePath: String { underlyingOperation.definition.filePath }
+  public var name: String { underlyingDefinition.name }
+  public var filePath: String { underlyingDefinition.filePath }
 
-  let underlyingOperation: IR.Operation
+  let underlyingDefinition: CompilationResult.OperationDefinition
 
-  init(operation: IR.Operation) throws {
-    guard let type = OperationType(rawValue: operation.definition.operationType.rawValue) else {
-      preconditionFailure("Unknown GraphQL operation type: \(operation.definition.operationType.rawValue)")
+  init(_ operation: CompilationResult.OperationDefinition) throws {
+    guard let type = OperationType(rawValue: operation.operationType.rawValue) else {
+      preconditionFailure("Unknown GraphQL operation type: \(operation.operationType.rawValue)")
     }
-    self.underlyingOperation = operation
+    self.underlyingDefinition = operation
     self.type = type
 
-    var source = operation.definition.source.convertedToSingleLine()
+    var source = operation.source.convertedToSingleLine()
     for fragment in operation.referencedFragments {
-      source += #"\n\#(fragment.definition.source.convertedToSingleLine())"#
+      source += #"\n\#(fragment.source.convertedToSingleLine())"#
     }
     self.rawSourceText = source
   }
