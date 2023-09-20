@@ -21,6 +21,7 @@ export interface OperationDefinition {
   rootType: GraphQLObjectType;
   selectionSet: SelectionSet;
   directives?: Directive[];
+  referencedFragments: FragmentDefinition[];
   source: string;
   filePath?: string;
 }
@@ -38,6 +39,7 @@ export interface FragmentDefinition {
   typeCondition: GraphQLCompositeType;
   selectionSet: SelectionSet;
   directives?: Directive[];
+  referencedFragments: FragmentDefinition[];
   source: string;
   filePath?: string;
 }
@@ -70,7 +72,7 @@ export interface Argument {
 }
 
 export interface InlineFragment {
-  kind: "InlineFragment";  
+  kind: "InlineFragment";
   selectionSet: SelectionSet;
   inclusionConditions?: InclusionCondition[];
   directives?: Directive[];
