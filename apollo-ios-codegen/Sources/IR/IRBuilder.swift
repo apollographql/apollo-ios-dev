@@ -83,6 +83,7 @@ public class IRBuilder {
       definition: fragmentDefinition,
       rootField: result.rootField,
       referencedFragments: result.referencedFragments,
+      hasDeferredFragments: result.hasDeferredFragments,
       entities: result.entities
     )
 

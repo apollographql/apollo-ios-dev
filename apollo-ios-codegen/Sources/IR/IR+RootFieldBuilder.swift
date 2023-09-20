@@ -368,6 +368,8 @@ class RootFieldBuilder {
     referencedFragments.append(fragment)
     referencedFragments.append(contentsOf: fragment.referencedFragments)
 
+    self.hasDeferredFragments = fragment.hasDeferredFragments
+
     let scopePath = scopeCondition.isEmpty ?
     parentTypeInfo.scopePath :
     parentTypeInfo.scopePath.mutatingLast {

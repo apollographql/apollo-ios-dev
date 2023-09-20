@@ -8,6 +8,8 @@ public class NamedFragment: Hashable, CustomDebugStringConvertible {
   /// All of the fragments that are referenced by this fragment's selection set.
   public let referencedFragments: OrderedSet<NamedFragment>
 
+  public let hasDeferredFragments: Bool
+
   /// All of the Entities that exist in the fragment's selection set,
   /// keyed by their relative location (ie. path) within the fragment.
   ///
@@ -22,11 +24,13 @@ public class NamedFragment: Hashable, CustomDebugStringConvertible {
     definition: CompilationResult.FragmentDefinition,
     rootField: EntityField,
     referencedFragments: OrderedSet<NamedFragment>,
+    hasDeferredFragments: Bool = false,
     entities: [Entity.Location: Entity]
   ) {
     self.definition = definition
     self.rootField = rootField
     self.referencedFragments = referencedFragments
+    self.hasDeferredFragments = hasDeferredFragments
     self.entities = entities
   }
 
