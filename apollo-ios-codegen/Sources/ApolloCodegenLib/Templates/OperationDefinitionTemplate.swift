@@ -53,7 +53,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
     """
   }
 
-  private func DocumentType() -> TemplateString {
+  func DocumentType() -> TemplateString {
     let includeFragments = !operation.referencedFragments.isEmpty
     let includeDefinition = config.options.operationDocumentFormat.contains(.definition)
 

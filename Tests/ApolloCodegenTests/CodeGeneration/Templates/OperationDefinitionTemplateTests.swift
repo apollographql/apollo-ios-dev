@@ -55,6 +55,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     operation = ir.build(operation: operationDefinition)
     subject = OperationDefinitionTemplate(
       operation: operation,
+      operationIdentifier: nil,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }

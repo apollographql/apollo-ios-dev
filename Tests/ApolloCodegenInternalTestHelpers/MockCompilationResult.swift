@@ -53,13 +53,14 @@ public extension CompilationResult.OperationDefinition {
   class func mock(
     name: String,
     type: CompilationResult.OperationType,
-    source: String
+    source: String,
+    referencedFragments: [CompilationResult.FragmentDefinition] = []
   ) -> Self {
     let mock = Self.emptyMockObject()
     mock.name = name
     mock.operationType = type
     mock.source = source
-
+    mock.referencedFragments = referencedFragments
     return mock
   }
 }

@@ -286,7 +286,7 @@ public class ApolloCodegen {
   }
 
   /// Generates Swift files for the compiled schema, ir and configured output structure.
-  private func generateFiles(
+  func generateFiles(
     compilationResult: CompilationResult,
     ir: IRBuilder,
     fileManager: ApolloFileManager

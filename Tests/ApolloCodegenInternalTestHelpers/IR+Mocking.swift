@@ -127,7 +127,8 @@ extension IR.Operation {
     let definition = CompilationResult.OperationDefinition.mock(
       name: name,
       type: type,
-      source: source
+      source: source,
+      referencedFragments: referencedFragments.map(\.definition)
     )
 
     return IR.Operation.mock(definition: definition, referencedFragments: referencedFragments)

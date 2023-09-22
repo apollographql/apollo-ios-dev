@@ -29,14 +29,14 @@ class OperationManifestFileGeneratorTests: XCTestCase {
       return .init(path: path, version: version)
     }()
 
-    subject = try OperationManifestFileGenerator(
+    subject = OperationManifestFileGenerator(
       config: ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(
         output: .init(
           schemaTypes: .init(path: "", moduleType: .swiftPackageManager)
         ),
         operationManifest: manifest
       ))
-    ).xctUnwrapped()
+    )
   }
 
   // MARK: Initializer Tests
@@ -82,15 +82,19 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     let filePath = "path/to/match"
     try buildSubject(path: filePath)
 
-    subject.collectOperationIdentifier(.mock(
-      name: "TestQuery",
-      type: .query,
-      source: """
-        query TestQuery {
-          test
-        }
-        """
-    ))
+    let manifest = [
+      (OperationDescriptor(.mock(
+        name: "TestQuery",
+        type: .query,
+        source: """
+          query TestQuery {
+            test
+          }
+          """
+      )),
+       "identifier1"
+       )
+    ]
 
     fileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
@@ -107,7 +111,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(fileManager: fileManager)
+    try subject.generate(operationManifest: manifest, fileManager: fileManager)
 
     expect(self.fileManager.allClosuresCalled).to(beTrue())
   }
@@ -117,15 +121,19 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     let filePath = "path/to/match"
     try buildSubject(path: "\(filePath).json")
 
-    subject.collectOperationIdentifier(.mock(
-      name: "TestQuery",
-      type: .query,
-      source: """
-        query TestQuery {
-          test
-        }
-        """
-    ))
+    let manifest = [
+      (OperationDescriptor(.mock(
+        name: "TestQuery",
+        type: .query,
+        source: """
+          query TestQuery {
+            test
+          }
+          """
+      )),
+       "identifier1"
+       )
+    ]
 
     fileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
@@ -142,7 +150,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(fileManager: fileManager)
+    try subject.generate(operationManifest: manifest, fileManager: fileManager)
 
     expect(self.fileManager.allClosuresCalled).to(beTrue())
   }
@@ -152,15 +160,19 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     let filePath = "./path/to/match"
     try buildSubject(path: filePath)
 
-    subject.collectOperationIdentifier(.mock(
-      name: "TestQuery",
-      type: .query,
-      source: """
-        query TestQuery {
-          test
-        }
-        """
-    ))
+    let manifest = [
+      (OperationDescriptor(.mock(
+        name: "TestQuery",
+        type: .query,
+        source: """
+          query TestQuery {
+            test
+          }
+          """
+      )),
+       "identifier1"
+       )
+    ]
 
     fileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
@@ -181,7 +193,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(fileManager: fileManager)
+    try subject.generate(operationManifest: manifest, fileManager: fileManager)
 
     expect(self.fileManager.allClosuresCalled).to(beTrue())
   }
@@ -191,15 +203,19 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     let filePath = "./path/to/match"
     try buildSubject(path: "\(filePath).json")
 
-    subject.collectOperationIdentifier(.mock(
-      name: "TestQuery",
-      type: .query,
-      source: """
-        query TestQuery {
-          test
-        }
-        """
-    ))
+    let manifest = [
+      (OperationDescriptor(.mock(
+        name: "TestQuery",
+        type: .query,
+        source: """
+          query TestQuery {
+            test
+          }
+          """
+      )),
+       "identifier1"
+       )
+    ]
 
     fileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
@@ -220,7 +236,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(fileManager: fileManager)
+    try subject.generate(operationManifest: manifest, fileManager: fileManager)
 
     expect(self.fileManager.allClosuresCalled).to(beTrue())
   }
@@ -230,15 +246,19 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     let filePath = "path/that/exists"
     try buildSubject(path: filePath)
 
-    subject.collectOperationIdentifier(.mock(
-      name: "TestQuery",
-      type: .query,
-      source: """
-        query TestQuery {
-          test
-        }
-        """
-    ))
+    let manifest = [
+      (OperationDescriptor(.mock(
+        name: "TestQuery",
+        type: .query,
+        source: """
+          query TestQuery {
+            test
+          }
+          """
+      )),
+       "identifier1"
+       )
+    ]
 
     fileManager.mock(closure: .fileExists({ path, isDirectory in
       return true
@@ -266,7 +286,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(fileManager: fileManager)
+    try subject.generate(operationManifest: manifest, fileManager: fileManager)
 
     expect(self.fileManager.allClosuresCalled).to(beTrue())
   }
