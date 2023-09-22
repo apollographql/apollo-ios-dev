@@ -11,7 +11,8 @@ public class Operation {
   /// All of the fragments that are referenced by this operation's selection set.
   public let referencedFragments: OrderedSet<NamedFragment>
 
-  /// `True` if the selection set contains any fragments marked with the `@defer` directive.
+  /// `True` if any selection set, or nested selection set, within the operation contains any
+  /// fragment marked with the `@defer` directive.
   public let hasDeferredFragments: Bool
 
   init(

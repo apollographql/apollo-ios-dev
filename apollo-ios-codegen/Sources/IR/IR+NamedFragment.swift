@@ -8,6 +8,8 @@ public class NamedFragment: Hashable, CustomDebugStringConvertible {
   /// All of the fragments that are referenced by this fragment's selection set.
   public let referencedFragments: OrderedSet<NamedFragment>
 
+  /// `True` if any selection set, or nested selection set, within the fragment contains any
+  /// fragment marked with the `@defer` directive.
   public let hasDeferredFragments: Bool
 
   /// All of the Entities that exist in the fragment's selection set,
