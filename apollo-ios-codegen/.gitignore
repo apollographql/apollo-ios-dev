@@ -72,7 +72,7 @@ SwiftScripts/.build-**
 .netlify
 
 # Generated js files we don't need committed
-Sources/ApolloCodegenLib/Frontend/dist/
+Sources/GraphQLCompiler/JavaScript/dist/
 
 # Local generated packages we don't need in the main project
 Sources/AnimalKingdomAPI/Generated/Package.swift

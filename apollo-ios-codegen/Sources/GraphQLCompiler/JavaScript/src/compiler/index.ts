@@ -168,6 +168,7 @@ export function compileToIR(
     const filePath = filePathForNode(operationDefinition);
     const name = operationDefinition.name.value;
     const operationType = operationDefinition.operation;
+    const referencedFragments = new Set<ir.FragmentDefinition>();
 
     const variables = (operationDefinition.variableDefinitions || []).map(
       (node) => {
@@ -214,9 +215,11 @@ export function compileToIR(
       rootType,
       selectionSet: compileSelectionSet(
         operationDefinition.selectionSet,
-        rootType
+        rootType,
+        referencedFragments
       ),
       directives: directives,
+      referencedFragments: Array.from(referencedFragments.values()),
       source,
       filePath
     };
@@ -232,6 +235,7 @@ export function compileToIR(
       fragmentDefinition,
       legacySafelistingCompatibleOperations
     ));
+    const referencedFragments = new Set<ir.FragmentDefinition>();
 
     const typeCondition = typeFromAST(
       schema,
@@ -249,21 +253,24 @@ export function compileToIR(
       typeCondition,
       selectionSet: compileSelectionSet(
         fragmentDefinition.selectionSet,
-        typeCondition
+        typeCondition,
+        referencedFragments
       ),
-      directives: directives
+      directives: directives,
+      referencedFragments: Array.from(referencedFragments.values()),
     };
   }
 
   function compileSelectionSet(
     selectionSetNode: SelectionSetNode,
-    parentType: GraphQLCompositeType
+    parentType: GraphQLCompositeType,
+    operationReferencedFragments: Set<ir.FragmentDefinition>,
   ): ir.SelectionSet {
     return {
       parentType,
       selections: selectionSetNode.selections
         .map((selectionNode) =>
-          compileSelection(selectionNode, parentType)
+          compileSelection(selectionNode, parentType, operationReferencedFragments)
         )
         .filter(isNotNullOrUndefined),
     };
@@ -271,7 +278,8 @@ export function compileToIR(
 
   function compileSelection(
     selectionNode: SelectionNode,
-    parentType: GraphQLCompositeType
+    parentType: GraphQLCompositeType,
+    operationReferencedFragments: Set<ir.FragmentDefinition>,
   ): ir.Selection | undefined {
     const [directives, inclusionConditions] = compileDirectives(selectionNode.directives) ?? [undefined, undefined];
 
@@ -343,7 +351,8 @@ export function compileToIR(
 
           field.selectionSet = compileSelectionSet(
             selectionSetNode,
-            unwrappedFieldType
+            unwrappedFieldType,
+            operationReferencedFragments
           );
         }
         return field;
@@ -360,7 +369,8 @@ export function compileToIR(
           kind: "InlineFragment",
           selectionSet: compileSelectionSet(
             selectionNode.selectionSet,
-            typeCondition
+            typeCondition,
+            operationReferencedFragments
           ),
           inclusionConditions: inclusionConditions,
           directives: directives
@@ -376,6 +386,8 @@ export function compileToIR(
             { nodes: selectionNode.name }
           );
         }
+
+        operationReferencedFragments.add(fragment);
 
         const fragmentSpread: ir.FragmentSpread = {
           kind: "FragmentSpread",

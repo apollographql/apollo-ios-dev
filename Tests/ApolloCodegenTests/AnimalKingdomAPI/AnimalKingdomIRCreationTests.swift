@@ -1040,4 +1040,54 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
     expect(actual).to(shallowlyMatch(self.expected))
   }
+
+  // MARK: - Referenced Fragment Tests
+
+  func test__referencedFragments__AllAnimalsQuery_isCorrect() throws {
+    // given
+    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
+
+    // when
+    let expected: [CompilationResult.FragmentDefinition] = [
+      "HeightInMeters",
+      "WarmBloodedDetails",
+      "PetDetails"
+    ].map { expectedName in
+      compilationResult.fragments.first(where:{ $0.name == expectedName })!
+    }
+
+    // then
+    expect(operation?.referencedFragments).to(equal(expected))
+  }
+
+  func test__referencedFragments__HeightInMeters_isCorrect() throws {
+    // given
+    let fragment = compilationResult.fragments.first { $0.name == "HeightInMeters" }
+
+    // then
+    expect(fragment?.referencedFragments).to(beEmpty())
+  }
+
+  func test__referencedFragments__WarmBloodedDetails_isCorrect() throws {
+    // given
+    let fragment = compilationResult.fragments.first { $0.name == "WarmBloodedDetails" }
+
+    // when
+    let expected: [CompilationResult.FragmentDefinition] = [
+      "HeightInMeters"
+    ].map { expectedName in
+      compilationResult.fragments.first(where:{ $0.name == expectedName })!
+    }
+
+    // then
+    expect(fragment?.referencedFragments).to(equal(expected))
+  }
+
+  func test__referencedFragments__PetDetails_isCorrect() throws {
+    // given
+    let fragment = compilationResult.fragments.first { $0.name == "PetDetails" }
+
+    // then
+    expect(fragment?.referencedFragments).to(beEmpty())
+  }
 }
