@@ -102,19 +102,26 @@ public class ApolloCodegen {
   ///     If `nil`, the current working directory of the executing process will be used.
   ///   - itemsToGenerate: Uses the `ItemsToGenerate` option set to determine what items should be generated during codegen.
   ///     By default this will use [.code] which maintains how codegen functioned prior to these options being added.
+  #warning("TODO: Update docs")
   public static func build(
     with configuration: ApolloCodegenConfiguration,
     withRootURL rootURL: URL? = nil,
-    itemsToGenerate: ItemsToGenerate = [.code]
+    itemsToGenerate: ItemsToGenerate = [.code],
+    operationIdentifierProvider: @escaping OperationIdentifierProvider? = nil
   ) async throws {
+    let idFactory = OperationIdentifierFactory(
+      idProvider: operationIdentifierProvider ?? DefaultOperationIdentifierProvider
+    )
+
     let codegen = ApolloCodegen(
       config: ConfigurationContext(
         config: configuration,
         rootURL: rootURL
       ),
-      operationIdentifierFactory: OperationIdentifierFactory(),
+      operationIdentifierFactory: idFactory,
       itemsToGenerate: itemsToGenerate
     )
+    
     try await codegen.build()
   }
 

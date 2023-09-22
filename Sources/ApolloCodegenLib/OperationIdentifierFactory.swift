@@ -3,7 +3,7 @@ import IR
 import GraphQLCompiler
 import CryptoKit
 
-typealias OperationIdentifierProvider = (_ operation: OperationDescriptor) async throws -> String
+public typealias OperationIdentifierProvider = (_ operation: OperationDescriptor) async throws -> String
 
 actor OperationIdentifierFactory {
 
@@ -46,7 +46,7 @@ actor OperationIdentifierFactory {
 
 }
 
-private let DefaultOperationIdentifierProvider =
+let DefaultOperationIdentifierProvider =
 { (operation: OperationDescriptor) -> String in
   var hasher = SHA256()
   func updateHash(with source: inout String) {
