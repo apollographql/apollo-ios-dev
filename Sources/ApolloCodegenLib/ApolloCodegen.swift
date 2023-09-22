@@ -107,7 +107,7 @@ public class ApolloCodegen {
     with configuration: ApolloCodegenConfiguration,
     withRootURL rootURL: URL? = nil,
     itemsToGenerate: ItemsToGenerate = [.code],
-    operationIdentifierProvider: @escaping OperationIdentifierProvider? = nil
+    operationIdentifierProvider: OperationIdentifierProvider? = nil
   ) async throws {
     let idFactory = OperationIdentifierFactory(
       idProvider: operationIdentifierProvider ?? DefaultOperationIdentifierProvider
@@ -121,7 +121,7 @@ public class ApolloCodegen {
       operationIdentifierFactory: idFactory,
       itemsToGenerate: itemsToGenerate
     )
-    
+
     try await codegen.build()
   }
 
