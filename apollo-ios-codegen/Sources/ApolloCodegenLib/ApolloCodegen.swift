@@ -106,7 +106,7 @@ public class ApolloCodegen {
     with configuration: ApolloCodegenConfiguration,
     withRootURL rootURL: URL? = nil,
     itemsToGenerate: ItemsToGenerate = [.code]
-  ) throws {
+  ) async throws {
     let codegen = ApolloCodegen(
       config: ConfigurationContext(
         config: configuration,
@@ -115,7 +115,7 @@ public class ApolloCodegen {
       operationIdentifierFactory: OperationIdentifierFactory(),
       itemsToGenerate: itemsToGenerate
     )
-    try codegen.build()
+    try await codegen.build()
   }
 
   /// Validates the configuration against deterministic errors that will cause code generation to
@@ -165,14 +165,14 @@ public class ApolloCodegen {
 
   internal func build(fileManager: ApolloFileManager = .default) async throws {
     try config.validateConfigValues()
-
+    
     let compilationResult = try compileGraphQLResult()
-
+    
     try config.validate(compilationResult)
-
+    
     let ir = IRBuilder(compilationResult: compilationResult)
-
-    try await withThrowingDiscardingTaskGroup { group in
+    
+    try await withThrowingTaskGroup(of: Void.self) { group in
       if itemsToGenerate.contains(.operationManifest) {
         group.addTask {
           try await self.generateOperationManifest(
@@ -181,48 +181,34 @@ public class ApolloCodegen {
           )
         }
       }
-
-
-    }
-
-    if itemsToGenerate.contains(.code) {
-      var existingGeneratedFilePaths = config.options.pruneGeneratedFiles ?
-      try findExistingGeneratedFilePaths(
-        config: configContext,
-        fileManager: fileManager
-      ) : []
-
-      try generateFiles(
-        compilationResult: compilationResult,
-        ir: ir,
-        config: config,
-        fileManager: fileManager,
-        itemsToGenerate: itemsToGenerate
-      )
-
-      if configuration.options.pruneGeneratedFiles {
-        try deleteExtraneousGeneratedFiles(
-          from: &existingGeneratedFilePaths,
-          afterCodeGenerationUsing: fileManager
-        )
-      }
-    } else if itemsToGenerate.contains(.operationManifest) {
-      var operationIDsFileGenerator = OperationManifestFileGenerator(config: configContext)
-      for operation in compilationResult.operations {
-        autoreleasepool {
-          let irOperation = ir.build(operation: operation)
-          operationIDsFileGenerator?.collectOperationIdentifier(irOperation)
+      
+      if itemsToGenerate.contains(.code) {
+        var existingGeneratedFilePaths = config.options.pruneGeneratedFiles ?
+        try findExistingGeneratedFilePaths(fileManager: fileManager) : []
+        
+        group.addTask {
+          try await self.generateFiles(
+            compilationResult: compilationResult,
+            ir: ir,
+            fileManager: fileManager
+          )
+        }
+        
+        if config.options.pruneGeneratedFiles {
+          try deleteExtraneousGeneratedFiles(
+            from: &existingGeneratedFilePaths,
+            afterCodeGenerationUsing: fileManager
+          )
         }
       }
-      try operationIDsFileGenerator?.generate(fileManager: fileManager)
     }
   }
 
   /// Performs GraphQL source validation and compiles the schema and operation source documents.
   func compileGraphQLResult() throws -> CompilationResult {
     let frontend = try GraphQLJSFrontend()
-    let graphQLSchema = try createSchema(config, frontend)
-    let operationsDocument = try createOperationsDocument(config, frontend, experimentalFeatures)
+    let graphQLSchema = try createSchema(frontend)
+    let operationsDocument = try createOperationsDocument(frontend)
     let validationOptions = ValidationOptions(config: config)
 
     let graphqlErrors = try frontend.validateDocument(
@@ -304,15 +290,15 @@ public class ApolloCodegen {
     compilationResult: CompilationResult,
     ir: IRBuilder,
     fileManager: ApolloFileManager
-  ) throws {
-    try generateGraphQLDefinitionFiles(
+  ) async throws {
+    try await generateGraphQLDefinitionFiles(
       fragments: compilationResult.fragments,
-      operations: <#T##[OperationDescription]#>,
+      operations: compilationResult.operations,
       ir: ir,
       fileManager: fileManager
     )
 
-    try generateSchemaFiles(ir: ir, config: config, fileManager: fileManager)
+    try generateSchemaFiles(ir: ir, fileManager: fileManager)
   }
 
   private func generateOperationManifest(
@@ -351,31 +337,39 @@ public class ApolloCodegen {
   /// Generates the files for the GraphQL fragments and operation definitions provided.
   private func generateGraphQLDefinitionFiles(
     fragments: [CompilationResult.FragmentDefinition],
-    operations: [OperationDescriptor],
+    operations: [CompilationResult.OperationDefinition],
     ir: IRBuilder,
     fileManager: ApolloFileManager
-  ) throws {
-    for fragment in fragments {
-      try autoreleasepool {
-        let irFragment = ir.build(fragment: fragment)
-        try config.validateTypeConflicts(
-          for: irFragment.rootField.selectionSet,
-          in: irFragment.definition.name
-        )
-        try FragmentFileGenerator(irFragment: irFragment, config: config)
-          .generate(forConfig: config, fileManager: fileManager)
+  ) async throws {
+    try await withThrowingTaskGroup(of: Void.self) { group in
+      for fragment in fragments {
+        try autoreleasepool {
+          let irFragment = ir.build(fragment: fragment)
+          try config.validateTypeConflicts(
+            for: irFragment.rootField.selectionSet,
+            in: irFragment.definition.name
+          )
+          try FragmentFileGenerator(irFragment: irFragment, config: config)
+            .generate(forConfig: config, fileManager: fileManager)
+        }
       }
-    }
 
-    for operation in operations {
-      try autoreleasepool {
-        let irOperation = ir.build(operation: operation.underlyingDefinition)
-        try config.validateTypeConflicts(
-          for: irOperation.rootField.selectionSet,
-          in: irOperation.definition.name
-        )
-        try OperationFileGenerator(irOperation: irOperation, config: config)
-          .generate(forConfig: config, fileManager: fileManager)
+      for operation in operations {
+        group.addTask {
+          async let identifier = self.operationIdentifierFactory.identifier(for: operation)
+
+          let irOperation = ir.build(operation: operation)
+          try self.config.validateTypeConflicts(
+            for: irOperation.rootField.selectionSet,
+            in: irOperation.definition.name
+          )
+
+          try OperationFileGenerator(
+            irOperation: irOperation,
+            operationIdentifier: await identifier,
+            config: self.config
+          ).generate(forConfig: self.config, fileManager: fileManager)
+        }
       }
     }
   }
