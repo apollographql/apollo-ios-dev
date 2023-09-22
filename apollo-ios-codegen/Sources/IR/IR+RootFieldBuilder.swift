@@ -136,6 +136,15 @@ class RootFieldBuilder {
   ) {
     addSelections(from: selectionSet, to: target, atTypePath: typeInfo)
 
+    self.hasDeferredFragments = {
+      switch typeInfo.scopePath.last.value.IsDeferred {
+      case .value(false):
+        return false
+      case .value(true), .if(_):
+        return true
+      }
+    }()
+
     typeInfo.entity.selectionTree.mergeIn(
       selections: target.readOnlyView,
       with: typeInfo
@@ -159,15 +168,6 @@ class RootFieldBuilder {
     to target: DirectSelections,
     atTypePath typeInfo: SelectionSet.TypeInfo
   ) {
-    let evaluateDeferredScopeDescriptor: ((ScopeDescriptor) -> Void) = { descriptor in
-      switch descriptor.IsDeferred {
-      case .value(false):
-        self.hasDeferredFragments = false
-      case .value(true), .if(_):
-        self.hasDeferredFragments = true
-      }
-    }
-
     switch selection {
     case let .field(field):
       if let irField = buildField(
@@ -198,8 +198,6 @@ class RootFieldBuilder {
           isDeferred: .init(inlineFragment.isDeferred)
         )
         target.mergeIn(irTypeCase)
-
-        evaluateDeferredScopeDescriptor(irTypeCase.typeInfo.scopePath.last.value)
       }
 
     case let .fragmentSpread(fragmentSpread):
@@ -222,8 +220,6 @@ class RootFieldBuilder {
         )
         target.mergeIn(irFragmentSpread)
 
-        evaluateDeferredScopeDescriptor(irFragmentSpread.typeInfo.scopePath.last.value)
-
       } else {
         let irTypeCaseEnclosingFragment = buildInlineFragmentSpread(
           from: CompilationResult.SelectionSet(
@@ -236,8 +232,6 @@ class RootFieldBuilder {
         )
 
         target.mergeIn(irTypeCaseEnclosingFragment)
-
-        evaluateDeferredScopeDescriptor(irTypeCaseEnclosingFragment.typeInfo.scopePath.last.value)
 
         if matchesType {
           typeInfo.entity.selectionTree.mergeIn(
