@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "36C7A583-06D6-4733-AF67-CC38D6FB14FF",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "skippedTests" : [
+        "GraphQLFileTests",
+        "MultipartFormDataTests",
+        "StoreConcurrencyTests"
+      ],
+      "target" : {
+        "containerPath" : "container:ApolloDev.xcodeproj",
+        "identifier" : "471B6A9B0B0EB6244F71ECA6",
+        "name" : "ApolloTests"
+      }
+    }
+  ],
+  "version" : 1
+}

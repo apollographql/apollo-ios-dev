@@ -1,0 +1,9 @@
+query DogQuery {
+  allAnimals {
+    id
+    skinCovering
+    ... on Dog {
+      ... DogFragment
+    }
+  }
+}

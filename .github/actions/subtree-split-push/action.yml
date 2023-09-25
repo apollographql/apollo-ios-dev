@@ -1,0 +1,30 @@
+name: "Subtree Split and Push"
+description: Attempts to split and rejoin the given subtree into the working history, if changes were found also pushes the changes to the subtree repo.
+inputs:
+  subtree:
+    description: "The prefix for the subtree being operated on."
+    required: true
+  remote:
+    description: "The remote repository for the subtree to push to."
+    required: true
+  target-branch:
+    description: "The branch of the remote to push to."
+    required: true
+  pr-number:
+    description: "The number of the PR that triggered this action."
+    required: true
+  pr-title: 
+    description: "The title of the PR that triggered this action."
+    required: true
+runs:
+  using: "composite"
+  steps:
+  - name: Split and Push ${{ inputs.subtree }}
+    shell: bash
+    run: |
+      git fetch ${{ inputs.remote }} ${{ inputs.target-branch }}
+      splitResult=$(sh git-subtree.sh -P ${{ inputs.subtree }} split --squash --rejoin -m "split: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - ${{ inputs.pr-title }}")
+      if [ ! -z "$splitResult" ]
+      then
+        sh git-subtree.sh push -P ${{ inputs.subtree }} ${{ inputs.remote }} ${{ inputs.target-branch }}
+      fi

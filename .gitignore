@@ -15,6 +15,10 @@ apollo-ios-cli
 !default.perspectivev3
 xcuserdata/
 
+# Xcode project and workspace files
+*.xcodeproj
+*.xcworkspace
+
 ## Other
 *.moved-aside
 *.xccheckout
@@ -83,3 +87,6 @@ Tests/TestCodeGenConfigurations/EmbeddedInTarget-RelativeAbsolute/PackageTwo/Sou
 !Tests/TestCodeGenConfigurations/**/SchemaConfiguration.swift
 !Tests/TestCodeGenConfigurations/Other-CustomTarget/AnimalKingdomAPI/AnimalKingdomAPI.h
 !Tests/TestCodeGenConfigurations/EmbeddedInTarget-RelativeAbsolute/PackageTwo/Sources/PackageTwo/PackageTwo.swift
+
+# Tuist
+Derived/**

@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "8B27E3A2-3A52-417E-9598-1FF14D3F8C84",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:ApolloDev.xcodeproj",
+        "identifier" : "471B6A9B0B0EB6244F71ECA6",
+        "name" : "ApolloTests"
+      }
+    }
+  ],
+  "version" : 1
+}

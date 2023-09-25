@@ -1,0 +1,1 @@
+If you would like to contribute to this library, you should make your code modifications and pull requests in the the [apollo-ios-dev](https://github.com/apollographql/apollo-ios-dev) repository. For more information, see the contributor guide in the `apollo-ios-dev` repo [here](https://github.com/apollographql/apollo-ios-dev/tree/main/CONTRIBUTING.md)
