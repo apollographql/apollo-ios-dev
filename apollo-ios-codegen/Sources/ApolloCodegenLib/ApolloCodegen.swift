@@ -172,6 +172,7 @@ public class ApolloCodegen {
   class ConfigurationContext {
     let config: ApolloCodegenConfiguration
     let pluralizer: Pluralizer
+    let operationIdentifierFactory: OperationIdentifierFactory
     let rootURL: URL?
 
     init(
@@ -180,6 +181,7 @@ public class ApolloCodegen {
     ) {
       self.config = config
       self.pluralizer = Pluralizer(rules: config.options.additionalInflectionRules)
+      self.operationIdentifierFactory = OperationIdentifierFactory()
       self.rootURL = rootURL?.standardizedFileURL
     }
 
