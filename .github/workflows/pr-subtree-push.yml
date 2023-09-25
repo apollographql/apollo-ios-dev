@@ -3,7 +3,7 @@ name: "PR Subtree Push"
 on:
   pull_request:
     branches:
-        - project-breakup
+        - main
     types: [closed]
 
 jobs:
@@ -15,7 +15,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v3
       with:
-        ref: project-breakup
+        ref: main
         fetch-depth: 0
     - name: Setup SSH Keys
       uses: webfactory/ssh-agent@v0.7.0
