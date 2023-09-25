@@ -131,7 +131,7 @@ public class ApolloCodegen {
 
     try validate(configContext, with: compilationResult)
 
-    let ir = IR(compilationResult: compilationResult)
+    let ir = IRBuilder(compilationResult: compilationResult)
 
     if itemsToGenerate.contains(.code) {
       var existingGeneratedFilePaths = configuration.options.pruneGeneratedFiles ?
@@ -419,7 +419,7 @@ public class ApolloCodegen {
   /// Generates Swift files for the compiled schema, ir and configured output structure.
   static func generateFiles(
     compilationResult: CompilationResult,
-    ir: IR,
+    ir: IRBuilder,
     config: ConfigurationContext,
     fileManager: ApolloFileManager = .default,
     itemsToGenerate: ItemsToGenerate
