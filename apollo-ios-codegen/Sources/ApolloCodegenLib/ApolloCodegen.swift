@@ -1,4 +1,6 @@
 import Foundation
+import IR
+import GraphQLCompiler
 import OrderedCollections
 
 // Only available on macOS
