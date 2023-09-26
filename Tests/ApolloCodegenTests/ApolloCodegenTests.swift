@@ -2518,7 +2518,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
     
-    expect(try await ApolloCodegen.build(with: config))
+    await expect { try await ApolloCodegen.build(with: config) }
       .to(throwError { error in
         guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
           fail("Expected .typeNameConflict, got .\(error)")
@@ -2592,7 +2592,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
     
-    expect(try await ApolloCodegen.build(with: config))
+    await expect { try await ApolloCodegen.build(with: config) }
       .to(throwError { error in
         guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
           fail("Expected .typeNameConflict, got .\(error)")
@@ -2604,7 +2604,7 @@ class ApolloCodegenTests: XCTestCase {
       })
   }
   
-  func test__validation__selectionSet_typeConflicts_withMergedInlineFragment_shouldThrowError() throws {
+  func test__validation__selectionSet_typeConflicts_withMergedInlineFragment_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -2673,7 +2673,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
     
-    expect(try ApolloCodegen.build(with: config))
+    await expect { try await ApolloCodegen.build(with: config) }
       .to(throwError { error in
         guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
           fail("Expected .typeNameConflict, got .\(error)")
@@ -2685,7 +2685,7 @@ class ApolloCodegenTests: XCTestCase {
       })
   }
   
-  func test__validation__selectionSet_typeConflicts_withDirectNamedFragment_shouldThrowError() throws {
+  func test__validation__selectionSet_typeConflicts_withDirectNamedFragment_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -2747,7 +2747,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
     
-    expect(try ApolloCodegen.build(with: config))
+    await expect { try await ApolloCodegen.build(with: config) }
       .to(throwError { error in
         guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
           fail("Expected .typeNameConflict, got .\(error)")
@@ -2759,7 +2759,7 @@ class ApolloCodegenTests: XCTestCase {
       })
   }
   
-  func test__validation__selectionSet_typeConflicts_withNamedFragment_shouldThrowError() throws {
+  func test__validation__selectionSet_typeConflicts_withNamedFragment_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -2813,7 +2813,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
     
-    expect(try ApolloCodegen.build(with: config))
+    await expect { try await ApolloCodegen.build(with: config) }
       .to(throwError { error in
         guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
           fail("Expected .typeNameConflict, got .\(error)")
@@ -2825,7 +2825,7 @@ class ApolloCodegenTests: XCTestCase {
       })
   }
   
-  func test__validation__selectionSet_typeConflicts_withNamedFragmentFieldCollisionWithinInlineFragment_shouldThrowError() throws {
+  func test__validation__selectionSet_typeConflicts_withNamedFragmentFieldCollisionWithinInlineFragment_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -2896,7 +2896,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
     
-    expect(try ApolloCodegen.build(with: config))
+    await expect { try await ApolloCodegen.build(with: config) }
       .to(throwError { error in
         guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
           fail("Expected .typeNameConflict, got .\(error)")
@@ -2908,7 +2908,7 @@ class ApolloCodegenTests: XCTestCase {
       })
   }
   
-  func test__validation__selectionSet_typeConflicts_withNamedFragmentWithinInlineFragmentTypeCollision_shouldThrowError() throws {
+  func test__validation__selectionSet_typeConflicts_withNamedFragmentWithinInlineFragmentTypeCollision_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -2984,7 +2984,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
     
-    expect(try ApolloCodegen.build(with: config))
+    await expect { try await ApolloCodegen.build(with: config) }
       .to(throwError { error in
         guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
           fail("Expected .typeNameConflict, got .\(error)")
@@ -2996,7 +2996,7 @@ class ApolloCodegenTests: XCTestCase {
       })
   }
   
-  func test__validation__selectionSet_typeConflicts_withFieldUsingNamedFragmentCollision_shouldThrowError() throws {
+  func test__validation__selectionSet_typeConflicts_withFieldUsingNamedFragmentCollision_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -3054,7 +3054,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
     
-    expect(try ApolloCodegen.build(with: config))
+    await expect { try await ApolloCodegen.build(with: config) }
       .to(throwError { error in
         guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
           fail("Expected .typeNameConflict, got .\(error)")
