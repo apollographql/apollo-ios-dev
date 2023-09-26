@@ -63,14 +63,16 @@ class AutomaticPersistedQueriesTests: XCTestCase {
   }
 
   // MARK: - Helper Methods
-  
-  private func validatePostBody<O: GraphQLOperation>(with request: URLRequest,
-                                operation: O,
-                                queryDocument: Bool = false,
-                                persistedQuery: Bool = false,
-                                file: StaticString = #filePath,
-                                line: UInt = #line) throws {
-    
+
+  private func validatePostBody<O: GraphQLOperation>(
+    with request: URLRequest,
+    operation: O,
+    queryDocument: Bool = false,
+    persistedQuery: Bool = false,
+    file: Nimble.FileString = #filePath,
+    line: UInt = #line
+  ) throws {
+
     guard
       let httpBody = request.httpBody,
       let jsonBody = try? JSONSerializationFormat.deserialize(data: httpBody) as? JSONObject else {
@@ -142,7 +144,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
                                  query: MockHeroNameQuery,
                                  queryDocument: Bool = false,
                                  persistedQuery: Bool = false,
-                                 file: StaticString = #filePath,
+                                 file: Nimble.FileString = #filePath,
                                  line: UInt = #line) throws {
     let url = try XCTUnwrap(request.url,
                             "URL not valid",
@@ -163,7 +165,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
     }
     
     if let variables = url.queryItemDictionary?["variables"] {
-      let expectation = expect(file: file.description, line: line, variables)
+      let expectation = expect(file: file, line: line, variables)
       switch query.episode {
       case let .some(episode):
         expectation.to(equal("{\"episode\":\"\(episode.rawValue)\"}"))
