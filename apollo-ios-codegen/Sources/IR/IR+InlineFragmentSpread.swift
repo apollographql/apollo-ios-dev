@@ -5,30 +5,22 @@ public class InlineFragmentSpread: Hashable, CustomDebugStringConvertible {
   /// enclosing operation/fragment.
   public let selectionSet: SelectionSet
 
-  public let isDeferred: IsDeferred
-
   /// Indicates the location where the inline fragment has been "spread into" its enclosing
   /// operation/fragment.
   public var typeInfo: SelectionSet.TypeInfo { selectionSet.typeInfo }
 
   public var inclusionConditions: InclusionConditions? { selectionSet.inclusionConditions }
 
-  init(
-    selectionSet: SelectionSet,
-    isDeferred: IsDeferred
-  ) {
+  init(selectionSet: SelectionSet) {
     self.selectionSet = selectionSet
-    self.isDeferred = isDeferred
   }
 
   public static func == (lhs: InlineFragmentSpread, rhs: InlineFragmentSpread) -> Bool {
-    lhs.selectionSet == rhs.selectionSet &&
-    lhs.isDeferred == rhs.isDeferred
+    lhs.selectionSet == rhs.selectionSet
   }
 
   public func hash(into hasher: inout Hasher) {
     hasher.combine(selectionSet)
-    hasher.combine(isDeferred)
   }
 
   public var debugDescription: String {
@@ -36,7 +28,7 @@ public class InlineFragmentSpread: Hashable, CustomDebugStringConvertible {
     if let conditions = typeInfo.inclusionConditions {
       string += " \(conditions.debugDescription)"
     }
-    string += isDeferred.definitionDirectiveDescription
+
     return string
   }
 }

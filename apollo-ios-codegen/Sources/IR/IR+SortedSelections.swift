@@ -108,8 +108,7 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
         selections: newField.selectionSet.selections.direct.unsafelyUnwrapped
       )
       let newFieldInlineFragment = InlineFragmentSpread(
-        selectionSet: newFieldSelectionSet,
-        isDeferred: false
+        selectionSet: newFieldSelectionSet
       )
       wrapperField.selectionSet.selections.direct?.mergeIn(newFieldInlineFragment)
 
@@ -353,8 +352,7 @@ public class MergedSelections: Equatable, CustomDebugStringConvertible {
         entity: self.typeInfo.entity,
         scopePath: self.typeInfo.scopePath.mutatingLast { $0.appending(condition) },
         mergedSelectionsOnly: true
-      ),
-      isDeferred: condition.isDeferred
+      )
     )
     inlineFragments[condition] = inlineFragment
   }

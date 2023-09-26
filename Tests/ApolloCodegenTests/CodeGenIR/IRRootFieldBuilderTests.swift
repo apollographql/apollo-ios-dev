@@ -15,8 +15,14 @@ class IRRootFieldBuilderTests: XCTestCase {
   var document: String!
   var ir: IRBuilder!
   var operation: CompilationResult.OperationDefinition!
-  var subject: IR.EntityField!
-  var computedReferencedFragments: IR.RootFieldBuilder.ReferencedFragments!
+  var result: IR.RootFieldBuilder.Result!
+
+  var subject: IR.EntityField! {
+    result.rootField
+  }
+  var computedReferencedFragments: IR.RootFieldBuilder.ReferencedFragments! {
+    result.referencedFragments
+  }
 
   var schema: IR.Schema { ir.schema }
 
@@ -28,8 +34,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     schemaSDL = nil
     document = nil
     operation = nil
-    subject = nil
-    computedReferencedFragments = nil
+    result = nil
     super.tearDown()
   }
 
@@ -39,7 +44,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ir = try .mock(schema: schemaSDL, document: document)
     operation = try XCTUnwrap(ir.compilationResult.operations.first)
 
-    let result = IR.RootFieldBuilder.buildRootEntityField(
+    result = IR.RootFieldBuilder.buildRootEntityField(
       forRootField: .mock(
         "query",
         type: .nonNull(.entity(operation.rootType)),
@@ -48,8 +53,6 @@ class IRRootFieldBuilderTests: XCTestCase {
       onRootEntity: IR.Entity(source: .operation(operation)),
       inIR: ir
     )
-    subject = result.rootField
-    computedReferencedFragments = result.referencedFragments
   }
 
   // MARK: - Children Computation
@@ -4322,6 +4325,254 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     // then
     expect(self.computedReferencedFragments).to(equal(expected))
+  }
+
+  // MARK: - Deferred Fragments
+
+  func test__deferredFragments__givenNoDeferredFragment_hasDeferredFragmentsFalse() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    expect(self.result.hasDeferredFragments).to(beFalse())
+  }
+
+  func test__deferredFragments__givenDeferredInlineFragment_hasDeferredFragmentsTrue() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    expect(self.result.hasDeferredFragments).to(beTrue())
+  }
+
+  func test__deferredFragments__givenDeferredInlineFragmentWithCondition_hasDeferredFragmentsTrue() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: "a", label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    expect(self.result.hasDeferredFragments).to(beTrue())
+  }
+
+  func test__deferredFragments__givenDeferredInlineFragmentWithConditionFalse_hasDeferredFragmentsFalse() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: false, label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    expect(self.result.hasDeferredFragments).to(beFalse())
+  }
+
+  func test__deferredFragments__givenDeferredNamedFragment_onDifferentTypeCase_hasDeferredFragmentsTrue() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ...DogFragment @defer
+      }
+    }
+
+    fragment DogFragment on Dog {
+      species
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    expect(self.result.hasDeferredFragments).to(beTrue())
+  }
+
+  func test__deferredFragments__givenDeferredInlineFragment_withinNamedFragment_hasDeferredFragmentsTrue() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ...DogFragment
+      }
+    }
+
+    fragment DogFragment on Animal {
+      ... on Dog @defer(label: "root") {
+        species
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    expect(self.result.hasDeferredFragments).to(beTrue())
   }
 
 }

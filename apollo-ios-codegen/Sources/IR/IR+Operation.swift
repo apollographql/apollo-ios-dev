@@ -11,13 +11,19 @@ public class Operation {
   /// All of the fragments that are referenced by this operation's selection set.
   public let referencedFragments: OrderedSet<NamedFragment>
 
+  /// `True` if any selection set, or nested selection set, within the operation contains any
+  /// fragment marked with the `@defer` directive.
+  public let hasDeferredFragments: Bool
+
   init(
     definition: CompilationResult.OperationDefinition,
     rootField: EntityField,
-    referencedFragments: OrderedSet<NamedFragment>
+    referencedFragments: OrderedSet<NamedFragment>,
+    hasDeferredFragments: Bool
   ) {
     self.definition = definition
     self.rootField = rootField
     self.referencedFragments = referencedFragments
+    self.hasDeferredFragments = hasDeferredFragments
   }
 }

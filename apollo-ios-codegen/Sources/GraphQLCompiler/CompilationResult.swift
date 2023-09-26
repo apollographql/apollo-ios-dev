@@ -164,7 +164,7 @@ public class CompilationResult: JavaScriptObject {
 
     lazy var directives: [Directive]? = self["directives"]
 
-    lazy var isDeferred: IsDeferred = getIsDeferred()
+    public lazy var isDeferred: IsDeferred = getIsDeferred()
 
     public override var debugDescription: String {
       selectionSet.debugDescription
@@ -445,8 +445,8 @@ fileprivate extension Deferrable where Self: JavaScriptObject {
     case let .boolean(value):
       return .value(value)
 
-    case let .variable(variable):
-      return .variable(variable)
+    case let .string(value), let .variable(value):
+      return .variable(value)
 
     default:
       preconditionFailure("Incompatible argument value. Expected Boolean or Variable, got \(argument.value).")

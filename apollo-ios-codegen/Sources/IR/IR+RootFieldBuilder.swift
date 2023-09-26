@@ -69,6 +69,7 @@ class RootFieldBuilder {
     let rootField: EntityField
     let referencedFragments: ReferencedFragments
     let entities: [Entity.Location: Entity]
+    let hasDeferredFragments: Bool
   }
 
   typealias ReferencedFragments = OrderedSet<NamedFragment>
@@ -86,6 +87,7 @@ class RootFieldBuilder {
   private let rootEntity: Entity
   private let entityStorage: RootFieldEntityStorage
   private var referencedFragments: ReferencedFragments = []
+  @IsEverTrue private var hasDeferredFragments: Bool
 
   private var schema: Schema { ir.schema }
 
@@ -122,7 +124,8 @@ class RootFieldBuilder {
     return Result(
       rootField: EntityField(rootField, selectionSet: rootIrSelectionSet),
       referencedFragments: referencedFragments,
-      entities: entityStorage.entitiesForFields
+      entities: entityStorage.entitiesForFields,
+      hasDeferredFragments: hasDeferredFragments
     )
   }
 
@@ -132,6 +135,15 @@ class RootFieldBuilder {
     from selectionSet: CompilationResult.SelectionSet
   ) {
     addSelections(from: selectionSet, to: target, atTypePath: typeInfo)
+
+    self.hasDeferredFragments = {
+      switch typeInfo.scopePath.last.value.IsDeferred {
+      case .value(false):
+        return false
+      case .value(true), .if(_):
+        return true
+      }
+    }()
 
     typeInfo.entity.selectionTree.mergeIn(
       selections: target.readOnlyView,
@@ -182,7 +194,8 @@ class RootFieldBuilder {
         let irTypeCase = buildInlineFragmentSpread(
           from: inlineSelectionSet,
           with: scope,
-          inParentTypePath: typeInfo
+          inParentTypePath: typeInfo,
+          isDeferred: .init(inlineFragment.isDeferred)
         )
         target.mergeIn(irTypeCase)
       }
@@ -214,7 +227,8 @@ class RootFieldBuilder {
             selections: [selection]
           ),
           with: scope,
-          inParentTypePath: typeInfo
+          inParentTypePath: typeInfo,
+          isDeferred: .init(fragmentSpread.isDeferred)
         )
 
         target.mergeIn(irTypeCaseEnclosingFragment)
@@ -316,10 +330,11 @@ class RootFieldBuilder {
   private func buildInlineFragmentSpread(
     from selectionSet: CompilationResult.SelectionSet?,
     with scopeCondition: ScopeCondition,
-    inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo
+    inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo,
+    isDeferred: IsDeferred = false
   ) -> InlineFragmentSpread {
     let typePath = enclosingTypeInfo.scopePath.mutatingLast {
-      $0.appending(scopeCondition)
+      $0.appending(scopeCondition, isDeferred: isDeferred)
     }
 
     let irSelectionSet = SelectionSet(
@@ -335,10 +350,7 @@ class RootFieldBuilder {
       )
     }
 
-    return InlineFragmentSpread(
-      selectionSet: irSelectionSet,
-      isDeferred: scopeCondition.isDeferred
-    )
+    return InlineFragmentSpread(selectionSet: irSelectionSet)
   }
 
   private func buildNamedFragmentSpread(
@@ -349,6 +361,8 @@ class RootFieldBuilder {
     let fragment = ir.build(fragment: fragmentSpread.fragment)
     referencedFragments.append(fragment)
     referencedFragments.append(contentsOf: fragment.referencedFragments)
+
+    self.hasDeferredFragments = fragment.hasDeferredFragments
 
     let scopePath = scopeCondition.isEmpty ?
     parentTypeInfo.scopePath :
@@ -364,8 +378,7 @@ class RootFieldBuilder {
     let fragmentSpread = NamedFragmentSpread(
       fragment: fragment,
       typeInfo: typeInfo,
-      inclusionConditions: AnyOf(scopeCondition.conditions),
-      isDeferred: scopeCondition.isDeferred
+      inclusionConditions: AnyOf(scopeCondition.conditions)
     )
 
     entityStorage.mergeAllSelectionsIntoEntitySelectionTrees(from: fragmentSpread)

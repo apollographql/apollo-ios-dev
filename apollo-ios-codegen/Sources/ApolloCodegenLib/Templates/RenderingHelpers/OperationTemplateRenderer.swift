@@ -53,4 +53,14 @@ extension OperationTemplateRenderer {
       """
   }
 
+  func DeferredProperties(
+    _ hasDeferredFragments: Bool
+  ) -> TemplateString {
+    return """
+      \(if:  hasDeferredFragments, """
+      public static let hasDeferredFragments: Bool = true
+      """)
+      """
+  }
+
 }
