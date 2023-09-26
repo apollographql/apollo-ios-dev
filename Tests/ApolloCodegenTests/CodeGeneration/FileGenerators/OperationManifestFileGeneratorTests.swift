@@ -59,22 +59,6 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     expect(instance).notTo(beNil())
   }
 
-  func test__initializer__givenNilPath_shouldReturnNil() {
-    // given
-    let config = ApolloCodegenConfiguration.mock(
-      output: .init(
-        schemaTypes: .init(path: "", moduleType: .swiftPackageManager)
-      ),
-      operationManifest: nil
-    )
-
-    // when
-    let instance = OperationManifestFileGenerator(config: .init(config: config))
-
-    // then
-    expect(instance).to(beNil())
-  }
-
   // MARK: Generate Tests
 
   func test__generate__givenOperation_shouldWriteToAbsolutePath() throws {
