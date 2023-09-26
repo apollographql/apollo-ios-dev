@@ -248,7 +248,7 @@ public class ApolloCodegen {
   func createSchema(
     _ frontend: GraphQLJSFrontend
   ) throws -> GraphQLSchema {
-    let matches = try match(
+    let matches = try Self.match(
       searchPaths: config.input.schemaSearchPaths,
       relativeTo: config.rootURL
     )
@@ -264,7 +264,7 @@ public class ApolloCodegen {
   func createOperationsDocument(
     _ frontend: GraphQLJSFrontend
   ) throws -> GraphQLDocument {
-    let matches = try match(
+    let matches = try Self.match(
       searchPaths: config.input.operationSearchPaths,
       relativeTo: config.rootURL)
 
@@ -282,7 +282,7 @@ public class ApolloCodegen {
     return try frontend.mergeDocuments(documents)
   }
 
-  private func match(searchPaths: [String], relativeTo relativeURL: URL?) throws -> OrderedSet<String> {
+  static func match(searchPaths: [String], relativeTo relativeURL: URL?) throws -> OrderedSet<String> {
     let excludedDirectories = [
       ".build",
       ".swiftpm",
