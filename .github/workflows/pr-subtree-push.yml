@@ -13,8 +13,9 @@ jobs:
     name: Split and Push Subtrees
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
+        ssh-key: ${{ secrets.APOLLO_IOS_DEV_DEPLOY_KEY }}
         ref: main
         fetch-depth: 0
     - name: Setup SSH Keys
