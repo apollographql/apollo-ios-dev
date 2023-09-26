@@ -25,13 +25,29 @@ public struct OperationDescriptor {
   public var rawSourceText: String {
     var source = underlyingDefinition.source.convertedToSingleLine()
     for fragment in underlyingDefinition.referencedFragments {
-      source += #"\n\#(fragment.source.convertedToSingleLine())"#
+      source += "\n\(fragment.source.convertedToSingleLine())"
     }
     return source
   }
 
+  // MARK: - Internal
+
   init(_ operation: CompilationResult.OperationDefinition) {
     self.underlyingDefinition = operation
+  }
+
+  /// The source text formatted for inclusion as the "body" field in a JSON object
+  /// written into a `OperationManifestTemplate`. It provides the
+  /// exact data that will be sent by the Apollo network transport when the
+  /// operation is executed in a format that can be written to a file.
+  ///
+  /// This escapes the newline characters between fragments.
+  var sourceTextFormattedForManifestJSONBody: String {
+    var source = underlyingDefinition.source.convertedToSingleLine()
+    for fragment in underlyingDefinition.referencedFragments {
+      source += #"\n\#(fragment.source.convertedToSingleLine())"#
+    }
+    return source
   }
 
 }
