@@ -163,7 +163,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
     }
     
     if let variables = url.queryItemDictionary?["variables"] {
-      let expectation = expect(file: file, line: line, variables)
+      let expectation = expect(file: file.description, line: line, variables)
       switch query.episode {
       case let .some(episode):
         expectation.to(equal("{\"episode\":\"\(episode.rawValue)\"}"))
