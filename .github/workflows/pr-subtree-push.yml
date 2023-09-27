@@ -15,7 +15,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v4
       with:
-        ssh-key: ${{ secrets.APOLLO_IOS_DEV_DEPLOY_KEY }}
+        token: ${{ secrets.CI_ACCESS_TOKEN }}
         ref: main
         fetch-depth: 0
     - name: Setup SSH Keys
