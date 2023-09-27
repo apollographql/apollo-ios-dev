@@ -1,5 +1,8 @@
 name: "PR Subtree Push"
 
+permissions:
+  contents: write
+
 on:
   pull_request:
     branches:
@@ -15,7 +18,6 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v4
       with:
-        token: ${{ secrets.CI_ACCESS_TOKEN }}
         ref: main
         fetch-depth: 0
     - name: Setup SSH Keys
