@@ -31,7 +31,7 @@ However, if you plan to handle your code generation through Swift scripting, you
 
 ## Issues
 
-To report an issue, bug, or feature request ou can do so in the [apollo-ios](https://github.com/apollographql/apollo-ios) repo.
+To report an issue, bug, or feature request ou can do so in the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repo.
 
 ## Releases and changelog
 
