@@ -137,7 +137,7 @@ class RootFieldBuilder {
     addSelections(from: selectionSet, to: target, atTypePath: typeInfo)
 
     self.hasDeferredFragments = {
-      switch typeInfo.scopePath.last.value.IsDeferred {
+      switch typeInfo.scopePath.last.value.isDeferred {
       case .value(false):
         return false
       case .value(true), .if(_):

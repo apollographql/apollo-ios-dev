@@ -70,7 +70,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
 
   let allTypesInSchema: Schema.ReferencedTypes
 
-  let IsDeferred: IsDeferred
+  let isDeferred: IsDeferred
 
   private init(
     typePath: LinkedList<ScopeCondition>,
@@ -85,7 +85,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
     self.matchingTypes = matchingTypes
     self.matchingConditions = matchingConditions
     self.allTypesInSchema = allTypesInSchema
-    self.IsDeferred = isDeferred
+    self.isDeferred = isDeferred
   }
 
   /// Creates a `ScopeDescriptor` for a root `SelectionSet`.
