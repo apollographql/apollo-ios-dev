@@ -45,7 +45,7 @@ jobs:
       with:
         subtree: apollo-ios-codegen
         remote: git@github.com:apollographql/apollo-ios-codegen.git
-        target-branch: project-breakup
+        target-branch: main
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Push Updated History
