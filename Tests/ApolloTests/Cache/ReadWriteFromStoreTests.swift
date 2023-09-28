@@ -2834,7 +2834,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 fileprivate func expectJSONMissingValueError<T>(
   _ result: Result<T, Error>,
   atPath path: ResponsePath,
-  file: FileString = #file, line: UInt = #line
+  file: Nimble.FileString = #file, line: UInt = #line
 ) {
   guard case let .failure(readError) = result else {
     fail("Expected JSON Missing Value Error: \(result)",
