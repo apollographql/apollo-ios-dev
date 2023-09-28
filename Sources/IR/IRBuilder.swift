@@ -14,23 +14,12 @@ public class IRBuilder {
   public init(compilationResult: CompilationResult) {
     self.compilationResult = compilationResult
     self.schema = Schema(
-      referencedTypes: .init(compilationResult.referencedTypes),
+      referencedTypes: .init(
+        compilationResult.referencedTypes,
+        schemaRootTypes: compilationResult.schemaRootTypes
+      ),
       documentation: compilationResult.schemaDocumentation
-    )
-    self.processRootTypes()
-  }
-  
-  private func processRootTypes() {
-    let rootTypes = compilationResult.rootTypes
-    let typeList = [rootTypes.queryType.name, rootTypes.mutationType?.name, rootTypes.subscriptionType?.name].compactMap { $0 }
-    
-    compilationResult.operations.forEach { op in
-      op.rootType.isRootFieldType = typeList.contains(op.rootType.name)
-    }
-    
-    compilationResult.fragments.forEach { fragment in
-      fragment.type.isRootFieldType = typeList.contains(fragment.type.name)
-    }
+    )    
   }
 
   public func build(operation operationDefinition: CompilationResult.OperationDefinition) -> Operation {

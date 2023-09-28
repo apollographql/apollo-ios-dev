@@ -17,6 +17,7 @@ public final class Schema {
 
   public final class ReferencedTypes: CustomDebugStringConvertible {
     public let allTypes: OrderedSet<GraphQLNamedType>
+    public let schemaRootTypes: CompilationResult.RootTypeDefinition
 
     public let objects: OrderedSet<GraphQLObjectType>
     public let interfaces: OrderedSet<GraphQLInterfaceType>
@@ -26,8 +27,12 @@ public final class Schema {
     public let enums: OrderedSet<GraphQLEnumType>
     public let inputObjects: OrderedSet<GraphQLInputObjectType>
 
-    init(_ types: [GraphQLNamedType]) {
+    init(
+      _ types: [GraphQLNamedType],
+      schemaRootTypes: CompilationResult.RootTypeDefinition
+    ) {
       self.allTypes = OrderedSet(types)
+      self.schemaRootTypes = schemaRootTypes
 
       var objects = OrderedSet<GraphQLObjectType>()
       var interfaces = OrderedSet<GraphQLInterfaceType>()
