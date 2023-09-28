@@ -63,7 +63,7 @@ The [roadmap](https://github.com/apollographql/apollo-ios/blob/main/ROADMAP.md) 
 
 ## Contributing
 
-This project is being developed using Xcode 14 and Swift 5.7.
+This project is being developed using Xcode 15 and Swift 5.9.
 
 Some of the tests run against [a simple GraphQL server serving the Star Wars example schema](https://github.com/apollographql/starwars-server) (see installation instructions there).
 
