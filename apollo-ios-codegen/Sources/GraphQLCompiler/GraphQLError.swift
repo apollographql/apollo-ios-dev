@@ -5,35 +5,55 @@ import JavaScriptCore
 /// Corresponds to [graphql-js/GraphQLError](https://graphql.org/graphql-js/error/#graphqlerror)
 /// You can get error details if you need them, or call `error.logLines` to get errors in a format
 /// that lets Xcode show inline errors.
-public class GraphQLError: JavaScriptError {
-  private lazy var source: GraphQLSource = self["source"]
-  
+public final class GraphQLError: JavaScriptError {
+  private let source: GraphQLSource
   /// The source locations associated with this error.
-  private(set) lazy var sourceLocations: [GraphQLSourceLocation]? = {
-    guard let locations: [JavaScriptObject] = self["locations"] else {
+  public let sourceLocations: [GraphQLSourceLocation]?
+
+  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    let source = GraphQLSource.fromJSValue(jsValue["source"], bridge: bridge)
+    self.source = source
+    self.sourceLocations = Self.computeSourceLocations(for: source, from: jsValue, bridge: bridge)
+    super.init(jsValue, bridge: bridge)
+  }
+
+  private static func computeSourceLocations(
+    for source: GraphQLSource,
+    from jsValue: JSValue,
+    bridge: isolated JavaScriptBridge
+  ) -> [GraphQLSourceLocation]? {
+    guard let locations = (jsValue["locations"] as JSValue?)?.toArray() as? [JSValue] else {
       return nil
     }
-    
-    if let nodes: [ASTNode] = self["nodes"] {
+
+    if let nodes: [ASTNode] = .fromJSValue(jsValue["nodes"], bridge: bridge)  {
       // We have AST nodes, so this is a validation error.
       // Because errors can be associated with locations from different
       // source files, we ignore the `source` property and go through the
       // individual nodes instead.
 
       precondition(locations.count == nodes.count)
-      
+
       return zip(locations, nodes).map { (location, node) in
-        return GraphQLSourceLocation(filePath: node.filePath, lineNumber: location["line"].toInt(), columnNumber: location["column"].toInt())
+        return GraphQLSourceLocation(
+          filePath: node.filePath,
+          lineNumber: location["line"].toInt(),
+          columnNumber: location["column"].toInt()
+        )
       }
     } else {
       // We have no AST nodes, so this is a syntax error. Those only apply to a single source file,
       // so we can rely on the `source` property.
-            
+
       return locations.map {
-        GraphQLSourceLocation(filePath: source.filePath, lineNumber: $0["line"].toInt(), columnNumber: $0["column"].toInt())
+        GraphQLSourceLocation(
+          filePath: source.filePath,
+          lineNumber: $0["line"].toInt(),
+          columnNumber: $0["column"].toInt()
+        )
       }
     }
-  }()
+  }
   
   /// Log lines for this error in a format that allows Xcode to show errors inline at the correct location.
   /// See https://shazronatadobe.wordpress.com/2010/12/04/xcode-shell-build-phase-reporting-of-errors/
@@ -46,5 +66,10 @@ public class GraphQLError: JavaScriptError {
 
 /// A GraphQL schema validation error. This wraps one or more underlying validation errors.
 public class GraphQLSchemaValidationError: JavaScriptError {
-  private(set) lazy var validationErrors: [GraphQLError] = self["validationErrors"]
+  public let validationErrors: [GraphQLError]
+
+  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    self.validationErrors = .fromJSValue(jsValue["validationErrors"], bridge: bridge)
+    super.init(jsValue, bridge: bridge)
+  }
 }
