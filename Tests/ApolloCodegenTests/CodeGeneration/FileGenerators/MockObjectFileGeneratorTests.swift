@@ -4,7 +4,7 @@ import Nimble
 import GraphQLCompiler
 
 class MockObjectFileGeneratorTests: XCTestCase {
-  let graphqlObject = GraphQLObjectType.mock("MockObject", fields: [:], interfaces: [])
+  let graphqlObject = GraphQLObjectType.mock("MockObject", interfaces: [], fields: [:])
 
   var subject: MockObjectFileGenerator!
 

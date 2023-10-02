@@ -17,7 +17,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
   // MARK: - Helpers
 
   private func buildSubject(
-    referencedTypes: IR.Schema.ReferencedTypes = .init([]),
+    referencedTypes: IR.Schema.ReferencedTypes = .init([], schemaRootTypes: .mock()),
     documentation: String? = nil,
     config: ApolloCodegenConfiguration = ApolloCodegenConfiguration.mock()
   ) {
@@ -383,7 +383,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
         GraphQLObjectType.mock("objA"),
         GraphQLObjectType.mock("objB"),
         GraphQLObjectType.mock("objC"),
-      ]),
+      ], schemaRootTypes: .mock()),
       config: .mock(schemaNamespace: "objectSchema")
     )
 

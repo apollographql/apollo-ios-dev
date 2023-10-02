@@ -33,10 +33,10 @@ class OperationIdentifierFactoryTests: XCTestCase {
   func getOperation(
     named operationName: String? = nil,
     fromJSONSchema json: Bool = false
-  ) throws {
+  ) async throws {
     ir = json ?
-    try .mock(schemaJSON: schemaSDL, document: document) :
-    try .mock(schema: schemaSDL, document: document)
+    try await .mock(schemaJSON: schemaSDL, document: document) :
+    try await .mock(schema: schemaSDL, document: document)
 
     if let operationName = operationName {
       operation = try XCTUnwrap(ir.compilationResult.operations.first {$0.name == operationName})
@@ -57,7 +57,7 @@ class OperationIdentifierFactoryTests: XCTestCase {
         contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema)
 
       let expected = "1e36c3331171b74c012b86caa04fbb01062f37c61227655d9c0729a62c6f7285"
-      try getOperation(named: "HeroAndFriendsNames", fromJSONSchema: true)
+      try await getOperation(named: "HeroAndFriendsNames", fromJSONSchema: true)
 
       // when
       let actual = try await subject.identifier(for: operation)
@@ -78,7 +78,7 @@ class OperationIdentifierFactoryTests: XCTestCase {
         contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema)
 
       let expected = "599cd7d91ede7a5508cdb26b424e3b8e99e6c2c5575b799f6090695289ff8e99"
-      try getOperation(named: "HeroAndFriendsNamesWithFragment", fromJSONSchema: true)
+      try await getOperation(named: "HeroAndFriendsNamesWithFragment", fromJSONSchema: true)
 
       // when
       let actual = try await subject.identifier(for: operation)

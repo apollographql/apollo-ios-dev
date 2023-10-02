@@ -22,6 +22,7 @@ class MockObjectTemplateTests: XCTestCase {
   private func buildSubject(
     name: String = "Dog",
     interfaces: [GraphQLInterfaceType] = [],
+    fields: [String : GraphQLField] = [:],
     schemaNamespace: String = "TestSchema",
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackageManager,
     testMocks: ApolloCodegenConfiguration.TestMockFileOutput = .swiftPackage(),
@@ -35,7 +36,7 @@ class MockObjectTemplateTests: XCTestCase {
     ir = IRBuilder.mock(compilationResult: .mock())
 
     subject = MockObjectTemplate(
-      graphqlObject: GraphQLObjectType.mock(name, interfaces: interfaces),
+      graphqlObject: GraphQLObjectType.mock(name, interfaces: interfaces, fields: fields),
       config: ApolloCodegen.ConfigurationContext(config: config),
       ir: ir
     )
@@ -150,19 +151,20 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render__givenSchemaType_generatesFieldAccessors() {
     // given
-    buildSubject(moduleType: .swiftPackageManager)
-
     let Cat: GraphQLType = .entity(.mock("Cat"))
 
-    subject.graphqlObject.fields = [
-      "string": .mock("string", type: .nonNull(.string())),
-      "customScalar": .mock("customScalar", type: .nonNull(.scalar(.mock(name: "CustomScalar")))),
-      "optionalString": .mock("optionalString", type: .string()),
-      "object": .mock("object", type: Cat),
-      "objectList": .mock("objectList", type: .list(.nonNull(Cat))),
-      "objectNestedList": .mock("objectNestedList", type: .list(.nonNull(.list(.nonNull(Cat))))),
-      "objectOptionalList": .mock("objectOptionalList", type: .list(Cat)),
-    ]
+    buildSubject(
+      fields: [
+        "string": .mock("string", type: .nonNull(.string())),
+        "customScalar": .mock("customScalar", type: .nonNull(.scalar(.mock(name: "CustomScalar")))),
+        "optionalString": .mock("optionalString", type: .string()),
+        "object": .mock("object", type: Cat),
+        "objectList": .mock("objectList", type: .list(.nonNull(Cat))),
+        "objectNestedList": .mock("objectNestedList", type: .list(.nonNull(.list(.nonNull(Cat))))),
+        "objectOptionalList": .mock("objectOptionalList", type: .list(Cat)),
+      ],
+      moduleType: .swiftPackageManager
+    )
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -191,15 +193,16 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render__givenFieldsWithLowercaseTypeNames_generatesFieldAccessors() {
     // given
-    buildSubject(moduleType: .swiftPackageManager)
-
     let Cat: GraphQLType = .entity(.mock("cat"))
 
-    subject.graphqlObject.fields = [
-      "customScalar": .mock("customScalar", type: .nonNull(.scalar(.mock(name: "customScalar")))),
-      "enumType": .mock("enumType", type: .enum(.mock(name: "enumType"))),
-      "object": .mock("object", type: Cat),
-    ]
+    buildSubject(
+      fields: [
+        "customScalar": .mock("customScalar", type: .nonNull(.scalar(.mock(name: "customScalar")))),
+        "enumType": .mock("enumType", type: .enum(.mock(name: "enumType"))),
+        "object": .mock("object", type: Cat),
+      ],
+      moduleType: .swiftPackageManager
+    )
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -224,65 +227,66 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render__givenFieldsWithSwiftReservedKeyworkNames_generatesFieldsEscapedWithBackticks() {
     // given
-    buildSubject(moduleType: .swiftPackageManager)
-
-    subject.graphqlObject.fields = [
-      "associatedtype": .mock("associatedtype", type: .nonNull(.string())),
-      "class": .mock("class", type: .nonNull(.string())),
-      "deinit": .mock("deinit", type: .nonNull(.string())),
-      "enum": .mock("enum", type: .nonNull(.string())),
-      "extension": .mock("extension", type: .nonNull(.string())),
-      "fileprivate": .mock("fileprivate", type: .nonNull(.string())),
-      "func": .mock("func", type: .nonNull(.string())),
-      "import": .mock("import", type: .nonNull(.string())),
-      "init": .mock("init", type: .nonNull(.string())),
-      "inout": .mock("inout", type: .nonNull(.string())),
-      "internal": .mock("internal", type: .nonNull(.string())),
-      "let": .mock("let", type: .nonNull(.string())),
-      "operator": .mock("operator", type: .nonNull(.string())),
-      "private": .mock("private", type: .nonNull(.string())),
-      "precedencegroup": .mock("precedencegroup", type: .nonNull(.string())),
-      "protocol": .mock("protocol", type: .nonNull(.string())),
-      "Protocol": .mock("Protocol", type: .nonNull(.string())),
-      "public": .mock("public", type: .nonNull(.string())),
-      "rethrows": .mock("rethrows", type: .nonNull(.string())),
-      "static": .mock("static", type: .nonNull(.string())),
-      "struct": .mock("struct", type: .nonNull(.string())),
-      "subscript": .mock("subscript", type: .nonNull(.string())),
-      "typealias": .mock("typealias", type: .nonNull(.string())),
-      "var": .mock("var", type: .nonNull(.string())),
-      "break": .mock("break", type: .nonNull(.string())),
-      "case": .mock("case", type: .nonNull(.string())),
-      "catch": .mock("catch", type: .nonNull(.string())),
-      "continue": .mock("continue", type: .nonNull(.string())),
-      "default": .mock("default", type: .nonNull(.string())),
-      "defer": .mock("defer", type: .nonNull(.string())),
-      "do": .mock("do", type: .nonNull(.string())),
-      "else": .mock("else", type: .nonNull(.string())),
-      "fallthrough": .mock("fallthrough", type: .nonNull(.string())),
-      "for": .mock("for", type: .nonNull(.string())),
-      "guard": .mock("guard", type: .nonNull(.string())),
-      "if": .mock("if", type: .nonNull(.string())),
-      "in": .mock("in", type: .nonNull(.string())),
-      "repeat": .mock("repeat", type: .nonNull(.string())),
-      "return": .mock("return", type: .nonNull(.string())),
-      "throw": .mock("throw", type: .nonNull(.string())),
-      "switch": .mock("switch", type: .nonNull(.string())),
-      "where": .mock("where", type: .nonNull(.string())),
-      "while": .mock("while", type: .nonNull(.string())),
-      "as": .mock("as", type: .nonNull(.string())),
-      "false": .mock("false", type: .nonNull(.string())),
-      "is": .mock("is", type: .nonNull(.string())),
-      "nil": .mock("nil", type: .nonNull(.string())),
-      "self": .mock("self", type: .nonNull(.string())),
-      "Self": .mock("Self", type: .nonNull(.string())),
-      "super": .mock("super", type: .nonNull(.string())),
-      "throws": .mock("throws", type: .nonNull(.string())),
-      "true": .mock("true", type: .nonNull(.string())),
-      "try": .mock("try", type: .nonNull(.string())),      
-      "Type": .mock("Type", type: .nonNull(.string())),
-      "Any": .mock("Any", type: .nonNull(.string())),
-    ]
+    buildSubject(
+      fields: [
+        "associatedtype": .mock("associatedtype", type: .nonNull(.string())),
+        "class": .mock("class", type: .nonNull(.string())),
+        "deinit": .mock("deinit", type: .nonNull(.string())),
+        "enum": .mock("enum", type: .nonNull(.string())),
+        "extension": .mock("extension", type: .nonNull(.string())),
+        "fileprivate": .mock("fileprivate", type: .nonNull(.string())),
+        "func": .mock("func", type: .nonNull(.string())),
+        "import": .mock("import", type: .nonNull(.string())),
+        "init": .mock("init", type: .nonNull(.string())),
+        "inout": .mock("inout", type: .nonNull(.string())),
+        "internal": .mock("internal", type: .nonNull(.string())),
+        "let": .mock("let", type: .nonNull(.string())),
+        "operator": .mock("operator", type: .nonNull(.string())),
+        "private": .mock("private", type: .nonNull(.string())),
+        "precedencegroup": .mock("precedencegroup", type: .nonNull(.string())),
+        "protocol": .mock("protocol", type: .nonNull(.string())),
+        "Protocol": .mock("Protocol", type: .nonNull(.string())),
+        "public": .mock("public", type: .nonNull(.string())),
+        "rethrows": .mock("rethrows", type: .nonNull(.string())),
+        "static": .mock("static", type: .nonNull(.string())),
+        "struct": .mock("struct", type: .nonNull(.string())),
+        "subscript": .mock("subscript", type: .nonNull(.string())),
+        "typealias": .mock("typealias", type: .nonNull(.string())),
+        "var": .mock("var", type: .nonNull(.string())),
+        "break": .mock("break", type: .nonNull(.string())),
+        "case": .mock("case", type: .nonNull(.string())),
+        "catch": .mock("catch", type: .nonNull(.string())),
+        "continue": .mock("continue", type: .nonNull(.string())),
+        "default": .mock("default", type: .nonNull(.string())),
+        "defer": .mock("defer", type: .nonNull(.string())),
+        "do": .mock("do", type: .nonNull(.string())),
+        "else": .mock("else", type: .nonNull(.string())),
+        "fallthrough": .mock("fallthrough", type: .nonNull(.string())),
+        "for": .mock("for", type: .nonNull(.string())),
+        "guard": .mock("guard", type: .nonNull(.string())),
+        "if": .mock("if", type: .nonNull(.string())),
+        "in": .mock("in", type: .nonNull(.string())),
+        "repeat": .mock("repeat", type: .nonNull(.string())),
+        "return": .mock("return", type: .nonNull(.string())),
+        "throw": .mock("throw", type: .nonNull(.string())),
+        "switch": .mock("switch", type: .nonNull(.string())),
+        "where": .mock("where", type: .nonNull(.string())),
+        "while": .mock("while", type: .nonNull(.string())),
+        "as": .mock("as", type: .nonNull(.string())),
+        "false": .mock("false", type: .nonNull(.string())),
+        "is": .mock("is", type: .nonNull(.string())),
+        "nil": .mock("nil", type: .nonNull(.string())),
+        "self": .mock("self", type: .nonNull(.string())),
+        "Self": .mock("Self", type: .nonNull(.string())),
+        "super": .mock("super", type: .nonNull(.string())),
+        "throws": .mock("throws", type: .nonNull(.string())),
+        "true": .mock("true", type: .nonNull(.string())),
+        "try": .mock("try", type: .nonNull(.string())),
+        "Type": .mock("Type", type: .nonNull(.string())),
+        "Any": .mock("Any", type: .nonNull(.string())),
+      ],
+      moduleType: .swiftPackageManager
+    )
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -359,13 +363,14 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render__givenFieldType_Interface_named_Actor_generatesFieldsWithNamespace() {
     // given
-    buildSubject(moduleType: .swiftPackageManager)
-
     let Actor_Interface = GraphQLInterfaceType.mock("Actor")
 
-    subject.graphqlObject.fields = [
-      "actor": .mock("actor", type: .entity(Actor_Interface)),
-    ]
+    buildSubject(
+      fields: [
+        "actor": .mock("actor", type: .entity(Actor_Interface)),
+      ],
+      moduleType: .swiftPackageManager
+    )
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -388,13 +393,14 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render__givenFieldType_Union_named_Actor_generatesFieldsWithNamespace() {
     // given
-    buildSubject(moduleType: .swiftPackageManager)
-
     let Actor_Union = GraphQLUnionType.mock("Actor")
 
-    subject.graphqlObject.fields = [
-      "actor": .mock("actor", type: .entity(Actor_Union)),
-    ]
+    buildSubject(
+      fields: [
+        "actor": .mock("actor", type: .entity(Actor_Union)),
+      ],
+      moduleType: .swiftPackageManager
+    )
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -417,13 +423,14 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render__givenFieldType_Object_named_Actor_generatesFieldsWithoutNamespace() {
     // given
-    buildSubject(moduleType: .swiftPackageManager)
-
     let Actor_Object = GraphQLObjectType.mock("Actor")
 
-    subject.graphqlObject.fields = [
-      "actor": .mock("actor", type: .entity(Actor_Object)),
-    ]
+    buildSubject(
+      fields: [
+        "actor": .mock("actor", type: .entity(Actor_Object)),
+      ],
+      moduleType: .swiftPackageManager
+    )
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -448,11 +455,9 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test_render_givenConflictingFieldName_generatesPropertyWithFieldName() {
     // given
-    buildSubject()
-
-    subject.graphqlObject.fields = [
+    buildSubject(fields: [
       "hash": .mock("hash", type: .nonNull(.string()))
-    ]
+    ])
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -480,37 +485,38 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render__givenSchemaType_generatesConvenienceInitializer() {
     // given
-    buildSubject(moduleType: .swiftPackageManager)
-
     let Cat: GraphQLType = .entity(GraphQLObjectType.mock("Cat"))
     let Animal: GraphQLType = .entity(GraphQLInterfaceType.mock("Animal"))
     let Pet: GraphQLType = .entity(GraphQLUnionType.mock("Pet"))
 
-    subject.graphqlObject.fields = [
-      "string": .mock("string", type: .nonNull(.string())),
-      "stringList": .mock("stringList", type: .list(.nonNull(.string()))),
-      "stringNestedList": .mock("stringNestedList", type: .list(.list(.nonNull(.string())))),
-      "stringOptionalList": .mock("stringOptionalList", type: .list(.string())),
-      "customScalar": .mock("customScalar", type: .nonNull(.scalar(.mock(name: "CustomScalar")))),
-      "customScalarList": .mock("customScalarList", type: .list(.nonNull(.scalar(.mock(name: "CustomScalar"))))),
-      "customScalarOptionalList": .mock("customScalarOptionalList", type: .list(.scalar(.mock(name: "CustomScalar")))),
-      "optionalString": .mock("optionalString", type: .string()),
-      "object": .mock("object", type: Cat),
-      "objectList": .mock("objectList", type: .list(.nonNull(Cat))),
-      "objectNestedList": .mock("objectNestedList", type: .list(.nonNull(.list(.nonNull(Cat))))),
-      "objectOptionalList": .mock("objectOptionalList", type: .list(Cat)),
-      "interface": .mock("interface", type: Animal),
-      "interfaceList": .mock("interfaceList", type: .list(.nonNull(Animal))),
-      "interfaceNestedList": .mock("interfaceNestedList", type: .list(.nonNull(.list(.nonNull(Animal))))),
-      "interfaceOptionalList": .mock("interfaceOptionalList", type: .list(Animal)),
-      "union": .mock("union", type: Pet),
-      "unionList": .mock("unionList", type: .list(.nonNull(Pet))),
-      "unionNestedList": .mock("unionNestedList", type: .list(.nonNull(.list(.nonNull(Pet))))),
-      "unionOptionalList": .mock("unionOptionalList", type: .list(Pet)),
-      "enumType": .mock("enumType", type: .enum(.mock(name: "enumType"))),
-      "enumList": .mock("enumList", type: .list(.nonNull(.enum(.mock(name: "enumType"))))),
-      "enumOptionalList": .mock("enumOptionalList", type: .list(.enum(.mock(name: "enumType"))))
-    ]
+    buildSubject(
+      fields: [
+        "string": .mock("string", type: .nonNull(.string())),
+        "stringList": .mock("stringList", type: .list(.nonNull(.string()))),
+        "stringNestedList": .mock("stringNestedList", type: .list(.list(.nonNull(.string())))),
+        "stringOptionalList": .mock("stringOptionalList", type: .list(.string())),
+        "customScalar": .mock("customScalar", type: .nonNull(.scalar(.mock(name: "CustomScalar")))),
+        "customScalarList": .mock("customScalarList", type: .list(.nonNull(.scalar(.mock(name: "CustomScalar"))))),
+        "customScalarOptionalList": .mock("customScalarOptionalList", type: .list(.scalar(.mock(name: "CustomScalar")))),
+        "optionalString": .mock("optionalString", type: .string()),
+        "object": .mock("object", type: Cat),
+        "objectList": .mock("objectList", type: .list(.nonNull(Cat))),
+        "objectNestedList": .mock("objectNestedList", type: .list(.nonNull(.list(.nonNull(Cat))))),
+        "objectOptionalList": .mock("objectOptionalList", type: .list(Cat)),
+        "interface": .mock("interface", type: Animal),
+        "interfaceList": .mock("interfaceList", type: .list(.nonNull(Animal))),
+        "interfaceNestedList": .mock("interfaceNestedList", type: .list(.nonNull(.list(.nonNull(Animal))))),
+        "interfaceOptionalList": .mock("interfaceOptionalList", type: .list(Animal)),
+        "union": .mock("union", type: Pet),
+        "unionList": .mock("unionList", type: .list(.nonNull(Pet))),
+        "unionNestedList": .mock("unionNestedList", type: .list(.nonNull(.list(.nonNull(Pet))))),
+        "unionOptionalList": .mock("unionOptionalList", type: .list(Pet)),
+        "enumType": .mock("enumType", type: .enum(.mock(name: "enumType"))),
+        "enumList": .mock("enumList", type: .list(.nonNull(.enum(.mock(name: "enumType"))))),
+        "enumOptionalList": .mock("enumOptionalList", type: .list(.enum(.mock(name: "enumType"))))
+      ],
+      moduleType: .swiftPackageManager
+    )
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -608,65 +614,66 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render__givenFieldsWithSwiftReservedKeyworkNames_generatesConvenienceInitializerParamatersEscapedWithBackticksAndInternalNames() {
     // given
-    buildSubject(moduleType: .swiftPackageManager)
-
-    subject.graphqlObject.fields = [
-      "associatedtype": .mock("associatedtype", type: .nonNull(.string())),
-      "class": .mock("class", type: .nonNull(.string())),
-      "deinit": .mock("deinit", type: .nonNull(.string())),
-      "enum": .mock("enum", type: .nonNull(.string())),
-      "extension": .mock("extension", type: .nonNull(.string())),
-      "fileprivate": .mock("fileprivate", type: .nonNull(.string())),
-      "func": .mock("func", type: .nonNull(.string())),
-      "import": .mock("import", type: .nonNull(.string())),
-      "init": .mock("init", type: .nonNull(.string())),
-      "inout": .mock("inout", type: .nonNull(.string())),
-      "internal": .mock("internal", type: .nonNull(.string())),
-      "let": .mock("let", type: .nonNull(.string())),
-      "operator": .mock("operator", type: .nonNull(.string())),
-      "private": .mock("private", type: .nonNull(.string())),
-      "precedencegroup": .mock("precedencegroup", type: .nonNull(.string())),
-      "protocol": .mock("protocol", type: .nonNull(.string())),
-      "Protocol": .mock("Protocol", type: .nonNull(.string())),
-      "public": .mock("public", type: .nonNull(.string())),
-      "rethrows": .mock("rethrows", type: .nonNull(.string())),
-      "static": .mock("static", type: .nonNull(.string())),
-      "struct": .mock("struct", type: .nonNull(.string())),
-      "subscript": .mock("subscript", type: .nonNull(.string())),
-      "typealias": .mock("typealias", type: .nonNull(.string())),
-      "var": .mock("var", type: .nonNull(.string())),
-      "break": .mock("break", type: .nonNull(.string())),
-      "case": .mock("case", type: .nonNull(.string())),
-      "catch": .mock("catch", type: .nonNull(.string())),
-      "continue": .mock("continue", type: .nonNull(.string())),
-      "default": .mock("default", type: .nonNull(.string())),
-      "defer": .mock("defer", type: .nonNull(.string())),
-      "do": .mock("do", type: .nonNull(.string())),
-      "else": .mock("else", type: .nonNull(.string())),
-      "fallthrough": .mock("fallthrough", type: .nonNull(.string())),
-      "for": .mock("for", type: .nonNull(.string())),
-      "guard": .mock("guard", type: .nonNull(.string())),
-      "if": .mock("if", type: .nonNull(.string())),
-      "in": .mock("in", type: .nonNull(.string())),
-      "repeat": .mock("repeat", type: .nonNull(.string())),
-      "return": .mock("return", type: .nonNull(.string())),
-      "throw": .mock("throw", type: .nonNull(.string())),
-      "switch": .mock("switch", type: .nonNull(.string())),
-      "where": .mock("where", type: .nonNull(.string())),
-      "while": .mock("while", type: .nonNull(.string())),
-      "as": .mock("as", type: .nonNull(.string())),
-      "false": .mock("false", type: .nonNull(.string())),
-      "is": .mock("is", type: .nonNull(.string())),
-      "nil": .mock("nil", type: .nonNull(.string())),
-      "self": .mock("self", type: .nonNull(.string())),
-      "Self": .mock("Self", type: .nonNull(.string())),
-      "super": .mock("super", type: .nonNull(.string())),
-      "throws": .mock("throws", type: .nonNull(.string())),
-      "true": .mock("true", type: .nonNull(.string())),
-      "try": .mock("try", type: .nonNull(.string())),
-      "Type": .mock("Type", type: .nonNull(.string())),
-      "Any": .mock("Any", type: .nonNull(.string())),
-    ]
+    buildSubject(
+      fields: [
+        "associatedtype": .mock("associatedtype", type: .nonNull(.string())),
+        "class": .mock("class", type: .nonNull(.string())),
+        "deinit": .mock("deinit", type: .nonNull(.string())),
+        "enum": .mock("enum", type: .nonNull(.string())),
+        "extension": .mock("extension", type: .nonNull(.string())),
+        "fileprivate": .mock("fileprivate", type: .nonNull(.string())),
+        "func": .mock("func", type: .nonNull(.string())),
+        "import": .mock("import", type: .nonNull(.string())),
+        "init": .mock("init", type: .nonNull(.string())),
+        "inout": .mock("inout", type: .nonNull(.string())),
+        "internal": .mock("internal", type: .nonNull(.string())),
+        "let": .mock("let", type: .nonNull(.string())),
+        "operator": .mock("operator", type: .nonNull(.string())),
+        "private": .mock("private", type: .nonNull(.string())),
+        "precedencegroup": .mock("precedencegroup", type: .nonNull(.string())),
+        "protocol": .mock("protocol", type: .nonNull(.string())),
+        "Protocol": .mock("Protocol", type: .nonNull(.string())),
+        "public": .mock("public", type: .nonNull(.string())),
+        "rethrows": .mock("rethrows", type: .nonNull(.string())),
+        "static": .mock("static", type: .nonNull(.string())),
+        "struct": .mock("struct", type: .nonNull(.string())),
+        "subscript": .mock("subscript", type: .nonNull(.string())),
+        "typealias": .mock("typealias", type: .nonNull(.string())),
+        "var": .mock("var", type: .nonNull(.string())),
+        "break": .mock("break", type: .nonNull(.string())),
+        "case": .mock("case", type: .nonNull(.string())),
+        "catch": .mock("catch", type: .nonNull(.string())),
+        "continue": .mock("continue", type: .nonNull(.string())),
+        "default": .mock("default", type: .nonNull(.string())),
+        "defer": .mock("defer", type: .nonNull(.string())),
+        "do": .mock("do", type: .nonNull(.string())),
+        "else": .mock("else", type: .nonNull(.string())),
+        "fallthrough": .mock("fallthrough", type: .nonNull(.string())),
+        "for": .mock("for", type: .nonNull(.string())),
+        "guard": .mock("guard", type: .nonNull(.string())),
+        "if": .mock("if", type: .nonNull(.string())),
+        "in": .mock("in", type: .nonNull(.string())),
+        "repeat": .mock("repeat", type: .nonNull(.string())),
+        "return": .mock("return", type: .nonNull(.string())),
+        "throw": .mock("throw", type: .nonNull(.string())),
+        "switch": .mock("switch", type: .nonNull(.string())),
+        "where": .mock("where", type: .nonNull(.string())),
+        "while": .mock("while", type: .nonNull(.string())),
+        "as": .mock("as", type: .nonNull(.string())),
+        "false": .mock("false", type: .nonNull(.string())),
+        "is": .mock("is", type: .nonNull(.string())),
+        "nil": .mock("nil", type: .nonNull(.string())),
+        "self": .mock("self", type: .nonNull(.string())),
+        "Self": .mock("Self", type: .nonNull(.string())),
+        "super": .mock("super", type: .nonNull(.string())),
+        "throws": .mock("throws", type: .nonNull(.string())),
+        "true": .mock("true", type: .nonNull(.string())),
+        "try": .mock("try", type: .nonNull(.string())),
+        "Type": .mock("Type", type: .nonNull(.string())),
+        "Any": .mock("Any", type: .nonNull(.string())),
+      ],
+      moduleType: .swiftPackageManager
+    )
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -811,11 +818,13 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render__givenSchemaTypeAndFields_whenTestMocksIsSwiftPackage_shouldRenderWithPublicAccess() {
     // given
-    buildSubject(name: "Dog", testMocks: .swiftPackage())
-
-    subject.graphqlObject.fields = [
-      "string": .mock("string", type: .nonNull(.string()))
-    ]
+    buildSubject(
+      name: "Dog",
+      fields: [
+        "string": .mock("string", type: .nonNull(.string()))
+      ],
+      testMocks: .swiftPackage()
+    )
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -847,11 +856,13 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render__givenSchemaType_whenTestMocksAbsolute_withPublicAccessModifier_shouldRenderWithPublicAccess() {
     // given
-    buildSubject(name: "Dog", testMocks: .absolute(path: "", accessModifier: .public))
-
-    subject.graphqlObject.fields = [
-      "string": .mock("string", type: .nonNull(.string()))
-    ]
+    buildSubject(
+      name: "Dog",
+      fields: [
+        "string": .mock("string", type: .nonNull(.string()))
+      ],
+      testMocks: .absolute(path: "", accessModifier: .public)
+    )
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -883,11 +894,13 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render__givenSchemaType_whenTestMocksAbsolute_withInternalAccessModifier_shouldRenderWithInternalAccess() {
     // given
-    buildSubject(name: "Dog", testMocks: .absolute(path: "", accessModifier: .internal))
-
-    subject.graphqlObject.fields = [
-      "string": .mock("string", type: .nonNull(.string()))
-    ]
+    buildSubject(
+      name: "Dog",
+      fields: [
+        "string": .mock("string", type: .nonNull(.string()))
+      ],
+      testMocks: .absolute(path: "", accessModifier: .internal)
+    )
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -921,11 +934,13 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render_fieldAccessors__givenWarningsOnDeprecatedUsage_include_hasDeprecatedField_shouldGenerateWarning() throws {
     // given
-    buildSubject(moduleType: .swiftPackageManager, warningsOnDeprecatedUsage: .include)
-
-    subject.graphqlObject.fields = [
-      "string": .mock("string", type: .nonNull(.string()), deprecationReason: "Cause I said so!"),
-    ]
+    buildSubject(
+      fields: [
+        "string": .mock("string", type: .nonNull(.string()), deprecationReason: "Cause I said so!"),
+      ],
+      moduleType: .swiftPackageManager,
+      warningsOnDeprecatedUsage: .include
+    )
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -949,11 +964,13 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render_fieldAccessors__givenWarningsOnDeprecatedUsage_exclude_hasDeprecatedField_shouldNotGenerateWarning() throws {
     // given
-    buildSubject(moduleType: .swiftPackageManager, warningsOnDeprecatedUsage: .exclude)
-
-    subject.graphqlObject.fields = [
-      "string": .mock("string", type: .nonNull(.string()), deprecationReason: "Cause I said so!"),
-    ]
+    buildSubject(
+      fields: [
+        "string": .mock("string", type: .nonNull(.string()), deprecationReason: "Cause I said so!"),
+      ],
+      moduleType: .swiftPackageManager,
+      warningsOnDeprecatedUsage: .exclude
+    )
 
     ir.fieldCollector.add(
       fields: subject.graphqlObject.fields.values.map {
@@ -982,11 +999,13 @@ class MockObjectTemplateTests: XCTestCase {
     
     keywords.forEach { keyword in
       // given
-      buildSubject(name: keyword, moduleType: .swiftPackageManager)
-
-      subject.graphqlObject.fields = [
-        "name": .mock("string", type: .nonNull(.string())),
-      ]
+      buildSubject(
+        name: keyword,
+        fields: [
+          "name": .mock("string", type: .nonNull(.string())),
+        ],
+        moduleType: .swiftPackageManager
+      )
 
       ir.fieldCollector.add(
         fields: subject.graphqlObject.fields.values.map {

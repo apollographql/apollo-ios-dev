@@ -9,17 +9,17 @@ class SchemaIntrospectionTests: XCTestCase {
   var codegenFrontend: GraphQLJSFrontend!
   var schema: GraphQLSchema!
   
-  override func setUpWithError() throws {
-    try super.setUpWithError()
+  override func setUp() async throws {
+    try await super.setUp()
 
-    codegenFrontend = try GraphQLJSFrontend()
+    codegenFrontend = try await GraphQLJSFrontend()
 
     let introspectionResult = try String(
       contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema
     )
 
-    schema = try codegenFrontend.loadSchema(
-      from: [try codegenFrontend.makeSource(introspectionResult, filePath: "schema.json")]
+    schema = try await codegenFrontend.loadSchema(
+      from: [try await codegenFrontend.makeSource(introspectionResult, filePath: "schema.json")]
     )
   }
 
@@ -30,7 +30,7 @@ class SchemaIntrospectionTests: XCTestCase {
     super.tearDown()
   }
   
-  func testGetFieldsForObjectType() throws {
+  func testGetFieldsForObjectType() async throws {
     let droidType = try XCTDowncast(XCTUnwrap(schema.getType(named: "Droid")), to: GraphQLObjectType.self)
     XCTAssertEqual(droidType.name, "Droid")
     
@@ -43,28 +43,28 @@ class SchemaIntrospectionTests: XCTestCase {
     XCTAssertEqual(fields["friends"]?.type.typeReference, "[Character]")
   }
   
-  func testGetPossibleTypesForInterface() throws {
+  func testGetPossibleTypesForInterface() async throws {
     let characterType = try XCTDowncast(XCTUnwrap(schema.getType(named: "Character")), to: GraphQLAbstractType.self)
     XCTAssertEqual(characterType.name, "Character")
     
     try XCTAssertEqualUnordered(schema.getPossibleTypes(characterType).map(\.name), ["Human", "Droid"])
   }
   
-  func testGetPossibleTypesForUnion() throws {
+  func testGetPossibleTypesForUnion() async throws {
     let searchResultType = try XCTDowncast(XCTUnwrap(schema.getType(named: "SearchResult")), to: GraphQLAbstractType.self)
     XCTAssertEqual(searchResultType.name, "SearchResult")
     
     try XCTAssertEqualUnordered(schema.getPossibleTypes(searchResultType).map(\.name), ["Human", "Droid", "Starship"])
   }
   
-  func testGetTypesForUnion() throws {
+  func testGetTypesForUnion() async throws {
     let searchResultType = try XCTDowncast(XCTUnwrap(schema.getType(named: "SearchResult")), to: GraphQLUnionType.self)
     XCTAssertEqual(searchResultType.name, "SearchResult")
     
     XCTAssertEqualUnordered(searchResultType.types.map(\.name), ["Human", "Droid", "Starship"])
   }
   
-  func testEnumType() throws {
+  func testEnumType() async throws {
     let episodeType = try XCTDowncast(XCTUnwrap(schema.getType(named: "Episode")), to: GraphQLEnumType.self)
     XCTAssertEqual(episodeType.name, "Episode")
     
@@ -78,7 +78,7 @@ class SchemaIntrospectionTests: XCTestCase {
     ])
   }
   
-  func testInputObjectType() throws {
+  func testInputObjectType() async throws {
     let episodeType = try XCTDowncast(XCTUnwrap(schema.getType(named: "ReviewInput")), to: GraphQLInputObjectType.self)
     XCTAssertEqual(episodeType.name, "ReviewInput")
     

@@ -43,8 +43,8 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     operations: ApolloCodegenConfiguration.OperationsFileOutput = .inSchemaModule,
     operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat = .definition,
     cocoapodsCompatibleImportStatements: Bool = false
-  ) throws {
-    ir = try .mock(schema: schemaSDL, document: document)
+  ) async throws {
+    ir = try await .mock(schema: schemaSDL, document: document)
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
     operation = ir.build(operation: operationDefinition)
 
@@ -69,7 +69,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
 
   // MARK: Query string formatting tests
 
-  func test__generate__givenSingleLineFormat_generatesWithOperationDefinition() throws {
+  func test__generate__givenSingleLineFormat_generatesWithOperationDefinition() async throws {
     // given
     document =
     """
@@ -78,7 +78,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       operationDocumentFormat: .definition
     )
 
@@ -96,7 +96,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__generate__givenSingleLineFormat_withInLineQuotes_generatesWithOperationDefinition_withInLineQuotes() throws {
+  func test__generate__givenSingleLineFormat_withInLineQuotes_generatesWithOperationDefinition_withInLineQuotes() async throws {
     // given
     document =
     """
@@ -105,7 +105,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       operationDocumentFormat: .definition
     )
 
@@ -123,7 +123,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__generate__givenIncludesFragment_formatSingleLine_generatesWithOperationDefinitionAndFragment() throws {
+  func test__generate__givenIncludesFragment_formatSingleLine_generatesWithOperationDefinitionAndFragment() async throws {
     // given
     document =
     """
@@ -136,7 +136,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       operationDocumentFormat: .definition
     )
 
@@ -155,7 +155,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__generate__givenIncludesFragment_fragmentNameStartsWithLowercase_generatesWithOperationDefinitionAndFragment_withFirstUppercased() throws {
+  func test__generate__givenIncludesFragment_fragmentNameStartsWithLowercase_generatesWithOperationDefinitionAndFragment_withFirstUppercased() async throws {
     // given
     document =
     """
@@ -168,7 +168,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       operationDocumentFormat: .definition
     )
 
@@ -187,7 +187,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__generate__givenIncludesManyFragments_formatSingleLine_generatesWithOperationDefinitionAndFragment() throws {
+  func test__generate__givenIncludesManyFragments_formatSingleLine_generatesWithOperationDefinitionAndFragment() async throws {
     // given
     document =
     """
@@ -220,7 +220,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       operationDocumentFormat: .definition
     )
 
@@ -239,7 +239,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__generate__givenAPQ_automaticallyPersist_generatesWithOperationDefinitionAndIdentifier() throws {
+  func test__generate__givenAPQ_automaticallyPersist_generatesWithOperationDefinitionAndIdentifier() async throws {
     // given
     let operationIdentifier = "1ec89997a185c50bacc5f62ad41f27f3070f4a950d72e4a1510a4c64160812d5"
     document =
@@ -249,7 +249,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       operationIdentifier: operationIdentifier,
       operationDocumentFormat: [.definition, .operationId]
     )
@@ -269,7 +269,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__generate__givenAPQ_persistedOperationsOnly_generatesWithIdentifierOnly() throws {
+  func test__generate__givenAPQ_persistedOperationsOnly_generatesWithIdentifierOnly() async throws {
     // given
     let operationIdentifier = "1ec89997a185c50bacc5f62ad41f27f3070f4a950d72e4a1510a4c64160812d5"
     document =
@@ -279,7 +279,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       operationIdentifier: operationIdentifier,
       operationDocumentFormat: .operationId
     )
@@ -299,7 +299,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
 
   // MARK: Namespacing tests
 
-  func test__generate__givenCocoapodsCompatibleImportStatements_true_shouldUseCorrectNamespace() throws {
+  func test__generate__givenCocoapodsCompatibleImportStatements_true_shouldUseCorrectNamespace() async throws {
     // given
     document =
     """
@@ -308,7 +308,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       cocoapodsCompatibleImportStatements: true
     )
 
@@ -323,7 +323,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenCocoapodsCompatibleImportStatements_false_shouldUseCorrectNamespace() throws {
+  func test__generate__givenCocoapodsCompatibleImportStatements_false_shouldUseCorrectNamespace() async throws {
     // given
     document =
     """
@@ -332,7 +332,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       cocoapodsCompatibleImportStatements: false
     )
 
@@ -349,7 +349,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
 
   // MARK: Access Level Tests
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsInSchemaModule_shouldRenderWithPublicAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsInSchemaModule_shouldRenderWithPublicAccess() async throws {
     // given
     document =
     """
@@ -358,7 +358,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .inSchemaModule
     )
@@ -374,7 +374,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsEmbeddedInTargetWithPublicAccessModifier_andOperationsInSchemaModule_shouldRenderWithPublicAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsEmbeddedInTargetWithPublicAccessModifier_andOperationsInSchemaModule_shouldRenderWithPublicAccess() async throws {
     // given
     document =
     """
@@ -383,7 +383,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .embeddedInTarget(name: "TestTarget", accessModifier: .public),
       operations: .inSchemaModule
     )
@@ -399,7 +399,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsEmbeddedInTargetWithInternalAccessModifier_andOperationsInSchemaModule_shouldRenderWithInternalAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsEmbeddedInTargetWithInternalAccessModifier_andOperationsInSchemaModule_shouldRenderWithInternalAccess() async throws {
     // given
     document =
     """
@@ -408,7 +408,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .embeddedInTarget(name: "TestTarget", accessModifier: .internal),
       operations: .inSchemaModule
     )
@@ -424,7 +424,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithPublicAccessModifier_shouldRenderWithPublicAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithPublicAccessModifier_shouldRenderWithPublicAccess() async throws {
     // given
     document =
     """
@@ -433,7 +433,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .relative(subpath: nil, accessModifier: .public)
     )
@@ -449,7 +449,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithInternalAccessModifier_shouldRenderWithInternalAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithInternalAccessModifier_shouldRenderWithInternalAccess() async throws {
     // given
     document =
     """
@@ -458,7 +458,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .relative(subpath: nil, accessModifier: .internal)
     )
@@ -474,7 +474,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithPublicAccessModifier_shouldRenderWithPublicAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithPublicAccessModifier_shouldRenderWithPublicAccess() async throws {
     // given
     document =
     """
@@ -483,7 +483,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .absolute(path: "", accessModifier: .public)
     )
@@ -499,7 +499,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithInternalAccessModifier_shouldRenderWithInternalAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithInternalAccessModifier_shouldRenderWithInternalAccess() async throws {
     // given
     document =
     """
@@ -508,7 +508,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     }
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .absolute(path: "", accessModifier: .internal)
     )

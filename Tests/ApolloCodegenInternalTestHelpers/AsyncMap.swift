@@ -1,7 +1,7 @@
 import Foundation
 
 extension Sequence {
-  func asyncMap<T>(
+  public func asyncMap<T>(
     _ transform: (Element) async throws -> T
   ) async rethrows -> [T] {
     var values = [T]()
@@ -11,5 +11,13 @@ extension Sequence {
     }
     
     return values
+  }
+
+  public func asyncForEach(
+    _ body: (Element) async throws -> Void
+  ) async rethrows {
+    for element in self {
+      try await body(element)
+    }
   }
 }

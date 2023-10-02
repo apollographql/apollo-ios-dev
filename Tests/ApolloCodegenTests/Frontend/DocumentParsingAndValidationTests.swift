@@ -1,4 +1,5 @@
 import XCTest
+import Nimble
 import ApolloInternalTestHelpers
 import ApolloCodegenInternalTestHelpers
 @testable import GraphQLCompiler
@@ -9,16 +10,16 @@ class DocumentParsingAndValidationTests: XCTestCase {
   var codegenFrontend: GraphQLJSFrontend!
   var schema: GraphQLSchema!
   
-  override func setUpWithError() throws {
-    try super.setUpWithError()
+  override func setUp() async throws {
+    try await super.setUp()
 
-    codegenFrontend = try GraphQLJSFrontend()
+    codegenFrontend = try await GraphQLJSFrontend()
 
     let introspectionResult = try String(
       contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema
     )
 
-    schema = try codegenFrontend.loadSchema(
+    schema = try await codegenFrontend.loadSchema(
       from: [try codegenFrontend.makeSource(introspectionResult, filePath: "schema.json")]
     )
   }
@@ -30,8 +31,8 @@ class DocumentParsingAndValidationTests: XCTestCase {
     super.tearDown()
   }
   
-  func testParseDocument() throws {
-    let source = try codegenFrontend.makeSource("""
+  func testParseDocument() async throws {
+    let source = try await codegenFrontend.makeSource("""
       query HeroAndFriendsNames($episode: Episode) {
         hero(episode: $episode) {
           name
@@ -42,34 +43,35 @@ class DocumentParsingAndValidationTests: XCTestCase {
       }
       """, filePath: "HeroAndFriendsNames.graphql")
     
-    let document = try codegenFrontend.parseDocument(source)
+    let document = try await codegenFrontend.parseDocument(source)
     
     XCTAssertEqual(document.filePath, "HeroAndFriendsNames.graphql")
   }
   
-  func testParseDocumentWithSyntaxError() throws {
-    let source = try codegenFrontend.makeSource("""
+  func testParseDocumentWithSyntaxError() async throws {
+    let source = try await codegenFrontend.makeSource("""
       query HeroAndFriendsNames($episode: Episode) {
         hero[episode: foo]
       }
       """, filePath: "HeroAndFriendsNames.graphql")
     
-    XCTAssertThrowsError(try codegenFrontend.parseDocument(source)) { error in
-      whileRecordingErrors {
-        let error = try XCTDowncast(error as AnyObject, to: GraphQLError.self)
-        XCTAssert(try XCTUnwrap(error.message).starts(with: "Syntax Error"))
-        
-        let sourceLocations = try XCTUnwrap(error.sourceLocations)
-        XCTAssertEqual(sourceLocations.count, 1)
-        
-        XCTAssertEqual(sourceLocations[0].filePath, "HeroAndFriendsNames.graphql")
-        XCTAssertEqual(sourceLocations[0].lineNumber, 2)
-      }
-    }
+    await expect { try await self.codegenFrontend.parseDocument(source) }
+      .to(throwError { error in
+        self.whileRecordingErrors {
+          let error = try XCTDowncast(error as AnyObject, to: GraphQLError.self)
+          XCTAssert(try XCTUnwrap(error.message).starts(with: "Syntax Error"))
+          
+          let sourceLocations = try XCTUnwrap(error.sourceLocations)
+          XCTAssertEqual(sourceLocations.count, 1)
+          
+          XCTAssertEqual(sourceLocations[0].filePath, "HeroAndFriendsNames.graphql")
+          XCTAssertEqual(sourceLocations[0].lineNumber, 2)
+        }
+    })
   }
   
-  func testValidateDocument() throws {
-    let source = try codegenFrontend.makeSource("""
+  func testValidateDocument() async throws {
+    let source = try await codegenFrontend.makeSource("""
       query HeroAndFriendsNames($episode: Episode) {
         hero(episode: $episode) {
           name
@@ -79,9 +81,9 @@ class DocumentParsingAndValidationTests: XCTestCase {
       }
       """, filePath: "HeroAndFriendsNames.graphql")
     
-    let document = try codegenFrontend.parseDocument(source)
+    let document = try await codegenFrontend.parseDocument(source)
     
-    let validationErrors = try codegenFrontend.validateDocument(
+    let validationErrors = try await codegenFrontend.validateDocument(
       schema: schema,
       document: document,
       validationOptions: .mock()
@@ -99,8 +101,8 @@ class DocumentParsingAndValidationTests: XCTestCase {
     XCTAssertEqual(document.filePath, "HeroAndFriendsNames.graphql")
   }
   
-  func testParseAndValidateMultipleDocuments() throws {
-    let source1 = try codegenFrontend.makeSource("""
+  func testParseAndValidateMultipleDocuments() async throws {
+    let source1 = try await codegenFrontend.makeSource("""
       query HeroAndFriendsNames($episode: Episode) {
         hero(episode: $episode) {
           name
@@ -109,7 +111,7 @@ class DocumentParsingAndValidationTests: XCTestCase {
       }
       """, filePath: "HeroAndFriendsNames.graphql")
     
-    let source2 = try codegenFrontend.makeSource("""
+    let source2 = try await codegenFrontend.makeSource("""
       query HeroName($episode: Episode) {
         hero(episode: $episode) {
           name
@@ -117,7 +119,7 @@ class DocumentParsingAndValidationTests: XCTestCase {
       }
       """, filePath: "HeroName.graphql")
     
-    let source3 = try codegenFrontend.makeSource("""
+    let source3 = try await codegenFrontend.makeSource("""
       fragment FriendsNames on Character {
         friends {
           name
@@ -125,14 +127,14 @@ class DocumentParsingAndValidationTests: XCTestCase {
       }
       """, filePath: "FriendsNames.graphql")
     
-    let document1 = try codegenFrontend.parseDocument(source1)
-    let document2 = try codegenFrontend.parseDocument(source2)
-    let document3 = try codegenFrontend.parseDocument(source3)
+    let document1 = try await codegenFrontend.parseDocument(source1)
+    let document2 = try await codegenFrontend.parseDocument(source2)
+    let document3 = try await codegenFrontend.parseDocument(source3)
     
-    let document = try codegenFrontend.mergeDocuments([document1, document2, document3])
+    let document = try await codegenFrontend.mergeDocuments([document1, document2, document3])
     XCTAssertEqual(document.definitions.count, 3)
     
-    let validationErrors = try codegenFrontend.validateDocument(
+    let validationErrors = try await codegenFrontend.validateDocument(
       schema: schema,
       document: document,
       validationOptions: .mock()
@@ -145,8 +147,8 @@ class DocumentParsingAndValidationTests: XCTestCase {
   // for example, both fields would be associated with the same error. These locations
   // may even come from different source files, so we need to test for that explicitly because
   // handling that situation required a workaround (see `GraphQLError.sourceLocations`).
-  func testValidationErrorThatSpansMultipleDocuments() throws {
-    let source1 = try codegenFrontend.makeSource("""
+  func testValidationErrorThatSpansMultipleDocuments() async throws {
+    let source1 = try await codegenFrontend.makeSource("""
       query HeroName($episode: Episode) {
         hero(episode: $episode) {
           foo: appearsIn
@@ -155,19 +157,19 @@ class DocumentParsingAndValidationTests: XCTestCase {
       }
       """, filePath: "HeroName.graphql")
     
-    let source2 = try codegenFrontend.makeSource("""
+    let source2 = try await codegenFrontend.makeSource("""
       fragment HeroName on Character {
         foo: name
       }
       """, filePath: "HeroNameFragment.graphql")
     
-    let document1 = try codegenFrontend.parseDocument(source1)
-    let document2 = try codegenFrontend.parseDocument(source2)
+    let document1 = try await codegenFrontend.parseDocument(source1)
+    let document2 = try await codegenFrontend.parseDocument(source2)
     
-    let document = try codegenFrontend.mergeDocuments([document1, document2])
+    let document = try await codegenFrontend.mergeDocuments([document1, document2])
     XCTAssertEqual(document.definitions.count, 2)
     
-    let validationErrors = try codegenFrontend.validateDocument(
+    let validationErrors = try await codegenFrontend.validateDocument(
       schema: schema,
       document: document,
       validationOptions: .mock()
@@ -191,11 +193,11 @@ class DocumentParsingAndValidationTests: XCTestCase {
     XCTAssertEqual(sourceLocations[1].lineNumber, 2)
   }
 
-  func test__validateDocument__givenFieldNameDisallowed_throwsError() throws {
+  func test__validateDocument__givenFieldNameDisallowed_throwsError() async throws {
     let disallowedFields = ["__data", "fragments", "Fragments"]
 
     for field in disallowedFields {
-      let schema = try codegenFrontend.loadSchema(
+      let schema = try await codegenFrontend.loadSchema(
         from: [try codegenFrontend.makeSource(
       """
       type Query {
@@ -204,15 +206,15 @@ class DocumentParsingAndValidationTests: XCTestCase {
       """
       , filePath: "schema.graphqls")])
 
-      let source = try codegenFrontend.makeSource("""
+      let source = try await codegenFrontend.makeSource("""
       query TestQuery {
         \(field)
       }
       """, filePath: "TestQuery.graphql")
 
-      let document = try codegenFrontend.parseDocument(source)
+      let document = try await codegenFrontend.parseDocument(source)
 
-      let validationErrors = try codegenFrontend.validateDocument(
+      let validationErrors = try await codegenFrontend.validateDocument(
         schema: schema,
         document: document,
         validationOptions: .mock()
@@ -229,11 +231,11 @@ class DocumentParsingAndValidationTests: XCTestCase {
     }
   }
 
-  func test__validateDocument__givenInputParameterNameDisallowed_throwsError() throws {
+  func test__validateDocument__givenInputParameterNameDisallowed_throwsError() async throws {
     let disallowedName = ["self", "Self", "_"]
 
     for name in disallowedName {
-      let schema = try codegenFrontend.loadSchema(
+      let schema = try await codegenFrontend.loadSchema(
         from: [try codegenFrontend.makeSource(
       """
       type Query {
@@ -242,15 +244,15 @@ class DocumentParsingAndValidationTests: XCTestCase {
       """
       , filePath: "schema.graphqls")])
 
-      let source = try codegenFrontend.makeSource("""
+      let source = try await codegenFrontend.makeSource("""
       query TestQuery($\(name): String!) {
         test(param: $\(name))
       }
       """, filePath: "TestQuery.graphql")
 
-      let document = try codegenFrontend.parseDocument(source)
+      let document = try await codegenFrontend.parseDocument(source)
 
-      let validationErrors = try codegenFrontend.validateDocument(
+      let validationErrors = try await codegenFrontend.validateDocument(
         schema: schema,
         document: document,
         validationOptions: .mock()
@@ -267,11 +269,11 @@ class DocumentParsingAndValidationTests: XCTestCase {
     }
   }
 
-  func test__validateDocument__givenInputParameterNameIsSchemaName_throwsError() throws {
+  func test__validateDocument__givenInputParameterNameIsSchemaName_throwsError() async throws {
     let disallowedName = ["AnimalKingdomAPI", "animalKingdomAPI"]
 
     for name in disallowedName {
-      let schema = try codegenFrontend.loadSchema(
+      let schema = try await codegenFrontend.loadSchema(
         from: [try codegenFrontend.makeSource(
       """
       type Query {
@@ -280,15 +282,15 @@ class DocumentParsingAndValidationTests: XCTestCase {
       """
       , filePath: "schema.graphqls")])
 
-      let source = try codegenFrontend.makeSource("""
+      let source = try await codegenFrontend.makeSource("""
       query TestQuery($\(name): String!) {
         test(param: $\(name))
       }
       """, filePath: "TestQuery.graphql")
 
-      let document = try codegenFrontend.parseDocument(source)
+      let document = try await codegenFrontend.parseDocument(source)
 
-      let validationErrors = try codegenFrontend.validateDocument(
+      let validationErrors = try await codegenFrontend.validateDocument(
         schema: schema,
         document: document,
         validationOptions: .mock(schemaNamespace: "AnimalKingdomAPI")

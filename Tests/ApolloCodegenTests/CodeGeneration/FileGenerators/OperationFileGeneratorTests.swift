@@ -30,7 +30,7 @@ class OperationFileGeneratorTests: XCTestCase {
 
   // MARK: Test Helpers
 
-  private func buildSubject() throws {
+  private func buildSubject() async throws {
     let schemaSDL = """
     type Animal {
       species: String
@@ -41,7 +41,7 @@ class OperationFileGeneratorTests: XCTestCase {
     }
     """
 
-    let ir = try IRBuilder.mock(schema: schemaSDL, document: operationDocument)
+    let ir = try await IRBuilder.mock(schema: schemaSDL, document: operationDocument)
     irOperation = ir.build(operation: ir.compilationResult.operations[0])
 
     let config = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock())
@@ -51,9 +51,9 @@ class OperationFileGeneratorTests: XCTestCase {
 
   // MARK: Property Tests
 
-  func test__properties__shouldReturnTargetType_operation() throws {
+  func test__properties__shouldReturnTargetType_operation() async throws {
     // given
-    try buildSubject()
+    try await buildSubject()
 
     let expected: FileTarget = .operation(irOperation.definition)
 
@@ -61,23 +61,23 @@ class OperationFileGeneratorTests: XCTestCase {
     expect(self.subject.target).to(equal(expected))
   }
 
-  func test__properties__givenIrOperation_shouldReturnFileName_matchingOperationDefinitionName() throws {
+  func test__properties__givenIrOperation_shouldReturnFileName_matchingOperationDefinitionName() async throws {
     // given
-    try buildSubject()
+    try await buildSubject()
 
     // then
     expect(self.subject.fileName).to(equal("AllAnimalsQuery"))
   }
 
-  func test__properties__givenIrOperation_shouldOverwrite() throws {
+  func test__properties__givenIrOperation_shouldOverwrite() async throws {
     // given
-    try buildSubject()
+    try await buildSubject()
 
     // then
     expect(self.subject.overwrite).to(beTrue())
   }
 
-  func test__template__givenNotLocalCacheMutationOperation_shouldBeOperationTemplate() throws {
+  func test__template__givenNotLocalCacheMutationOperation_shouldBeOperationTemplate() async throws {
     // given
     operationDocument = """
     query AllAnimals {
@@ -88,13 +88,13 @@ class OperationFileGeneratorTests: XCTestCase {
     """
 
     // when
-    try buildSubject()
+    try await buildSubject()
 
     // then
     expect(self.subject.template).to(beAKindOf(OperationDefinitionTemplate.self))
   }
 
-  func test__template__givenLocalCacheMutationOperation_shouldBeLocalCacheMutationOperationTemplate() throws {
+  func test__template__givenLocalCacheMutationOperation_shouldBeLocalCacheMutationOperationTemplate() async throws {
     // given
     operationDocument = """
     query AllAnimals @apollo_client_ios_localCacheMutation {
@@ -105,7 +105,7 @@ class OperationFileGeneratorTests: XCTestCase {
     """
 
     // when
-    try buildSubject()
+    try await buildSubject()
 
     // then
     expect(self.subject.template).to(beAKindOf(LocalCacheMutationDefinitionTemplate.self))

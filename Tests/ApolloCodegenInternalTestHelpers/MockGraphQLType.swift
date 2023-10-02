@@ -4,6 +4,7 @@ import OrderedCollections
 import AppKit
 
 public extension GraphQLCompositeType {
+  @_disfavoredOverload
   class func mock(
     _ name: String = ""
   ) -> GraphQLCompositeType {

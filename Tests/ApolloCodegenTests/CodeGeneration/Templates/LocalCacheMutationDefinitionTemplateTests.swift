@@ -49,8 +49,8 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
   // MARK: - Helpers
 
-  private func buildSubjectAndOperation(named operationName: String = "TestOperation") throws {
-    ir = try .mock(schema: schemaSDL, document: document)
+  private func buildSubjectAndOperation(named operationName: String = "TestOperation") async throws {
+    ir = try await .mock(schema: schemaSDL, document: document)
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
     operation = ir.build(operation: operationDefinition)
     subject = LocalCacheMutationDefinitionTemplate(
@@ -65,7 +65,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
   // MARK: - Access Level Tests
 
-  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsInSchemaModule_generatesWithPublicAccess() throws {
+  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsInSchemaModule_generatesWithPublicAccess() async throws {
     // given
     let expected =
     """
@@ -80,7 +80,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     ))
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -88,7 +88,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQuery_whenModuleTypeIsEmbeddedInTargetWithPublicAccessModifier_andOperationsInSchemaModule_generatesWithPublicAccess() throws {
+  func test__generate__givenQuery_whenModuleTypeIsEmbeddedInTargetWithPublicAccessModifier_andOperationsInSchemaModule_generatesWithPublicAccess() async throws {
     // given
     let expected =
     """
@@ -103,7 +103,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     ))
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -111,7 +111,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQuery_whenModuleTypeIsEmbeddedInTargetWithInternalAccessModifier_andOperationsInSchemaModule_generatesWithInternalAccess() throws {
+  func test__generate__givenQuery_whenModuleTypeIsEmbeddedInTargetWithInternalAccessModifier_andOperationsInSchemaModule_generatesWithInternalAccess() async throws {
     // given
     let expected =
     """
@@ -126,7 +126,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     ))
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -134,7 +134,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithPublicAccessModifier_generatesWithPublicAccess() throws {
+  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithPublicAccessModifier_generatesWithPublicAccess() async throws {
     // given
     let expected =
     """
@@ -149,7 +149,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     ))
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -157,7 +157,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithInternalAccessModifier_generatesWithInternalAccess() throws {
+  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithInternalAccessModifier_generatesWithInternalAccess() async throws {
     // given
     let expected =
     """
@@ -172,7 +172,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     ))
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -180,7 +180,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithPublicAccessModifier_generatesWithPublicAccess() throws {
+  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithPublicAccessModifier_generatesWithPublicAccess() async throws {
     // given
     let expected =
     """
@@ -195,7 +195,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     ))
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -203,7 +203,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithInternalAccessModifier_generatesWithInternalAccess() throws {
+  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithInternalAccessModifier_generatesWithInternalAccess() async throws {
     // given
     let expected =
     """
@@ -218,7 +218,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     ))
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -228,7 +228,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
   // MARK: - Operation Definition
 
-  func test__generate__givenQuery_generatesLocalCacheMutation() throws {
+  func test__generate__givenQuery_generatesLocalCacheMutation() async throws {
     // given
     let expected =
     """
@@ -238,7 +238,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -246,7 +246,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate_givenQuery_configIncludesMarkOperationDefinitionsAsFinal_generatesFinalLocalCacheMutation() throws {
+  func test__generate_givenQuery_configIncludesMarkOperationDefinitionsAsFinal_generatesFinalLocalCacheMutation() async throws {
     // given
     let expected =
     """
@@ -257,7 +257,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     config = .mock(options: .init(markOperationDefinitionsAsFinal: true))
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -266,7 +266,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   }
 
 
-  func test__generate__givenQueryWithLowercasing_generatesCorrectlyCasedLocalCacheMutation() throws {
+  func test__generate__givenQueryWithLowercasing_generatesCorrectlyCasedLocalCacheMutation() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -294,7 +294,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation(named: "lowercaseOperation")
+    try await buildSubjectAndOperation(named: "lowercaseOperation")
 
     let actual = renderSubject()
 
@@ -302,7 +302,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQueryWithNameEndingInLocalCacheMutation_generatesLocalCacheMutationWithoutDoubledTypeSuffix() throws {
+  func test__generate__givenQueryWithNameEndingInLocalCacheMutation_generatesLocalCacheMutationWithoutDoubledTypeSuffix() async throws {
     // given
     document = """
     query TestOperationLocalCacheMutation @apollo_client_ios_localCacheMutation {
@@ -320,7 +320,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation(named: "TestOperationLocalCacheMutation")
+    try await buildSubjectAndOperation(named: "TestOperationLocalCacheMutation")
 
     let actual = renderSubject()
 
@@ -328,7 +328,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenMutation_generatesLocalCacheMutation() throws {
+  func test__generate__givenMutation_generatesLocalCacheMutation() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -360,7 +360,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -368,7 +368,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenSubscription_generatesSubscriptionOperation() throws {
+  func test__generate__givenSubscription_generatesSubscriptionOperation() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -400,7 +400,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -408,7 +408,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQuery_generatesSelectionSetsAsMutable() throws {
+  func test__generate__givenQuery_generatesSelectionSetsAsMutable() async throws {
     // given
     let expected =
     """
@@ -417,7 +417,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -425,7 +425,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
 
-  func test__generate__givenLowercasedSchemaName_generatesSelectionSetsWithFirstUppercasedNamespace() throws {
+  func test__generate__givenLowercasedSchemaName_generatesSelectionSetsWithFirstUppercasedNamespace() async throws {
     // given
     let expected =
     """
@@ -435,7 +435,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
     // when
     config = .mock(schemaNamespace: "myschema")
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -443,7 +443,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
 
-  func test__generate__givenUppercasedSchemaName_generatesSelectionSetsWithUppercasedNamespace() throws {
+  func test__generate__givenUppercasedSchemaName_generatesSelectionSetsWithUppercasedNamespace() async throws {
     // given
     let expected =
     """
@@ -453,7 +453,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
     // when
     config = .mock(schemaNamespace: "MYSCHEMA")
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -461,10 +461,10 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
 
-  func test_render_givenModuleType_swiftPackageManager_generatesClassDefinition_withPublicModifier() throws {
+  func test_render_givenModuleType_swiftPackageManager_generatesClassDefinition_withPublicModifier() async throws {
     // given
     config = .mock(.swiftPackageManager)
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let expected = """
     public class TestOperationLocalCacheMutation: LocalCacheMutation {
@@ -477,10 +477,10 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test_render_givenModuleType_other_generatesClassDefinition_withPublicModifier() throws {
+  func test_render_givenModuleType_other_generatesClassDefinition_withPublicModifier() async throws {
     // given
     config  = .mock(.other)
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let expected = """
     public class TestOperationLocalCacheMutation: LocalCacheMutation {
@@ -493,10 +493,10 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test_render_givenModuleType_embeddedInTarget_generatesClassDefinition_noPublicModifier() throws {
+  func test_render_givenModuleType_embeddedInTarget_generatesClassDefinition_noPublicModifier() async throws {
     // given
     config = .mock(.embeddedInTarget(name: "MyOtherProject"))
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let expected = """
     class TestOperationLocalCacheMutation: LocalCacheMutation {
@@ -511,7 +511,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
   // MARK: - Variables
 
-   func test__generate__givenQueryWithScalarVariable_generatesQueryOperationWithVariable() throws {
+  func test__generate__givenQueryWithScalarVariable_generatesQueryOperationWithVariable() async throws {
      // given
      schemaSDL = """
      type Query {
@@ -543,7 +543,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
      """
 
      // when
-     try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
      let actual = renderSubject()
 
@@ -551,7 +551,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
      expect(actual).to(equalLineByLine(expected, atLine: 4, ignoringExtraLines: true))
    }
 
-  func test__generate__givenQueryWithMutlipleScalarVariables_generatesQueryOperationWithVariables() throws {
+  func test__generate__givenQueryWithMutlipleScalarVariables_generatesQueryOperationWithVariables() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -596,7 +596,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -604,7 +604,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 4, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQueryWithNullableScalarVariable_generatesQueryOperationWithVariable() throws {
+  func test__generate__givenQueryWithNullableScalarVariable_generatesQueryOperationWithVariable() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -636,7 +636,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -646,7 +646,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
   // MARK: Initializer Rendering Config - Tests
 
-  func test__render_givenLocalCacheMutation_configIncludesLocalCacheMutations_rendersInitializer() throws {
+  func test__render_givenLocalCacheMutation_configIncludesLocalCacheMutations_rendersInitializer() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -681,7 +681,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     )
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -689,7 +689,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
   }
 
-  func test__render_givenLocalCacheMutation_configIncludesSpecificLocalCacheMutations_rendersInitializer() throws {
+  func test__render_givenLocalCacheMutation_configIncludesSpecificLocalCacheMutations_rendersInitializer() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -724,7 +724,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     )
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -732,7 +732,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
   }
 
-  func test__render_givenLocalCacheMutation_configDoesNotIncludesLocalCacheMutations_doesNotRenderInitializer() throws
+  func test__render_givenLocalCacheMutation_configDoesNotIncludesLocalCacheMutations_doesNotRenderInitializer() async throws
   {
     // given
     schemaSDL = """
@@ -761,7 +761,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     )
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
