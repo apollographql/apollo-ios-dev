@@ -73,6 +73,15 @@ public class GraphQLNamedType:
     self.documentation = jsValue["description"]
   }
 
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?
+  ) {
+    self.name = name
+    self.documentation = nil
+  }
+
   static func initializeNewObject(
     _ jsValue: JSValue,
     bridge: isolated JavaScriptBridge
@@ -113,6 +122,16 @@ public final class GraphQLScalarType: GraphQLNamedType {
     super.init(jsValue, bridge: bridge)
   }
 
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?,
+    specifiedByURL: String?
+  ) {
+    self.specifiedByURL = specifiedByURL
+    super.init(name: name, documentation: documentation)
+  }
+
 }
 
 public final class GraphQLEnumType: GraphQLNamedType {
@@ -121,6 +140,16 @@ public final class GraphQLEnumType: GraphQLNamedType {
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
     self.values = try! bridge.invokeMethod("getValues", on: jsValue)
     super.init(jsValue, bridge: bridge)
+  }
+
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?,
+    values: [GraphQLEnumValue]
+  ) {
+    self.values = values
+    super.init(name: name, documentation: documentation)
   }
 }
 
@@ -142,6 +171,16 @@ public struct GraphQLEnumValue: JavaScriptObjectDecodable {
 
   public var isDeprecated: Bool { deprecationReason != nil }
 
+  init(
+    name: Name,
+    documentation: String?,
+    deprecationReason: String?
+  ) {
+    self.name = name
+    self.documentation = documentation
+    self.deprecationReason = deprecationReason
+  }
+
   static func fromJSValue(
     _ jsValue: JSValue,
     bridge: isolated JavaScriptBridge
@@ -162,6 +201,16 @@ public final class GraphQLInputObjectType: GraphQLNamedType {
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
     self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
     super.init(jsValue, bridge: bridge)
+  }
+
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?,
+    fields: GraphQLInputFieldDictionary
+  ) {
+    self.fields = fields
+    super.init(name: name, documentation: documentation)
   }
 }
 
@@ -188,6 +237,20 @@ public struct GraphQLInputField: JavaScriptObjectDecodable {
       defaultValue: (jsValue["astNode"] as JSValue?)?["defaultValue"]
     )
   }
+
+  init(
+    name: String,
+    type: GraphQLType,
+    documentation: String?,
+    deprecationReason: String?,
+    defaultValue: GraphQLValue?
+  ) {
+    self.name = name
+    self.type = type
+    self.documentation = documentation
+    self.deprecationReason = deprecationReason
+    self.defaultValue = defaultValue
+  }
 }
 
 public class GraphQLCompositeType: GraphQLNamedType {
@@ -211,6 +274,18 @@ public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImpl
 
   public let interfaces: [GraphQLInterfaceType]
 
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?,
+    fields: [String: GraphQLField],
+    interfaces: [GraphQLInterfaceType]
+  ) {
+    self.fields = fields
+    self.interfaces = interfaces
+    super.init(name: name, documentation: documentation)
+  }
+
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
     self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
     self.interfaces = try! bridge.invokeMethod("getInterfaces", on: jsValue)
@@ -226,14 +301,29 @@ public class GraphQLAbstractType: GraphQLCompositeType {
 }
 
 public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceImplementingType {
-  public let deprecationReason: String?
+  #warning("TODO: remove this field?")
+//  public let deprecationReason: String?
 
   public let fields: [String: GraphQLField]
 
   public let interfaces: [GraphQLInterfaceType]
 
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?,
+    fields: [String: GraphQLField],
+    interfaces: [GraphQLInterfaceType]
+//    deprecationReason: String?
+  ) {
+    self.fields = fields
+    self.interfaces = interfaces
+//    self.deprecationReason = deprecationReason
+    super.init(name: name, documentation: documentation)
+  }
+
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
-    self.deprecationReason = jsValue["deprecationReason"]
+//    self.deprecationReason = jsValue["deprecationReason"]
     self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
     self.interfaces = try! bridge.invokeMethod("getInterfaces", on: jsValue)
     super.init(jsValue, bridge: bridge)
@@ -251,6 +341,17 @@ public final class GraphQLUnionType: GraphQLAbstractType {
     self.types = try! bridge.invokeMethod("getTypes", on: jsValue)
     super.init(jsValue, bridge: bridge)
   }
+
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?,
+    types: [GraphQLObjectType]
+  ) {
+    self.types = types
+    super.init(name: name, documentation: documentation)
+  }
+
 
   public override var debugDescription: String {
     "Union - \(name)"

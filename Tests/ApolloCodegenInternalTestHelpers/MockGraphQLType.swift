@@ -1,59 +1,48 @@
 @testable import ApolloCodegenLib
+@testable import GraphQLCompiler
 import OrderedCollections
 import AppKit
-import GraphQLCompiler
 
 public extension GraphQLCompositeType {
-  @objc class func mock(
+  class func mock(
     _ name: String = ""
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    return mock
+  ) -> GraphQLCompositeType {
+    GraphQLCompositeType(
+      name: name,
+      documentation: nil
+    )
   }
 }
 
 public extension GraphQLObjectType {
-  class override func mock(
-    _ name: String = ""
-  ) -> Self {
-    Self.mock(name, fields: [:], interfaces: [])
-  }
-
   class func mock(
     _ name: String = "",
-    fields: [String: GraphQLField] = [:],
     interfaces: [GraphQLInterfaceType] = [],
+    fields: [String: GraphQLField] = [:],
     documentation: String? = nil
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    mock.fields = fields
-    mock.interfaces = interfaces
-    mock.documentation = documentation
-    return mock
+  ) -> GraphQLObjectType {
+    GraphQLObjectType(
+      name: name,
+      documentation: documentation,
+      fields: fields,
+      interfaces: interfaces
+    )
   }
 }
 
 public extension GraphQLInterfaceType {
-  class override func mock(
-    _ name: String = ""
-  ) -> Self {
-    Self.mock(name, fields: [:], interfaces: [])
-  }
-
   class func mock(
     _ name: String = "",
     fields: [String: GraphQLField] = [:],
     interfaces: [GraphQLInterfaceType] = [],
     documentation: String? = nil
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    mock.fields = fields
-    mock.interfaces = interfaces
-    mock.documentation = documentation
-    return mock
+  ) -> GraphQLInterfaceType {
+    GraphQLInterfaceType(
+      name: name,
+      documentation: documentation,
+      fields: fields,
+      interfaces: interfaces
+    )
   }
 }
 
@@ -62,54 +51,54 @@ public extension GraphQLUnionType {
     _ name: String = "",
     types: [GraphQLObjectType] = [],
     documentation: String? = nil
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    mock.types = types
-    mock.documentation = documentation
-    return mock
+  ) -> GraphQLUnionType {
+    GraphQLUnionType(
+      name: name,
+      documentation: documentation,
+      types: types
+    )
   }
 }
 
 public extension GraphQLScalarType {
-  class func string() -> Self { mock(name: "String") }
-  class func integer() -> Self { mock(name: "Int") }
-  class func boolean() -> Self { mock(name: "Boolean") }
-  class func float() -> Self { mock(name: "Float") }
+  class func string() -> GraphQLScalarType { mock(name: "String") }
+  class func integer() -> GraphQLScalarType { mock(name: "Int") }
+  class func boolean() -> GraphQLScalarType { mock(name: "Boolean") }
+  class func float() -> GraphQLScalarType { mock(name: "Float") }
 
   class func mock(
     name: String,
     specifiedByURL: String? = nil,
     documentation: String? = nil
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    mock.specifiedByURL = specifiedByURL
-    mock.documentation = documentation
-    return mock
+  ) -> GraphQLScalarType {
+    GraphQLScalarType(
+      name: name,
+      documentation: documentation,
+      specifiedByURL: specifiedByURL
+    )
   }
 }
 
 public extension GraphQLType {
-  static func string() -> Self { .scalar(GraphQLScalarType.mock(name: "String")) }
-  static func integer() -> Self { .scalar(GraphQLScalarType.mock(name: "Int")) }
-  static func boolean() -> Self { .scalar(GraphQLScalarType.mock(name: "Boolean")) }
-  static func float() -> Self { .scalar(GraphQLScalarType.mock(name: "Float")) }
+  static func string() -> Self { .scalar(.string()) }
+  static func integer() -> Self { .scalar(.integer()) }
+  static func boolean() -> Self { .scalar(.boolean()) }
+  static func float() -> Self { .scalar(.float()) }
 }
 
 public extension GraphQLEnumType {
-  class func skinCovering() -> Self {
+  class func skinCovering() -> GraphQLEnumType {
     mock(name: "SkinCovering", values: ["FUR", "HAIR", "FEATHERS", "SCALES"])
   }
 
-  class func relativeSize() -> Self {
+  class func relativeSize() -> GraphQLEnumType {
     mock(name: "RelativeSize", values: ["LARGE", "AVERAGE", "SMALL"])
   }
 
   class func mock(
     name: String,
     values: [String] = []
-  ) -> Self {
+  ) -> GraphQLEnumType {
     return self.mock(
       name: name,
       values: values.map { GraphQLEnumValue.mock(name: $0) }
@@ -120,26 +109,26 @@ public extension GraphQLEnumType {
     name: String,
     values: [GraphQLEnumValue],
     documentation: String? = nil
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    mock.values = values
-    mock.documentation = documentation
-    return mock
+  ) -> GraphQLEnumType {
+    GraphQLEnumType(
+      name: name,
+      documentation: documentation,
+      values: values
+    )
   }
 }
 
 public extension GraphQLEnumValue {
-  class func mock(
+  static func mock(
     name: String,
     deprecationReason: String? = nil,
     documentation: String? = nil
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = Name(value: name)
-    mock.deprecationReason = deprecationReason
-    mock.documentation = documentation
-    return mock
+  ) -> GraphQLEnumValue {
+    GraphQLEnumValue(
+      name: Name(value: name),
+      documentation: documentation,
+      deprecationReason: deprecationReason
+    )
   }
 }
 
@@ -148,30 +137,30 @@ public extension GraphQLInputObjectType {
     _ name: String,
     fields: [GraphQLInputField] = [],
     documentation: String? = nil
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    mock.fields = OrderedDictionary.init(uniqueKeysWithValues: fields.map({ ($0.name, $0) }))
-    mock.documentation = documentation
-    return mock
+  ) -> GraphQLInputObjectType {
+    GraphQLInputObjectType(
+      name: name,
+      documentation: documentation,
+      fields: OrderedDictionary.init(uniqueKeysWithValues: fields.map({ ($0.name, $0) }))
+    )
   }
 }
 
 public extension GraphQLInputField {
-  class func mock(
+  static func mock(
     _ name: String,
     type: GraphQLType,
     defaultValue: GraphQLValue?,
     documentation: String? = nil,
     deprecationReason: String? = nil
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    mock.type = type
-    mock.defaultValue = defaultValue
-    mock.documentation = documentation
-    mock.deprecationReason = deprecationReason
-    return mock
+  ) -> GraphQLInputField {
+    GraphQLInputField(
+      name: name,
+      type: type,
+      documentation: documentation,
+      deprecationReason: deprecationReason,
+      defaultValue: defaultValue
+    )
   }
 }
 
@@ -180,12 +169,13 @@ public extension GraphQLField {
     _ name: String,
     type: GraphQLType,
     deprecationReason: String? = nil
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    mock.type = type
-    mock.deprecationReason = deprecationReason
-    mock.arguments = []
-    return mock
+  ) -> GraphQLField {
+    GraphQLField(
+      name: name,
+      type: type,
+      arguments: [],
+      documentation: nil,
+      deprecationReason: deprecationReason
+    )
   }
 }

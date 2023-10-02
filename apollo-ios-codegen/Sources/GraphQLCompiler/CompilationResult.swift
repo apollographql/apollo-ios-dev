@@ -18,7 +18,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
   public let schemaDocumentation: String?
 
-  private init(
+  init(
     schemaRootTypes: RootTypeDefinition,
     referencedTypes: [GraphQLNamedType],
     operations: [OperationDefinition],
@@ -312,7 +312,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       )
     }
 
-    private init(
+    init(
       selectionSet: SelectionSet,
       inclusionConditions: [InclusionCondition]?
     ) {
@@ -354,7 +354,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       )
     }
 
-    private init(
+    init(
       fragment: FragmentDefinition,
       inclusionConditions: [InclusionCondition]?,
       directives: [Directive]?
