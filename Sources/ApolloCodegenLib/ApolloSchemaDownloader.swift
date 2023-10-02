@@ -53,14 +53,14 @@ public struct ApolloSchemaDownloader {
   public static func fetch(
     configuration: ApolloSchemaDownloadConfiguration,
     withRootURL rootURL: URL? = nil
-  ) throws {
+  ) async throws {
     try ApolloFileManager.default.createContainingDirectoryIfNeeded(
       forPath: configuration.outputPath
     )
 
     switch configuration.downloadMethod {
     case .introspection(let endpointURL, let httpMethod, _, let includeDeprecatedInputValues):
-      try self.downloadFrom(
+      try await self.downloadFrom(
         introspection: endpointURL,
         httpMethod: httpMethod,
         includeDeprecatedInputValues: includeDeprecatedInputValues,
@@ -342,7 +342,7 @@ public struct ApolloSchemaDownloader {
     includeDeprecatedInputValues: Bool,
     configuration: ApolloSchemaDownloadConfiguration,
     withRootURL: URL?
-  ) throws {
+  ) async throws {
 
     CodegenLogger.log("Downloading schema via introspection from \(endpoint)", logLevel: .debug)
 
@@ -371,7 +371,7 @@ public struct ApolloSchemaDownloader {
     )
 
     if configuration.outputFormat == .SDL {
-      try convertFromIntrospectionJSONToSDLFile(
+      try await convertFromIntrospectionJSONToSDLFile(
         jsonFileURL: jsonOutputURL,
         configuration: configuration,
         withRootURL: withRootURL
@@ -426,17 +426,17 @@ public struct ApolloSchemaDownloader {
     jsonFileURL: URL,
     configuration: ApolloSchemaDownloadConfiguration,
     withRootURL rootURL: URL?
-  ) throws {
+  ) async throws {
 
     defer {
       try? FileManager.default.removeItem(at: jsonFileURL)
     }
 
-    let frontend = try GraphQLJSFrontend()
+    let frontend = try await GraphQLJSFrontend()
     let schema: GraphQLSchema
 
     do {
-      schema = try frontend.loadSchema(from: [try frontend.makeSource(from: jsonFileURL)])
+      schema = try await frontend.loadSchema(from: [try frontend.makeSource(from: jsonFileURL)])
     } catch {
       throw SchemaDownloadError.downloadedIntrospectionJSONFileNotFound(underlying: error)
     }
@@ -444,7 +444,7 @@ public struct ApolloSchemaDownloader {
     let sdlSchema: String
 
     do {
-      sdlSchema = try frontend.printSchemaAsSDL(schema: schema)
+      sdlSchema = try await frontend.printSchemaAsSDL(schema: schema)
     } catch {
       throw SchemaDownloadError.couldNotConvertIntrospectionJSONToSDL(underlying: error)
     }

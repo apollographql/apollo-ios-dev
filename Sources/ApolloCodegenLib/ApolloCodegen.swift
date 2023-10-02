@@ -173,8 +173,8 @@ public class ApolloCodegen {
   internal func build(fileManager: ApolloFileManager = .default) async throws {
     try config.validateConfigValues()
     
-    let compilationResult = try compileGraphQLResult()
-    
+    let compilationResult = try await compileGraphQLResult()
+
     try config.validate(compilationResult)
     
     let ir = IRBuilder(compilationResult: compilationResult)
@@ -212,13 +212,13 @@ public class ApolloCodegen {
   }
 
   /// Performs GraphQL source validation and compiles the schema and operation source documents.
-  func compileGraphQLResult() throws -> CompilationResult {
-    let frontend = try GraphQLJSFrontend()
-    let graphQLSchema = try createSchema(frontend)
-    let operationsDocument = try createOperationsDocument(frontend)
+  func compileGraphQLResult() async throws -> CompilationResult {
+    let frontend = try await GraphQLJSFrontend()
+    async let graphQLSchema = try createSchema(frontend)
+    async let operationsDocument = try createOperationsDocument(frontend)
     let validationOptions = ValidationOptions(config: config)
 
-    let graphqlErrors = try frontend.validateDocument(
+    let graphqlErrors = try await frontend.validateDocument(
       schema: graphQLSchema,
       document: operationsDocument,
       validationOptions: validationOptions
@@ -236,7 +236,7 @@ public class ApolloCodegen {
       throw Error.graphQLSourceValidationFailure(atLines: errorlines)
     }
 
-    return try frontend.compile(
+    return try await frontend.compile(
       schema: graphQLSchema,
       document: operationsDocument,
       experimentalLegacySafelistingCompatibleOperations:
@@ -247,7 +247,7 @@ public class ApolloCodegen {
 
   func createSchema(
     _ frontend: GraphQLJSFrontend
-  ) throws -> GraphQLSchema {
+  ) async throws -> GraphQLSchema {
     let matches = try Self.match(
       searchPaths: config.input.schemaSearchPaths,
       relativeTo: config.rootURL
@@ -257,13 +257,27 @@ public class ApolloCodegen {
       throw Error.cannotLoadSchema
     }
 
-    let sources = try matches.map { try frontend.makeSource(from: URL(fileURLWithPath: $0)) }
-    return try frontend.loadSchema(from: sources)
+    let sources = try await withThrowingTaskGroup(of: GraphQLSource.self) { group in
+      for match in matches {
+        group.addTask {
+          try await frontend.makeSource(from: URL(fileURLWithPath: match))
+        }
+      }
+      var sources: [GraphQLSource] = []
+
+      for try await source in group {
+        sources.append(source)
+      }
+
+      return sources
+    }
+
+    return try await frontend.loadSchema(from: sources)
   }
 
   func createOperationsDocument(
     _ frontend: GraphQLJSFrontend
-  ) throws -> GraphQLDocument {
+  ) async throws -> GraphQLDocument {
     let matches = try Self.match(
       searchPaths: config.input.operationSearchPaths,
       relativeTo: config.rootURL)
@@ -272,14 +286,26 @@ public class ApolloCodegen {
       throw Error.cannotLoadOperations
     }
 
-    let documents = try matches.map({ path in
-      return try frontend.parseDocument(
-        from: URL(fileURLWithPath: path),
-        experimentalClientControlledNullability:
-          config.experimentalFeatures.clientControlledNullability
-      )
-    })
-    return try frontend.mergeDocuments(documents)
+    let documents = try await withThrowingTaskGroup(of: GraphQLDocument.self) { group in
+      for match in matches {
+        group.addTask {
+          try await frontend.parseDocument(
+            from: URL(fileURLWithPath: match),
+            experimentalClientControlledNullability:
+              self.config.experimentalFeatures.clientControlledNullability
+          )
+        }
+      }
+
+      var documents: [GraphQLDocument] = []
+      for try await document in group {
+        documents.append(document)
+      }
+
+      return documents
+    }
+
+    return try await frontend.mergeDocuments(documents)
   }
 
   static func match(searchPaths: [String], relativeTo relativeURL: URL?) throws -> OrderedSet<String> {
