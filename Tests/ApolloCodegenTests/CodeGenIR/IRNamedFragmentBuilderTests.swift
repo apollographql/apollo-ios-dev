@@ -33,13 +33,13 @@ class IRNamedFragmentBuilderTests: XCTestCase {
 
   // MARK: - Helpers
 
-  func buildSubjectFragment() throws {
-    ir = try .mock(schema: schemaSDL, document: document)
+  func buildSubjectFragment() async throws {
+    ir = try await .mock(schema: schemaSDL, document: document)
     fragment = try XCTUnwrap(ir.compilationResult[fragment: "TestFragment"])
     subject = ir.build(fragment: fragment)
   }
 
-  func test__buildFragment__givenFragment_hasConfiguredRootField() throws {
+  func test__buildFragment__givenFragment_hasConfiguredRootField() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -58,7 +58,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectFragment()
+    try await buildSubjectFragment()
 
     let Object_Animal = try ir.schema[interface: "Animal"].xctUnwrapped()
 
@@ -78,7 +78,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
       .to(equal(.init(source: .namedFragment(self.subject.definition), fieldPath: nil)))
   }
 
-  func test__buildFragment__givenFragment_hasNamedFragmentInBuiltFragments() throws {
+  func test__buildFragment__givenFragment_hasNamedFragmentInBuiltFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -97,7 +97,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectFragment()
+    try await buildSubjectFragment()
 
     let actual = ir.builtFragments["TestFragment"]
 
@@ -105,7 +105,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     expect(actual).to(beIdenticalTo(self.subject))
   }
 
-  func test__buildFragment__givenAlreadyBuiltFragment_returnsExistingBuiltFragment() throws {
+  func test__buildFragment__givenAlreadyBuiltFragment_returnsExistingBuiltFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -124,7 +124,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectFragment()
+    try await buildSubjectFragment()
 
     let actual = ir.build(fragment: fragment)
 
@@ -132,7 +132,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     expect(actual).to(beIdenticalTo(self.subject))
   }
 
-  func test__referencedFragments__givenUsesFragmentsReferencingOtherFragment_includesBothFragments() throws {
+  func test__referencedFragments__givenUsesFragmentsReferencingOtherFragment_includesBothFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -161,7 +161,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectFragment()
+    try await buildSubjectFragment()
 
     let expected: OrderedSet = [
       try ir.builtFragments["AnimalDetails"].xctUnwrapped(),
@@ -172,7 +172,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     expect(self.subject.referencedFragments).to(equal(expected))
   }
 
-  func test__entities__givenUsesMultipleNestedEntities_includingEntitiesInNestedFragments_includesAllEntities() throws {
+  func test__entities__givenUsesMultipleNestedEntities_includingEntitiesInNestedFragments_includesAllEntities() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -205,7 +205,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectFragment()
+    try await buildSubjectFragment()
 
     let Interface_Animal = try schema[interface: "Animal"].xctUnwrapped()
 

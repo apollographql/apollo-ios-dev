@@ -5,13 +5,14 @@ public extension CompilationResult {
 
   class func mock(
     rootTypes: RootTypeDefinition = RootTypeDefinition.mock(),
-    referencedTypes: [GraphQLNamedType] = []
+    referencedTypes: [GraphQLNamedType] = [],
+    fragments: [CompilationResult.FragmentDefinition] = []
   ) -> CompilationResult {
     CompilationResult(
       schemaRootTypes: rootTypes,
       referencedTypes: referencedTypes + rootTypes.allRootTypes,
       operations: [],
-      fragments: [],
+      fragments: fragments,
       schemaDocumentation: nil
     )
   }

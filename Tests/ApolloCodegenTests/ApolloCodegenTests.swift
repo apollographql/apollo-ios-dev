@@ -105,7 +105,7 @@ class ApolloCodegenTests: XCTestCase {
 
   // MARK: CompilationResult Tests
 
-  func test_compileResults_givenOperation_withGraphQLErrors_shouldThrow() throws {
+  func test_compileResults_givenOperation_withGraphQLErrors_shouldThrow() async throws {
     // given
     let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -137,7 +137,7 @@ class ApolloCodegenTests: XCTestCase {
     // is not a property of the `Book` type.
 
     // then
-    expect(try subject.compileGraphQLResult())
+    await expect { try await subject.compileGraphQLResult() }
       .to(throwError { error in
         guard case let ApolloCodegen.Error.graphQLSourceValidationFailure(lines) = error else {
           fail("Expected .graphQLSourceValidationFailure, got .\(error)")
@@ -147,7 +147,7 @@ class ApolloCodegenTests: XCTestCase {
       })
   }
 
-  func test_compileResults_givenOperations_withNoErrors_shouldReturn() throws {
+  func test_compileResults_givenOperations_withNoErrors_shouldReturn() async throws {
     // given
     let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -183,10 +183,10 @@ class ApolloCodegenTests: XCTestCase {
     )
 
     // then
-    expect(try subject.compileGraphQLResult().operations).to(haveCount(2))
+    await expect { try await subject.compileGraphQLResult().operations }.to(haveCount(2))
   }
 
-  func test_compileResults_givenRelativeSearchPath_relativeToRootURL_hasOperations_shouldReturnOperationsRelativeToRoot() throws {
+  func test_compileResults_givenRelativeSearchPath_relativeToRootURL_hasOperations_shouldReturnOperationsRelativeToRoot() async throws {
     // given
     let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -223,14 +223,14 @@ class ApolloCodegenTests: XCTestCase {
       itemsToGenerate: .code
     )
 
-    let actual = try subject.compileGraphQLResult().operations
+    let actual = try await subject.compileGraphQLResult().operations
 
     // then
     expect(actual).to(haveCount(1))
     expect(actual.first?.name).to(equal("getBooks"))
   }
 
-  func test_CCN_compileResults_givenOperations_withNoErrors_shouldReturn() throws {
+  func test_CCN_compileResults_givenOperations_withNoErrors_shouldReturn() async throws {
     let schemaData: Data = {
       """
       type Query {
@@ -270,13 +270,13 @@ class ApolloCodegenTests: XCTestCase {
       itemsToGenerate: .code
     )
 
-    let compiledDocument = try subject.compileGraphQLResult()
+    let compiledDocument = try await subject.compileGraphQLResult()
 
     // then
     expect(compiledDocument.operations).to(haveCount(1))
   }
 
-  func test_CCN_compileResults_givenOperations_withErrors_shouldError() throws {
+  func test_CCN_compileResults_givenOperations_withErrors_shouldError() async throws {
     // given
     let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -302,7 +302,8 @@ class ApolloCodegenTests: XCTestCase {
     )
 
     // then
-    expect(try subject.compileGraphQLResult().operations).to(throwError { error in
+    await expect { try await subject.compileGraphQLResult().operations }
+      .to(throwError { error in
       guard let error = error as? GraphQLError else {
         fail("Expected .graphQLSourceValidationFailure because we attempted to compile a document that uses CCN without CCN enabled, got \(error)")
         return
@@ -311,7 +312,7 @@ class ApolloCodegenTests: XCTestCase {
     })
   }
 
-  func test_compileResults_givenRelativeSchemaSearchPath_relativeToRootURL_shouldReturnSchemaRelativeToRoot() throws {
+  func test_compileResults_givenRelativeSchemaSearchPath_relativeToRootURL_shouldReturnSchemaRelativeToRoot() async throws {
     // given
     try createFile(
       body: """
@@ -346,14 +347,14 @@ class ApolloCodegenTests: XCTestCase {
       itemsToGenerate: .code
     )
 
-    let actual = try subject.compileGraphQLResult()
+    let actual = try await subject.compileGraphQLResult()
 
     // then
     expect(actual.operations).to(haveCount(1))
     expect(actual.referencedTypes).to(haveCount(3))
   }
 
-  func test__compileResults__givenMultipleSchemaFiles_withDependentTypes_compilesResult() throws {
+  func test__compileResults__givenMultipleSchemaFiles_withDependentTypes_compilesResult() async throws {
     // given
     try createFile(
       body: """
@@ -401,10 +402,10 @@ class ApolloCodegenTests: XCTestCase {
     )
 
     // then
-    expect(try subject.compileGraphQLResult().referencedTypes.count).to(equal(3))
+    await expect { try await subject.compileGraphQLResult().referencedTypes.count }.to(equal(3))
   }
 
-  func test__compileResults__givenMultipleSchemaFiles_withDifferentRootTypes_compilesResult() throws {
+  func test__compileResults__givenMultipleSchemaFiles_withDifferentRootTypes_compilesResult() async throws {
     // given
     try createFile(
       body: """
@@ -450,13 +451,13 @@ class ApolloCodegenTests: XCTestCase {
       itemsToGenerate: .code
     )
 
-    let result = try subject.compileGraphQLResult()
+    let result = try await subject.compileGraphQLResult()
 
     // then
     expect(result.operations.count).to(equal(2))
   }
 
-  func test__compileResults__givenMultipleSchemaFiles_withSchemaTypeExtension_compilesResultWithExtension() throws {
+  func test__compileResults__givenMultipleSchemaFiles_withSchemaTypeExtension_compilesResultWithExtension() async throws {
     // given
     try createFile(
       body: """
@@ -495,13 +496,13 @@ class ApolloCodegenTests: XCTestCase {
       itemsToGenerate: .code
     )
 
-    let result = try subject.compileGraphQLResult()
+    let result = try await subject.compileGraphQLResult()
 
     // then
     expect(result.operations.count).to(equal(1))
   }
 
-  func test__compileResults__givenMultipleSchemaFilesWith_introspectionJSONSchema_withSchemaTypeExtension_compilesResultWithExtension() throws {
+  func test__compileResults__givenMultipleSchemaFilesWith_introspectionJSONSchema_withSchemaTypeExtension_compilesResultWithExtension() async throws {
     // given
     let introspectionJSON = try String(
       contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema
@@ -540,13 +541,13 @@ class ApolloCodegenTests: XCTestCase {
       itemsToGenerate: .code
     )
 
-    let result = try subject.compileGraphQLResult()
+    let result = try await subject.compileGraphQLResult()
 
     // then
     expect(result.operations.count).to(equal(1))
   }
 
-  func test__compileResults__givenMultipleIntrospectionJSONSchemaFiles_throwsError() throws {
+  func test__compileResults__givenMultipleIntrospectionJSONSchemaFiles_throwsError() async throws {
     // given
     let introspectionJSON = try String(
       contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema
@@ -571,10 +572,10 @@ class ApolloCodegenTests: XCTestCase {
     )
 
     // then
-    expect(try subject.compileGraphQLResult()).to(throwError())
+    await expect { try await subject.compileGraphQLResult() }.to(throwError())
   }
 
-  func test__compileResults__givenSchemaSearchPath_withNoMatches_throwsError() throws {
+  func test__compileResults__givenSchemaSearchPath_withNoMatches_throwsError() async throws {
     // given
     let config = ApolloCodegen.ConfigurationContext(config: .mock(
       input: .init(schemaPath: directoryURL.appendingPathComponent("file_does_not_exist").path)))
@@ -586,11 +587,11 @@ class ApolloCodegenTests: XCTestCase {
     )
 
     // then
-    expect(try subject.compileGraphQLResult())
+    await expect { try await subject.compileGraphQLResult() }
       .to(throwError(ApolloCodegen.Error.cannotLoadSchema))
   }
 
-  func test__compileResults__givenSchemaSearchPaths_withMixedMatches_doesNotThrowError() throws {
+  func test__compileResults__givenSchemaSearchPaths_withMixedMatches_doesNotThrowError() async throws {
     // given
     let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -616,10 +617,10 @@ class ApolloCodegenTests: XCTestCase {
     )
 
     // then
-    expect(try subject.compileGraphQLResult()).notTo(throwError())
+    await expect { try await subject.compileGraphQLResult() }.notTo(throwError())
   }
 
-  func test__compileResults__givenOperationSearchPath_withNoMatches_throwsError() throws {
+  func test__compileResults__givenOperationSearchPath_withNoMatches_throwsError() async throws {
     // given
     let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -636,11 +637,11 @@ class ApolloCodegenTests: XCTestCase {
     )
 
     // then
-    expect(try subject.compileGraphQLResult())
+    await expect { try await subject.compileGraphQLResult() }
       .to(throwError(ApolloCodegen.Error.cannotLoadOperations))
   }
 
-  func test__compileResults__givenOperationSearchPaths_withMixedMatches_doesNotThrowError() throws {
+  func test__compileResults__givenOperationSearchPaths_withMixedMatches_doesNotThrowError() async throws {
     // given
     let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -665,7 +666,7 @@ class ApolloCodegenTests: XCTestCase {
     )
 
     // then
-    expect(try subject.compileGraphQLResult()).notTo(throwError())
+    await expect { try await subject.compileGraphQLResult() }.notTo(throwError())
   }
 
   // MARK: File Generator Tests
@@ -761,7 +762,7 @@ class ApolloCodegenTests: XCTestCase {
     ]
 
     // when
-    let compilationResult = try subject.compileGraphQLResult()
+    let compilationResult = try await subject.compileGraphQLResult()
 
     let ir = IRBuilder(compilationResult: compilationResult)
 
@@ -863,7 +864,7 @@ class ApolloCodegenTests: XCTestCase {
     ]
 
     // when
-    let compilationResult = try subject.compileGraphQLResult()
+    let compilationResult = try await subject.compileGraphQLResult()
 
     let ir = IRBuilder(compilationResult: compilationResult)
 
@@ -969,7 +970,7 @@ class ApolloCodegenTests: XCTestCase {
     ]
 
     // when
-    let compilationResult = try subject.compileGraphQLResult()
+    let compilationResult = try await subject.compileGraphQLResult()
 
     let ir = IRBuilder(compilationResult: compilationResult)
 
@@ -1036,7 +1037,7 @@ class ApolloCodegenTests: XCTestCase {
     ]
 
     // when
-    let compilationResult = try subject.compileGraphQLResult()
+    let compilationResult = try await subject.compileGraphQLResult()
 
     let ir = IRBuilder(compilationResult: compilationResult)
 
@@ -1143,7 +1144,7 @@ class ApolloCodegenTests: XCTestCase {
     ]
 
     // when
-    let compilationResult = try subject.compileGraphQLResult()
+    let compilationResult = try await subject.compileGraphQLResult()
 
     let ir = IRBuilder(compilationResult: compilationResult)
 
@@ -1248,7 +1249,7 @@ class ApolloCodegenTests: XCTestCase {
     ]
 
     // when
-    let compilationResult = try subject.compileGraphQLResult()
+    let compilationResult = try await subject.compileGraphQLResult()
 
     let ir = IRBuilder(compilationResult: compilationResult)
 
@@ -2196,9 +2197,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaName_matchingObjectName_shouldThrow() throws {
     // given
     let object = GraphQLObjectType.mock("Rocket")
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.referencedTypes.append(object)
+    let compilationResult = CompilationResult.mock(referencedTypes: [object])
 
     // then
     for name in conflictingSchemaNames {
@@ -2214,9 +2213,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaName_matchingInterfaceName_shouldThrow() throws {
     // given
     let interface = GraphQLInterfaceType.mock("Rocket")
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.referencedTypes.append(interface)
+    let compilationResult = CompilationResult.mock(referencedTypes: [interface])
 
     // then
     for name in conflictingSchemaNames {
@@ -2232,9 +2229,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaName_matchingUnionName_shouldThrow() throws {
     // given
     let union = GraphQLUnionType.mock("Rocket")
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.referencedTypes.append(union)
+    let compilationResult = CompilationResult.mock(referencedTypes: [union])
 
     // then
     for name in conflictingSchemaNames {
@@ -2250,9 +2245,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaName_matchingEnumName_shouldThrow() throws {
     // given
     let `enum` = GraphQLEnumType.mock(name: "Rocket", values: ["one", "two"])
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.referencedTypes.append(`enum`)
+    let compilationResult = CompilationResult.mock(referencedTypes: [`enum`])
 
     // then
     for name in conflictingSchemaNames {
@@ -2268,9 +2261,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaName_matchingInputObjectName_shouldThrow() throws {
     // given
     let inputObject = GraphQLInputObjectType.mock("Rocket")
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.referencedTypes.append(inputObject)
+    let compilationResult = CompilationResult.mock(referencedTypes: [inputObject])
 
     // then
     for name in conflictingSchemaNames {
@@ -2286,9 +2277,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaName_matchingCustomScalarName_shouldThrow() throws {
     // given
     let customScalar = GraphQLScalarType.mock(name: "Rocket")
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.referencedTypes.append(customScalar)
+    let compilationResult = CompilationResult.mock(referencedTypes: [customScalar])
 
     // then
     for name in conflictingSchemaNames {
@@ -2306,9 +2295,7 @@ class ApolloCodegenTests: XCTestCase {
     let fragmentDefinition = CompilationResult.FragmentDefinition.mock(
       "Rocket",
       type: .mock("MockType"))
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.fragments.append(fragmentDefinition)
+    let compilationResult = CompilationResult.mock(fragments: [fragmentDefinition])
 
     // then
     for name in conflictingSchemaNames {
@@ -2388,17 +2375,18 @@ class ApolloCodegenTests: XCTestCase {
     let fragmentDefinition = CompilationResult.FragmentDefinition.mock(
       "MockFragmentDefinition",
       type: .mock("MockType"))
-    let compilationResult = CompilationResult.mock()
 
-    compilationResult.referencedTypes.append(contentsOf: [
-      object,
-      interface,
-      union,
-      `enum`,
-      inputObject,
-      customScalar
-    ])
-    compilationResult.fragments.append(fragmentDefinition)
+    let compilationResult = CompilationResult.mock(
+      referencedTypes: [
+        object,
+        interface,
+        union,
+        `enum`,
+        inputObject,
+        customScalar
+      ],
+      fragments: [fragmentDefinition]
+    )
 
     // then
     let configContext = ApolloCodegen.ConfigurationContext(config: .mock(

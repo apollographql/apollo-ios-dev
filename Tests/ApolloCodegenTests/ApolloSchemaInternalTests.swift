@@ -9,7 +9,7 @@ class ApolloSchemaInternalTests: XCTestCase {
 
   // MARK: Conversion Tests
 
-  func testFormatConversion_givenIntrospectionJSON_shouldOutputValidSDL() throws {
+  func testFormatConversion_givenIntrospectionJSON_shouldOutputValidSDL() async throws {
     let bundle = Bundle(for: type(of: self))
     guard let jsonURL = bundle.url(forResource: "introspection_response", withExtension: "json") else {
       throw XCTFailure("Missing resource file!", file: #file, line: #line)
@@ -21,21 +21,21 @@ class ApolloSchemaInternalTests: XCTestCase {
       outputPath: CodegenTestHelper.schemaOutputURL().path
     )
 
-    try ApolloSchemaDownloader.convertFromIntrospectionJSONToSDLFile(
+    try await ApolloSchemaDownloader.convertFromIntrospectionJSONToSDLFile(
       jsonFileURL: jsonURL,
       configuration: configuration,
       withRootURL: nil
     )
     XCTAssertTrue(ApolloFileManager.default.doesFileExist(atPath: configuration.outputPath))
 
-    let frontend = try GraphQLJSFrontend()
-    let source = try frontend.makeSource(from: URL(fileURLWithPath: configuration.outputPath))
-    let schema = try frontend.loadSchema(from: [source])
+    let frontend = try await GraphQLJSFrontend()
+    let source = try await frontend.makeSource(from: URL(fileURLWithPath: configuration.outputPath))
+    let schema = try await frontend.loadSchema(from: [source])
 
-    let authorType = try schema.getType(named: "Author")
+    let authorType = try await schema.getType(named: "Author")
     XCTAssertEqual(authorType?.name, "Author")
 
-    let postType = try schema.getType(named: "Post")
+    let postType = try await schema.getType(named: "Post")
     XCTAssertEqual(postType?.name, "Post")
   }
 

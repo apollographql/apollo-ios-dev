@@ -23,14 +23,14 @@ class IRInputObjectTests: XCTestCase {
 
   // MARK: - Helpers
 
-  func buildSubject() throws {
-    let ir: IRBuilder = try .mock(schema: schemaSDL, document: document)
+  func buildSubject() async throws {
+    let ir: IRBuilder = try await .mock(schema: schemaSDL, document: document)
     subject = ir.schema.referencedTypes.inputObjects.first!
   }
 
   // MARK: - Tests
 
-  func test__compileInputObject__givenNestedInputObjectParameterWithDefaultValue_compilesInputTypeWithDefaultValue() throws {
+  func test__compileInputObject__givenNestedInputObjectParameterWithDefaultValue_compilesInputTypeWithDefaultValue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -55,7 +55,7 @@ class IRInputObjectTests: XCTestCase {
     """
 
     // when
-    try buildSubject()
+    try await buildSubject()
     let childField = subject.fields["child"]
 
     let expectedDefaultValue = GraphQLValue.object([

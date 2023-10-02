@@ -46,12 +46,28 @@ extension GraphQLJSFrontend {
     config: ApolloCodegen.ConfigurationContext
   ) async throws -> CompilationResult {
     async let schemaSource = try makeSource(schema, filePath: "")
+
+    let sources: [GraphQLSource] = try await documents.enumerated().asyncMap {
+      try await makeSource($0.element, filePath: "Doc_\($0.offset)")
+    }
+
+    return try await compile(
+      schema: schemaSource,
+      definitions: sources,
+      config: config
+    )
+  }
+
+  public func compile(
+    schema schemaSource: GraphQLSource,
+    definitions: [GraphQLSource],
+    config: ApolloCodegen.ConfigurationContext
+  ) async throws -> CompilationResult {
     let schema = try await loadSchema(from: [schemaSource])
 
-    let documents: [GraphQLDocument] = try await documents.enumerated().asyncMap {
-      let source = try await makeSource($0.element, filePath: "Doc_\($0.offset)")
+    let documents: [GraphQLDocument] = try await definitions.asyncMap {
       return try await parseDocument(
-        source,
+        $0,
         experimentalClientControlledNullability: config.experimentalFeatures.clientControlledNullability
       )
     }

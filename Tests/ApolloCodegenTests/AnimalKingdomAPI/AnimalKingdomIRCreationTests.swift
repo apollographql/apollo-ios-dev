@@ -24,7 +24,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     private(set) var compilationResult: CompilationResult!
 
     func setUp() async throws {
-      guard frontend == nil else { return }
+      guard compilationResult == nil else { return }
       self.frontend = try await GraphQLJSFrontend()
       self.schema = try await frontend.loadSchema(from: [
         try! frontend.makeSource(from: ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.Schema)
@@ -87,13 +87,14 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
   }
 
   override func setUp() async throws {
-    try await super.setUp()
     try await AnimalKingdomSchema.shared.setUp()
+    try await AnimalKingdomSchema.sharedWithCCN.setUp()
+    try await super.setUp()
   }
 
   override func tearDown() {
-    super.tearDown()
     expected = nil
+    super.tearDown()
   }
 
   func test__directSelections_AllAnimalsQuery_RootQuery__isCorrect() async throws {

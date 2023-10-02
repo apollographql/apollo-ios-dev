@@ -30,8 +30,8 @@ class IRFieldCollectorTests: XCTestCase {
 
   // MARK: - Helpers
 
-  func buildIR() throws {
-    ir = try .mock(schema: schemaSDL, document: document)
+  func buildIR() async throws {
+    ir = try await .mock(schema: schemaSDL, document: document)
 
     for operation in ir.compilationResult.operations {
       _ = ir.build(operation: operation)
@@ -42,7 +42,7 @@ class IRFieldCollectorTests: XCTestCase {
 
   // MARK: - Tests
 
-  func test__collectedFields__givenObject_collectsReferencedFieldsOnly() throws {
+  func test__collectedFields__givenObject_collectsReferencedFieldsOnly() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -66,7 +66,7 @@ class IRFieldCollectorTests: XCTestCase {
     """
 
     // when
-    try buildIR()
+    try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
     let actual = subject.collectedFields(for: Dog)
@@ -79,7 +79,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(actual).to(equal(expected))
   }
 
-  func test__collectedFields__givenInterface_collectsReferencedFieldsOnly() throws {
+  func test__collectedFields__givenInterface_collectsReferencedFieldsOnly() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -103,7 +103,7 @@ class IRFieldCollectorTests: XCTestCase {
     """
 
     // when
-    try buildIR()
+    try await buildIR()
 
     let Dog = try schema[interface: "Dog"].xctUnwrapped()
     let actual = subject.collectedFields(for: Dog)
@@ -116,7 +116,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(actual).to(equal(expected))
   }
 
-  func test__collectedFields__givenFieldsInNonAlphabeticalOrder_retrurnsReferencedFieldsSortedAlphabetically() throws {
+  func test__collectedFields__givenFieldsInNonAlphabeticalOrder_retrurnsReferencedFieldsSortedAlphabetically() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -139,7 +139,7 @@ class IRFieldCollectorTests: XCTestCase {
     """
 
     // when
-    try buildIR()
+    try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
     let actual = subject.collectedFields(for: Dog)
@@ -152,7 +152,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(actual).to(equal(expected))
   }
 
-  func test__collectedFields__givenObjectImplementingInterface_collectsFieldsReferencedOnInterface() throws {
+  func test__collectedFields__givenObjectImplementingInterface_collectsFieldsReferencedOnInterface() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -182,7 +182,7 @@ class IRFieldCollectorTests: XCTestCase {
     """
 
     // when
-    try buildIR()
+    try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
     let actual = subject.collectedFields(for: Dog)
@@ -195,7 +195,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(actual).to(equal(expected))
   }
 
-  func test__collectedFields__givenFieldsFromFragment_collectsFieldsReferencedInFragment() throws {
+  func test__collectedFields__givenFieldsFromFragment_collectsFieldsReferencedInFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -223,7 +223,7 @@ class IRFieldCollectorTests: XCTestCase {
     """
 
     // when
-    try buildIR()
+    try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
     let actual = subject.collectedFields(for: Dog)
@@ -236,7 +236,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(actual).to(equal(expected))
   }
 
-  func test__collectedFields__givenFieldsFromFragmentOnInterface_collectsFieldsReferencedInFragment() throws {
+  func test__collectedFields__givenFieldsFromFragmentOnInterface_collectsFieldsReferencedInFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -270,7 +270,7 @@ class IRFieldCollectorTests: XCTestCase {
     """
 
     // when
-    try buildIR()
+    try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
     let actual = subject.collectedFields(for: Dog)
@@ -283,7 +283,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(actual).to(equal(expected))
   }
 
-  func test__collectedFields__givenFieldsFromQueryOnImplementedInterface_collectsFieldsReferencedInQueryOnInterface() throws {
+  func test__collectedFields__givenFieldsFromQueryOnImplementedInterface_collectsFieldsReferencedInQueryOnInterface() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -317,7 +317,7 @@ class IRFieldCollectorTests: XCTestCase {
     """
 
     // when
-    try buildIR()
+    try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
     let actual = subject.collectedFields(for: Dog)
@@ -330,7 +330,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(actual).to(equal(expected))
   }
 
-  func test__collectedFields__givenAliasedField_collectsFields() throws {
+  func test__collectedFields__givenAliasedField_collectsFields() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -353,7 +353,7 @@ class IRFieldCollectorTests: XCTestCase {
     """
 
     // when
-    try buildIR()
+    try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
     let actual = subject.collectedFields(for: Dog)
@@ -365,7 +365,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(actual).to(equal(expected))
   }
 
-  func test__collectedFields__givenFieldWithArguments_collectsFields() throws {
+  func test__collectedFields__givenFieldWithArguments_collectsFields() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -386,7 +386,7 @@ class IRFieldCollectorTests: XCTestCase {
     """
 
     // when
-    try buildIR()
+    try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
     let actual = subject.collectedFields(for: Dog)
@@ -398,7 +398,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(actual).to(equal(expected))
   }
 
-  func test__collectedFields__givenAliasedFieldsWithArguments_collectsFields() throws {
+  func test__collectedFields__givenAliasedFieldsWithArguments_collectsFields() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -420,7 +420,7 @@ class IRFieldCollectorTests: XCTestCase {
     """
 
     // when
-    try buildIR()
+    try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
     let actual = subject.collectedFields(for: Dog)
@@ -433,7 +433,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(actual).to(equal(expected))
   }
 
-  func test__collectedFields__givenFieldsOnNestedInlineFragmentWithRedundantType_referenceFieldOnNestedTypeNotMatchingTargetType_doesNotCollectsField() throws {
+  func test__collectedFields__givenFieldsOnNestedInlineFragmentWithRedundantType_referenceFieldOnNestedTypeNotMatchingTargetType_doesNotCollectsField() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -472,7 +472,7 @@ class IRFieldCollectorTests: XCTestCase {
     """
 
     // when
-    try buildIR()
+    try await buildIR()
 
     let PetRock = try schema[object: "PetRock"].xctUnwrapped()
     let petRockActual = subject.collectedFields(for: PetRock)
@@ -493,7 +493,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(dogActual).to(equal(dogExpected))
   }
 
-  func test__collectedFields__givenFieldsOnNestedNamedFragmentWithRedundantType_referenceFieldOnNestedTypeNotMatchingTargetType_doesNotCollectsField() throws {
+  func test__collectedFields__givenFieldsOnNestedNamedFragmentWithRedundantType_referenceFieldOnNestedTypeNotMatchingTargetType_doesNotCollectsField() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -534,7 +534,7 @@ class IRFieldCollectorTests: XCTestCase {
     """
 
     // when
-    try buildIR()
+    try await buildIR()
 
     let PetRock = try schema[object: "PetRock"].xctUnwrapped()
     let petRockActual = subject.collectedFields(for: PetRock)
