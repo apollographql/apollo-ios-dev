@@ -59,7 +59,7 @@ public final class GraphQLError: JavaScriptError {
   /// See https://shazronatadobe.wordpress.com/2010/12/04/xcode-shell-build-phase-reporting-of-errors/
   public var logLines: [String]? {
     return sourceLocations?.map {
-      return [$0.filePath, String($0.lineNumber), "error", message ?? "?"].joined(separator: ":")
+      return [$0.filePath ?? "", String($0.lineNumber), "error", message ?? "?"].joined(separator: ":")
     }
   }
 }
