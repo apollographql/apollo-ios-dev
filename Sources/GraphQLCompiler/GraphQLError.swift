@@ -22,7 +22,7 @@ public final class GraphQLError: JavaScriptError {
     from jsValue: JSValue,
     bridge: isolated JavaScriptBridge
   ) -> [GraphQLSourceLocation]? {
-    guard let locations = (jsValue["locations"] as JSValue?)?.toArray() as? [JSValue] else {
+    guard let locations = (jsValue["locations"]).toArray() as? [[String: Int]] else {
       return nil
     }
 
@@ -37,8 +37,8 @@ public final class GraphQLError: JavaScriptError {
       return zip(locations, nodes).map { (location, node) in
         return GraphQLSourceLocation(
           filePath: node.filePath,
-          lineNumber: location["line"].toInt(),
-          columnNumber: location["column"].toInt()
+          lineNumber: location["line"]!,
+          columnNumber: location["column"]!
         )
       }
     } else {
@@ -48,8 +48,8 @@ public final class GraphQLError: JavaScriptError {
       return locations.map {
         GraphQLSourceLocation(
           filePath: source.filePath,
-          lineNumber: $0["line"].toInt(),
-          columnNumber: $0["column"].toInt()
+          lineNumber: $0["line"]!,
+          columnNumber: $0["column"]!
         )
       }
     }
