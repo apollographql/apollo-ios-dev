@@ -142,8 +142,6 @@ class RootFieldBuilder {
       backgroundTaskGroup: &backgroundTaskGroup
     )
 
-    await self.ir.fieldCollector.collectFields(from: selectionSet)
-
     typeInfo.entity.selectionTree.mergeIn(
       selections: target.readOnlyView,
       with: typeInfo
@@ -164,6 +162,8 @@ class RootFieldBuilder {
         backgroundTaskGroup: &backgroundTaskGroup
       )
     }
+
+    await self.ir.fieldCollector.collectFields(from: selectionSet)
   }
 
   private func add(
