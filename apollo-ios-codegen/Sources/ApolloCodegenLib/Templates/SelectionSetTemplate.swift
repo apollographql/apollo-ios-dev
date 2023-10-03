@@ -203,7 +203,7 @@ struct SelectionSetTemplate {
     var isRootType: Bool {
       scope.allTypesInSchema.schemaRootTypes.allRootTypes.contains(scope.type)
     }
-    return scope.scopePath.count == 1 && isRootType
+    return scope.scopePath.count == 1 && !isRootType
   }
 
   private func renderedSelections(

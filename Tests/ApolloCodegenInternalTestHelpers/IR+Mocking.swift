@@ -48,8 +48,7 @@ extension IRBuilder {
     return .mock(compilationResult: compilationResult)
   }
 
-  public static func mock(
-    schemaNamespace: String = "TestSchema",
+  public static func mock(    
     compilationResult: CompilationResult
   ) -> IRBuilder {
     return IRBuilder(compilationResult: compilationResult)
