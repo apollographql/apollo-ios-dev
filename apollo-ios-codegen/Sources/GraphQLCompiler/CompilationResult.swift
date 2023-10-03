@@ -211,6 +211,17 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       directives?.contains { $0.name == Constants.LocalCacheMutationDirectiveName } ?? false
     }
 
+    init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+      self.name = jsValue["name"]
+      self.type = .fromJSValue(jsValue["typeCondition"], bridge: bridge)
+      self.selectionSet = .fromJSValue(jsValue["selectionSet"], bridge: bridge)
+      self.directives = .fromJSValue(jsValue["directives"], bridge: bridge)
+      self.referencedFragments = .fromJSValue(jsValue["referencedFragments"], bridge: bridge)
+      self.source = jsValue["source"]
+      self.filePath = jsValue["filePath"]
+    }
+
+    /// Initializer to be used for creating mock objects in tests only.
     init(
       name: String,
       type: GraphQLCompositeType,
@@ -227,21 +238,6 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.referencedFragments = referencedFragments
       self.source = source
       self.filePath = filePath
-    }
-
-    static func initializeNewObject(
-      _ jsValue: JSValue,
-      bridge: isolated JavaScriptBridge
-    ) -> FragmentDefinition {
-      self.init(
-        name: jsValue["name"],
-        type: .fromJSValue(jsValue["typeCondition"], bridge: bridge),
-        selectionSet: .fromJSValue(jsValue["selectionSet"], bridge: bridge),
-        directives: .fromJSValue(jsValue["directives"], bridge: bridge),
-        referencedFragments: .fromJSValue(jsValue["referencedFragments"], bridge: bridge),
-        source: jsValue["source"],
-        filePath: jsValue["filePath"]
-      )
     }
 
     public var debugDescription: String {

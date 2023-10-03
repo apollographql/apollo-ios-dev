@@ -6,53 +6,13 @@ import OrderedCollections
 // and are partially described in https://graphql.org/graphql-js/type/
 
 /// A GraphQL schema.
-public final class GraphQLSchema: JavaScriptReferencedObject, JavaScriptCallable {
-
-  let jsValue: JSValue
-  let bridge: JavaScriptBridge
-
-  static func initializeNewObject(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
-    self.init(jsValue: jsValue, bridge: bridge)
-  }
-
-  private init(jsValue: JSValue, bridge: JavaScriptBridge) {
-    self.jsValue = jsValue
-    self.bridge = bridge
-  }
+public final class GraphQLSchema: JavaScriptObject {
 
   // MARK: Methods
   func getType(named typeName: String) async throws -> (GraphQLNamedType)? {
     try await invokeMethod("getType", with: typeName)
   }
   
-  func getPossibleTypes(_ abstractType: GraphQLAbstractType) async throws -> [GraphQLObjectType] {
-    return try await invokeMethod("getPossibleTypes", with: abstractType)
-  }
-  
-  func getImplementations(
-    interfaceType: GraphQLInterfaceType
-  ) async throws -> InterfaceImplementations {
-    return try await invokeMethod("getImplementations", with: interfaceType)
-  }
-  
-  struct InterfaceImplementations: JavaScriptObjectDecodable {
-    let objects: [GraphQLObjectType]
-    let interfaces: [GraphQLInterfaceType]
-
-    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
-      self.init(
-        objects: .fromJSValue(jsValue["objects"], bridge: bridge),
-        interfaces: .fromJSValue(jsValue["interfaces"], bridge: bridge)
-      )
-    }
-  }
-    
-  func isSubType(
-    abstractType: GraphQLAbstractType,
-    maybeSubType: GraphQLNamedType
-  ) async throws -> Bool {
-    return try await invokeMethod("isSubType", with: abstractType, maybeSubType)
-  }
 }
 
 protocol GraphQLSchemaType: JavaScriptReferencedObject {
@@ -73,13 +33,15 @@ public class GraphQLNamedType:
     self.documentation = jsValue["description"]
   }
 
+  func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) { }
+
   /// Initializer to be used for creating mock objects in tests only.
   init(
     name: String,
     documentation: String?
   ) {
     self.name = name
-    self.documentation = nil
+    self.documentation = documentation
   }
 
   static func initializeNewObject(
@@ -135,11 +97,14 @@ public final class GraphQLScalarType: GraphQLNamedType {
 }
 
 public final class GraphQLEnumType: GraphQLNamedType {
-  public let values: [GraphQLEnumValue]
+  public private(set) var values: [GraphQLEnumValue]!
 
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
-    self.values = try! bridge.invokeMethod("getValues", on: jsValue)
     super.init(jsValue, bridge: bridge)
+  }
+
+  override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    self.values = try! bridge.invokeMethod("getValues", on: jsValue)
   }
 
   /// Initializer to be used for creating mock objects in tests only.
@@ -196,11 +161,14 @@ public struct GraphQLEnumValue: JavaScriptObjectDecodable {
 public typealias GraphQLInputFieldDictionary = OrderedDictionary<String, GraphQLInputField>
 
 public final class GraphQLInputObjectType: GraphQLNamedType {
-  public let fields: GraphQLInputFieldDictionary
+  public private(set) var fields: GraphQLInputFieldDictionary!
 
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
-    self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
     super.init(jsValue, bridge: bridge)
+  }
+
+  override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
   }
 
   /// Initializer to be used for creating mock objects in tests only.
@@ -260,7 +228,7 @@ public class GraphQLCompositeType: GraphQLNamedType {
 }
 
 public protocol GraphQLInterfaceImplementingType: GraphQLCompositeType {
-  var interfaces: [GraphQLInterfaceType] { get }
+  var interfaces: [GraphQLInterfaceType]! { get }
 }
 
 public extension GraphQLInterfaceImplementingType {
@@ -270,9 +238,10 @@ public extension GraphQLInterfaceImplementingType {
 }
 
 public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImplementingType {
-  public let fields: [String: GraphQLField]
 
-  public let interfaces: [GraphQLInterfaceType]
+  public private(set) var fields: [String: GraphQLField]!
+
+  public private(set) var interfaces: [GraphQLInterfaceType]!
 
   /// Initializer to be used for creating mock objects in tests only.
   init(
@@ -287,9 +256,12 @@ public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImpl
   }
 
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    super.init(jsValue, bridge: bridge)
+  }
+
+  override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
     self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
     self.interfaces = try! bridge.invokeMethod("getInterfaces", on: jsValue)
-    super.init(jsValue, bridge: bridge)
   }
 
   public override var debugDescription: String {
@@ -301,12 +273,10 @@ public class GraphQLAbstractType: GraphQLCompositeType {
 }
 
 public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceImplementingType {
-  #warning("TODO: remove this field?")
-//  public let deprecationReason: String?
 
-  public let fields: [String: GraphQLField]
+  public private(set) var fields: [String: GraphQLField]!
 
-  public let interfaces: [GraphQLInterfaceType]
+  public private(set) var interfaces: [GraphQLInterfaceType]!
 
   /// Initializer to be used for creating mock objects in tests only.
   init(
@@ -314,19 +284,19 @@ public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceIm
     documentation: String?,
     fields: [String: GraphQLField],
     interfaces: [GraphQLInterfaceType]
-//    deprecationReason: String?
   ) {
     self.fields = fields
     self.interfaces = interfaces
-//    self.deprecationReason = deprecationReason
     super.init(name: name, documentation: documentation)
   }
 
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
-//    self.deprecationReason = jsValue["deprecationReason"]
+    super.init(jsValue, bridge: bridge)
+  }
+
+  override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
     self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
     self.interfaces = try! bridge.invokeMethod("getInterfaces", on: jsValue)
-    super.init(jsValue, bridge: bridge)
   }
 
   public override var debugDescription: String {

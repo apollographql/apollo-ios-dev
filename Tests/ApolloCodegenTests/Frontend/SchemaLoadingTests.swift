@@ -35,9 +35,12 @@ class SchemaLoadingTests: XCTestCase {
   }
   
   func testParseSchemaFromSDL() async throws {
-    let source = try await codegenFrontend.makeSource(
-      from: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema
-    )
+    let source = try await codegenFrontend.makeSource("""
+      type Query {
+        foo
+      }
+      """, filePath: "schema.graphqls")
+
     let schema = try await codegenFrontend.loadSchema(from: [source])
     
     await expect { try await schema.getType(named: "Character")?.name }
