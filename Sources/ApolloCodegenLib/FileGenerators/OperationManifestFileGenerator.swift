@@ -41,7 +41,7 @@ struct OperationManifestFileGenerator {
   func generate(
     operationManifest: OperationManifestTemplate.OperationManifest,
     fileManager: ApolloFileManager = .default
-  ) throws {
+  ) async throws {
     let rendered: String = try template.render(operations: operationManifest)
 
     var manifestPath = config.operationManifest.unsafelyUnwrapped.path
@@ -59,7 +59,7 @@ struct OperationManifestFileGenerator {
       manifestPath.append(".json")
     }
       
-    try fileManager.createFile(
+    try await fileManager.createFile(
       atPath: manifestPath,
       data: rendered.data(using: .utf8),
       overwrite: true

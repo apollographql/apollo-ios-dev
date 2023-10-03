@@ -69,7 +69,7 @@ public struct ApolloSchemaDownloader {
       )
 
     case .apolloRegistry(let settings):
-      try self.downloadFrom(
+      try await self.downloadFrom(
         registry: settings,
         configuration: configuration,
         withRootURL: rootURL
@@ -101,7 +101,7 @@ public struct ApolloSchemaDownloader {
     path: String,
     rootURL: URL?,
     fileManager: ApolloFileManager = .default
-  ) throws {
+  ) async throws {
 
     let outputURL: URL
     if let rootURL = rootURL {
@@ -114,7 +114,7 @@ public struct ApolloSchemaDownloader {
       throw SchemaDownloadError.couldNotCreateSDLDataToWrite(schema: string)
     }
 
-    try fileManager.createFile(atPath: outputURL.path, data: data, overwrite: true)
+    try await fileManager.createFile(atPath: outputURL.path, data: data, overwrite: true)
   }
 
   // MARK: - Schema Registry
@@ -139,7 +139,7 @@ public struct ApolloSchemaDownloader {
     registry: ApolloSchemaDownloadConfiguration.DownloadMethod.ApolloRegistrySettings,
     configuration: ApolloSchemaDownloadConfiguration,
     withRootURL rootURL: URL?
-  ) throws {
+  ) async throws {
     CodegenLogger.log("Downloading schema from registry", logLevel: .debug)
 
     let urlRequest = try registryRequest(with: registry, headers: configuration.headers)
@@ -153,7 +153,7 @@ public struct ApolloSchemaDownloader {
       timeout: configuration.downloadTimeout
     )
 
-    try self.convertFromRegistryJSONToSDLFile(
+    try await self.convertFromRegistryJSONToSDLFile(
       jsonFileURL: jsonOutputURL,
       configuration: configuration,
       withRootURL: rootURL
@@ -199,7 +199,7 @@ public struct ApolloSchemaDownloader {
     jsonFileURL: URL,
     configuration: ApolloSchemaDownloadConfiguration,
     withRootURL rootURL: URL?
-  ) throws {
+  ) async throws {
     let jsonData: Data
 
     do {
@@ -230,7 +230,7 @@ public struct ApolloSchemaDownloader {
       throw SchemaDownloadError.couldNotExtractSDLFromRegistryJSON
     }
 
-    try write(sdlSchema, path: configuration.outputPath, rootURL: rootURL)
+    try await write(sdlSchema, path: configuration.outputPath, rootURL: rootURL)
   }
 
   // MARK: - Schema Introspection
@@ -449,7 +449,7 @@ public struct ApolloSchemaDownloader {
       throw SchemaDownloadError.couldNotConvertIntrospectionJSONToSDL(underlying: error)
     }
 
-    try write(sdlSchema, path: configuration.outputPath, rootURL: rootURL)
+    try await write(sdlSchema, path: configuration.outputPath, rootURL: rootURL)
   }
 }
 #endif
