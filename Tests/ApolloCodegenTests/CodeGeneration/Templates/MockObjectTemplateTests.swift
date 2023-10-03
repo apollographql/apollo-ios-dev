@@ -40,7 +40,8 @@ class MockObjectTemplateTests: XCTestCase {
         name,
         interfaces: interfaces
       ),
-      fields: fields.map { ($0.key, $0.value.type, $0.value.deprecationReason) },
+      fields: fields        
+        .map { ($0.key, $0.value.type, $0.value.deprecationReason) },
       config: ApolloCodegen.ConfigurationContext(config: config),
       ir: ir
     )
@@ -536,7 +537,7 @@ class MockObjectTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(
       expected,
-      atLine: 8 + self.subject.graphqlObject.fields.count,
+      atLine: 8 + self.subject.fields.count,
       ignoringExtraLines: false)
     )
   }
@@ -750,7 +751,7 @@ class MockObjectTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(
       expected,
-      atLine: 8 + self.subject.graphqlObject.fields.count,
+      atLine: 8 + self.subject.fields.count,
       ignoringExtraLines: false)
     )
   }
@@ -908,7 +909,7 @@ class MockObjectTemplateTests: XCTestCase {
       buildSubject(
         name: keyword,
         fields: [
-          "name": .mock("string", type: .nonNull(.string())),
+          "string": .mock("string", type: .nonNull(.string())),
         ],
         moduleType: .swiftPackageManager
       )

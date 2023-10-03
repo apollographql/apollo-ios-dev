@@ -1186,7 +1186,7 @@ class ApolloCodegenTests: XCTestCase {
     )
 
     let fileManager = MockApolloFileManager(strict: false)
-
+    
     var filePaths: Set<String> = []
     fileManager.mock(closure: .createFile({ path, data, attributes in
       filePaths.insert(path)

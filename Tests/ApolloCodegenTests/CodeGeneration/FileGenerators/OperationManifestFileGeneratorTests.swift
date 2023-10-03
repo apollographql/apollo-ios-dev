@@ -258,7 +258,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
       expect(String(data: data!, encoding: .utf8)).to(equal(
         """
         {
-          "8ed9fcbb8ef3c853ad0ecdc920eb8216608bd7c3b32258744e9289ec0372eb30" : {
+          "identifier1" : {
             "name": "TestQuery",
             "source": "query TestQuery { test }"
           }
