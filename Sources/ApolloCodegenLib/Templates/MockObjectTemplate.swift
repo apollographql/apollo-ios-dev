@@ -27,6 +27,7 @@ struct MockObjectTemplate: TemplateRenderer {
   var template: TemplateString {
     let objectName = graphqlObject.formattedName
     let fields: [TemplateField] = fields
+      .sorted { $0.0 < $1.0 }
       .map {
          (
           responseKey: $0.0,

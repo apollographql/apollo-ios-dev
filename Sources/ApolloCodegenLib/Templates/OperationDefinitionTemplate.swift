@@ -63,7 +63,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
       \(if: config.options.operationDocumentFormat.contains(.operationId), {
         precondition(operationIdentifier != nil, "operationIdentifier is missing.")
         return """
-        operationIdentifier: \"\(operationIdentifier.unsafelyUnwrapped)\"\(if: includeDefinition, ",")
+          operationIdentifier: \"\(operationIdentifier.unsafelyUnwrapped)\"\(if: includeDefinition, ",")
         """ }()
       )
       \(if: includeDefinition, """
