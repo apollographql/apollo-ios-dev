@@ -210,6 +210,7 @@ public class ApolloCodegen {
           }
         }
       }
+      try await group.waitForAll()
     }
   }
 
