@@ -54,8 +54,10 @@ public struct CodegenTestHelper {
       .appendingPathComponent("Schema")
   }
   
-  public static func deleteExistingOutputFolder(file: StaticString = #filePath,
-                                         line: UInt = #line) {
+  public static func deleteExistingOutputFolder(
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
     do {
       let outputFolderURL = self.outputFolderURL()
       try ApolloFileManager.default.deleteDirectory(atPath: outputFolderURL.path)

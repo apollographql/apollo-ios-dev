@@ -37,7 +37,10 @@ class SchemaLoadingTests: XCTestCase {
   func testParseSchemaFromSDL() async throws {
     let source = try await codegenFrontend.makeSource("""
       type Query {
-        foo
+        foo: String!
+      }
+      type Character {
+        bar: String!
       }
       """, filePath: "schema.graphqls")
 
