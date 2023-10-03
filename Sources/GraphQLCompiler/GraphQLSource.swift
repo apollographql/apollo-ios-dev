@@ -18,7 +18,7 @@ public final class GraphQLSource: JavaScriptObject {
 
 /// Represents a location in a GraphQL source file.
 public struct GraphQLSourceLocation {
-  let filePath: String
+  let filePath: String?
 
   let lineNumber: Int
   let columnNumber: Int
@@ -35,9 +35,9 @@ public struct GraphQLSourceLocation {
 public class ASTNode: JavaScriptObject, @unchecked Sendable {
   public let kind: String
 
-  public let source: GraphQLSource
+  public let source: GraphQLSource?
 
-  public var filePath: String { source.filePath }
+  public var filePath: String? { source?.filePath }
 
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
     self.kind = jsValue["kind"]

@@ -73,8 +73,9 @@ public final class GraphQLJSFrontend {
     from fileURL: URL,
     experimentalClientControlledNullability: Bool = false
   ) async throws -> GraphQLDocument {
+    let source = try await makeSource(from: fileURL)
     return try await parseDocument(
-      try makeSource(from: fileURL),
+      source,
       experimentalClientControlledNullability: experimentalClientControlledNullability
     )
   }
