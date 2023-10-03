@@ -53,13 +53,17 @@ After you have run the `tuist generate` command you should see both an `ApolloDe
 
 After working and making changes in the `ApolloDev.xcworkspace` you can commit your changes as normal and submit a PR to the `main` branch of the `apollo-ios-dev` repo for review.
 
+## Issues
+
+To report an issue, bug, or feature request ou can do so in the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repo.
+
 ## Roadmap
 
 The [roadmap](https://github.com/apollographql/apollo-ios/blob/main/ROADMAP.md) is a high-level document that describes the next major steps or milestones for this project. We are always open to feature requests, and contributions from the community.
 
 ## Contributing
 
-This project is being developed using Xcode 14 and Swift 5.7.
+This project is being developed using Xcode 15 and Swift 5.9.
 
 Some of the tests run against [a simple GraphQL server serving the Star Wars example schema](https://github.com/apollographql/starwars-server) (see installation instructions there).
 
