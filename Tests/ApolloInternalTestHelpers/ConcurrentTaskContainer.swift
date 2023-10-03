@@ -25,7 +25,10 @@ public class ConcurrentTaskContainer {
 
     func didFinishTask() {
       if tasks.isEmpty {
-        for continuation in waitForAllTaskContinuations {
+        var continuations = waitForAllTaskContinuations
+        waitForAllTaskContinuations = []
+
+        for continuation in continuations {
           continuation.resume()
         }
       }
@@ -33,10 +36,10 @@ public class ConcurrentTaskContainer {
 
     func waitForAllTasks() async {
       guard !tasks.isEmpty else { return }
-
       await withCheckedContinuation { continuation in
         waitForAllTaskContinuations.append(continuation)
       }
+
     }
   }
 
