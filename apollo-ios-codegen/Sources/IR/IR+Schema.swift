@@ -27,6 +27,8 @@ public final class Schema {
     public let enums: OrderedSet<GraphQLEnumType>
     public let inputObjects: OrderedSet<GraphQLInputObjectType>
 
+    private let typeToUnionMap: [GraphQLObjectType: Set<GraphQLUnionType>]
+
     init(
       _ types: [GraphQLNamedType],
       schemaRootTypes: CompilationResult.RootTypeDefinition
@@ -66,18 +68,16 @@ public final class Schema {
       self.customScalars = customScalars
       self.enums = enums
       self.inputObjects = inputObjects
+
+      var typeToUnionMap: [GraphQLObjectType: Set<GraphQLUnionType>] = [:]
+      objects.forEach { type in
+        typeToUnionMap[type] = Set(unions.filter { $0.types.contains(type) })
+      }
+      self.typeToUnionMap = typeToUnionMap
     }
 
-    private var typeToUnionMap: [GraphQLObjectType: Set<GraphQLUnionType>] = [:]
-
     public func unions(including type: GraphQLObjectType) -> Set<GraphQLUnionType> {
-      if let unions = typeToUnionMap[type] {
-        return unions
-      }
-
-      let matchingUnions = Set(unions.filter { $0.types.contains(type) })
-      typeToUnionMap[type] = matchingUnions
-      return matchingUnions
+      typeToUnionMap[type].unsafelyUnwrapped
     }
 
     public var debugDescription: String {
