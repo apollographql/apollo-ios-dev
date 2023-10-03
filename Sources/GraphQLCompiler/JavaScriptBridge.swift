@@ -45,14 +45,24 @@ protocol JavaScriptReferencedObject: AnyObject, JavaScriptObjectDecodable {
   ///
   /// - Warning: This function should not be called directly to initialize an instance. Instead use
   /// `fromJSValue(_:bridge)`, which will return the existing object if it has already been
-  /// initialized or call this method to initialize and store the object in the `bridge`.
-  static func initializeNewObject(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self
+  /// initialized or call this and then `finalize(_: bridge:)` to initialize and store the object in the `bridge`.
+  init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge)
+
+  /// This function will be after being initialized by a `JavaScriptBridge` to allow the object to
+  /// complete setup of its values.
+  ///
+  /// Some properties of the object may be self-referential. In order to avoid infinite recursion,
+  /// while initializing these objects, these properties must be set up after the object has been
+  /// initialized and stored by the `JavaScriptBridge`.
+  func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge)
 }
 
 extension JavaScriptReferencedObject {
   static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
     bridge.getReferenceOrInitialize(jsValue)
   }
+
+  func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) { }
 }
 
 // MARK: - JavaScriptCallable
@@ -70,20 +80,23 @@ extension JavaScriptCallable {
 
   // MARK: Invoke Method
 
-  func invokeMethod(_ methodName: String, with arguments: Any...) async throws -> JSValue {
+  func invokeMethod(
+    _ methodName: String,
+    with arguments: any JavaScriptValueConvertible...
+  ) async throws -> JSValue {
     try await bridge.invokeMethod(methodName, on: jsValue, with: arguments)
   }
 
   func invokeMethod<Decodable: JavaScriptValueDecodable>(
     _ methodName: String,
-    with arguments: Any...
+    with arguments: any JavaScriptValueConvertible...
   ) async throws -> Decodable {
     return Decodable.init(try await bridge.invokeMethod(methodName, on: jsValue, with: arguments))
   }
 
   func invokeMethod<Decodable: JavaScriptObjectDecodable>(
     _ methodName: String,
-    with arguments: Any...
+    with arguments: any JavaScriptValueConvertible...
   ) async throws -> Decodable {
     return await Decodable.fromJSValue(
       try bridge.invokeMethod(methodName, on: jsValue, with: arguments),
@@ -93,20 +106,23 @@ extension JavaScriptCallable {
 
   // MARK: Call Function
 
-  func call(_ functionName: String, with arguments: Any...) async throws -> JSValue {
+  func call(
+    _ functionName: String,
+    with arguments: any JavaScriptValueConvertible...
+  ) async throws -> JSValue {
     try await bridge.call(functionName, on: jsValue, with: arguments)
   }
 
   func call<Decodable: JavaScriptValueDecodable>(
     _ functionName: String,
-    with arguments: Any...
+    with arguments: any JavaScriptValueConvertible...
   ) async throws -> Decodable {
     return Decodable.init(try await bridge.call(functionName, on: jsValue, with: arguments))
   }
 
   func call<Decodable: JavaScriptObjectDecodable>(
     _ functionName: String,
-    with arguments: Any...
+    with arguments: any JavaScriptValueConvertible...
   ) async throws -> Decodable {
     return await Decodable.fromJSValue(
       try bridge.call(functionName, on: jsValue, with: arguments),
@@ -117,7 +133,7 @@ extension JavaScriptCallable {
   // MARK: Construct Object
 
   func construct<Wrapper: JavaScriptObjectDecodable>(
-    with arguments: Any...
+    with arguments: any JavaScriptValueConvertible...
   ) async throws -> Wrapper {
     return try await bridge.construct(from: jsValue, with: arguments)
   }
@@ -141,7 +157,7 @@ extension JavaScriptCallable {
 
 /// A default object type to be initialized when an unregistered type is initialized from
 /// a `JavaScriptBridge`.
-class JavaScriptObject: JavaScriptReferencedObject, JavaScriptCallable {
+public class JavaScriptObject: JavaScriptReferencedObject, JavaScriptCallable {
   /// The underlying JavaScript value for the object.
   ///
   /// - precondition: This value must be an object (ie. `jsValue.isObject` must be `true`).
@@ -175,6 +191,7 @@ actor JavaScriptBridge {
   public enum Error: Swift.Error {
     case failedToCreateJSContext
     case unrecognizedJavaScriptErrorThrown(JSValue)
+    
   }
 
   private struct WeakRef {
@@ -256,8 +273,9 @@ actor JavaScriptBridge {
       preconditionFailure("Expected JavaScriptReferencedObject.Type, got \(wrapperType).")
     }
 
-    let wrapper = wrapperType.initializeNewObject(jsValue, bridge: self)
+    let wrapper = wrapperType.init(jsValue, bridge: self)
     wrapperMap[jsValue] = WeakRef(wrapper)
+    wrapper.finalize(jsValue, bridge: self)
     return checkedDowncast(wrapper)
   }
 
@@ -304,10 +322,10 @@ actor JavaScriptBridge {
 
   // MARK: Invoke Method
 
-  private func invokeMethod(
+  func invokeMethod(
     _ methodName: String,
     on jsValue: JSValue,
-    with arguments: [Any]
+    with arguments: [any JavaScriptValueConvertible]
   ) throws -> JSValue {
     return try throwingJavaScriptErrorIfNeeded {
       jsValue.invokeMethod(methodName, withArguments: unwrap(arguments))
@@ -317,7 +335,7 @@ actor JavaScriptBridge {
   func invokeMethod(
     _ methodName: String,
     on jsValue: JSValue,
-    with arguments: Any...
+    with arguments: any JavaScriptValueConvertible...
   ) throws -> JSValue {
     try invokeMethod(methodName, on: jsValue, with: arguments)
   }
@@ -325,7 +343,7 @@ actor JavaScriptBridge {
   func invokeMethod<Decodable: JavaScriptValueDecodable>(
     _ methodName: String,
     on jsValue: JSValue,
-    with arguments: Any...
+    with arguments: any JavaScriptValueConvertible...
   ) throws -> Decodable {
     return Decodable.init(try invokeMethod(methodName, on: jsValue, with: arguments))
   }
@@ -333,7 +351,7 @@ actor JavaScriptBridge {
   func invokeMethod<Decodable: JavaScriptObjectDecodable>(
     _ methodName: String,
     on jsValue: JSValue,
-    with arguments: Any...
+    with arguments: any JavaScriptValueConvertible...
   ) throws -> Decodable {
     return Decodable.fromJSValue(
       try invokeMethod(methodName, on: jsValue, with: arguments),
@@ -343,10 +361,10 @@ actor JavaScriptBridge {
 
   // MARK: Call Function
 
-  private func call(
+  func call(
     _ functionName: String,
     on jsValue: JSValue,
-    with arguments: [Any]
+    with arguments: [any JavaScriptValueConvertible]
   ) throws -> JSValue {
     return try throwingJavaScriptErrorIfNeeded {
       let function = jsValue[functionName]
@@ -360,7 +378,7 @@ actor JavaScriptBridge {
   func call(
     _ functionName: String,
     on jsValue: JSValue,
-    with arguments: Any...
+    with arguments: any JavaScriptValueConvertible...
   ) throws -> JSValue {
     try call(functionName, on: jsValue, with: arguments)
   }
@@ -368,7 +386,7 @@ actor JavaScriptBridge {
   func call<Decodable: JavaScriptValueDecodable>(
     _ functionName: String,
     on jsValue: JSValue,
-    with arguments: Any...
+    with arguments: any JavaScriptValueConvertible...
   ) throws -> Decodable {
     return Decodable.init(
       try call(functionName, on: jsValue, with: arguments)
@@ -378,7 +396,7 @@ actor JavaScriptBridge {
   func call<Decodable: JavaScriptObjectDecodable>(
     _ functionName: String,
     on jsValue: JSValue,
-    with arguments: Any...
+    with arguments: any JavaScriptValueConvertible...
   ) throws -> Decodable {
     return Decodable.fromJSValue(
       try call(functionName, on: jsValue, with: arguments),
@@ -390,7 +408,7 @@ actor JavaScriptBridge {
 
   func construct<Wrapper: JavaScriptObjectDecodable>(
     from jsValue: JSValue,
-    with arguments: Any...
+    with arguments: [any JavaScriptValueConvertible]
   ) throws -> Wrapper {
     return try throwingJavaScriptErrorIfNeeded {
       return Wrapper.fromJSValue(
@@ -434,14 +452,8 @@ actor JavaScriptBridge {
     return result
   }
 
-  private func unwrap(_ values: [Any]) -> [Any] {
-    return values.map { value in
-      if let unwrappable = value as? CustomJavaScriptValueUnwrappable {
-        return unwrappable.unwrapJSValue
-      } else {
-        return value
-      }
-    }
+  private func unwrap(_ values: [any JavaScriptValueConvertible]) -> [Any] {
+    values.map { $0.unwrapJSValue }
   }
 }
 
@@ -636,30 +648,38 @@ private func checkedDowncast<ExpectedType: AnyObject>(_ object: AnyObject) -> Ex
   return expected
 }
 
-fileprivate protocol CustomJavaScriptValueUnwrappable {
+protocol JavaScriptValueConvertible {
   var unwrapJSValue: Any { get }
 }
 
-extension JavaScriptObject: CustomJavaScriptValueUnwrappable {
+extension JavaScriptObject: JavaScriptValueConvertible {
   var unwrapJSValue: Any {
     return jsValue
   }
 }
 
-extension Optional: CustomJavaScriptValueUnwrappable where Wrapped: CustomJavaScriptValueUnwrappable {
+extension Optional: JavaScriptValueConvertible where Wrapped: JavaScriptValueConvertible {
   var unwrapJSValue: Any {
     return map(\.unwrapJSValue) as Any
   }
 }
 
-extension Array: CustomJavaScriptValueUnwrappable where Element: CustomJavaScriptValueUnwrappable {
+extension Array: JavaScriptValueConvertible where Element: JavaScriptValueConvertible {
   var unwrapJSValue: Any {
     return map(\.unwrapJSValue)
   }
 }
 
-extension Dictionary: CustomJavaScriptValueUnwrappable where Key == String, Value: CustomJavaScriptValueUnwrappable {
+extension Dictionary: JavaScriptValueConvertible where Key == String, Value: JavaScriptValueConvertible {
   var unwrapJSValue: Any {
     return mapValues(\.unwrapJSValue)
   }
+}
+
+extension String: JavaScriptValueConvertible {
+  var unwrapJSValue: Any { self }
+}
+
+extension Bool: JavaScriptValueConvertible {
+  var unwrapJSValue: Any { self }
 }

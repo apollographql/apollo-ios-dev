@@ -3,17 +3,17 @@ import JavaScriptCore
 
 /// A representation of source input to GraphQL parsing.
 /// Corresponds to https://github.com/graphql/graphql-js/blob/master/src/language/source.js
-public struct GraphQLSource: JavaScriptObjectDecodable {
+public final class GraphQLSource: JavaScriptObject {
   public let filePath: String
 
   public let body: String
 
-  static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> GraphQLSource {
-    self.init(
-      filePath: jsValue["name"],
-      body: jsValue["body"]
-    )
+  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    self.filePath = jsValue["name"]
+    self.body = jsValue["body"]
+    super.init(jsValue, bridge: bridge)
   }
+
 }
 
 /// Represents a location in a GraphQL source file.
@@ -32,7 +32,7 @@ public struct GraphQLSourceLocation {
 // `GraphQLDocument`.
 
 /// An AST node.
-public class ASTNode: JavaScriptObjectDecodable, @unchecked Sendable {
+public class ASTNode: JavaScriptObject, @unchecked Sendable {
   public let kind: String
 
   public let source: GraphQLSource
@@ -42,6 +42,7 @@ public class ASTNode: JavaScriptObjectDecodable, @unchecked Sendable {
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
     self.kind = jsValue["kind"]
     self.source = .fromJSValue(jsValue["loc"]["source"], bridge: bridge)
+    super.init(jsValue, bridge: bridge)
   }
 
   static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
