@@ -12,6 +12,7 @@ public class CompilationResult: JavaScriptObject {
 
     enum ArgumentLabels {
       static let `If` = "if"
+      static let Label = "label"
     }
   }
 
@@ -164,7 +165,7 @@ public class CompilationResult: JavaScriptObject {
 
     lazy var directives: [Directive]? = self["directives"]
 
-    public lazy var isDeferred: IsDeferred = getIsDeferred()
+    public lazy var deferCondition: DeferCondition? = getDeferCondition()
 
     public override var debugDescription: String {
       selectionSet.debugDescription
@@ -191,7 +192,7 @@ public class CompilationResult: JavaScriptObject {
 
     public lazy var directives: [Directive]? = self["directives"]
 
-    public lazy var isDeferred: IsDeferred = getIsDeferred()
+    public lazy var deferCondition: DeferCondition? = getDeferCondition()
 
     @inlinable public var parentType: GraphQLCompositeType { fragment.type }
 
@@ -408,16 +409,13 @@ public class CompilationResult: JavaScriptObject {
     }
   }
 
-  public enum IsDeferred: ExpressibleByBooleanLiteral {
-    case value(Bool)
-    case variable(String)
+  public struct DeferCondition {
+    public let label: String
+    public let variable: String?
 
-    public init(booleanLiteral value: BooleanLiteralType) {
-      self = .value(value)
-    }
-
-    static func `if`(_ variable: String) -> Self {
-      .variable(variable)
+    init(label: String, variable: String? = nil) {
+      self.label = label
+      self.variable = variable
     }
   }
 
@@ -428,28 +426,43 @@ fileprivate protocol Deferrable {
 }
 
 fileprivate extension Deferrable where Self: JavaScriptObject {
-  func getIsDeferred() -> CompilationResult.IsDeferred {
+  func getDeferCondition() -> CompilationResult.DeferCondition? {
     guard let directive = directives?.first(
       where: { $0.name == CompilationResult.Constants.DirectiveNames.Defer }
     ) else {
-      return false
+      return nil
     }
 
-    guard let argument = directive.arguments?.first(
+    guard
+      let labelArgument = directive.arguments?.first(
+        where: { $0.name == CompilationResult.Constants.ArgumentLabels.Label }),
+      case let .string(labelValue) = labelArgument.value
+    else {
+      preconditionFailure("Incorrect `label` argument. Either missing or value is not a String.")
+    }
+
+    guard let variableArgument = directive.arguments?.first(
       where: { $0.name == CompilationResult.Constants.ArgumentLabels.If }
     ) else {
-      return true
+      return .init(label: labelValue)
     }
 
-    switch (argument.value) {
+    switch (variableArgument.value) {
     case let .boolean(value):
-      return .value(value)
+      if value {
+        return .init(label: labelValue)
+      } else {
+        return nil
+      }
 
     case let .string(value), let .variable(value):
-      return .variable(value)
+      return .init(label: labelValue, variable: value)
 
     default:
-      preconditionFailure("Incompatible argument value. Expected Boolean or Variable, got \(argument.value).")
+      preconditionFailure("""
+        Incompatible variable value. Expected Boolean, String or Variable,
+        got \(variableArgument.value).
+        """)
     }
   }
 }

@@ -331,10 +331,10 @@ class RootFieldBuilder {
     from selectionSet: CompilationResult.SelectionSet?,
     with scopeCondition: ScopeCondition,
     inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo,
-    isDeferred: IsDeferred = false
+    deferCondition: DeferCondition? = nil
   ) -> InlineFragmentSpread {
     let typePath = enclosingTypeInfo.scopePath.mutatingLast {
-      $0.appending(scopeCondition, isDeferred: isDeferred)
+      $0.appending(scopeCondition, deferCondition: deferCondition)
     }
 
     let irSelectionSet = SelectionSet(

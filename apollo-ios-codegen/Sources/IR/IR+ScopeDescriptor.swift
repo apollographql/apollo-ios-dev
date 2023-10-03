@@ -70,7 +70,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
 
   let allTypesInSchema: Schema.ReferencedTypes
 
-  let isDeferred: IsDeferred
+  let deferCondition: DeferCondition?
 
   private init(
     typePath: LinkedList<ScopeCondition>,
@@ -78,14 +78,14 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
     matchingTypes: TypeScope,
     matchingConditions: InclusionConditions?,
     allTypesInSchema: Schema.ReferencedTypes,
-    isDeferred: IsDeferred = false
+    deferCondition: DeferCondition? = nil
   ) {
     self.scopePath = typePath
     self.type = type
     self.matchingTypes = matchingTypes
     self.matchingConditions = matchingConditions
     self.allTypesInSchema = allTypesInSchema
-    self.isDeferred = isDeferred
+    self.deferCondition = deferCondition
   }
 
   /// Creates a `ScopeDescriptor` for a root `SelectionSet`.
@@ -144,7 +144,10 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
   ///
   /// This should be used to create a `ScopeDescriptor` for a conditional `SelectionSet` inside
   /// of an entity, by appending the conditions to the parent `SelectionSet`'s `ScopeDescriptor`.
-  func appending(_ scopeCondition: ScopeCondition, isDeferred: IsDeferred = false) -> ScopeDescriptor {
+  func appending(
+    _ scopeCondition: ScopeCondition,
+    deferCondition: DeferCondition? = nil
+  ) -> ScopeDescriptor {
     let matchingTypes: TypeScope
     if let newType = scopeCondition.type {
       matchingTypes = Self.typeScope(
@@ -167,7 +170,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
       matchingTypes: matchingTypes,
       matchingConditions: matchingConditions,
       allTypesInSchema: self.allTypesInSchema,
-      isDeferred: isDeferred
+      deferCondition: deferCondition
     )
   }
 
