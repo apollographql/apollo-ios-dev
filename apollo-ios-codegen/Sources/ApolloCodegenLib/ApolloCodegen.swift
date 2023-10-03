@@ -190,7 +190,7 @@ public class ApolloCodegen {
       }
       
       if itemsToGenerate.contains(.code) {
-        var existingGeneratedFilePaths = config.options.pruneGeneratedFiles ?
+        let existingGeneratedFilePaths = config.options.pruneGeneratedFiles ?
         try findExistingGeneratedFilePaths(fileManager: fileManager) : []
         
         group.addTask {
@@ -202,10 +202,12 @@ public class ApolloCodegen {
         }
         
         if config.options.pruneGeneratedFiles {
-          try deleteExtraneousGeneratedFiles(
-            from: &existingGeneratedFilePaths,
-            afterCodeGenerationUsing: fileManager
-          )
+          group.addTask {
+            try await self.deleteExtraneousGeneratedFiles(
+              from: existingGeneratedFilePaths,
+              afterCodeGenerationUsing: fileManager
+            )
+          }
         }
       }
     }
@@ -360,7 +362,7 @@ public class ApolloCodegen {
       return operationManifest
     }
 
-    try OperationManifestFileGenerator(config: config)
+    try await OperationManifestFileGenerator(config: config)
       .generate(
         operationManifest: operationManifest,
         fileManager: fileManager
@@ -382,7 +384,7 @@ public class ApolloCodegen {
             for: irFragment.rootField.selectionSet,
             in: irFragment.definition.name
           )
-          try FragmentFileGenerator(irFragment: irFragment, config: self.config)
+          try await FragmentFileGenerator(irFragment: irFragment, config: self.config)
             .generate(forConfig: self.config, fileManager: fileManager)
         }
       }
@@ -397,7 +399,7 @@ public class ApolloCodegen {
             in: irOperation.definition.name
           )
 
-          try OperationFileGenerator(
+          try await OperationFileGenerator(
             irOperation: irOperation,
             operationIdentifier: await identifier,
             config: self.config
@@ -414,10 +416,12 @@ public class ApolloCodegen {
     ir: IRBuilder,
     fileManager: ApolloFileManager
   ) async throws {
+    let config = config
+
     try await withThrowingTaskGroup(of: Void.self) { group in
       for graphQLObject in ir.schema.referencedTypes.objects {
-        group.addTask { [self] in
-          try ObjectFileGenerator(
+        group.addTask {
+          try await ObjectFileGenerator(
             graphqlObject: graphQLObject,
             config: config
           ).generate(
@@ -427,7 +431,7 @@ public class ApolloCodegen {
 
           if config.output.testMocks != .none {
             let fields = await ir.fieldCollector.collectedFields(for: graphQLObject)
-            try MockObjectFileGenerator(
+            try await MockObjectFileGenerator(
               graphqlObject: graphQLObject,
               fields: fields,
               ir: ir,
@@ -443,74 +447,104 @@ public class ApolloCodegen {
       try await group.waitForAll()
     }
 
-    for graphQLEnum in ir.schema.referencedTypes.enums {
-      try autoreleasepool {
-        try EnumFileGenerator(graphqlEnum: graphQLEnum, config: config)
+    try await withThrowingTaskGroup(of: Void.self) { group in
+      for graphQLEnum in ir.schema.referencedTypes.enums {
+        group.addTask {
+          try await EnumFileGenerator(graphqlEnum: graphQLEnum, config: config)
+            .generate(forConfig: config, fileManager: fileManager)
+        }
+      }
+      try await group.waitForAll()
+    }
+
+    try await withThrowingTaskGroup(of: Void.self) { group in
+      for graphQLInterface in ir.schema.referencedTypes.interfaces {
+        group.addTask {
+          try await InterfaceFileGenerator(graphqlInterface: graphQLInterface, config: config)
+            .generate(forConfig: config, fileManager: fileManager)
+        }
+      }
+      try await group.waitForAll()
+    }
+
+    try await withThrowingTaskGroup(of: Void.self) { group in
+      for graphQLUnion in ir.schema.referencedTypes.unions {
+        group.addTask {
+          try await UnionFileGenerator(
+            graphqlUnion: graphQLUnion,
+            config: config
+          ).generate(
+            forConfig: config,
+            fileManager: fileManager
+          )
+        }
+      }
+      try await group.waitForAll()
+    }
+
+    try await withThrowingTaskGroup(of: Void.self) { group in
+      for graphQLInputObject in ir.schema.referencedTypes.inputObjects {
+        group.addTask {
+          try await InputObjectFileGenerator(
+            graphqlInputObject: graphQLInputObject,
+            config: config
+          ).generate(
+            forConfig: config,
+            fileManager: fileManager
+          )
+        }
+      }
+      try await group.waitForAll()
+    }
+
+    try await withThrowingTaskGroup(of: Void.self) { group in
+      for graphQLScalar in ir.schema.referencedTypes.customScalars {
+        group.addTask {
+          try await CustomScalarFileGenerator(graphqlScalar: graphQLScalar, config: config)
+            .generate(forConfig: config, fileManager: fileManager)
+        }
+      }
+      try await group.waitForAll()
+    }
+
+    try await withThrowingTaskGroup(of: Void.self) { group in
+      if config.output.testMocks != .none {
+        group.addTask {
+          try await MockUnionsFileGenerator(
+            ir: ir,
+            config: config
+          )?.generate(
+            forConfig: config,
+            fileManager: fileManager
+          )
+        }
+
+        group.addTask {
+          try await MockInterfacesFileGenerator(
+            ir: ir,
+            config: config
+          )?.generate(
+            forConfig: config,
+            fileManager: fileManager
+          )
+        }
+      }
+
+      group.addTask {
+        try await SchemaMetadataFileGenerator(schema: ir.schema, config: config)
           .generate(forConfig: config, fileManager: fileManager)
       }
-    }
-
-    for graphQLInterface in ir.schema.referencedTypes.interfaces {
-      try autoreleasepool {
-        try InterfaceFileGenerator(graphqlInterface: graphQLInterface, config: config)
+      group.addTask {
+        try await SchemaConfigurationFileGenerator(config: config)
           .generate(forConfig: config, fileManager: fileManager)
       }
-    }
 
-    for graphQLUnion in ir.schema.referencedTypes.unions {
-      try autoreleasepool {
-        try UnionFileGenerator(
-          graphqlUnion: graphQLUnion,
-          config: config
-        ).generate(
-          forConfig: config,
-          fileManager: fileManager
-        )
+      group.addTask {
+        try await SchemaModuleFileGenerator.generate(config, fileManager: fileManager)
       }
+
+      try await group.waitForAll()
     }
-
-    for graphQLInputObject in ir.schema.referencedTypes.inputObjects {
-      try autoreleasepool {
-        try InputObjectFileGenerator(
-          graphqlInputObject: graphQLInputObject,
-          config: config
-        ).generate(
-          forConfig: config,
-          fileManager: fileManager
-        )
-      }
-    }
-
-    for graphQLScalar in ir.schema.referencedTypes.customScalars {
-      try autoreleasepool {
-        try CustomScalarFileGenerator(graphqlScalar: graphQLScalar, config: config)
-          .generate(forConfig: config, fileManager: fileManager)
-      }
-    }
-
-    if config.output.testMocks != .none {
-      try MockUnionsFileGenerator(
-        ir: ir,
-        config: config
-      )?.generate(
-        forConfig: config,
-        fileManager: fileManager
-      )
-      try MockInterfacesFileGenerator(
-        ir: ir,
-        config: config
-      )?.generate(
-        forConfig: config,
-        fileManager: fileManager
-      )
-    }
-
-    try SchemaMetadataFileGenerator(schema: ir.schema, config: config)
-      .generate(forConfig: config, fileManager: fileManager)
-    try SchemaConfigurationFileGenerator(config: config)
-      .generate(forConfig: config, fileManager: fileManager)
-
-    try SchemaModuleFileGenerator.generate(config, fileManager: fileManager)
   }
 
   /// MARK: - Generated File Pruning
@@ -565,11 +599,12 @@ public class ApolloCodegen {
   }
 
   func deleteExtraneousGeneratedFiles(
-    from oldGeneratedFilePaths: inout Set<String>,
+    from oldGeneratedFilePaths: Set<String>,
     afterCodeGenerationUsing fileManager: ApolloFileManager
-  ) throws {
-    oldGeneratedFilePaths.subtract(fileManager.writtenFiles)
-    for path in oldGeneratedFilePaths {
+  ) async throws {
+    let filePathsToDelete = await oldGeneratedFilePaths.subtracting(fileManager.writtenFiles)
+
+    for path in filePathsToDelete {
       try fileManager.deleteFile(atPath: path)
     }
   }

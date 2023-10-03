@@ -159,7 +159,7 @@ class ApolloSchemaInternalTests: XCTestCase {
 
   // MARK: Path Tests
 
-  func test__write__givenRelativePath_noRootURL_shouldUseRelativePath() throws {
+  func test__write__givenRelativePath_noRootURL_shouldUseRelativePath() async throws {
     // given
     let path = "./subfolder/output.test"
 
@@ -184,14 +184,14 @@ class ApolloSchemaInternalTests: XCTestCase {
     }))
 
     // when
-    try ApolloSchemaDownloader.write(
+    try await ApolloSchemaDownloader.write(
       "Test File",
       path: path,
       rootURL: nil,
       fileManager: mockFileManager)
   }
 
-  func test__write__givenAbsolutePath_noRootURL_shouldUseAbsolutePath() throws {
+  func test__write__givenAbsolutePath_noRootURL_shouldUseAbsolutePath() async throws {
     // given
     let path = "/absolute/path/subfolder/output.test"
 
@@ -215,14 +215,14 @@ class ApolloSchemaInternalTests: XCTestCase {
     }))
 
     // when
-    try ApolloSchemaDownloader.write(
+    try await ApolloSchemaDownloader.write(
       "Test File",
       path: path,
       rootURL: nil,
       fileManager: mockFileManager)
   }
 
-  func test__write__givenPath_withRootURL_shouldExtendRootURL() throws {
+  func test__write__givenPath_withRootURL_shouldExtendRootURL() async throws {
     // given
     let path = "output.test"
 
@@ -246,7 +246,7 @@ class ApolloSchemaInternalTests: XCTestCase {
     }))
 
     // when
-    try ApolloSchemaDownloader.write(
+    try await ApolloSchemaDownloader.write(
       "Test File",
       path: path,
       rootURL: URL(fileURLWithPath: "/rootURL/path/"),

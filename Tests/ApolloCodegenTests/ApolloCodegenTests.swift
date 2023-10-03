@@ -700,9 +700,13 @@ class ApolloCodegenTests: XCTestCase {
 
     let fileManager = MockApolloFileManager(strict: false)
 
-    var filePaths: Set<String> = []
+    let filePathStore = ApolloFileManager.WrittenFiles()
+    let concurrentTasks = ConcurrentTaskContainer()
+
     fileManager.mock(closure: .createFile({ path, data, attributes in
-      filePaths.insert(path)
+      concurrentTasks.dispatch {
+        await filePathStore.addWrittenFile(path: path)
+      }
       return true
     }))
 
@@ -771,6 +775,8 @@ class ApolloCodegenTests: XCTestCase {
       ir: ir,
       fileManager: fileManager
     )
+    await concurrentTasks.waitForAllTasks()
+    let filePaths = await filePathStore.value
 
     // then
     expect(filePaths).to(equal(expectedPaths))
@@ -807,9 +813,13 @@ class ApolloCodegenTests: XCTestCase {
 
     let fileManager = MockApolloFileManager(strict: false)
 
-    var filePaths: Set<String> = []
+    let filePathStore = ApolloFileManager.WrittenFiles()
+    let concurrentTasks = ConcurrentTaskContainer()
+
     fileManager.mock(closure: .createFile({ path, data, attributes in
-      filePaths.insert(path)
+      concurrentTasks.dispatch {
+        await filePathStore.addWrittenFile(path: path)
+      }
       return true
     }))
 
@@ -873,6 +883,8 @@ class ApolloCodegenTests: XCTestCase {
       ir: ir,
       fileManager: fileManager
     )
+    await concurrentTasks.waitForAllTasks()
+    let filePaths = await filePathStore.value
 
     // then
     expect(filePaths).to(equal(expectedPaths))
@@ -905,9 +917,13 @@ class ApolloCodegenTests: XCTestCase {
 
     let fileManager = MockApolloFileManager(strict: false)
 
-    var filePaths: Set<String> = []
+    let filePathStore = ApolloFileManager.WrittenFiles()
+    let concurrentTasks = ConcurrentTaskContainer()
+
     fileManager.mock(closure: .createFile({ path, data, attributes in
-      filePaths.insert(path)
+      concurrentTasks.dispatch {
+        await filePathStore.addWrittenFile(path: path)
+      }
       return true
     }))
 
@@ -980,6 +996,9 @@ class ApolloCodegenTests: XCTestCase {
       fileManager: fileManager
     )
 
+    await concurrentTasks.waitForAllTasks()
+    let filePaths = await filePathStore.value
+
     // then
     expect(filePaths).to(equal(expectedPaths))
     expect(fileManager.allClosuresCalled).to(beTrue())
@@ -1012,10 +1031,14 @@ class ApolloCodegenTests: XCTestCase {
 
     let fileManager = MockApolloFileManager(strict: false)
 
-    var filePaths: Set<String> = []
+    let filePathStore = ApolloFileManager.WrittenFiles()
+    let concurrentTasks = ConcurrentTaskContainer()
+
     fileManager.mock(closure: .createFile({ path, data, attributes in
       if path.contains("/TestMocks/") {
-        filePaths.insert(path)
+        concurrentTasks.dispatch {
+          await filePathStore.addWrittenFile(path: path)
+        }
       }
       return true
     }))
@@ -1046,6 +1069,8 @@ class ApolloCodegenTests: XCTestCase {
       ir: ir,
       fileManager: fileManager
     )
+    await concurrentTasks.waitForAllTasks()
+    let filePaths = await filePathStore.value
 
     // then
     expect(filePaths).to(equal(expectedPaths))
@@ -1082,9 +1107,13 @@ class ApolloCodegenTests: XCTestCase {
 
     let fileManager = MockApolloFileManager(strict: false)
 
-    var filePaths: Set<String> = []
+    let filePathStore = ApolloFileManager.WrittenFiles()
+    let concurrentTasks = ConcurrentTaskContainer()
+
     fileManager.mock(closure: .createFile({ path, data, attributes in
-      filePaths.insert(path)
+      concurrentTasks.dispatch {
+        await filePathStore.addWrittenFile(path: path)
+      }
       return true
     }))
 
@@ -1153,6 +1182,8 @@ class ApolloCodegenTests: XCTestCase {
       ir: ir,
       fileManager: fileManager
     )
+    await concurrentTasks.waitForAllTasks()
+    let filePaths = await filePathStore.value
 
     // then
     expect(filePaths).to(equal(expectedPaths))
@@ -1186,10 +1217,14 @@ class ApolloCodegenTests: XCTestCase {
     )
 
     let fileManager = MockApolloFileManager(strict: false)
-    
-    var filePaths: Set<String> = []
+
+    let filePathStore = ApolloFileManager.WrittenFiles()
+    let concurrentTasks = ConcurrentTaskContainer()
+
     fileManager.mock(closure: .createFile({ path, data, attributes in
-      filePaths.insert(path)
+      concurrentTasks.dispatch {
+        await filePathStore.addWrittenFile(path: path)
+      }
       return true
     }))
 
@@ -1258,6 +1293,8 @@ class ApolloCodegenTests: XCTestCase {
       ir: ir,
       fileManager: fileManager
     )
+    await concurrentTasks.waitForAllTasks()
+    let filePaths = await filePathStore.value
 
     // then
     expect(filePaths).to(equal(expectedPaths))

@@ -61,7 +61,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
 
   // MARK: Generate Tests
 
-  func test__generate__givenOperation_shouldWriteToAbsolutePath() throws {
+  func test__generate__givenOperation_shouldWriteToAbsolutePath() async throws {
     // given
     let filePath = "path/to/match"
     try buildSubject(path: filePath)
@@ -95,12 +95,12 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(operationManifest: manifest, fileManager: fileManager)
+    try await subject.generate(operationManifest: manifest, fileManager: fileManager)
 
     expect(self.fileManager.allClosuresCalled).to(beTrue())
   }
   
-  func test__generate__givenOperation_withPathExtension_shouldWriteToAbsolutePathWithSinglePathExtension() throws {
+  func test__generate__givenOperation_withPathExtension_shouldWriteToAbsolutePathWithSinglePathExtension() async throws {
     // given
     let filePath = "path/to/match"
     try buildSubject(path: "\(filePath).json")
@@ -134,12 +134,12 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(operationManifest: manifest, fileManager: fileManager)
+    try await subject.generate(operationManifest: manifest, fileManager: fileManager)
 
     expect(self.fileManager.allClosuresCalled).to(beTrue())
   }
   
-  func test__generate__givenOperation_shouldWriteToRelativePath() throws {
+  func test__generate__givenOperation_shouldWriteToRelativePath() async throws {
     // given
     let filePath = "./path/to/match"
     try buildSubject(path: filePath)
@@ -177,12 +177,12 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(operationManifest: manifest, fileManager: fileManager)
+    try await subject.generate(operationManifest: manifest, fileManager: fileManager)
 
     expect(self.fileManager.allClosuresCalled).to(beTrue())
   }
   
-  func test__generate__givenOperation_withPathExtension_shouldWriteToRelativePathWithSinglePathExtension() throws {
+  func test__generate__givenOperation_withPathExtension_shouldWriteToRelativePathWithSinglePathExtension() async throws {
     // given
     let filePath = "./path/to/match"
     try buildSubject(path: "\(filePath).json")
@@ -220,12 +220,12 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(operationManifest: manifest, fileManager: fileManager)
+    try await subject.generate(operationManifest: manifest, fileManager: fileManager)
 
     expect(self.fileManager.allClosuresCalled).to(beTrue())
   }
   
-  func test__generate__givenOperations_whenFileExists_shouldOverwrite() throws {
+  func test__generate__givenOperations_whenFileExists_shouldOverwrite() async throws {
     // given
     let filePath = "path/that/exists"
     try buildSubject(path: filePath)
@@ -270,7 +270,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(operationManifest: manifest, fileManager: fileManager)
+    try await subject.generate(operationManifest: manifest, fileManager: fileManager)
 
     expect(self.fileManager.allClosuresCalled).to(beTrue())
   }
