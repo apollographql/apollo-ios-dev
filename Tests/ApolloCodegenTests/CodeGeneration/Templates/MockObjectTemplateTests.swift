@@ -36,7 +36,11 @@ class MockObjectTemplateTests: XCTestCase {
     ir = IRBuilder.mock(compilationResult: .mock())
 
     subject = MockObjectTemplate(
-      graphqlObject: GraphQLObjectType.mock(name, interfaces: interfaces, fields: fields),
+      graphqlObject: GraphQLObjectType.mock(
+        name,
+        interfaces: interfaces
+      ),
+      fields: fields.map { ($0.key, $0.value.type, $0.value.deprecationReason) },
       config: ApolloCodegen.ConfigurationContext(config: config),
       ir: ir
     )
@@ -166,13 +170,6 @@ class MockObjectTemplateTests: XCTestCase {
       moduleType: .swiftPackageManager
     )
 
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type)
-      },
-      to: subject.graphqlObject
-    )
-
     let expected = """
       public struct MockFields {
         @Field<TestSchema.CustomScalar>("customScalar") public var customScalar
@@ -202,13 +199,6 @@ class MockObjectTemplateTests: XCTestCase {
         "object": .mock("object", type: Cat),
       ],
       moduleType: .swiftPackageManager
-    )
-
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type)
-      },
-      to: subject.graphqlObject
     )
 
     let expected = """
@@ -288,13 +278,6 @@ class MockObjectTemplateTests: XCTestCase {
       moduleType: .swiftPackageManager
     )
 
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type)
-      },
-      to: subject.graphqlObject
-    )
-
     let expected = """
       public struct MockFields {
         @Field<String>("Any") public var `Any`
@@ -372,13 +355,6 @@ class MockObjectTemplateTests: XCTestCase {
       moduleType: .swiftPackageManager
     )
 
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type)
-      },
-      to: subject.graphqlObject
-    )
-
     let expected = """
       public struct MockFields {
         @Field<MockObject.Actor>("actor") public var actor
@@ -400,13 +376,6 @@ class MockObjectTemplateTests: XCTestCase {
         "actor": .mock("actor", type: .entity(Actor_Union)),
       ],
       moduleType: .swiftPackageManager
-    )
-
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type)
-      },
-      to: subject.graphqlObject
     )
 
     let expected = """
@@ -432,13 +401,6 @@ class MockObjectTemplateTests: XCTestCase {
       moduleType: .swiftPackageManager
     )
 
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type)
-      },
-      to: subject.graphqlObject
-    )
-
     let expected = """
       public struct MockFields {
         @Field<Actor>("actor") public var actor
@@ -458,13 +420,6 @@ class MockObjectTemplateTests: XCTestCase {
     buildSubject(fields: [
       "hash": .mock("hash", type: .nonNull(.string()))
     ])
-
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type)
-      },
-      to: subject.graphqlObject
-    )
 
     let expected = """
       var hash: String? {
@@ -516,13 +471,6 @@ class MockObjectTemplateTests: XCTestCase {
         "enumOptionalList": .mock("enumOptionalList", type: .list(.enum(.mock(name: "enumType"))))
       ],
       moduleType: .swiftPackageManager
-    )
-
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type)
-      },
-      to: subject.graphqlObject
     )
 
     let expected = """
@@ -675,13 +623,6 @@ class MockObjectTemplateTests: XCTestCase {
       moduleType: .swiftPackageManager
     )
 
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type)
-      },
-      to: subject.graphqlObject
-    )
-
     let expected = """
     }
 
@@ -826,13 +767,6 @@ class MockObjectTemplateTests: XCTestCase {
       testMocks: .swiftPackage()
     )
 
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type)
-      },
-      to: subject.graphqlObject
-    )
-
     let expectedClassDefinition = """
     public class Dog: MockObject {
       public static let objectType: Object = TestSchema.Objects.Dog
@@ -864,13 +798,6 @@ class MockObjectTemplateTests: XCTestCase {
       testMocks: .absolute(path: "", accessModifier: .public)
     )
 
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type)
-      },
-      to: subject.graphqlObject
-    )
-
     let expectedClassDefinition = """
     public class Dog: MockObject {
       public static let objectType: Object = TestSchema.Objects.Dog
@@ -900,13 +827,6 @@ class MockObjectTemplateTests: XCTestCase {
         "string": .mock("string", type: .nonNull(.string()))
       ],
       testMocks: .absolute(path: "", accessModifier: .internal)
-    )
-
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type)
-      },
-      to: subject.graphqlObject
     )
 
     let expectedClassDefinition = """
@@ -942,13 +862,6 @@ class MockObjectTemplateTests: XCTestCase {
       warningsOnDeprecatedUsage: .include
     )
 
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type, deprecationReason: $0.deprecationReason)
-      },
-      to: subject.graphqlObject
-    )
-
     let expected = """
       public struct MockFields {
         @available(*, deprecated, message: "Cause I said so!")
@@ -970,13 +883,6 @@ class MockObjectTemplateTests: XCTestCase {
       ],
       moduleType: .swiftPackageManager,
       warningsOnDeprecatedUsage: .exclude
-    )
-
-    ir.fieldCollector.add(
-      fields: subject.graphqlObject.fields.values.map {
-        .mock($0.name, type: $0.type, deprecationReason: $0.deprecationReason)
-      },
-      to: subject.graphqlObject
     )
 
     let expected = """
@@ -1005,13 +911,6 @@ class MockObjectTemplateTests: XCTestCase {
           "name": .mock("string", type: .nonNull(.string())),
         ],
         moduleType: .swiftPackageManager
-      )
-
-      ir.fieldCollector.add(
-        fields: subject.graphqlObject.fields.values.map {
-          .mock($0.name, type: $0.type)
-        },
-        to: subject.graphqlObject
       )
 
       let expected = """

@@ -36,7 +36,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     ir = try await .mock(schema: schemaSDL, document: document)
     operation = try XCTUnwrap(ir.compilationResult.operations.first)
 
-    let result = IR.RootFieldBuilder.buildRootEntityField(
+    let result = await IR.RootFieldBuilder.buildRootEntityField(
       forRootField: .mock(
         "query",
         type: .nonNull(.entity(operation.rootType)),

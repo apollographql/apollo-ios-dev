@@ -39,7 +39,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ir = try await .mock(schema: schemaSDL, document: document)
     operation = try XCTUnwrap(ir.compilationResult.operations.first)
 
-    let result = IR.RootFieldBuilder.buildRootEntityField(
+    let result = await IR.RootFieldBuilder.buildRootEntityField(
       forRootField: .mock(
         "query",
         type: .nonNull(.entity(operation.rootType)),
@@ -4197,8 +4197,8 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     try await buildSubjectRootField()
 
-    let expected: OrderedSet = [
-      try ir.builtFragments["QueryDetails"].xctUnwrapped()
+    let expected: OrderedSet = await [
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "QueryDetails").xctUnwrapped()
     ]
 
     // then
@@ -4232,8 +4232,8 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     try await buildSubjectRootField()
 
-    let expected: OrderedSet = [
-      try ir.builtFragments["AnimalDetails"].xctUnwrapped()
+    let expected: OrderedSet = await [
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalDetails").xctUnwrapped()
     ]
 
     // then
@@ -4273,9 +4273,9 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     try await buildSubjectRootField()
 
-    let expected: OrderedSet = [
-      try ir.builtFragments["AnimalDetails"].xctUnwrapped(),
-      try ir.builtFragments["AnimalName"].xctUnwrapped(),
+    let expected: OrderedSet = await [
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalDetails").xctUnwrapped(),
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalName").xctUnwrapped(),
     ]
 
     // then
@@ -4315,9 +4315,9 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     try await buildSubjectRootField()
 
-    let expected: OrderedSet = [
-      try ir.builtFragments["AnimalDetails"].xctUnwrapped(),
-      try ir.builtFragments["AnimalName"].xctUnwrapped(),
+    let expected: OrderedSet = await [
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalDetails").xctUnwrapped(),
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalName").xctUnwrapped(),
     ]
 
     // then

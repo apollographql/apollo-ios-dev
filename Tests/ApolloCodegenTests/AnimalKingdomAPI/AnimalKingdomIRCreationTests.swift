@@ -102,7 +102,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     expected = (
       fields: [
@@ -125,7 +125,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     // when
     let actual = rootSelectionSet.selections.merged
@@ -141,7 +141,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(rootSelectionSet[field: "allAnimals"]?.selectionSet)
 
@@ -183,7 +183,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(rootSelectionSet[field: "allAnimals"]?.selectionSet)
 
@@ -200,7 +200,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "height"]?.selectionSet
@@ -230,7 +230,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "height"]?.selectionSet
@@ -258,7 +258,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "predators"]?.selectionSet
@@ -288,7 +288,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "predators"]?.selectionSet
@@ -307,7 +307,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "predators"]?[as: "WarmBlooded"]
@@ -339,7 +339,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "predators"]?[as: "WarmBlooded"]
@@ -373,7 +373,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "WarmBlooded"]
@@ -400,7 +400,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "WarmBlooded"]
@@ -438,7 +438,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "WarmBlooded"]?[field: "height"]?.selectionSet
@@ -457,7 +457,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "WarmBlooded"]?[field: "height"]?.selectionSet
@@ -489,7 +489,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]
@@ -521,7 +521,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]
@@ -562,7 +562,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[field: "height"]?.selectionSet
@@ -592,7 +592,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[field: "height"]?.selectionSet
@@ -624,7 +624,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[as: "WarmBlooded"]
@@ -651,7 +651,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[as: "WarmBlooded"]
@@ -696,7 +696,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[as: "WarmBlooded"]?[field: "height"]?.selectionSet
@@ -715,7 +715,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[as: "WarmBlooded"]?[field: "height"]?.selectionSet
@@ -751,7 +751,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Cat"]
@@ -779,7 +779,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Cat"]
@@ -825,7 +825,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Cat"]?[field: "height"]?.selectionSet
@@ -844,7 +844,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Cat"]?[field: "height"]?.selectionSet
@@ -880,7 +880,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]
@@ -907,7 +907,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]
@@ -944,7 +944,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]?[as: "Bird"]
@@ -972,7 +972,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]?[as: "Bird"]
@@ -1018,7 +1018,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]?[as: "Bird"]?[field: "height"]?.selectionSet
@@ -1037,7 +1037,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]?[as: "Bird"]?[field: "height"]?.selectionSet
@@ -1074,7 +1074,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsCCN" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "height"]?.selectionSet

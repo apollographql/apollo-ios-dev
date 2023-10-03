@@ -36,7 +36,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
   func buildSubjectFragment() async throws {
     ir = try await .mock(schema: schemaSDL, document: document)
     fragment = try XCTUnwrap(ir.compilationResult[fragment: "TestFragment"])
-    subject = ir.build(fragment: fragment)
+    subject = await ir.build(fragment: fragment)
   }
 
   func test__buildFragment__givenFragment_hasConfiguredRootField() async throws {
@@ -99,7 +99,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     // when
     try await buildSubjectFragment()
 
-    let actual = ir.builtFragments["TestFragment"]
+    let actual = await ir.builtFragmentStorage.getFragmentIfBuilt(named: "TestFragment")
 
     // then
     expect(actual).to(beIdenticalTo(self.subject))
@@ -126,7 +126,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     // when
     try await buildSubjectFragment()
 
-    let actual = ir.build(fragment: fragment)
+    let actual = await ir.build(fragment: fragment)
 
     // then
     expect(actual).to(beIdenticalTo(self.subject))
@@ -163,9 +163,9 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     // when
     try await buildSubjectFragment()
 
-    let expected: OrderedSet = [
-      try ir.builtFragments["AnimalDetails"].xctUnwrapped(),
-      try ir.builtFragments["AnimalName"].xctUnwrapped(),
+    let expected: OrderedSet = await [
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalDetails").xctUnwrapped(),
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalName").xctUnwrapped(),
     ]
 
     // then

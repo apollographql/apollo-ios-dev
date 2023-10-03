@@ -17,6 +17,7 @@ class MockObjectFileGeneratorTests: XCTestCase {
   private func buildSubject() {
     subject = MockObjectFileGenerator(
       graphqlObject: graphqlObject,
+      fields: [],
       ir: .mock(compilationResult: .mock()),
       config: ApolloCodegen.ConfigurationContext(config: .mock(.other))
     )

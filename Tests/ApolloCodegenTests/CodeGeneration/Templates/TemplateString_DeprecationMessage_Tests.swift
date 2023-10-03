@@ -268,7 +268,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       """
 
     let ir = try await IRBuilder.mock(schema: schemaSDL, document: document)
-    let operation = ir.build(operation: try XCTUnwrap(ir.compilationResult[operation: "GetAnimal"]))
+    let operation = await ir.build(operation: try XCTUnwrap(ir.compilationResult[operation: "GetAnimal"]))
     let subject = SelectionSetTemplate(
       definition: .operation(operation),
       generateInitializers: true,
@@ -397,7 +397,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       """
 
     let ir = try await IRBuilder.mock(schema: schemaSDL, document: document)
-    let operation = ir.build(operation: try XCTUnwrap(ir.compilationResult[operation: "GetAnimal"]))
+    let operation = await ir.build(operation: try XCTUnwrap(ir.compilationResult[operation: "GetAnimal"]))
     let subject = SelectionSetTemplate(
       definition: .operation(operation),
       generateInitializers: true,

@@ -34,7 +34,7 @@ class IRFieldCollectorTests: XCTestCase {
     ir = try await .mock(schema: schemaSDL, document: document)
 
     for operation in ir.compilationResult.operations {
-      _ = ir.build(operation: operation)
+      _ = await ir.build(operation: operation)
     }
 
     subject = ir.fieldCollector
@@ -69,7 +69,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -106,7 +106,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[interface: "Dog"].xctUnwrapped()
-    let actual = subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -142,7 +142,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -185,7 +185,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -226,7 +226,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -273,7 +273,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -320,7 +320,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -356,7 +356,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog)
 
     let expected: ReferencedFields = [
       ("aliasedA", .string(), nil),
@@ -389,7 +389,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -423,7 +423,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog)
 
     let expected: ReferencedFields = [
       ("field1", .string(), nil),
@@ -475,14 +475,14 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let PetRock = try schema[object: "PetRock"].xctUnwrapped()
-    let petRockActual = subject.collectedFields(for: PetRock)
+    let petRockActual = await subject.collectedFields(for: PetRock)
 
     let petRockExpected: ReferencedFields = [
       ("b", .string(), nil),
     ]
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let dogActual = subject.collectedFields(for: Dog)
+    let dogActual = await subject.collectedFields(for: Dog)
 
     let dogExpected: ReferencedFields = [
       ("a", .string(), nil),
@@ -537,14 +537,14 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let PetRock = try schema[object: "PetRock"].xctUnwrapped()
-    let petRockActual = subject.collectedFields(for: PetRock)
+    let petRockActual = await subject.collectedFields(for: PetRock)
 
     let petRockExpected: ReferencedFields = [
       ("b", .string(), nil),
     ]
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let dogActual = subject.collectedFields(for: Dog)
+    let dogActual = await subject.collectedFields(for: Dog)
 
     let dogExpected: ReferencedFields = [
       ("a", .string(), nil),

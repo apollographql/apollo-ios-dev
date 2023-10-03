@@ -50,7 +50,7 @@ class FragmentTemplateTests: XCTestCase {
   ) async throws {
     ir = try await .mock(schema: schemaSDL, document: document)
     let fragmentDefinition = try XCTUnwrap(ir.compilationResult[fragment: fragmentName])
-    fragment = ir.build(fragment: fragmentDefinition)
+    fragment = await ir.build(fragment: fragmentDefinition)
     subject = FragmentTemplate(
       fragment: fragment,
       config: ApolloCodegen.ConfigurationContext(config: config)

@@ -331,7 +331,7 @@ public class ApolloCodegen {
       fileManager: fileManager
     )
 
-    try generateSchemaFiles(ir: ir, fileManager: fileManager)
+    try await generateSchemaFiles(ir: ir, fileManager: fileManager)
   }
 
   private func generateOperationManifest(
@@ -376,14 +376,14 @@ public class ApolloCodegen {
   ) async throws {
     try await withThrowingTaskGroup(of: Void.self) { group in
       for fragment in fragments {
-        try autoreleasepool {
-          let irFragment = ir.build(fragment: fragment)
-          try config.validateTypeConflicts(
+        group.addTask {
+          let irFragment = await ir.build(fragment: fragment)
+          try self.config.validateTypeConflicts(
             for: irFragment.rootField.selectionSet,
             in: irFragment.definition.name
           )
-          try FragmentFileGenerator(irFragment: irFragment, config: config)
-            .generate(forConfig: config, fileManager: fileManager)
+          try FragmentFileGenerator(irFragment: irFragment, config: self.config)
+            .generate(forConfig: self.config, fileManager: fileManager)
         }
       }
 
@@ -391,7 +391,7 @@ public class ApolloCodegen {
         group.addTask {
           async let identifier = self.operationIdentifierFactory.identifier(for: operation)
 
-          let irOperation = ir.build(operation: operation)
+          let irOperation = await ir.build(operation: operation)
           try self.config.validateTypeConflicts(
             for: irOperation.rootField.selectionSet,
             in: irOperation.definition.name
@@ -404,6 +404,8 @@ public class ApolloCodegen {
           ).generate(forConfig: self.config, fileManager: fileManager)
         }
       }
+      
+      try await group.waitForAll()
     }
   }
 
@@ -411,28 +413,34 @@ public class ApolloCodegen {
   private func generateSchemaFiles(
     ir: IRBuilder,
     fileManager: ApolloFileManager
-  ) throws {
-    for graphQLObject in ir.schema.referencedTypes.objects {
-      try autoreleasepool {
-        try ObjectFileGenerator(
-          graphqlObject: graphQLObject,
-          config: config
-        ).generate(
-          forConfig: config,
-          fileManager: fileManager
-        )
-
-        if config.output.testMocks != .none {
-          try MockObjectFileGenerator(
+  ) async throws {
+    try await withThrowingTaskGroup(of: Void.self) { group in
+      for graphQLObject in ir.schema.referencedTypes.objects {
+        group.addTask { [self] in
+          try ObjectFileGenerator(
             graphqlObject: graphQLObject,
-            ir: ir,
             config: config
           ).generate(
             forConfig: config,
             fileManager: fileManager
           )
+
+          if config.output.testMocks != .none {
+            let fields = await ir.fieldCollector.collectedFields(for: graphQLObject)
+            try MockObjectFileGenerator(
+              graphqlObject: graphQLObject,
+              fields: fields,
+              ir: ir,
+              config: config
+            ).generate(
+              forConfig: config,
+              fileManager: fileManager
+            )
+          }
         }
       }
+
+      try await group.waitForAll()
     }
 
     for graphQLEnum in ir.schema.referencedTypes.enums {

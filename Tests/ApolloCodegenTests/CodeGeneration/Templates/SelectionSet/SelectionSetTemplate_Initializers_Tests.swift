@@ -35,7 +35,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
   ) async throws {
     ir = try await .mock(schema: schemaSDL, document: document)
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
-    operation = ir.build(operation: operationDefinition)
+    operation = await ir.build(operation: operationDefinition)
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       output: .mock(moduleType: moduleType, operations: operations),
@@ -62,7 +62,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
   ) async throws -> IR.NamedFragment {
     ir = try await .mock(schema: schemaSDL, document: document)
     let fragmentDefinition = try XCTUnwrap(ir.compilationResult[fragment: fragmentName])
-    let fragment = ir.build(fragment: fragmentDefinition)
+    let fragment = await ir.build(fragment: fragmentDefinition)
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       output: .mock(moduleType: moduleType, operations: operations),

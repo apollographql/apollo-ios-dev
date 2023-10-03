@@ -52,7 +52,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   private func buildSubjectAndOperation(named operationName: String = "TestOperation") async throws {
     ir = try await .mock(schema: schemaSDL, document: document)
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
-    operation = ir.build(operation: operationDefinition)
+    operation = await ir.build(operation: operationDefinition)
     subject = LocalCacheMutationDefinitionTemplate(
       operation: operation,
       config: ApolloCodegen.ConfigurationContext(config: config)

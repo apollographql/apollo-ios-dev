@@ -84,9 +84,9 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
 
     let ir = IRBuilder(compilationResult: compilationResult)
 
-    irFragment = ir.build(fragment: ir.compilationResult.fragments[0])
+    irFragment = await ir.build(fragment: ir.compilationResult.fragments[0])
 
-    irOperation = ir.build(operation: ir.compilationResult.operations[0])
+    irOperation = await ir.build(operation: ir.compilationResult.operations[0])
   }
 
   private func buildConfig(

@@ -1,6 +1,6 @@
 import GraphQLCompiler
 
-public class FieldCollector {
+public actor FieldCollector {
 
   typealias CollectedField = (String, GraphQLType, deprecationReason: String?)
 

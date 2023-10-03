@@ -46,7 +46,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
   ) async throws {
     ir = try await .mock(schema: schemaSDL, document: document)
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
-    operation = ir.build(operation: operationDefinition)
+    operation = await ir.build(operation: operationDefinition)
 
     config = .mock(
       output: .mock(moduleType: moduleType, operations: operations),

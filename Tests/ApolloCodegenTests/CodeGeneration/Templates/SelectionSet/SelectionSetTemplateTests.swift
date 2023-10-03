@@ -38,7 +38,7 @@ class SelectionSetTemplateTests: XCTestCase {
   ) async throws {
     ir = try await .mock(schema: schemaSDL, document: document)
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
-    operation = ir.build(operation: operationDefinition)
+    operation = await ir.build(operation: operationDefinition)
     let config = ApolloCodegen.ConfigurationContext(config: .mock(
       schemaNamespace: "TestSchema",
       output: configOutput,

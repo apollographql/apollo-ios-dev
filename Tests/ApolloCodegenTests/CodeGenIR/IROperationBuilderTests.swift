@@ -46,7 +46,7 @@ class IROperationBuilderTests: XCTestCase {
     } else {
       operation = try XCTUnwrap(ir.compilationResult.operations.first)
     }
-    subject = ir.build(operation: operation)
+    subject = await ir.build(operation: operation)
   }
 
   func test__buildOperation__givenQuery_hasRootFieldAsQuery() async throws {

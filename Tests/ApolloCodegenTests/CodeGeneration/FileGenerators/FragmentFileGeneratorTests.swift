@@ -46,7 +46,7 @@ class FragmentFileGeneratorTests: XCTestCase {
     """
 
     let ir = try await IRBuilder.mock(schema: schemaSDL, document: operationDocument)
-    irFragment = ir.build(fragment: ir.compilationResult.fragments[0])
+    irFragment = await ir.build(fragment: ir.compilationResult.fragments[0])
     
     subject = FragmentFileGenerator(
       irFragment: irFragment,
