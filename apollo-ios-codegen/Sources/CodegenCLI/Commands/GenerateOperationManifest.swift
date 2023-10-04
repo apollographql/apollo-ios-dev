@@ -2,8 +2,8 @@ import Foundation
 import ArgumentParser
 import ApolloCodegenLib
 
-public struct GenerateOperationManifest: ParsableCommand {
-  
+public struct GenerateOperationManifest: AsyncParsableCommand {
+
   // MARK: - Configuration
   
   public static var configuration = CommandConfiguration(
@@ -16,22 +16,22 @@ public struct GenerateOperationManifest: ParsableCommand {
   
   public init() { }
   
-  public func run() throws {
-    try _run()
+  public func run() async throws {
+    try await _run()
   }
   
   func _run(
     fileManager: FileManager = .default,
     codegenProvider: CodegenProvider.Type = ApolloCodegen.self,
     logger: LogLevelSetter.Type = CodegenLogger.self
-  ) throws {
+  ) async throws {
     logger.SetLoggingLevel(verbose: inputs.verbose)
 
     let configuration = try inputs.getCodegenConfiguration(fileManager: fileManager)
 
     try validate(configuration: configuration)
 
-    try generateManifest(
+    try await generateManifest(
       configuration: configuration,
       codegenProvider: codegenProvider
     )
@@ -40,11 +40,12 @@ public struct GenerateOperationManifest: ParsableCommand {
   private func generateManifest(
     configuration: ApolloCodegenConfiguration,
     codegenProvider: CodegenProvider.Type
-  ) throws {
-    try codegenProvider.build(
+  ) async throws {
+    try await codegenProvider.build(
       with: configuration,
       withRootURL: rootOutputURL(for: inputs),
-      itemsToGenerate: [.operationManifest]
+      itemsToGenerate: [.operationManifest],
+      operationIdentifierProvider: nil
     )
   }
 

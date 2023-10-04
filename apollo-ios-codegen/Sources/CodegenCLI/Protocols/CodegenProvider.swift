@@ -6,8 +6,9 @@ public protocol CodegenProvider {
   static func build(
     with configuration: ApolloCodegenConfiguration,
     withRootURL rootURL: URL?,
-    itemsToGenerate: ApolloCodegen.ItemsToGenerate
-  ) throws
+    itemsToGenerate: ApolloCodegen.ItemsToGenerate,
+    operationIdentifierProvider: OperationIdentifierProvider?
+  ) async throws
 }
 
 extension ApolloCodegen: CodegenProvider { }
