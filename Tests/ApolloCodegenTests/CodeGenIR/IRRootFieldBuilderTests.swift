@@ -4327,7 +4327,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.computedReferencedFragments).to(equal(expected))
   }
 
-  // MARK: - Deferred Fragments
+  // MARK: - Deferred Fragments - hasDeferredFragments property
 
   func test__deferredFragments__givenNoDeferredFragment_hasDeferredFragmentsFalse() throws {
     // given
@@ -4515,7 +4515,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       allAnimals {
         __typename
         id
-        ...DogFragment @defer
+        ...DogFragment @defer(label: "root")
       }
     }
 
@@ -4575,4 +4575,139 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.hasDeferredFragments).to(beTrue())
   }
 
+  #warning("tests to match IR struct changes")
+
+  // MARK: Deferred Fragments - type case
+
+  func test__deferredFragments__givenDeferredInlineFragment_buildsDeferredInlineFragment() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+      name: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    let Scalar_String = try XCTUnwrap(schema[scalar: "String"])
+    let Object_Dog = try XCTUnwrap(schema[object: "Dog"])
+
+    let allAnimals = self.subject[field: "allAnimals"]?.selectionSet
+    expect(allAnimals?.selections.direct?.fields.values).to(shallowlyMatch([
+      .mock("id", type: .nonNull(.scalar(Scalar_String)))
+    ]))
+    expect(allAnimals?.selections.direct?.inlineFragments.values.map(\.selectionSet)).to(shallowlyMatch([
+      .mock(parentType: Object_Dog)
+    ]))
+    expect(allAnimals?.scope.deferCondition).to(beNil())
+
+    let allAnimals_AsDog = allAnimals?[as: "Dog"]
+    expect(allAnimals_AsDog?.selections.direct?.fields).to(beEmpty())
+    expect(allAnimals_AsDog?.selections.direct?.inlineFragments.values.map(\.selectionSet)).to(shallowlyMatch([
+      .mock(parentType: Object_Dog) // ? should this match on the type Root.self instead
+    ]))
+    expect(allAnimals_AsDog?.scope.deferCondition).to(beNil())
+
+    let allAnimals_AsDog_Deferred = allAnimals_AsDog?[as: "Dog"]
+    expect(allAnimals_AsDog_Deferred?.selections.direct?.fields.values).to(shallowlyMatch([
+      .mock("species", type: .nonNull(.scalar(Scalar_String)))
+    ]))
+    expect(allAnimals_AsDog_Deferred?.selections.direct?.inlineFragments).to(beEmpty())
+    expect(allAnimals_AsDog_Deferred?.scope.deferCondition.unsafelyUnwrapped).to(equal(
+      DeferCondition(label: "root")
+    ))
+  }
+
+  func test__deferredFragments__givenDeferredInlineFragmentWithCondition_buildsDeferredInlineFragmentWithCondition() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+      name: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: "a", label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    let Scalar_String = try XCTUnwrap(schema[scalar: "String"])
+    let Object_Dog = try XCTUnwrap(schema[object: "Dog"])
+
+    let allAnimals = self.subject[field: "allAnimals"]?.selectionSet
+    expect(allAnimals?.selections.direct?.fields.values).to(shallowlyMatch([
+      .mock("id", type: .nonNull(.scalar(Scalar_String)))
+    ]))
+    expect(allAnimals?.selections.direct?.inlineFragments.values.map(\.selectionSet)).to(shallowlyMatch([
+      .mock(parentType: Object_Dog)
+    ]))
+    expect(allAnimals?.scope.deferCondition).to(beNil())
+
+    let allAnimals_AsDog = allAnimals?[as: "Dog"]
+    expect(allAnimals_AsDog?.selections.direct?.fields).to(beEmpty())
+    expect(allAnimals_AsDog?.selections.direct?.inlineFragments.values.map(\.selectionSet)).to(shallowlyMatch([
+      .mock(parentType: Object_Dog) // ? should this match on the type Root.self instead
+    ]))
+    expect(allAnimals_AsDog?.scope.deferCondition).to(beNil())
+
+    let allAnimals_AsDog_Deferred = allAnimals_AsDog?[as: "Dog"]
+    expect(allAnimals_AsDog_Deferred?.selections.direct?.fields.values).to(shallowlyMatch([
+      .mock("species", type: .nonNull(.scalar(Scalar_String)))
+    ]))
+    expect(allAnimals_AsDog_Deferred?.selections.direct?.inlineFragments).to(beEmpty())
+    expect(allAnimals_AsDog_Deferred?.scope.deferCondition.unsafelyUnwrapped).to(equal(
+      DeferCondition(label: "root", variable: "a")
+    ))
+  }
 }

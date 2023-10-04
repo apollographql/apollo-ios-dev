@@ -137,12 +137,11 @@ class RootFieldBuilder {
     addSelections(from: selectionSet, to: target, atTypePath: typeInfo)
 
     self.hasDeferredFragments = {
-      switch typeInfo.scopePath.last.value.isDeferred {
-      case .value(false):
+      guard let _ = typeInfo.scope.deferCondition else {
         return false
-      case .value(true), .if(_):
-        return true
       }
+
+      return true
     }()
 
     typeInfo.entity.selectionTree.mergeIn(
@@ -178,24 +177,42 @@ class RootFieldBuilder {
       }
 
     case let .inlineFragment(inlineFragment):
-      let inlineSelectionSet = inlineFragment.selectionSet
-      guard let scope = scopeCondition(for: inlineFragment, in: typeInfo) else {
+      guard let scope = scopeCondition(
+        for: inlineFragment,
+        in: typeInfo,
+        deferCondition: inlineFragment.deferCondition
+      ) else {
         return
       }
 
-      if typeInfo.scope.matches(scope) {
-        addSelections(
-          from: inlineSelectionSet,
-          to: target,
-          atTypePath: typeInfo
-        )
+      let inlineSelectionSet = inlineFragment.selectionSet
 
-      } else {
+      switch (typeInfo.scope.matches(scope), inlineFragment.deferCondition) {
+      case let (true, .some(deferCondition)):
         let irTypeCase = buildInlineFragmentSpread(
           from: inlineSelectionSet,
           with: scope,
           inParentTypePath: typeInfo,
-          isDeferred: .init(inlineFragment.isDeferred)
+          deferCondition: .init(deferCondition)
+        )
+        target.mergeIn(irTypeCase)
+
+      case (true, .none):
+        addSelections(from: inlineSelectionSet, to: target, atTypePath: typeInfo)
+
+      case (false, .some):
+        let deferredTypeCase = buildInlineFragmentSpread(
+          toWrap: selection,
+          with: scope,
+          inParentTypePath: typeInfo
+        )
+        target.mergeIn(deferredTypeCase)
+
+      case (false, .none):
+        let irTypeCase = buildInlineFragmentSpread(
+          from: inlineSelectionSet,
+          with: scope,
+          inParentTypePath: typeInfo
         )
         target.mergeIn(irTypeCase)
       }
@@ -245,15 +262,20 @@ class RootFieldBuilder {
 
   private func scopeCondition(
     for conditionalSelectionSet: ConditionallyIncludable,
-    in parentTypePath: SelectionSet.TypeInfo
+    in parentTypePath: SelectionSet.TypeInfo,
+    deferCondition: CompilationResult.DeferCondition? = nil
   ) -> ScopeCondition? {
     let inclusionResult = inclusionResult(for: conditionalSelectionSet.inclusionConditions)
     guard inclusionResult != .skipped else {
       return nil
     }
 
-    let type = parentTypePath.parentType == conditionalSelectionSet.parentType ?
-    nil : conditionalSelectionSet.parentType
+    let type = (
+      parentTypePath.parentType == conditionalSelectionSet.parentType
+      && deferCondition == nil
+    )
+    ? nil
+    : conditionalSelectionSet.parentType
 
     return ScopeCondition(type: type, conditions: inclusionResult.conditions)
   }
@@ -349,6 +371,29 @@ class RootFieldBuilder {
         from: selectionSet
       )
     }
+
+    return InlineFragmentSpread(selectionSet: irSelectionSet)
+  }
+
+  private func buildInlineFragmentSpread(
+    toWrap selection: CompilationResult.Selection,
+    with scopeCondition: ScopeCondition,
+    inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo
+  ) -> InlineFragmentSpread {
+    let typePath = enclosingTypeInfo.scopePath.mutatingLast {
+      $0.appending(scopeCondition)
+    }
+
+    let irSelectionSet = SelectionSet(
+      entity: enclosingTypeInfo.entity,
+      scopePath: typePath
+    )
+
+    add(
+      selection,
+      to: irSelectionSet.selections.direct.unsafelyUnwrapped,
+      atTypePath: irSelectionSet.typeInfo
+    )
 
     return InlineFragmentSpread(selectionSet: irSelectionSet)
   }
