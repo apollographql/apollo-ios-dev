@@ -3,6 +3,8 @@ import IR
 import GraphQLCompiler
 import CryptoKit
 
+/// An async closure used to compute the operation identifiers for operations
+/// in the persisted queries manifest
 public typealias OperationIdentifierProvider = (_ operation: OperationDescriptor) async throws -> String
 
 actor OperationIdentifierFactory {

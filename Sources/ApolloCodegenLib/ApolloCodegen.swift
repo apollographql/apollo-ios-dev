@@ -102,7 +102,9 @@ public class ApolloCodegen {
   ///     If `nil`, the current working directory of the executing process will be used.
   ///   - itemsToGenerate: Uses the `ItemsToGenerate` option set to determine what items should be generated during codegen.
   ///     By default this will use [.code] which maintains how codegen functioned prior to these options being added.
-  #warning("TODO: Update docs")
+  ///   - operationIdentifierProvider: [optional] An async closure used to compute the operation
+  ///     identifiers for operations in the persisted queries manifest. If not provided, the default
+  ///     identifier will be computed as a SHA256 hash of the operation's source text.
   public static func build(
     with configuration: ApolloCodegenConfiguration,
     withRootURL rootURL: URL? = nil,

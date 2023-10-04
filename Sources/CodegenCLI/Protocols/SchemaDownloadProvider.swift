@@ -6,7 +6,7 @@ public protocol SchemaDownloadProvider {
   static func fetch(
     configuration: ApolloSchemaDownloadConfiguration,
     withRootURL rootURL: URL?
-  ) throws
+  ) async throws
 }
 
 extension ApolloSchemaDownloader: SchemaDownloadProvider { }

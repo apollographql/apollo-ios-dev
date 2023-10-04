@@ -21,7 +21,15 @@ public struct OperationDescriptor {
     return type
   }
 
-#warning("TODO: Document")
+  /// The source text for the operation formatted exactly as it will be sent via network
+  /// transport when executed by an `ApolloClient`. This value should be used to calculate
+  /// the operation identifier for a persisted queries manifest.
+  ///
+  /// This format includes:
+  /// - The operation's source, minimized to a single line
+  /// - The source of each fragment referenced by the operation, each minimized to a
+  ///   single line. There will be a `\n` character between the operation and each
+  ///   fragment.
   public var rawSourceText: String {
     var source = underlyingDefinition.source.convertedToSingleLine()
     for fragment in underlyingDefinition.referencedFragments {
