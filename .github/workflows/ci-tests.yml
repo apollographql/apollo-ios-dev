@@ -9,7 +9,7 @@ on:
 jobs:
   run-swift-builds:
     runs-on: macos-13
-    timeout-minutes: 6
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -33,7 +33,7 @@ jobs:
 
   build-and-unit-test:
     runs-on: macos-13
-    timeout-minutes: 15
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -132,7 +132,7 @@ jobs:
 
   run-codegen-test-configurations:
     runs-on: macos-13
-    timeout-minutes: 15
+    timeout-minutes: 20
     name: Codegen Test Configurations - macOS ${{ vars.MACOS_VERSION }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
@@ -154,7 +154,7 @@ jobs:
 
   run-cocoapods-integration-tests:
     runs-on: macos-13
-    timeout-minutes: 15
+    timeout-minutes: 20
     name: Cocoapods Integration Tests - macOS ${{ vars.MACOS_VERSION }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
@@ -177,7 +177,7 @@ jobs:
 
   run-integration-tests:
     runs-on: macos-13
-    timeout-minutes: 15
+    timeout-minutes: 20
     name: Apollo Integration Tests - macOS ${{ vars.MACOS_VERSION }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
