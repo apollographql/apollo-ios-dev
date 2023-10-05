@@ -217,9 +217,9 @@ extension Array: SelectionSetEntityValue where Element: SelectionSetEntityValue 
     }
     self = data.map {
       if DataDict._AnyHashableCanBeCoerced {
-        Element.init(_fieldData:$0)
+        return Element.init(_fieldData:$0)
       } else {
-        Element.init(_fieldData:$0?.base as? AnyHashable)
+        return Element.init(_fieldData:$0?.base as? AnyHashable)
       }
     }
   }
