@@ -9,7 +9,7 @@ public extension SelectionSet {
     guard let value = self.__data._data[key] else {
       return false
     }
-    return value == DataDict.NullValue
+    return value == DataDict._NullValue
   }
 
 }
