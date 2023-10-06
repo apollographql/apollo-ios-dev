@@ -37,7 +37,7 @@ jobs:
       with:
         subtree: apollo-ios
         remote: git@github.com:apollographql/apollo-ios.git
-        target-branch: project-breakup
+        target-branch: main
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Subtree - Apollo iOS Codegen
