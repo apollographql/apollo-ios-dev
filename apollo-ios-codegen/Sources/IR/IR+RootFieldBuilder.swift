@@ -177,45 +177,7 @@ class RootFieldBuilder {
       }
 
     case let .inlineFragment(inlineFragment):
-      guard let scope = scopeCondition(
-        for: inlineFragment,
-        in: typeInfo,
-        deferCondition: inlineFragment.deferCondition
-      ) else {
-        return
-      }
-
-      let inlineSelectionSet = inlineFragment.selectionSet
-
-      switch (typeInfo.scope.matches(scope), inlineFragment.deferCondition) {
-      case let (true, .some(deferCondition)):
-        let irTypeCase = buildInlineFragmentSpread(
-          from: inlineSelectionSet,
-          with: scope,
-          inParentTypePath: typeInfo,
-          deferCondition: .init(deferCondition)
-        )
-        target.mergeIn(irTypeCase)
-
-      case (true, .none):
-        addSelections(from: inlineSelectionSet, to: target, atTypePath: typeInfo)
-
-      case (false, .some):
-        let deferredTypeCase = buildInlineFragmentSpread(
-          toWrap: selection,
-          with: scope,
-          inParentTypePath: typeInfo
-        )
-        target.mergeIn(deferredTypeCase)
-
-      case (false, .none):
-        let irTypeCase = buildInlineFragmentSpread(
-          from: inlineSelectionSet,
-          with: scope,
-          inParentTypePath: typeInfo
-        )
-        target.mergeIn(irTypeCase)
-      }
+      add(inlineFragment, from: selection, to: target, atTypePath: typeInfo)
 
     case let .fragmentSpread(fragmentSpread):
       guard let scope = scopeCondition(for: fragmentSpread, in: typeInfo) else {
@@ -257,6 +219,53 @@ class RootFieldBuilder {
           )
         }
       }
+    }
+  }
+
+  private func add(
+    _ inlineFragment: CompilationResult.InlineFragment,
+    from selection: CompilationResult.Selection,
+    to target: DirectSelections,
+    atTypePath typeInfo: SelectionSet.TypeInfo
+  ) {
+    guard let scope = scopeCondition(
+      for: inlineFragment,
+      in: typeInfo,
+      deferCondition: inlineFragment.deferCondition
+    ) else {
+      return
+    }
+
+    let inlineSelectionSet = inlineFragment.selectionSet
+
+    switch (typeInfo.scope.matches(scope), inlineFragment.deferCondition) {
+    case let (true, .some(deferCondition)):
+      let irTypeCase = buildInlineFragmentSpread(
+        from: inlineSelectionSet,
+        with: scope,
+        inParentTypePath: typeInfo,
+        deferCondition: .init(deferCondition)
+      )
+      target.mergeIn(irTypeCase)
+
+    case (true, .none):
+      addSelections(from: inlineSelectionSet, to: target, atTypePath: typeInfo)
+
+    case (false, .some):
+      let irTypeCase = buildInlineFragmentSpread(
+        toWrap: selection,
+        with: scope,
+        inParentTypePath: typeInfo
+      )
+      target.mergeIn(irTypeCase)
+
+    case (false, .none):
+      let irTypeCase = buildInlineFragmentSpread(
+        from: inlineSelectionSet,
+        with: scope,
+        inParentTypePath: typeInfo
+      )
+      target.mergeIn(irTypeCase)
     }
   }
 
