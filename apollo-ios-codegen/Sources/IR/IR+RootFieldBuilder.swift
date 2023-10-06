@@ -207,8 +207,9 @@ class RootFieldBuilder {
           ),
           with: scope,
           inParentTypePath: typeInfo,
-          isDeferred: .init(fragmentSpread.isDeferred)
+          deferCondition: (fragmentSpread.deferCondition != nil ? .init(fragmentSpread.deferCondition!) : nil)
         )
+        #warning("remove force unwrap above")
 
         target.mergeIn(irTypeCaseEnclosingFragment)
 
@@ -364,8 +365,13 @@ class RootFieldBuilder {
     inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo,
     deferCondition: DeferCondition? = nil
   ) -> InlineFragmentSpread {
+    let scope = ScopeCondition(
+      type: scopeCondition.type,
+      conditions: scopeCondition.conditions,
+      deferDirective: deferCondition
+    )
     let typePath = enclosingTypeInfo.scopePath.mutatingLast {
-      $0.appending(scopeCondition, deferCondition: deferCondition)
+      $0.appending(scope, deferCondition: deferCondition)
     }
 
     let irSelectionSet = SelectionSet(

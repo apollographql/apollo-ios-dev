@@ -1,7 +1,7 @@
 import GraphQLCompiler
 
 // TODO: Documentation for this to be completed in issue #3141
-public struct DeferCondition: Equatable {
+public struct DeferCondition: Hashable, CustomDebugStringConvertible {
   public let label: String
   public let variable: String?
 
@@ -12,5 +12,14 @@ public struct DeferCondition: Equatable {
 
   init(_ compilationResult: CompilationResult.DeferCondition) {
     self.init(label: compilationResult.label, variable: compilationResult.variable)
+  }
+
+  public var debugDescription: String {
+    var string = "Defer \"\(label)\""
+    if let variable {
+      string += " - if \"\(variable)\""
+    }
+
+    return string
   }
 }
