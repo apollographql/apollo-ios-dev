@@ -4575,6 +4575,57 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.hasDeferredFragments).to(beTrue())
   }
 
+  func test__deferredFragments__givenDeferredNamedFragment_withSelectionOnDifferentTypeCase_hasDeferredFragmentsTrue() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+    }
+
+    interface Pet implements Animal {
+      id: String
+      species: String
+      friends: [Pet]
+      name: String
+    }
+
+    type Dog implements Pet {
+      id: String
+      species: String
+      friends: [Pet]
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        ...FriendsFragment @defer(label: "root")
+      }
+    }
+
+    fragment FriendsFragment on Dog {
+      id
+      ... on Pet {
+        friends {
+          name
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    expect(self.result.hasDeferredFragments).to(beTrue())
+  }
+
   #warning("tests to match IR struct changes")
 
   // MARK: Deferred Fragments - Inline Fragments
@@ -5081,14 +5132,14 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(allAnimals?.selections.direct?.inlineFragments.values.map(\.selectionSet)).to(shallowlyMatch([
       .mock(parentType: Object_Dog)
     ]))
-    expect(allAnimals?.scope.deferCondition).to(beNil())
+//    expect(allAnimals?.scope.deferCondition).to(beNil())
 
     let allAnimals_AsDog = allAnimals?[as: "Dog"]
     expect(allAnimals_AsDog?.selections.direct?.fields).to(beEmpty())
     expect(allAnimals_AsDog?.selections.direct?.inlineFragments.values.map(\.selectionSet)).to(shallowlyMatch([
       .mock(parentType: Object_Dog) // ? should this match on the type Root.self instead
     ]))
-    expect(allAnimals_AsDog?.scope.deferCondition).to(beNil())
+//    expect(allAnimals_AsDog?.scope.deferCondition).to(beNil())
 
 //    let allAnimals_AsDog_Deferred = allAnimals_AsDog?[as: "Dog"]
 //    expect(allAnimals_AsDog_Deferred?.selections.direct?.fields.values).to(shallowlyMatch([

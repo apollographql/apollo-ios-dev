@@ -73,22 +73,18 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
 
   let allTypesInSchema: Schema.ReferencedTypes
 
-  let deferCondition: DeferCondition?
-
   private init(
     typePath: LinkedList<ScopeCondition>,
     type: GraphQLCompositeType,
     matchingTypes: TypeScope,
     matchingConditions: InclusionConditions?,
-    allTypesInSchema: Schema.ReferencedTypes,
-    deferCondition: DeferCondition? = nil
+    allTypesInSchema: Schema.ReferencedTypes
   ) {
     self.scopePath = typePath
     self.type = type
     self.matchingTypes = matchingTypes
     self.matchingConditions = matchingConditions
     self.allTypesInSchema = allTypesInSchema
-    self.deferCondition = deferCondition
   }
 
   /// Creates a `ScopeDescriptor` for a root `SelectionSet`.
@@ -148,8 +144,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
   /// This should be used to create a `ScopeDescriptor` for a conditional `SelectionSet` inside
   /// of an entity, by appending the conditions to the parent `SelectionSet`'s `ScopeDescriptor`.
   func appending(
-    _ scopeCondition: ScopeCondition,
-    deferCondition: DeferCondition? = nil
+    _ scopeCondition: ScopeCondition
   ) -> ScopeDescriptor {
     let matchingTypes: TypeScope
     if let newType = scopeCondition.type {
@@ -172,8 +167,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
       type: scopeCondition.type ?? self.type,
       matchingTypes: matchingTypes,
       matchingConditions: matchingConditions,
-      allTypesInSchema: self.allTypesInSchema,
-      deferCondition: deferCondition
+      allTypesInSchema: self.allTypesInSchema
     )
   }
 

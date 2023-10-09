@@ -136,13 +136,7 @@ class RootFieldBuilder {
   ) {
     addSelections(from: selectionSet, to: target, atTypePath: typeInfo)
 
-    self.hasDeferredFragments = {
-      guard let _ = typeInfo.scope.deferCondition else {
-        return false
-      }
-
-      return true
-    }()
+    self.hasDeferredFragments = typeInfo.scope.scopePath.hasDeferredDirective
 
     typeInfo.entity.selectionTree.mergeIn(
       selections: target.readOnlyView,
@@ -371,7 +365,7 @@ class RootFieldBuilder {
       deferDirective: deferCondition
     )
     let typePath = enclosingTypeInfo.scopePath.mutatingLast {
-      $0.appending(scope, deferCondition: deferCondition)
+      $0.appending(scope)
     }
 
     let irSelectionSet = SelectionSet(

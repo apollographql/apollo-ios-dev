@@ -160,3 +160,17 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
   }
 
 }
+
+extension LinkedList where T == ScopeCondition {
+  var hasDeferredDirective: Bool {
+    var node: Node? = last
+    var deferDirective = node?.value.deferDirective
+
+    while node?.previous != nil && deferDirective == nil {
+      node = node?.previous
+      deferDirective = node?.value.deferDirective
+    }
+
+    return deferDirective != nil
+  }
+}
