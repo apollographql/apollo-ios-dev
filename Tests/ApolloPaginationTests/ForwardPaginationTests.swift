@@ -5,7 +5,7 @@ import ApolloInternalTestHelpers
 
 @testable import apollo_ios_pagination
 
-final class QueryPagerTests: XCTestCase, CacheDependentTesting {
+final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
 
   var cacheType: TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
@@ -37,7 +37,7 @@ final class QueryPagerTests: XCTestCase, CacheDependentTesting {
   }
 
   private typealias Query = MockQuery<MockPaginatedSelectionSet>
-  func test_fetchMultiplePages() {
+  func test_fetchMultiplePages() throws {
     let query = Query()
     query.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
     let pager = GraphQLQueryPager.makeForwardCursorQueryPager(client: client) { page in
@@ -63,13 +63,22 @@ final class QueryPagerTests: XCTestCase, CacheDependentTesting {
 
     addTeardownBlock { pager.cancel() }
 
-    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
 
+    let initialFetchExpectation = expectation(description: "Results")
+    initialFetchExpectation.assertForOverFulfill = false
+    let nextPageExpectation = expectation(description: "Next Page")
+    nextPageExpectation.expectedFulfillmentCount = 2
+    
+    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
+    var counter = 0
     pager.subscribe { result in
       results.append(result)
+      initialFetchExpectation.fulfill()
+      nextPageExpectation.fulfill()
+      counter += 1
     }
 
-    runActivity("Initial fetch from server") { _ in
+    try runActivity("Initial fetch from server") { _ in
       let serverExpectation = server.expect(MockQuery<MockPaginatedSelectionSet>.self) { _ in
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
@@ -112,7 +121,73 @@ final class QueryPagerTests: XCTestCase, CacheDependentTesting {
       }
 
       pager.fetch()
-      wait(for: [serverExpectation], timeout: 1.0)
+      wait(for: [serverExpectation, initialFetchExpectation], timeout: 1.0)
+      XCTAssertFalse(results.isEmpty)
+      let result = try XCTUnwrap(results.first)
+      XCTAssertSuccessResult(result) { value in
+        let (first, next, source) = value
+        XCTAssertTrue(next.isEmpty)
+        XCTAssertEqual(first.hero.friendsConnection.friends.count, 2)
+        XCTAssertEqual(first.hero.friendsConnection.totalCount, 3)
+        XCTAssertEqual(source, .fetch)
+        XCTAssertEqual(counter, 1)
+      }
+    }
+
+    try runActivity("Fetch second page") { _ in
+      let secondPageExpectation = server.expect(MockQuery<MockPaginatedSelectionSet>.self) { _ in
+        let pageInfo: [AnyHashable: AnyHashable] = [
+          "__typename": "PageInfo",
+          "endCursor": "Y3Vyc29yMw==",
+          "hasNextPage": false
+        ]
+        let friends: [[String: AnyHashable]] = [
+          [
+            "__typename": "Human",
+            "name": "Leia Organa",
+            "id": "1003",
+          ]
+        ]
+        let friendsConnection: [String: AnyHashable] = [
+          "__typename": "FriendsConnection",
+          "totalCount": 3,
+          "friends": friends,
+          "pageInfo": pageInfo
+        ]
+
+        let hero: [String: AnyHashable] = [
+          "__typename": "Droid",
+          "id": "2001",
+          "name": "R2-D2",
+          "friendsConnection": friendsConnection
+        ]
+
+        let data: [String: AnyHashable] = [
+          "hero": hero
+        ]
+
+        return [
+          "data": data
+        ]
+      }
+
+      pager.loadMore()
+      wait(for: [secondPageExpectation, nextPageExpectation], timeout: 1.0)
+      XCTAssertFalse(results.isEmpty)
+      let result = try XCTUnwrap(results.last)
+      try XCTAssertSuccessResult(result) { [pager] value in
+        let (_, next, source) = value
+        // Assert first page is unchanged
+        XCTAssertEqual(try? results.first?.get().0, try? results.last?.get().0)
+
+        XCTAssertEqual(counter, 2)
+        XCTAssertFalse(next.isEmpty)
+        XCTAssertEqual(next.count, 1)
+        let page = try XCTUnwrap(next.first)
+        XCTAssertEqual(page.hero.friendsConnection.friends.count, 1)
+        XCTAssertEqual(pager.varMap.values.count, 1)
+        XCTAssertEqual(source, .fetch)
+      }
     }
   }
 }
