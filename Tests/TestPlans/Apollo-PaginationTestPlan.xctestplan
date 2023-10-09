@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "BF52CC8B-4AB1-4640-BAF4-00FDB47CC315",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:ApolloDev.xcodeproj",
+        "identifier" : "F13FB1AFFD21C03856AD8A03",
+        "name" : "ApolloPaginationTests"
+      }
+    }
+  ],
+  "version" : 1
+}
