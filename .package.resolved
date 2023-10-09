@@ -6,7 +6,7 @@
       "location" : "https://github.com/apollographql/apollo-ios-pagination.git",
       "state" : {
         "branch" : "hs/complete-rewrite",
-        "revision" : "645e13d7137bc0e01dbf29cb0e133ccf15f46f0e"
+        "revision" : "5f8b00e366fb21851b1ad60064462f678a7ab7c6"
       }
     },
     {
