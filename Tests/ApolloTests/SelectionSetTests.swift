@@ -226,6 +226,31 @@ class SelectionSetTests: XCTestCase {
     expect(actual.friend).to(beNil())
   }
 
+  func test__selection_givenOptionalEntityField_givenNullValue__returnsNil() {
+    // given
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("friend", Hero?.self)
+      ]}
+
+      var friend: Hero? { __data["friend"] }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Human",
+      "friend": DataDict._NullValue
+    ]
+
+    // when
+    let actual = try! Hero(data: object)
+
+    // then
+    expect(actual.friend).to(beNil())
+  }
+
   // MARK: Entity - Array Tests
 
   func test__selection__arrayOfEntity_nonNull_givenValue__returnsValue() {
