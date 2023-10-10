@@ -10,6 +10,7 @@ let project = Project(
         .package(url: "https://github.com/Quick/Nimble.git", from: "10.0.0"),
         .package(path: "apollo-ios"),
         .package(path: "apollo-ios-codegen"),
+        .package(path: "apollo-ios-pagination"),
     ],
     settings: Settings.settings(configurations: [
         .debug(name: .debug, xcconfig: "Configuration/Apollo/Apollo-Project-Debug.xcconfig"),
