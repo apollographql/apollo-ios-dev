@@ -37,7 +37,7 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
 
   private typealias Query = MockQuery<Mocks.Hero.FriendsQuery>
 
-  func test_fetchMultiplePages() throws {
+  func test_multipleSubscribers() throws {
     let query = Query()
     query.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
     let pager = GraphQLQueryPager.makeForwardCursorQueryPager(client: client) { page in
