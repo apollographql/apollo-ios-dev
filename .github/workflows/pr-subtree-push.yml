@@ -53,7 +53,7 @@ jobs:
       with:
         subtree: apollo-ios-pagination
         remote: git@github.com:apollographql/apollo-ios-pagination.git
-        target-branch: main
+        target-branch: hs/complete-rewrite
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Push Updated History
