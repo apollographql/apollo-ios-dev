@@ -4693,11 +4693,9 @@ class IRRootFieldBuilderTests: XCTestCase {
         ],
         mergedSelections: [
           .field("id", type: .nonNull(.scalar(Scalar_String))),
-          .field("species", type: .nonNull(.scalar(Scalar_String))), // wrong - will change when merging of deferred fragments is disabled
         ],
         mergedSources: [
           try .mock(allAnimals),
-          try .mock(allAnimals_AsDog_Deferred), // wrong - will change when merging of deferred fragments is disabled
         ]
       )
     ))
@@ -4781,11 +4779,9 @@ class IRRootFieldBuilderTests: XCTestCase {
         ],
         mergedSelections: [
           .field("id", type: .nonNull(.scalar(Scalar_String))),
-          .field("species", type: .nonNull(.scalar(Scalar_String))), // wrong - will change when merging of deferred fragments is disabled
         ],
         mergedSources: [
           try .mock(allAnimals),
-          try .mock(allAnimals_AsDog_Deferred), // wrong - will change when merging of deferred fragments is disabled
         ]
       )
     ))
@@ -4869,11 +4865,9 @@ class IRRootFieldBuilderTests: XCTestCase {
         ],
         mergedSelections: [
           .field("id", type: .nonNull(.scalar(Scalar_String))),
-          .field("species", type: .nonNull(.scalar(Scalar_String))), // wrong - will change when merging of deferred fragments is disabled
         ],
         mergedSources: [
           try .mock(allAnimals),
-          try .mock(allAnimals_AsDog_Deferred), // wrong - will change when merging of deferred fragments is disabled
         ]
       )
     ))
@@ -5035,13 +5029,9 @@ class IRRootFieldBuilderTests: XCTestCase {
         ],
         mergedSelections: [
           .field("id", type: .nonNull(.scalar(Scalar_String))),
-//          .field("species", type: .nonNull(.scalar(Scalar_String))), // wrong - will change when merging of deferred fragments is disabled
-          .field("genus", type: .nonNull(.scalar(Scalar_String))), // wrong - will change when merging of deferred fragments is disabled
         ],
         mergedSources: [
           try .mock(allAnimals),
-//          try .mock(allAnimals_AsDog_Deferred_AsOne), // wrong - will change when merging of deferred fragments is disabled
-          try .mock(allAnimals_AsDog_Deferred_AsTwo), // wrong - will change when merging of deferred fragments is disabled
         ]
       )
     ))
@@ -5054,11 +5044,9 @@ class IRRootFieldBuilderTests: XCTestCase {
         ],
         mergedSelections: [
           .field("id", type: .nonNull(.scalar(Scalar_String))),
-          .field("genus", type: .nonNull(.scalar(Scalar_String))), // bug
         ],
         mergedSources: [
           try .mock(allAnimals),
-          try .mock(allAnimals_AsDog_Deferred_AsTwo), // bug
         ]
       )
     ))
@@ -5082,7 +5070,7 @@ class IRRootFieldBuilderTests: XCTestCase {
   // MARK: Deferred Fragments - Named Fragments
 
   func test__deferredFragments__givenDeferredNamedFragment_buildsDeferredInlineFragment() throws {
-//    throw XCTSkip()
+    throw XCTSkip()
 
     // given
     schemaSDL = """

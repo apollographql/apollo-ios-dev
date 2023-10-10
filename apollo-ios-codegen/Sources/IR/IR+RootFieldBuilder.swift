@@ -138,10 +138,12 @@ class RootFieldBuilder {
 
     self.hasDeferredFragments = typeInfo.scope.scopePath.hasDeferredDirective
 
-    typeInfo.entity.selectionTree.mergeIn(
-      selections: target.readOnlyView,
-      with: typeInfo
-    )
+    if typeInfo.scope.scopePath.last.value.deferDirective == nil {
+      typeInfo.entity.selectionTree.mergeIn(
+        selections: target.readOnlyView,
+        with: typeInfo
+      )
+    }
   }
 
   private func addSelections(
@@ -163,10 +165,7 @@ class RootFieldBuilder {
   ) {
     switch selection {
     case let .field(field):
-      if let irField = buildField(
-        from: field,
-        atTypePath: typeInfo
-      ) {
+      if let irField = buildField(from: field, atTypePath: typeInfo) {
         target.mergeIn(irField)
       }
 
