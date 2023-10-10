@@ -7,6 +7,8 @@ import ApolloInternalTestHelpers
 
 final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
 
+  private typealias Query = MockQuery<Mocks.Hero.FriendsQuery>
+
   var cacheType: TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
@@ -36,7 +38,6 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     try super.tearDownWithError()
   }
 
-  private typealias Query = MockQuery<MockPaginatedSelectionSet>
   func test_fetchMultiplePages() throws {
     let query = Query()
     query.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
@@ -79,7 +80,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     }
 
     try runActivity("Initial fetch from server") { _ in
-      let serverExpectation = server.expect(MockQuery<MockPaginatedSelectionSet>.self) { _ in
+      let serverExpectation = server.expect(Query.self) { _ in
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
           "endCursor": "Y3Vyc29yMg==",
@@ -135,7 +136,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     }
 
     try runActivity("Fetch second page") { _ in
-      let secondPageExpectation = server.expect(MockQuery<MockPaginatedSelectionSet>.self) { _ in
+      let secondPageExpectation = server.expect(Query.self) { _ in
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
           "endCursor": "Y3Vyc29yMw==",
@@ -233,7 +234,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     }
 
     try runActivity("Initial fetch from server") { _ in
-      let serverExpectation = server.expect(MockQuery<MockPaginatedSelectionSet>.self) { _ in
+      let serverExpectation = server.expect(Query.self) { _ in
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
           "endCursor": "Y3Vyc29yMg==",
@@ -289,7 +290,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     }
 
     try runActivity("Fetch second page") { _ in
-      let secondPageExpectation = server.expect(MockQuery<MockPaginatedSelectionSet>.self) { _ in
+      let secondPageExpectation = server.expect(Query.self) { _ in
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
           "endCursor": "Y3Vyc29yMw==",
@@ -392,7 +393,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     }
 
     try runActivity("Initial fetch from server") { _ in
-      let serverExpectation = server.expect(MockQuery<MockPaginatedSelectionSet>.self) { _ in
+      let serverExpectation = server.expect(Query.self) { _ in
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
           "endCursor": "Y3Vyc29yMg==",
@@ -448,7 +449,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     }
 
     try runActivity("Fetch second page") { _ in
-      let secondPageExpectation = server.expect(MockQuery<MockPaginatedSelectionSet>.self) { _ in
+      let secondPageExpectation = server.expect(Query.self) { _ in
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
           "endCursor": "Y3Vyc29yMw==",
@@ -505,7 +506,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
 
     try runActivity("Local Cache Mutation") { _ in
       client.store.withinReadWriteTransaction { transaction in
-        let cacheMutation = MockLocalCacheMutation<NameCacheMutation>()
+        let cacheMutation = MockLocalCacheMutation<Mocks.Hero.NameCacheMutation>()
         cacheMutation.__variables = ["id": "2001"]
         try! transaction.update(cacheMutation) { data in
           data.hero?.name = "C3PO"
@@ -521,98 +522,6 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
           XCTAssertEqual(page.hero.name, "C3PO")
         }
       }
-    }
-  }
-}
-
-private class MockPaginatedSelectionSet: MockSelectionSet {
-  override class var __selections: [Selection] { [
-    .field("hero", Hero?.self, arguments: ["id": .variable("id")])
-  ]}
-
-  var hero: Hero { __data["hero"] }
-
-  class Hero: MockSelectionSet {
-    override class var __selections: [Selection] {[
-      .field("__typename", String.self),
-      .field("id", String.self),
-      .field("name", String.self),
-      .field("friendsConnection", FriendsConnection.self, arguments: [
-        "first": .variable("first"),
-        "after": .variable("after")
-      ])
-    ]}
-
-    var name: String { __data["name"] }
-    var id: String { __data["id"] }
-    var friendsConnection: FriendsConnection { __data["friendsConnection"] }
-
-    class FriendsConnection: MockSelectionSet {
-      override class var __selections: [Selection] {[
-        .field("__typename", String.self),
-        .field("totalCount", Int.self),
-        .field("friends", [Character].self),
-        .field("pageInfo", PageInfo.self)
-      ]}
-
-      var totalCount: Int { __data["totalCount"] }
-      var friends: [Character] { __data["friends"] }
-      var pageInfo: PageInfo { __data["pageInfo"] }
-
-      class Character: MockSelectionSet {
-        override class var __selections: [Selection] {[
-          .field("__typename", String.self),
-          .field("name", String.self),
-          .field("id", String.self),
-        ]}
-
-        var name: String { __data["name"] }
-        var id: String { __data["id"] }
-      }
-
-      class PageInfo: MockSelectionSet {
-        override class var __selections: [Selection] {[
-          .field("__typename", String.self),
-          .field("endCursor", Optional<String>.self),
-          .field("hasNextPage", Bool.self)
-        ]}
-
-        var endCursor: String? { __data["endCursor"] }
-        var hasNextPage: Bool { __data["hasNextPage"] }
-      }
-    }
-  }
-}
-
-private struct NameCacheMutation: MockMutableRootSelectionSet {
-  public var __data: DataDict = .empty()
-  init(_dataDict: DataDict) { __data = _dataDict }
-  static var __selections: [Selection] { [
-    .field("hero", Hero?.self, arguments: ["id": .variable("id")])
-  ]}
-
-  var hero: Hero? {
-    get { __data["hero"] }
-    set { __data["hero"] = newValue }
-  }
-
-  struct Hero: MockMutableRootSelectionSet {
-    public var __data: DataDict = .empty()
-    init(_dataDict: DataDict) { __data = _dataDict }
-    static var __selections: [Selection] {[
-      .field("__typename", String.self),
-      .field("id", String.self),
-      .field("name", String.self),
-    ]}
-
-    var id: String {
-      get { __data["id"] }
-      set { __data["id"] = newValue }
-    }
-
-    var name: String {
-      get { __data["name"] }
-      set { __data["name"] = newValue }
     }
   }
 }
