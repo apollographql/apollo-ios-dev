@@ -1,7 +1,7 @@
-import XCTest
 import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
+import XCTest
 
 enum Mocks {
   enum Hero {
@@ -19,8 +19,8 @@ enum Mocks {
           .field("name", String.self),
           .field("friendsConnection", FriendsConnection.self, arguments: [
             "first": .variable("first"),
-            "after": .variable("after")
-          ])
+            "after": .variable("after"),
+          ]),
         ]}
 
         var name: String { __data["name"] }
@@ -32,7 +32,7 @@ enum Mocks {
             .field("__typename", String.self),
             .field("totalCount", Int.self),
             .field("friends", [Character].self),
-            .field("pageInfo", PageInfo.self)
+            .field("pageInfo", PageInfo.self),
           ]}
 
           var totalCount: Int { __data["totalCount"] }
@@ -54,7 +54,7 @@ enum Mocks {
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
               .field("endCursor", Optional<String>.self),
-              .field("hasNextPage", Bool.self)
+              .field("hasNextPage", Bool.self),
             ]}
 
             var endCursor: String? { __data["endCursor"] }

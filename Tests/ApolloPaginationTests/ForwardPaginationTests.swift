@@ -1,7 +1,7 @@
-import XCTest
 import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
+import XCTest
 
 @testable import ApolloPagination
 
@@ -52,7 +52,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       query.__variables = [
         "id": "2001",
         "first": 2,
-        "after": after
+        "after": after,
       ]
       return query
     } extractPageInfo: { data in
@@ -64,12 +64,11 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
 
     addTeardownBlock { pager.cancel() }
 
-
     let initialFetchExpectation = expectation(description: "Results")
     initialFetchExpectation.assertForOverFulfill = false
     let nextPageExpectation = expectation(description: "Next Page")
     nextPageExpectation.expectedFulfillmentCount = 2
-    
+
     var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
     var counter = 0
     pager.subscribe { result in
@@ -84,7 +83,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
           "endCursor": "Y3Vyc29yMg==",
-          "hasNextPage": true
+          "hasNextPage": true,
         ]
         let friends: [[String: AnyHashable]] = [
           [
@@ -96,20 +95,20 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
             "__typename": "Human",
             "name": "Han Solo",
             "id": "1002",
-          ]
+          ],
         ]
         let friendsConnection: [String: AnyHashable] = [
           "__typename": "FriendsConnection",
           "totalCount": 3,
           "friends": friends,
-          "pageInfo": pageInfo
+          "pageInfo": pageInfo,
         ]
 
         let hero: [String: AnyHashable] = [
           "__typename": "Droid",
           "id": "2001",
           "name": "R2-D2",
-          "friendsConnection": friendsConnection
+          "friendsConnection": friendsConnection,
         ]
 
         let data: [String: AnyHashable] = [
@@ -140,27 +139,27 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
           "endCursor": "Y3Vyc29yMw==",
-          "hasNextPage": false
+          "hasNextPage": false,
         ]
         let friends: [[String: AnyHashable]] = [
           [
             "__typename": "Human",
             "name": "Leia Organa",
             "id": "1003",
-          ]
+          ],
         ]
         let friendsConnection: [String: AnyHashable] = [
           "__typename": "FriendsConnection",
           "totalCount": 3,
           "friends": friends,
-          "pageInfo": pageInfo
+          "pageInfo": pageInfo,
         ]
 
         let hero: [String: AnyHashable] = [
           "__typename": "Droid",
           "id": "2001",
           "name": "R2-D2",
-          "friendsConnection": friendsConnection
+          "friendsConnection": friendsConnection,
         ]
 
         let data: [String: AnyHashable] = [
@@ -206,7 +205,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       query.__variables = [
         "id": "2001",
         "first": 2,
-        "after": after
+        "after": after,
       ]
       return query
     } extractPageInfo: { data in
@@ -217,7 +216,6 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     }
 
     addTeardownBlock { pager.cancel() }
-
 
     let initialFetchExpectation = expectation(description: "Results")
     initialFetchExpectation.assertForOverFulfill = false
@@ -238,7 +236,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
           "endCursor": "Y3Vyc29yMg==",
-          "hasNextPage": true
+          "hasNextPage": true,
         ]
         let friends: [[String: AnyHashable]] = [
           [
@@ -250,20 +248,20 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
             "__typename": "Human",
             "name": "Han Solo",
             "id": "1002",
-          ]
+          ],
         ]
         let friendsConnection: [String: AnyHashable] = [
           "__typename": "FriendsConnection",
           "totalCount": 3,
           "friends": friends,
-          "pageInfo": pageInfo
+          "pageInfo": pageInfo,
         ]
 
         let hero: [String: AnyHashable] = [
           "__typename": "Droid",
           "id": "2001",
           "name": "R2-D2",
-          "friendsConnection": friendsConnection
+          "friendsConnection": friendsConnection,
         ]
 
         let data: [String: AnyHashable] = [
@@ -294,27 +292,27 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
           "endCursor": "Y3Vyc29yMw==",
-          "hasNextPage": false
+          "hasNextPage": false,
         ]
         let friends: [[String: AnyHashable]] = [
           [
             "__typename": "Human",
             "name": "Leia Organa",
             "id": "1003",
-          ]
+          ],
         ]
         let friendsConnection: [String: AnyHashable] = [
           "__typename": "FriendsConnection",
           "totalCount": 3,
           "friends": friends,
-          "pageInfo": pageInfo
+          "pageInfo": pageInfo,
         ]
 
         let hero: [String: AnyHashable] = [
           "__typename": "Droid",
           "id": "2001",
           "name": "R2-D2",
-          "friendsConnection": friendsConnection
+          "friendsConnection": friendsConnection,
         ]
 
         let data: [String: AnyHashable] = [
@@ -360,7 +358,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       query.__variables = [
         "id": "2001",
         "first": 2,
-        "after": after
+        "after": after,
       ]
       return query
     } extractPageInfo: { data in
@@ -371,7 +369,6 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     }
 
     addTeardownBlock { pager.cancel() }
-
 
     let initialFetchExpectation = expectation(description: "Results")
     initialFetchExpectation.assertForOverFulfill = false
@@ -397,7 +394,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
           "endCursor": "Y3Vyc29yMg==",
-          "hasNextPage": true
+          "hasNextPage": true,
         ]
         let friends: [[String: AnyHashable]] = [
           [
@@ -409,20 +406,20 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
             "__typename": "Human",
             "name": "Han Solo",
             "id": "1002",
-          ]
+          ],
         ]
         let friendsConnection: [String: AnyHashable] = [
           "__typename": "FriendsConnection",
           "totalCount": 3,
           "friends": friends,
-          "pageInfo": pageInfo
+          "pageInfo": pageInfo,
         ]
 
         let hero: [String: AnyHashable] = [
           "__typename": "Droid",
           "id": "2001",
           "name": "R2-D2",
-          "friendsConnection": friendsConnection
+          "friendsConnection": friendsConnection,
         ]
 
         let data: [String: AnyHashable] = [
@@ -453,27 +450,27 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
           "endCursor": "Y3Vyc29yMw==",
-          "hasNextPage": false
+          "hasNextPage": false,
         ]
         let friends: [[String: AnyHashable]] = [
           [
             "__typename": "Human",
             "name": "Leia Organa",
             "id": "1003",
-          ]
+          ],
         ]
         let friendsConnection: [String: AnyHashable] = [
           "__typename": "FriendsConnection",
           "totalCount": 3,
           "friends": friends,
-          "pageInfo": pageInfo
+          "pageInfo": pageInfo,
         ]
 
         let hero: [String: AnyHashable] = [
           "__typename": "Droid",
           "id": "2001",
           "name": "R2-D2",
-          "friendsConnection": friendsConnection
+          "friendsConnection": friendsConnection,
         ]
 
         let data: [String: AnyHashable] = [

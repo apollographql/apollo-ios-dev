@@ -1,7 +1,7 @@
-import XCTest
 import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
+import XCTest
 
 @testable import ApolloPagination
 
@@ -51,7 +51,7 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
       query.__variables = [
         "id": "2001",
         "first": 2,
-        "after": after
+        "after": after,
       ]
       return query
     } extractPageInfo: { data in
@@ -82,7 +82,7 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
         let pageInfo: [AnyHashable: AnyHashable] = [
           "__typename": "PageInfo",
           "endCursor": "Y3Vyc29yMg==",
-          "hasNextPage": true
+          "hasNextPage": true,
         ]
         let friends: [[String: AnyHashable]] = [
           [
@@ -94,20 +94,20 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
             "__typename": "Human",
             "name": "Han Solo",
             "id": "1002",
-          ]
+          ],
         ]
         let friendsConnection: [String: AnyHashable] = [
           "__typename": "FriendsConnection",
           "totalCount": 3,
           "friends": friends,
-          "pageInfo": pageInfo
+          "pageInfo": pageInfo,
         ]
 
         let hero: [String: AnyHashable] = [
           "__typename": "Droid",
           "id": "2001",
           "name": "R2-D2",
-          "friendsConnection": friendsConnection
+          "friendsConnection": friendsConnection,
         ]
 
         let data: [String: AnyHashable] = [
