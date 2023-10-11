@@ -44,7 +44,7 @@ jobs:
           - destination: platform=macOS,arch=x86_64
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
-            name: Apollo Unit Tests - macOS $MACOS_VERSION
+            name: Apollo Unit Tests - macOS ${{ env.MACOS_VERSION }}
             run-js-tests: false
           # Codegen CLI Test
           # - destination: platform=macOS,arch=x86_64
@@ -62,7 +62,7 @@ jobs:
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: $XCODE_VERSION
+        xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Setup Repo
