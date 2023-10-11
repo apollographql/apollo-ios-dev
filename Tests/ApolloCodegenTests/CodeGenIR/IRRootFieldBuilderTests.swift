@@ -4961,7 +4961,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(allAnimals_AsDog_Deferred).to(beNil())
   }
 
-  func test__deferredFragments__givenMultipleDeferredInlineFragments_buildsMultipleDeferredInlineFragments() throws {
+  func test__deferredFragments__givenSiblingSelectionSetIsSameObjectType_doesNotMergesDeferredFragments() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5062,6 +5062,101 @@ class IRRootFieldBuilderTests: XCTestCase {
         ],
         mergedSources: [
           try .mock(allAnimals),
+        ]
+      )
+    ))
+  }
+
+  func test__deferredFragments__givenSiblingSelectionSetIsDifferentObjectType_doesNotMergesDeferredFragments() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+    }
+
+    type Bird implements Animal {
+      species: String
+      wingspan: Int
+    }
+
+    type Cat implements Animal {
+      species: String
+    }
+    """
+
+    document = """
+    query Test {
+      allAnimals {
+        ... on Bird @defer(label: "bird") {
+          wingspan
+        }
+        ... on Cat @defer(label: "cat") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
+    let Object_Bird = try XCTUnwrap(schema[object: "Bird"])
+    let Object_Cat = try XCTUnwrap(schema[object: "Cat"])
+
+    let allAnimals = self.subject[field: "allAnimals"]
+    let allAnimals_AsBird = allAnimals?[as: "Bird"]
+    let allAnimals_AsCat = allAnimals?[as: "Cat"]
+    let allAnimals_AsBird_Deferred_AsBird = allAnimals_AsBird?[deferredAs: "bird"]
+    let allAnimals_AsCat_Deferred_AsCat = allAnimals_AsCat?[deferredAs: "cat"]
+
+    expect(allAnimals?.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .inlineFragment(parentType: Object_Bird),
+          .inlineFragment(parentType: Object_Cat),
+        ]
+      )
+    ))
+
+    expect(allAnimals_AsBird).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Bird,
+        directSelections: [
+          .inlineFragment(parentType: Object_Bird),
+        ]
+      )
+    ))
+
+    expect(allAnimals_AsCat).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Cat,
+        directSelections: [
+          .inlineFragment(parentType: Object_Cat),
+        ]
+      )
+    ))
+
+    expect(allAnimals_AsBird_Deferred_AsBird).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Bird,
+        directSelections: [
+          .field("wingspan", type: .integer()),
+        ]
+      )
+    ))
+
+    expect(allAnimals_AsCat_Deferred_AsCat).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Cat,
+        directSelections: [
+          .field("species", type: .string()),
         ]
       )
     ))
