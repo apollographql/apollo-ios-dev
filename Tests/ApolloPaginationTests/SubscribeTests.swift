@@ -3,7 +3,7 @@ import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
 
-@testable import apollo_ios_pagination
+@testable import ApolloPagination
 
 final class SubscribeTest: XCTestCase, CacheDependentTesting {
   var cacheType: TestCacheProvider.Type {
