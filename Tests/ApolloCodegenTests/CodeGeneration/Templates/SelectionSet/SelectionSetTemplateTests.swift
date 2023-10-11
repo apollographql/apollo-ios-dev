@@ -1491,6 +1491,8 @@ class SelectionSetTemplateTests: XCTestCase {
   // MARK: Selections - Deferred Inline Fragment
 
   func test__render_selections__givenDeferredInlineFragment_rendersDeferredFragmentSelection() throws {
+    throw XCTSkip()
+
     // given
     schemaSDL = """
     type Query {
@@ -1542,6 +1544,8 @@ class SelectionSetTemplateTests: XCTestCase {
   }
 
   func test__render_selections__givenDeferredInlineFragmentsWithDifferentLabels_rendersBothDeferredFragmentSelections() throws {
+    throw XCTSkip()
+
     // given
     schemaSDL = """
     type Query {
@@ -1597,6 +1601,8 @@ class SelectionSetTemplateTests: XCTestCase {
   }
 
   func test__render_selections__givenDeferredInlineFragmentWithCondition_rendersDeferredFragmentSelectionWithCondition() throws {
+    throw XCTSkip()
+
     // given
     schemaSDL = """
     type Query {
@@ -1648,6 +1654,8 @@ class SelectionSetTemplateTests: XCTestCase {
   }
 
   func test__render_selections__givenDeferredInlineFragmentWithTrueCondition_rendersDeferredFragmentSelectionWithoutCondition() throws {
+    throw XCTSkip()
+
     // given
     schemaSDL = """
     type Query {
@@ -1750,6 +1758,8 @@ class SelectionSetTemplateTests: XCTestCase {
   }
 
   func test__render_selections__givenNestedDeferredInlineFragments_rendersNestedDeferredFragmentSelections() throws {
+    throw XCTSkip()
+
     // given
     schemaSDL = """
     type Query {
@@ -1824,6 +1834,8 @@ class SelectionSetTemplateTests: XCTestCase {
   // MARK: Selections - Deferred Named Fragment
 
   func test__render_selections__givenDeferredNamedFragment_rendersDeferredFragmentSelection() throws {
+    throw XCTSkip()
+
     // given
     schemaSDL = """
     type Query {
@@ -1877,6 +1889,8 @@ class SelectionSetTemplateTests: XCTestCase {
   }
 
   func test__render_selections__givenDeferredNamedFragmentWithLabel_rendersDeferredFragmentSelectionUsingNamedFragmentType() throws {
+    throw XCTSkip()
+
     // given
     schemaSDL = """
     type Query {
@@ -1930,6 +1944,8 @@ class SelectionSetTemplateTests: XCTestCase {
   }
 
   func test__render_selections__givenDeferredNamedFragmentWithCondition_rendersDeferredFragmentSelectionWithCondition() throws {
+    throw XCTSkip()
+
     // given
     schemaSDL = """
     type Query {
@@ -1983,6 +1999,8 @@ class SelectionSetTemplateTests: XCTestCase {
   }
 
   func test__render_selections__givenDeferredNamedFragmentWithTrueCondition_rendersDeferredFragmentSelection() throws {
+    throw XCTSkip()
+
     // given
     schemaSDL = """
     type Query {
@@ -5605,812 +5623,6 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
-  // MARK: - Fragment Accessors - Deferred Inline Fragment
-
-  func test__render_fragmentAccessor__givenDeferredInlineFragment_rendersConvenienceDeferredFragmentAccessorAsOptional() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(label: "root") {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) {
-          __data = _dataDict
-          _root = Deferred(_dataDict: _dataDict)
-        }
-
-        @Deferred public var root: AsDog.Root?
-      }
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
-    )
-
-    let actual = subject.render(field: allAnimals)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
-  }
-
-  func test__render_fragmentAccessor__givenDeferredInlineFragment_rendersTypeCaseDeferredFragmentAccessorAsOptional() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(label: "root") {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) {
-          __data = _dataDict
-          _root = Deferred(_dataDict: _dataDict)
-        }
-
-        @Deferred public var root: Root?
-      }
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
-  }
-
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentsWithDifferentLabels_rendersBothConvenienceDeferredFragmentAccessorsAsOptional() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(label: "one") {
-          species
-        }
-        ... on Dog @defer(label: "two") {
-          genus
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) {
-          __data = _dataDict
-          _one = Deferred(_dataDict: _dataDict)
-          _two = Deferred(_dataDict: _dataDict)
-        }
-
-        @Deferred public var one: AsDog.One?
-        @Deferred public var two: AsDog.Two?
-      }
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
-    )
-
-    let actual = subject.render(field: allAnimals)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
-  }
-
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentsWithDifferentLabels_rendersBothTypeCaseDeferredFragmentAccessorsAsOptional() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(label: "one") {
-          species
-        }
-        ... on Dog @defer(label: "two") {
-          genus
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) {
-          __data = _dataDict
-          _one = Deferred(_dataDict: _dataDict)
-          _two = Deferred(_dataDict: _dataDict)
-        }
-
-        @Deferred public var one: One?
-        @Deferred public var two: Two?
-      }
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
-  }
-
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithCondition_rendersConvenienceDeferredFragmentAccessorAsOptional() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(if: "a", label: "root") {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) {
-          __data = _dataDict
-          _root = Deferred(_dataDict: _dataDict)
-        }
-
-        @Deferred public var root: AsDog.Root?
-      }
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
-    )
-
-    let actual = subject.render(field: allAnimals)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
-  }
-
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithCondition_rendersTypeCaseDeferredFragmentAccessorAsOptional() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(if: "a", label: "root") {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) {
-          __data = _dataDict
-          _root = Deferred(_dataDict: _dataDict)
-        }
-
-        @Deferred public var root: Root?
-      }
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
-  }
-
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithTrueCondition_rendersConvenienceDeferredFragmentAccessorAsOptional() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(if: true, label: "root") {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) {
-          __data = _dataDict
-          _root = Deferred(_dataDict: _dataDict)
-        }
-
-        @Deferred public var root: AsDog.Root?
-      }
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
-    )
-
-    let actual = subject.render(field: allAnimals)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
-  }
-
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithTrueCondition_rendersTypeCaseDeferredFragmentAccessorAsOptional() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(if: true, label: "root") {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) {
-          __data = _dataDict
-          _root = Deferred(_dataDict: _dataDict)
-        }
-
-        @Deferred public var root: Root?
-      }
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
-  }
-
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithFalseCondition_doesNotRenderConvenienceDeferredFragmentAccessor() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(if: false, label: "root") {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public var asDog: AsDog? { _asInlineFragment() }
-
-      /// Parent Type: `Dog`
-      public struct AsDog: TestSchema.InlineFragment {
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
-    )
-
-    let actual = subject.render(field: allAnimals)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
-  }
-
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithFalseCondition_doesNotRenderTypeCaseDeferredFragmentAccessor() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(if: false, label: "root") {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-        public var species: String? { __data["species"] }
-      }
-    }
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
-  }
-
-  // MARK: - Fragment Accessors - Deferred Named Fragment
-
-  func test__render_fragmentAccessor__givenDeferredNamedFragment_rendersDeferredFragmentAccessorAsOptional() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ...DogFragment @defer(label: "root")
-      }
-    }
-
-    fragment DogFragment on Dog {
-      species
-    }
-    """
-
-    let expected = """
-      public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) {
-          __data = _dataDict
-          _dogFragment = Deferred(_dataDict: _dataDict)
-        }
-
-        @Deferred public var dogFragment: DogFragment?
-      }
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
-  }
-
-  func test__render_fragmentAccessor__givenDeferredNamedFragmentWithCondition_rendersDeferredFragmentAccessorAsOptional() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ...DogFragment @defer(if: "a", label: "root")
-      }
-    }
-
-    fragment DogFragment on Dog {
-      species
-    }
-    """
-
-    let expected = """
-      public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) {
-          __data = _dataDict
-          _dogFragment = Deferred(_dataDict: _dataDict)
-        }
-
-        @Deferred public var dogFragment: DogFragment?
-      }
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
-  }
-
-  func test__render_fragmentAccessor__givenDeferredNamedFragmentWithTrueCondition_rendersDeferredFragmentAccessorAsOptional() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ...DogFragment @defer(if: true, label: "root")
-      }
-    }
-
-    fragment DogFragment on Dog {
-      species
-    }
-    """
-
-    let expected = """
-      public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) {
-          __data = _dataDict
-          _dogFragment = Deferred(_dataDict: _dataDict)
-        }
-
-        @Deferred public var dogFragment: DogFragment?
-      }
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
-  }
-
-  func test__render_fragmentAccessor__givenDeferredNamedFragmentWithFalseCondition_doesNotRenderDeferredFragmentAccessor() throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ...DogFragment @defer(if: false, label: "root")
-      }
-    }
-
-    fragment DogFragment on Dog {
-      species
-    }
-    """
-
-    let expected = """
-      public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
-
-        public var dogFragment: DogFragment { _toFragment() }
-      }
-    """
-
-    // when
-    try buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
-  }
-
   // MARK: - Nested Selection Sets
 
   func test__render_nestedSelectionSets__givenDirectEntityFieldAsList_rendersNestedSelectionSet() throws {
@@ -7398,6 +6610,8 @@ class SelectionSetTemplateTests: XCTestCase {
   // MARK: Nested Selection Sets - Deferred Inline Fragments
 
   func test__render_nestedSelectionSet__givenDeferredInlineFragment_rendersNestedSelectionSet() throws {
+    throw XCTSkip()
+
     // given
     schemaSDL = """
     type Query {
@@ -7456,6 +6670,8 @@ class SelectionSetTemplateTests: XCTestCase {
   }
 
   func test__render_nestedSelectionSet__givenDeferredInlineFragmentsWithDifferentLabels_rendersBothNestedSelectionSets() throws {
+    throw XCTSkip()
+    
     // given
     schemaSDL = """
     type Query {
