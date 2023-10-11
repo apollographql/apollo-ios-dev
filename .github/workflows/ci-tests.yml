@@ -63,7 +63,7 @@ jobs:
             scheme: ApolloPaginationTests
             test-plan: Apollo-PaginationTestPlan
             name: ApolloPagination Unit Tests - macOS
-            run-js-tests: true
+            run-js-tests: false
     name: ${{ matrix.name }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
