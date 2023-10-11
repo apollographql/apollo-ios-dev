@@ -162,7 +162,7 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
 }
 
 extension LinkedList where T == ScopeCondition {
-  var containsDeferredFragments: Bool {
+  var containsDeferredFragment: Bool {
     var node: Node? = last
     var deferCondition = node?.value.deferCondition
 

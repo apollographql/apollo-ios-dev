@@ -4366,7 +4366,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     try buildSubjectRootField()
 
     // then
-    expect(self.result.containsDeferredFragments).to(beFalse())
+    expect(self.result.containsDeferredFragment).to(beFalse())
   }
 
   func test__deferredFragments__givenDeferredInlineFragment_hasDeferredFragmentsTrue() throws {
@@ -4406,7 +4406,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     try buildSubjectRootField()
 
     // then
-    expect(self.result.containsDeferredFragments).to(beTrue())
+    expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
   func test__deferredFragments__givenDeferredInlineFragmentWithCondition_hasDeferredFragmentsTrue() throws {
@@ -4446,7 +4446,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     try buildSubjectRootField()
 
     // then
-    expect(self.result.containsDeferredFragments).to(beTrue())
+    expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
   func test__deferredFragments__givenDeferredInlineFragmentWithConditionFalse_hasDeferredFragmentsFalse() throws {
@@ -4486,7 +4486,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     try buildSubjectRootField()
 
     // then
-    expect(self.result.containsDeferredFragments).to(beFalse())
+    expect(self.result.containsDeferredFragment).to(beFalse())
   }
 
   func test__deferredFragments__givenDeferredNamedFragment_onDifferentTypeCase_hasDeferredFragmentsTrue() throws {
@@ -4528,7 +4528,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     try buildSubjectRootField()
 
     // then
-    expect(self.result.containsDeferredFragments).to(beTrue())
+    expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
   func test__deferredFragments__givenDeferredInlineFragment_withinNamedFragment_hasDeferredFragmentsTrue() throws {
@@ -4572,7 +4572,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     try buildSubjectRootField()
 
     // then
-    expect(self.result.containsDeferredFragments).to(beTrue())
+    expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
   func test__deferredFragments__givenDeferredNamedFragment_withSelectionOnDifferentTypeCase_hasDeferredFragmentsTrue() throws {
@@ -4623,7 +4623,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     try buildSubjectRootField()
 
     // then
-    expect(self.result.containsDeferredFragments).to(beTrue())
+    expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
   #warning("tests to match IR struct changes")
