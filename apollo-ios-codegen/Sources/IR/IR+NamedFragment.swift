@@ -10,7 +10,7 @@ public class NamedFragment: Hashable, CustomDebugStringConvertible {
 
   /// `True` if any selection set, or nested selection set, within the fragment contains any
   /// fragment marked with the `@defer` directive.
-  public let hasDeferredFragments: Bool
+  public let containsDeferredFragments: Bool
 
   /// All of the Entities that exist in the fragment's selection set,
   /// keyed by their relative location (ie. path) within the fragment.
@@ -26,13 +26,13 @@ public class NamedFragment: Hashable, CustomDebugStringConvertible {
     definition: CompilationResult.FragmentDefinition,
     rootField: EntityField,
     referencedFragments: OrderedSet<NamedFragment>,
-    hasDeferredFragments: Bool = false,
+    containsDeferredFragments: Bool = false,
     entities: [Entity.Location: Entity]
   ) {
     self.definition = definition
     self.rootField = rootField
     self.referencedFragments = referencedFragments
-    self.hasDeferredFragments = hasDeferredFragments
+    self.containsDeferredFragments = containsDeferredFragments
     self.entities = entities
   }
 

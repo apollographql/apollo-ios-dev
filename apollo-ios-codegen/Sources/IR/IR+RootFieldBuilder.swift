@@ -69,7 +69,7 @@ class RootFieldBuilder {
     let rootField: EntityField
     let referencedFragments: ReferencedFragments
     let entities: [Entity.Location: Entity]
-    let hasDeferredFragments: Bool
+    let containsDeferredFragments: Bool
   }
 
   typealias ReferencedFragments = OrderedSet<NamedFragment>
@@ -87,7 +87,7 @@ class RootFieldBuilder {
   private let rootEntity: Entity
   private let entityStorage: RootFieldEntityStorage
   private var referencedFragments: ReferencedFragments = []
-  @IsEverTrue private var hasDeferredFragments: Bool
+  @IsEverTrue private var containsDeferredFragments: Bool
 
   private var schema: Schema { ir.schema }
 
@@ -125,7 +125,7 @@ class RootFieldBuilder {
       rootField: EntityField(rootField, selectionSet: rootIrSelectionSet),
       referencedFragments: referencedFragments,
       entities: entityStorage.entitiesForFields,
-      hasDeferredFragments: hasDeferredFragments
+      containsDeferredFragments: containsDeferredFragments
     )
   }
 
@@ -136,7 +136,7 @@ class RootFieldBuilder {
   ) {
     addSelections(from: selectionSet, to: target, atTypePath: typeInfo)
 
-    self.hasDeferredFragments = typeInfo.scope.scopePath.hasDeferredDirective
+    self.containsDeferredFragments = typeInfo.scope.scopePath.containsDeferredFragments
 
     if typeInfo.scope.scopePath.last.value.deferDirective == nil {
       typeInfo.entity.selectionTree.mergeIn(
@@ -415,7 +415,7 @@ class RootFieldBuilder {
     referencedFragments.append(fragment)
     referencedFragments.append(contentsOf: fragment.referencedFragments)
 
-    self.hasDeferredFragments = fragment.hasDeferredFragments
+    self.containsDeferredFragments = fragment.containsDeferredFragments
 
     let scopePath = scopeCondition.isEmpty ?
     parentTypeInfo.scopePath :

@@ -162,7 +162,7 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
 }
 
 extension LinkedList where T == ScopeCondition {
-  var hasDeferredDirective: Bool {
+  var containsDeferredFragments: Bool {
     var node: Node? = last
     var deferDirective = node?.value.deferDirective
 
