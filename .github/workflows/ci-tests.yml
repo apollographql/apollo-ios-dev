@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  XCODE_VERSION: "15.0"
+  XCODE_VERSION: "15.0.0"
   MACOS_VERSION: "13.2"
 
 jobs:
