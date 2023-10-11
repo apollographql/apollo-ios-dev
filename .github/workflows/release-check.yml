@@ -141,9 +141,6 @@ jobs:
             name: Apollo Unit Tests - iOS 14.4
     name: ${{ matrix.name }}
     steps:
-    - uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: 12.4.0
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Setup Repo
@@ -159,6 +156,9 @@ jobs:
       with:
           command: 'generate'
           arguments: ''
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: 12.4.0
     - name: Build and Test
       uses: ./.github/actions/build-and-run-unit-tests
       with:
