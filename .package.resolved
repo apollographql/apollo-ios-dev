@@ -1,15 +1,6 @@
 {
   "pins" : [
     {
-      "identity" : "apollo-ios-pagination",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apollographql/apollo-ios-pagination.git",
-      "state" : {
-        "branch" : "hs/complete-rewrite",
-        "revision" : "65eea3587769404c939c64dc5c58f406431a2d64"
-      }
-    },
-    {
       "identity" : "cwlcatchexception",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mattgallagher/CwlCatchException.git",
