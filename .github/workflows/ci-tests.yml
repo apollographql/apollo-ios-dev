@@ -6,7 +6,6 @@ on:
 
 env:
   XCODE_VERSION: "15.0.0"
-  MACOS_VERSION: "13.2"
 
 jobs:
   # run-swift-builds:
@@ -44,7 +43,7 @@ jobs:
           - destination: platform=macOS,arch=x86_64
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
-            name: Apollo Unit Tests - macOS ${{ env.MACOS_VERSION }}
+            name: Apollo Unit Tests - macOS 13.2
             run-js-tests: false
           # Codegen CLI Test
           # - destination: platform=macOS,arch=x86_64
