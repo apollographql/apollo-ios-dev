@@ -61,8 +61,8 @@ jobs:
           # ApolloPagination Tests
           - destination: platform=macOS,arch=x86_64
             scheme: ApolloPaginationTests
-            test-plan: Apollo-Codegen-CITestPlan
-            name: Codegen Lib Unit Tests - macOS
+            test-plan: Apollo-PaginationTestPlan
+            name: ApolloPagination Unit Tests - macOS
             run-js-tests: true
     name: ${{ matrix.name }}
     steps:
