@@ -21,7 +21,7 @@ extension Target {
                 .package(product: "ApolloAPI"),
                 .package(product: "ApolloTestSupport"),
                 .package(product: "Nimble"),
-                .package(product: "apollo-ios-pagination")
+                .package(product: "ApolloPagination")
             ],
             settings: .forTarget(target)
         )
