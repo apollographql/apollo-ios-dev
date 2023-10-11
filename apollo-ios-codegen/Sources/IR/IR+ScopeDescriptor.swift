@@ -9,26 +9,26 @@ import Utilities
 public struct ScopeCondition: Hashable, CustomDebugStringConvertible {
   public let type: GraphQLCompositeType?
   public let conditions: InclusionConditions?
-  public let deferDirective: DeferCondition?
+  public let deferCondition: DeferCondition?
 
   init(
     type: GraphQLCompositeType? = nil,
     conditions: InclusionConditions? = nil,
-    deferDirective: DeferCondition? = nil
+    deferCondition: DeferCondition? = nil
   ) {
     self.type = type
     self.conditions = conditions
-    self.deferDirective = deferDirective
+    self.deferCondition = deferCondition
   }
 
   public var debugDescription: String {
-    [type?.debugDescription, conditions?.debugDescription, deferDirective?.debugDescription]
+    [type?.debugDescription, conditions?.debugDescription, deferCondition?.debugDescription]
       .compactMap { $0 }
       .joined(separator: " ")
   }
 
   var isEmpty: Bool {
-    type == nil && (conditions?.isEmpty ?? true) && deferDirective == nil
+    type == nil && (conditions?.isEmpty ?? true) && deferCondition == nil
   }
 }
 

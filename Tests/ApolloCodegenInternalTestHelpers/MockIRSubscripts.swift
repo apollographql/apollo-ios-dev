@@ -71,7 +71,7 @@ extension ScopeConditionalSubscriptAccessing {
       conditions = nil
     }
 
-    return IR.ScopeCondition(type: type, conditions: conditions, deferDirective: deferCondition)
+    return IR.ScopeCondition(type: type, conditions: conditions, deferCondition: deferCondition)
   }
 
 }
@@ -154,7 +154,7 @@ extension IR.SelectionSet: ScopeConditionalSubscriptAccessing {
     let scope = ScopeCondition(
       type: self.parentType,
       conditions: self.inclusionConditions,
-      deferDirective: DeferCondition(label: label, variable: variable)
+      deferCondition: DeferCondition(label: label, variable: variable)
     )
     return selections[scope]
   }
