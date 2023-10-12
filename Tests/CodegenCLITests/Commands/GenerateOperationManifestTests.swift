@@ -193,6 +193,7 @@ class GenerateOperationManifestTests: XCTestCase {
   func test__generate__givenCLIVersionMismatch_shouldThrowVersionMismatchError() async throws {
     // given
     let mockConfiguration = ApolloCodegenConfiguration.mock()
+    let fileManager = try testIsolatedFileManager()
 
     let jsonString = String(
       data: try! JSONEncoder().encode(mockConfiguration),
@@ -207,7 +208,7 @@ class GenerateOperationManifestTests: XCTestCase {
     MockApolloCodegen.buildHandler = { configuration in }
     MockApolloSchemaDownloader.fetchHandler = { configuration in }
 
-    try self.testIsolatedFileManager().createFile(
+    try fileManager.createFile(
       body: """
         {
           "pins": [
@@ -233,6 +234,7 @@ class GenerateOperationManifestTests: XCTestCase {
     // then
     await expect {
       try await command._run(
+        projectRootURL: fileManager.directoryURL,
         codegenProvider: MockApolloCodegen.self
       )
     }.to(throwError())
@@ -241,6 +243,7 @@ class GenerateOperationManifestTests: XCTestCase {
   func test__generate__givenCLIVersionMismatch_withIgnoreVersionMismatchArgument_shouldNotThrowVersionMismatchError() async throws {
     // given
     let mockConfiguration = ApolloCodegenConfiguration.mock()
+    let fileManager = try testIsolatedFileManager()
 
     let jsonString = String(
       data: try! JSONEncoder().encode(mockConfiguration),
@@ -256,7 +259,7 @@ class GenerateOperationManifestTests: XCTestCase {
     MockApolloCodegen.buildHandler = { configuration in }
     MockApolloSchemaDownloader.fetchHandler = { configuration in }
 
-    try self.testIsolatedFileManager().createFile(
+    try fileManager.createFile(
       body: """
         {
           "pins": [
@@ -282,6 +285,7 @@ class GenerateOperationManifestTests: XCTestCase {
     // then
     await expect {
       try await command._run(
+        projectRootURL: fileManager.directoryURL,
         codegenProvider: MockApolloCodegen.self
       )
     }.toNot(throwError())

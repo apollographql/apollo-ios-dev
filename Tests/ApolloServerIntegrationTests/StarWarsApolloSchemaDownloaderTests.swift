@@ -9,15 +9,12 @@ class StarWarsApolloSchemaDownloaderTests: XCTestCase {
 
   func testDownloadingSchema_usingIntrospection_shouldOutputSDL() async throws {
     let fileManager = try testIsolatedFileManager()
-    let testOutputFolderURL = fileManager.directoryURL
 
     let configuration = ApolloSchemaDownloadConfiguration(
       using: .introspection(endpointURL: TestServerURL.starWarsServer.url),
-      outputPath: testOutputFolderURL.path
+      outputPath: fileManager.filePathBuilder.schemaOutputURL.path
     )
 
-    // Delete anything existing at the output URL
-    try ApolloFileManager.default.deleteDirectory(atPath: configuration.outputPath)
     XCTAssertFalse(ApolloFileManager.default.doesFileExist(atPath: configuration.outputPath))
 
     try await ApolloSchemaDownloader.fetch(configuration: configuration)

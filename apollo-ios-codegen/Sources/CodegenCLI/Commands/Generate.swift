@@ -28,6 +28,7 @@ public struct Generate: AsyncParsableCommand {
 
   func _run(
     fileManager: FileManager = .default,
+    projectRootURL: URL? = nil,
     codegenProvider: CodegenProvider.Type = ApolloCodegen.self,
     schemaDownloadProvider: SchemaDownloadProvider.Type = ApolloSchemaDownloader.self,
     logger: LogLevelSetter.Type = CodegenLogger.self
@@ -35,7 +36,8 @@ public struct Generate: AsyncParsableCommand {
     logger.SetLoggingLevel(verbose: inputs.verbose)
 
     try checkForCLIVersionMismatch(
-      with: inputs
+      with: inputs,
+      projectRootURL: projectRootURL
     )
 
     try await generate(

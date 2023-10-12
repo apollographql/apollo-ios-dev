@@ -25,7 +25,7 @@ public class ConcurrentTaskContainer {
 
     func didFinishTask() {
       if tasks.isEmpty {
-        var continuations = waitForAllTaskContinuations
+        let continuations = waitForAllTaskContinuations
         waitForAllTaskContinuations = []
 
         for continuation in continuations {
