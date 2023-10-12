@@ -226,6 +226,31 @@ class SelectionSetTests: XCTestCase {
     expect(actual.friend).to(beNil())
   }
 
+  func test__selection_givenOptionalEntityField_givenNullValue__returnsNil() {
+    // given
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("friend", Hero?.self)
+      ]}
+
+      var friend: Hero? { __data["friend"] }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Human",
+      "friend": DataDict._NullValue
+    ]
+
+    // when
+    let actual = try! Hero(data: object)
+
+    // then
+    expect(actual.friend).to(beNil())
+  }
+
   // MARK: Entity - Array Tests
 
   func test__selection__arrayOfEntity_nonNull_givenValue__returnsValue() {
@@ -1436,12 +1461,20 @@ class SelectionSetTests: XCTestCase {
       return
     }
     expect(nameValue).to(beNil())
-
-    guard let nameValue = nameValue as? String? else {
-      fail("name should be Optional.some(Optional.none).")
-      return
+    
+    if DataDict._AnyHashableCanBeCoerced {
+      guard let nameValue = nameValue as? String? else {
+        fail("name should be Optional.some(Optional.none).")
+        return
+      }
+      expect(nameValue).to(beNil())
+    } else {
+      guard let nameValue = nameValue.base as? String? else {
+        fail("name should be Optional.some(Optional.none).")
+        return
+      }
+      expect(nameValue).to(beNil())
     }
-    expect(nameValue).to(beNil())
   }
 
   func test__selectionInitializer_givenOptionalEntityField__fieldIsPresentWithOptionalNilValue() {
@@ -1510,11 +1543,20 @@ class SelectionSetTests: XCTestCase {
     }
     expect(childValue).to(beNil())
 
-    guard let childValue = childValue as? Hero.Child? else {
-      fail("child should be Optional.some(Optional.none).")
-      return
+    if DataDict._AnyHashableCanBeCoerced {
+      guard let childValue = childValue as? Hero.Child? else {
+        fail("child should be Optional.some(Optional.none).")
+        return
+      }
+      expect(childValue).to(beNil())
+
+    } else {
+      guard let childValue = childValue.base as? Hero.Child? else {
+        fail("child should be Optional.some(Optional.none).")
+        return
+      }
+      expect(childValue).to(beNil())
     }
-    expect(childValue).to(beNil())
   }
 
   func test__selectionInitializer_givenOptionalListOfOptionalEntitiesField__setsFieldDataCorrectly() {

@@ -7,6 +7,7 @@ enum ApolloTestPlan {
     case codegenCITest
     case codegenCLITest
     case integrationTest
+    case paginationTest
     case performanceTest
     case unitTest
     
@@ -22,6 +23,8 @@ enum ApolloTestPlan {
             return Path("Tests/TestPlans/CodegenCLITestPlan.xctestplan")
         case .integrationTest:
             return Path("Tests/TestPlans/Apollo-IntegrationTestPlan.xctestplan")
+        case .paginationTest:
+            return Path("Tests/TestPlans/Apollo-PaginationTestPlan.xctestplan")
         case .performanceTest:
             return Path("Tests/TestPlans/Apollo-PerformanceTestPlan.xctestplan")
         case .unitTest:

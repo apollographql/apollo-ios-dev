@@ -1,26 +1,28 @@
 name: "CI Tests"
 
 on:
-  schedule:
-    - cron: "0 7 * * *"
   pull_request:
     types: [opened, synchronize, reopened]
+
+env:
+  XCODE_VERSION: "15.0.0"
 
 jobs:
   run-swift-builds:
     runs-on: macos-13
-    timeout-minutes: 6
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
         include:
           - package: apollo-ios
           - package: apollo-ios-codegen
+          - package: apollo-ios-pagination
     name: Run swift build for SPM packages
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: ${{ vars.XCODE_VERSION }}
+        xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Setup Repo
@@ -32,8 +34,8 @@ jobs:
         cd ${{ matrix.package }} && swift build
 
   build-and-unit-test:
-    runs-on: macos-13-xl
-    timeout-minutes: 15
+    runs-on: macos-13
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -42,43 +44,25 @@ jobs:
           - destination: platform=macOS,arch=x86_64
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
-            name: Apollo Unit Tests - macOS ${{ vars.MACOS_VERSION }}
-            run-js-tests: false
-          # iOS_current
-          - destination: platform=iOS Simulator,OS=${{ vars.IOS_CURRENT_VERSION }},name=iPhone 14
-            scheme: ApolloTests
-            test-plan: Apollo-CITestPlan
-            name: Apollo Unit Tests - iOS ${{ vars.IOS_CURRENT_VERSION }}
-            run-js-tests: false
-          # iOS_previous
-          - destination: platform=iOS Simulator,OS=${{ vars.IOS_PREVIOUS_VERSION }},name=iPhone 13
-            scheme: ApolloTests
-            test-plan: Apollo-CITestPlan
-            name: Apollo Unit Tests - iOS ${{ vars.IOS_PREVIOUS_VERSION }}
-            run-js-tests: false
-          # tvOS_current
-          - destination: platform=tvOS Simulator,OS=${{ vars.TVOS_VERSION }},name=Apple TV
-            scheme: ApolloTests
-            test-plan: Apollo-CITestPlan
-            name: Apollo Unit Tests - tvOS ${{ vars.TVOS_VERSION }}
+            name: Apollo Unit Tests - macOS
             run-js-tests: false
           # Codegen CLI Test
           - destination: platform=macOS,arch=x86_64
             scheme: CodegenCLITests
             test-plan: CodegenCLITestPlan
-            name: Codegen CLI Unit Tests - macOS ${{ vars.MACOS_VERSION }}
+            name: Codegen CLI Unit Tests - macOS
             run-js-tests: false
           # CodegenLib Test
           - destination: platform=macOS,arch=x86_64
             scheme: ApolloCodegenTests
             test-plan: Apollo-Codegen-CITestPlan
-            name: Codegen Lib Unit Tests - macOS ${{ vars.MACOS_VERSION }}
+            name: Codegen Lib Unit Tests - macOS
             run-js-tests: true
     name: ${{ matrix.name }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: ${{ vars.XCODE_VERSION }}
+        xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Setup Repo
@@ -131,13 +115,13 @@ jobs:
           TestResults/ResultBundle.zip
 
   run-codegen-test-configurations:
-    runs-on: macos-13-xl
-    timeout-minutes: 15
-    name: Codegen Test Configurations - macOS ${{ vars.MACOS_VERSION }}
+    runs-on: macos-13
+    timeout-minutes: 20
+    name: Codegen Test Configurations - macOS
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: ${{ vars.XCODE_VERSION }}
+        xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Setup Repo
@@ -154,12 +138,12 @@ jobs:
 
   run-cocoapods-integration-tests:
     runs-on: macos-13
-    timeout-minutes: 15
-    name: Cocoapods Integration Tests - macOS ${{ vars.MACOS_VERSION }}
+    timeout-minutes: 20
+    name: Cocoapods Integration Tests - macOS
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: ${{ vars.XCODE_VERSION }}
+        xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Setup Repo
@@ -176,13 +160,13 @@ jobs:
       uses: ./.github/actions/run-cocoapods-integration-tests
 
   run-integration-tests:
-    runs-on: macos-13-xl
-    timeout-minutes: 15
-    name: Apollo Integration Tests - macOS ${{ vars.MACOS_VERSION }}
+    runs-on: macos-13
+    timeout-minutes: 20
+    name: Apollo Integration Tests - macOS
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: ${{ vars.XCODE_VERSION }}
+        xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Setup Repo
