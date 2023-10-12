@@ -27,6 +27,7 @@ jobs:
       shell: bash
       run: |
           HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
+          which xcbeautify
     - name: Cache Build Dependencies
       uses: actions/cache@v3
       with:
