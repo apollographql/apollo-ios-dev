@@ -23,11 +23,6 @@ jobs:
       with:
           command: 'generate'
           arguments: ''
-    - name: Install XCBeautify
-      shell: bash
-      run: |
-          HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
-          which xcbeautify
     - name: Cache Build Dependencies
       uses: actions/cache@v3
       with:
@@ -35,7 +30,6 @@ jobs:
           ./ApolloDev.xcodeproj
           ./ApolloDev.xcworkspace
           ./Derived/*
-          ~/usr/local/bin/xcbeautify
         key: ${{ github.run_id }}-tuist
 
   # run-swift-builds:
@@ -100,13 +94,8 @@ jobs:
           ./ApolloDev.xcodeproj
           ./ApolloDev.xcworkspace
           ./Derived/*
-          ~/usr/local/bin/xcbeautify
         key: ${{ github.run_id }}-tuist
         fail-on-cache-miss: true
-    - name: Export xcbeautify to PATH
-      shell: bash
-      run: |
-        export PATH="$PATH:/usr/local/bin/xcbeautify"
     # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
     # - uses: actions/cache@v3
     #   with:
