@@ -48,7 +48,8 @@ public struct FetchSchema: AsyncParsableCommand {
 
     try await schemaDownloadProvider.fetch(
       configuration: schemaDownload,
-      withRootURL: rootOutputURL(for: inputs)
+      withRootURL: rootOutputURL(for: inputs),
+      session: nil
     )
   }
 }
