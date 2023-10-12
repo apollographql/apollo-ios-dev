@@ -138,7 +138,7 @@ class RootFieldBuilder {
 
     self.containsDeferredFragment = typeInfo.scope.scopePath.containsDeferredFragment
 
-    if typeInfo.scope.scopePath.last.value.deferCondition == nil {
+    if typeInfo.deferCondition == nil {
       typeInfo.entity.selectionTree.mergeIn(
         selections: target.readOnlyView,
         with: typeInfo

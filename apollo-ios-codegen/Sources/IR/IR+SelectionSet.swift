@@ -23,6 +23,8 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
 
     public var inclusionConditions: InclusionConditions? { scope.scopePath.last.value.conditions }
 
+    public var deferCondition: DeferCondition? { scope.scopePath.last.value.deferCondition }
+
     /// Indicates if the `SelectionSet` represents a root selection set.
     /// If `true`, the `SelectionSet` belongs to a field directly.
     /// If `false`, the `SelectionSet` belongs to a conditional selection set enclosed
