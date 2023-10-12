@@ -86,6 +86,6 @@ public struct Generate: AsyncParsableCommand {
     configuration: ApolloSchemaDownloadConfiguration,
     schemaDownloadProvider: SchemaDownloadProvider.Type
   ) async throws {
-    try await schemaDownloadProvider.fetch(configuration: configuration, withRootURL: rootOutputURL(for: inputs))
+    try await schemaDownloadProvider.fetch(configuration: configuration, withRootURL: rootOutputURL(for: inputs), session: nil)
   }
 }
