@@ -13,12 +13,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-  # Look into caching the xcbeautify installation to instead of installing for each test
-  - name: Install XCBeautify
-    shell: bash
-    run: |
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
   - name: Build and Test
     shell: bash
     run: |
-      xcodebuild clean test -resultBundlePath TestResults/ResultBundle.xcresult -derivedDataPath DerivedData -workspace "ApolloDev.xcworkspace" -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}" -testPlan "${{ inputs.test-plan }}" | xcbeautify
+      xcodebuild clean test -resultBundlePath TestResults/ResultBundle.xcresult -derivedDataPath DerivedData -workspace "ApolloDev.xcworkspace" -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}" -testPlan "${{ inputs.test-plan }}"
