@@ -9,6 +9,30 @@ env:
   XCODE_VERSION: "15.0.0"
 
 jobs:
+  tuist-generation:
+    runs-on: macos-13
+    timeout-minutes: 8
+    name: Run Tuist Generation
+    steps:
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: ${{ env.XCODE_VERSION }}
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Run Tuist Generation
+      uses: tuist/tuist-action@0.13.0
+      with:
+          command: 'generate'
+          arguments: ''
+    - name: Cache Build Dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ./ApolloDev.xcodeproj
+          ./ApolloDev.xcworkspace
+          ./Derived/*
+        key: ${{ github.run_id }}-dependencies
+
   run-swift-builds:
     runs-on: macos-13
     timeout-minutes: 15
@@ -26,9 +50,6 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
     - name: Run Swift Build
       shell: bash
       run: |
@@ -36,6 +57,7 @@ jobs:
 
   build-and-unit-test:
     runs-on: macos-13
+    needs: tuist-generation
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -78,19 +100,20 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
     # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
     # - uses: actions/cache@v3
     #   with:
     #     path: ./DerivedData/SourcePackages
     #     key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
-    - name: Run Tuist Generation
-      uses: tuist/tuist-action@0.13.0
+    - name: Retrieve Build Cache
+      uses: actions/cache@v3
       with:
-          command: 'generate'
-          arguments: ''
+        path: |
+          ./ApolloDev.xcodeproj
+          ./ApolloDev.xcworkspace
+          ./Derived/*
+        key: ${{ github.run_id }}-dependencies
+        fail-on-cache-miss: true
     - name: Build and Test
       uses: ./.github/actions/build-and-run-unit-tests
       with:
@@ -129,6 +152,7 @@ jobs:
 
   legacy-unit-test:
     runs-on: macos-11
+    needs: tuist-generation
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -143,19 +167,20 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
     # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
     # - uses: actions/cache@v3
     #   with:
     #     path: ./DerivedData/SourcePackages
     #     key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
-    - name: Run Tuist Generation
-      uses: tuist/tuist-action@0.13.0
+    - name: Retrieve Build Cache
+      uses: actions/cache@v3
       with:
-          command: 'generate'
-          arguments: ''
+        path: |
+          ./ApolloDev.xcodeproj
+          ./ApolloDev.xcworkspace
+          ./Derived/*
+        key: ${{ github.run_id }}-dependencies
+        fail-on-cache-miss: true
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: 12.4.0
@@ -205,9 +230,6 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
     - name: Install XCBeautify
       shell: bash
       run: |
@@ -227,9 +249,6 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
     - name: Export ENV Variables
       shell: bash
       working-directory: apollo-ios
@@ -242,6 +261,7 @@ jobs:
 
   run-integration-tests:
     runs-on: macos-13
+    needs: tuist-generation
     timeout-minutes: 20
     name: Apollo Integration Tests - macOS
     steps:
@@ -250,9 +270,6 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
     - name: Setup Node 12.22.10
       uses: actions/setup-node@v3
       with:
@@ -276,11 +293,15 @@ jobs:
       run: |
         sh ./scripts/install-or-update-starwars-server.sh
         cd ../starwars-server && npm start &
-    - name: Run Tuist Generation
-      uses: tuist/tuist-action@0.13.0
+    - name: Retrieve Build Cache
+      uses: actions/cache@v3
       with:
-          command: 'generate'
-          arguments: ''
+        path: |
+          ./ApolloDev.xcodeproj
+          ./ApolloDev.xcworkspace
+          ./Derived/*
+        key: ${{ github.run_id }}-dependencies
+        fail-on-cache-miss: true
     - name: Build and Test
       uses: ./.github/actions/build-and-run-unit-tests
       with:
