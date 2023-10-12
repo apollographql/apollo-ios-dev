@@ -23,13 +23,18 @@ jobs:
       with:
           command: 'generate'
           arguments: ''
-    - name: Cache Tuist Output
+    - name: Install XCBeautify
+      shell: bash
+      run: |
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
+    - name: Cache Build Dependencies
       uses: actions/cache@v3
       with:
         path: |
           ./ApolloDev.xcodeproj
           ./ApolloDev.xcworkspace
           ./Derived/*
+          ~/usr/local/Cellar/xcbeautify/*
         key: ${{ github.run_id }}-tuist
 
   # run-swift-builds:
@@ -87,13 +92,14 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Retrieve Tuist Cache
+    - name: Retrieve Build Cache
       uses: actions/cache@v3
       with:
         path: |
           ./ApolloDev.xcodeproj
           ./ApolloDev.xcworkspace
           ./Derived/*
+          ~/usr/local/Cellar/xcbeautify/*
         key: ${{ github.run_id }}-tuist
         fail-on-cache-miss: true
     # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
