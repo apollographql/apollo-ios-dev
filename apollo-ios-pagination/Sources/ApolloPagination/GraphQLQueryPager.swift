@@ -12,9 +12,6 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     case paginated(PaginatedQuery.Data)
   }
 
-  /// Whether or not we can load more information based on the current page.
-  public var canLoadNext: Bool { currentPageInfo?.canLoadMore ?? false }
-
   public typealias Output = (InitialQuery.Data, [PaginatedQuery.Data], UpdateSource)
 
   private let client: any ApolloClientProtocol
@@ -195,6 +192,11 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     pageOrder = []
     initialPageResult = nil
     _subject.send(nil)
+  }
+
+  /// Whether or not we can load more information based on the current page.
+  public func canLoadNext() -> Bool {
+    currentPageInfo?.canLoadMore ?? false
   }
 
   deinit {

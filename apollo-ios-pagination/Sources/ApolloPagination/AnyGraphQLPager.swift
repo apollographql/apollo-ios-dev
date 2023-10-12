@@ -9,6 +9,7 @@ public class AnyGraphQLQueryPager<Model> {
   private let _refetch: () -> Void
   private let _cancel: () -> Void
   private let _subject: AnyPublisher<Output, Never>
+  private let _canLoadNext: () -> Bool
   private var cancellables = [AnyCancellable]()
 
   public init<Pager: GraphQLQueryPager<InitialQuery, NextQuery>, InitialQuery, NextQuery>(
@@ -40,6 +41,7 @@ public class AnyGraphQLQueryPager<Model> {
 
       return returnValue
     }.eraseToAnyPublisher()
+    _canLoadNext = pager.canLoadNext
   }
 
   public func subscribe(completion: @escaping (Output) -> Void) {
