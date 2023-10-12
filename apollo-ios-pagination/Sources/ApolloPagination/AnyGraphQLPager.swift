@@ -71,8 +71,8 @@ public class AnyGraphQLQueryPager<Model> {
 
 public extension GraphQLQueryPager {
   func eraseToAnyPager<T>(
-    initialTransform: @escaping (InitialQuery.Data) -> [T],
-    nextPageTransform: @escaping (PaginatedQuery.Data) -> [T]
+    initialTransform: @escaping (InitialQuery.Data) throws -> [T],
+    nextPageTransform: @escaping (PaginatedQuery.Data) throws -> [T]
   ) -> AnyGraphQLQueryPager<T> {
     .init(pager: self, initialTransform: initialTransform, nextPageTransform: nextPageTransform)
   }
