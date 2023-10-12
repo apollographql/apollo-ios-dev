@@ -28,6 +28,7 @@ let project = Project(
         .apolloInternalTestHelpersFramework(),
         .apolloCodegenInternalTestHelpersFramework(),
         .apolloTests(),
+        .apolloPaginationTests(),
         .apolloPerformanceTests(),
         .apolloServerIntegrationTests(),
         .apolloCodegenTests(),
@@ -36,6 +37,7 @@ let project = Project(
     schemes: [
         .apolloCodegenTests(),
         .apolloPerformanceTests(),
+        .apolloPaginationTests(),
         .apolloServerIntegrationTests(),
         .apolloTests(),
         .codegenCLITests()

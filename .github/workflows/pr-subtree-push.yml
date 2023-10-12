@@ -4,7 +4,7 @@ permissions:
   contents: write
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
         - main
     types: [closed]
@@ -42,6 +42,7 @@ jobs:
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Subtree - Apollo iOS Codegen
+      if: always()
       uses: ./.github/actions/subtree-split-push
       with:
         subtree: apollo-ios-codegen
@@ -50,14 +51,16 @@ jobs:
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Subtree - Apollo iOS Pagination
+      if: always()
       uses: ./.github/actions/subtree-split-push
       with:
         subtree: apollo-ios-pagination
         remote: git@github.com:apollographql/apollo-ios-pagination.git
-        target-branch: hs/complete-rewrite
+        target-branch: main
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Push Updated History
+      if: always()
       shell: bash
       run: |
         git push
