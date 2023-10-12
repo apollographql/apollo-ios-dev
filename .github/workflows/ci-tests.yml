@@ -103,6 +103,10 @@ jobs:
           ~/usr/local/bin/xcbeautify
         key: ${{ github.run_id }}-tuist
         fail-on-cache-miss: true
+    - name: Export xcbeautify to PATH
+      shell: bash
+      run: |
+        export PATH="$PATH:/usr/local/bin/xcbeautify"
     # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
     # - uses: actions/cache@v3
     #   with:
