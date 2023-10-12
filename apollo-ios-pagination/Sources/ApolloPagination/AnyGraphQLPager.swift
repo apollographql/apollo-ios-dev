@@ -5,7 +5,7 @@ import Combine
 public class AnyGraphQLQueryPager<Model> {
   public typealias Output = Result<([Model], UpdateSource), Error>
   private let _fetch: (CachePolicy) -> Void
-  private let _loadMore: (CachePolicy) async throws -> Void
+  private let _loadMore: (CachePolicy, (() -> Void)?) throws -> Void
   private let _refetch: () -> Void
   private let _cancel: () -> Void
   private let _subject: AnyPublisher<Output, Never>
@@ -56,10 +56,9 @@ public class AnyGraphQLQueryPager<Model> {
 
   public func loadMore(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
-    completion: (@MainActor () -> Void)? = nil
-  ) async throws {
-    try await _loadMore(cachePolicy)
-    await completion?()
+    completion: (() -> Void)? = nil
+  ) throws {
+    try _loadMore(cachePolicy, completion)
   }
 
   public func refetch() {
