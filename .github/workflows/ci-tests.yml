@@ -17,6 +17,7 @@ jobs:
         include:
           - package: apollo-ios
           - package: apollo-ios-codegen
+          - package: apollo-ios-pagination
     name: Run swift build for SPM packages
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
