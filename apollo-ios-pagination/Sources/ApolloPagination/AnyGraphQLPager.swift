@@ -13,8 +13,8 @@ public class AnyGraphQLQueryPager<Model> {
 
   public init<Pager: GraphQLQueryPager<InitialQuery, NextQuery>, InitialQuery, NextQuery>(
     pager: Pager,
-    initialTransform: @escaping (InitialQuery.Data) -> [Model],
-    nextPageTransform: @escaping (NextQuery.Data) -> [Model]
+    initialTransform: @escaping (InitialQuery.Data) throws -> [Model],
+    nextPageTransform: @escaping (NextQuery.Data) throws -> [Model]
   ) {
     _fetch = pager.fetch
     _loadMore = pager.loadMore
@@ -27,9 +27,13 @@ public class AnyGraphQLQueryPager<Model> {
       switch result {
       case let .success(value):
         let (initial, next, updateSource) = value
-        let firstPage = initialTransform(initial)
-        let nextPages = next.flatMap { nextPageTransform($0) }
-        returnValue = .success((firstPage + nextPages, updateSource))
+        do {
+          let firstPage = try initialTransform(initial)
+          let nextPages = try next.flatMap { try nextPageTransform($0) }
+          returnValue = .success((firstPage + nextPages, updateSource))
+        } catch {
+          returnValue = .failure(error)
+        }
       case let .failure(error):
         returnValue = .failure(error)
       }
@@ -49,11 +53,11 @@ public class AnyGraphQLQueryPager<Model> {
   }
 
   public func loadMore(
-      cachePolicy: CachePolicy = .returnCacheDataAndFetch,
-      completion: (@MainActor () -> Void)? = nil
+    cachePolicy: CachePolicy = .returnCacheDataAndFetch,
+    completion: (@MainActor () -> Void)? = nil
   ) async throws {
-      try await _loadMore(cachePolicy)
-      await completion?()
+    try await _loadMore(cachePolicy)
+    await completion?()
   }
 
   public func refetch() {
@@ -71,6 +75,12 @@ public extension GraphQLQueryPager {
     nextPageTransform: @escaping (PaginatedQuery.Data) -> [T]
   ) -> AnyGraphQLQueryPager<T> {
     .init(pager: self, initialTransform: initialTransform, nextPageTransform: nextPageTransform)
+  }
+
+  func eraseToAnyPager<T>(
+    transform: @escaping (InitialQuery.Data) throws -> [T]
+  ) -> AnyGraphQLQueryPager<T> where InitialQuery == PaginatedQuery {
+    .init(pager: self, initialTransform: transform, nextPageTransform: transform)
   }
 }
 
