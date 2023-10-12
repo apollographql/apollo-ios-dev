@@ -261,19 +261,8 @@ public class ApolloCodegen {
       throw Error.cannotLoadSchema
     }
 
-    let sources = try await withThrowingTaskGroup(of: (Int, GraphQLSource).self) { group in
-      for (index, match) in matches.enumerated() {
-        group.addTask {
-          (index, try await frontend.makeSource(from: URL(fileURLWithPath: match)))
-        }
-      }
-        var sources: [GraphQLSource?] = Array(repeating: nil, count: matches.count)
-
-      for try await (index, source) in group {
-        sources[index] = source
-      }
-
-      return sources.compactMap { $0 }
+    let sources = try await matches.concurrentCompactMap { match in
+      try await frontend.makeSource(from: URL(fileURLWithPath: match))
     }
 
     return try await frontend.loadSchema(from: sources)
@@ -290,23 +279,12 @@ public class ApolloCodegen {
       throw Error.cannotLoadOperations
     }
 
-    let documents = try await withThrowingTaskGroup(of: (Int, GraphQLDocument).self) { group in
-      for (index, match) in matches.enumerated() {
-        group.addTask {
-          (index, try await frontend.parseDocument(
-            from: URL(fileURLWithPath: match),
-            experimentalClientControlledNullability:
-              self.config.experimentalFeatures.clientControlledNullability
-          ))
-        }
-      }
-
-      var documents: [GraphQLDocument?] = Array(repeating: nil, count: matches.count)
-      for try await (index, document) in group {
-        documents[index] = document
-      }
-
-      return documents.compactMap { $0 }
+    let documents = try await matches.concurrentCompactMap { match in
+      try await frontend.parseDocument(
+        from: URL(fileURLWithPath: match),
+        experimentalClientControlledNullability:
+          self.config.experimentalFeatures.clientControlledNullability
+      )
     }
 
     return try await frontend.mergeDocuments(documents)
@@ -344,24 +322,11 @@ public class ApolloCodegen {
   ) async throws {
     let idFactory = self.operationIdentifierFactory
 
-    let operationManifest = try await withThrowingTaskGroup(
-      of: (Int, item: OperationManifestTemplate.OperationManifestItem).self,
-      returning: OperationManifestTemplate.OperationManifest.self
-    ) { group in
-      for (index, operation) in operations.enumerated() {
-        group.addTask {
-          return (index, item: (
-            OperationDescriptor(operation),
-            try await idFactory.identifier(for: operation)
-          ))
-        }
-      }
-
-      var operationManifest: [OperationManifestTemplate.OperationManifestItem?] = Array(repeating: nil, count: operations.count)
-      for try await (index, item) in group {
-        operationManifest[index] = item
-      }
-      return operationManifest.compactMap { $0 }
+    let operationManifest = try await operations.concurrentCompactMap { operation in
+      return (
+        OperationDescriptor(operation),
+        try await idFactory.identifier(for: operation)
+      )
     }
 
     try await OperationManifestFileGenerator(config: config)
