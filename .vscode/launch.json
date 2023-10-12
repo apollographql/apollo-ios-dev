@@ -1,0 +1,28 @@
+{
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "sourceLanguages": [
+        "swift"
+      ],
+      "name": "Debug apollo-ios-cli (apollo-ios-codegen)",
+      "program": "${workspaceFolder:apollo-ios-dev}/apollo-ios-codegen/.build/debug/apollo-ios-cli",
+      "args": [],
+      "cwd": "${workspaceFolder:apollo-ios-dev}/apollo-ios-codegen",
+      "preLaunchTask": "swift: Build Debug apollo-ios-cli (apollo-ios-codegen)"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "sourceLanguages": [
+        "swift"
+      ],
+      "name": "Release apollo-ios-cli (apollo-ios-codegen)",
+      "program": "${workspaceFolder:apollo-ios-dev}/apollo-ios-codegen/.build/release/apollo-ios-cli",
+      "args": [],
+      "cwd": "${workspaceFolder:apollo-ios-dev}/apollo-ios-codegen",
+      "preLaunchTask": "swift: Build Release apollo-ios-cli (apollo-ios-codegen)"
+    }
+  ]
+}
