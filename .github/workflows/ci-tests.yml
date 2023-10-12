@@ -34,7 +34,7 @@ jobs:
           ./ApolloDev.xcodeproj
           ./ApolloDev.xcworkspace
           ./Derived/*
-          ~/usr/local/Cellar/xcbeautify/*
+          ~/opt/homebrew/Cellar/xcbeautify/*
         key: ${{ github.run_id }}-tuist
 
   # run-swift-builds:
@@ -99,7 +99,7 @@ jobs:
           ./ApolloDev.xcodeproj
           ./ApolloDev.xcworkspace
           ./Derived/*
-          ~/usr/local/Cellar/xcbeautify/*
+          ~/opt/homebrew/Cellar/xcbeautify/*
         key: ${{ github.run_id }}-tuist
         fail-on-cache-miss: true
     # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
