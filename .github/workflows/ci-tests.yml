@@ -29,6 +29,7 @@ jobs:
         path: |
           ./ApolloDev.xcodeproj
           ./ApolloDev.xcworkspace
+          ./Derived/*
         key: ${{ github.run_id }}-tuist
 
   # run-swift-builds:
@@ -86,12 +87,13 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Cache Tuist Output
+    - name: Retrieve Tuist Cache
       uses: actions/cache@v3
       with:
         path: |
           ./ApolloDev.xcodeproj
           ./ApolloDev.xcworkspace
+          ./Derived/*
         key: ${{ github.run_id }}-tuist
         fail-on-cache-miss: true
     # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
