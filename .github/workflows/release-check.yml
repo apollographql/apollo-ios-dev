@@ -26,9 +26,6 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
     - name: Run Swift Build
       shell: bash
       run: |
@@ -78,9 +75,6 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
     # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
     # - uses: actions/cache@v3
     #   with:
@@ -143,9 +137,6 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
     # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
     # - uses: actions/cache@v3
     #   with:
@@ -205,9 +196,6 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
     - name: Install XCBeautify
       shell: bash
       run: |
@@ -227,9 +215,6 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
     - name: Export ENV Variables
       shell: bash
       working-directory: apollo-ios
@@ -250,9 +235,6 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Setup Repo
-      id: setup-repo
-      uses: ./.github/actions/setup-repo
     - name: Setup Node 12.22.10
       uses: actions/setup-node@v3
       with:
