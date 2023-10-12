@@ -90,3 +90,6 @@ Tests/TestCodeGenConfigurations/EmbeddedInTarget-RelativeAbsolute/PackageTwo/Sou
 
 # Tuist
 Derived/**
+
+# VSCode
+.vscode
