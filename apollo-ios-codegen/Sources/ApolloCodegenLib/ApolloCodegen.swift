@@ -203,6 +203,10 @@ public class ApolloCodegen {
             fileManager: fileManager
           )
 
+          // To ensure generated files aren't accidentally pruned, pruning must be done after all
+          // files are generated. Because of the async nature of this code, testing this is
+          // difficult. When modifying this code, please ensure that pruning waits until after all
+          // generated files are created before it begins.
           if config.options.pruneGeneratedFiles {
             try await self.deleteExtraneousGeneratedFiles(
               from: existingGeneratedFilePaths,

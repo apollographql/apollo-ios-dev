@@ -4,16 +4,25 @@ import IR
 @testable import ApolloCodegenLib
 @testable import GraphQLCompiler
 import ApolloCodegenInternalTestHelpers
+import ApolloInternalTestHelpers
 
 class FileGenerator_ResolvePath_Tests: XCTestCase {
-  let directoryURL = CodegenTestHelper.outputFolderURL()
 
   var irFragment: IR.NamedFragment!
   var irOperation: IR.Operation!
   var subject: FileTarget!
   var config: ApolloCodegenConfiguration!
+  var testFilePathBuilder: TestFilePathBuilder!
+
+  var directoryURL: URL { testFilePathBuilder.testIsolatedOutputFolder }
+
+  override func setUp() {
+    super.setUp()
+    testFilePathBuilder = TestFilePathBuilder(test: self)
+  }
 
   override func tearDown() {
+    testFilePathBuilder = nil
     irOperation = nil
     irFragment = nil
     subject = nil

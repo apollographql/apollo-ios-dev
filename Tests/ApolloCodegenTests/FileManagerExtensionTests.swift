@@ -1,23 +1,36 @@
 import Foundation
 import XCTest
 import ApolloCodegenInternalTestHelpers
+import ApolloInternalTestHelpers
 @testable import ApolloCodegenLib
 import Nimble
 
 class FileManagerExtensionTests: XCTestCase {
-  lazy var uniquePath: String = {
-    CodegenTestHelper.outputFolderURL().appendingPathComponent(UUID().uuidString)
-  }().path
+  var uniquePath: String { testFilePathBuilder.testIsolatedOutputFolder.path }
 
-  lazy var uniqueError: Error = {
+  lazy var uniqueError: Error! = {
     NSError(domain: "FileManagerExtensionTest", code: Int.random(in: 1...100))
   }()
 
-  lazy var uniqueData: Data = {
+  lazy var uniqueData: Data! = {
     let length = Int(128)
     let bytes = [UInt32](repeating: 0, count: length).map { _ in arc4random() }
     return Data(bytes: bytes, count: length)
   }()
+
+  var testFilePathBuilder: TestFilePathBuilder!
+
+  override func setUp() {
+    super.setUp()
+    testFilePathBuilder = TestFilePathBuilder(test: self)
+  }
+
+  override func tearDown() {
+    testFilePathBuilder = nil
+    uniqueError = nil
+    uniqueData = nil
+    super.tearDown()
+  }
 
   // MARK: Presence
 

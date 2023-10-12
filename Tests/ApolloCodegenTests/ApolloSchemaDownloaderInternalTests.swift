@@ -4,21 +4,25 @@ import ApolloCodegenInternalTestHelpers
 @testable import ApolloCodegenLib
 @testable import GraphQLCompiler
 
-class ApolloSchemaInternalTests: XCTestCase {
+class ApolloSchemaDownloaderInternalTests: XCTestCase {
   let mockFileManager = MockApolloFileManager(strict: true)
 
   // MARK: Conversion Tests
 
   func testFormatConversion_givenIntrospectionJSON_shouldOutputValidSDL() async throws {
+    let testFilePathBuilder = TestFilePathBuilder(test: self)
+
     let bundle = Bundle(for: type(of: self))
-    guard let jsonURL = bundle.url(forResource: "introspection_response", withExtension: "json") else {
+    guard let jsonURL = bundle.url(
+      forResource: "introspection_response",
+      withExtension: "json"
+    ) else {
       throw XCTFailure("Missing resource file!", file: #file, line: #line)
     }
 
-    try ApolloFileManager.default.createDirectoryIfNeeded(atPath: CodegenTestHelper.outputFolderURL().path)
     let configuration = ApolloSchemaDownloadConfiguration(
       using: .introspection(endpointURL: TestURL.mockPort8080.url),
-      outputPath: CodegenTestHelper.schemaOutputURL().path
+      outputPath: testFilePathBuilder.schemaOutputURL.path
     )
 
     try await ApolloSchemaDownloader.convertFromIntrospectionJSONToSDLFile(
@@ -26,6 +30,7 @@ class ApolloSchemaInternalTests: XCTestCase {
       configuration: configuration,
       withRootURL: nil
     )
+
     XCTAssertTrue(ApolloFileManager.default.doesFileExist(atPath: configuration.outputPath))
 
     let frontend = try await GraphQLJSFrontend()
@@ -49,10 +54,12 @@ class ApolloSchemaInternalTests: XCTestCase {
       .init(key: "key2", value: "value2")
     ]
 
-    let request = try ApolloSchemaDownloader.introspectionRequest(from: url,
-                                                                  httpMethod: .GET(queryParameterName: queryParameterName),
-                                                                  headers: headers,
-                                                                  includeDeprecatedInputValues: false)
+    let request = try ApolloSchemaDownloader.introspectionRequest(
+      from: url,
+      httpMethod: .GET(queryParameterName: queryParameterName),
+      headers: headers,
+      includeDeprecatedInputValues: false
+    )
 
     XCTAssertEqual(request.httpMethod, "GET")
     XCTAssertNil(request.httpBody)
@@ -77,10 +84,12 @@ class ApolloSchemaInternalTests: XCTestCase {
       .init(key: "key2", value: "value2")
     ]
 
-    let request = try ApolloSchemaDownloader.introspectionRequest(from: url,
-                                                                  httpMethod: .GET(queryParameterName: queryParameterName),
-                                                                  headers: headers,
-                                                                  includeDeprecatedInputValues: true)
+    let request = try ApolloSchemaDownloader.introspectionRequest(
+      from: url,
+      httpMethod: .GET(queryParameterName: queryParameterName),
+      headers: headers,
+      includeDeprecatedInputValues: true
+    )
 
     XCTAssertEqual(request.httpMethod, "GET")
     XCTAssertNil(request.httpBody)
@@ -104,7 +113,12 @@ class ApolloSchemaInternalTests: XCTestCase {
       .init(key: "key2", value: "value2")
     ]
 
-    let request = try ApolloSchemaDownloader.introspectionRequest(from: url, httpMethod: .POST, headers: headers, includeDeprecatedInputValues: false)
+    let request = try ApolloSchemaDownloader.introspectionRequest(
+      from: url,
+      httpMethod: .POST,
+      headers: headers,
+      includeDeprecatedInputValues: false
+    )
 
     XCTAssertEqual(request.httpMethod, "POST")
     XCTAssertEqual(request.url, url)
@@ -114,9 +128,11 @@ class ApolloSchemaInternalTests: XCTestCase {
       XCTAssertEqual(request.allHTTPHeaderFields?[header.key], header.value)
     }
 
-    let requestBody = UntypedGraphQLRequestBodyCreator.requestBody(for: ApolloSchemaDownloader.introspectionQuery(includeDeprecatedInputValues: false),
-                                                                   variables: nil,
-                                                                   operationName: "IntrospectionQuery")
+    let requestBody = UntypedGraphQLRequestBodyCreator.requestBody(
+      for: ApolloSchemaDownloader.introspectionQuery(includeDeprecatedInputValues: false),
+      variables: nil,
+      operationName: "IntrospectionQuery"
+    )
     let bodyData = try JSONSerialization.data(withJSONObject: requestBody, options: [.sortedKeys])
 
     XCTAssertEqual(request.httpBody, bodyData)
@@ -131,10 +147,14 @@ class ApolloSchemaInternalTests: XCTestCase {
       .init(key: "key2", value: "value2"),
     ]
 
-    let request = try ApolloSchemaDownloader.registryRequest(with: .init(apiKey: apiKey,
-                                                                         graphID: graphID,
-                                                                         variant: variant),
-                                                             headers: headers)
+    let request = try ApolloSchemaDownloader.registryRequest(
+      with: .init(
+        apiKey: apiKey,
+        graphID: graphID,
+        variant: variant
+      ),
+      headers: headers
+    )
 
     XCTAssertEqual(request.httpMethod, "POST")
     XCTAssertEqual(request.url, ApolloSchemaDownloader.RegistryEndpoint)
@@ -163,7 +183,7 @@ class ApolloSchemaInternalTests: XCTestCase {
     // given
     let path = "./subfolder/output.test"
 
-    mockFileManager.base.changeCurrentDirectoryPath(CodegenTestHelper.outputFolderURL().path)
+    mockFileManager.base.changeCurrentDirectoryPath(TestFileHelper.sourceRootURL().path)
 
     mockFileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
@@ -174,7 +194,7 @@ class ApolloSchemaInternalTests: XCTestCase {
     }))
 
     mockFileManager.mock(closure: .createFile({ path, data, attributes in
-      let expected = CodegenTestHelper.outputFolderURL()
+      let expected = TestFileHelper.sourceRootURL()
         .appendingPathComponent("subfolder/output.test").path
 
       // then
@@ -195,7 +215,7 @@ class ApolloSchemaInternalTests: XCTestCase {
     // given
     let path = "/absolute/path/subfolder/output.test"
 
-    mockFileManager.base.changeCurrentDirectoryPath(CodegenTestHelper.outputFolderURL().path)
+    mockFileManager.base.changeCurrentDirectoryPath(TestFileHelper.sourceRootURL().path)
 
     mockFileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
@@ -226,7 +246,7 @@ class ApolloSchemaInternalTests: XCTestCase {
     // given
     let path = "output.test"
 
-    mockFileManager.base.changeCurrentDirectoryPath(CodegenTestHelper.outputFolderURL().path)
+    mockFileManager.base.changeCurrentDirectoryPath(TestFileHelper.sourceRootURL().path)
 
     mockFileManager.mock(closure: .fileExists({ path, isDirectory in
       return false

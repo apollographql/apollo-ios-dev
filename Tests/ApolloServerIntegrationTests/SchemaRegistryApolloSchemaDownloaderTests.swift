@@ -7,7 +7,7 @@ import ApolloCodegenInternalTestHelpers
 
 class SchemaRegistryApolloSchemaDownloaderTests: XCTestCase {
   func testDownloadingSchema_fromSchemaRegistry_shouldOutputSDL() throws {
-    let testOutputFolderURL = CodegenTestHelper.outputFolderURL()
+    let testOutputFolderURL = TestFilePathBuilder.outputFolderURL()
     XCTAssertFalse(ApolloFileManager.default.doesFileExist(atPath: testOutputFolderURL.path))
 
     guard let apiKey = ProcessInfo.processInfo.environment["REGISTRY_API_KEY"] else {
@@ -20,7 +20,7 @@ class SchemaRegistryApolloSchemaDownloaderTests: XCTestCase {
     )
     let configuration = ApolloSchemaDownloadConfiguration(
       using: .apolloRegistry(settings),
-      outputPath: CodegenTestHelper.schemaFolderURL().path
+      outputPath: TestFilePathBuilder.schemaFolderURL().path
     )
 
     try ApolloSchemaDownloader.fetch(configuration: configuration)

@@ -4,8 +4,7 @@ import Nimble
 @testable import ApolloCodegenInternalTestHelpers
 
 class FileGeneratorTests: XCTestCase {
-  let fileManager = MockApolloFileManager(strict: false)
-  let directoryURL = CodegenTestHelper.outputFolderURL()
+  let fileManager = MockApolloFileManager(strict: false)  
 
   var config: ApolloCodegen.ConfigurationContext!
   var fileTarget: FileTarget!
@@ -26,8 +25,7 @@ class FileGeneratorTests: XCTestCase {
   private func buildConfig() {
     let mockedConfig = ApolloCodegenConfiguration.mock(output: .mock(
       moduleType: .swiftPackageManager,      
-      operations: .inSchemaModule,
-      path: directoryURL.path
+      operations: .inSchemaModule
     ))
 
     config = ApolloCodegen.ConfigurationContext(config: mockedConfig)

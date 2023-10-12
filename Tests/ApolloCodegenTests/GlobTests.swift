@@ -2,22 +2,27 @@ import XCTest
 import Nimble
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
+import ApolloInternalTestHelpers
 
 class GlobTests: XCTestCase {
   var baseURL: URL!
   let fileManager = ApolloFileManager.default
+  var testFilePathBuilder: TestFilePathBuilder!
 
   // MARK: Setup
 
   override func setUpWithError() throws {
     try super.setUpWithError()
+    testFilePathBuilder = TestFilePathBuilder(test: self)
+    baseURL = testFilePathBuilder.testIsolatedOutputFolder
+      .appendingPathComponent("Glob/\(UUID().uuidString)")
 
-    baseURL = CodegenTestHelper.outputFolderURL().appendingPathComponent("Glob/\(UUID().uuidString)")
     try fileManager.createDirectoryIfNeeded(atPath: baseURL.path)
   }
 
   override func tearDownWithError() throws {
-    try ApolloFileManager.default.deleteDirectory(atPath: baseURL.path)
+    baseURL = nil
+    testFilePathBuilder = nil
 
     try super.tearDownWithError()
   }

@@ -8,7 +8,7 @@ import ApolloCodegenInternalTestHelpers
 class StarWarsApolloSchemaDownloaderTests: XCTestCase {
 
   func testDownloadingSchema_usingIntrospection_shouldOutputSDL() throws {
-    let testOutputFolderURL = CodegenTestHelper.outputFolderURL()
+    let testOutputFolderURL = TestFilePathBuilder.outputFolderURL()
     let configuration = ApolloSchemaDownloadConfiguration(
       using: .introspection(endpointURL: TestServerURL.starWarsServer.url),
       outputPath: testOutputFolderURL.path
