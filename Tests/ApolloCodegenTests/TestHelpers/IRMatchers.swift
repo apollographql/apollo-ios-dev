@@ -212,10 +212,13 @@ public enum ShallowSelectionMatcher {
 
   public static func inlineFragment(
     parentType: GraphQLCompositeType,
-    inclusionConditions: [IR.InclusionCondition]? = nil
+    inclusionConditions: [IR.InclusionCondition]? = nil,
+    deferCondition: IR.DeferCondition? = nil
   ) -> ShallowSelectionMatcher {
     .shallowInlineFragment(ShallowInlineFragmentMatcher(
-      parentType: parentType, inclusionConditions: inclusionConditions
+      parentType: parentType,
+      inclusionConditions: inclusionConditions,
+      deferCondition: deferCondition
     ))
   }
 
@@ -250,6 +253,19 @@ public enum ShallowSelectionMatcher {
       name: fragment.name,
       type: fragment.type,
       inclusionConditions: inclusionConditions
+    ))
+  }
+
+  public static func deferred(
+    _ parentType: GraphQLCompositeType,
+    label: String,
+    variable: String? = nil,
+    inclusionConditions: [IR.InclusionCondition]? = nil
+  ) -> ShallowSelectionMatcher {
+    .shallowInlineFragment(ShallowInlineFragmentMatcher(
+      parentType: parentType,
+      inclusionConditions: inclusionConditions,
+      deferCondition: IR.DeferCondition(label: label, variable: variable)
     ))
   }
 }
@@ -349,12 +365,16 @@ fileprivate func shallowlyMatch(expected: ShallowFieldMatcher, actual: IR.Field)
 public struct ShallowInlineFragmentMatcher: Equatable, CustomDebugStringConvertible {
   let parentType: GraphQLCompositeType
   let inclusionConditions: IR.InclusionConditions?
+  let deferCondition: IR.DeferCondition?
 
   init(
     parentType: GraphQLCompositeType,
-    inclusionConditions: [IR.InclusionCondition]?
+    inclusionConditions: [IR.InclusionCondition]?,
+    deferCondition: IR.DeferCondition?
   ) {
     self.parentType = parentType
+    self.deferCondition = deferCondition
+
     if let inclusionConditions = inclusionConditions {
       self.inclusionConditions = IR.InclusionConditions.allOf(inclusionConditions).conditions
     } else {
@@ -364,9 +384,14 @@ public struct ShallowInlineFragmentMatcher: Equatable, CustomDebugStringConverti
 
   public static func mock(
     parentType: GraphQLCompositeType,
-    inclusionConditions: [IR.InclusionCondition]? = nil
+    inclusionConditions: [IR.InclusionCondition]? = nil,
+    deferCondition: IR.DeferCondition? = nil
   ) -> ShallowInlineFragmentMatcher {
-    self.init(parentType: parentType, inclusionConditions: inclusionConditions)
+    self.init(
+      parentType: parentType,
+      inclusionConditions: inclusionConditions,
+      deferCondition: deferCondition
+    )
   }
 
   public var debugDescription: String {
@@ -408,9 +433,13 @@ fileprivate func shallowlyMatch<T: Collection>(
   return PredicateResult(status: .matches, message: message)
 }
 
-fileprivate func shallowlyMatch(expected: ShallowInlineFragmentMatcher, actual: IR.SelectionSet) -> Bool {
-  return expected.parentType == actual.typeInfo.parentType &&
-  expected.inclusionConditions == actual.inclusionConditions
+fileprivate func shallowlyMatch(
+  expected: ShallowInlineFragmentMatcher,
+  actual: IR.SelectionSet
+) -> Bool {
+  return expected.parentType == actual.typeInfo.parentType
+    && expected.inclusionConditions == actual.inclusionConditions
+    && expected.deferCondition == actual.deferCondition
 }
 
 // MARK: - Shallow Fragment Spread Matcher

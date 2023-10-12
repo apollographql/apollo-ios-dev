@@ -4626,8 +4626,6 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
-  #warning("tests to match IR struct changes")
-
   // MARK: Deferred Fragments - Inline Fragments
 
   func test__deferredFragments__givenDeferredInlineFragment_buildsDeferredInlineFragment() throws {
@@ -4689,7 +4687,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
-          .inlineFragment(parentType: Object_Dog)
+          .deferred(Object_Dog, label: "root"),
         ],
         mergedSelections: [
           .field("id", type: .nonNull(.scalar(Scalar_String))),
@@ -4775,7 +4773,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
-          .inlineFragment(parentType: Object_Dog)
+          .deferred(Object_Dog, label: "root", variable: "a"),
         ],
         mergedSelections: [
           .field("id", type: .nonNull(.scalar(Scalar_String))),
@@ -4861,7 +4859,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
-          .inlineFragment(parentType: Object_Dog)
+          .deferred(Object_Dog, label: "root"),
         ],
         mergedSelections: [
           .field("id", type: .nonNull(.scalar(Scalar_String))),
@@ -5024,8 +5022,8 @@ class IRRootFieldBuilderTests: XCTestCase {
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
-          .inlineFragment(parentType: Object_Dog),
-          .inlineFragment(parentType: Object_Dog),
+          .deferred(Object_Dog, label: "one"),
+          .deferred(Object_Dog, label: "two"),
         ],
         mergedSelections: [
           .field("id", type: .nonNull(.scalar(Scalar_String))),
@@ -5129,7 +5127,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       SelectionSetMatcher(
         parentType: Object_Bird,
         directSelections: [
-          .inlineFragment(parentType: Object_Bird),
+          .deferred(Object_Bird, label: "bird"),
         ]
       )
     ))
@@ -5138,7 +5136,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       SelectionSetMatcher(
         parentType: Object_Cat,
         directSelections: [
-          .inlineFragment(parentType: Object_Cat),
+          .deferred(Object_Cat, label: "cat"),
         ]
       )
     ))
