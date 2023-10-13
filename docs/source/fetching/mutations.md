@@ -99,19 +99,12 @@ In most cases, the data available from a mutation result should be the server de
 
 ## Uploading files
 
-### An Important Caveat About File Uploads
-Apollo recommends only using GraphQL file uploading for proof-of-concept applications. While there is a spec we presently support for making `multipart-form` requests with GraphQL, we've found that, in practice, it's much simpler to use more purpose-built tools for file upload.
+Apollo iOS supports file uploads via the [GraphQL multipart request specification](https://github.com/jaydenseric/graphql-multipart-request-spec) with a few caveats:
 
-Apollo recommends using more traditional methods to upload your files, such as REST `multipart-form` uploads or SDK's that support file uploads, such as AmazonS3. [This article covers how to do that with Typescript](https://www.apollographql.com/blog/graphql-file-uploads-with-react-hooks-typescript-amazon-s3-tutorial-ef39d21066a2), but the general theory for iOS works basically the same:
-
-- Upload data **not** using GraphQL, getting back either an identifier or URL for the uploaded data.
-- Send that received identifier or URL to your graph using GraphQL.
-
-If you'd still prefer to upload directly with Apollo, continue reading.
+- Uploading files with GraphQL is most often suitable for proof-of-concept applications. In production, using purpose-built tools for file uploads may be preferable. Refer to this [blog post](https://www.apollographql.com/blog/backend/file-uploads/file-upload-best-practices/) for the advantages and disadvantages of multiple approaches.
+- The [Apollo Router](/router/) doesn't support `multipart-form` uploads.
 
 ### Uploading Directly With Apollo
-
-The iOS SDK supports the [GraphQL Multipart Request Specification](https://github.com/jaydenseric/graphql-multipart-request-spec#multipart-form-field-structure) for uploading files.
 
 At the moment, we only support uploads for a single operation, not for batch operations. You can upload multiple files for a single operation if your server supports it, though.
 
