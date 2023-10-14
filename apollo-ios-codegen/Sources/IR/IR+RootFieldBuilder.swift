@@ -192,18 +192,19 @@ class RootFieldBuilder {
     }
 
     let inlineSelectionSet = inlineFragment.selectionSet
+    let matchesScope = typeInfo.scope.matches(scope)
 
-    switch (typeInfo.scope.matches(scope), inlineFragment.deferCondition) {
+    switch (matchesScope, inlineFragment.deferCondition) {
     case let (true, .some(deferCondition)):
       let irTypeCase = buildInlineFragmentSpread(
         from: inlineSelectionSet,
         with: scope,
         inParentTypePath: typeInfo,
-        deferCondition: .init(deferCondition)
+        deferCondition: DeferCondition(deferCondition)
       )
       target.mergeIn(irTypeCase)
 
-    case (true, .none):
+    case (true, nil):
       addSelections(from: inlineSelectionSet, to: target, atTypePath: typeInfo)
 
     case (false, .some):
@@ -214,7 +215,7 @@ class RootFieldBuilder {
       )
       target.mergeIn(irTypeCase)
 
-    case (false, .none):
+    case (false, nil):
       let irTypeCase = buildInlineFragmentSpread(
         from: inlineSelectionSet,
         with: scope,
@@ -393,6 +394,7 @@ class RootFieldBuilder {
       conditions: scopeCondition.conditions,
       deferCondition: deferCondition
     )
+
     let typePath = enclosingTypeInfo.scopePath.mutatingLast {
       $0.appending(scope)
     }
