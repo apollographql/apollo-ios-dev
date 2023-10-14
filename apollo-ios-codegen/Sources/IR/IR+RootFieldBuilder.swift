@@ -173,46 +173,7 @@ class RootFieldBuilder {
       add(inlineFragment, from: selection, to: target, atTypePath: typeInfo)
 
     case let .fragmentSpread(fragmentSpread):
-      guard let scope = scopeCondition(for: fragmentSpread, in: typeInfo) else {
-        return
-      }
-      let selectionSetScope = typeInfo.scope
-
-      var matchesType: Bool {
-        guard let typeCondition = scope.type else { return true }
-        return selectionSetScope.matches(typeCondition)
-      }
-      let matchesScope = selectionSetScope.matches(scope)
-
-      if matchesScope {
-        let irFragmentSpread = buildNamedFragmentSpread(
-          fromFragment: fragmentSpread,
-          with: scope,
-          spreadIntoParentWithTypePath: typeInfo
-        )
-        target.mergeIn(irFragmentSpread)
-
-      } else {
-        let irTypeCaseEnclosingFragment = buildInlineFragmentSpread(
-          from: CompilationResult.SelectionSet(
-            parentType: fragmentSpread.parentType,
-            selections: [selection]
-          ),
-          with: scope,
-          inParentTypePath: typeInfo,
-          deferCondition: (fragmentSpread.deferCondition != nil ? .init(fragmentSpread.deferCondition!) : nil)
-        )
-        #warning("remove force unwrap above")
-
-        target.mergeIn(irTypeCaseEnclosingFragment)
-
-        if matchesType {
-          typeInfo.entity.selectionTree.mergeIn(
-            selections: irTypeCaseEnclosingFragment.selectionSet.selections.direct.unsafelyUnwrapped.readOnlyView,
-            with: typeInfo
-          )
-        }
-      }
+      add(fragmentSpread, from: selection, to: target, atTypePath: typeInfo)
     }
   }
 
@@ -260,6 +221,75 @@ class RootFieldBuilder {
         inParentTypePath: typeInfo
       )
       target.mergeIn(irTypeCase)
+    }
+  }
+
+  private func add(
+    _ fragmentSpread: CompilationResult.FragmentSpread,
+    from selection: CompilationResult.Selection,
+    to target: DirectSelections,
+    atTypePath typeInfo: SelectionSet.TypeInfo
+  ) {
+    guard let scope = scopeCondition(
+      for: fragmentSpread,
+      in: typeInfo,
+      deferCondition: fragmentSpread.deferCondition
+    ) else {
+      return
+    }
+
+    let selectionSetScope = typeInfo.scope
+    let matchesScope = selectionSetScope.matches(scope)
+
+    switch (matchesScope, fragmentSpread.deferCondition) {
+    case let (true, .some(deferCondition)):
+      let irFragmentSpread = buildNamedFragmentSpread(
+        fromFragment: fragmentSpread,
+        with: scope,
+        spreadIntoParentWithTypePath: typeInfo,
+        deferCondition: DeferCondition(deferCondition)
+      )
+      target.mergeIn(irFragmentSpread)
+
+    case (true, nil):
+      let irFragmentSpread = buildNamedFragmentSpread(
+        fromFragment: fragmentSpread,
+        with: scope,
+        spreadIntoParentWithTypePath: typeInfo
+      )
+      target.mergeIn(irFragmentSpread)
+
+    case (false, .some):
+      let irTypeCase = buildInlineFragmentSpread(
+        toWrap: selection,
+        with: scope,
+        inParentTypePath: typeInfo
+      )
+      target.mergeIn(irTypeCase)
+
+    case (false, nil):
+      let irTypeCaseEnclosingFragment = buildInlineFragmentSpread(
+        from: CompilationResult.SelectionSet(
+          parentType: fragmentSpread.parentType,
+          selections: [selection]
+        ),
+        with: scope,
+        inParentTypePath: typeInfo
+      )
+
+      target.mergeIn(irTypeCaseEnclosingFragment)
+
+      var matchesType: Bool {
+        guard let typeCondition = scope.type else { return true }
+        return selectionSetScope.matches(typeCondition)
+      }
+
+      if matchesType {
+        typeInfo.entity.selectionTree.mergeIn(
+          selections: irTypeCaseEnclosingFragment.selectionSet.selections.direct.unsafelyUnwrapped.readOnlyView,
+          with: typeInfo
+        )
+      }
     }
   }
 
@@ -409,7 +439,8 @@ class RootFieldBuilder {
   private func buildNamedFragmentSpread(
     fromFragment fragmentSpread: CompilationResult.FragmentSpread,
     with scopeCondition: ScopeCondition,
-    spreadIntoParentWithTypePath parentTypeInfo: SelectionSet.TypeInfo
+    spreadIntoParentWithTypePath parentTypeInfo: SelectionSet.TypeInfo,
+    deferCondition: DeferCondition? = nil
   ) -> NamedFragmentSpread {
     let fragment = ir.build(fragment: fragmentSpread.fragment)
     referencedFragments.append(fragment)
@@ -417,10 +448,16 @@ class RootFieldBuilder {
 
     self.containsDeferredFragment = fragment.containsDeferredFragment
 
+    let scope = ScopeCondition(
+      type: scopeCondition.type,
+      conditions: scopeCondition.conditions,
+      deferCondition: deferCondition
+    )
+
     let scopePath = scopeCondition.isEmpty ?
     parentTypeInfo.scopePath :
     parentTypeInfo.scopePath.mutatingLast {
-      $0.appending(scopeCondition)
+      $0.appending(scope)
     }
 
     let typeInfo = SelectionSet.TypeInfo(
@@ -431,7 +468,7 @@ class RootFieldBuilder {
     let fragmentSpread = NamedFragmentSpread(
       fragment: fragment,
       typeInfo: typeInfo,
-      inclusionConditions: AnyOf(scopeCondition.conditions)
+      inclusionConditions: AnyOf(scope.conditions)
     )
 
     entityStorage.mergeAllSelectionsIntoEntitySelectionTrees(from: fragmentSpread)
