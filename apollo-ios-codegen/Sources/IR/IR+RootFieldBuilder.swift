@@ -136,8 +136,6 @@ class RootFieldBuilder {
   ) {
     addSelections(from: selectionSet, to: target, atTypePath: typeInfo)
 
-    self.containsDeferredFragment = typeInfo.scope.scopePath.containsDeferredFragment
-
     if typeInfo.deferCondition == nil {
       typeInfo.entity.selectionTree.mergeIn(
         selections: target.readOnlyView,
@@ -395,6 +393,8 @@ class RootFieldBuilder {
       deferCondition: deferCondition
     )
 
+    self.containsDeferredFragment = (scope.deferCondition != nil)
+
     let typePath = enclosingTypeInfo.scopePath.mutatingLast {
       $0.appending(scope)
     }
@@ -448,13 +448,13 @@ class RootFieldBuilder {
     referencedFragments.append(fragment)
     referencedFragments.append(contentsOf: fragment.referencedFragments)
 
-    self.containsDeferredFragment = fragment.containsDeferredFragment
-
     let scope = ScopeCondition(
       type: scopeCondition.type,
       conditions: scopeCondition.conditions,
       deferCondition: deferCondition
     )
+
+    self.containsDeferredFragment = fragment.containsDeferredFragment || scope.deferCondition != nil
 
     let scopePath = scopeCondition.isEmpty ?
     parentTypeInfo.scopePath :
