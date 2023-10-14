@@ -258,12 +258,11 @@ public enum ShallowSelectionMatcher {
   public static func deferred(
     _ parentType: GraphQLCompositeType,
     label: String,
-    variable: String? = nil,
-    inclusionConditions: [IR.InclusionCondition]? = nil
+    variable: String? = nil
   ) -> ShallowSelectionMatcher {
     .shallowInlineFragment(ShallowInlineFragmentMatcher(
       parentType: parentType,
-      inclusionConditions: inclusionConditions,
+      inclusionConditions: nil,
       deferCondition: IR.DeferCondition(label: label, variable: variable)
     ))
   }
