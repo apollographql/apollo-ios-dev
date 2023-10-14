@@ -266,6 +266,18 @@ public enum ShallowSelectionMatcher {
       deferCondition: IR.DeferCondition(label: label, variable: variable)
     ))
   }
+
+  public static func deferred(
+    _ fragment: CompilationResult.FragmentDefinition,
+    label: String,
+    variable: String? = nil
+  ) -> ShallowSelectionMatcher {
+    .shallowFragmentSpread(ShallowFragmentSpreadMatcher(
+      name: fragment.name,
+      type: fragment.type,
+      inclusionConditions: nil
+    ))
+  }
 }
 
 // MARK: - Shallow Field Matcher
@@ -394,7 +406,9 @@ public struct ShallowInlineFragmentMatcher: Equatable, CustomDebugStringConverti
 
   public var debugDescription: String {
     TemplateString("""
-      ... on \(parentType.debugDescription)\(ifLet: inclusionConditions, { " \($0.debugDescription)"})
+      ... on \(parentType.debugDescription)\
+      \(ifLet: inclusionConditions, { " \($0.debugDescription)"})\
+      \(ifLet: deferCondition, { " \($0.debugDescription)"})
       """).description
   }
 }
@@ -462,6 +476,7 @@ public struct ShallowFragmentSpreadMatcher: Equatable, CustomDebugStringConverti
     }
   }
 
+  @_disfavoredOverload
   init(
     name: String,
     type: GraphQLCompositeType,

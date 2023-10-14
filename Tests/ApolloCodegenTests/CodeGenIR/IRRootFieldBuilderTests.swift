@@ -4499,14 +4499,11 @@ class IRRootFieldBuilderTests: XCTestCase {
     interface Animal {
       id: String
       species: String
-      genus: String
     }
 
     type Dog implements Animal {
       id: String
       species: String
-      genus: String
-      name: String
     }
     """
 
@@ -5158,6 +5155,81 @@ class IRRootFieldBuilderTests: XCTestCase {
         ]
       )
     ))
+  }
+
+  // MARK: Deferred Fragments - Named Fragments
+
+  func test__deferredFragments__givenDeferredNamedFragment_buildsDeferredInlineFragment() throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String
+        species: String
+      }
+
+      type Dog implements Animal {
+        id: String
+        species: String
+      }
+      """
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...DogFragment @defer(label: "root")
+        }
+      }
+
+      fragment DogFragment on Dog {
+        species
+      }
+      """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
+    let Object_Dog = try XCTUnwrap(schema[object: "Dog"])
+    let Fragment_DogFragment = try XCTUnwrap(ir.compilationResult[fragment: "DogFragment"])
+
+    let allAnimals = self.subject[field: "allAnimals"] as? IR.EntityField
+    let allAnimals_AsDog = allAnimals?[as: "Dog"]
+    let allAnimals_AsDog_DogFragment = allAnimals_AsDog?[fragment: "DogFragment"]
+
+    expect(allAnimals?.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("id", type: .string()),
+          .inlineFragment(parentType: Object_Dog),
+        ]
+      )
+    ))
+
+    expect(allAnimals_AsDog).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Dog,
+        directSelections: [
+          .deferred(Fragment_DogFragment, label: "root"),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+          .field("species", type: .string()), // wrong
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+          try .mock(allAnimals_AsDog_DogFragment), // wrong
+        ]
+      )
+    ))
+    #warning("fix these 'wrong' merges")
   }
 
 }
