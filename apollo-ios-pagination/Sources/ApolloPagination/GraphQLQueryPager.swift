@@ -77,14 +77,16 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 
   /// Subscribe to new data from this watcher, using a callback
   /// - Parameter onUpdate: A callback function that supplies a `Result<Output, Error>`
-  public func subscribe(
+  @discardableResult public func subscribe(
     onUpdate: @MainActor @escaping (Result<Output, Error>) -> Void
-  ) {
-    subject.sink { value in
+  ) -> AnyCancellable {
+    let cancellable = subject.sink { value in
       Task {
         await onUpdate(value)
       }
-    }.store(in: &subscribers)
+    }
+    cancellable.store(in: &subscribers)
+    return cancellable
   }
 
   /// Loads the first page of results.

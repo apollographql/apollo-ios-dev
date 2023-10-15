@@ -74,10 +74,12 @@ public class AnyGraphQLQueryPager<Model> {
     )
   }
 
-  public func subscribe(completion: @escaping (Output) -> Void) {
-    _subject.sink { result in
+  @discardableResult public func subscribe(completion: @escaping (Output) -> Void) -> AnyCancellable {
+    let cancellable = _subject.sink { result in
       completion(result)
-    }.store(in: &cancellables)
+    }
+    cancellable.store(in: &cancellables)
+    return cancellable
   }
 
   public func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) {
