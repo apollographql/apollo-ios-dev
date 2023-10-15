@@ -77,7 +77,10 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 
   /// Subscribe to new data from this watcher, using a callback
   /// - Parameter onUpdate: A callback function that supplies a `Result<Output, Error>`
-  @discardableResult public func subscribe(onUpdate: @MainActor @escaping (Result<Output, Error>) -> Void) -> Combine.AnyCancellable {
+  /// - Returns: A combine cancellable.
+  @discardableResult public func subscribe(
+    onUpdate: @MainActor @escaping (Result<Output, Error>) -> Void
+  ) -> AnyCancellable {
     let subscription = subject.sink { value in
       Task {
         await onUpdate(value)
@@ -89,7 +92,8 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 
   /// Loads the first page of results.
   /// This method is non-destructive: It will re-fetch the contents of the first page, without modifying any of the other pages, should there be any.
-  public func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) {
+  /// - Parameter cachePolicy: Preferred cache policy for first-page fetches. Defaults to `returnCacheDataAndFetch`
+  func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) {
     defer { firstPageWatcher?.refetch(cachePolicy: cachePolicy) }
     guard firstPageWatcher == nil else { return }
     self.firstPageWatcher = GraphQLQueryWatcher(
@@ -112,19 +116,25 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     )
   }
 
+
+  /// A convenience wrapper around the asynchronous `loadMore` function.
   public func loadMore(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
     completion: (() -> Void)? = nil
   ) throws {
     Task {
-      try await loadMore(cachePolicy: cachePolicy, completion: completion)
+      try await loadMore(cachePolicy: cachePolicy)
+      completion?()
     }
   }
 
-  /// Loads the next page, based on the latest page info.
+  /// Loads the next page, using the currently saved pagination information to do so.
+  /// Thread-safe, and supports multiple subscribers calling from multiple threads.
+  /// **NOTE**: Requires having already called `fetch` or `refetch` prior to this call.
+  /// - Parameters:
+  ///   - cachePolicy: Preferred cache policy for fetching subsequent pages. Defaults to `fetchIgnoringCacheData`.
   public func loadMore(
-    cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-    completion: (() -> Void)? = nil
+    cachePolicy: CachePolicy = .fetchIgnoringCacheData
   ) async throws {
     guard let currentPageInfo else {
       assertionFailure("No page info detected -- are you calling `loadMore` prior to calling the initial fetch?")
@@ -171,7 +181,6 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
             self._subject.send(.failure(error))
             publisher.send(completion: .finished)
           }
-          completion?()
         }
         nextPageWatchers.append(watcher)
         publisher.sink(receiveCompletion: { [weak self] _ in
@@ -188,9 +197,10 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   }
 
   /// Reloads all data, starting at the first query, resetting pagination state.
-  public func refetch() {
+  /// - Parameter cachePolicy: Preferred cache policy for first-page fetches. Defaults to `returnCacheDataAndFetch`
+  public func refetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) {
     cancel()
-    fetch()
+    fetch(cachePolicy: cachePolicy)
   }
 
   /// Cancel any in progress fetching operations and unsubscribe from the store.

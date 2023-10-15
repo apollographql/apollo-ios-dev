@@ -8,7 +8,7 @@ public class AnyGraphQLQueryPager<Model> {
 
   private let _fetch: (CachePolicy) -> Void
   private let _loadMore: (CachePolicy, (() -> Void)?) throws -> Void
-  private let _refetch: () -> Void
+  private let _refetch: (CachePolicy) -> Void
   private let _cancel: () -> Void
   private let _subject: AnyPublisher<Output, Never>
   private let _canLoadNext: () -> Bool
@@ -91,8 +91,8 @@ public class AnyGraphQLQueryPager<Model> {
     try _loadMore(cachePolicy, completion)
   }
 
-  public func refetch() {
-    _refetch()
+  public func refetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) {
+    _refetch(cachePolicy)
   }
 
   public func cancel() {
