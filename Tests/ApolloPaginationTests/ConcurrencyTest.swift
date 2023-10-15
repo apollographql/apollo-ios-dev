@@ -45,11 +45,9 @@ final class ConcurrencyTests: XCTestCase {
   ) async {
     try? await withThrowingTaskGroup(of: Void.self) { group in
       let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
-      group.addTask { try await pager.loadMore(completion: onUpdate) }
-      group.addTask { try await pager.loadMore(completion: onUpdate) }
-      group.addTask { try await pager.loadMore(completion: onUpdate) }
-      group.addTask { try await pager.loadMore(completion: onUpdate) }
-      group.addTask { try await pager.loadMore(completion: onUpdate) }
+      (1...5).forEach { _ in
+        group.addTask { try await pager.loadMore(completion: onUpdate) }
+      }
       group.addTask { await self.fulfillment(of: [serverExpectation], timeout: 1) }
       try await group.waitForAll()
     }
