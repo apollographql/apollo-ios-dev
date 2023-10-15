@@ -229,7 +229,8 @@ public enum ShallowSelectionMatcher {
     .shallowFragmentSpread(ShallowFragmentSpreadMatcher(
       name: name,
       type: type,
-      inclusionConditions: inclusionConditions
+      inclusionConditions: inclusionConditions,
+      deferCondition: nil
     ))
   }
 
@@ -240,7 +241,8 @@ public enum ShallowSelectionMatcher {
     .shallowFragmentSpread(ShallowFragmentSpreadMatcher(
       name: fragment.name,
       type: fragment.type,
-      inclusionConditions: inclusionConditions
+      inclusionConditions: inclusionConditions,
+      deferCondition: nil
     ))
   }
 
@@ -251,7 +253,8 @@ public enum ShallowSelectionMatcher {
     .shallowFragmentSpread(ShallowFragmentSpreadMatcher(
       name: fragment.name,
       type: fragment.type,
-      inclusionConditions: inclusionConditions
+      inclusionConditions: inclusionConditions,
+      deferCondition: nil
     ))
   }
 
@@ -275,7 +278,8 @@ public enum ShallowSelectionMatcher {
     .shallowFragmentSpread(ShallowFragmentSpreadMatcher(
       name: fragment.name,
       type: fragment.type,
-      inclusionConditions: nil
+      inclusionConditions: nil,
+      deferCondition: DeferCondition(label: label, variable: variable)
     ))
   }
 }
@@ -460,14 +464,18 @@ public struct ShallowFragmentSpreadMatcher: Equatable, CustomDebugStringConverti
   let name: String
   let type: GraphQLCompositeType
   let inclusionConditions: AnyOf<IR.InclusionConditions>?
+  let deferCondition: IR.DeferCondition?
 
   init(
     name: String,
     type: GraphQLCompositeType,
-    inclusionConditions: [IR.InclusionCondition]?
+    inclusionConditions: [IR.InclusionCondition]?,
+    deferCondition: IR.DeferCondition?
   ) {
     self.name = name
     self.type = type
+    self.deferCondition = deferCondition
+
     if let inclusionConditions = inclusionConditions,
      let evaluatedConditions = IR.InclusionConditions.allOf(inclusionConditions).conditions {
       self.inclusionConditions = AnyOf(evaluatedConditions)
@@ -480,33 +488,47 @@ public struct ShallowFragmentSpreadMatcher: Equatable, CustomDebugStringConverti
   init(
     name: String,
     type: GraphQLCompositeType,
-    inclusionConditions: AnyOf<IR.InclusionConditions>?
+    inclusionConditions: AnyOf<IR.InclusionConditions>?,
+    deferCondition: IR.DeferCondition?
   ) {
     self.name = name
     self.type = type
     self.inclusionConditions = inclusionConditions
+    self.deferCondition = deferCondition
   }
 
   public static func mock(
     _ name: String,
     type: GraphQLCompositeType,
-    inclusionConditions: AnyOf<IR.InclusionConditions>? = nil
+    inclusionConditions: AnyOf<IR.InclusionConditions>? = nil,
+    deferCondition: IR.DeferCondition? = nil
   ) -> ShallowFragmentSpreadMatcher {
-    self.init(name: name, type: type, inclusionConditions: inclusionConditions)
+    self.init(
+      name: name,
+      type: type,
+      inclusionConditions: inclusionConditions,
+      deferCondition: deferCondition
+    )
   }
 
   public static func mock(
     _ fragment: CompilationResult.FragmentDefinition,
-    inclusionConditions: AnyOf<IR.InclusionConditions>? = nil
+    inclusionConditions: AnyOf<IR.InclusionConditions>? = nil,
+    deferCondition: IR.DeferCondition? = nil
   ) -> ShallowFragmentSpreadMatcher {
-    self.init(name: fragment.name, type: fragment.type, inclusionConditions: inclusionConditions)
+    self.init(
+      name: fragment.name,
+      type: fragment.type,
+      inclusionConditions: inclusionConditions,
+      deferCondition: deferCondition
+    )
   }
 
   public var debugDescription: String {
     TemplateString("""
-    fragment \(name) on \(type.debugDescription)\(ifLet: inclusionConditions, {
-      " \($0.debugDescription)"
-      })
+    fragment \(name) on \(type.debugDescription)\
+    \(ifLet: inclusionConditions, { " \($0.debugDescription)" })
+    \(ifLet: deferCondition, { " \($0.debugDescription)" })
     """).description
   }
 }
@@ -552,9 +574,10 @@ fileprivate func shallowlyMatch<T: Collection>(
 }
 
 fileprivate func shallowlyMatch(expected: ShallowFragmentSpreadMatcher, actual: IR.NamedFragmentSpread) -> Bool {
-  return expected.name == actual.fragment.name &&
-  expected.type == actual.fragment.type &&
-  expected.inclusionConditions == actual.inclusionConditions
+  return expected.name == actual.fragment.name 
+  && expected.type == actual.fragment.type
+  && expected.inclusionConditions == actual.inclusionConditions
+  && expected.deferCondition == actual.typeInfo.deferCondition
 }
 
 // MARK: - Predicate Mapping
