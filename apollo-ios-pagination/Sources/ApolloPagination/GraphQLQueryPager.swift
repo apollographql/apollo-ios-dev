@@ -113,7 +113,6 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     )
   }
 
-
   /// A convenience wrapper around the asynchronous `loadMore` function.
   public func loadMore(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
