@@ -119,88 +119,13 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
   }
 
   private func fetchFirstPage<T>(pager: AnyGraphQLQueryPager<T>) {
-    let serverExpectation = server.expect(Query.self) { _ in
-      let pageInfo: [AnyHashable: AnyHashable] = [
-        "__typename": "PageInfo",
-        "endCursor": "Y3Vyc29yMg==",
-        "hasNextPage": true,
-      ]
-      let friends: [[String: AnyHashable]] = [
-        [
-          "__typename": "Human",
-          "name": "Luke Skywalker",
-          "id": "1000",
-        ],
-        [
-          "__typename": "Human",
-          "name": "Han Solo",
-          "id": "1002",
-        ],
-      ]
-      let friendsConnection: [String: AnyHashable] = [
-        "__typename": "FriendsConnection",
-        "totalCount": 3,
-        "friends": friends,
-        "pageInfo": pageInfo,
-      ]
-
-      let hero: [String: AnyHashable] = [
-        "__typename": "Droid",
-        "id": "2001",
-        "name": "R2-D2",
-        "friendsConnection": friendsConnection,
-      ]
-
-      let data: [String: AnyHashable] = [
-        "hero": hero
-      ]
-
-      return [
-        "data": data
-      ]
-    }
-
-    pager.fetch()
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    pager.refetch()
     wait(for: [serverExpectation], timeout: 1.0)
   }
 
   private func fetchSecondPage<T>(pager: AnyGraphQLQueryPager<T>) throws {
-    let serverExpectation = server.expect(Query.self) { _ in
-      let pageInfo: [AnyHashable: AnyHashable] = [
-        "__typename": "PageInfo",
-        "endCursor": "Y3Vyc29yMw==",
-        "hasNextPage": false,
-      ]
-      let friends: [[String: AnyHashable]] = [
-        [
-          "__typename": "Human",
-          "name": "Leia Organa",
-          "id": "1003",
-        ],
-      ]
-      let friendsConnection: [String: AnyHashable] = [
-        "__typename": "FriendsConnection",
-        "totalCount": 3,
-        "friends": friends,
-        "pageInfo": pageInfo,
-      ]
-
-      let hero: [String: AnyHashable] = [
-        "__typename": "Droid",
-        "id": "2001",
-        "name": "R2-D2",
-        "friendsConnection": friendsConnection,
-      ]
-
-      let data: [String: AnyHashable] = [
-        "hero": hero
-      ]
-
-      return [
-        "data": data
-      ]
-    }
-
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     try pager.loadMore()
     wait(for: [serverExpectation], timeout: 1.0)
   }

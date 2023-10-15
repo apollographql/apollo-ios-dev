@@ -22,41 +22,36 @@ final class ConcurrencyTests: XCTestCase {
     client = ApolloClient(networkTransport: networkTransport, store: store)
   }
 
-  func test_concatenatesPages_matchingInitialAndPaginated() throws {
+  func test_concurrentFetches() async throws {
     let pager = createPager()
-    let firstPageExpectation = expectation(description: "Firstpage")
-    let subscription = pager.subscribe { _ in
-      firstPageExpectation.fulfill()
+    var results: [Result<(Query.Data, [Query.Data], UpdateSource), Error>] = []
+    pager.subscribe { result in
+      results.append(result)
     }
     fetchFirstPage(pager: pager)
-    wait(for: [firstPageExpectation], timeout: 1)
-    subscription.cancel()
-
-    Task {
-      var results: [Result<(Query.Data, [Query.Data], UpdateSource), Error>] = []
-      var completionCount = 0
-
-      fetchFirstPage(pager: pager)
-      pager.subscribe { result in
-        results.append(result)
-        completionCount += 1
-      }
-      await loadDataFromManyThreads(pager: pager)
-
-      XCTAssertEqual(results.count, 2)
-      XCTAssertEqual(completionCount, 1)
+    var completionCount = 0
+    let onUpdate: () -> Void = {
+      completionCount += 1
     }
+    await loadDataFromManyThreads(pager: pager, onUpdate: onUpdate)
 
+    XCTAssertEqual(results.count, 2)
+    XCTAssertEqual(completionCount, 1)
   }
 
   private func loadDataFromManyThreads(
-    pager: GraphQLQueryPager<Query, Query>
+    pager: GraphQLQueryPager<Query, Query>,
+    onUpdate: @escaping () -> Void
   ) async {
-    await withTaskGroup(of: Void.self) { group in
-      (1...10).forEach { _ in
-        group.addTask { try? pager.loadMore() }
-      }
-      await group.waitForAll()
+    try? await withThrowingTaskGroup(of: Void.self) { group in
+      let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
+      group.addTask { try await pager.loadMore(completion: onUpdate) }
+      group.addTask { try await pager.loadMore(completion: onUpdate) }
+      group.addTask { try await pager.loadMore(completion: onUpdate) }
+      group.addTask { try await pager.loadMore(completion: onUpdate) }
+      group.addTask { try await pager.loadMore(completion: onUpdate) }
+      group.addTask { await self.fulfillment(of: [serverExpectation], timeout: 1) }
+      try await group.waitForAll()
     }
   }
 
@@ -90,89 +85,8 @@ final class ConcurrencyTests: XCTestCase {
   }
 
   private func fetchFirstPage(pager: GraphQLQueryPager<Query, Query>) {
-    let serverExpectation = server.expect(Query.self) { _ in
-      let pageInfo: [AnyHashable: AnyHashable] = [
-        "__typename": "PageInfo",
-        "endCursor": "Y3Vyc29yMg==",
-        "hasNextPage": true,
-      ]
-      let friends: [[String: AnyHashable]] = [
-        [
-          "__typename": "Human",
-          "name": "Luke Skywalker",
-          "id": "1000",
-        ],
-        [
-          "__typename": "Human",
-          "name": "Han Solo",
-          "id": "1002",
-        ],
-      ]
-      let friendsConnection: [String: AnyHashable] = [
-        "__typename": "FriendsConnection",
-        "totalCount": 3,
-        "friends": friends,
-        "pageInfo": pageInfo,
-      ]
-
-      let hero: [String: AnyHashable] = [
-        "__typename": "Droid",
-        "id": "2001",
-        "name": "R2-D2",
-        "friendsConnection": friendsConnection,
-      ]
-
-      let data: [String: AnyHashable] = [
-        "hero": hero
-      ]
-
-      return [
-        "data": data
-      ]
-    }
-
-    pager.fetch()
-    wait(for: [serverExpectation], timeout: 1.0)
-  }
-
-  private func fetchSecondPage(pager: GraphQLQueryPager<Query, Query>) throws {
-    let serverExpectation = server.expect(Query.self) { _ in
-      let pageInfo: [AnyHashable: AnyHashable] = [
-        "__typename": "PageInfo",
-        "endCursor": "Y3Vyc29yMw==",
-        "hasNextPage": false,
-      ]
-      let friends: [[String: AnyHashable]] = [
-        [
-          "__typename": "Human",
-          "name": "Leia Organa",
-          "id": "1003",
-        ],
-      ]
-      let friendsConnection: [String: AnyHashable] = [
-        "__typename": "FriendsConnection",
-        "totalCount": 3,
-        "friends": friends,
-        "pageInfo": pageInfo,
-      ]
-
-      let hero: [String: AnyHashable] = [
-        "__typename": "Droid",
-        "id": "2001",
-        "name": "R2-D2",
-        "friendsConnection": friendsConnection,
-      ]
-
-      let data: [String: AnyHashable] = [
-        "hero": hero
-      ]
-
-      return [
-        "data": data
-      ]
-    }
-
-    try pager.loadMore()
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    pager.refetch()
     wait(for: [serverExpectation], timeout: 1.0)
   }
 }

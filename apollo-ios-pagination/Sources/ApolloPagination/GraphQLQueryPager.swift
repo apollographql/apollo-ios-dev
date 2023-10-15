@@ -77,17 +77,14 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 
   /// Subscribe to new data from this watcher, using a callback
   /// - Parameter onUpdate: A callback function that supplies a `Result<Output, Error>`
-  /// - Returns: A combine cancellable.
-  @discardableResult public func subscribe(
+  public func subscribe(
     onUpdate: @MainActor @escaping (Result<Output, Error>) -> Void
-  ) -> AnyCancellable {
-    let subscription = subject.sink { value in
+  ) {
+    subject.sink { value in
       Task {
         await onUpdate(value)
       }
-    }
-    subscription.store(in: &subscribers)
-    return subscription
+    }.store(in: &subscribers)
   }
 
   /// Loads the first page of results.
@@ -123,8 +120,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     completion: (() -> Void)? = nil
   ) throws {
     Task {
-      try await loadMore(cachePolicy: cachePolicy)
-      completion?()
+      try await loadMore(cachePolicy: cachePolicy, completion: completion)
     }
   }
 
@@ -134,7 +130,8 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// - Parameters:
   ///   - cachePolicy: Preferred cache policy for fetching subsequent pages. Defaults to `fetchIgnoringCacheData`.
   public func loadMore(
-    cachePolicy: CachePolicy = .fetchIgnoringCacheData
+    cachePolicy: CachePolicy = .fetchIgnoringCacheData,
+    completion: (() -> Void)? = nil
   ) async throws {
     guard let currentPageInfo else {
       assertionFailure("No page info detected -- are you calling `loadMore` prior to calling the initial fetch?")
@@ -187,6 +184,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
           continuation.resume(with: .success(()))
           self?.activeTask?.cancel()
           self?.activeTask = nil
+          completion?()
         }, receiveValue: { })
         .store(in: &subscribers)
         watcher.refetch(cachePolicy: cachePolicy)
