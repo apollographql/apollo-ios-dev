@@ -46,6 +46,21 @@ extension ScopeConditionalSubscriptAccessing {
     return self[scope]
   }
 
+  public subscript(
+    as typeCase: String? = nil,
+    deferred deferCondition: IR.DeferCondition? = nil
+  ) -> IR.SelectionSet? {
+    guard let scope = self.scopeCondition(
+      type: typeCase,
+      conditions: nil,
+      deferCondition: deferCondition
+    ) else {
+      return nil
+    }
+
+    return self[scope]
+  }
+
   private func scopeCondition(
     type typeCase: String?,
     conditions conditionsResult: IR.InclusionConditions.Result?,
