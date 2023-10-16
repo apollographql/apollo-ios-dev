@@ -184,7 +184,7 @@ class RootFieldBuilder {
     guard let scope = scopeCondition(
       for: inlineFragment,
       in: typeInfo,
-      deferCondition: inlineFragment.deferCondition
+      isDeferred: (inlineFragment.deferCondition != nil)
     ) else {
       return
     }
@@ -232,7 +232,7 @@ class RootFieldBuilder {
     guard let scope = scopeCondition(
       for: fragmentSpread,
       in: typeInfo,
-      deferCondition: fragmentSpread.deferCondition
+      isDeferred: (fragmentSpread.deferCondition != nil)
     ) else {
       return
     }
@@ -295,7 +295,7 @@ class RootFieldBuilder {
   private func scopeCondition(
     for conditionalSelectionSet: ConditionallyIncludable,
     in parentTypePath: SelectionSet.TypeInfo,
-    deferCondition: CompilationResult.DeferCondition? = nil
+    isDeferred: Bool = false
   ) -> ScopeCondition? {
     let inclusionResult = inclusionResult(for: conditionalSelectionSet.inclusionConditions)
     guard inclusionResult != .skipped else {
@@ -304,7 +304,7 @@ class RootFieldBuilder {
 
     let type = (
       parentTypePath.parentType == conditionalSelectionSet.parentType
-      && deferCondition == nil
+      && !isDeferred
     )
     ? nil
     : conditionalSelectionSet.parentType
