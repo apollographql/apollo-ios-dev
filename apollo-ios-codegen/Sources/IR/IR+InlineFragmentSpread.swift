@@ -28,6 +28,9 @@ public class InlineFragmentSpread: Hashable, CustomDebugStringConvertible {
     if let conditions = typeInfo.inclusionConditions {
       string += " \(conditions.debugDescription)"
     }
+    if let deferCondition = typeInfo.deferCondition {
+      string += " \(deferCondition.debugDescription)"
+    }
 
     return string
   }
