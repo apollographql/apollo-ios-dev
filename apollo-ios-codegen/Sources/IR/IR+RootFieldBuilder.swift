@@ -193,12 +193,18 @@ class RootFieldBuilder {
     let matchesScope = typeInfo.scope.matches(scope)
 
     switch (matchesScope, inlineFragment.deferCondition) {
-    case let (true, .some(deferCondition)):
+    case (true, .some), (false, nil):
+      var deferCondition: DeferCondition? {
+        guard let condition = inlineFragment.deferCondition else { return nil }
+
+        return DeferCondition(condition)
+      }
+
       let irTypeCase = buildInlineFragmentSpread(
         from: inlineSelectionSet,
         with: scope,
         inParentTypePath: typeInfo,
-        deferCondition: DeferCondition(deferCondition)
+        deferCondition: deferCondition
       )
       target.mergeIn(irTypeCase)
 
@@ -208,14 +214,6 @@ class RootFieldBuilder {
     case (false, .some):
       let irTypeCase = buildInlineFragmentSpread(
         toWrap: selection,
-        with: scope,
-        inParentTypePath: typeInfo
-      )
-      target.mergeIn(irTypeCase)
-
-    case (false, nil):
-      let irTypeCase = buildInlineFragmentSpread(
-        from: inlineSelectionSet,
         with: scope,
         inParentTypePath: typeInfo
       )
@@ -241,20 +239,18 @@ class RootFieldBuilder {
     let matchesScope = selectionSetScope.matches(scope)
 
     switch (matchesScope, fragmentSpread.deferCondition) {
-    case let (true, .some(deferCondition)):
+    case (true, .some), (true, nil):
+      var deferCondition: DeferCondition? {
+        guard let condition = fragmentSpread.deferCondition else { return nil }
+
+        return DeferCondition(condition)
+      }
+
       let irFragmentSpread = buildNamedFragmentSpread(
         fromFragment: fragmentSpread,
         with: scope,
         spreadIntoParentWithTypePath: typeInfo,
-        deferCondition: DeferCondition(deferCondition)
-      )
-      target.mergeIn(irFragmentSpread)
-
-    case (true, nil):
-      let irFragmentSpread = buildNamedFragmentSpread(
-        fromFragment: fragmentSpread,
-        with: scope,
-        spreadIntoParentWithTypePath: typeInfo
+        deferCondition: deferCondition
       )
       target.mergeIn(irFragmentSpread)
 
