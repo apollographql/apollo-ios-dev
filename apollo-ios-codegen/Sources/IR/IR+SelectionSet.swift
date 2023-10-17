@@ -166,13 +166,14 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
 extension LinkedList where T == ScopeCondition {
   var containsDeferredFragment: Bool {
     var node: Node? = last
-    var deferCondition = node?.value.deferCondition
 
-    while node?.previous != nil && deferCondition == nil {
+    repeat {
+      guard node?.value.deferCondition == nil else {
+        return true
+      }
       node = node?.previous
-      deferCondition = node?.value.deferCondition
-    }
-
-    return deferCondition != nil
+    } while node != nil
+              
+    return false
   }
 }
