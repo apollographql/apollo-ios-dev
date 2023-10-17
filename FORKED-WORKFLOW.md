@@ -2,7 +2,7 @@
 
 When working with Apollo iOS and forking the repositories, there are some scenarios that may arise in which you have questions on the best way to proceed. This guide will collect these questions and aim to provide clarity for these different scenarios.
 
-This guide assumes you have read the [CONTRIBUTING](https://github.com/apollographql/apollo-ios-dev/blob/main/CONTRIBUTING.md) guide to get an overview of how our repositories are structured and worked on. Please submit an issue to the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repository.
+This guide assumes you have read the [CONTRIBUTING](https://github.com/apollographql/apollo-ios-dev/blob/main/CONTRIBUTING.md) guide to get an overview of how our repositories are structured and worked on. Please submit issues to the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repository.
 
 ## Questions
 
@@ -16,7 +16,7 @@ Once you have your forks, create a branch off of `main` in your `apollo-ios-dev`
 
 After you have made your changes, you can make a commit and then all that is left to do is get your changes pushed to a branch in your `apollo-ios` fork that you can point your `Package.swift` to.
 
-Our development workflow uses git subtree's to bring all of our different packages into the `apollo-ios-dev` repo for development. To assist in running the proper commands to push your code to your `apollo-ios` fork we have provided a basic script that allows you to pass in the pakcage you are pushing to (in this case `apollo-ios`), remote (name or URL), and branch name you would like to push to in your `apollo-ios` fork.
+Our development workflow uses git subtree's to bring all of our different packages into the `apollo-ios-dev` repo for development. To assist in running the proper commands to push your code to your `apollo-ios` fork we have provided a basic script that allows you to pass in the package you are pushing to (in this case `apollo-ios`), remote (name or URL), and branch name you would like to push to in your `apollo-ios` fork.
 
 Run the following command in terminal
 
