@@ -91,10 +91,10 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
 
   // MARK: - Test helpers
 
-  private func createPager() -> GraphQLQueryPager<Query, Query> {
+  private func createPager() -> GraphQLQueryPagerWrapper<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return GraphQLQueryPager<Query, Query>(
+    return GraphQLQueryPagerWrapper<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in
