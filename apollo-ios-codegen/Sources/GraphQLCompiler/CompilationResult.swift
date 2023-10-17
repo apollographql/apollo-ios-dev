@@ -9,11 +9,6 @@ public class CompilationResult: JavaScriptObject {
       static let LocalCacheMutation = "apollo_client_ios_localCacheMutation"
       static let Defer = "defer"
     }
-
-    enum ArgumentLabels {
-      static let `If` = "if"
-      static let Label = "label"
-    }
   }
 
   public lazy var rootTypes: RootTypeDefinition = self["rootTypes"]
@@ -410,6 +405,14 @@ public class CompilationResult: JavaScriptObject {
   }
 
   public struct DeferCondition {
+    /// String constants used to match JavaScriptObject instances.
+    fileprivate enum Constants {
+      enum ArgumentNames {
+        static let Label = "label"
+        static let `If` = "if"
+      }
+    }
+
     public let label: String
     public let variable: String?
 
@@ -435,14 +438,14 @@ fileprivate extension Deferrable where Self: JavaScriptObject {
 
     guard
       let labelArgument = directive.arguments?.first(
-        where: { $0.name == CompilationResult.Constants.ArgumentLabels.Label }),
+        where: { $0.name == CompilationResult.DeferCondition.Constants.ArgumentNames.Label }),
       case let .string(labelValue) = labelArgument.value
     else {
       preconditionFailure("Incorrect `label` argument. Either missing or value is not a String.")
     }
 
     guard let variableArgument = directive.arguments?.first(
-      where: { $0.name == CompilationResult.Constants.ArgumentLabels.If }
+      where: { $0.name == CompilationResult.DeferCondition.Constants.ArgumentNames.If }
     ) else {
       return .init(label: labelValue)
     }
