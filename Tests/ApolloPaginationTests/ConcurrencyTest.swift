@@ -42,12 +42,8 @@ final class ConcurrencyTests: XCTestCase {
   func test_concurrentFetchesThrowsError() async throws {
     let pager = createPager()
     await fetchFirstPage(pager: pager)
-    do {
-      try await loadDataFromManyThreadsThrowing(pager: pager)
-      XCTFail()
-    } catch {
-      let paginationError = try XCTUnwrap(error as? PaginationError)
-      XCTAssertEqual(paginationError, PaginationError.loadInProgress)
+    await XCTAssertThrowsError(try await loadDataFromManyThreadsThrowing(pager: pager)) { error in
+      XCTAssertEqual(error as? PaginationError, PaginationError.loadInProgress)
     }
   }
 
