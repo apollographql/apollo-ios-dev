@@ -146,7 +146,7 @@ extension GraphQLQueryPager {
     /// Maps each query variable set to latest results from internal watchers.
     var varMap: [AnyHashable: PaginatedQuery.Data] = [:]
 
-    var activeTask: Task<Void, Never>?
+    private var activeTask: Task<Void, Never>?
 
     /// Designated Initializer
     /// - Parameters:
