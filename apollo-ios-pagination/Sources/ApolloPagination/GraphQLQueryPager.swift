@@ -87,7 +87,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   }
 
   public func loadMore(
-    cachePolicy: ApolloOne.CachePolicy = .fetchIgnoringCacheData,
+    cachePolicy: CachePolicy = .fetchIgnoringCacheData,
     completion: (@MainActor () -> Void)? = nil
   ) throws {
     Task {
@@ -96,7 +96,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
-  public func refetch(cachePolicy: ApolloOne.CachePolicy = .returnCacheDataAndFetch) {
+  public func refetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) {
     Task {
       await pager.refetch(cachePolicy: cachePolicy)
     }

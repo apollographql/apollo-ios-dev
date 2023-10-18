@@ -103,14 +103,6 @@ public class AnyGraphQLQueryPager<Model> {
   }
 }
 
-extension AnyGraphQLQueryPager where Model: RangeReplaceableCollection {
-  public func subscribe(completion: @escaping (WatchResult<Model>) -> Void) {
-    _subject?.compactMap({ $0 }).sink { result in
-      completion(legacyMapper(result: result))
-    }.store(in: &cancellables)
-  }
-}
-
 public extension GraphQLQueryPager.Actor {
   nonisolated func eraseToAnyPager<T>(
     transform: @escaping (InitialQuery.Data, [PaginatedQuery.Data]) throws -> T
@@ -169,19 +161,5 @@ public extension GraphQLQueryPager {
       initialTransform: transform,
       nextPageTransform: transform
     )
-  }
-}
-
-/// Maps results which include an update source to the legacy WatchResult type.
-/// Note that this function is only implemented for `[Model]`, which was the most common consumer of `WatchResult`.
-/// - Parameter result: Result containing an update source.
-/// - Returns: Watch result mapped to the update source.
-private func legacyMapper<Model, S: RangeReplaceableCollection>(result: Result<(S, UpdateSource), Error>) -> WatchResult<S> where S.Element == Model {
-  switch result {
-  case let .success(value):
-    let (pages, update) = value
-    return .success(pages, update)
-  case .failure(let error):
-    return .failure(error)
   }
 }

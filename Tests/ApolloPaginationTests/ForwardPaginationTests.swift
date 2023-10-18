@@ -244,7 +244,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):
-          return ForwardPagination(
+          return CursorBasedPagination.ForwardPagination(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor
           )
