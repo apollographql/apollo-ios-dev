@@ -39,6 +39,18 @@ final class ConcurrencyTests: XCTestCase {
     XCTAssertEqual(results.count, 2)
   }
 
+  func test_concurrentFetchesThrowsError() async throws {
+    let pager = createPager()
+    await fetchFirstPage(pager: pager)
+    do {
+      try await loadDataFromManyThreadsThrowing(pager: pager)
+      XCTFail()
+    } catch {
+      let paginationError = try XCTUnwrap(error as? PaginationError)
+      XCTAssertEqual(paginationError, PaginationError.loadInProgress)
+    }
+  }
+
   func test_concurrentFetches_nonisolated() throws {
     let pager = createNonisolatedPager()
     var results: [Result<(Query.Data, [Query.Data], UpdateSource), Error>] = []
@@ -66,6 +78,22 @@ final class ConcurrencyTests: XCTestCase {
     pager: GraphQLQueryPager<Query, Query>.Actor
   ) async {
     try? await withThrowingTaskGroup(of: Void.self) { group in
+      let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
+      group.addTask(priority: .userInitiated) { try await pager.loadMore() }
+      group.addTask { try await pager.loadMore() }
+      group.addTask { try await pager.loadMore() }
+      group.addTask { try await pager.loadMore() }
+      group.addTask { try await pager.loadMore() }
+
+      group.addTask { await self.fulfillment(of: [serverExpectation], timeout: 100) }
+      try await group.waitForAll()
+    }
+  }
+
+  private func loadDataFromManyThreadsThrowing(
+    pager: GraphQLQueryPager<Query, Query>.Actor
+  ) async throws {
+    try await withThrowingTaskGroup(of: Void.self) { group in
       let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
       group.addTask(priority: .userInitiated) { try await pager.loadMore() }
       group.addTask { try await pager.loadMore() }
