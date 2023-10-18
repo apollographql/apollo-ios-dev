@@ -26,11 +26,15 @@ final class ConcurrencyTests: XCTestCase {
   func test_concurrentFetches() async throws {
     let pager = createPager()
     var results: [Result<(Query.Data, [Query.Data], UpdateSource), Error>] = []
+    let resultsExpectation = expectation(description: "Results arrival")
+    resultsExpectation.expectedFulfillmentCount = 2
     await pager.subscribe { result in
       results.append(result)
+      resultsExpectation.fulfill()
     }.store(in: &cancellables)
     await fetchFirstPage(pager: pager)
     await loadDataFromManyThreads(pager: pager)
+    await fulfillment(of: [resultsExpectation], timeout: 1)
 
     XCTAssertEqual(results.count, 2)
   }
