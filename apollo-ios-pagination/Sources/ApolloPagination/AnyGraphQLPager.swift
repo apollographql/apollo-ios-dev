@@ -82,20 +82,12 @@ public class AnyGraphQLQueryPager<Model> {
     try pager.loadMore(cachePolicy: cachePolicy, completion: completion)
   }
 
-  public func loadMoreLegacy(
-    cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-    completion: (@MainActor () -> Void)? = nil
-  ) -> Bool {
-    do {
-      try loadMore(cachePolicy: cachePolicy, completion: completion)
-      return pager.canLoadNext()
-    } catch {
-      return false
-    }
+  public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
+    pager.refetch(cachePolicy: cachePolicy)
   }
 
-  public func refetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) {
-    pager.refetch(cachePolicy: cachePolicy)
+  public func fetch() {
+    pager.fetch()
   }
 
   public func cancel() {

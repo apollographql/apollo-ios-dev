@@ -22,6 +22,7 @@ public protocol PagerType {
     completion: (@MainActor () -> Void)?
   ) throws
   func refetch(cachePolicy: CachePolicy)
+  func fetch()
 }
 
 /// Handles pagination in the queue by managing multiple query watchers.
@@ -96,9 +97,15 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
-  public func refetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) {
+  public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
     Task {
       await pager.refetch(cachePolicy: cachePolicy)
+    }
+  }
+
+  public func fetch() {
+    Task {
+      await pager.fetch()
     }
   }
 }
@@ -234,9 +241,22 @@ extension GraphQLQueryPager {
 
     /// Reloads all data, starting at the first query, resetting pagination state.
     /// - Parameter cachePolicy: Preferred cache policy for first-page fetches. Defaults to `returnCacheDataAndFetch`
-    public func refetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) {
+    public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
       cancel()
-      fetch(cachePolicy: cachePolicy)
+      if firstPageWatcher == nil {
+          assertionFailure("To create consistent product behaviors, calling `fetch` before calling `refetch` will use cached data while still refreshing.")
+          self.firstPageWatcher = createInitialPageWatcher()
+      }
+      firstPageWatcher?.refetch(cachePolicy: cachePolicy)
+    }
+
+    /// Loads the first page of results, returning cached data initially, should it exist.
+    public func fetch() {
+        cancel()
+        if firstPageWatcher == nil {
+            self.firstPageWatcher = createInitialPageWatcher()
+        }
+        firstPageWatcher?.refetch(cachePolicy: .returnCacheDataAndFetch)
     }
 
     /// Cancel any in progress fetching operations and unsubscribe from the store.
@@ -261,21 +281,6 @@ extension GraphQLQueryPager {
     }
 
     // MARK: - Private
-
-    private func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) {
-      if firstPageWatcher == nil {
-        self.firstPageWatcher = GraphQLQueryWatcher(
-          client: client,
-          query: initialQuery,
-          resultHandler: { result in
-            Task {
-              self.onInitialFetch(result: result)
-            }
-          }
-        )
-      }
-      firstPageWatcher?.refetch(cachePolicy: cachePolicy)
-    }
 
     private func onInitialFetch(result: Result<GraphQLResult<InitialQuery.Data>, Error>) {
       switch result {
@@ -330,6 +335,29 @@ extension GraphQLQueryPager {
     private func onTaskCancellation() {
       activeTask?.cancel()
       activeTask = nil
+    }
+
+    /// Creates a watcher for the first page. Used for the initial load, and subsequent refreshes.
+    /// - Returns: A GraphQL watcher for the first page.
+    private func createInitialPageWatcher() -> GraphQLQueryWatcher<InitialQuery> {
+        GraphQLQueryWatcher(
+            client: client,
+            query: initialQuery,
+            resultHandler: { [weak self] result in
+                guard let self else { return }
+                switch result {
+                case .success(let data):
+                    self.initialPageResult = data.data
+                    guard let firstPageData = data.data else { return }
+                    if let latest = self.latest {
+                        let (_, nextPage) = latest
+                        self._subject.send(.success((firstPageData, nextPage, data.source == .cache ? .cache : .fetch)))
+                    }
+                case .failure(let error):
+                    self._subject.send(.failure(error))
+                }
+            }
+        )
     }
   }
 
