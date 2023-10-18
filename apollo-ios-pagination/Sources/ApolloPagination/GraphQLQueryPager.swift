@@ -244,19 +244,19 @@ extension GraphQLQueryPager {
     public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
       cancel()
       if firstPageWatcher == nil {
-          assertionFailure("To create consistent product behaviors, calling `fetch` before calling `refetch` will use cached data while still refreshing.")
-          self.firstPageWatcher = createInitialPageWatcher()
+        assertionFailure("To create consistent product behaviors, calling `fetch` before calling `refetch` will use cached data while still refreshing.")
+        self.firstPageWatcher = createInitialPageWatcher()
       }
       firstPageWatcher?.refetch(cachePolicy: cachePolicy)
     }
 
     /// Loads the first page of results, returning cached data initially, should it exist.
     public func fetch() {
-        cancel()
-        if firstPageWatcher == nil {
-            self.firstPageWatcher = createInitialPageWatcher()
-        }
-        firstPageWatcher?.refetch(cachePolicy: .returnCacheDataAndFetch)
+      cancel()
+      if firstPageWatcher == nil {
+        self.firstPageWatcher = createInitialPageWatcher()
+      }
+      firstPageWatcher?.refetch(cachePolicy: .returnCacheDataAndFetch)
     }
 
     /// Cancel any in progress fetching operations and unsubscribe from the store.
@@ -340,25 +340,15 @@ extension GraphQLQueryPager {
     /// Creates a watcher for the first page. Used for the initial load, and subsequent refreshes.
     /// - Returns: A GraphQL watcher for the first page.
     private func createInitialPageWatcher() -> GraphQLQueryWatcher<InitialQuery> {
-        GraphQLQueryWatcher(
-            client: client,
-            query: initialQuery,
-            resultHandler: { [weak self] result in
-                guard let self else { return }
-                switch result {
-                case .success(let data):
-                    self.initialPageResult = data.data
-                    guard let firstPageData = data.data else { return }
-                    if let latest = self.latest {
-                        let (_, nextPage) = latest
-                        self._subject.send(.success((firstPageData, nextPage, data.source == .cache ? .cache : .fetch)))
-                    }
-                case .failure(let error):
-                    self._subject.send(.failure(error))
-                }
-            }
-        )
+      GraphQLQueryWatcher(
+        client: client,
+        query: initialQuery,
+        resultHandler: { result in
+          Task {
+            self.onInitialFetch(result: result)
+          }
+        }
+      )
     }
   }
-
 }
