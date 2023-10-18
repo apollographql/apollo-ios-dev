@@ -59,7 +59,7 @@ final class ConcurrencyTests: XCTestCase {
   }
 
   private func loadDataFromManyThreads(
-    pager: GraphQLQueryPager<Query, Query>
+    pager: GraphQLQueryPager<Query, Query>.Actor
   ) async {
     try? await withThrowingTaskGroup(of: Void.self) { group in
       let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
@@ -75,7 +75,7 @@ final class ConcurrencyTests: XCTestCase {
   }
 
   private func loadDataFromManyThreads(
-    pager: GraphQLQueryPagerWrapper<Query, Query>
+    pager: GraphQLQueryPager<Query, Query>
   ) {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
 
@@ -87,7 +87,34 @@ final class ConcurrencyTests: XCTestCase {
 
   // MARK: - Test helpers
 
-  private func createPager() -> GraphQLQueryPager<Query, Query> {
+  private func createPager() -> GraphQLQueryPager<Query, Query>.Actor {
+    let initialQuery = Query()
+    initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
+    return GraphQLQueryPager<Query, Query>.Actor(
+      client: client,
+      initialQuery: initialQuery,
+      extractPageInfo: { data in
+        switch data {
+        case .initial(let data), .paginated(let data):
+          return CursorBasedPagination.ForwardPagination(
+            hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
+            endCursor: data.hero.friendsConnection.pageInfo.endCursor
+          )
+        }
+      },
+      nextPageResolver: { pageInfo in
+        let nextQuery = Query()
+        nextQuery.__variables = [
+          "id": "2001",
+          "first": 2,
+          "after": pageInfo.endCursor,
+        ]
+        return nextQuery
+      }
+    )
+  }
+
+  private func createNonisolatedPager() -> GraphQLQueryPager<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
     return GraphQLQueryPager<Query, Query>(
@@ -114,34 +141,7 @@ final class ConcurrencyTests: XCTestCase {
     )
   }
 
-  private func createNonisolatedPager() -> GraphQLQueryPagerWrapper<Query, Query> {
-    let initialQuery = Query()
-    initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return GraphQLQueryPagerWrapper<Query, Query>(
-      client: client,
-      initialQuery: initialQuery,
-      extractPageInfo: { data in
-        switch data {
-        case .initial(let data), .paginated(let data):
-          return CursorBasedPagination.ForwardPagination(
-            hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
-            endCursor: data.hero.friendsConnection.pageInfo.endCursor
-          )
-        }
-      },
-      nextPageResolver: { pageInfo in
-        let nextQuery = Query()
-        nextQuery.__variables = [
-          "id": "2001",
-          "first": 2,
-          "after": pageInfo.endCursor,
-        ]
-        return nextQuery
-      }
-    )
-  }
-
-  private func fetchFirstPage(pager: GraphQLQueryPager<Query, Query>) async {
+  private func fetchFirstPage(pager: GraphQLQueryPager<Query, Query>.Actor) async {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     await pager.refetch()
     await fulfillment(of: [serverExpectation], timeout: 1.0)

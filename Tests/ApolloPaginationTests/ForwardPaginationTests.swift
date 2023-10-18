@@ -93,7 +93,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     let nextPageExpectation = expectation(description: "Next Page")
     nextPageExpectation.expectedFulfillmentCount = 2
 
-    var results: [Result<GraphQLQueryPagerWrapper<Query, Query>.Output, Error>] = []
+    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
     var counter = 0
     await pager.subscribe { result in
       results.append(result)
@@ -235,16 +235,16 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     }
   }
 
-  private func createPager() -> GraphQLQueryPager<Query, Query> {
+  private func createPager() -> GraphQLQueryPager<Query, Query>.Actor {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return GraphQLQueryPager<Query, Query>(
+    return GraphQLQueryPager<Query, Query>.Actor(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):
-          return CursorBasedPagination.ForwardPagination(
+          return ForwardPagination(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor
           )

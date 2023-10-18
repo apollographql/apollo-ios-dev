@@ -91,16 +91,16 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
 
   // MARK: - Test helpers
 
-  private func createPager() -> GraphQLQueryPagerWrapper<Query, Query> {
+  private func createPager() -> GraphQLQueryPager<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return GraphQLQueryPagerWrapper<Query, Query>(
+    return GraphQLQueryPager<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):
-          return CursorBasedPagination.ForwardPagination(
+          return ForwardPagination(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor
           )
