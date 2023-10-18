@@ -3,13 +3,6 @@ import ApolloAPI
 import Combine
 import Foundation
 
-/// The result of either the initial query or the paginated query, for the purpose of extracting a `PageInfo` from it.
-public enum PageExtractionData<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery> {
-  // This class is outside of the scope of the `GraphQLQueryPager` such that it can be shared between it and the `Actor`.
-  case initial(InitialQuery.Data)
-  case paginated(PaginatedQuery.Data)
-}
-
 public protocol PagerType {
   associatedtype InitialQuery: GraphQLQuery
   associatedtype PaginatedQuery: GraphQLQuery
@@ -36,10 +29,17 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     case workaround
   }
 
+  /// The result of either the initial query or the paginated query, for the purpose of extracting a `PageInfo` from it.
+  public enum PageExtractionData {
+    // This class is outside of the scope of the `GraphQLQueryPager` such that it can be shared between it and the `Actor`.
+    case initial(InitialQuery.Data)
+    case paginated(PaginatedQuery.Data)
+  }
+
   public init<P: PaginationInfo>(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
-    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery>) -> P,
+    extractPageInfo: @escaping (PageExtractionData) -> P,
     nextPageResolver: @escaping (P) -> PaginatedQuery
   ) {
     pager = .init(
@@ -117,7 +117,7 @@ extension GraphQLQueryPager {
     private var nextPageWatchers: [GraphQLQueryWatcher<PaginatedQuery>] = []
     private let initialQuery: InitialQuery
     let nextPageResolver: (PaginationInfo) -> PaginatedQuery?
-    let extractPageInfo: (PageExtractionData<InitialQuery, PaginatedQuery>) -> PaginationInfo
+    let extractPageInfo: (PageExtractionData) -> PaginationInfo
     var currentPageInfo: PaginationInfo? {
       guard let last = pageOrder.last else {
         return initialPageResult.flatMap { extractPageInfo(.initial($0)) }
@@ -158,7 +158,7 @@ extension GraphQLQueryPager {
     public init<P: PaginationInfo>(
       client: ApolloClientProtocol,
       initialQuery: InitialQuery,
-      extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery>) -> P,
+      extractPageInfo: @escaping (PageExtractionData) -> P,
       nextPageResolver: @escaping (P) -> PaginatedQuery
     ) {
       self.client = client

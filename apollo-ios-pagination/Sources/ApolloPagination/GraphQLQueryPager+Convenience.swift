@@ -182,7 +182,7 @@ public extension GraphQLQueryPager {
 private func pageExtraction<InitialQuery: GraphQLQuery, NextQuery: GraphQLQuery, P: PaginationInfo>(
   initialTransfom: @escaping (InitialQuery.Data) -> P,
   paginatedTransform: @escaping (NextQuery.Data) -> P
-) -> (PageExtractionData<InitialQuery, NextQuery>) -> P {
+) -> (GraphQLQueryPager<InitialQuery, NextQuery>.PageExtractionData) -> P {
   { extractionData in
     switch extractionData {
     case .initial(let value):
@@ -195,7 +195,7 @@ private func pageExtraction<InitialQuery: GraphQLQuery, NextQuery: GraphQLQuery,
 
 private func pageExtraction<InitialQuery: GraphQLQuery, P: PaginationInfo>(
   transform: @escaping (InitialQuery.Data) -> P
-) -> (PageExtractionData<InitialQuery, InitialQuery>) -> P {
+) -> (GraphQLQueryPager<InitialQuery, InitialQuery>.PageExtractionData) -> P {
   { extractionData in
     switch extractionData {
     case .initial(let value), .paginated(let value):
