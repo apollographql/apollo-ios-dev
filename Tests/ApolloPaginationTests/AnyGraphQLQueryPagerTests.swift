@@ -120,7 +120,7 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
 
   private func fetchFirstPage<T>(pager: AnyGraphQLQueryPager<T>) {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-    pager.refetch()
+    pager.fetch()
     wait(for: [serverExpectation], timeout: 1.0)
   }
 

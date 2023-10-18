@@ -58,7 +58,7 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
 
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
-    await pager.refetch()
+    await pager.fetch()
     await fulfillment(of: [serverExpectation, initialFetchExpectation], timeout: 1.0)
     XCTAssertFalse(results.isEmpty)
     let result = try XCTUnwrap(results.first)

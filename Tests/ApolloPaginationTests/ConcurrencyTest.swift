@@ -48,7 +48,7 @@ final class ConcurrencyTests: XCTestCase {
       nextExpectation.fulfill()
     })
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-    pager.refetch()
+    pager.fetch()
     wait(for: [serverExpectation, initialExpectation], timeout: 1.0)
 
     XCTAssertEqual(results.count, 1)
@@ -143,7 +143,7 @@ final class ConcurrencyTests: XCTestCase {
 
   private func fetchFirstPage(pager: GraphQLQueryPager<Query, Query>.Actor) async {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-    await pager.refetch()
+    await pager.fetch()
     await fulfillment(of: [serverExpectation], timeout: 1.0)
   }
 }

@@ -115,7 +115,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         }
       }
       
-      watcher.refetch()
+      watcher.fetch()
       
       wait(for: [serverRequestExpectation, refetchedWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
     }

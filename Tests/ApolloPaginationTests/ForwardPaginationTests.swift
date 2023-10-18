@@ -46,7 +46,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
     var results: [Result<(Query.Data, [Query.Data], UpdateSource), Error>] = []
-    await pager.refetch()
+    await pager.fetch()
     await fulfillment(of: [serverExpectation], timeout: 1)
     var _result = await pager.currentValue
     var result = try XCTUnwrap(_result)
@@ -104,7 +104,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
 
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
-    await pager.refetch(cachePolicy: .fetchIgnoringCacheData)
+    await pager.fetch()
     await fulfillment(of: [serverExpectation, initialFetchExpectation])
     XCTAssertFalse(results.isEmpty)
     let result = try XCTUnwrap(results.first)
@@ -180,7 +180,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
 
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
-    await pager.refetch()
+    await pager.fetch()
     await fulfillment(of: [serverExpectation, initialFetchExpectation])
     XCTAssertFalse(results.isEmpty)
     let result = try XCTUnwrap(results.first)
