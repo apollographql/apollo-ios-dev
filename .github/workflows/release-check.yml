@@ -15,18 +15,18 @@ jobs:
     runs-on: macos-11
     name: Cache iOS 14.4
     steps:
-    - name: Sim Setup
-      shell: bash
-      run: |
-        sudo mkdir -p /Library/Developer/CoreSimulator/Profiles/Runtimes
-        sudo ln -s /Applications/Xcode_12.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime /Library/Developer/CoreSimulator/Profiles/Runtimes/iOS\ 14.4.simruntime
-        xcrun simctl list runtimes
-        xcrun simctl list devices
+    # - name: Sim Setup
+    #   shell: bash
+    #   run: |
+    #     sudo mkdir -p /Library/Developer/CoreSimulator/Profiles/Runtimes
+    #     sudo ln -s /Applications/Xcode_12.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime /Library/Developer/CoreSimulator/Profiles/Runtimes/iOS\ 14.4.simruntime
+    #     xcrun simctl list runtimes
+    #     xcrun simctl list devices
     - name: Cache Sim
       uses: actions/cache@v3
       with:
         path: |
-          /Library/Developer/CoreSimulator/Profiles/Runtimes
+          /Applications/Xcode_12.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime
         key: ios-14-4-sim
 
   tuist-generation:
@@ -208,12 +208,14 @@ jobs:
       uses: actions/cache@v3
       with:
         path: |
-          /Library/Developer/CoreSimulator/Profiles/Runtimes
+          /Applications/Xcode_12.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime
         key: ios-14-4-sim
         fail-on-cache-miss: true
     - name: Sim Logging
       shell: bash
       run: |
+        sudo mkdir -p /Library/Developer/CoreSimulator/Profiles/Runtimes
+        sudo ln -s /Applications/Xcode_12.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime /Library/Developer/CoreSimulator/Profiles/Runtimes/iOS\ 14.4.simruntime
         xcrun simctl list runtimes
         xcrun simctl list devices
     # - name: Reset SPM
