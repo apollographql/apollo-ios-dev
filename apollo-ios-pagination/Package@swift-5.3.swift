@@ -14,7 +14,10 @@ let package = Package(
     .library(name: "ApolloPagination", targets: ["ApolloPagination"]),
   ],
   dependencies: [
-    .package(name: "apollo-ios", path: "../apollo-ios")
+    .package(
+      url: "https://github.com/apollographql/apollo-ios.git",
+      branch: "ci-test")
+    )
   ],
   targets: [
     .target(
