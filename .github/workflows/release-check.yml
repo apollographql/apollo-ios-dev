@@ -11,6 +11,24 @@ env:
   XCODE_VERSION: "15.0.0"
 
 jobs:
+  cache-sim:
+    runs-on: macos-11
+    name: Cache iOS 14.4
+    steps:
+    - name: Sim Setup
+      shell: bash
+      run: |
+        sudo mkdir -p /Library/Developer/CoreSimulator/Profiles/Runtimes
+        sudo ln -s /Applications/Xcode_12.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime /Library/Developer/CoreSimulator/Profiles/Runtimes/iOS\ 14.4.simruntime
+        xcrun simctl list runtimes
+        xcrun simctl list devices
+    - name: Cache Sim
+      uses: actions/cache@v3
+      with:
+        path: |
+          /Library/Developer/CoreSimulator/Profiles/Runtimes
+        key: ios-14-4-sim
+
   tuist-generation:
     runs-on: macos-13
     timeout-minutes: 8
@@ -153,7 +171,7 @@ jobs:
   #         TestResults/ResultBundle.zip
 
   legacy-unit-test:
-    runs-on: macos-11
+    runs-on: macos-13
     needs: tuist-generation
     timeout-minutes: 20
     strategy:
@@ -185,13 +203,25 @@ jobs:
         fail-on-cache-miss: true
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: 12.4.0
-    - name: Reset SPM
+        xcode-version: 15.0.0
+    - name: Load Simulators
+      uses: actions/cache@v3
+      with:
+        path: |
+          /Library/Developer/CoreSimulator/Profiles/Runtimes
+        key: ios-14-4-sim
+        fail-on-cache-miss: true
+    - name: Sim Logging
       shell: bash
       run: |
-        (cd apollo-ios && swift package reset)
-        (cd apollo-ios-codegen && swift package reset)
-        rm -f ApolloDev.xcworkspace/xcshareddata/swiftpm/Package.resolved
+        xcrun simctl list runtimes
+        xcrun simctl list devices
+    # - name: Reset SPM
+    #   shell: bash
+    #   run: |
+    #     (cd apollo-ios && swift package reset)
+    #     (cd apollo-ios-codegen && swift package reset)
+    #     rm -f ApolloDev.xcworkspace/xcshareddata/swiftpm/Package.resolved
     - name: Build and Test
       uses: ./.github/actions/build-and-run-unit-tests
       with:
