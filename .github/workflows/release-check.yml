@@ -27,7 +27,7 @@ jobs:
       with:
         path: |
           /Applications/Xcode_12.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime
-        key: ios-14-4-sim
+        key: ios-14-4
 
   tuist-generation:
     runs-on: macos-13
@@ -172,7 +172,7 @@ jobs:
 
   legacy-unit-test:
     runs-on: macos-13
-    needs: tuist-generation
+    needs: [tuist-generation, cache-sim]
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -209,7 +209,7 @@ jobs:
       with:
         path: |
           /Applications/Xcode_12.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime
-        key: ios-14-4-sim
+        key: ios-14-4
         fail-on-cache-miss: true
     - name: Sim Logging
       shell: bash
