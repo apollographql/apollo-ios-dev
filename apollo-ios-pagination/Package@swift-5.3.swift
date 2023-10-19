@@ -16,7 +16,7 @@ let package = Package(
   dependencies: [
     .package(
       url: "https://github.com/apollographql/apollo-ios.git",
-      branch: "ci-test")
+      .branch("ci-test")
     )
   ],
   targets: [

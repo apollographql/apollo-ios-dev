@@ -16,4 +16,4 @@ runs:
   - name: Build and Test
     shell: bash
     run: |
-      xcodebuild clean test -resultBundlePath TestResults/ResultBundle.xcresult -derivedDataPath DerivedData -workspace "ApolloDev.xcworkspace" -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}" -testPlan "${{ inputs.test-plan }}"
+      xcodebuild clean -resolvePackageDependencies test -resultBundlePath TestResults/ResultBundle.xcresult -derivedDataPath DerivedData -workspace "ApolloDev.xcworkspace" -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}" -testPlan "${{ inputs.test-plan }}"
