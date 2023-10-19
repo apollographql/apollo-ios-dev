@@ -194,10 +194,10 @@ class RootFieldBuilder {
 
     switch (matchesScope, inlineFragment.deferCondition) {
     case (true, .some), (false, nil):
-      var deferCondition: DeferCondition? {
+      var deferCondition: CompilationResult.DeferCondition? {
         guard let condition = inlineFragment.deferCondition else { return nil }
 
-        return DeferCondition(condition)
+        return condition
       }
 
       let irTypeCase = buildInlineFragmentSpread(
@@ -240,10 +240,10 @@ class RootFieldBuilder {
 
     switch (matchesScope, fragmentSpread.deferCondition) {
     case (true, .some), (true, nil):
-      var deferCondition: DeferCondition? {
+      var deferCondition: CompilationResult.DeferCondition? {
         guard let condition = fragmentSpread.deferCondition else { return nil }
 
-        return DeferCondition(condition)
+        return condition
       }
 
       let irFragmentSpread = buildNamedFragmentSpread(
@@ -381,7 +381,7 @@ class RootFieldBuilder {
     from selectionSet: CompilationResult.SelectionSet?,
     with scopeCondition: ScopeCondition,
     inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo,
-    deferCondition: DeferCondition? = nil
+    deferCondition: CompilationResult.DeferCondition? = nil
   ) -> InlineFragmentSpread {
     let scope = ScopeCondition(
       type: scopeCondition.type,
@@ -438,7 +438,7 @@ class RootFieldBuilder {
     fromFragment fragmentSpread: CompilationResult.FragmentSpread,
     with scopeCondition: ScopeCondition,
     spreadIntoParentWithTypePath parentTypeInfo: SelectionSet.TypeInfo,
-    deferCondition: DeferCondition? = nil
+    deferCondition: CompilationResult.DeferCondition? = nil
   ) -> NamedFragmentSpread {
     let fragment = ir.build(fragment: fragmentSpread.fragment)
     referencedFragments.append(fragment)

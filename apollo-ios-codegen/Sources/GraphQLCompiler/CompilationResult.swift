@@ -404,7 +404,7 @@ public class CompilationResult: JavaScriptObject {
     }
   }
 
-  public struct DeferCondition {
+  public struct DeferCondition: Hashable, CustomDebugStringConvertible {
     /// String constants used to match JavaScriptObject instances.
     fileprivate enum Constants {
       enum ArgumentNames {
@@ -416,9 +416,18 @@ public class CompilationResult: JavaScriptObject {
     public let label: String
     public let variable: String?
 
-    init(label: String, variable: String? = nil) {
+    public init(label: String, variable: String? = nil) {
       self.label = label
       self.variable = variable
+    }
+
+    public var debugDescription: String {
+      var string = "Defer \"\(label)\""
+      if let variable {
+        string += " - if \"\(variable)\""
+      }
+
+      return string
     }
   }
 

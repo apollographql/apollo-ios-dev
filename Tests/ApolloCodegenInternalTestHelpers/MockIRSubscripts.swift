@@ -48,7 +48,7 @@ extension ScopeConditionalSubscriptAccessing {
 
   public subscript(
     as typeCase: String? = nil,
-    deferred deferCondition: IR.DeferCondition? = nil
+    deferred deferCondition: CompilationResult.DeferCondition? = nil
   ) -> IR.SelectionSet? {
     guard let scope = self.scopeCondition(
       type: typeCase,
@@ -64,7 +64,7 @@ extension ScopeConditionalSubscriptAccessing {
   private func scopeCondition(
     type typeCase: String?,
     conditions conditionsResult: IR.InclusionConditions.Result?,
-    deferCondition: DeferCondition? = nil
+    deferCondition: CompilationResult.DeferCondition? = nil
   ) -> IR.ScopeCondition? {
     let type: GraphQLCompositeType?
     if let typeCase = typeCase {
@@ -169,7 +169,7 @@ extension IR.SelectionSet: ScopeConditionalSubscriptAccessing {
     let scope = ScopeCondition(
       type: self.parentType,
       conditions: self.inclusionConditions,
-      deferCondition: DeferCondition(label: label, variable: variable)
+      deferCondition: CompilationResult.DeferCondition(label: label, variable: variable)
     )
     return selections[scope]
   }

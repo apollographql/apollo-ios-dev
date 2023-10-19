@@ -21,9 +21,13 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
 
     public var parentType: GraphQLCompositeType { scope.type }
 
-    public var inclusionConditions: InclusionConditions? { scope.scopePath.last.value.conditions }
+    public var inclusionConditions: InclusionConditions? {
+      scope.scopePath.last.value.conditions
+    }
 
-    public var deferCondition: DeferCondition? { scope.scopePath.last.value.deferCondition }
+    public var deferCondition: CompilationResult.DeferCondition? {
+      scope.scopePath.last.value.deferCondition
+    }
 
     /// Indicates if the `SelectionSet` represents a root selection set.
     /// If `true`, the `SelectionSet` belongs to a field directly.

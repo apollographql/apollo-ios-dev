@@ -9,12 +9,12 @@ import Utilities
 public struct ScopeCondition: Hashable, CustomDebugStringConvertible {
   public let type: GraphQLCompositeType?
   public let conditions: InclusionConditions?
-  public let deferCondition: DeferCondition?
+  public let deferCondition: CompilationResult.DeferCondition?
 
   init(
     type: GraphQLCompositeType? = nil,
     conditions: InclusionConditions? = nil,
-    deferCondition: DeferCondition? = nil
+    deferCondition: CompilationResult.DeferCondition? = nil
   ) {
     self.type = type
     self.conditions = conditions

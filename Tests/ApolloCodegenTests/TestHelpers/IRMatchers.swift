@@ -266,7 +266,7 @@ public enum ShallowSelectionMatcher {
     .shallowInlineFragment(ShallowInlineFragmentMatcher(
       parentType: parentType,
       inclusionConditions: nil,
-      deferCondition: IR.DeferCondition(label: label, variable: variable)
+      deferCondition: CompilationResult.DeferCondition(label: label, variable: variable)
     ))
   }
 
@@ -279,7 +279,7 @@ public enum ShallowSelectionMatcher {
       name: fragment.name,
       type: fragment.type,
       inclusionConditions: nil,
-      deferCondition: DeferCondition(label: label, variable: variable)
+      deferCondition: CompilationResult.DeferCondition(label: label, variable: variable)
     ))
   }
 }
@@ -379,12 +379,12 @@ fileprivate func shallowlyMatch(expected: ShallowFieldMatcher, actual: IR.Field)
 public struct ShallowInlineFragmentMatcher: Equatable, CustomDebugStringConvertible {
   let parentType: GraphQLCompositeType
   let inclusionConditions: IR.InclusionConditions?
-  let deferCondition: IR.DeferCondition?
+  let deferCondition: CompilationResult.DeferCondition?
 
   init(
     parentType: GraphQLCompositeType,
     inclusionConditions: [IR.InclusionCondition]?,
-    deferCondition: IR.DeferCondition?
+    deferCondition: CompilationResult.DeferCondition?
   ) {
     self.parentType = parentType
     self.deferCondition = deferCondition
@@ -399,7 +399,7 @@ public struct ShallowInlineFragmentMatcher: Equatable, CustomDebugStringConverti
   public static func mock(
     parentType: GraphQLCompositeType,
     inclusionConditions: [IR.InclusionCondition]? = nil,
-    deferCondition: IR.DeferCondition? = nil
+    deferCondition: CompilationResult.DeferCondition? = nil
   ) -> ShallowInlineFragmentMatcher {
     self.init(
       parentType: parentType,
@@ -464,13 +464,13 @@ public struct ShallowFragmentSpreadMatcher: Equatable, CustomDebugStringConverti
   let name: String
   let type: GraphQLCompositeType
   let inclusionConditions: AnyOf<IR.InclusionConditions>?
-  let deferCondition: IR.DeferCondition?
+  let deferCondition: CompilationResult.DeferCondition?
 
   init(
     name: String,
     type: GraphQLCompositeType,
     inclusionConditions: [IR.InclusionCondition]?,
-    deferCondition: IR.DeferCondition?
+    deferCondition: CompilationResult.DeferCondition?
   ) {
     self.name = name
     self.type = type
@@ -489,7 +489,7 @@ public struct ShallowFragmentSpreadMatcher: Equatable, CustomDebugStringConverti
     name: String,
     type: GraphQLCompositeType,
     inclusionConditions: AnyOf<IR.InclusionConditions>?,
-    deferCondition: IR.DeferCondition?
+    deferCondition: CompilationResult.DeferCondition?
   ) {
     self.name = name
     self.type = type
@@ -501,7 +501,7 @@ public struct ShallowFragmentSpreadMatcher: Equatable, CustomDebugStringConverti
     _ name: String,
     type: GraphQLCompositeType,
     inclusionConditions: AnyOf<IR.InclusionConditions>? = nil,
-    deferCondition: IR.DeferCondition? = nil
+    deferCondition: CompilationResult.DeferCondition? = nil
   ) -> ShallowFragmentSpreadMatcher {
     self.init(
       name: name,
@@ -514,7 +514,7 @@ public struct ShallowFragmentSpreadMatcher: Equatable, CustomDebugStringConverti
   public static func mock(
     _ fragment: CompilationResult.FragmentDefinition,
     inclusionConditions: AnyOf<IR.InclusionConditions>? = nil,
-    deferCondition: IR.DeferCondition? = nil
+    deferCondition: CompilationResult.DeferCondition? = nil
   ) -> ShallowFragmentSpreadMatcher {
     self.init(
       name: fragment.name,
