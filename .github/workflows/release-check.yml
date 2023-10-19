@@ -173,7 +173,7 @@ jobs:
   legacy-unit-test:
     runs-on: macos-13
     needs: [tuist-generation, cache-sim]
-    timeout-minutes: 20
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
