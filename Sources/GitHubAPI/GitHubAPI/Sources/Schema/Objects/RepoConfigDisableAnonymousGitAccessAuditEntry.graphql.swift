@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a repo.config.disable_anonymous_git_access event.
-  static let RepoConfigDisableAnonymousGitAccessAuditEntry = Object(
+  static let RepoConfigDisableAnonymousGitAccessAuditEntry = ApolloAPI.Object(
     typename: "RepoConfigDisableAnonymousGitAccessAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

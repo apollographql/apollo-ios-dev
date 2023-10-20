@@ -32,7 +32,8 @@ class TestMockUsageTests: XCTestCase {
                             owner: mockHuman,
                             predators: [mockCrocodile, mockBird],
                             skinCovering: .case(.fur),
-                            species: "Lab")
+                            species: "Lab",
+                            houseDetails: "Single Level Ranch")
 
     // then
     XCTAssertEqual(mockDog.birthdate, "Jan 10")
@@ -47,6 +48,7 @@ class TestMockUsageTests: XCTestCase {
     XCTAssertEqual(mockDog.predators?.count, 2)
     XCTAssertEqual(mockDog.skinCovering, .case(.fur))
     XCTAssertEqual(mockDog.species, "Lab")
+    XCTAssertEqual(mockDog.houseDetails, "Single Level Ranch")
   
   }
 

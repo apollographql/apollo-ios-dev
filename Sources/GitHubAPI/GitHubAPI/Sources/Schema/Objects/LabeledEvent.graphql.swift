@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'labeled' event on a given issue or pull request.
-  static let LabeledEvent = Object(
+  static let LabeledEvent = ApolloAPI.Object(
     typename: "LabeledEvent",
     implementedInterfaces: [Interfaces.Node.self]
   )

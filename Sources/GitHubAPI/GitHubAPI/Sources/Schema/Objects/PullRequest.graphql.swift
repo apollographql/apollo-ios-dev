@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A repository pull request.
-  static let PullRequest = Object(
+  static let PullRequest = ApolloAPI.Object(
     typename: "PullRequest",
     implementedInterfaces: [
       Interfaces.Assignable.self,

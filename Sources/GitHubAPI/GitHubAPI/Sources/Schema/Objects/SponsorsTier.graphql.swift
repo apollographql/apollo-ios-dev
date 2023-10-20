@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A GitHub Sponsors tier associated with a GitHub Sponsors listing.
-  static let SponsorsTier = Object(
+  static let SponsorsTier = ApolloAPI.Object(
     typename: "SponsorsTier",
     implementedInterfaces: [Interfaces.Node.self]
   )

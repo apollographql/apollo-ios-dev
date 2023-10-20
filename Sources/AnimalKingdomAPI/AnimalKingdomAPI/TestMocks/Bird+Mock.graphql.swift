@@ -5,7 +5,7 @@ import ApolloTestSupport
 import AnimalKingdomAPI
 
 public class Bird: MockObject {
-  public static let objectType: Object = AnimalKingdomAPI.Objects.Bird
+  public static let objectType: ApolloAPI.Object = AnimalKingdomAPI.Objects.Bird
   public static let _mockFields = MockFields()
   public typealias MockValueCollectionType = Array<Mock<Bird>>
 

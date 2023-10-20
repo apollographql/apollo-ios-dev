@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'base_ref_force_pushed' event on a given pull request.
-  static let BaseRefForcePushedEvent = Object(
+  static let BaseRefForcePushedEvent = ApolloAPI.Object(
     typename: "BaseRefForcePushedEvent",
     implementedInterfaces: [Interfaces.Node.self]
   )

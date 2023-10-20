@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A GitHub Sponsors listing.
-  static let SponsorsListing = Object(
+  static let SponsorsListing = ApolloAPI.Object(
     typename: "SponsorsListing",
     implementedInterfaces: [Interfaces.Node.self]
   )

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// An account for a user who is an admin of an enterprise or a member of an enterprise through one or more organizations.
-  static let EnterpriseUserAccount = Object(
+  static let EnterpriseUserAccount = ApolloAPI.Object(
     typename: "EnterpriseUserAccount",
     implementedInterfaces: [
       Interfaces.Actor.self,

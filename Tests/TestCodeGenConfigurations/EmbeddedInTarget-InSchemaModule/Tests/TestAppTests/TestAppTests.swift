@@ -16,6 +16,7 @@ final class TestAppTests: XCTestCase {
             "id": "1",
             "skinCovering": "Fur",
             "species": "Canine",
+            "houseDetails": "Single Level Ranch"
           ]
         ]
       ]])

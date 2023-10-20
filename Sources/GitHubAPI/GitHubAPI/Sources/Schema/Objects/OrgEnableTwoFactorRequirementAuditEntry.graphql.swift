@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a org.enable_two_factor_requirement event.
-  static let OrgEnableTwoFactorRequirementAuditEntry = Object(
+  static let OrgEnableTwoFactorRequirementAuditEntry = ApolloAPI.Object(
     typename: "OrgEnableTwoFactorRequirementAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

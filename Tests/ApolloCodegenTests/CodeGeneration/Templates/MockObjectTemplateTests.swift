@@ -59,7 +59,7 @@ class MockObjectTemplateTests: XCTestCase {
 
     let expected = """
     public class Dog: MockObject {
-      public static let objectType: Object = TestSchema.Objects.Dog
+      public static let objectType: ApolloAPI.Object = TestSchema.Objects.Dog
       public static let _mockFields = MockFields()
       public typealias MockValueCollectionType = Array<Mock<Dog>>
 
@@ -84,7 +84,7 @@ class MockObjectTemplateTests: XCTestCase {
 
     let expected = """
     public class Dog: MockObject {
-      public static let objectType: Object = TestSchema.Objects.Dog
+      public static let objectType: ApolloAPI.Object = TestSchema.Objects.Dog
       public static let _mockFields = MockFields()
       public typealias MockValueCollectionType = Array<Mock<Dog>>
 
@@ -106,7 +106,7 @@ class MockObjectTemplateTests: XCTestCase {
     buildSubject(schemaNamespace: "lowercased")
 
     let expected = """
-      public static let objectType: Object = Lowercased.Objects.Dog
+      public static let objectType: ApolloAPI.Object = Lowercased.Objects.Dog
     """
 
     // when
@@ -121,7 +121,7 @@ class MockObjectTemplateTests: XCTestCase {
     buildSubject(schemaNamespace: "UPPER")
 
     let expected = """
-      public static let objectType: Object = UPPER.Objects.Dog
+      public static let objectType: ApolloAPI.Object = UPPER.Objects.Dog
     """
 
     // when
@@ -136,7 +136,7 @@ class MockObjectTemplateTests: XCTestCase {
     buildSubject(schemaNamespace: "MySchema")
 
     let expected = """
-      public static let objectType: Object = MySchema.Objects.Dog
+      public static let objectType: ApolloAPI.Object = MySchema.Objects.Dog
     """
 
     // when
@@ -826,7 +826,7 @@ class MockObjectTemplateTests: XCTestCase {
 
     let expectedClassDefinition = """
     public class Dog: MockObject {
-      public static let objectType: Object = TestSchema.Objects.Dog
+      public static let objectType: ApolloAPI.Object = TestSchema.Objects.Dog
       public static let _mockFields = MockFields()
       public typealias MockValueCollectionType = Array<Mock<Dog>>
 
@@ -862,7 +862,7 @@ class MockObjectTemplateTests: XCTestCase {
 
     let expectedClassDefinition = """
     public class Dog: MockObject {
-      public static let objectType: Object = TestSchema.Objects.Dog
+      public static let objectType: ApolloAPI.Object = TestSchema.Objects.Dog
       public static let _mockFields = MockFields()
       public typealias MockValueCollectionType = Array<Mock<Dog>>
 
@@ -898,7 +898,7 @@ class MockObjectTemplateTests: XCTestCase {
 
     let expectedClassDefinition = """
     class Dog: MockObject {
-      static let objectType: Object = TestSchema.Objects.Dog
+      static let objectType: ApolloAPI.Object = TestSchema.Objects.Dog
       static let _mockFields = MockFields()
       typealias MockValueCollectionType = Array<Mock<Dog>>
 
@@ -997,7 +997,7 @@ class MockObjectTemplateTests: XCTestCase {
 
       let expected = """
       public class \(keyword.firstUppercased)_Object: MockObject {
-        public static let objectType: Object = TestSchema.Objects.\(keyword.firstUppercased)_Object
+        public static let objectType: ApolloAPI.Object = TestSchema.Objects.\(keyword.firstUppercased)_Object
         public static let _mockFields = MockFields()
         public typealias MockValueCollectionType = Array<Mock<\(keyword.firstUppercased)_Object>>
 

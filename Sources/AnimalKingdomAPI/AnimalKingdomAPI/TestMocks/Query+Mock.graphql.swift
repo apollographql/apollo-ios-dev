@@ -5,7 +5,7 @@ import ApolloTestSupport
 import AnimalKingdomAPI
 
 public class Query: MockObject {
-  public static let objectType: Object = AnimalKingdomAPI.Objects.Query
+  public static let objectType: ApolloAPI.Object = AnimalKingdomAPI.Objects.Query
   public static let _mockFields = MockFields()
   public typealias MockValueCollectionType = Array<Mock<Query>>
 

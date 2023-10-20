@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'marked_as_duplicate' event on a given issue or pull request.
-  static let MarkedAsDuplicateEvent = Object(
+  static let MarkedAsDuplicateEvent = ApolloAPI.Object(
     typename: "MarkedAsDuplicateEvent",
     implementedInterfaces: [Interfaces.Node.self]
   )

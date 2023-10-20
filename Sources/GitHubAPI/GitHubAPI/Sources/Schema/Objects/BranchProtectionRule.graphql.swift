@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A branch protection rule.
-  static let BranchProtectionRule = Object(
+  static let BranchProtectionRule = ApolloAPI.Object(
     typename: "BranchProtectionRule",
     implementedInterfaces: [Interfaces.Node.self]
   )

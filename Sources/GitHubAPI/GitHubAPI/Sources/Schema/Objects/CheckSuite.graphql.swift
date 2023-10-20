@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A check suite.
-  static let CheckSuite = Object(
+  static let CheckSuite = ApolloAPI.Object(
     typename: "CheckSuite",
     implementedInterfaces: [Interfaces.Node.self]
   )
