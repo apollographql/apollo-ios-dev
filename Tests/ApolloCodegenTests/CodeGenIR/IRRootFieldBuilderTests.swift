@@ -5500,7 +5500,6 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_AsDog = allAnimals?[as: "Dog"]
-    let allAnimals_AsDog_DogFragment = allAnimals_AsDog?[fragment: "DogFragment"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5520,15 +5519,12 @@ class IRRootFieldBuilderTests: XCTestCase {
         ],
         mergedSelections: [
           .field("id", type: .string()),
-          .field("species", type: .string()), // wrong
         ],
         mergedSources: [
           try .mock(allAnimals),
-          try .mock(allAnimals_AsDog_DogFragment), // wrong
         ]
       )
     ))
-    #warning("fix these 'wrong' merges")
   }
 
   func test__deferredFragments__givenDeferredNamedFragmentWithVariableCondition_buildsDeferredNamedFragmentWithVariable() throws {
@@ -5573,7 +5569,6 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_AsDog = allAnimals?[as: "Dog"]
-    let allAnimals_AsDog_DogFragment = allAnimals_AsDog?[fragment: "DogFragment"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5593,15 +5588,12 @@ class IRRootFieldBuilderTests: XCTestCase {
         ],
         mergedSelections: [
           .field("id", type: .string()),
-          .field("species", type: .string()), // wrong
         ],
         mergedSources: [
           try .mock(allAnimals),
-          try .mock(allAnimals_AsDog_DogFragment), // wrong
         ]
       )
     ))
-    #warning("fix these 'wrong' merges")
   }
 
   func test__deferredFragments__givenDeferredNamedFragmentWithTrueCondition_buildsDeferredNamedFragment() throws {
@@ -5646,7 +5638,6 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_AsDog = allAnimals?[as: "Dog"]
-    let allAnimals_AsDog_DogFragment = allAnimals_AsDog?[fragment: "DogFragment"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5666,15 +5657,12 @@ class IRRootFieldBuilderTests: XCTestCase {
         ],
         mergedSelections: [
           .field("id", type: .string()),
-          .field("species", type: .string()), // wrong
         ],
         mergedSources: [
           try .mock(allAnimals),
-          try .mock(allAnimals_AsDog_DogFragment), // wrong
         ]
       )
     ))
-    #warning("fix these 'wrong' merges")
   }
 
   func test__deferredFragments__givenDeferredNamedFragmentWithFalseCondition_doesNotBuildDeferredNamedFragment() throws {

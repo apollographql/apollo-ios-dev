@@ -255,8 +255,11 @@ class EntitySelectionTree {
 
     fileprivate func scopeConditionNode(for condition: ScopeCondition) -> EntityNode {
       let nodeCondition = ScopeCondition(
-        type: condition.type == self.type ? nil : condition.type,
-        conditions: condition.conditions
+        type: (condition.type == self.type && condition.deferCondition == nil) 
+          ? nil 
+          : condition.type,
+        conditions: condition.conditions,
+        deferCondition: condition.deferCondition
       )
 
       func createNode() -> EntityNode {
