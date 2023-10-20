@@ -26,7 +26,7 @@ class TestMockUsageTests: XCTestCase {
                             bodyTemperature: 70,
                             favoriteToy: "Ball",
                             height: mockHeight,
-                            houseDetails: "Single Level Ranch"
+                            houseDetails: "Single Level Ranch",
                             humanName: "Lucky",
                             id: "Dog",
                             laysEggs: false,
