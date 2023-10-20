@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		665BDA882AE30E9D004DD21F /* Object.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665BDA872AE30E9D004DD21F /* Object.swift */; };
 		DE454BCC28B43262009DC80E /* CustomTargetProject.h in Headers */ = {isa = PBXBuildFile; fileRef = DE454BCB28B43262009DC80E /* CustomTargetProject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E6BACC1C29FC909F008B46F2 /* AnimalKingdomAPI.h in Headers */ = {isa = PBXBuildFile; fileRef = E6BACC1B29FC909F008B46F2 /* AnimalKingdomAPI.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E6BACC2129FC90CC008B46F2 /* ApolloAPI in Frameworks */ = {isa = PBXBuildFile; productRef = E6BACC2029FC90CC008B46F2 /* ApolloAPI */; };
@@ -104,6 +105,7 @@
 
 /* Begin PBXFileReference section */
 		663EB6712A58B3C300A63215 /* apollo-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "apollo-ios"; path = "../../../apollo-ios"; sourceTree = "<group>"; };
+		665BDA872AE30E9D004DD21F /* Object.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Object.swift; sourceTree = "<group>"; };
 		DE454BC928B43262009DC80E /* CustomTargetProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CustomTargetProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE454BCB28B43262009DC80E /* CustomTargetProject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomTargetProject.h; sourceTree = "<group>"; };
 		E6BACC1329FC8C8B008B46F2 /* apollo-codegen-config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "apollo-codegen-config.json"; sourceTree = "<group>"; };
@@ -290,6 +292,7 @@
 		E6BACC2929FC9468008B46F2 /* CustomScalars */ = {
 			isa = PBXGroup;
 			children = (
+				665BDA872AE30E9D004DD21F /* Object.swift */,
 				E6BACC2A29FC9468008B46F2 /* CustomDate.swift */,
 			);
 			path = CustomScalars;
@@ -587,6 +590,7 @@
 				E6BACC5C29FC9468008B46F2 /* SkinCovering.graphql.swift in Sources */,
 				E6BACC6D29FC9468008B46F2 /* SchemaMetadata.graphql.swift in Sources */,
 				E6BACC6A29FC9468008B46F2 /* PetAdoptionInput.graphql.swift in Sources */,
+				665BDA882AE30E9D004DD21F /* Object.swift in Sources */,
 				E6BACC6629FC9468008B46F2 /* Fish.graphql.swift in Sources */,
 				E6BACC7829FC9468008B46F2 /* PetAdoptionMutation.graphql.swift in Sources */,
 				E6BACC7329FC9468008B46F2 /* HeightInMeters.graphql.swift in Sources */,
