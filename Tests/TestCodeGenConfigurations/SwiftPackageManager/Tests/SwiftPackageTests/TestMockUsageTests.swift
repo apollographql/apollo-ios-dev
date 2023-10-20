@@ -26,14 +26,14 @@ class TestMockUsageTests: XCTestCase {
                             bodyTemperature: 70,
                             favoriteToy: "Ball",
                             height: mockHeight,
+                            houseDetails: "Single Level Ranch"
                             humanName: "Lucky",
                             id: "Dog",
                             laysEggs: false,
                             owner: mockHuman,
                             predators: [mockCrocodile, mockBird],
                             skinCovering: .case(.fur),
-                            species: "Lab",
-                            houseDetails: "Single Level Ranch")
+                            species: "Lab")
 
     // then
     XCTAssertEqual(mockDog.birthdate, "Jan 10")
