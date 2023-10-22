@@ -30,6 +30,8 @@ public struct ScopeCondition: Hashable, CustomDebugStringConvertible {
   var isEmpty: Bool {
     type == nil && (conditions?.isEmpty ?? true) && deferCondition == nil
   }
+
+  var isDeferred: Bool { deferCondition != nil }
 }
 
 public typealias TypeScope = OrderedSet<GraphQLCompositeType>
