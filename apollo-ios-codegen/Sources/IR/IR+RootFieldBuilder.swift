@@ -452,7 +452,7 @@ class RootFieldBuilder {
 
     self.containsDeferredFragment = fragment.containsDeferredFragment || scope.deferCondition != nil
 
-    let scopePath = scopeCondition.isEmpty ?
+    let scopePath = scope.isEmpty ?
     parentTypeInfo.scopePath :
     parentTypeInfo.scopePath.mutatingLast {
       $0.appending(scope)

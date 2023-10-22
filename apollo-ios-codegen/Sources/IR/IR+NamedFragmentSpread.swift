@@ -51,6 +51,9 @@ public class NamedFragmentSpread: Hashable, CustomDebugStringConvertible {
     if let inclusionConditions = inclusionConditions {
       description += " \(inclusionConditions.debugDescription)"
     }
+    if let deferCondition = typeInfo.deferCondition {
+      description += " \(deferCondition.debugDescription)"
+    }
 
     return description
   }

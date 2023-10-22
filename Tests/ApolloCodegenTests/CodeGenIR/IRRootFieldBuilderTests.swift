@@ -5458,7 +5458,55 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
   // MARK: Deferred Fragments - Named Fragments
 
-  func test__deferredFragments__givenDeferredNamedFragment_buildsDeferredNamedFragment() throws {
+  func test__deferredFragments__givenDeferredNamedFragmentOnSameTypeCase_buildsDeferredNamedFragment() throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String
+        species: String
+      }
+      """
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...AnimalFragment @defer(label: "root")
+        }
+      }
+
+      fragment AnimalFragment on Animal {
+        species
+      }
+      """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
+    let Fragment_AnimalFragment = try XCTUnwrap(ir.compilationResult[fragment: "AnimalFragment"])
+
+    let allAnimals = self.subject[field: "allAnimals"]
+    let allAnimals_AnimalFragment = allAnimals?[fragment: "AnimalFragment"]
+
+    expect(allAnimals?.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("id", type: .string()),
+          .deferred(Fragment_AnimalFragment, label: "root"),
+        ]
+      )
+    ))
+  }
+
+  func test__deferredFragments__givenDeferredNamedFragmentOnDifferentTypeCase_buildsDeferredNamedFragment() throws {
     // given
     schemaSDL = """
       type Query {
