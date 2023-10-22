@@ -211,6 +211,10 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
     return false
   }
 
+  public func matches(_ otherDeferCondition: CompilationResult.DeferCondition) -> Bool {
+    otherDeferCondition == self.scopePath.last.value.deferCondition
+  }
+
   /// Indicates if the receiver is of the given type. If the receiver matches a given type,
   /// then selections for a `SelectionSet` of that type can be merged in to the receiver's
   /// `SelectionSet`.
@@ -220,6 +224,10 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
     }
 
     if let inclusionConditions = condition.conditions, !self.matches(inclusionConditions) {
+      return false
+    }
+
+    if let deferConditions = condition.deferCondition, !self.matches(deferConditions) {
       return false
     }
 
