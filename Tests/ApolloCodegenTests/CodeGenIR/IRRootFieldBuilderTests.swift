@@ -4763,7 +4763,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_AsDog = allAnimals?[as: "Dog"]
-    let allAnimals_AsDog_Deferred = allAnimals_AsDog?[deferredAs: "root"]
+    let allAnimals_AsDog_DeferredAsRoot = allAnimals_AsDog?[deferredAs: "root"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -4790,7 +4790,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_AsDog_Deferred).to(shallowlyMatch(
+    expect(allAnimals_AsDog_DeferredAsRoot).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
@@ -4849,7 +4849,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_AsDog = allAnimals?[as: "Dog"]
-    let allAnimals_AsDog_Deferred = allAnimals_AsDog?[deferredAs: "root", withVariable: "a"]
+    let allAnimals_AsDog_DeferredAsRoot = allAnimals_AsDog?[deferredAs: "root", withVariable: "a"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -4876,7 +4876,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_AsDog_Deferred).to(shallowlyMatch(
+    expect(allAnimals_AsDog_DeferredAsRoot).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
@@ -4935,7 +4935,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_AsDog = allAnimals?[as: "Dog"]
-    let allAnimals_AsDog_Deferred = allAnimals_AsDog?[deferredAs: "root"]
+    let allAnimals_AsDog_DeferredAsRoot = allAnimals_AsDog?[deferredAs: "root"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -4962,7 +4962,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_AsDog_Deferred).to(shallowlyMatch(
+    expect(allAnimals_AsDog_DeferredAsRoot).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
@@ -5021,7 +5021,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_AsDog = allAnimals?[as: "Dog"]
-    let allAnimals_AsDog_Deferred = allAnimals_AsDog?[deferredAs: "root"]
+    let allAnimals_AsDog_DeferredAsRoot = allAnimals_AsDog?[deferredAs: "root"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5048,7 +5048,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_AsDog_Deferred).to(beNil())
+    expect(allAnimals_AsDog_DeferredAsRoot).to(beNil())
   }
 
   func test__deferredFragments__givenSiblingDeferredInlineFragmentsOnSameTypeCase_doesNotMergeDeferredFragments() throws {
@@ -5097,8 +5097,8 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_AsDog = allAnimals?[as: "Dog"]
-    let allAnimals_AsDog_Deferred_AsOne = allAnimals_AsDog?[deferredAs: "one"]
-    let allAnimals_AsDog_Deferred_AsTwo = allAnimals_AsDog?[deferredAs: "two"]
+    let allAnimals_AsDog_DeferredAsOne = allAnimals_AsDog?[deferredAs: "one"]
+    let allAnimals_AsDog_DeferredAsTwo = allAnimals_AsDog?[deferredAs: "two"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5126,7 +5126,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_AsDog_Deferred_AsOne).to(shallowlyMatch(
+    expect(allAnimals_AsDog_DeferredAsOne).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
@@ -5141,7 +5141,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_AsDog_Deferred_AsTwo).to(shallowlyMatch(
+    expect(allAnimals_AsDog_DeferredAsTwo).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
@@ -5202,8 +5202,8 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_AsBird = allAnimals?[as: "Bird"]
     let allAnimals_AsCat = allAnimals?[as: "Cat"]
-    let allAnimals_AsBird_Deferred_AsBird = allAnimals_AsBird?[deferredAs: "bird"]
-    let allAnimals_AsCat_Deferred_AsCat = allAnimals_AsCat?[deferredAs: "cat"]
+    let allAnimals_AsBird_DeferredAsBird = allAnimals_AsBird?[deferredAs: "bird"]
+    let allAnimals_AsCat_DeferredAsCat = allAnimals_AsCat?[deferredAs: "cat"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5233,7 +5233,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_AsBird_Deferred_AsBird).to(shallowlyMatch(
+    expect(allAnimals_AsBird_DeferredAsBird).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Bird,
         directSelections: [
@@ -5242,7 +5242,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_AsCat_Deferred_AsCat).to(shallowlyMatch(
+    expect(allAnimals_AsCat_DeferredAsCat).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Cat,
         directSelections: [
@@ -5295,7 +5295,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_AsDog = allAnimals?[as: "Dog"]
-    let allAnimals_AsDog_Deferred_AsRoot = allAnimals_AsDog?[deferredAs: "root"]
+    let allAnimals_AsDog_DeferredAsRoot = allAnimals_AsDog?[deferredAs: "root"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5323,7 +5323,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_AsDog_Deferred_AsRoot).to(shallowlyMatch(
+    expect(allAnimals_AsDog_DeferredAsRoot).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
@@ -5393,7 +5393,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_AsPet = allAnimals?[as: "Pet"]
     let allAnimals_AsDog = allAnimals?[as: "Dog"]
-    let allAnimals_AsDog_Deferred_AsRoot = allAnimals_AsDog?[deferredAs: "root"]
+    let allAnimals_AsDog_DeferredAsRoot = allAnimals_AsDog?[deferredAs: "root"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5436,7 +5436,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_AsDog_Deferred_AsRoot).to(shallowlyMatch(
+    expect(allAnimals_AsDog_DeferredAsRoot).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
@@ -5823,7 +5823,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_AsDog = allAnimals?[as: "Dog"]
     let allAnimals_DogFragment = ir.builtFragments["DogFragment"]
-    let allAnimals_DogFragment_AsDog_Deferred = allAnimals_DogFragment?[as: "Dog", deferred: .init(label: "root")]
+    let allAnimals_DogFragment_AsDog_DeferredAsRoot = allAnimals_DogFragment?[as: "Dog", deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5859,7 +5859,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_DogFragment_AsDog_Deferred).to(shallowlyMatch(
+    expect(allAnimals_DogFragment_AsDog_DeferredAsRoot).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
@@ -5913,7 +5913,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_DogFragment = ir.builtFragments["DogFragment"]
     let allAnimals_DogFragment_AsDog = allAnimals_DogFragment?[as: "Dog"]
-    let allAnimals_DogFragment_AsDog_Deferred = allAnimals_DogFragment_AsDog?[as: "Dog", deferred: .init(label: "root")]
+    let allAnimals_DogFragment_AsDog_DeferredAsRoot = allAnimals_DogFragment_AsDog?[as: "Dog", deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5934,7 +5934,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_DogFragment_AsDog_Deferred).to(shallowlyMatch(
+    expect(allAnimals_DogFragment_AsDog_DeferredAsRoot).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
