@@ -4686,11 +4686,6 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String!
       species: String!
     }
-
-    type Dog implements Animal {
-      id: String!
-      species: String!
-    }
     """
 
     document = """
@@ -5828,7 +5823,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_AsDog = allAnimals?[as: "Dog"]
     let allAnimals_DogFragment = ir.builtFragments["DogFragment"]
-    let allAnimals_DogFragment_AsDog = allAnimals_DogFragment?[as: "Dog", deferred: .init(label: "root")]
+    let allAnimals_DogFragment_AsDog_Deferred = allAnimals_DogFragment?[as: "Dog", deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5864,7 +5859,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_DogFragment_AsDog).to(shallowlyMatch(
+    expect(allAnimals_DogFragment_AsDog_Deferred).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
