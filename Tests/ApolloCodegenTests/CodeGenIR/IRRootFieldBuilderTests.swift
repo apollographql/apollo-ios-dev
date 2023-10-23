@@ -5451,6 +5451,124 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
   }
+
+  func test__deferredFragments__givenNestedDeferredInlineFragments_buildsNestedDeferredFragments_doesNotMergeDeferredFragments() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+      friend: Animal
+    }
+
+    type Cat implements Animal {
+      id: String
+      species: String
+      genus: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "outer") {
+          friend {
+            ... on Cat @defer(label: "inner") {
+              species
+            }
+          }
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
+    let Object_Dog = try XCTUnwrap(schema[object: "Dog"])
+    let Object_Cat = try XCTUnwrap(schema[object: "Cat"])
+
+    let allAnimals = self.subject[field: "allAnimals"]
+    let allAnimals_AsDog = allAnimals?[as: "Dog"]
+    let allAnimals_AsDog_DeferredAsOuter = allAnimals_AsDog?[deferredAs: "outer"]
+    let allAnimals_AsDog_DeferredAsOuter_AsCat = allAnimals_AsDog_DeferredAsOuter?[field: "friend"]?[as: "Cat"]
+    let allAnimals_AsDog_DeferredAsOuter_AsCat_DeferredAsInner = allAnimals_AsDog_DeferredAsOuter_AsCat?[deferredAs: "inner"]
+
+    expect(allAnimals?.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("id", type: .string()),
+          .inlineFragment(parentType: Object_Dog),
+        ]
+      )
+    ))
+
+    expect(allAnimals_AsDog).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Dog,
+        directSelections: [
+          .deferred(Object_Dog, label: "outer"),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+    ))
+
+    expect(allAnimals_AsDog_DeferredAsOuter).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Dog,
+        directSelections: [
+          .field("friend", type: .entity(Interface_Animal)),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+    ))
+
+    expect(allAnimals_AsDog_DeferredAsOuter_AsCat).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Cat,
+        directSelections: [
+          .deferred(Object_Cat, label: "inner"),
+        ]
+      )
+    ))
+
+    expect(allAnimals_AsDog_DeferredAsOuter_AsCat_DeferredAsInner).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Cat,
+        directSelections: [
+          .field("species", type: .string()),
+        ]
+      )
+    ))
+  }
+
+  #warning("Need tests here with @include and @skip")
+
   // MARK: Deferred Fragments - Named Fragments
 
   func test__deferredFragments__givenDeferredNamedFragmentOnSameTypeCase_buildsDeferredNamedFragment() throws {
@@ -5943,5 +6061,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
   }
+
+  #warning("Need tests here with @include and @skip")
 
 }
