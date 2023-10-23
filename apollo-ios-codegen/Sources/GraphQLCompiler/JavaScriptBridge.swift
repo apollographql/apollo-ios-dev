@@ -188,6 +188,10 @@ extension JavaScriptObject: CustomDebugStringConvertible {
 /// The JavaScript bridge is responsible for converting values to and from type-safe wrapper objects. It also ensures exceptions thrown from JavaScript wrapped and rethrown.
 actor JavaScriptBridge {
 
+  nonisolated var unownedExecutor: UnownedSerialExecutor {
+    MainActor.sharedUnownedExecutor
+  }
+
   public enum Error: Swift.Error {
     case failedToCreateJSContext
     case unrecognizedJavaScriptErrorThrown(JSValue)
