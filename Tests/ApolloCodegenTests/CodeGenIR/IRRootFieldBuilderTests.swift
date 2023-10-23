@@ -5567,7 +5567,515 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  #warning("Need tests here with @include and @skip")
+  // MARK: Deferred Fragments - Inline Fragments (with @include/@skip)
+
+  func test__deferredFragments__givenDeferredInlineFragment_withIncludeDirective_buildsInclusionTypeCaseWithNestedDeferredInlineFragment() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+    }
+    """
+
+    document = """
+    query TestOperation($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @include(if: $a) @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
+
+    let allAnimals = self.subject[field: "allAnimals"]
+    let allAnimals_ifA = allAnimals?[as: "Animal", if: "a"]
+
+    expect(allAnimals?.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("id", type: .string()),
+          .inlineFragment(parentType: Interface_Animal, inclusionConditions: [.include(if: "a")]),
+        ]
+      )
+    ))
+
+    expect(allAnimals_ifA).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        inclusionConditions: [.include(if: "a")],
+        directSelections: [
+          .deferred(Interface_Animal, label: "root"),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+    ))
+  }
+
+  func test__deferredFragments__givenBothDeferAndIncludeDirectives_directivesOrderShouldNotAffectGeneratedFragments() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+    }
+    """
+
+    document = """
+    query IncludeFirst($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @include(if: $a) @defer(label: "root") {
+          species
+        }
+      }
+    }
+
+    query DeferFirst($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @defer(label: "root") @include(if: $a) {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    let operations = ["IncludeFirst", "DeferFirst"]
+
+    ir = try .mock(schema: schemaSDL, document: document)
+
+    for operationName in operations {
+      operation = try XCTUnwrap(ir.compilationResult.operations.first(
+        where: { $0.name == operationName }
+      ))
+
+      result = IR.RootFieldBuilder.buildRootEntityField(
+        forRootField: .mock(
+          "query",
+          type: .nonNull(.entity(operation.rootType)),
+          selectionSet: operation.selectionSet
+        ),
+        onRootEntity: IR.Entity(source: .operation(operation)),
+        inIR: ir
+      )
+
+      // then
+      let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
+
+      let allAnimals = self.subject[field: "allAnimals"]
+      let allAnimals_ifA = allAnimals?[as: "Animal", if: "a"]
+
+      let expectedInclusion = SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("id", type: .string()),
+          .inlineFragment(parentType: Interface_Animal, inclusionConditions: [.include(if: "a")]),
+        ]
+      )
+
+      let expectedDefer = SelectionSetMatcher(
+        parentType: Interface_Animal,
+        inclusionConditions: [.include(if: "a")],
+        directSelections: [
+          .deferred(Interface_Animal, label: "root"),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+
+      expect(allAnimals?.selectionSet).to(shallowlyMatch(expectedInclusion))
+      expect(allAnimals_ifA).to(shallowlyMatch(expectedDefer))
+    }
+  }
+
+  func test__deferredFragments__givenBothDeferAndIncludeDirectives_onDifferentTypeCases_shouldNotNestFragments() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+    }
+    """
+
+    document = """
+    query TestOperation($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @include(if: $a) {
+          species
+        }
+        ... on Dog @defer(label: "root") {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
+    let Object_Dog = try XCTUnwrap(schema[object: "Dog"])
+
+    let allAnimals = self.subject[field: "allAnimals"]
+    let allAnimals_ifA = allAnimals?[if: "a"]
+    let allAnimals_asDog = allAnimals?[as: "Dog"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals?[as: "Dog"]?[deferredAs: "root"]
+
+    expect(allAnimals?.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("id", type: .string()),
+          .inlineFragment(parentType: Interface_Animal, inclusionConditions: [.include(if: "a")]),
+          .inlineFragment(parentType: Object_Dog)
+        ]
+      )
+    ))
+
+    expect(allAnimals_ifA).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        inclusionConditions: [.include(if: "a")],
+        directSelections: [
+          .field("species", type: .string()),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+    ))
+
+    expect(allAnimals_asDog).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Dog,
+        directSelections: [
+          .deferred(Object_Dog, label: "root"),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+    ))
+
+    expect(allAnimals_asDog_deferredAsRoot).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Dog,
+        directSelections: [
+          .field("genus", type: .string()),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+    ))
+  }
+
+  func test__deferredFragments__givenDeferredInlineFragment_withSkipDirective_buildsInclusionTypeCaseWithNestedDeferredInlineFragment() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+    }
+    """
+
+    document = """
+    query TestOperation($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @skip(if: $a) @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
+
+    let allAnimals = self.subject[field: "allAnimals"]
+    let allAnimals_skipIfA = allAnimals?[as: "Animal", if: !"a"]
+
+    expect(allAnimals?.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("id", type: .string()),
+          .inlineFragment(parentType: Interface_Animal, inclusionConditions: [.skip(if: "a")]),
+        ]
+      )
+    ))
+
+    expect(allAnimals_skipIfA).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        inclusionConditions: [.skip(if: "a")],
+        directSelections: [
+          .deferred(Interface_Animal, label: "root"),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+    ))
+  }
+
+  func test__deferredFragments__givenBothDeferAndSkipDirectives_directivesOrderShouldNotAffectGeneratedFragments() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+    }
+    """
+
+    document = """
+    query IncludeFirst($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @skip(if: $a) @defer(label: "root") {
+          species
+        }
+      }
+    }
+
+    query DeferFirst($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @defer(label: "root") @skip(if: $a) {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    let operations = ["IncludeFirst", "DeferFirst"]
+
+    ir = try .mock(schema: schemaSDL, document: document)
+
+    for operationName in operations {
+      operation = try XCTUnwrap(ir.compilationResult.operations.first(
+        where: { $0.name == operationName }
+      ))
+
+      result = IR.RootFieldBuilder.buildRootEntityField(
+        forRootField: .mock(
+          "query",
+          type: .nonNull(.entity(operation.rootType)),
+          selectionSet: operation.selectionSet
+        ),
+        onRootEntity: IR.Entity(source: .operation(operation)),
+        inIR: ir
+      )
+
+      // then
+      let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
+
+      let allAnimals = self.subject[field: "allAnimals"]
+      let allAnimals_skipIfA = allAnimals?[as: "Animal", if: !"a"]
+
+      let expectedInclusion = SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("id", type: .string()),
+          .inlineFragment(parentType: Interface_Animal, inclusionConditions: [.skip(if: "a")]),
+        ]
+      )
+
+      let expectedDefer = SelectionSetMatcher(
+        parentType: Interface_Animal,
+        inclusionConditions: [.skip(if: "a")],
+        directSelections: [
+          .deferred(Interface_Animal, label: "root"),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+
+      expect(allAnimals?.selectionSet).to(shallowlyMatch(expectedInclusion))
+      expect(allAnimals_skipIfA).to(shallowlyMatch(expectedDefer))
+    }
+  }
+
+  func test__deferredFragments__givenBothDeferAndSkipDirectives_onDifferentTypeCases_shouldNotNestFragments() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String
+      species: String
+      genus: String
+    }
+
+    type Dog implements Animal {
+      id: String
+      species: String
+      genus: String
+    }
+    """
+
+    document = """
+    query TestOperation($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @skip(if: $a) {
+          species
+        }
+        ... on Dog @defer(label: "root") {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
+    let Object_Dog = try XCTUnwrap(schema[object: "Dog"])
+
+    let allAnimals = self.subject[field: "allAnimals"]
+    let allAnimals_skipIfA = allAnimals?[if: !"a"]
+    let allAnimals_asDog = allAnimals?[as: "Dog"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals?[as: "Dog"]?[deferredAs: "root"]
+
+    expect(allAnimals?.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("id", type: .string()),
+          .inlineFragment(parentType: Interface_Animal, inclusionConditions: [.skip(if: "a")]),
+          .inlineFragment(parentType: Object_Dog)
+        ]
+      )
+    ))
+
+    expect(allAnimals_skipIfA).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        inclusionConditions: [.skip(if: "a")],
+        directSelections: [
+          .field("species", type: .string()),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+    ))
+
+    expect(allAnimals_asDog).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Dog,
+        directSelections: [
+          .deferred(Object_Dog, label: "root"),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+    ))
+
+    expect(allAnimals_asDog_deferredAsRoot).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Dog,
+        directSelections: [
+          .field("genus", type: .string()),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+    ))
+  }
 
   // MARK: Deferred Fragments - Named Fragments
 

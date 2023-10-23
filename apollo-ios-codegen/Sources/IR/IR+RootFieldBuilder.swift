@@ -385,7 +385,7 @@ class RootFieldBuilder {
   ) -> InlineFragmentSpread {
     let scope = ScopeCondition(
       type: scopeCondition.type,
-      conditions: scopeCondition.conditions,
+      conditions: (deferCondition == nil ? scopeCondition.conditions : nil),
       deferCondition: deferCondition
     )
 
