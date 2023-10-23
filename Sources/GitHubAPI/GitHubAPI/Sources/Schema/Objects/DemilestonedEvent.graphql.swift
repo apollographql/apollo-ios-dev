@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'demilestoned' event on a given issue or pull request.
-  static let DemilestonedEvent = Object(
+  static let DemilestonedEvent = ApolloAPI.Object(
     typename: "DemilestonedEvent",
     implementedInterfaces: [Interfaces.Node.self]
   )

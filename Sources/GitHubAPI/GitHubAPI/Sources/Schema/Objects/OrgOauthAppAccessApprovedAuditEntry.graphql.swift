@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a org.oauth_app_access_approved event.
-  static let OrgOauthAppAccessApprovedAuditEntry = Object(
+  static let OrgOauthAppAccessApprovedAuditEntry = ApolloAPI.Object(
     typename: "OrgOauthAppAccessApprovedAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

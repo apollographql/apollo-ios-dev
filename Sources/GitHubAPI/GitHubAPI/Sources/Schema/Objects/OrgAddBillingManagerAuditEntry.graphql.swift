@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a org.add_billing_manager
-  static let OrgAddBillingManagerAuditEntry = Object(
+  static let OrgAddBillingManagerAuditEntry = ApolloAPI.Object(
     typename: "OrgAddBillingManagerAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

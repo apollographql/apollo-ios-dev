@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a org.oauth_app_access_denied event.
-  static let OrgOauthAppAccessDeniedAuditEntry = Object(
+  static let OrgOauthAppAccessDeniedAuditEntry = ApolloAPI.Object(
     typename: "OrgOauthAppAccessDeniedAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

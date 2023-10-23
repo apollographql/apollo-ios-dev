@@ -4,6 +4,7 @@ query DogQuery {
     skinCovering
     ... on Dog {
       ... DogFragment
+      houseDetails
     }
   }
 }

@@ -4,7 +4,7 @@
 import ApolloAPI
 
 public extension Objects {
-  static let Human = Object(
+  static let Human = ApolloAPI.Object(
     typename: "Human",
     implementedInterfaces: [
       Interfaces.Animal.self,

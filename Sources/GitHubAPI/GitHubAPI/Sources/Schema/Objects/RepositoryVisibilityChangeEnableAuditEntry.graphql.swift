@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a repository_visibility_change.enable event.
-  static let RepositoryVisibilityChangeEnableAuditEntry = Object(
+  static let RepositoryVisibilityChangeEnableAuditEntry = ApolloAPI.Object(
     typename: "RepositoryVisibilityChangeEnableAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

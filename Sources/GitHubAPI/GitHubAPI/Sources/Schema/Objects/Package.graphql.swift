@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Information for an uploaded package.
-  static let Package = Object(
+  static let Package = ApolloAPI.Object(
     typename: "Package",
     implementedInterfaces: [Interfaces.Node.self]
   )

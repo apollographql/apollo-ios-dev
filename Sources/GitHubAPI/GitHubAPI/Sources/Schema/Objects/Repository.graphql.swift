@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A repository contains the content for a project.
-  static let Repository = Object(
+  static let Repository = ApolloAPI.Object(
     typename: "Repository",
     implementedInterfaces: [
       Interfaces.Node.self,

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a members_can_delete_repos.clear event.
-  static let MembersCanDeleteReposClearAuditEntry = Object(
+  static let MembersCanDeleteReposClearAuditEntry = ApolloAPI.Object(
     typename: "MembersCanDeleteReposClearAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

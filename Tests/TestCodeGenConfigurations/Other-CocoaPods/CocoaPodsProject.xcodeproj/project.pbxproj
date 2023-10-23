@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1B7ED6E41035FB2A0D763AD8 /* Pods_CocoaPodsProjectTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E998DF0E4DCCF80C445451 /* Pods_CocoaPodsProjectTests.framework */; };
+		665BDA862AE30BE2004DD21F /* Object.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665BDA852AE30BE2004DD21F /* Object.swift */; };
 		B51EE231D8798C8408AB9CD5 /* Pods_CocoaPodsProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C684794938D6314DF12AB411 /* Pods_CocoaPodsProject.framework */; };
 		E607A69C29FB43F80059899E /* CocoaPodsProjectApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A69B29FB43F80059899E /* CocoaPodsProjectApp.swift */; };
 		E607A69E29FB43F80059899E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A69D29FB43F80059899E /* ContentView.swift */; };
@@ -82,6 +83,7 @@
 
 /* Begin PBXFileReference section */
 		4C671E51FD3FF74D8B077F45 /* Pods-CocoaPodsProjectTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPodsProjectTests.release.xcconfig"; path = "Target Support Files/Pods-CocoaPodsProjectTests/Pods-CocoaPodsProjectTests.release.xcconfig"; sourceTree = "<group>"; };
+		665BDA852AE30BE2004DD21F /* Object.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Object.swift; sourceTree = "<group>"; };
 		7D6507DAD078EC7A270097F0 /* Pods-CocoaPodsProject.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPodsProject.release.xcconfig"; path = "Target Support Files/Pods-CocoaPodsProject/Pods-CocoaPodsProject.release.xcconfig"; sourceTree = "<group>"; };
 		951B5BB1CBB3B06FF1E6F602 /* Pods-CocoaPodsProject.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPodsProject.debug.xcconfig"; path = "Target Support Files/Pods-CocoaPodsProject/Pods-CocoaPodsProject.debug.xcconfig"; sourceTree = "<group>"; };
 		C684794938D6314DF12AB411 /* Pods_CocoaPodsProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CocoaPodsProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -334,6 +336,7 @@
 		E607A72C29FB692F0059899E /* CustomScalars */ = {
 			isa = PBXGroup;
 			children = (
+				665BDA852AE30BE2004DD21F /* Object.swift */,
 				E607A72D29FB692F0059899E /* CustomDate.swift */,
 			);
 			path = CustomScalars;
@@ -580,6 +583,7 @@
 				E607A75929FB692F0059899E /* ClassroomPet.graphql.swift in Sources */,
 				E607A75F29FB692F0059899E /* PetRock.graphql.swift in Sources */,
 				E607A76129FB69300059899E /* Height.graphql.swift in Sources */,
+				665BDA862AE30BE2004DD21F /* Object.swift in Sources */,
 				E607A75329FB692F0059899E /* AllAnimalsCCNQuery.graphql.swift in Sources */,
 				E607A76C29FB69300059899E /* SchemaMetadata.graphql.swift in Sources */,
 				E607A76329FB69300059899E /* Query.graphql.swift in Sources */,

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A public description of a Marketplace category.
-  static let MarketplaceCategory = Object(
+  static let MarketplaceCategory = ApolloAPI.Object(
     typename: "MarketplaceCategory",
     implementedInterfaces: [Interfaces.Node.self]
   )

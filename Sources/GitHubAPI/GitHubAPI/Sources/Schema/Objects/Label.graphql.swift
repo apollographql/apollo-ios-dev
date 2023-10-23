@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A label for categorizing Issues or Milestones with a given Repository.
-  static let Label = Object(
+  static let Label = ApolloAPI.Object(
     typename: "Label",
     implementedInterfaces: [Interfaces.Node.self]
   )

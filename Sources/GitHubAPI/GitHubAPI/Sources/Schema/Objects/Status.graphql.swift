@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a commit status.
-  static let Status = Object(
+  static let Status = ApolloAPI.Object(
     typename: "Status",
     implementedInterfaces: [Interfaces.Node.self]
   )

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a team.remove_repository event.
-  static let TeamRemoveRepositoryAuditEntry = Object(
+  static let TeamRemoveRepositoryAuditEntry = ApolloAPI.Object(
     typename: "TeamRemoveRepositoryAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

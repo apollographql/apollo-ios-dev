@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// The query type, represents all of the entry points into our object graph
-  static let Query = Object(
+  static let Query = ApolloAPI.Object(
     typename: "Query",
     implementedInterfaces: []
   )

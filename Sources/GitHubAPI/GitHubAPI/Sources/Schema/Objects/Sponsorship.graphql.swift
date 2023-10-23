@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A sponsorship relationship between a sponsor and a maintainer
-  static let Sponsorship = Object(
+  static let Sponsorship = ApolloAPI.Object(
     typename: "Sponsorship",
     implementedInterfaces: [Interfaces.Node.self]
   )

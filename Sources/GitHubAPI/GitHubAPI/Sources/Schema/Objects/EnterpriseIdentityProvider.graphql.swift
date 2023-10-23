@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// An identity provider configured to provision identities for an enterprise.
-  static let EnterpriseIdentityProvider = Object(
+  static let EnterpriseIdentityProvider = ApolloAPI.Object(
     typename: "EnterpriseIdentityProvider",
     implementedInterfaces: [Interfaces.Node.self]
   )

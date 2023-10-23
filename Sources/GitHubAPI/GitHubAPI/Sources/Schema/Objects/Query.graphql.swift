@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// The query root of GitHub's GraphQL interface.
-  static let Query = Object(
+  static let Query = ApolloAPI.Object(
     typename: "Query",
     implementedInterfaces: []
   )

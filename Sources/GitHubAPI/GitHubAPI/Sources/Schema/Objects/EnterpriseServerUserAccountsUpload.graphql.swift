@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A user accounts upload from an Enterprise Server installation.
-  static let EnterpriseServerUserAccountsUpload = Object(
+  static let EnterpriseServerUserAccountsUpload = ApolloAPI.Object(
     typename: "EnterpriseServerUserAccountsUpload",
     implementedInterfaces: [Interfaces.Node.self]
   )

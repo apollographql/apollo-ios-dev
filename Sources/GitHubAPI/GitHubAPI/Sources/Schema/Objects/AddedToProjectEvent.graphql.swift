@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'added_to_project' event on a given issue or pull request.
-  static let AddedToProjectEvent = Object(
+  static let AddedToProjectEvent = ApolloAPI.Object(
     typename: "AddedToProjectEvent",
     implementedInterfaces: [Interfaces.Node.self]
   )

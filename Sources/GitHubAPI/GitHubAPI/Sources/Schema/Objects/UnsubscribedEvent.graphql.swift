@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents an 'unsubscribed' event on a given `Subscribable`.
-  static let UnsubscribedEvent = Object(
+  static let UnsubscribedEvent = ApolloAPI.Object(
     typename: "UnsubscribedEvent",
     implementedInterfaces: [Interfaces.Node.self]
   )
