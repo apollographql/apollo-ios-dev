@@ -206,6 +206,20 @@ actor JavaScriptBridge {
     }
   }
 
+  private struct WeakValue: Hashable {
+    weak var value: JSValue?
+    var id: ObjectIdentifier
+
+    init(_ value: JSValue) {
+      self.value = value
+      self.id = ObjectIdentifier(value)
+    }
+
+    func hash(into hasher: inout Hasher) {
+      hasher.combine(id)
+    }
+  }
+
   private let virtualMachine = JSVirtualMachine()
 
   let context: JSContext
@@ -220,11 +234,11 @@ actor JavaScriptBridge {
 
   /// We keep a map between `JSValue` objects and wrapper objects, to avoid repeatedly creating new
   /// wrappers and to guarantee referential equality.
-  /// TODO: We may want to consider making the keys weak here, because this does mean we'll be
-  /// keeping alive all objects that are passed over the bridge in JavaScript.
+  /// Making the keys weak here, prevents us from keeping alive all objects that are passed over
+  /// the bridge in JavaScript.
   /// ('JSValue` is an Objective-C object that uses `JSValueProtect` to mark the underlying
   /// JavaScript object as ineligible for garbage collection.)
-  private var wrapperMap: [JSValue: WeakRef] = [:]
+  private var wrapperMap: [WeakValue: WeakRef] = [:]
 
   init() async throws {
     guard let context = JSContext(virtualMachine: virtualMachine) else {
@@ -262,7 +276,9 @@ actor JavaScriptBridge {
   func getReferenceOrInitialize<Wrapper: JavaScriptReferencedObject>(
     _ jsValue: JSValue
   ) -> Wrapper {
-    if let wrapper = wrapperMap[jsValue]?.value {
+    precondition(jsValue.context === self.context)
+    let weakJSValue = WeakValue(jsValue)
+    if let wrapper = wrapperMap[weakJSValue]?.value {
       return checkedDowncast(wrapper)
     }
     
@@ -278,7 +294,7 @@ actor JavaScriptBridge {
     }
 
     let wrapper = wrapperType.init(jsValue, bridge: self)
-    wrapperMap[jsValue] = WeakRef(wrapper)
+    wrapperMap[weakJSValue] = WeakRef(wrapper)
     wrapper.finalize(jsValue, bridge: self)
     return checkedDowncast(wrapper)
   }
