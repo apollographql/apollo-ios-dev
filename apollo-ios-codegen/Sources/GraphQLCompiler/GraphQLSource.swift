@@ -32,7 +32,7 @@ public struct GraphQLSourceLocation {
 // `GraphQLDocument`.
 
 /// An AST node.
-public class ASTNode: JavaScriptObject, @unchecked Sendable {
+public class ASTNode: JavaScriptObject {
   public let kind: String
 
   public let source: GraphQLSource?

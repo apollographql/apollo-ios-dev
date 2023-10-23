@@ -83,7 +83,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
   }
   
-  public final class OperationDefinition: JavaScriptObjectDecodable, Hashable {
+  public final class OperationDefinition: Sendable, JavaScriptObjectDecodable, Hashable {
 
     public let name: String
 
@@ -102,6 +102,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     public let source: String
 
     public let filePath: String
+
+    public let isLocalCacheMutation: Bool
 
     static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
       self.init(
@@ -137,6 +139,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.referencedFragments = referencedFragments
       self.source = source
       self.filePath = filePath
+      self.isLocalCacheMutation = directives?
+        .contains { $0.name == Constants.LocalCacheMutationDirectiveName } ?? false
     }
 
     public var debugDescription: String {
@@ -150,13 +154,9 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     public static func ==(lhs: OperationDefinition, rhs: OperationDefinition) -> Bool {
       return lhs.name == rhs.name
     }
-
-    public lazy var isLocalCacheMutation: Bool = {
-      directives?.contains { $0.name == Constants.LocalCacheMutationDirectiveName } ?? false
-    }()    
   }
   
-  public enum OperationType: String, Equatable, JavaScriptValueDecodable {
+  public enum OperationType: String, Equatable, Sendable, JavaScriptValueDecodable {
     case query
     case mutation
     case subscription
@@ -171,7 +171,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     }
   }
   
-  public struct VariableDefinition: JavaScriptObjectDecodable {
+  public struct VariableDefinition: JavaScriptObjectDecodable, Sendable {
     public let name: String
 
     public let type: GraphQLType

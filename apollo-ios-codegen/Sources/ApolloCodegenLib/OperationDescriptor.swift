@@ -24,7 +24,7 @@ private func append(
   }
 }
 
-public struct OperationDescriptor {
+public struct OperationDescriptor: Sendable {
   public enum OperationType: String, Hashable {
     case query
     case mutation
