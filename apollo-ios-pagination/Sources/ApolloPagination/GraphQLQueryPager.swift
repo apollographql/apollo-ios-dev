@@ -2,6 +2,7 @@ import Apollo
 import ApolloAPI
 import Combine
 import Foundation
+import OrderedCollections
 
 public protocol PagerType {
   associatedtype InitialQuery: GraphQLQuery
@@ -119,7 +120,7 @@ extension GraphQLQueryPager {
     let nextPageResolver: (PaginationInfo) -> PaginatedQuery?
     let extractPageInfo: (PageExtractionData) -> PaginationInfo
     var currentPageInfo: PaginationInfo? {
-      guard let last = pageOrder.last else {
+      guard let last = varMap.values.last else {
         return initialPageResult.flatMap { extractPageInfo(.initial($0)) }
       }
       if let data = varMap[last] {
@@ -137,14 +138,11 @@ extension GraphQLQueryPager {
     var initialPageResult: InitialQuery.Data?
     var latest: (InitialQuery.Data, [PaginatedQuery.Data])? {
       guard let initialPageResult else { return nil }
-      return (initialPageResult, pageOrder.compactMap({ varMap[$0] }))
+      return (initialPageResult, Array(varMap.values))
     }
 
-    /// Array of page info used to fetch next pages. Maintains an order of values used to fetch each page in a connection.
-    var pageOrder = [AnyHashable]()
-
     /// Maps each query variable set to latest results from internal watchers.
-    var varMap: [AnyHashable: PaginatedQuery.Data] = [:]
+    var varMap: OrderedDictionary<AnyHashable, PaginatedQuery.Data> = [:]
 
     private var activeTask: Task<Void, Never>?
 
@@ -211,18 +209,22 @@ extension GraphQLQueryPager {
       activeTask = Task {
         let publisher = CurrentValueSubject<Void, Never>(())
         await withCheckedContinuation { continuation in
-          let watcher = GraphQLQueryWatcher(client: client, query: nextPageQuery) { result in
-            self.onSubsequentFetch(
-              cachePolicy: cachePolicy,
-              result: result,
-              publisher: publisher,
-              query: nextPageQuery
-            )
+          let watcher = GraphQLQueryWatcher(client: client, query: nextPageQuery) { [weak self] result in
+            guard let self else { return }
+            Task {
+              await self.onSubsequentFetch(
+                cachePolicy: cachePolicy,
+                result: result,
+                publisher: publisher,
+                query: nextPageQuery
+              )
+            }
           }
           nextPageWatchers.append(watcher)
-          publisher.sink(receiveCompletion: { _ in
+          publisher.sink(receiveCompletion: { [weak self] _ in
             continuation.resume(with: .success(()))
-            self.onTaskCancellation()
+            guard let self else { return }
+            Task { await self.onTaskCancellation() }
           }, receiveValue: { })
           .store(in: &subscribers)
           watcher.refetch(cachePolicy: cachePolicy)
@@ -260,7 +262,6 @@ extension GraphQLQueryPager {
       firstPageWatcher = nil
 
       varMap = [:]
-      pageOrder = []
       initialPageResult = nil
       activeTask?.cancel()
       activeTask = nil
@@ -277,12 +278,13 @@ extension GraphQLQueryPager {
 
     private func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) {
       if firstPageWatcher == nil {
-        self.firstPageWatcher = GraphQLQueryWatcher(
+        firstPageWatcher = GraphQLQueryWatcher(
           client: client,
           query: initialQuery,
-          resultHandler: { result in
+          resultHandler: { [weak self] result in
+            guard let self else { return }
             Task {
-              self.onInitialFetch(result: result)
+              await self.onInitialFetch(result: result)
             }
           }
         )
@@ -293,9 +295,9 @@ extension GraphQLQueryPager {
     private func onInitialFetch(result: Result<GraphQLResult<InitialQuery.Data>, Error>) {
       switch result {
       case .success(let data):
-        self.initialPageResult = data.data
+        initialPageResult = data.data
         guard let firstPageData = data.data else { return }
-        if let latest = self.latest {
+        if let latest {
           let (_, nextPage) = latest
           currentValue = .success((firstPageData, nextPage, data.source == .cache ? .cache : .fetch))
         }
@@ -325,12 +327,11 @@ extension GraphQLQueryPager {
         }
         let variables = query.__variables?.values.compactMap { $0._jsonEncodableValue?._jsonValue } ?? []
         if shouldUpdate {
-          self.pageOrder.append(variables)
           publisher.send(completion: .finished)
         }
-        self.varMap[variables] = nextPageData
+        varMap[variables] = nextPageData
 
-        if let latest = self.latest {
+        if let latest {
           let (firstPage, nextPage) = latest
           currentValue = .success((firstPage, nextPage, data.source == .cache ? .cache : .fetch))
         }
@@ -343,6 +344,8 @@ extension GraphQLQueryPager {
     private func onTaskCancellation() {
       activeTask?.cancel()
       activeTask = nil
+      subscribers.forEach { $0.cancel() }
+      subscribers = []
     }
   }
 }
