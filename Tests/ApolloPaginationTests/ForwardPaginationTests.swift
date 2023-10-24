@@ -94,18 +94,13 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     XCTAssertEqual(count, 1)
   }
 
-  func test_fetchMultiplePages_noCache() async throws {
+  func test_variableMapping() async throws {
     let pager = createPager()
 
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
-    let firstPageExpectation = expectation(description: "First page")
-    var subscription = await pager.subscribe { result in
-      firstPageExpectation.fulfill()
-    }
     await pager.fetch()
-    await fulfillment(of: [serverExpectation, firstPageExpectation])
-    subscription.cancel()
+    await fulfillment(of: [serverExpectation])
 
     let result = try await XCTUnwrapping(await pager.currentValue)
     XCTAssertSuccessResult(result) { value in
@@ -118,27 +113,12 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
-    subscription = await pager.subscribe(onUpdate: { _ in
+    let subscription = await pager.subscribe(onUpdate: { _ in
       secondPageFetch.fulfill()
     })
     try await pager.loadMore(cachePolicy: .fetchIgnoringCacheData)
     await fulfillment(of: [secondPageExpectation, secondPageFetch])
     subscription.cancel()
-
-    let newResult = try await XCTUnwrapping(await pager.currentValue)
-    try XCTAssertSuccessResult(newResult) { value in
-      let (_, next, source) = value
-      // Assert first page is unchanged
-      XCTAssertEqual(try? result.get().0, try? newResult.get().0)
-
-      XCTAssertFalse(next.isEmpty)
-      XCTAssertEqual(next.count, 1)
-      let page = try XCTUnwrap(next.first)
-      XCTAssertEqual(page.hero.friendsConnection.friends.count, 1)
-      XCTAssertEqual(source, .fetch)
-    }
-    let count = await pager.varMap.values.count
-    XCTAssertEqual(count, 1)
 
     // Test Variable Mapping
 
