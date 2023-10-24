@@ -9,7 +9,7 @@ public protocol PagerType {
   associatedtype PaginatedQuery: GraphQLQuery
   typealias Output = (InitialQuery.Data, [PaginatedQuery.Data], UpdateSource)
 
-  func canLoadNext() -> Bool
+  var canLoadNext: Bool { get }
   func cancel()
   func loadMore(
     cachePolicy: CachePolicy,
@@ -25,10 +25,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 
   private let pager: Actor
   private var cancellables: [AnyCancellable] = []
-
-  private enum PhonyError: Error {
-    case workaround
-  }
+  private var canLoadNextSubject: CurrentValueSubject<Bool, Never> = .init(false)
 
   /// The result of either the initial query or the paginated query, for the purpose of extracting a `PageInfo` from it.
   public enum PageExtractionData {
@@ -49,6 +46,17 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
       extractPageInfo: extractPageInfo,
       nextPageResolver: nextPageResolver
     )
+    Task {
+      let varMapPublisher = await pager.$varMap
+      let initialPublisher = await pager.$initialPageResult
+      varMapPublisher.combineLatest(initialPublisher).sink { [weak self] _ in
+        guard let self else { return }
+        Task {
+          let value = await self.pager.pageTransformation()
+          self.canLoadNextSubject.send(value?.canLoadMore ?? false)
+        }
+      }.store(in: &cancellables)
+    }
   }
 
   deinit {
@@ -66,21 +74,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
-  public func canLoadNext() -> Bool {
-    do {
-      try _canLoadNext()
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  private func _canLoadNext() throws {
-    Task {
-      let canLoadNext = await pager.canLoadNext()
-      if !canLoadNext { throw PhonyError.workaround }
-    }
-  }
+  public var canLoadNext: Bool { canLoadNextSubject.value }
 
   public func cancel() {
     Task {
@@ -120,29 +114,20 @@ extension GraphQLQueryPager {
     let nextPageResolver: (PaginationInfo) -> PaginatedQuery?
     let extractPageInfo: (PageExtractionData) -> PaginationInfo
     var currentPageInfo: PaginationInfo? {
-      guard let last = varMap.values.last else {
-        return initialPageResult.flatMap { extractPageInfo(.initial($0)) }
-      }
-      if let data = varMap[last] {
-        return extractPageInfo(.paginated(data))
-      } else if let initialPageResult {
-        return extractPageInfo(.initial(initialPageResult))
-      } else {
-        return nil
-      }
+      pageTransformation()
     }
 
     @Published var currentValue: Result<Output, Error>?
     private var subscribers: [AnyCancellable] = []
 
-    var initialPageResult: InitialQuery.Data?
+    @Published var initialPageResult: InitialQuery.Data?
     var latest: (InitialQuery.Data, [PaginatedQuery.Data])? {
       guard let initialPageResult else { return nil }
       return (initialPageResult, Array(varMap.values))
     }
 
     /// Maps each query variable set to latest results from internal watchers.
-    var varMap: OrderedDictionary<AnyHashable, PaginatedQuery.Data> = [:]
+    @Published var varMap: OrderedDictionary<AnyHashable, PaginatedQuery.Data> = [:]
 
     private var activeTask: Task<Void, Never>?
 
@@ -270,7 +255,7 @@ extension GraphQLQueryPager {
     }
 
     /// Whether or not we can load more information based on the current page.
-    public func canLoadNext() -> Bool {
+    public var canLoadNext: Bool {
       currentPageInfo?.canLoadMore ?? false
     }
 
@@ -346,6 +331,19 @@ extension GraphQLQueryPager {
       activeTask = nil
       subscribers.forEach { $0.cancel() }
       subscribers = []
+    }
+
+    fileprivate func pageTransformation() -> PaginationInfo? {
+      guard let last = varMap.values.last else {
+        return initialPageResult.flatMap { extractPageInfo(.initial($0)) }
+      }
+      if let data = varMap[last] {
+        return extractPageInfo(.paginated(data))
+      } else if let initialPageResult {
+        return extractPageInfo(.initial(initialPageResult))
+      } else {
+        return nil
+      }
     }
   }
 }
