@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// An email belonging to a user account on an Enterprise Server installation.
-  static let EnterpriseServerUserAccountEmail = Object(
+  static let EnterpriseServerUserAccountEmail = ApolloAPI.Object(
     typename: "EnterpriseServerUserAccountEmail",
     implementedInterfaces: [Interfaces.Node.self]
   )

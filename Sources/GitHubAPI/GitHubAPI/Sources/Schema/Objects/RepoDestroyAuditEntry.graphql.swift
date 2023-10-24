@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a repo.destroy event.
-  static let RepoDestroyAuditEntry = Object(
+  static let RepoDestroyAuditEntry = ApolloAPI.Object(
     typename: "RepoDestroyAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

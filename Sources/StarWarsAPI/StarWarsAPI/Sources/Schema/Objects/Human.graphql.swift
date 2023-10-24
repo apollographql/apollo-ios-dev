@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A humanoid creature from the Star Wars universe
-  static let Human = Object(
+  static let Human = ApolloAPI.Object(
     typename: "Human",
     implementedInterfaces: [Interfaces.Character.self]
   )

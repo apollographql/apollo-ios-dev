@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a Git tag.
-  static let Tag = Object(
+  static let Tag = ApolloAPI.Object(
     typename: "Tag",
     implementedInterfaces: [
       Interfaces.GitObject.self,

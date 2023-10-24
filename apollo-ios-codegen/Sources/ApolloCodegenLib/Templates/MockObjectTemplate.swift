@@ -41,7 +41,7 @@ struct MockObjectTemplate: TemplateRenderer {
 
     return """
     \(accessControlModifier(for: .parent))class \(objectName): MockObject {
-      \(memberAccessControl)static let objectType: Object = \(config.schemaNamespace.firstUppercased).Objects.\(objectName)
+      \(memberAccessControl)static let objectType: \(config.ApolloAPITargetName).Object = \(config.schemaNamespace.firstUppercased).Objects.\(objectName)
       \(memberAccessControl)static let _mockFields = MockFields()
       \(memberAccessControl)typealias MockValueCollectionType = Array<Mock<\(objectName)>>
 

@@ -15,7 +15,8 @@ final class CocoaPodsProjectTests: XCTestCase {
             "__typename": "Dog",
             "id": "1",
             "skinCovering": "Fur",
-            "species": "Canine"
+            "species": "Canine",
+            "houseDetails": "Single Level Ranch"
           ]
         ]
       ]])

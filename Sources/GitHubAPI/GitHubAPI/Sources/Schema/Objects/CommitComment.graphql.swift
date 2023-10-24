@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a comment on a given Commit.
-  static let CommitComment = Object(
+  static let CommitComment = ApolloAPI.Object(
     typename: "CommitComment",
     implementedInterfaces: [
       Interfaces.Comment.self,

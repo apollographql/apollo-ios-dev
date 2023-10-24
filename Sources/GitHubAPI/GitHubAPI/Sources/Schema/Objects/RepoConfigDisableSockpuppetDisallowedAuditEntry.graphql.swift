@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a repo.config.disable_sockpuppet_disallowed event.
-  static let RepoConfigDisableSockpuppetDisallowedAuditEntry = Object(
+  static let RepoConfigDisableSockpuppetDisallowedAuditEntry = ApolloAPI.Object(
     typename: "RepoConfigDisableSockpuppetDisallowedAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

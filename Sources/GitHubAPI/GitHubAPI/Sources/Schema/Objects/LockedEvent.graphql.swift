@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'locked' event on a given issue or pull request.
-  static let LockedEvent = Object(
+  static let LockedEvent = ApolloAPI.Object(
     typename: "LockedEvent",
     implementedInterfaces: [Interfaces.Node.self]
   )

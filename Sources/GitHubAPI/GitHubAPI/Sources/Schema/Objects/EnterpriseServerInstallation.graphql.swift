@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// An Enterprise Server installation.
-  static let EnterpriseServerInstallation = Object(
+  static let EnterpriseServerInstallation = ApolloAPI.Object(
     typename: "EnterpriseServerInstallation",
     implementedInterfaces: [Interfaces.Node.self]
   )

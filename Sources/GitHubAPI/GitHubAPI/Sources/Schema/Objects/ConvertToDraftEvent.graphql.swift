@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'convert_to_draft' event on a given pull request.
-  static let ConvertToDraftEvent = Object(
+  static let ConvertToDraftEvent = ApolloAPI.Object(
     typename: "ConvertToDraftEvent",
     implementedInterfaces: [
       Interfaces.Node.self,

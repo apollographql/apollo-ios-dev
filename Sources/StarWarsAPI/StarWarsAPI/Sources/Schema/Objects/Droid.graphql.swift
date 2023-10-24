@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// An autonomous mechanical character in the Star Wars universe
-  static let Droid = Object(
+  static let Droid = ApolloAPI.Object(
     typename: "Droid",
     implementedInterfaces: [Interfaces.Character.self]
   )

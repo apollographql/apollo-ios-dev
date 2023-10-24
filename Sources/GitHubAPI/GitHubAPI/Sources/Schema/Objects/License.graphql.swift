@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A repository's open source license
-  static let License = Object(
+  static let License = ApolloAPI.Object(
     typename: "License",
     implementedInterfaces: [Interfaces.Node.self]
   )

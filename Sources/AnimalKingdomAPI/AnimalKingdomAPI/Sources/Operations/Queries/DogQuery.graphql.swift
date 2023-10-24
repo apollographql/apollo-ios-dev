@@ -7,7 +7,7 @@ public class DogQuery: GraphQLQuery {
   public static let operationName: String = "DogQuery"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
-      #"query DogQuery { allAnimals { __typename id skinCovering ... on Dog { ...DogFragment } } }"#,
+      #"query DogQuery { allAnimals { __typename id skinCovering ... on Dog { ...DogFragment houseDetails } } }"#,
       fragments: [DogFragment.self]
     ))
 
@@ -85,9 +85,11 @@ public class DogQuery: GraphQLQuery {
         public typealias RootEntityType = DogQuery.Data.AllAnimal
         public static var __parentType: ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Dog }
         public static var __selections: [ApolloAPI.Selection] { [
+          .field("houseDetails", AnimalKingdomAPI.Object?.self),
           .fragment(DogFragment.self),
         ] }
 
+        public var houseDetails: AnimalKingdomAPI.Object? { __data["houseDetails"] }
         public var id: AnimalKingdomAPI.ID { __data["id"] }
         public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
         public var species: String { __data["species"] }
@@ -100,6 +102,7 @@ public class DogQuery: GraphQLQuery {
         }
 
         public init(
+          houseDetails: AnimalKingdomAPI.Object? = nil,
           id: AnimalKingdomAPI.ID,
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
           species: String
@@ -107,6 +110,7 @@ public class DogQuery: GraphQLQuery {
           self.init(_dataDict: DataDict(
             data: [
               "__typename": AnimalKingdomAPI.Objects.Dog.typename,
+              "houseDetails": houseDetails,
               "id": id,
               "skinCovering": skinCovering,
               "species": species,

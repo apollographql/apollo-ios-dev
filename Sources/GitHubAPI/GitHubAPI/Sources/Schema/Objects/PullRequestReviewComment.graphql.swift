@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A review comment associated with a given repository pull request.
-  static let PullRequestReviewComment = Object(
+  static let PullRequestReviewComment = ApolloAPI.Object(
     typename: "PullRequestReviewComment",
     implementedInterfaces: [
       Interfaces.Comment.self,

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'converted_note_to_issue' event on a given issue or pull request.
-  static let ConvertedNoteToIssueEvent = Object(
+  static let ConvertedNoteToIssueEvent = ApolloAPI.Object(
     typename: "ConvertedNoteToIssueEvent",
     implementedInterfaces: [Interfaces.Node.self]
   )

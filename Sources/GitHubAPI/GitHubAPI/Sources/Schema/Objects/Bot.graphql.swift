@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A special type of user which takes actions on behalf of GitHub Apps.
-  static let Bot = Object(
+  static let Bot = ApolloAPI.Object(
     typename: "Bot",
     implementedInterfaces: [
       Interfaces.Actor.self,

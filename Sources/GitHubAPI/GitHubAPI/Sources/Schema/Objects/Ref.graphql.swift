@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a Git reference.
-  static let Ref = Object(
+  static let Ref = ApolloAPI.Object(
     typename: "Ref",
     implementedInterfaces: [Interfaces.Node.self]
   )

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a commit comment thread part of a pull request.
-  static let PullRequestCommitCommentThread = Object(
+  static let PullRequestCommitCommentThread = ApolloAPI.Object(
     typename: "PullRequestCommitCommentThread",
     implementedInterfaces: [
       Interfaces.Node.self,

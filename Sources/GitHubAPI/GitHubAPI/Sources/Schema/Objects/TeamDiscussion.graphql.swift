@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A team discussion.
-  static let TeamDiscussion = Object(
+  static let TeamDiscussion = ApolloAPI.Object(
     typename: "TeamDiscussion",
     implementedInterfaces: [
       Interfaces.Comment.self,

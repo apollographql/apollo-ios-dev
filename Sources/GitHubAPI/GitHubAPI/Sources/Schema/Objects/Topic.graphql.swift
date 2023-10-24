@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A topic aggregates entities that are related to a subject.
-  static let Topic = Object(
+  static let Topic = ApolloAPI.Object(
     typename: "Topic",
     implementedInterfaces: [
       Interfaces.Node.self,

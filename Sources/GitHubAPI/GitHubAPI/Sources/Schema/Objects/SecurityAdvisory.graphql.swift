@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A GitHub Security Advisory
-  static let SecurityAdvisory = Object(
+  static let SecurityAdvisory = ApolloAPI.Object(
     typename: "SecurityAdvisory",
     implementedInterfaces: [Interfaces.Node.self]
   )
