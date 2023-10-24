@@ -28,6 +28,8 @@ jobs:
           ${{ secrets.APOLLO_IOS_CODEGEN_DEPLOY_KEY }}
           ${{ secrets.APOLLO_IOS_DEV_DEPLOY_KEY }}
           ${{ secrets.APOLLO_IOS_PAGINATION_DEPLOY_KEY }}
+    - name: Configure Git
+      uses: ./.github/actions/configure-git
     - name: Update Merge Commit Message
       shell: bash
       run: |

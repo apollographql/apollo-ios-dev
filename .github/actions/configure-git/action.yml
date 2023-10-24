@@ -1,0 +1,8 @@
+name: "Configure Git Settings"
+description: Configures appropriate git settings for the github action workflows.
+runs:
+  using: "composite"
+  shell: bash
+  run: |
+    git config --global user.name "gh-action-runner"
+    
