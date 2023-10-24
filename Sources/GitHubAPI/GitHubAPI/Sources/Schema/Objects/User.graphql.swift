@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A user is an individual's account on GitHub that owns repositories and can make new content.
-  static let User = Object(
+  static let User = ApolloAPI.Object(
     typename: "User",
     implementedInterfaces: [
       Interfaces.Actor.self,

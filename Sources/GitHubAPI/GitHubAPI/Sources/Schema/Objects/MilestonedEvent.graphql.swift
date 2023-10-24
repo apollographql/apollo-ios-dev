@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'milestoned' event on a given issue or pull request.
-  static let MilestonedEvent = Object(
+  static let MilestonedEvent = ApolloAPI.Object(
     typename: "MilestonedEvent",
     implementedInterfaces: [Interfaces.Node.self]
   )

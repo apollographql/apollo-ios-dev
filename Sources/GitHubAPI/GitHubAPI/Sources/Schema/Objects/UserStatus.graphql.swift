@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// The user's description of what they're currently doing.
-  static let UserStatus = Object(
+  static let UserStatus = ApolloAPI.Object(
     typename: "UserStatus",
     implementedInterfaces: [Interfaces.Node.self]
   )

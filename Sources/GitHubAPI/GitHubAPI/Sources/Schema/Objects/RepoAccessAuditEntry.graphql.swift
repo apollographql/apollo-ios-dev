@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a repo.access event.
-  static let RepoAccessAuditEntry = Object(
+  static let RepoAccessAuditEntry = ApolloAPI.Object(
     typename: "RepoAccessAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

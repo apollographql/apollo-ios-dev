@@ -56,7 +56,7 @@ class ObjectTemplateTests: XCTestCase {
     buildSubject(name: "dog")
 
     let expected = """
-    static let Dog = Object(
+    static let Dog = ApolloAPI.Object(
       typename: "dog",
     """
 
@@ -140,7 +140,7 @@ class ObjectTemplateTests: XCTestCase {
 
     let expected = """
     /// \(documentation)
-    static let Dog = Object(
+    static let Dog = ApolloAPI.Object(
     """
 
     // when
@@ -160,7 +160,7 @@ class ObjectTemplateTests: XCTestCase {
     )
 
     let expected = """
-    static let Dog = Object(
+    static let Dog = ApolloAPI.Object(
     """
 
     // when
@@ -180,7 +180,7 @@ class ObjectTemplateTests: XCTestCase {
       buildSubject(name: keyword)
 
       let expected = """
-      static let \(keyword.firstUppercased)_Object = Object(
+      static let \(keyword.firstUppercased)_Object = ApolloAPI.Object(
         typename: "\(keyword)",
       """
 

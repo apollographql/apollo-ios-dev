@@ -641,6 +641,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("Sources/Schema/Objects/Dog.graphql.swift").path,
 
       directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/CustomDate.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/Object.swift").path,
       
       directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsIncludeSkipQuery.graphql.swift").path,
@@ -739,6 +740,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("Sources/Objects/Mutation.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Objects/Dog.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/CustomScalars/CustomDate.swift").path,
+      directoryURL.appendingPathComponent("Sources/CustomScalars/Object.swift").path,
 
       operationsOutputURL.appendingPathComponent("Queries/AllAnimalsQuery.graphql.swift").path,
       operationsOutputURL.appendingPathComponent("Queries/DogQuery.graphql.swift").path,
@@ -836,6 +838,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("Sources/Schema/Objects/Crocodile.graphql.swift").path,
 
       directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/CustomDate.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/Object.swift").path,
 
       directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Queries/DogQuery.graphql.swift").path,
@@ -1011,6 +1014,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("RelativePath/Sources/Schema/Objects/Dog.graphql.swift").path,
 
       directoryURL.appendingPathComponent("RelativePath/Sources/Schema/CustomScalars/CustomDate.swift").path,
+      directoryURL.appendingPathComponent("RelativePath/Sources/Schema/CustomScalars/Object.swift").path,
 
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/AllAnimalsQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/DogQuery.graphql.swift").path,
@@ -1112,6 +1116,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("RelativePath/Sources/Objects/Dog.graphql.swift").path,
 
       directoryURL.appendingPathComponent("RelativePath/Sources/CustomScalars/CustomDate.swift").path,
+      directoryURL.appendingPathComponent("RelativePath/Sources/CustomScalars/Object.swift").path,
 
       directoryURL.appendingPathComponent("RelativeOperations/Queries/AllAnimalsQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativeOperations/Queries/DogQuery.graphql.swift").path,

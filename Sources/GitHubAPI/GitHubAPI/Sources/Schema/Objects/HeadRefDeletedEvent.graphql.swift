@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'head_ref_deleted' event on a given pull request.
-  static let HeadRefDeletedEvent = Object(
+  static let HeadRefDeletedEvent = ApolloAPI.Object(
     typename: "HeadRefDeletedEvent",
     implementedInterfaces: [Interfaces.Node.self]
   )

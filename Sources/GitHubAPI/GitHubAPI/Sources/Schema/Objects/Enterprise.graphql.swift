@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// An account to manage multiple organizations with consolidated policy and billing.
-  static let Enterprise = Object(
+  static let Enterprise = ApolloAPI.Object(
     typename: "Enterprise",
     implementedInterfaces: [Interfaces.Node.self]
   )

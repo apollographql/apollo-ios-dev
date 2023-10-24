@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// An Issue is a place to discuss ideas, enhancements, tasks, and bugs for a project.
-  static let Issue = Object(
+  static let Issue = ApolloAPI.Object(
     typename: "Issue",
     implementedInterfaces: [
       Interfaces.Assignable.self,

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Projects manage issues, pull requests and notes within a project owner.
-  static let Project = Object(
+  static let Project = ApolloAPI.Object(
     typename: "Project",
     implementedInterfaces: [
       Interfaces.Closable.self,

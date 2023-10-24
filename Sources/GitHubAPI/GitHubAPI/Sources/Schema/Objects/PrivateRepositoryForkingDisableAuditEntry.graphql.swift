@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a private_repository_forking.disable event.
-  static let PrivateRepositoryForkingDisableAuditEntry = Object(
+  static let PrivateRepositoryForkingDisableAuditEntry = ApolloAPI.Object(
     typename: "PrivateRepositoryForkingDisableAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

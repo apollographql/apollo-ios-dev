@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a org.block_user
-  static let OrgBlockUserAuditEntry = Object(
+  static let OrgBlockUserAuditEntry = ApolloAPI.Object(
     typename: "OrgBlockUserAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

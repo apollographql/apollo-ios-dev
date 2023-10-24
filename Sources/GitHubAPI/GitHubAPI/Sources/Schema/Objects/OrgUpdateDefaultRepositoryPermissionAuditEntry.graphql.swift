@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a org.update_default_repository_permission
-  static let OrgUpdateDefaultRepositoryPermissionAuditEntry = Object(
+  static let OrgUpdateDefaultRepositoryPermissionAuditEntry = ApolloAPI.Object(
     typename: "OrgUpdateDefaultRepositoryPermissionAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

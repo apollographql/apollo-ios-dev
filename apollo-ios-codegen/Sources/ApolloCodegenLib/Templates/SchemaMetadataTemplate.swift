@@ -55,7 +55,7 @@ struct SchemaMetadataTemplate: TemplateRenderer {
   var objectTypeFunction: TemplateString {
     return """
     \(accessControlModifier(for: .member))\
-    static func objectType(forTypename typename: String) -> Object? {
+    static func objectType(forTypename typename: String) -> \(config.ApolloAPITargetName).Object? {
       switch typename {
       \(schema.referencedTypes.objects.map {
         "case \"\($0.name)\": return \(schemaNamespace).Objects.\($0.formattedName)"

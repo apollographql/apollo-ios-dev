@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a repo.config.disable_collaborators_only event.
-  static let RepoConfigDisableCollaboratorsOnlyAuditEntry = Object(
+  static let RepoConfigDisableCollaboratorsOnlyAuditEntry = ApolloAPI.Object(
     typename: "RepoConfigDisableCollaboratorsOnlyAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

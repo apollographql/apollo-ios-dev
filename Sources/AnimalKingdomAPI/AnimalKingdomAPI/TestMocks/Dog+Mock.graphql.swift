@@ -5,7 +5,7 @@ import ApolloTestSupport
 import AnimalKingdomAPI
 
 public class Dog: MockObject {
-  public static let objectType: Object = AnimalKingdomAPI.Objects.Dog
+  public static let objectType: ApolloAPI.Object = AnimalKingdomAPI.Objects.Dog
   public static let _mockFields = MockFields()
   public typealias MockValueCollectionType = Array<Mock<Dog>>
 
@@ -14,6 +14,7 @@ public class Dog: MockObject {
     @Field<Int>("bodyTemperature") public var bodyTemperature
     @Field<String>("favoriteToy") public var favoriteToy
     @Field<Height>("height") public var height
+    @Field<AnimalKingdomAPI.Object>("houseDetails") public var houseDetails
     @Field<String>("humanName") public var humanName
     @Field<AnimalKingdomAPI.ID>("id") public var id
     @Field<Bool>("laysEggs") public var laysEggs
@@ -30,6 +31,7 @@ public extension Mock where O == Dog {
     bodyTemperature: Int? = nil,
     favoriteToy: String? = nil,
     height: Mock<Height>? = nil,
+    houseDetails: AnimalKingdomAPI.Object? = nil,
     humanName: String? = nil,
     id: AnimalKingdomAPI.ID? = nil,
     laysEggs: Bool? = nil,
@@ -43,6 +45,7 @@ public extension Mock where O == Dog {
     _setScalar(bodyTemperature, for: \.bodyTemperature)
     _setScalar(favoriteToy, for: \.favoriteToy)
     _setEntity(height, for: \.height)
+    _setScalar(houseDetails, for: \.houseDetails)
     _setScalar(humanName, for: \.humanName)
     _setScalar(id, for: \.id)
     _setScalar(laysEggs, for: \.laysEggs)

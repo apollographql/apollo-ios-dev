@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents an 'unlocked' event on a given issue or pull request.
-  static let UnlockedEvent = Object(
+  static let UnlockedEvent = ApolloAPI.Object(
     typename: "UnlockedEvent",
     implementedInterfaces: [Interfaces.Node.self]
   )
