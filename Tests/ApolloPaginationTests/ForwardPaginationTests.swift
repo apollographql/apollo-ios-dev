@@ -102,7 +102,6 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     await pager.fetch()
     await fulfillment(of: [serverExpectation])
 
-    let result = try await XCTUnwrapping(await pager.currentValue)
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
