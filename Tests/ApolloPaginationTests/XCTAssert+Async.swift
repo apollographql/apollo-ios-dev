@@ -12,3 +12,11 @@ public func XCTAssertThrowsError<T>(
     errorHandler(error)
   }
 }
+
+public func XCTUnwrapping<T>(
+    _ expression: @autoclosure () async throws -> T?,
+    _ message: @autoclosure () -> String = ""
+) async throws -> T {
+    let value = try await expression()
+    return try XCTUnwrap(value)
+}
