@@ -446,17 +446,15 @@ class RootFieldBuilder {
 
     let scope = ScopeCondition(
       type: scopeCondition.type,
-      conditions: scopeCondition.conditions,
+      conditions: (deferCondition == nil ? scopeCondition.conditions : nil),
       deferCondition: deferCondition
     )
 
     self.containsDeferredFragment = fragment.containsDeferredFragment || scope.deferCondition != nil
 
-    let scopePath = scope.isEmpty ?
-    parentTypeInfo.scopePath :
-    parentTypeInfo.scopePath.mutatingLast {
-      $0.appending(scope)
-    }
+    let scopePath = scope.isEmpty 
+      ? parentTypeInfo.scopePath
+      : parentTypeInfo.scopePath.mutatingLast { $0.appending(scope) }
 
     let typeInfo = SelectionSet.TypeInfo(
       entity: parentTypeInfo.entity,
@@ -469,7 +467,9 @@ class RootFieldBuilder {
       inclusionConditions: AnyOf(scope.conditions)
     )
 
-    entityStorage.mergeAllSelectionsIntoEntitySelectionTrees(from: fragmentSpread)
+    if fragmentSpread.typeInfo.deferCondition == nil {
+      entityStorage.mergeAllSelectionsIntoEntitySelectionTrees(from: fragmentSpread)
+    }
 
     return fragmentSpread
   }

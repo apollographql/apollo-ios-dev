@@ -6570,6 +6570,84 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
+  // MARK: Deferred Fragments - Named Fragments (with @include/@skip)
+
+  func test__deferredFragments__givenDeferredNamedFragment_withIncludeDirective_onSameTypeCase_buildsNestedDeferredNamedFragment() throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String
+        species: String
+      }
+      """
+
+    document = """
+      query TestOperation($a: Boolean) {
+        allAnimals {
+          __typename
+          id
+          ...AnimalFragment @include(if: $a) @defer(label: "root")
+        }
+      }
+
+      fragment AnimalFragment on Animal {
+        species
+      }
+      """
+
+    // when
+    try buildSubjectRootField()
+
+    // then
+    let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
+    let Fragment_AnimalFragment = try XCTUnwrap(ir.compilationResult[fragment: "AnimalFragment"])
+
+    let allAnimals = self.subject[field: "allAnimals"]
+    let allAnimals_ifA = allAnimals?[as: "Animal", if: "a"]
+    let animalFragment = ir.builtFragments["AnimalFragment"]
+
+    expect(allAnimals?.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("id", type: .string()),
+          .inlineFragment(parentType: Interface_Animal, inclusionConditions: [.include(if: "a")]),
+        ],
+        mergedSelections: [
+        ]
+      )
+    ))
+
+    expect(allAnimals_ifA).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        inclusionConditions: [.include(if: "a")],
+        directSelections: [
+          .deferred(Fragment_AnimalFragment, label: "root"),
+        ],
+        mergedSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+    ))
+
+    expect(animalFragment?.rootField.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("species", type: .string()),
+        ]
+      )
+    ))
+  }
+
   #warning("Need tests here with @include and @skip")
 
 }
