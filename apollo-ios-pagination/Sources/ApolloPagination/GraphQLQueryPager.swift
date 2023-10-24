@@ -155,7 +155,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
           } else {
             shouldUpdate = true
           }
-          let variables = initialQuery.__variables?.values.compactMap { $0._jsonEncodableValue?._jsonValue } ?? []
+          let variables = nextPageQuery.__variables?.values.compactMap { $0._jsonEncodableValue?._jsonValue } ?? []
           if shouldUpdate {
             self.pageOrder.append(variables)
           }
