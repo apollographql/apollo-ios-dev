@@ -82,21 +82,21 @@ jobs:
             test-plan: Apollo-CITestPlan
             name: Apollo Unit Tests - macOS
             run-js-tests: false
-            should-run: 'true'
+            should-run: true
           # Codegen CLI Test
           - destination: platform=macOS,arch=x86_64
             scheme: CodegenCLITests
             test-plan: CodegenCLITestPlan
             name: Codegen CLI Unit Tests - macOS
             run-js-tests: false
-            should-run: 'true'
+            should-run: true
           # CodegenLib Test
           - destination: platform=macOS,arch=x86_64
             scheme: ApolloCodegenTests
             test-plan: Apollo-Codegen-CITestPlan
             name: Codegen Lib Unit Tests - macOS
             run-js-tests: true
-            should-run: 'true'
+            should-run: true
           # ApolloPagination Tests
           - destination: platform=macOS,arch=x86_64
             scheme: ApolloPaginationTests
