@@ -130,6 +130,12 @@ jobs:
     #   with:
     #       command: 'generate'
     #       arguments: ''
+    - name: Log
+      shell: bash
+      env:
+        SHOULD_RUN: ${{ matrix.should-run }}
+      run: |
+        echo "Should run: $SHOULD_RUN"
     - name: Build and Test
       if: ${{ matrix.should-run == true || matrix.should-run == 'true' }}
       uses: ./.github/actions/build-and-run-unit-tests
