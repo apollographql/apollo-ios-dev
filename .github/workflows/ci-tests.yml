@@ -8,8 +8,25 @@ env:
   XCODE_VERSION: "15.0.0"
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      project: ${{ steps.filter.outputs.project }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            project:
+              - 'Workspace.swift'
+              - 'Tuist/**'
+              - 'Project.swift'
+
   tuist-generation:
     runs-on: macos-13
+    needs: changes
+    if: ${{ needs.changes.outputs.project == 'true' }}
     timeout-minutes: 8
     name: Run Tuist Generation
     steps:
