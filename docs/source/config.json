@@ -94,8 +94,7 @@
     ],
     "Networking": [
       {
-        "Creating a Client": "/networking/client-creation",
-        "Advanced Network Configuration": "/networking/request-pipeline"
+        "Creating a Client": "/networking/client-creation"
       },
       true
     ],
@@ -107,7 +106,8 @@
     ],
     "Advanced": [
       {
-        "File uploads": "/file-uploads"
+        "File Uploads": "/file-uploads",
+        "Request Chain Customization": "/networking/request-pipeline"
       },
       true
     ]
