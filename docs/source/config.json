@@ -58,7 +58,8 @@
         "The Codegen CLI": "/code-generation/codegen-cli",
         "Configuration": "/code-generation/codegen-configuration",
         "Downloading a Schema": "/code-generation/downloading-schema",
-        "Running Code Generation in Swift Code": "/code-generation/run-codegen-in-swift-code"
+        "Running Code Generation in Swift Code": "/code-generation/run-codegen-in-swift-code",
+        "Code Generation Troubleshooting": "/troubleshooting/codegen-troubleshooting"
       },
       true
     ],
@@ -93,8 +94,7 @@
     ],
     "Networking": [
       {
-        "Creating a Client": "/networking/client-creation",
-        "Advanced Network Configuration": "/networking/request-pipeline"
+        "Creating a Client": "/networking/client-creation"
       },
       true
     ],
@@ -104,9 +104,10 @@
       },
       true
     ],
-    "Troubleshooting": [
+    "Advanced": [
       {
-        "Code Generation": "/troubleshooting/codegen-troubleshooting"
+        "File Uploads": "/file-uploads",
+        "Request Chain Customization": "/networking/request-pipeline"
       },
       true
     ]
