@@ -9,10 +9,6 @@ public class CompilationResult: JavaScriptObject {
       static let LocalCacheMutation = "apollo_client_ios_localCacheMutation"
       static let Defer = "defer"
     }
-
-    enum ArgumentLabels {
-      static let `If` = "if"
-    }
   }
 
   public lazy var rootTypes: RootTypeDefinition = self["rootTypes"]
@@ -164,7 +160,7 @@ public class CompilationResult: JavaScriptObject {
 
     lazy var directives: [Directive]? = self["directives"]
 
-    public lazy var isDeferred: IsDeferred = getIsDeferred()
+    public lazy var deferCondition: DeferCondition? = getDeferCondition()
 
     public override var debugDescription: String {
       selectionSet.debugDescription
@@ -191,7 +187,7 @@ public class CompilationResult: JavaScriptObject {
 
     public lazy var directives: [Directive]? = self["directives"]
 
-    public lazy var isDeferred: IsDeferred = getIsDeferred()
+    public lazy var deferCondition: DeferCondition? = getDeferCondition()
 
     @inlinable public var parentType: GraphQLCompositeType { fragment.type }
 
@@ -408,16 +404,30 @@ public class CompilationResult: JavaScriptObject {
     }
   }
 
-  public enum IsDeferred: ExpressibleByBooleanLiteral {
-    case value(Bool)
-    case variable(String)
-
-    public init(booleanLiteral value: BooleanLiteralType) {
-      self = .value(value)
+  public struct DeferCondition: Hashable, CustomDebugStringConvertible {
+    /// String constants used to match JavaScriptObject instances.
+    fileprivate enum Constants {
+      enum ArgumentNames {
+        static let Label = "label"
+        static let `If` = "if"
+      }
     }
 
-    static func `if`(_ variable: String) -> Self {
-      .variable(variable)
+    public let label: String
+    public let variable: String?
+
+    public init(label: String, variable: String? = nil) {
+      self.label = label
+      self.variable = variable
+    }
+
+    public var debugDescription: String {
+      var string = "Defer \"\(label)\""
+      if let variable {
+        string += " - if \"\(variable)\""
+      }
+
+      return string
     }
   }
 
@@ -428,28 +438,43 @@ fileprivate protocol Deferrable {
 }
 
 fileprivate extension Deferrable where Self: JavaScriptObject {
-  func getIsDeferred() -> CompilationResult.IsDeferred {
+  func getDeferCondition() -> CompilationResult.DeferCondition? {
     guard let directive = directives?.first(
       where: { $0.name == CompilationResult.Constants.DirectiveNames.Defer }
     ) else {
-      return false
+      return nil
     }
 
-    guard let argument = directive.arguments?.first(
-      where: { $0.name == CompilationResult.Constants.ArgumentLabels.If }
+    guard
+      let labelArgument = directive.arguments?.first(
+        where: { $0.name == CompilationResult.DeferCondition.Constants.ArgumentNames.Label }),
+      case let .string(labelValue) = labelArgument.value
+    else {
+      preconditionFailure("Incorrect `label` argument. Either missing or value is not a String.")
+    }
+
+    guard let variableArgument = directive.arguments?.first(
+      where: { $0.name == CompilationResult.DeferCondition.Constants.ArgumentNames.If }
     ) else {
-      return true
+      return .init(label: labelValue)
     }
 
-    switch (argument.value) {
+    switch (variableArgument.value) {
     case let .boolean(value):
-      return .value(value)
+      if value {
+        return .init(label: labelValue)
+      } else {
+        return nil
+      }
 
     case let .string(value), let .variable(value):
-      return .variable(value)
+      return .init(label: labelValue, variable: value)
 
     default:
-      preconditionFailure("Incompatible argument value. Expected Boolean or Variable, got \(argument.value).")
+      preconditionFailure("""
+        Incompatible variable value. Expected Boolean, String or Variable,
+        got \(variableArgument.value).
+        """)
     }
   }
 }

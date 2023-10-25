@@ -54,7 +54,7 @@ public class IRBuilder {
       definition: operationDefinition,
       rootField: result.rootField,
       referencedFragments: result.referencedFragments,
-      hasDeferredFragments: result.hasDeferredFragments
+      containsDeferredFragment: result.containsDeferredFragment
     )
   }
 
@@ -83,7 +83,7 @@ public class IRBuilder {
       definition: fragmentDefinition,
       rootField: result.rootField,
       referencedFragments: result.referencedFragments,
-      hasDeferredFragments: result.hasDeferredFragments,
+      containsDeferredFragment: result.containsDeferredFragment,
       entities: result.entities
     )
 

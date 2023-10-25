@@ -13,17 +13,17 @@ public class Operation {
 
   /// `True` if any selection set, or nested selection set, within the operation contains any
   /// fragment marked with the `@defer` directive.
-  public let hasDeferredFragments: Bool
+  public let containsDeferredFragment: Bool
 
   init(
     definition: CompilationResult.OperationDefinition,
     rootField: EntityField,
     referencedFragments: OrderedSet<NamedFragment>,
-    hasDeferredFragments: Bool
+    containsDeferredFragment: Bool
   ) {
     self.definition = definition
     self.rootField = rootField
     self.referencedFragments = referencedFragments
-    self.hasDeferredFragments = hasDeferredFragments
+    self.containsDeferredFragment = containsDeferredFragment
   }
 }

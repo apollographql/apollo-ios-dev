@@ -215,6 +215,8 @@ class EntitySelectionTree {
 
         if let conditionalScopes = scopeConditions {
           for (condition, node) in conditionalScopes {
+            guard !node.scope.isDeferred else { continue }
+
             if scopePathNode.value.matches(condition) {
               node.mergeSelections(matchingScopePath: scopePathNode, into: targetSelections)
 
@@ -229,6 +231,8 @@ class EntitySelectionTree {
 
       if let scopeConditions = scopeConditions {
         for (condition, node) in scopeConditions {
+          guard !node.scope.isDeferred else { continue }
+
           if scopePathNode.value.matches(condition) {
             node.mergeSelections(matchingScopePath: scopePathNode, into: targetSelections)
           }
@@ -256,7 +260,8 @@ class EntitySelectionTree {
     fileprivate func scopeConditionNode(for condition: ScopeCondition) -> EntityNode {
       let nodeCondition = ScopeCondition(
         type: condition.type == self.type ? nil : condition.type,
-        conditions: condition.conditions
+        conditions: condition.conditions,
+        deferCondition: condition.deferCondition
       )
 
       func createNode() -> EntityNode {

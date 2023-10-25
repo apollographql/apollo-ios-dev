@@ -9,24 +9,29 @@ import Utilities
 public struct ScopeCondition: Hashable, CustomDebugStringConvertible {
   public let type: GraphQLCompositeType?
   public let conditions: InclusionConditions?
+  public let deferCondition: CompilationResult.DeferCondition?
 
   init(
     type: GraphQLCompositeType? = nil,
-    conditions: InclusionConditions? = nil
+    conditions: InclusionConditions? = nil,
+    deferCondition: CompilationResult.DeferCondition? = nil
   ) {
     self.type = type
     self.conditions = conditions
+    self.deferCondition = deferCondition
   }
 
   public var debugDescription: String {
-    [type?.debugDescription, conditions?.debugDescription]
+    [type?.debugDescription, conditions?.debugDescription, deferCondition?.debugDescription]
       .compactMap { $0 }
       .joined(separator: " ")
   }
 
   var isEmpty: Bool {
-    type == nil && (conditions?.isEmpty ?? true)
+    type == nil && (conditions?.isEmpty ?? true) && deferCondition == nil
   }
+
+  var isDeferred: Bool { deferCondition != nil }
 }
 
 public typealias TypeScope = OrderedSet<GraphQLCompositeType>
@@ -70,22 +75,18 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
 
   let allTypesInSchema: Schema.ReferencedTypes
 
-  let IsDeferred: IsDeferred
-
   private init(
     typePath: LinkedList<ScopeCondition>,
     type: GraphQLCompositeType,
     matchingTypes: TypeScope,
     matchingConditions: InclusionConditions?,
-    allTypesInSchema: Schema.ReferencedTypes,
-    isDeferred: IsDeferred = false
+    allTypesInSchema: Schema.ReferencedTypes
   ) {
     self.scopePath = typePath
     self.type = type
     self.matchingTypes = matchingTypes
     self.matchingConditions = matchingConditions
     self.allTypesInSchema = allTypesInSchema
-    self.IsDeferred = isDeferred
   }
 
   /// Creates a `ScopeDescriptor` for a root `SelectionSet`.
@@ -144,7 +145,9 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
   ///
   /// This should be used to create a `ScopeDescriptor` for a conditional `SelectionSet` inside
   /// of an entity, by appending the conditions to the parent `SelectionSet`'s `ScopeDescriptor`.
-  func appending(_ scopeCondition: ScopeCondition, isDeferred: IsDeferred = false) -> ScopeDescriptor {
+  func appending(
+    _ scopeCondition: ScopeCondition
+  ) -> ScopeDescriptor {
     let matchingTypes: TypeScope
     if let newType = scopeCondition.type {
       matchingTypes = Self.typeScope(
@@ -166,8 +169,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
       type: scopeCondition.type ?? self.type,
       matchingTypes: matchingTypes,
       matchingConditions: matchingConditions,
-      allTypesInSchema: self.allTypesInSchema,
-      isDeferred: isDeferred
+      allTypesInSchema: self.allTypesInSchema
     )
   }
 
@@ -211,6 +213,10 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
     return false
   }
 
+  public func matches(_ otherDeferCondition: CompilationResult.DeferCondition) -> Bool {
+    otherDeferCondition == self.scopePath.last.value.deferCondition
+  }
+
   /// Indicates if the receiver is of the given type. If the receiver matches a given type,
   /// then selections for a `SelectionSet` of that type can be merged in to the receiver's
   /// `SelectionSet`.
@@ -220,6 +226,10 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
     }
 
     if let inclusionConditions = condition.conditions, !self.matches(inclusionConditions) {
+      return false
+    }
+
+    if let deferConditions = condition.deferCondition, !self.matches(deferConditions) {
       return false
     }
 

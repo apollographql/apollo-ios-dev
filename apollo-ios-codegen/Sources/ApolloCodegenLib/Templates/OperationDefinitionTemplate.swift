@@ -27,7 +27,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
         accessControlRenderer: { accessControlModifier(for: .member) }()
       ))
 
-      \(section: DeferredProperties(operation.hasDeferredFragments))
+      \(section: DeferredProperties(operation.containsDeferredFragment))
 
       \(section: VariableProperties(operation.definition.variables))
 
