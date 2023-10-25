@@ -58,7 +58,8 @@
         "The Codegen CLI": "/code-generation/codegen-cli",
         "Configuration": "/code-generation/codegen-configuration",
         "Downloading a Schema": "/code-generation/downloading-schema",
-        "Running Code Generation in Swift Code": "/code-generation/run-codegen-in-swift-code"
+        "Running Code Generation in Swift Code": "/code-generation/run-codegen-in-swift-code",
+        "Code Generation Troubleshooting": "/troubleshooting/codegen-troubleshooting"
       },
       true
     ],
@@ -104,9 +105,9 @@
       },
       true
     ],
-    "Troubleshooting": [
+    "Advanced": [
       {
-        "Code Generation": "/troubleshooting/codegen-troubleshooting"
+        "File uploads": "/file-uploads"
       },
       true
     ]
