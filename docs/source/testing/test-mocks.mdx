@@ -13,7 +13,7 @@ Generated test mocks provide a type-safe way to mock your response models. Rathe
 Because the generated response models are backed by a JSON dictionary, initializing them with mock data without generated test mocks is verbose and error-prone. You need to create stringly-typed JSON dictionaries that are structured exactly like the expected network response to ensure the your models parse properly.
 
 ```swift
-let data: [String: AnyHashable] = [
+let data: [String: Any] = [
     "data": [
         "__typename": "Query",
         "hero": [
@@ -36,7 +36,7 @@ let data: [String: AnyHashable] = [
     ]
 ]
 
-let model = HeroAndFriendsQuery.Data(data: DataDict(data))
+let model = HeroAndFriendsQuery.Data(data: DataDict(data.asAnyHashable))
 
 XCTAssertEqual(model.hero.friends[1].name, "C-3PO")
 ```
