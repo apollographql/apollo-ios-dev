@@ -103,7 +103,7 @@ jobs:
             test-plan: Apollo-PaginationTestPlan
             name: ApolloPagination Unit Tests - macOS
             run-js-tests: false
-            should-run: ${{ needs.changes.outputs.pagination == 'true' }}
+            should-run: ${{ needs.changes.outputs.pagination }}
     name: ${{ matrix.name }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
@@ -132,7 +132,7 @@ jobs:
     #       arguments: ''
     - name: Build and Test
       uses: ./.github/actions/build-and-run-unit-tests
-      if: ${{ matrix.should-run == true }}
+      if: ${{ matrix.should-run == true || matrix.should-run == 'true' }}
       with:
         destination: ${{ matrix.destination }}
         scheme: ${{ matrix.scheme }}
