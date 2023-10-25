@@ -299,6 +299,10 @@ class RootFieldBuilder {
     }
 
     let type = (
+      // We must specify the type whenever there is a defer condition because even when the type
+      // case matches that of the parent it must be evaluted as an entirely separate scope because
+      // deferred fragments are treated as isolated selections and must not be merged into any
+      // other selection.
       parentTypePath.parentType == conditionalSelectionSet.parentType
       && !isDeferred
     )
