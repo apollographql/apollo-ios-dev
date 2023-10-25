@@ -131,8 +131,8 @@ jobs:
     #       command: 'generate'
     #       arguments: ''
     - name: Build and Test
-      uses: ./.github/actions/build-and-run-unit-tests
       if: ${{ matrix.should-run == true || matrix.should-run == 'true' }}
+      uses: ./.github/actions/build-and-run-unit-tests
       with:
         destination: ${{ matrix.destination }}
         scheme: ${{ matrix.scheme }}
