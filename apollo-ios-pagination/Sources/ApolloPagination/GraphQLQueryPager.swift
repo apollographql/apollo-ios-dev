@@ -337,13 +337,7 @@ extension GraphQLQueryPager {
       guard let last = varMap.values.last else {
         return initialPageResult.flatMap { extractPageInfo(.initial($0)) }
       }
-      if let data = varMap[last] {
-        return extractPageInfo(.paginated(data))
-      } else if let initialPageResult {
-        return extractPageInfo(.initial(initialPageResult))
-      } else {
-        return nil
-      }
+      return extractPageInfo(.paginated(last))
     }
   }
 }
