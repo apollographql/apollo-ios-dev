@@ -36,7 +36,7 @@ let data: [String: Any] = [
     ]
 ]
 
-let model = HeroAndFriendsQuery.Data(data: DataDict(data.asAnyHashable))
+let model = HeroAndFriendsQuery.Data(dict: data)
 
 XCTAssertEqual(model.hero.friends[1].name, "C-3PO")
 ```
