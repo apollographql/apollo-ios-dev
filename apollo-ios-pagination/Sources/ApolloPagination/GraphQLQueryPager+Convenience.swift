@@ -1,7 +1,7 @@
 import Apollo
 import ApolloAPI
 
-public extension GraphQLQueryPager.Actor {
+extension GraphQLQueryPager.Actor {
   static func makeQueryPager<P: PaginationInfo>(
     client: ApolloClientProtocol,
     queryProvider: @escaping (P?) -> InitialQuery,
