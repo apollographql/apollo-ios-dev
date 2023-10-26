@@ -29,7 +29,6 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 
   /// The result of either the initial query or the paginated query, for the purpose of extracting a `PageInfo` from it.
   public enum PageExtractionData {
-    // This class is outside of the scope of the `GraphQLQueryPager` such that it can be shared between it and the `Actor`.
     case initial(InitialQuery.Data)
     case paginated(PaginatedQuery.Data)
   }
