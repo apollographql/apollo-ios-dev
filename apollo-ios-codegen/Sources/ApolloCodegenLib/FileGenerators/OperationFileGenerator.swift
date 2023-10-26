@@ -5,6 +5,8 @@ import IR
 struct OperationFileGenerator: FileGenerator {
   /// Source IR operation.
   let irOperation: IR.Operation
+  /// The persisted query identifier for the ``operation``.
+  let operationIdentifier: String?
   /// Shared codegen configuration
   let config: ApolloCodegen.ConfigurationContext
   
@@ -16,6 +18,7 @@ struct OperationFileGenerator: FileGenerator {
     ) :
     OperationDefinitionTemplate(
       operation: irOperation,
+      operationIdentifier: operationIdentifier,
       config: config
     )
   }

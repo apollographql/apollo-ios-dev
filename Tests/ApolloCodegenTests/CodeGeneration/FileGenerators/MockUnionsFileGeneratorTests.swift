@@ -17,8 +17,7 @@ class MockUnionsFileGeneratorTests: XCTestCase {
   // MARK: Test Helpers
 
   private func buildSubject(unions: OrderedSet<GraphQLUnionType> = [mockUnion]) {
-    let compilationResult = CompilationResult.mock()
-    compilationResult.referencedTypes.append(contentsOf: unions.elements)
+    let compilationResult = CompilationResult.mock(referencedTypes: unions.elements)
 
     let ir = IRBuilder.mock(compilationResult: compilationResult)
 

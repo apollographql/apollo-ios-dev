@@ -4,7 +4,7 @@ import Nimble
 import GraphQLCompiler
 
 class MockObjectFileGeneratorTests: XCTestCase {
-  let graphqlObject = GraphQLObjectType.mock("MockObject", fields: [:], interfaces: [])
+  let graphqlObject = GraphQLObjectType.mock("MockObject", interfaces: [], fields: [:])
 
   var subject: MockObjectFileGenerator!
 
@@ -17,6 +17,7 @@ class MockObjectFileGeneratorTests: XCTestCase {
   private func buildSubject() {
     subject = MockObjectFileGenerator(
       graphqlObject: graphqlObject,
+      fields: [],
       ir: .mock(compilationResult: .mock()),
       config: ApolloCodegen.ConfigurationContext(config: .mock(.other))
     )

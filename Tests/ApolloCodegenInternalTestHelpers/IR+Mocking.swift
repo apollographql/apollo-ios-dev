@@ -10,9 +10,9 @@ extension IRBuilder {
     schema: String,
     document: String,
     enableCCN: Bool = false
-  ) throws -> IRBuilder {
-    let frontend = try GraphQLJSFrontend()
-    let compilationResult = try frontend.compile(
+  ) async throws -> IRBuilder {
+    let frontend = try await GraphQLJSFrontend()
+    let compilationResult = try await frontend.compile(
       schema: schema,
       document: document,
       enableCCN: enableCCN
@@ -24,9 +24,9 @@ extension IRBuilder {
     schema: String,
     documents: [String],
     enableCCN: Bool = false
-  ) throws -> IRBuilder {
-    let frontend = try GraphQLJSFrontend()
-    let compilationResult = try frontend.compile(
+  ) async throws -> IRBuilder {
+    let frontend = try await GraphQLJSFrontend()
+    let compilationResult = try await frontend.compile(
       schema: schema,
       documents: documents,
       enableCCN: enableCCN
@@ -38,9 +38,9 @@ extension IRBuilder {
     schemaJSON: String,
     document: String,
     enableCCN: Bool = false
-  ) throws -> IRBuilder {
-    let frontend = try GraphQLJSFrontend()
-    let compilationResult = try frontend.compile(
+  ) async throws -> IRBuilder {
+    let frontend = try await GraphQLJSFrontend()
+    let compilationResult = try await frontend.compile(
       schemaJSON: schemaJSON,
       document: document,
       enableCCN: enableCCN
@@ -48,8 +48,7 @@ extension IRBuilder {
     return .mock(compilationResult: compilationResult)
   }
 
-  public static func mock(
-    schemaNamespace: String = "TestSchema",
+  public static func mock(    
     compilationResult: CompilationResult
   ) -> IRBuilder {
     return IRBuilder(compilationResult: compilationResult)
@@ -62,7 +61,7 @@ extension IR.NamedFragment {
   public static func mock(
     _ name: String,
     type: GraphQLCompositeType = .mock("MockType"),
-    source: String? = nil
+    source: String = ""
   ) -> IR.NamedFragment {
     let definition = CompilationResult.FragmentDefinition.mock(name, type: type, source: source)
     let rootField = CompilationResult.Field.mock(name, type: .entity(type))
@@ -79,7 +78,7 @@ extension IR.NamedFragment {
           .descriptor(
             forType: type,
             inclusionConditions: nil,
-            givenAllTypesInSchema: .init([type])
+            givenAllTypesInSchema: .init([type], schemaRootTypes: .mock())
           ))))
 
     return IR.NamedFragment(
@@ -111,7 +110,7 @@ extension IR.Operation {
           scopePath: [.descriptor(
             forType: .mock(),
             inclusionConditions: nil,
-            givenAllTypesInSchema: .init([]))
+            givenAllTypesInSchema: .init([], schemaRootTypes: .mock()))
           ])
       ),
       referencedFragments: referencedFragments
@@ -127,7 +126,8 @@ extension IR.Operation {
     let definition = CompilationResult.OperationDefinition.mock(
       name: name,
       type: type,
-      source: source
+      source: source,
+      referencedFragments: referencedFragments.map(\.definition)
     )
 
     return IR.Operation.mock(definition: definition, referencedFragments: referencedFragments)

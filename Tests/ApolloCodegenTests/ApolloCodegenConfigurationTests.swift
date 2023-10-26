@@ -1,10 +1,12 @@
 import XCTest
 @testable import ApolloCodegenInternalTestHelpers
 @testable import ApolloCodegenLib
+import ApolloInternalTestHelpers
 import Nimble
 
 class ApolloCodegenConfigurationTests: XCTestCase {
 
+  var testFilePathBuilder: TestFilePathBuilder!
   var directoryURL: URL!
   var filename: String!
   var fileURL: URL!
@@ -16,7 +18,9 @@ class ApolloCodegenConfigurationTests: XCTestCase {
 
   override func setUpWithError() throws {
     try super.setUpWithError()
-    directoryURL = CodegenTestHelper.outputFolderURL()
+    testFilePathBuilder = TestFilePathBuilder(test: self)
+
+    directoryURL = testFilePathBuilder.testIsolatedOutputFolder
       .appendingPathComponent("Configuration")
       .appendingPathComponent(self.testRun!.test.name)
 
@@ -26,12 +30,16 @@ class ApolloCodegenConfigurationTests: XCTestCase {
     fileURL = directoryURL.appendingPathComponent(filename)
 
     input = .init(schemaPath: fileURL.path)
-    output = .init(schemaTypes: .init(path: directoryURL.path, moduleType: .embeddedInTarget(name: "MockApplication")))
+    output = .init(schemaTypes: .init(
+      path: directoryURL.path,
+      moduleType: .embeddedInTarget(name: "MockApplication")
+    ))
   }
 
   override func tearDownWithError() throws {
     try ApolloFileManager.default.deleteDirectory(atPath: directoryURL.path)
 
+    testFilePathBuilder = nil
     config = nil
     output = nil
     input = nil

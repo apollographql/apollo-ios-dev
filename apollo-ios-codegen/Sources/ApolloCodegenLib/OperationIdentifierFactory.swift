@@ -1,42 +1,64 @@
 import Foundation
 import IR
+import GraphQLCompiler
 import CryptoKit
 
-class OperationIdentifierFactory {
+/// An async closure used to compute the operation identifiers for operations
+/// in the persisted queries manifest
+public typealias OperationIdentifierProvider = (_ operation: OperationDescriptor) async throws -> String
 
-  private var computedIdentifiers: [ObjectIdentifier: String] = [:]
+actor OperationIdentifierFactory {
 
-  func identifier(for operation: IR.Operation) -> String {
+  private enum CacheEntry {
+    case inProgress(Task<String, Error>)
+    case ready(String)
+  }
+
+  let idProvider: OperationIdentifierProvider
+
+  private var computedIdentifiersCache: [ObjectIdentifier: CacheEntry] = [:]
+
+  init(
+    idProvider: @escaping OperationIdentifierProvider = DefaultOperationIdentifierProvider) {
+    self.idProvider = idProvider
+  }
+
+  func identifier(
+    for operation: CompilationResult.OperationDefinition
+  ) async throws -> String {
     let operationObjectID = ObjectIdentifier(operation)
-    if let identifier = computedIdentifiers[operationObjectID] {
-      return identifier
+    let descriptor = OperationDescriptor(operation)
+    if let cached = computedIdentifiersCache[operationObjectID] {
+      switch cached {
+      case let .ready(identifier): return identifier
+      case let .inProgress(task): return try await task.value
+      }
     }
 
-    let identifier = computeIdentifier(for: operation)
-    computedIdentifiers[operationObjectID] = identifier
+    let task = Task {      
+      try await idProvider(descriptor)
+    }
+
+    computedIdentifiersCache[operationObjectID] = .inProgress(task)
+
+    let identifier = try await task.value
+    computedIdentifiersCache[operationObjectID] = .ready(identifier)
     return identifier
   }
 
-  private func computeIdentifier(for operation: IR.Operation) -> String {
-    var hasher = SHA256()
-    func updateHash(with source: inout String) {
-      source.withUTF8({ buffer in
-        hasher.update(bufferPointer: UnsafeRawBufferPointer(buffer))
-      })
-    }
-    var definitionSource = operation.definition.source.convertedToSingleLine()
-    updateHash(with: &definitionSource)
+}
 
-    var newline: String
-    for fragment in operation.referencedFragments {
-      newline = "\n"
-      updateHash(with: &newline)
-      var fragmentSource = fragment.definition.source.convertedToSingleLine()
-      updateHash(with: &fragmentSource)
-    }
-
-    let digest = hasher.finalize()
-    return digest.compactMap { String(format: "%02x", $0) }.joined()
-
+let DefaultOperationIdentifierProvider =
+{ (operation: OperationDescriptor) -> String in
+  var hasher = SHA256()
+  func updateHash(with source: inout String) {
+    source.withUTF8({ buffer in
+      hasher.update(bufferPointer: UnsafeRawBufferPointer(buffer))
+    })
   }
+  var definitionSource = operation.rawSourceText
+  updateHash(with: &definitionSource)
+
+  let digest = hasher.finalize()
+  return digest.compactMap { String(format: "%02x", $0) }.joined()
 }

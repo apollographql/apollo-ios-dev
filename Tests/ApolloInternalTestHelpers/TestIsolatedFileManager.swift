@@ -4,10 +4,6 @@ import XCTest
 /// A test helper object that manages creation and deletion of files in a temporary directory
 /// that ensures test isolation.
 ///
-/// **Creating a `TestIsolatedFileManager` sets the current working directory for the
-/// current process to it's `directoryURL`.** After the test finishes, the current working
-/// directory is reset to its previous value.
-///
 /// All files and directories created by this class will be automatically deleted upon test
 /// completion prior to the test case's `tearDown()` function being called.
 ///
@@ -15,24 +11,27 @@ import XCTest
 /// `testIsolatedFileManager()` function on `XCTestCase`.
 public class TestIsolatedFileManager {
 
-  public let directoryURL: URL
+  public var directoryURL: URL { filePathBuilder.testIsolatedOutputFolder }
   public let fileManager: FileManager
-  private let previousWorkingDirectory: String
+  public let filePathBuilder: TestFilePathBuilder
 
   /// The paths for the files written to by the ``ApolloFileManager``.
   public private(set) var writtenFiles: Set<String> = []
 
-  fileprivate init(directoryURL: URL, fileManager: FileManager) throws {
-    self.directoryURL = directoryURL
+  fileprivate init(
+    filePathBuilder: TestFilePathBuilder,
+    fileManager: FileManager
+  ) throws {
+    self.filePathBuilder = filePathBuilder
     self.fileManager = fileManager
 
-    try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true)
-    previousWorkingDirectory = fileManager.currentDirectoryPath
-    fileManager.changeCurrentDirectoryPath(directoryURL.path)
+    try fileManager.createDirectory(
+      at: filePathBuilder.testIsolatedOutputFolder,
+      withIntermediateDirectories: true
+    )    
   }
 
   func cleanUp() throws {
-    fileManager.changeCurrentDirectoryPath(previousWorkingDirectory)
     try fileManager.removeItem(at: directoryURL)
   }
 
@@ -115,7 +114,7 @@ public extension XCTestCase {
     with fileManager: FileManager = .default
   ) throws -> TestIsolatedFileManager {
     let manager = try TestIsolatedFileManager(
-      directoryURL: computeTestTempDirectoryURL(),
+      filePathBuilder: TestFilePathBuilder(test: self),
       fileManager: fileManager
     )
 
@@ -126,19 +125,4 @@ public extension XCTestCase {
     return manager
   }
 
-  private func computeTestTempDirectoryURL() -> URL {
-    let directoryURL: URL
-    if #available(macOS 13.0, iOS 16.0, tvOS 16.0, *) {
-      directoryURL = URL(filePath: NSTemporaryDirectory(), directoryHint: .isDirectory)
-    } else {
-      directoryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-    }
-
-    return directoryURL
-      .appendingPathComponent("ApolloTests")
-      .appendingPathComponent(name
-        .trimmingCharacters(in: CharacterSet(charactersIn: "-[]"))
-        .replacingOccurrences(of: " ", with: "_")        
-      )
-  }
 }

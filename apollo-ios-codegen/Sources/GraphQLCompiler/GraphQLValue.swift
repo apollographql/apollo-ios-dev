@@ -2,7 +2,15 @@ import Foundation
 import JavaScriptCore
 import OrderedCollections
 
-public indirect enum GraphQLValue: Hashable {
+/// A value in a GraphQL document
+///
+/// The `Sendable` implementation of this enum is `@unchecked` because `OrderedDictionary` is not
+/// currently marked as `Sendable`. v1.1 of the OrderedCollections module will mark the dictionary
+/// as `Sendable` from this pull request https://github.com/apple/swift-collections/pull/191. Once
+/// that version is released and we upgrade to it, `@unchecked` can be removed here.
+/// Regardless, the `OrderedDictionary` should be compliant with `Sendable` as it uses
+/// copy-on-write value semantics.
+public indirect enum GraphQLValue: @unchecked Sendable, Hashable {
   case variable(String)
   case int(Int)
   case float(Double)
@@ -15,7 +23,7 @@ public indirect enum GraphQLValue: Hashable {
 }
 
 extension GraphQLValue: JavaScriptValueDecodable {
-  init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
+  init(_ jsValue: JSValue) {
     precondition(jsValue.isObject, "Expected JavaScript object but found: \(jsValue)")
 
     let kind: String = jsValue["kind"].toString()
@@ -40,7 +48,7 @@ extension GraphQLValue: JavaScriptValueDecodable {
       if value.isUndefined {
         value = jsValue["values"]
       }
-      self = .list(.fromJSValue(value, bridge: bridge))
+      self = .list(.init(value))
     case "ObjectValue":
       let value = jsValue["value"]
 
@@ -49,11 +57,11 @@ extension GraphQLValue: JavaScriptValueDecodable {
       /// We need to handle both converted object values and default values and represented by
       /// `graphql-js`.
       if !value.isUndefined {
-        self = .object(.fromJSValue(value, bridge: bridge))
+        self = .object(.init(value))
 
       } else {
         let fields = jsValue["fields"].toOrderedDictionary { field in
-          (field["name"]["value"].toString(), GraphQLValue(field["value"], bridge: bridge))
+          (field["name"]["value"].toString(), GraphQLValue(field["value"]))
         }
         self = .object(fields)
       }

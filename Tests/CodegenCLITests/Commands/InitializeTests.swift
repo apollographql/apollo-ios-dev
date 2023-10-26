@@ -44,7 +44,7 @@ class InitializeTests: XCTestCase {
 
   // MARK: - Validation Tests
 
-  func test__validation__givenWhitespaceOnlySchemaName_shouldThrowError() throws {
+  func test__validation__givenWhitespaceOnlySchemaName_shouldThrowError() async throws {
     // given
     let options = [
       "--schema-namespace= ",
@@ -54,10 +54,10 @@ class InitializeTests: XCTestCase {
     let subject = try self.parse(options)
 
     // then
-    expect(try subject._run()).to(throwError())
+    await expect { try await subject._run() }.to(throwError())
   }
 
-  func test__validation__givenSchemaNameContainingWhitespace_shouldThrowError() throws {
+  func test__validation__givenSchemaNameContainingWhitespace_shouldThrowError() async throws {
     // given
     let options = [
       "--schema-namespace=\"My Schema\"",
@@ -67,7 +67,7 @@ class InitializeTests: XCTestCase {
     let subject = try self.parse(options)
 
     // then
-    expect(try subject._run()).to(throwError())
+    await expect { try await subject._run() }.to(throwError())
   }
 
   func test__validation__givenModuleType_embeddedInTarget_withNoTargetName_shouldThrowValidationError() throws {
@@ -141,7 +141,7 @@ class InitializeTests: XCTestCase {
 
   // MARK: - Output Tests
 
-  func test__output__givenParameters_pathCustom_overwriteDefault_whenNoExistingFile_shouldWriteToPath() throws {
+  func test__output__givenParameters_pathCustom_overwriteDefault_whenNoExistingFile_shouldWriteToPath() async throws {
     // given
     let outputPath = "./path/to/output.file"
 
@@ -176,13 +176,13 @@ class InitializeTests: XCTestCase {
       return true
     }))
 
-    try subject._run(fileManager: mockFileManager)
+    try await subject._run(fileManager: mockFileManager)
 
     // then
     expect(self.mockFileManager.allClosuresCalled).to(beTrue())
   }
 
-  func test__output__givenParameters_pathCustom_overwriteDefault_whenFileExists_shouldThrow() throws {
+  func test__output__givenParameters_pathCustom_overwriteDefault_whenFileExists_shouldThrow() async throws {
     // given
     let outputPath = "./path/to/output.file"
 
@@ -202,15 +202,15 @@ class InitializeTests: XCTestCase {
     }))
 
     // then
-    expect(
-      try subject._run(fileManager: self.mockFileManager)
-    ).to(throwError(
+    await expect {
+      try await subject._run(fileManager: self.mockFileManager)
+    }.to(throwError(
       localizedDescription: "File already exists at \(outputPath).",
       ignoringExtraCharacters: true
     ))
   }
 
-  func test__output__givenParameters_pathCustom_overwriteTrue_whenFileExists_shouldWriteToPath() throws {
+  func test__output__givenParameters_pathCustom_overwriteTrue_whenFileExists_shouldWriteToPath() async throws {
     // given
     let outputPath = "./path/to/output.file"
 
@@ -246,13 +246,13 @@ class InitializeTests: XCTestCase {
       return true
     }))
 
-    try subject._run(fileManager: mockFileManager)
+    try await subject._run(fileManager: mockFileManager)
 
     // then
     expect(self.mockFileManager.allClosuresCalled).to(beTrue())
   }
 
-  func test__output__givenParameters_printTrue_shouldPrintToStandardOutput() throws {
+  func test__output__givenParameters_printTrue_shouldPrintToStandardOutput() async throws {
     // given
     let options = requiredOptions + [
       "--print"
@@ -262,12 +262,12 @@ class InitializeTests: XCTestCase {
 
     // when
     var output: String?
-    try command._run() { message in
+    try await command._run() { message in
       output = message
     }
 
     // then
-    expect(output).toEventuallyNot(beNil())
+    await expect(output).toEventuallyNot(beNil())
     expect(output).to(equal(
       ApolloCodegenConfiguration.minimalJSON(
         schemaNamespace: "MockSchema",
@@ -277,7 +277,7 @@ class InitializeTests: XCTestCase {
     ))
   }
 
-  func test__output__givenParameters_bothPathAndPrint_shouldPrintToStandardOutput() throws {
+  func test__output__givenParameters_bothPathAndPrint_shouldPrintToStandardOutput() async throws {
     // given
     let options = requiredOptions + [
       "--path=./path/to/file",
@@ -288,12 +288,12 @@ class InitializeTests: XCTestCase {
 
     // when
     var output: String?
-    try command._run() { message in
+    try await command._run() { message in
       output = message
     }
 
     // then
-    expect(output).toEventuallyNot(beNil())
+    await expect(output).toEventuallyNot(beNil())
     expect(output).to(equal(
       ApolloCodegenConfiguration.minimalJSON(
         schemaNamespace: "MockSchema",

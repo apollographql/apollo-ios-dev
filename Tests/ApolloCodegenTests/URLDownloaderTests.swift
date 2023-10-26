@@ -123,7 +123,9 @@ class URLDownloaderTests: XCTestCase {
   func testDownloader_withCorrectResponse_shouldNotThrow() {
     let statusCode = 200
     let responseString = "Success!"
-    let downloadURL = CodegenTestHelper.outputFolderURL().appendingPathComponent("urldownloader.txt")
+    let testFilePathBuilder = TestFilePathBuilder(test: self)
+    let downloadURL = testFilePathBuilder.testIsolatedOutputFolder
+      .appendingPathComponent("urldownloader.txt")
 
     setRequestHandler(statusCode: statusCode, data: responseString.data(using: .utf8))
 
