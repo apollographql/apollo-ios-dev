@@ -73,16 +73,16 @@ final class ConcurrencyTests: XCTestCase {
   private func loadDataFromManyThreads(
     pager: GraphQLQueryPager<Query, Query>.Actor
   ) async {
-    try? await withThrowingTaskGroup(of: Void.self) { group in
+    await withTaskGroup(of: Void.self) { group in
       let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
-      group.addTask(priority: .userInitiated) { try await pager.loadMore() }
-      group.addTask { try await pager.loadMore() }
-      group.addTask { try await pager.loadMore() }
-      group.addTask { try await pager.loadMore() }
-      group.addTask { try await pager.loadMore() }
+      group.addTask { try? await pager.loadMore() }
+      group.addTask { try? await pager.loadMore() }
+      group.addTask { try? await pager.loadMore() }
+      group.addTask { try? await pager.loadMore() }
+      group.addTask { try? await pager.loadMore() }
 
       group.addTask { await self.fulfillment(of: [serverExpectation], timeout: 100) }
-      try await group.waitForAll()
+      await group.waitForAll()
     }
   }
 
