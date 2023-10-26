@@ -60,7 +60,7 @@ public struct OperationDescriptor: Sendable {
   /// - The source of each fragment referenced by the operation, each minimized to a
   ///   single line. There will be a `\n` character between the operation and each
   ///   fragment.
-  public var rawSourceText: String { formmatedSourceText(formatFragmentForRawSourceText) }
+  public var rawSourceText: String { formattedSourceText(formatFragmentForRawSourceText) }
 
   // MARK: - Internal
 
@@ -74,6 +74,6 @@ public struct OperationDescriptor: Sendable {
   /// operation is executed in a format that can be written to a file.
   ///
   /// This escapes the newline characters between fragments.
-  var sourceTextFormattedForManifestJSONBody: String { formmatedSourceText(formatFragmentForManifestJSONBody) }
+  var sourceTextFormattedForManifestJSONBody: String { formattedSourceText(formatFragmentForManifestJSONBody) }
 
 }
