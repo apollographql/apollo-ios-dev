@@ -44,7 +44,7 @@ public struct OperationDescriptor: Sendable {
     return type
   }
 
-  private func formmatedSourceText(_ format: (CompilationResult.FragmentDefinition) -> String) -> String {
+  private func formattedSourceText(_ format: (CompilationResult.FragmentDefinition) -> String) -> String {
     var source = underlyingDefinition.source.convertedToSingleLine()
     var set = Set<String>()
     append(to: &source, set: &set, fragments: underlyingDefinition.referencedFragments, format: format)

@@ -714,9 +714,6 @@ class FragmentTemplateTests: XCTestCase {
   func test__render__givenFragmentReservedKeywordName_rendersEscapedName() async throws {
     let keywords = ["Type", "type"]
     
-    await withThrowingTaskGroup(of: Void.self) { group in
-
-    }
     try await keywords.asyncForEach { keyword in
       // given
       schemaSDL = """
