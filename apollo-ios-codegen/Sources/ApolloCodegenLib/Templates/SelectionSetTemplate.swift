@@ -200,7 +200,10 @@ struct SelectionSetTemplate {
   }
 
   private func shouldIncludeTypenameSelection(for scope: IR.ScopeDescriptor) -> Bool {
-    return scope.scopePath.count == 1 && !scope.type.isRootFieldType
+    var isRootType: Bool {
+      scope.allTypesInSchema.schemaRootTypes.allRootTypes.contains(scope.type)
+    }
+    return scope.scopePath.count == 1 && !isRootType
   }
 
   private func renderedSelections(

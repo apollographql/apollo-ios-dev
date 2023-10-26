@@ -12,11 +12,11 @@ struct LegacyAPQOperationManifestTemplate: OperationManifestTemplate {
     return TemplateString(
     """
     {
-      \(forEachIn: operations, { operation in
+      \(forEachIn: operations, {
           return """
-            "\(operation.identifier)" : {
-              "name": "\(operation.name)",
-              "source": "\(operation.source)"
+            "\($0.identifier)" : {
+              "name": "\($0.operation.name)",
+              "source": "\($0.operation.sourceTextFormattedForManifestJSONBody)"
             }
             """
         })

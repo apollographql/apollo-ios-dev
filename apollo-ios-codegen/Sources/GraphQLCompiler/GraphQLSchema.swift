@@ -6,33 +6,50 @@ import OrderedCollections
 // and are partially described in https://graphql.org/graphql-js/type/
 
 /// A GraphQL schema.
-public class GraphQLSchema: JavaScriptObject {  
-  func getType(named typeName: String) throws -> GraphQLNamedType? {
-    try invokeMethod("getType", with: typeName)
+public final class GraphQLSchema: JavaScriptObject {
+
+  // MARK: Methods
+  func getType(named typeName: String) async throws -> (GraphQLNamedType)? {
+    try await invokeMethod("getType", with: typeName)
   }
   
-  func getPossibleTypes(_ abstractType: GraphQLAbstractType) throws -> [GraphQLObjectType] {
-    return try invokeMethod("getPossibleTypes", with: abstractType)
-  }
-  
-  func getImplementations(interfaceType: GraphQLInterfaceType) throws -> InterfaceImplementations {
-    return try invokeMethod("getImplementations", with: interfaceType)
-  }
-  
-  class InterfaceImplementations: JavaScriptObject {
-    private(set) lazy var objects: [GraphQLObjectType] = self["objects"]
-    private(set) lazy var interfaces: [GraphQLInterfaceType] = self["interfaces"]
-  }
-    
-  func isSubType(abstractType: GraphQLAbstractType, maybeSubType: GraphQLNamedType) throws -> Bool {
-    return try invokeMethod("isSubType", with: abstractType, maybeSubType)
-  }
 }
 
-public class GraphQLNamedType: JavaScriptObject, Hashable {
-  public lazy var name: String = self["name"]
+protocol GraphQLSchemaType: JavaScriptReferencedObject {
 
-  public lazy var documentation: String? = self["description"]
+}
+
+public class GraphQLNamedType: 
+  JavaScriptReferencedObject, @unchecked Sendable, Hashable, CustomDebugStringConvertible {
+  public let name: String
+
+  public let documentation: String?
+
+  required init(
+    _ jsValue: JSValue,
+    bridge: isolated JavaScriptBridge
+  ) {
+    self.name = jsValue["name"]
+    self.documentation = jsValue["description"]
+  }
+
+  func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) { }
+
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?
+  ) {
+    self.name = name
+    self.documentation = documentation
+  }
+
+  static func initializeNewObject(
+    _ jsValue: JSValue,
+    bridge: isolated JavaScriptBridge
+  ) -> Self {
+    return self.init(jsValue, bridge: bridge)
+  }
 
   public func hash(into hasher: inout Hasher) {
     hasher.combine(name)
@@ -41,10 +58,15 @@ public class GraphQLNamedType: JavaScriptObject, Hashable {
   public static func ==(lhs: GraphQLNamedType, rhs: GraphQLNamedType) -> Bool {
     return lhs.name == rhs.name
   }
+
+  public var debugDescription: String {
+    name
+  }
 }
 
-public class GraphQLScalarType: GraphQLNamedType {
-  public lazy var specifiedByURL: String? = self["specifiedByUrl"]
+public final class GraphQLScalarType: GraphQLNamedType {
+
+  public let specifiedByURL: String?
 
   public var isCustomScalar: Bool {
     guard self.specifiedByURL == nil else { return true }
@@ -56,13 +78,47 @@ public class GraphQLScalarType: GraphQLNamedType {
       return true
     }
   }
+
+  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    self.specifiedByURL = jsValue["specifiedByUrl"]
+    super.init(jsValue, bridge: bridge)
+  }
+
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?,
+    specifiedByURL: String?
+  ) {
+    self.specifiedByURL = specifiedByURL
+    super.init(name: name, documentation: documentation)
+  }
+
 }
 
-public class GraphQLEnumType: GraphQLNamedType {
-  public lazy var values: [GraphQLEnumValue] = try! invokeMethod("getValues")
+public final class GraphQLEnumType: GraphQLNamedType {
+  public private(set) var values: [GraphQLEnumValue]!
+
+  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    super.init(jsValue, bridge: bridge)
+  }
+
+  override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    self.values = try! bridge.invokeMethod("getValues", on: jsValue)
+  }
+
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?,
+    values: [GraphQLEnumValue]
+  ) {
+    self.values = values
+    super.init(name: name, documentation: documentation)
+  }
 }
 
-public class GraphQLEnumValue: JavaScriptObject {
+public struct GraphQLEnumValue: JavaScriptObjectDecodable {
 
   public struct Name {
     public let value: String
@@ -72,47 +128,107 @@ public class GraphQLEnumValue: JavaScriptObject {
     }
   }
 
-  public lazy var name: Name = Name(value: self["name"])
-  
-  public lazy var documentation: String? = self["description"]
-    
-  public lazy var deprecationReason: String? = self["deprecationReason"]
+  public let name: Name
+
+  public let documentation: String?
+
+  public let deprecationReason: String?
 
   public var isDeprecated: Bool { deprecationReason != nil }
+
+  init(
+    name: Name,
+    documentation: String?,
+    deprecationReason: String?
+  ) {
+    self.name = name
+    self.documentation = documentation
+    self.deprecationReason = deprecationReason
+  }
+
+  static func fromJSValue(
+    _ jsValue: JSValue,
+    bridge: isolated JavaScriptBridge
+  ) -> GraphQLEnumValue {
+    self.init(
+      name: .init(value: jsValue["name"]),
+      documentation: jsValue["description"],
+      deprecationReason: jsValue["deprecationReason"]
+    )
+  }
 }
 
 public typealias GraphQLInputFieldDictionary = OrderedDictionary<String, GraphQLInputField>
 
-public class GraphQLInputObjectType: GraphQLNamedType {
-  public lazy var fields: GraphQLInputFieldDictionary = try! invokeMethod("getFields")
+public final class GraphQLInputObjectType: GraphQLNamedType {
+  public private(set) var fields: GraphQLInputFieldDictionary!
+
+  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    super.init(jsValue, bridge: bridge)
+  }
+
+  override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
+  }
+
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?,
+    fields: GraphQLInputFieldDictionary
+  ) {
+    self.fields = fields
+    super.init(name: name, documentation: documentation)
+  }
 }
 
-public class GraphQLInputField: JavaScriptObject {
-  public lazy var name: String = self["name"]
-  
-  public lazy var type: GraphQLType = self["type"]
-  
-  public lazy var documentation: String? = self["description"]
-  
-  public lazy var defaultValue: GraphQLValue? = {
-    let node: JavaScriptObject? = self["astNode"]
-    return node?["defaultValue"]
-  }()
-    
-  public lazy var deprecationReason: String? = self["deprecationReason"]
+public struct GraphQLInputField: JavaScriptObjectDecodable {
+  public let name: String
+
+  public let type: GraphQLType
+
+  public let documentation: String?
+
+  public let deprecationReason: String?
+
+  public let defaultValue: GraphQLValue?
+
+  static func fromJSValue(
+    _ jsValue: JSValue,
+    bridge: isolated JavaScriptBridge
+  ) -> GraphQLInputField {
+    self.init(
+      name: jsValue["name"],
+      type: GraphQLType.fromJSValue(jsValue["type"], bridge: bridge),
+      documentation: jsValue["description"],
+      deprecationReason: jsValue["deprecationReason"],
+      defaultValue: (jsValue["astNode"] as JSValue?)?["defaultValue"]
+    )
+  }
+
+  init(
+    name: String,
+    type: GraphQLType,
+    documentation: String?,
+    deprecationReason: String?,
+    defaultValue: GraphQLValue?
+  ) {
+    self.name = name
+    self.type = type
+    self.documentation = documentation
+    self.deprecationReason = deprecationReason
+    self.defaultValue = defaultValue
+  }
 }
 
 public class GraphQLCompositeType: GraphQLNamedType {
   public override var debugDescription: String {
     "Type - \(name)"
   }
-
-  public var isRootFieldType: Bool = false
-  
 }
 
 public protocol GraphQLInterfaceImplementingType: GraphQLCompositeType {
-  var interfaces: [GraphQLInterfaceType] { get }
+  var interfaces: [GraphQLInterfaceType]! { get }
 }
 
 public extension GraphQLInterfaceImplementingType {
@@ -121,10 +237,32 @@ public extension GraphQLInterfaceImplementingType {
   }
 }
 
-public class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImplementingType {
-  public lazy var fields: [String: GraphQLField] = try! invokeMethod("getFields")
-  
-  public lazy var interfaces: [GraphQLInterfaceType] = try! invokeMethod("getInterfaces")
+public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImplementingType {
+
+  public private(set) var fields: [String: GraphQLField]!
+
+  public private(set) var interfaces: [GraphQLInterfaceType]!
+
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?,
+    fields: [String: GraphQLField],
+    interfaces: [GraphQLInterfaceType]
+  ) {
+    self.fields = fields
+    self.interfaces = interfaces
+    super.init(name: name, documentation: documentation)
+  }
+
+  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    super.init(jsValue, bridge: bridge)
+  }
+
+  override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
+    self.interfaces = try! bridge.invokeMethod("getInterfaces", on: jsValue)
+  }
 
   public override var debugDescription: String {
     "Object - \(name)"
@@ -134,37 +272,101 @@ public class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImplementi
 public class GraphQLAbstractType: GraphQLCompositeType {
 }
 
-public class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceImplementingType {  
-  public lazy var deprecationReason: String? = self["deprecationReason"]
-  
-  public lazy var fields: [String: GraphQLField] = try! invokeMethod("getFields")
-  
-  public lazy var interfaces: [GraphQLInterfaceType] = try! invokeMethod("getInterfaces")
+public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceImplementingType {
+
+  public private(set) var fields: [String: GraphQLField]!
+
+  public private(set) var interfaces: [GraphQLInterfaceType]!
+
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?,
+    fields: [String: GraphQLField],
+    interfaces: [GraphQLInterfaceType]
+  ) {
+    self.fields = fields
+    self.interfaces = interfaces
+    super.init(name: name, documentation: documentation)
+  }
+
+  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    super.init(jsValue, bridge: bridge)
+  }
+
+  override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
+    self.interfaces = try! bridge.invokeMethod("getInterfaces", on: jsValue)
+  }
 
   public override var debugDescription: String {
     "Interface - \(name)"
   }
 }
 
-public class GraphQLUnionType: GraphQLAbstractType {
-  public lazy var types: [GraphQLObjectType] = try! invokeMethod("getTypes")
+public final class GraphQLUnionType: GraphQLAbstractType {
+  public let types: [GraphQLObjectType]
+
+  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    self.types = try! bridge.invokeMethod("getTypes", on: jsValue)
+    super.init(jsValue, bridge: bridge)
+  }
+
+  /// Initializer to be used for creating mock objects in tests only.
+  init(
+    name: String,
+    documentation: String?,
+    types: [GraphQLObjectType]
+  ) {
+    self.types = types
+    super.init(name: name, documentation: documentation)
+  }
+
 
   public override var debugDescription: String {
     "Union - \(name)"
   }
 }
 
-public class GraphQLField: JavaScriptObject, Hashable {
+public final class GraphQLField:
+  JavaScriptObjectDecodable, Sendable, Hashable, CustomDebugStringConvertible {
 
-  public lazy var name: String = self["name"]
-  
-  public lazy var type: GraphQLType = self["type"]
+  public let name: String
 
-  public lazy var arguments: [GraphQLFieldArgument] = self["args"]
-  
-  public lazy var documentation: String? = self["description"]
-  
-  public lazy var deprecationReason: String? = self["deprecationReason"]
+  public let type: GraphQLType
+
+  public let arguments: [GraphQLFieldArgument]
+
+  public let documentation: String?
+
+  public let deprecationReason: String?
+
+  init(
+    name: String,
+    type: GraphQLType,
+    arguments: [GraphQLFieldArgument],
+    documentation: String?,
+    deprecationReason: String?
+  ) {
+    self.name = name
+    self.type = type
+    self.arguments = arguments
+    self.documentation = documentation
+    self.deprecationReason = deprecationReason
+  }
+
+  static func fromJSValue(
+    _ jsValue: JSValue,
+    bridge: isolated JavaScriptBridge
+  ) -> GraphQLField {
+    self.init(
+      name: jsValue["name"],
+      type: .fromJSValue(jsValue["type"], bridge: bridge),
+      arguments: .fromJSValue(jsValue["args"], bridge: bridge),
+      documentation: jsValue["description"],
+      deprecationReason: jsValue["deprecationReason"]
+    )
+  }
 
   public func hash(into hasher: inout Hasher) {
     hasher.combine(name)
@@ -178,20 +380,44 @@ public class GraphQLField: JavaScriptObject, Hashable {
     lhs.arguments == rhs.arguments
   }
 
-  public override var debugDescription: String {
+  public var debugDescription: String {
     "\(name): \(type.debugDescription)"
   }
 }
 
-public class GraphQLFieldArgument: JavaScriptObject, Hashable {
+public struct GraphQLFieldArgument: JavaScriptObjectDecodable, Sendable, Hashable {
 
-  public lazy var name: String = self["name"]
+  public let name: String
 
-  public lazy var type: GraphQLType = self["type"]
+  public let type: GraphQLType
 
-  public lazy var documentation: String? = self["description"]
+  public let documentation: String?
 
-  public lazy var deprecationReason: String? = self["deprecationReason"]
+  public let deprecationReason: String?
+
+  init(
+    name: String,
+    type: GraphQLType,
+    documentation: String?,
+    deprecationReason: String?
+  ) {
+    self.name = name
+    self.type = type
+    self.documentation = documentation
+    self.deprecationReason = deprecationReason
+  }
+
+  static func fromJSValue(
+    _ jsValue: JSValue,
+    bridge: isolated JavaScriptBridge
+  ) -> GraphQLFieldArgument {
+    self.init(
+      name: jsValue["name"],
+      type: .fromJSValue(jsValue["type"], bridge: bridge),
+      documentation: jsValue["description"],
+      deprecationReason: jsValue["deprecationReason"]
+    )
+  }
 
   public func hash(into hasher: inout Hasher) {
     hasher.combine(name)

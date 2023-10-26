@@ -2,48 +2,148 @@ import JavaScriptCore
 import TemplateString
 
 /// The output of the frontend compiler.
-public class CompilationResult: JavaScriptObject {
+public final class CompilationResult: JavaScriptObjectDecodable {
+
   private enum Constants {
     static let LocalCacheMutationDirectiveName = "apollo_client_ios_localCacheMutation"
   }
-  public lazy var rootTypes: RootTypeDefinition = self["rootTypes"]
-  
-  public lazy var referencedTypes: [GraphQLNamedType] = self["referencedTypes"]
 
-  public lazy var operations: [OperationDefinition] = self["operations"]
+  public let schemaRootTypes: RootTypeDefinition
 
-  public lazy var fragments: [FragmentDefinition] = self["fragments"]
+  public let referencedTypes: [GraphQLNamedType]
 
-  public lazy var schemaDocumentation: String? = self["schemaDocumentation"]
-  
-  public class RootTypeDefinition: JavaScriptObject {
-    public lazy var queryType: GraphQLNamedType = self["queryType"]
-    
-    public lazy var mutationType: GraphQLNamedType? = self["mutationType"]
-    
-    public lazy var subscriptionType: GraphQLNamedType? = self["subscriptionType"]
+  public let operations: [OperationDefinition]
+
+  public let fragments: [FragmentDefinition]
+
+  public let schemaDocumentation: String?
+
+  init(
+    schemaRootTypes: RootTypeDefinition,
+    referencedTypes: [GraphQLNamedType],
+    operations: [OperationDefinition],
+    fragments: [FragmentDefinition],
+    schemaDocumentation: String?
+  ) {
+    self.schemaRootTypes = schemaRootTypes
+    self.referencedTypes = referencedTypes
+    self.operations = operations
+    self.fragments = fragments
+    self.schemaDocumentation = schemaDocumentation
+  }
+
+  static func fromJSValue(
+    _ jsValue: JSValue,
+    bridge: isolated JavaScriptBridge
+  ) -> Self {
+    self.init(
+      schemaRootTypes: .fromJSValue(jsValue["rootTypes"], bridge: bridge),
+      referencedTypes: .fromJSValue(jsValue["referencedTypes"], bridge: bridge),
+      operations: .fromJSValue(jsValue["operations"], bridge: bridge),
+      fragments: .fromJSValue(jsValue["fragments"], bridge: bridge),
+      schemaDocumentation: jsValue["schemaDocumentation"]
+    )
+  }
+
+  public final class RootTypeDefinition: JavaScriptObjectDecodable {
+    public let queryType: GraphQLNamedType
+
+    public let mutationType: GraphQLNamedType?
+
+    public let subscriptionType: GraphQLNamedType?
+
+    public let allRootTypes: [GraphQLNamedType]
+
+    init(
+      queryType: GraphQLNamedType,
+      mutationType: GraphQLNamedType?,
+      subscriptionType: GraphQLNamedType?
+    ) {
+      self.queryType = queryType
+      self.mutationType = mutationType
+      self.subscriptionType = subscriptionType
+
+      self.allRootTypes = [
+        queryType,
+        mutationType,
+        subscriptionType
+      ].compactMap { $0 }
+    }
+
+    static func fromJSValue(
+      _ jsValue: JSValue,
+      bridge: isolated JavaScriptBridge
+    ) -> RootTypeDefinition {
+      self.init(
+        queryType: .fromJSValue(jsValue["queryType"], bridge: bridge),
+        mutationType: .fromJSValue(jsValue["mutationType"], bridge: bridge),
+        subscriptionType: .fromJSValue(jsValue["subscriptionType"], bridge: bridge)
+      )
+    }
+
   }
   
-  public class OperationDefinition: JavaScriptObject, Hashable {
-    public lazy var name: String = self["name"]
-    
-    public lazy var operationType: OperationType = self["operationType"]
-    
-    public lazy var variables: [VariableDefinition] = self["variables"]
-    
-    public lazy var rootType: GraphQLCompositeType = self["rootType"]
-    
-    public lazy var selectionSet: SelectionSet = self["selectionSet"]
+  public final class OperationDefinition: Sendable, JavaScriptObjectDecodable, Hashable {
 
-    public lazy var directives: [Directive]? = self["directives"]
+    public let name: String
 
-    public lazy var referencedFragments: [FragmentDefinition] = self["referencedFragments"]
+    public let operationType: OperationType
 
-    public lazy var source: String = self["source"]
-    
-    public lazy var filePath: String = self["filePath"]
+    public let variables: [VariableDefinition]
 
-    override public var debugDescription: String {
+    public let rootType: GraphQLCompositeType
+
+    public let selectionSet: SelectionSet
+
+    public let directives: [Directive]?
+
+    public let referencedFragments: [FragmentDefinition]
+
+    public let source: String
+
+    public let filePath: String
+
+    public let isLocalCacheMutation: Bool
+
+    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+      self.init(
+        name: jsValue["name"],
+        operationType: jsValue["operationType"],
+        variables: .fromJSValue(jsValue["variables"], bridge: bridge),
+        rootType: .fromJSValue(jsValue["rootType"], bridge: bridge),
+        selectionSet: .fromJSValue(jsValue["selectionSet"], bridge: bridge),
+        directives: .fromJSValue(jsValue["directives"], bridge: bridge),
+        referencedFragments: .fromJSValue(jsValue["referencedFragments"], bridge: bridge),
+        source: jsValue["source"],
+        filePath: jsValue["filePath"]
+      )
+    }
+
+    init(
+      name: String,
+      operationType: OperationType,
+      variables: [VariableDefinition],
+      rootType: GraphQLCompositeType,
+      selectionSet: SelectionSet,
+      directives: [Directive]?,
+      referencedFragments: [FragmentDefinition],
+      source: String,
+      filePath: String
+    ) {
+      self.name = name
+      self.operationType = operationType
+      self.variables = variables
+      self.rootType = rootType
+      self.selectionSet = selectionSet
+      self.directives = directives
+      self.referencedFragments = referencedFragments
+      self.source = source
+      self.filePath = filePath
+      self.isLocalCacheMutation = directives?
+        .contains { $0.name == Constants.LocalCacheMutationDirectiveName } ?? false
+    }
+
+    public var debugDescription: String {
       "\(name) on \(rootType.debugDescription)"
     }
 
@@ -54,19 +154,15 @@ public class CompilationResult: JavaScriptObject {
     public static func ==(lhs: OperationDefinition, rhs: OperationDefinition) -> Bool {
       return lhs.name == rhs.name
     }
-
-    public lazy var isLocalCacheMutation: Bool = {
-      directives?.contains { $0.name == Constants.LocalCacheMutationDirectiveName } ?? false
-    }()    
   }
   
-  public enum OperationType: String, Equatable, JavaScriptValueDecodable {
+  public enum OperationType: String, Equatable, Sendable, JavaScriptValueDecodable {
     case query
     case mutation
     case subscription
     
-    init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
-      let rawValue: String = .fromJSValue(jsValue, bridge: bridge)
+    init(_ jsValue: JSValue) {
+      let rawValue = String(jsValue)
       guard let operationType = Self(rawValue: rawValue) else {
         preconditionFailure("Unknown GraphQL operation type: \(rawValue)")
       }
@@ -75,34 +171,76 @@ public class CompilationResult: JavaScriptObject {
     }
   }
   
-  public class VariableDefinition: JavaScriptObject {
-    public lazy var name: String = self["name"]
-    
-    public lazy var type: GraphQLType = self["type"]
-    
-    public lazy var defaultValue: GraphQLValue? = self["defaultValue"]
+  public struct VariableDefinition: JavaScriptObjectDecodable, Sendable {
+    public let name: String
+
+    public let type: GraphQLType
+
+    public let defaultValue: GraphQLValue?
+
+    static func fromJSValue(
+      _ jsValue: JSValue,
+      bridge: isolated JavaScriptBridge
+    ) -> CompilationResult.VariableDefinition {
+      return self.init(
+        name: jsValue["name"],
+        type: GraphQLType.fromJSValue(jsValue["type"], bridge: bridge),
+        defaultValue: jsValue["defaultValue"]
+      )
+    }
   }
   
-  public class FragmentDefinition: JavaScriptObject, Hashable {
-    public lazy var name: String = self["name"]
-    
-    public lazy var type: GraphQLCompositeType = self["typeCondition"]
-    
-    public lazy var selectionSet: SelectionSet = self["selectionSet"]
-    
-    public lazy var source: String = self["source"]
-    
-    public lazy var filePath: String = self["filePath"]
+  public final class FragmentDefinition:
+    JavaScriptReferencedObject, Sendable, Hashable, CustomDebugStringConvertible {
 
-    public lazy var directives: [Directive]? = self["directives"]
+    public let name: String
 
-    public lazy var referencedFragments: [FragmentDefinition] = self["referencedFragments"]
+    public let type: GraphQLCompositeType
 
-    public lazy var isLocalCacheMutation: Bool = {
+    public let selectionSet: SelectionSet
+
+    public let directives: [Directive]?
+
+    public let referencedFragments: [FragmentDefinition]
+
+    public let source: String
+
+    public let filePath: String
+
+    public var isLocalCacheMutation: Bool {
       directives?.contains { $0.name == Constants.LocalCacheMutationDirectiveName } ?? false
-    }()
+    }
 
-    public override var debugDescription: String {
+    init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+      self.name = jsValue["name"]
+      self.type = .fromJSValue(jsValue["typeCondition"], bridge: bridge)
+      self.selectionSet = .fromJSValue(jsValue["selectionSet"], bridge: bridge)
+      self.directives = .fromJSValue(jsValue["directives"], bridge: bridge)
+      self.referencedFragments = .fromJSValue(jsValue["referencedFragments"], bridge: bridge)
+      self.source = jsValue["source"]
+      self.filePath = jsValue["filePath"]
+    }
+
+    /// Initializer to be used for creating mock objects in tests only.
+    init(
+      name: String,
+      type: GraphQLCompositeType,
+      selectionSet: SelectionSet,
+      directives: [Directive]?,
+      referencedFragments: [FragmentDefinition],
+      source: String,
+      filePath: String
+    ) {
+      self.name = name
+      self.type = type
+      self.selectionSet = selectionSet
+      self.directives = directives
+      self.referencedFragments = referencedFragments
+      self.source = source
+      self.filePath = filePath
+    }
+
+    public var debugDescription: String {
       "\(name) on \(type.debugDescription)"
     }
 
@@ -115,18 +253,26 @@ public class CompilationResult: JavaScriptObject {
     }
   }
   
-  public class SelectionSet: JavaScriptWrapper, Hashable, CustomDebugStringConvertible {
-    public lazy var parentType: GraphQLCompositeType = self["parentType"]
-    
-    public lazy var selections: [Selection] = self["selections"]
+  public final class SelectionSet:
+    JavaScriptObjectDecodable, Sendable, Hashable, CustomDebugStringConvertible {
 
-    public required convenience init(
+    public let parentType: GraphQLCompositeType
+
+    public let selections: [Selection]
+
+    public init(
       parentType: GraphQLCompositeType,
       selections: [Selection] = []
     ) {
-      self.init(nil)
       self.parentType = parentType
       self.selections = selections
+    }
+
+    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+      self.init(
+        parentType: .fromJSValue(jsValue["parentType"], bridge: bridge),
+        selections: .fromJSValue(jsValue["selections"], bridge: bridge)
+      )
     }
 
     public var debugDescription: String {
@@ -148,12 +294,29 @@ public class CompilationResult: JavaScriptObject {
     }
   }
 
-  public class InlineFragment: JavaScriptObject, Hashable {
-    public lazy var selectionSet: SelectionSet = self["selectionSet"]
+  public final class InlineFragment:
+    JavaScriptObjectDecodable, Sendable, Hashable, CustomDebugStringConvertible {
 
-    public lazy var inclusionConditions: [InclusionCondition]? = self["inclusionConditions"]
+    public let selectionSet: SelectionSet
 
-    public override var debugDescription: String {
+    public let inclusionConditions: [InclusionCondition]?
+
+    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+      self.init(
+        selectionSet: .fromJSValue(jsValue["selectionSet"], bridge: bridge),
+        inclusionConditions: jsValue["inclusionConditions"]
+      )
+    }
+
+    init(
+      selectionSet: SelectionSet,
+      inclusionConditions: [InclusionCondition]?
+    ) {
+      self.selectionSet = selectionSet
+      self.inclusionConditions = inclusionConditions
+    }
+
+    public var debugDescription: String {
       selectionSet.debugDescription
     }
 
@@ -170,14 +333,32 @@ public class CompilationResult: JavaScriptObject {
 
   /// Represents an individual selection that includes a named fragment in a selection set.
   /// (ie. `...FragmentName`)
-  public class FragmentSpread: JavaScriptObject, Hashable {
-    public lazy var fragment: FragmentDefinition = self["fragment"]
+  public final class FragmentSpread: JavaScriptObjectDecodable, Sendable, Hashable, CustomDebugStringConvertible {
+    public let fragment: FragmentDefinition
 
-    public lazy var inclusionConditions: [InclusionCondition]? = self["inclusionConditions"]
+    public let inclusionConditions: [InclusionCondition]?
 
-    public lazy var directives: [Directive]? = self["directives"]
+    public let directives: [Directive]?
 
     @inlinable public var parentType: GraphQLCompositeType { fragment.type }
+
+    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+      self.init(
+        fragment: .fromJSValue(jsValue["fragment"], bridge: bridge),
+        inclusionConditions: jsValue["inclusionConditions"],
+        directives: .fromJSValue(jsValue["directives"], bridge: bridge)
+      )
+    }
+
+    init(
+      fragment: FragmentDefinition,
+      inclusionConditions: [InclusionCondition]?,
+      directives: [Directive]?
+    ) {
+      self.fragment = fragment
+      self.inclusionConditions = inclusionConditions
+      self.directives = directives
+    }
 
     public func hash(into hasher: inout Hasher) {
       hasher.combine(fragment)
@@ -190,25 +371,30 @@ public class CompilationResult: JavaScriptObject {
       lhs.inclusionConditions == rhs.inclusionConditions &&
       lhs.directives == rhs.directives
     }
+
+    public var debugDescription: String {
+      "...\(fragment.name)"
+    }
   }
   
-  public enum Selection: JavaScriptValueDecodable, CustomDebugStringConvertible, Hashable {
+  public enum Selection:
+    JavaScriptObjectDecodable, Sendable, CustomDebugStringConvertible, Hashable {
     case field(Field)
     case inlineFragment(InlineFragment)
     case fragmentSpread(FragmentSpread)
     
-    init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
+    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
       precondition(jsValue.isObject, "Expected JavaScript object but found: \(jsValue)")
 
       let kind: String = jsValue["kind"].toString()
 
       switch kind {
       case "Field":
-        self = .field(Field(jsValue, bridge: bridge))
+        return .field(Field.fromJSValue(jsValue, bridge: bridge))
       case "InlineFragment":
-        self = .inlineFragment(InlineFragment(jsValue, bridge: bridge))
+        return .inlineFragment(InlineFragment.fromJSValue(jsValue, bridge: bridge))
       case "FragmentSpread":
-        self = .fragmentSpread(FragmentSpread(jsValue, bridge: bridge))
+        return .fragmentSpread(FragmentSpread.fromJSValue(jsValue, bridge: bridge))
       default:
         preconditionFailure("""
           Unknown GraphQL selection of kind "\(kind)"
@@ -236,34 +422,34 @@ public class CompilationResult: JavaScriptObject {
     }
   }
   
-  public class Field: JavaScriptWrapper, Hashable, CustomDebugStringConvertible {
-    public lazy var name: String = self["name"]!
-    
-    public lazy var alias: String? = self["alias"]
-    
+  public final class Field: JavaScriptObjectDecodable, Sendable, Hashable, CustomDebugStringConvertible {
+    public let name: String
+
+    public let alias: String?
+
+    public let type: GraphQLType
+
+    public let arguments: [Argument]?
+
+    public let inclusionConditions: [InclusionCondition]?
+
+    public let directives: [Directive]?
+
+    public let selectionSet: SelectionSet?
+
+    public let deprecationReason: String?
+
+    public let documentation: String?
+
     public var responseKey: String {
       alias ?? name
     }
-    
-    public lazy var type: GraphQLType = self["type"]!
 
-    public lazy var arguments: [Argument]? = self["arguments"]
-
-    public lazy var inclusionConditions: [InclusionCondition]? = self["inclusionConditions"]
-
-    public lazy var directives: [Directive]? = self["directives"]
-    
-    public lazy var selectionSet: SelectionSet? = self["selectionSet"]
-    
-    public lazy var deprecationReason: String? = self["deprecationReason"]
-    
     public var isDeprecated: Bool {
       return deprecationReason != nil
     }
-    
-    public lazy var documentation: String? = self["description"]
 
-    public required convenience init(
+    public init(
       name: String,
       alias: String? = nil,
       arguments: [Argument]? = nil,
@@ -274,7 +460,6 @@ public class CompilationResult: JavaScriptObject {
       deprecationReason: String? = nil,
       documentation: String? = nil
     ) {
-      self.init(nil)
       self.name = name
       self.alias = alias
       self.type = type
@@ -284,6 +469,20 @@ public class CompilationResult: JavaScriptObject {
       self.selectionSet = selectionSet
       self.deprecationReason = deprecationReason
       self.documentation = documentation
+    }
+
+    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+      self.init(
+        name: jsValue["name"],
+        alias: jsValue["alias"],
+        arguments: .fromJSValue(jsValue["arguments"], bridge: bridge),
+        inclusionConditions: jsValue["inclusionConditions"],
+        directives: .fromJSValue(jsValue["directives"], bridge: bridge),
+        type: .fromJSValue(jsValue["type"], bridge: bridge),
+        selectionSet: .fromJSValue(jsValue["selectionSet"], bridge: bridge),
+        deprecationReason: jsValue["deprecationReason"],
+        documentation: jsValue["description"]
+      )
     }
 
     public var debugDescription: String {
@@ -313,14 +512,24 @@ public class CompilationResult: JavaScriptObject {
     }
   }
   
-  public class Argument: JavaScriptObject, Hashable {
-    public lazy var name: String = self["name"]
+  public struct Argument: 
+    JavaScriptObjectDecodable, Sendable, Hashable {
+    public let name: String
 
-    public lazy var type: GraphQLType = self["type"]
+    public let type: GraphQLType
 
-    public lazy var value: GraphQLValue = self["value"]
+    public let value: GraphQLValue
 
-    public lazy var deprecationReason: String? = self["deprecationReason"]
+    public let deprecationReason: String?
+
+    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+      self.init(
+        name: jsValue["name"],
+        type: .fromJSValue(jsValue["type"], bridge: bridge),
+        value: jsValue["value"],
+        deprecationReason: jsValue["deprecationReason"]
+      )
+    }
 
     public func hash(into hasher: inout Hasher) {
       hasher.combine(name)
@@ -335,10 +544,18 @@ public class CompilationResult: JavaScriptObject {
     }
   }
 
-  public class Directive: JavaScriptObject, Hashable {
-    public lazy var name: String = self["name"]
+  public struct Directive:
+    JavaScriptObjectDecodable, Sendable, Hashable, CustomDebugStringConvertible {
+    public let name: String
 
-    public lazy var arguments: [Argument]? = self["arguments"]
+    public let arguments: [Argument]?
+
+    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+      self.init(
+        name: jsValue["name"],
+        arguments: .fromJSValue(jsValue["arguments"], bridge: bridge)
+      )
+    }
 
     public func hash(into hasher: inout Hasher) {
       hasher.combine(name)
@@ -350,7 +567,7 @@ public class CompilationResult: JavaScriptObject {
       lhs.arguments == rhs.arguments
     }
 
-    public override var debugDescription: String {
+    public var debugDescription: String {
       TemplateString("""
       "@\(name)\(ifLet: arguments, {
         "(\($0.map { "\($0.name): \(String(describing: $0.value))" }, separator: ","))"
@@ -359,12 +576,12 @@ public class CompilationResult: JavaScriptObject {
     }
   }
 
-  public enum InclusionCondition: JavaScriptValueDecodable, Hashable {
+  public enum InclusionCondition: JavaScriptValueDecodable, Sendable, Hashable {
     case included
     case skipped
     case variable(String, isInverted: Bool)
 
-    init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
+    init(_ jsValue: JSValue) {
       if jsValue.isString, let value = jsValue.toString() {
         switch value {
         case "INCLUDED":

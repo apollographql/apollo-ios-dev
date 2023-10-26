@@ -17,7 +17,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
   // MARK: - Helpers
 
   private func buildSubject(
-    referencedTypes: IR.Schema.ReferencedTypes = .init([]),
+    referencedTypes: IR.Schema.ReferencedTypes = .init([], schemaRootTypes: .mock()),
     documentation: String? = nil,
     config: ApolloCodegenConfiguration = ApolloCodegenConfiguration.mock()
   ) {
@@ -383,7 +383,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
         GraphQLObjectType.mock("objA"),
         GraphQLObjectType.mock("objB"),
         GraphQLObjectType.mock("objC"),
-      ]),
+      ], schemaRootTypes: .mock()),
       config: .mock(schemaNamespace: "objectSchema")
     )
 
@@ -417,7 +417,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
         GraphQLScalarType.mock(name: "ScalarD"),
         GraphQLEnumType.mock(name: "EnumE"),
         GraphQLInputObjectType.mock("InputObjectC"),
-      ]),
+      ], schemaRootTypes: .mock()),
       config: .mock(schemaNamespace: "ObjectSchema")
     )
 
@@ -449,7 +449,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
         GraphQLScalarType.mock(name: "ScalarD"),
         GraphQLEnumType.mock(name: "EnumE"),
         GraphQLInputObjectType.mock("InputObjectC"),
-      ]),
+      ], schemaRootTypes: .mock()),
       config: .mock(
         .embeddedInTarget(name: "TestTarget", accessModifier: .internal),
         schemaNamespace: "ObjectSchema"
@@ -480,7 +480,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
         GraphQLScalarType.mock(name: "ScalarD"),
         GraphQLEnumType.mock(name: "EnumE"),
         GraphQLInputObjectType.mock("InputObjectC"),
-      ]),
+      ], schemaRootTypes: .mock()),
       config: .mock(
         .embeddedInTarget(name: "TestTarget", accessModifier: .public),
         schemaNamespace: "ObjectSchema"
@@ -511,7 +511,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
         GraphQLScalarType.mock(name: "ScalarD"),
         GraphQLEnumType.mock(name: "EnumE"),
         GraphQLInputObjectType.mock("InputObjectC"),
-      ]),
+      ], schemaRootTypes: .mock()),
       config: .mock(
         .swiftPackageManager,
         schemaNamespace: "ObjectSchema"
@@ -542,7 +542,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
         GraphQLScalarType.mock(name: "ScalarD"),
         GraphQLEnumType.mock(name: "EnumE"),
         GraphQLInputObjectType.mock("InputObjectC"),
-      ]),
+      ], schemaRootTypes: .mock()),
       config: .mock(
         .other,
         schemaNamespace: "ObjectSchema"

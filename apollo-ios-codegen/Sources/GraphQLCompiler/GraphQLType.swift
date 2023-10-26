@@ -1,7 +1,7 @@
 import JavaScriptCore
 
 /// A GraphQL type.
-public indirect enum GraphQLType: Hashable {
+public indirect enum GraphQLType: Sendable, Hashable {
   case entity(GraphQLCompositeType)
   case scalar(GraphQLScalarType)
   case `enum`(GraphQLEnumType)
@@ -62,8 +62,8 @@ extension GraphQLType: CustomDebugStringConvertible {
   }
 }
 
-extension GraphQLType: JavaScriptValueDecodable {
-  init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
+extension GraphQLType: JavaScriptObjectDecodable {
+  static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
     precondition(jsValue.isObject, "Expected JavaScript object but found: \(jsValue)")
 
     let tag = jsValue[jsValue.context.globalObject["Symbol"]["toStringTag"]].toString()
@@ -71,25 +71,25 @@ extension GraphQLType: JavaScriptValueDecodable {
     switch tag {
     case "GraphQLNonNull":
       let ofType = jsValue["ofType"]
-      self = .nonNull(GraphQLType(ofType, bridge: bridge))
+      return .nonNull(GraphQLType.fromJSValue(ofType, bridge: bridge))
     case "GraphQLList":
       let ofType = jsValue["ofType"]
-      self = .list(GraphQLType(ofType, bridge: bridge))
+      return .list(GraphQLType.fromJSValue(ofType, bridge: bridge))
     default:
-      let namedType: GraphQLNamedType = bridge.fromJSValue(jsValue)
+      let namedType = GraphQLNamedType.fromJSValue(jsValue, bridge: bridge)
 
       switch namedType {
       case let entityType as GraphQLCompositeType:
-        self = .entity(entityType)
+        return .entity(entityType)
 
       case let scalarType as GraphQLScalarType:
-        self = .scalar(scalarType)
+        return .scalar(scalarType)
 
       case let enumType as GraphQLEnumType:
-        self = .enum(enumType)
+        return .enum(enumType)
 
       case let inputObjectType as GraphQLInputObjectType:
-        self = .inputObject(inputObjectType)
+        return .inputObject(inputObjectType)
 
       default:
         fatalError("JSValue: \(jsValue) is not a recognized GraphQLType value.")

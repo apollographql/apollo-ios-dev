@@ -1,0 +1,14 @@
+name: "Configure Git Settings"
+inputs:
+  user:
+    description: "The user name to use for commits."
+    required: false
+    default: gh-action-runner
+description: Configures appropriate git settings for the github action workflows.
+runs:
+  using: "composite"
+  steps:
+  - name: Configure Git
+    shell: bash
+    run: |
+      git config --global user.name "${{ inputs.user }}"

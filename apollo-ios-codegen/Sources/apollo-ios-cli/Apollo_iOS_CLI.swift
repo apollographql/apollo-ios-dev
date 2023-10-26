@@ -2,7 +2,8 @@ import Foundation
 import ArgumentParser
 import CodegenCLI
 
-struct Apollo_iOS_CLI: ParsableCommand {
+@main
+struct Apollo_iOS_CLI: AsyncParsableCommand {
   static var configuration = CommandConfiguration(
     commandName: "apollo-ios-cli",
     abstract: "A command line utility for Apollo iOS code generation.",
@@ -15,5 +16,3 @@ struct Apollo_iOS_CLI: ParsableCommand {
     ]
   )
 }
-
-Apollo_iOS_CLI.main()

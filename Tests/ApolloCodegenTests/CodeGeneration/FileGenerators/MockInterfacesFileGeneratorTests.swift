@@ -17,8 +17,9 @@ class MockInterfacesFileGeneratorTests: XCTestCase {
   // MARK: Test Helpers
 
   private func buildSubject(interfaces: OrderedSet<GraphQLInterfaceType> = [mockInterface]) {
-    let compilationResult = CompilationResult.mock()
-    compilationResult.referencedTypes.append(contentsOf: interfaces.elements)
+    let compilationResult = CompilationResult.mock(
+      referencedTypes: interfaces.elements
+    )    
 
     let ir = IRBuilder.mock(compilationResult: compilationResult)
 

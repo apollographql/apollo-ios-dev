@@ -1,11 +1,3 @@
-//
-//  TestFileHelper.swift
-//  ApolloTests
-//
-//  Created by Ellen Shapiro on 3/18/20.
-//  Copyright © 2020 Apollo GraphQL. All rights reserved.
-//
-
 import Foundation
 import Apollo
 
@@ -36,5 +28,25 @@ public struct TestFileHelper {
         .appendingPathComponent("Resources")
         .appendingPathComponent(name)
         .appendingPathExtension(fileExtension)
+  }
+
+  public static func sourceRootURL() -> URL {
+    FileFinder.findParentFolder()
+        .deletingLastPathComponent() // Tests
+        .deletingLastPathComponent() // apollo-ios-dev
+  }
+
+  public static func starWarsFolderURL() -> URL {
+    let source = self.sourceRootURL()
+    return source
+      .appendingPathComponent("Sources")
+      .appendingPathComponent("StarWarsAPI")
+  }
+
+  public static func starWarsSchemaFileURL() -> URL {
+    let starWars = self.starWarsFolderURL()
+    return starWars
+      .appendingPathComponent("graphql")
+      .appendingPathComponent("schema.json")
   }
 }
