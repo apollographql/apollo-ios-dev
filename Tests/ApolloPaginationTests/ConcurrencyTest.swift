@@ -33,8 +33,7 @@ final class ConcurrencyTests: XCTestCase {
       resultsExpectation.fulfill()
     }.store(in: &cancellables)
     await fetchFirstPage(pager: pager)
-    await loadDataFromManyThreads(pager: pager)
-    await fulfillment(of: [resultsExpectation], timeout: 1)
+    await loadDataFromManyThreads(pager: pager, expectation: resultsExpectation)
 
     XCTAssertEqual(results.count, 2)
   }
@@ -71,7 +70,8 @@ final class ConcurrencyTests: XCTestCase {
   }
 
   private func loadDataFromManyThreads(
-    pager: GraphQLQueryPager<Query, Query>.Actor
+    pager: GraphQLQueryPager<Query, Query>.Actor,
+    expectation: XCTestExpectation
   ) async {
     await withTaskGroup(of: Void.self) { group in
       let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
@@ -81,7 +81,7 @@ final class ConcurrencyTests: XCTestCase {
       group.addTask { try? await pager.loadMore() }
       group.addTask { try? await pager.loadMore() }
 
-      group.addTask { await self.fulfillment(of: [serverExpectation], timeout: 100) }
+      group.addTask { await self.fulfillment(of: [serverExpectation, expectation], timeout: 100) }
       await group.waitForAll()
     }
   }
