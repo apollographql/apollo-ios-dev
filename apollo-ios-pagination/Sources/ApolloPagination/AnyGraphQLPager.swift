@@ -40,7 +40,7 @@ public class AnyGraphQLQueryPager<Model> {
   }
 
   /// Type-erases a given pager, transforming the initial page to an array of models, and the
-  /// subsequent pagination to an adition array of models, concatenating the results of each into one array.
+  /// subsequent pagination to an additional array of models, concatenating the results of each into one array.
   /// - Parameters:
   ///   - pager: Pager to type-erase.
   ///   - initialTransform: Initial transformation from the initial page to an array of models.
