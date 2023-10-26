@@ -59,12 +59,12 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
-  deinit {
-    cancellables.forEach { $0.cancel() }
+  init(pager: Actor) {
+    self.pager = pager
   }
 
-  public init(pager: Actor) {
-    self.pager = pager
+  deinit {
+    cancellables.forEach { $0.cancel() }
   }
 
   public func subscribe(onUpdate: @MainActor @escaping (Result<Output, Error>) -> Void) {
@@ -106,7 +106,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 }
 
 extension GraphQLQueryPager {
-  public actor Actor {
+  actor Actor {
     private let client: any ApolloClientProtocol
     private var firstPageWatcher: GraphQLQueryWatcher<InitialQuery>?
     private var nextPageWatchers: [GraphQLQueryWatcher<PaginatedQuery>] = []
