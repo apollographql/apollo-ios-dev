@@ -131,6 +131,44 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     XCTAssertEqual(Set(expectedVariables), Set(actualVariables))
   }
 
+  func test_paginationState() async throws {
+      let pager = createPager()
+
+      var currentPageInfo = await pager.currentPageInfo
+      XCTAssertNil(currentPageInfo)
+
+      let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+
+      await pager.fetch()
+      await fulfillment(of: [serverExpectation])
+
+      currentPageInfo = try await XCTUnwrapping(await pager.currentPageInfo)
+      var page = try XCTUnwrap(currentPageInfo as? CursorBasedPagination.ForwardPagination)
+      let expectedFirstPage = CursorBasedPagination.ForwardPagination(
+          hasNext: true,
+          endCursor: "Y3Vyc29yMg=="
+      )
+      XCTAssertEqual(page, expectedFirstPage)
+
+      let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
+      let secondPageFetch = expectation(description: "Second Page")
+      secondPageFetch.expectedFulfillmentCount = 2
+      let subscription = await pager.subscribe(onUpdate: { _ in
+          secondPageFetch.fulfill()
+      })
+      try await pager.loadMore(cachePolicy: .fetchIgnoringCacheData)
+      await fulfillment(of: [secondPageExpectation, secondPageFetch])
+      subscription.cancel()
+
+      currentPageInfo = try await XCTUnwrapping(await pager.currentPageInfo)
+      page = try XCTUnwrap(currentPageInfo as? CursorBasedPagination.ForwardPagination)
+      let expectedSecondPage = CursorBasedPagination.ForwardPagination(
+          hasNext: false,
+          endCursor: "Y3Vyc29yMw=="
+      )
+      XCTAssertEqual(page, expectedSecondPage)
+  }
+
   func test_fetchMultiplePages_mutateHero() async throws {
     let pager = createPager()
 
