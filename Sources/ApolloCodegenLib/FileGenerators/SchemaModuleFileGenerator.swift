@@ -9,7 +9,7 @@ struct SchemaModuleFileGenerator {
   static func generate(
     _ config: ApolloCodegen.ConfigurationContext,
     fileManager: ApolloFileManager = .default
-  ) throws {
+  ) async throws {
 
     let pathURL: URL = URL(
       fileURLWithPath: config.output.schemaTypes.path,
@@ -38,7 +38,7 @@ struct SchemaModuleFileGenerator {
       return
     }
 
-    try fileManager.createFile(
+    try await fileManager.createFile(
       atPath: filePath,
       data: rendered.data(using: .utf8)
     )

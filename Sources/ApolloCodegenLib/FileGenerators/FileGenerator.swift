@@ -24,7 +24,7 @@ extension FileGenerator {
   func generate(
     forConfig config: ApolloCodegen.ConfigurationContext,
     fileManager: ApolloFileManager = .default
-  ) throws {
+  ) async throws {
     let directoryPath = target.resolvePath(forConfig: config)
     let filePath = URL(fileURLWithPath: directoryPath)
       .resolvingSymlinksInPath()
@@ -34,7 +34,7 @@ extension FileGenerator {
 
     let rendered: String = template.render()
 
-    try fileManager.createFile(
+    try await fileManager.createFile(
       atPath: filePath,
       data: rendered.data(using: .utf8),
       overwrite: self.overwrite

@@ -9,6 +9,9 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
   /// IR representation of source [GraphQL Operation](https://spec.graphql.org/draft/#sec-Language.Operations).
   let operation: IR.Operation
 
+  /// The persisted query identifier for the ``operation``.
+  let operationIdentifier: String?
+
   let config: ApolloCodegen.ConfigurationContext
 
   let target: TemplateTarget = .operationFile
@@ -19,13 +22,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
     return TemplateString(
     """
     \(OperationDeclaration())
-      \(DocumentType.render(
-        operation.definition,
-        identifier: config.operationIdentifierFactory.identifier(for: operation),
-        fragments: operation.referencedFragments,
-        config: config,
-        accessControlRenderer: { accessControlModifier(for: .member) }()
-      ))
+      \(DocumentType())
 
       \(section: VariableProperties(operation.definition.variables))
 
@@ -56,38 +53,36 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
     """
   }
 
-  enum DocumentType {
-    static func render(
-      _ operation: CompilationResult.OperationDefinition,
-      identifier: @autoclosure () -> String,
-      fragments: OrderedSet<IR.NamedFragment>,
-      config: ApolloCodegen.ConfigurationContext,
-      accessControlRenderer: @autoclosure () -> String
-    ) -> TemplateString {
-      let includeFragments = !fragments.isEmpty
-      let includeDefinition = config.options.operationDocumentFormat.contains(.definition)
+  func DocumentType() -> TemplateString {
+    let includeFragments = !operation.referencedFragments.isEmpty
+    let includeDefinition = config.options.operationDocumentFormat.contains(.definition)
 
-      return TemplateString("""
-      \(accessControlRenderer())\
+    return TemplateString("""
+      \(accessControlModifier(for: .member))\
       static let operationDocument: \(config.ApolloAPITargetName).OperationDocument = .init(
-      \(if: config.options.operationDocumentFormat.contains(.operationId), """
-        operationIdentifier: \"\(identifier())\"\(if: includeDefinition, ",")
-      """)
+      \(if: config.options.operationDocumentFormat.contains(.operationId), {
+        precondition(operationIdentifier != nil, "operationIdentifier is missing.")
+        return """
+          operationIdentifier: \"\(operationIdentifier.unsafelyUnwrapped)\"\(if: includeDefinition, ",")
+        """ }()
+      )
       \(if: includeDefinition, """
         definition: .init(
-          \(operation.source.formattedSource())\(if: includeFragments, ",")
-          \(if: includeFragments,
-                            "fragments: [\(fragments.map { "\($0.name.asFragmentName).self" }, separator: ", ")]")
+          \(operation.definition.source.formattedSource())\(if: includeFragments, ",")
+          \(if: includeFragments, """
+            fragments: [\(operation.referencedFragments.map {
+              "\($0.name.asFragmentName).self"
+            }, separator: ", ")]
+            """
+          )
         ))
       """,
       else: """
       )
       """)
       """
-      )
-    }
+    )
   }
-
 }
 
 fileprivate extension CompilationResult.OperationType {
