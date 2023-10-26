@@ -16,21 +16,21 @@ extension RootSelectionSet {
     dict: [String: Any],
     variables: GraphQLOperation.Variables? = nil
   ) throws {
-    let jsonObject = Self.converDictToJSONObject(dict: dict)
+    let jsonObject = Self.convertDictToJSONObject(dict: dict)
     try self.init(data: jsonObject, variables: variables)
   }
 
   /// Convert dictionary type [String: Any] to JSONObject
   /// - Parameter dict: dictionary value
   /// - Returns: converted JSONObject
-  static func converDictToJSONObject(dict: [String: Any]) -> JSONObject {
+  static func convertDictToJSONObject(dict: [String: Any]) -> JSONObject {
     var result = JSONObject()
 
     for (key, value) in dict {
       if let hashableValue = value as? AnyHashable {
         result[key] = hashableValue
       } else if let dictValue = value as? [String: Any] {
-        result[key] = converDictToJSONObject(dict: dictValue)
+        result[key] = convertDictToJSONObject(dict: dictValue)
       }
     }
     return result
