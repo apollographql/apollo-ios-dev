@@ -8,7 +8,6 @@ public class AnyGraphQLQueryPager<Model> {
   public var canLoadNext: Bool { pager.canLoadNext }
 
   private var _subject: CurrentValueSubject<Output?, Never>? = .init(nil)
-  private var cancellables = [AnyCancellable]()
   private var pager: any PagerType
 
   /// Type-erases a given pager, transforming data to a model as pagination receives new results.
@@ -66,13 +65,15 @@ public class AnyGraphQLQueryPager<Model> {
     )
   }
 
+  /// Subscribe to new pagination `Output`s.
+  /// - Parameter completion: Receives a new `Output` for the consumer of the API.
+  /// - Returns: A `Combine` `AnyCancellable`, such that the caller can manage its own susbcription.
   @discardableResult public func subscribe(completion: @escaping (Output) -> Void) -> AnyCancellable {
     guard let _subject else { return AnyCancellable({ }) }
 
     let cancellable = _subject.compactMap({ $0 }).sink { result in
       completion(result)
     }
-    cancellable.store(in: &cancellables)
     return cancellable
   }
 
