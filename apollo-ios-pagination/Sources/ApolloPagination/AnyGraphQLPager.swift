@@ -69,14 +69,21 @@ public class AnyGraphQLQueryPager<Model> {
   /// Subscribe to new pagination `Output`s.
   /// - Parameter completion: Receives a new `Output` for the consumer of the API.
   /// - Returns: A `Combine` `AnyCancellable`, such that the caller can manage its own susbcription.
-  @discardableResult public func subscribe(completion: @escaping (Output) -> Void) -> AnyCancellable {
+  public func subscribe(completion: @escaping (Output) -> Void) -> AnyCancellable {
     guard let _subject else { return AnyCancellable({ }) }
 
     let cancellable = _subject.compactMap({ $0 }).sink { result in
       completion(result)
     }
-    cancellable.store(in: &cancellables)
     return cancellable
+  }
+
+
+  /// Subscribe to new pagination `Output`. The `Combine` subscription is tied to the lifecycle of the `Pager`.
+  /// - Parameter completion: Receives a new `Output` for the consumer of the API.
+  public func subscribe(completion: @escaping (Output) -> Void) {
+    let cancellable: AnyCancellable = subscribe(completion: completion)
+    cancellable.store(in: &cancellables)
   }
 
   public func loadMore(
