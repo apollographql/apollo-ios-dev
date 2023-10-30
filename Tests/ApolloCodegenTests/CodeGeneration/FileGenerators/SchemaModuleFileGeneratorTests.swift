@@ -5,7 +5,7 @@ import ApolloInternalTestHelpers
 import Nimble
 
 class SchemaModuleFileGeneratorTests: XCTestCase {
-  let mockFileManager = MockApolloFileManager(strict: false)
+  var mockFileManager: MockApolloFileManager!
 
   var testFilePathBuilder: TestFilePathBuilder!
 
@@ -14,10 +14,12 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
   override func setUp() {
     super.setUp()
     testFilePathBuilder = TestFilePathBuilder(test: self)
+    mockFileManager = MockApolloFileManager(strict: true)
   }
 
   override func tearDown() {
     testFilePathBuilder = nil
+    mockFileManager = nil
     super.tearDown()
   }
 

@@ -5,7 +5,17 @@ import ApolloCodegenInternalTestHelpers
 @testable import GraphQLCompiler
 
 class ApolloSchemaDownloaderInternalTests: XCTestCase {
-  let mockFileManager = MockApolloFileManager(strict: true)
+  var mockFileManager: MockApolloFileManager!
+
+  override func setUp() {
+    super.setUp()
+    mockFileManager = MockApolloFileManager(strict: true)
+  }
+
+  override func tearDown() {
+    mockFileManager = nil
+    super.tearDown()
+  }
 
   // MARK: Conversion Tests
 
