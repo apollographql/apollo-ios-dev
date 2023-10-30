@@ -245,4 +245,46 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
 
     expect(rendered).to(equalLineByLine(expected))
   }
+
+  // MARK: Character Escaping Tests
+
+  func test__render__givenOperationWithQuotationMarks_shouldEscapeQuotes() async throws {
+    // given
+    let operation = CompilationResult.OperationDefinition.mock(
+      name: "TestQuery",
+      type: .query,
+      source: """
+        query TestQuery {
+          test(param: "string")
+        }
+        """
+    )
+
+    let expected = #"""
+      {
+        "format": "apollo-persisted-query-manifest",
+        "version": 1,
+        "operations": [
+          {
+            "id": "acb5e747550912f7afd3f0a8d11430c4fd50741d1fd7c8d42e5dfcaf96cf8dc1",
+            "body": "query TestQuery { test(param: \"string\") }",
+            "name": "TestQuery",
+            "type": "query"
+          }
+        ]
+      }
+      """#
+
+    let operations = try await [operation].asyncMap {
+      OperationManifestTemplate.OperationManifestItem(
+        operation: OperationDescriptor($0),
+        identifier: try await self.operationIdentiferFactory.identifier(for: $0)
+      )
+    }
+
+    // when
+    let rendered = subject.render(operations: operations)
+
+    expect(rendered).to(equalLineByLine(expected))
+  }
 }
