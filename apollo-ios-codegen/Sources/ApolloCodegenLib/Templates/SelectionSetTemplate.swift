@@ -98,7 +98,7 @@ struct SelectionSetTemplate {
     let selections = selectionSet.selections
     let scope = selectionSet.typeInfo.scope
     return """
-    \(DataFieldAndInitializerTemplate())
+    \(BodyDataFieldAndInitializerTemplate())
 
     \(RootEntityTypealias(selectionSet))
     \(ParentTypeTemplate(selectionSet.parentType))
@@ -118,14 +118,42 @@ struct SelectionSetTemplate {
     \(section: ChildTypeCaseSelectionSets(selections))
     """
   }
+  
+  private func BodyDataFieldAndInitializerTemplate() -> String {
+    DataFieldAndInitializerTemplate({ " __data = _dataDict " }())
+  }
 
-  private func DataFieldAndInitializerTemplate() -> String {
+  private func FragmentDataFieldAndInitializerTemplate(
+    _ selections: IR.SelectionSet.Selections
+  ) -> String {
+    if let inlineFragments = selections.direct?.inlineFragments, inlineFragments.containsDeferredFragment {
+      return DataFieldAndInitializerTemplate({ TemplateString("""
+
+        __data = _dataDict
+        \(inlineFragments.values.deferConditionMap {
+          guard let deferCondition = $0.typeInfo.deferCondition else {
+            fatalError("Expected scope with defer condition, got \($0.typeInfo.scope)")
+          }
+
+          return "_\(deferCondition.label) = Deferred(_dataDict: _dataDict)"
+        }, separator: "\n")
+
+      """).description }())
+
+    } else {
+      return BodyDataFieldAndInitializerTemplate()
+    }
+  }
+
+  private func DataFieldAndInitializerTemplate(
+    _ propertiesTemplate: @autoclosure @escaping () -> String
+  ) -> String {
     let accessControl = renderAccessControl()
 
-    return """
+    return TemplateString("""
     \(accessControl)\(isMutable ? "var" : "let") __data: DataDict
-    \(accessControl)init(_dataDict: DataDict) { __data = _dataDict }
-    """
+    \(accessControl)init(_dataDict: DataDict) {\(propertiesTemplate())}
+    """).description
   }
 
   private func RootEntityTypealias(_ selectionSet: IR.SelectionSet) -> TemplateString {
@@ -282,14 +310,29 @@ struct SelectionSetTemplate {
   }
 
   private func InlineFragmentSelectionTemplate(_ inlineFragment: IR.SelectionSet) -> TemplateString {
-    """
-    .inlineFragment(\(inlineFragment.renderedTypeName).self)
-    """
+    if let deferCondition = inlineFragment.deferCondition {
+      return DeferredInlineFragmentSelectionTemplate(deferCondition)
+
+    } else {
+      return """
+      .inlineFragment(\(inlineFragment.renderedTypeName).self)
+      """
+    }
   }
 
   private func FragmentSelectionTemplate(_ fragment: IR.NamedFragmentSpread) -> TemplateString {
     """
     .fragment(\(fragment.definition.name.asFragmentName).self)
+    """
+  }
+
+  private func DeferredInlineFragmentSelectionTemplate(
+    _ deferCondition: CompilationResult.DeferCondition
+  ) -> TemplateString {
+    """
+    .deferred(\
+    \(ifLet: deferCondition.variable, { "if: \"\($0)\", " })\
+    \(deferCondition.renderedTypeName).self, label: "\(deferCondition.label)")
     """
   }
 
@@ -340,6 +383,8 @@ struct SelectionSetTemplate {
   }
 
   private func InlineFragmentAccessorTemplate(_ inlineFragment: IR.SelectionSet) -> TemplateString {
+    guard !inlineFragment.typeInfo.scope.isDeferred else { return "" }
+
     let typeName = inlineFragment.renderedTypeName
     return """
     \(renderAccessControl())var \(typeName.firstLowercased): \(typeName)? {\
@@ -359,21 +404,27 @@ struct SelectionSetTemplate {
     _ selections: IR.SelectionSet.Selections,
     in scope: IR.ScopeDescriptor
   ) -> TemplateString {
-    guard !(selections.direct?.namedFragments.isEmpty ?? true) ||
-            !selections.merged.namedFragments.isEmpty else {
+    guard
+      !(selections.direct?.namedFragments.isEmpty ?? true)
+      || !selections.merged.namedFragments.isEmpty
+      || (selections.direct?.inlineFragments.containsDeferredFragment ?? false)
+    else {
       return ""
     }
 
     return """
     \(renderAccessControl())struct Fragments: FragmentContainer {
-      \(DataFieldAndInitializerTemplate())
+      \(FragmentDataFieldAndInitializerTemplate(selections))
 
       \(ifLet: selections.direct?.namedFragments.values, {
         "\($0.map { NamedFragmentAccessorTemplate($0, in: scope) }, separator: "\n")"
-        })
+      })
       \(selections.merged.namedFragments.values.map {
-          NamedFragmentAccessorTemplate($0, in: scope)
-        }, separator: "\n")
+        NamedFragmentAccessorTemplate($0, in: scope)
+      }, separator: "\n")
+      \(ifLet: selections.direct?.inlineFragments.values, {
+        "\($0.deferConditionMap { DeferredFragmentAccessorTemplate($0) }, separator: "\n")"
+      })
     }
     """
   }
@@ -407,6 +458,16 @@ struct SelectionSetTemplate {
       else: " _toFragment() }"
     )
     """
+  }
+
+  private func DeferredFragmentAccessorTemplate(
+    _ inlineFragment: IR.InlineFragmentSpread
+  ) -> TemplateString {
+    guard let deferCondition = inlineFragment.typeInfo.deferCondition else {
+      fatalError("Expected defer condition for \(inlineFragment)")
+    }
+
+    return "@Deferred public var \(deferCondition.label): \(deferCondition.renderedTypeName)?"
   }
 
   // MARK: - SelectionSet Initializer
@@ -984,5 +1045,32 @@ extension IR.SelectionSet.Selections {
       return (direct?.isEmpty ?? true) && merged.isEmpty
     }
 
+  }
+}
+
+fileprivate extension CompilationResult.DeferCondition {
+  var renderedTypeName: String {
+    self.label.convertToCamelCase().firstUppercased.asSelectionSetName
+  }
+}
+
+fileprivate extension OrderedDictionary<ScopeCondition, InlineFragmentSpread> {
+  var containsDeferredFragment: Bool {
+    keys.contains(where: { $0.isDeferred })
+  }
+}
+
+fileprivate extension Sequence<InlineFragmentSpread> {
+  /// Maps the closure over the inline fragments that have a defer condition.
+  func deferConditionMap<T>(_ transform: (Element) -> T) -> [T] {
+    var result = [T]()
+
+    for element in self {
+      if element.typeInfo.deferCondition != nil {
+        result.append(transform(element))
+      }
+    }
+
+    return result
   }
 }
