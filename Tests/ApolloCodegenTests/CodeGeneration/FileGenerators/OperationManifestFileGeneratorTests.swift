@@ -16,6 +16,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
   override func tearDown() {
     subject = nil
     fileManager = nil
+    super.tearDown()
   }
 
   // MARK: Test Helpers
