@@ -22,7 +22,7 @@ struct PersistedQueriesOperationManifestTemplate: OperationManifestTemplate {
             return """
             {
               "id": "\($0.identifier)",
-              "body": "\($0.operation.sourceTextFormattedForManifestJSONBody)",
+              "body": "\($0.operation.sourceText(withFormat: .manifestJSONBody))",
               "name": "\($0.operation.name)",
               "type": "\($0.operation.type.rawValue)"
             }

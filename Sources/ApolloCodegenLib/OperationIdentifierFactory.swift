@@ -56,7 +56,7 @@ let DefaultOperationIdentifierProvider =
       hasher.update(bufferPointer: UnsafeRawBufferPointer(buffer))
     })
   }
-  var definitionSource = operation.rawSourceText
+  var definitionSource = operation.sourceText(withFormat: .rawSource)
   updateHash(with: &definitionSource)
 
   let digest = hasher.finalize()
