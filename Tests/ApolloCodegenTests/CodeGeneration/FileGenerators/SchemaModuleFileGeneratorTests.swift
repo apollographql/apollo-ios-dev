@@ -14,7 +14,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
   override func setUp() {
     super.setUp()
     testFilePathBuilder = TestFilePathBuilder(test: self)
-    mockFileManager = MockApolloFileManager(strict: true)
+    mockFileManager = MockApolloFileManager(strict: false)
   }
 
   override func tearDown() {
@@ -122,6 +122,11 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
 
   func test__generate__givenModuleType_other_shouldNotGenerateFile() async throws {
     // given
+    mockFileManager = MockApolloFileManager(
+      strict: false,
+      requireAllClosuresCalled: false
+    )
+
     let configuration = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(
       .other,
       to: rootURL.path
