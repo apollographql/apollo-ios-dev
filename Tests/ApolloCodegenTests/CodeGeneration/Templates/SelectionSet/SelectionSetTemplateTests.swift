@@ -35,10 +35,10 @@ class SelectionSetTemplateTests: XCTestCase {
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude,
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = .init(),
     cocoapodsImportStatements: Bool = false
-  ) async throws {
-    ir = try await .mock(schema: schemaSDL, document: document)
+  ) throws {
+    ir = try .mock(schema: schemaSDL, document: document)
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
-    operation = await ir.build(operation: operationDefinition)
+    operation = ir.build(operation: operationDefinition)
     let config = ApolloCodegen.ConfigurationContext(config: .mock(
       schemaNamespace: "TestSchema",
       output: configOutput,
@@ -65,7 +65,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: - Tests
 
-  func test__render_rendersClosingBracket() async throws {
+  func test__render_rendersClosingBracket() throws {
     // given
     schemaSDL = """
     type Query {
@@ -86,7 +86,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -100,7 +100,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Parent Type
 
-  func test__render_parentType__givenParentTypeAs_Object_rendersParentType() async throws {
+  func test__render_parentType__givenParentTypeAs_Object_rendersParentType() throws {
     // given
     schemaSDL = """
     type Query {
@@ -125,7 +125,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -137,7 +137,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
 
-  func test__render_parentType__givenParentTypeAs_Interface_rendersParentType() async throws {
+  func test__render_parentType__givenParentTypeAs_Interface_rendersParentType() throws {
     // given
     schemaSDL = """
     type Query {
@@ -162,7 +162,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -173,7 +173,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
 
-  func test__render_parentType__givenParentTypeAs_Union_rendersParentType() async throws {
+  func test__render_parentType__givenParentTypeAs_Union_rendersParentType() throws {
     // given
     schemaSDL = """
     type Query {
@@ -202,7 +202,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -213,7 +213,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
 
-  func test__render_parentType__givenCocoapodsImportStatements_true_rendersParentTypeWithApolloNamespace() async throws {
+  func test__render_parentType__givenCocoapodsImportStatements_true_rendersParentTypeWithApolloNamespace() throws {
     // given
     schemaSDL = """
     type Query {
@@ -242,7 +242,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(cocoapodsImportStatements: true)
+    try buildSubjectAndOperation(cocoapodsImportStatements: true)
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -255,7 +255,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: - Selections
 
-  func test__render_selections__givenCocoapodsImportStatements_true_rendersSelectionsWithApolloNamespace() async throws {
+  func test__render_selections__givenCocoapodsImportStatements_true_rendersSelectionsWithApolloNamespace() throws {
     // given
     schemaSDL = """
     type Query {
@@ -283,7 +283,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(cocoapodsImportStatements: true)
+    try buildSubjectAndOperation(cocoapodsImportStatements: true)
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -294,7 +294,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenNilDirectSelections_doesNotRenderSelections() async throws {
+  func test__render_selections__givenNilDirectSelections_doesNotRenderSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -335,7 +335,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let asDog_Nested = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "nested"] as? IR.EntityField
     )
@@ -346,7 +346,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenCustomRootTypes_doesNotGenerateTypenameField() async throws {
+  func test__render_selections__givenCustomRootTypes_doesNotGenerateTypenameField() throws {
     // given
     schemaSDL = """
     schema {
@@ -382,7 +382,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"] as? IR.EntityField
     )
@@ -395,7 +395,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Selections - Fields
 
-  func test__render_selections__givenScalarFieldSelections_rendersAllFieldSelections() async throws {
+  func test__render_selections__givenScalarFieldSelections_rendersAllFieldSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -494,7 +494,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -505,7 +505,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenAllUppercase_generatesCorrectCasing() async throws {
+  func test__render_selections__givenAllUppercase_generatesCorrectCasing() throws {
     // given
     schemaSDL = """
     type Query {
@@ -533,7 +533,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -544,7 +544,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenCustomScalar_rendersFieldSelectionsWithNamespaceInAllConfigurations() async throws {
+  func test__render_selections__givenCustomScalar_rendersFieldSelectionsWithNamespaceInAllConfigurations() throws {
     // given
     schemaSDL = """
     type Query {
@@ -600,7 +600,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
     for test in tests {
       // when
-      try await buildSubjectAndOperation(configOutput: test)
+      try buildSubjectAndOperation(configOutput: test)
       let allAnimals = try XCTUnwrap(
         operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
       )
@@ -612,7 +612,7 @@ class SelectionSetTemplateTests: XCTestCase {
     }
   }
 
-  func test__render_selections__givenEnumField_rendersFieldSelectionsWithNamespaceInAllConfigurations() async throws {
+  func test__render_selections__givenEnumField_rendersFieldSelectionsWithNamespaceInAllConfigurations() throws {
     // given
     schemaSDL = """
     type Query {
@@ -671,7 +671,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
     for test in tests {
       // when
-      try await buildSubjectAndOperation(configOutput: test)
+      try buildSubjectAndOperation(configOutput: test)
       let allAnimals = try XCTUnwrap(
         operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
       )
@@ -683,7 +683,7 @@ class SelectionSetTemplateTests: XCTestCase {
     }
   }
 
-  func test__render_selections__givenFieldWithUppercasedName_rendersFieldSelections() async throws {
+  func test__render_selections__givenFieldWithUppercasedName_rendersFieldSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -711,7 +711,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -722,7 +722,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenFieldWithAlias_rendersFieldSelections() async throws {
+  func test__render_selections__givenFieldWithAlias_rendersFieldSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -750,7 +750,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -761,7 +761,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenEntityFieldWithNameNotMatchingType_rendersFieldSelections() async throws {
+  func test__render_selections__givenEntityFieldWithNameNotMatchingType_rendersFieldSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -801,7 +801,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -814,7 +814,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Selections - Fields - Reserved Keywords & Special Names
 
-  func test__render_selections__givenFieldsWithSwiftReservedKeywordNames_rendersFieldsNotBacktickEscaped() async throws {
+  func test__render_selections__givenFieldsWithSwiftReservedKeywordNames_rendersFieldsNotBacktickEscaped() throws {
     // given
     schemaSDL = """
     type Query {
@@ -1001,7 +1001,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -1012,7 +1012,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenEntityFieldWithUnderscorePrefixedName_rendersFieldSelectionsWithTypeFirstUppercased() async throws {
+  func test__render_selections__givenEntityFieldWithUnderscorePrefixedName_rendersFieldSelectionsWithTypeFirstUppercased() throws {
     // given
     schemaSDL = """
     type Query {
@@ -1048,7 +1048,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -1059,7 +1059,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenEntityFieldWithSwiftKeywordAndApolloReservedTypeNames_rendersFieldSelectionsWithTypeNameSuffixed() async throws {
+  func test__render_selections__givenEntityFieldWithSwiftKeywordAndApolloReservedTypeNames_rendersFieldSelectionsWithTypeNameSuffixed() throws {
     // given
     schemaSDL = """
     type Query {
@@ -1170,7 +1170,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -1183,7 +1183,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Selections - Fields - Arguments
 
-  func test__render_selections__givenFieldWithArgumentWithConstantValue_rendersFieldSelections() async throws {
+  func test__render_selections__givenFieldWithArgumentWithConstantValue_rendersFieldSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -1211,7 +1211,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -1222,7 +1222,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenFieldWithArgumentWithNullConstantValue_rendersFieldSelections() async throws {
+  func test__render_selections__givenFieldWithArgumentWithNullConstantValue_rendersFieldSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -1250,7 +1250,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -1261,7 +1261,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenFieldWithArgumentWithVariableValue_rendersFieldSelections() async throws {
+  func test__render_selections__givenFieldWithArgumentWithVariableValue_rendersFieldSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -1289,7 +1289,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -1300,7 +1300,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenFieldWithArgumentOfInputObjectTypeWithNullableFields_withConstantValues_rendersFieldSelections() async throws {
+  func test__render_selections__givenFieldWithArgumentOfInputObjectTypeWithNullableFields_withConstantValues_rendersFieldSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -1370,7 +1370,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -1383,7 +1383,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Selections - Type Cases
 
-  func test__render_selections__givenTypeCases_rendersTypeCaseSelections() async throws {
+  func test__render_selections__givenTypeCases_rendersTypeCaseSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -1425,7 +1425,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -1438,7 +1438,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Selections - Fragments
 
-  func test__render_selections__givenFragments_rendersFragmentSelections() async throws {
+  func test__render_selections__givenFragments_rendersFragmentSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -1477,7 +1477,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -1490,9 +1490,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Selections - Deferred Inline Fragment
 
-  func test__render_selections__givenDeferredInlineFragment_rendersDeferredFragmentSelection() async throws {
-    throw XCTSkip()
-
+  func test__render_selections__givenDeferredInlineFragmentWithoutTypeCase_rendersDeferredFragmentSelectionAndFieldSelectionInDeferredFragment() throws {
     // given
     schemaSDL = """
     type Query {
@@ -1500,16 +1498,141 @@ class SelectionSetTemplateTests: XCTestCase {
     }
 
     interface Animal {
-      id: String
-      species: String
-      genus: String
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+    )
+    let allAnimals_deferredAsRoot = try XCTUnwrap(
+      allAnimals[as: "Animal", deferred: .init(label: "root")]
+    )
+
+    let rendered_allAnimals = subject.render(field: allAnimals)
+    let rendered_allAnimals_deferredAsRoot = subject.render(
+      inlineFragment: allAnimals_deferredAsRoot
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__deferredFragments__givenDeferredInlineFragmentOnSameTypeCase_rendersDeferredFragmentSelectionAndFieldSelectionInDeferredFragment() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+    )
+    let allAnimals_deferredAsRoot = try XCTUnwrap(
+      allAnimals[as: "Animal", deferred: .init(label: "root")]
+    )
+
+    let rendered_allAnimals = subject.render(field: allAnimals)
+    let rendered_allAnimals_deferredAsRoot = subject.render(
+      inlineFragment: allAnimals_deferredAsRoot
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__deferredFragments__givenDeferredInlineFragmentOnDifferentTypeCase_rendersTypeCaseSelectionAndDeferredFragmentSelectionAndFieldSelectionInDeferredFragment() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
     }
 
     type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
+      id: String!
+      species: String!
     }
     """
 
@@ -1525,590 +1648,66 @@ class SelectionSetTemplateTests: XCTestCase {
     }
     """
 
-    let expected = """
-      public static var __selections: [ApolloAPI.Selection] { [
-        .deferred(Root.self, label: "root")
-      ] }
-    """
-
     // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
+    try buildSubjectAndOperation()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 10, ignoringExtraLines: true))
-  }
-
-  func test__render_selections__givenDeferredInlineFragmentsWithDifferentLabels_rendersBothDeferredFragmentSelections() async throws {
-    throw XCTSkip()
-
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(label: "one") {
-          species
-        }
-        ... on Dog @defer(label: "two") {
-          genus
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public static var __selections: [ApolloAPI.Selection] { [
-        .deferred(One.self, label: "one"),
-        .deferred(Two.self, label: "two")
-      ] }
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+    )
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(
+      allAnimals_asDog[as: "Dog", deferred: .init(label: "root")]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 10, ignoringExtraLines: true))
-  }
-
-  func test__render_selections__givenDeferredInlineFragmentWithCondition_rendersDeferredFragmentSelectionWithCondition() async throws {
-    throw XCTSkip()
-
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(if: "a", label: "root") {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public static var __selections: [ApolloAPI.Selection] { [
-        .deferred(if: "a", Root.self, label: "root")
-      ] }
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    let rendered_allAnimals = subject.render(field: allAnimals)
+    let rendered_allAnimals_asDog = subject.render(inlineFragment: allAnimals_asDog)
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
 
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 10, ignoringExtraLines: true))
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
   }
 
-  func test__render_selections__givenDeferredInlineFragmentWithTrueCondition_rendersDeferredFragmentSelectionWithoutCondition() async throws {
-    throw XCTSkip()
-
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(if: true, label: "root") {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public static var __selections: [ApolloAPI.Selection] { [
-        .deferred(Root.self, label: "root")
-      ] }
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 10, ignoringExtraLines: true))
-  }
-
-  func test__render_selections__givenDeferredInlineFragmentWithFalseCondition_doesNotRendersDeferredFragmentSelection() async throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(if: false, label: "root") {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public static var __selections: [ApolloAPI.Selection] { [
-        .field("species", String?.self),
-      ] }
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
-  }
-
-  func test__render_selections__givenNestedDeferredInlineFragments_rendersNestedDeferredFragmentSelections() async throws {
-    throw XCTSkip()
-
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-      friend: Animal
-    }
-
-    type Cat implements Animal {
-      id: String
-      species: String
-      genus: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(label: "one") {
-          friend {
-            ... on Cat @defer(label: "two") {
-              species
-            }
-          }
-        }
-      }
-    }
-    """
-
-    let expectedOne = """
-      public static var __selections: [ApolloAPI.Selection] { [
-        .deferred(One.self, label: "one"),
-      ] }
-    """
-    let expectedTwo = """
-      public static var __selections: [ApolloAPI.Selection] { [
-        .deferred(Two.self, label: "two"),
-      ] }
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-    let allAnimals_asDog_asCat = try XCTUnwrap(
-      allAnimals_asDog[as: "One"]?[field: "friend"]?[as: "Cat"]
-    )
-
-    let actualOne = subject.render(inlineFragment: allAnimals_asDog)
-    let actualTwo = subject.render(inlineFragment: allAnimals_asDog_asCat)
-
-    // then
-    expect(actualOne).to(equalLineByLine(expectedOne, atLine: 11, ignoringExtraLines: true))
-    expect(actualTwo).to(equalLineByLine(expectedTwo, atLine: 11, ignoringExtraLines: true))
-  }
+  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
 
   // MARK: Selections - Deferred Named Fragment
 
-  func test__render_selections__givenDeferredNamedFragment_rendersDeferredFragmentSelection() async throws {
-    throw XCTSkip()
-
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ...DogFragment @defer(label: "root")
-      }
-    }
-
-    fragment DogFragment on Dog {
-      species
-    }
-    """
-
-    let expected = """
-      public static var __selections: [ApolloAPI.Selection] { [
-        .deferred(DogFragment.self)
-      ] }
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
-  }
-
-  func test__render_selections__givenDeferredNamedFragmentWithLabel_rendersDeferredFragmentSelectionUsingNamedFragmentType() async throws {
-    throw XCTSkip()
-
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ...DogFragment @defer(label: "root")
-      }
-    }
-
-    fragment DogFragment on Dog {
-      species
-    }
-    """
-
-    let expected = """
-      public static var __selections: [ApolloAPI.Selection] { [
-        .deferred(DogFragment.self, label: "root")
-      ] }
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
-  }
-
-  func test__render_selections__givenDeferredNamedFragmentWithCondition_rendersDeferredFragmentSelectionWithCondition() async throws {
-    throw XCTSkip()
-
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ...DogFragment @defer(if: "a", label: "root")
-      }
-    }
-
-    fragment DogFragment on Dog {
-      species
-    }
-    """
-
-    let expected = """
-      public static var __selections: [ApolloAPI.Selection] { [
-        .deferred(if: "a", DogFragment.self),
-      ] }
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
-  }
-
-  func test__render_selections__givenDeferredNamedFragmentWithTrueCondition_rendersDeferredFragmentSelection() async throws {
-    throw XCTSkip()
-
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ...DogFragment @defer(if: true, label: "root")
-      }
-    }
-
-    fragment DogFragment on Dog {
-      species
-    }
-    """
-
-    let expected = """
-      public static var __selections: [ApolloAPI.Selection] { [
-        .deferred(DogFragment.self),
-      ] }
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
-  }
-
-  func test__render_selections__givenDeferredNamedFragmentWithFalseCondition_doesNotRenderDeferredFragmentSelection() async throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ...DogFragment @defer(if: false, label: "root")
-      }
-    }
-
-    fragment DogFragment on Dog {
-      species
-    }
-    """
-
-    let expected = """
-      public static var __selections: [ApolloAPI.Selection] { [
-        .fragment(DogFragment.self),
-      ] }
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
-  }
+  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
 
   // MARK: Selections - Include/Skip
 
-  func test__render_selections__givenFieldWithIncludeCondition_rendersFieldSelections() async throws {
+  func test__render_selections__givenFieldWithIncludeCondition_rendersFieldSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2136,7 +1735,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -2147,7 +1746,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenFieldWithSkipCondition_rendersFieldSelections() async throws {
+  func test__render_selections__givenFieldWithSkipCondition_rendersFieldSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2175,7 +1774,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -2186,7 +1785,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenFieldWithMultipleConditions_rendersFieldSelections() async throws {
+  func test__render_selections__givenFieldWithMultipleConditions_rendersFieldSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2214,7 +1813,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -2225,7 +1824,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenMergedFieldsWithMultipleConditions_rendersFieldSelections() async throws {
+  func test__render_selections__givenMergedFieldsWithMultipleConditions_rendersFieldSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2256,7 +1855,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -2267,7 +1866,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenMultipleSelectionsWithSameIncludeConditions_rendersFieldSelections() async throws {
+  func test__render_selections__givenMultipleSelectionsWithSameIncludeConditions_rendersFieldSelections() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2314,7 +1913,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -2325,7 +1924,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenFragmentWithNonMatchingTypeAndInclusionCondition_rendersTypeCaseSelectionWithInclusionCondition() async throws {
+  func test__render_selections__givenFragmentWithNonMatchingTypeAndInclusionCondition_rendersTypeCaseSelectionWithInclusionCondition() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2363,7 +1962,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -2374,7 +1973,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenInlineFragmentOnSameTypeWithConditions_rendersInlineFragmentSelectionSetAccessorWithCorrectName() async throws {
+  func test__render_selections__givenInlineFragmentOnSameTypeWithConditions_rendersInlineFragmentSelectionSetAccessorWithCorrectName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2408,7 +2007,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -2419,7 +2018,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenFragmentWithInclusionConditionThatMatchesScope_rendersFragmentSelectionWithoutInclusionCondition() async throws {
+  func test__render_selections__givenFragmentWithInclusionConditionThatMatchesScope_rendersFragmentSelectionWithoutInclusionCondition() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2456,7 +2055,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asPet = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Pet", if: "a"]
     )
@@ -2469,7 +2068,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Selections - __typename Selection
 
-  func test__render_selections__givenEntityRootSelectionSet_rendersTypenameSelection() async throws {
+  func test__render_selections__givenEntityRootSelectionSet_rendersTypenameSelection() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2497,7 +2096,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -2508,7 +2107,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenInlineFragment_doesNotRenderTypenameSelection() async throws {
+  func test__render_selections__givenInlineFragment_doesNotRenderTypenameSelection() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2541,7 +2140,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asPet = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Pet"]
     )
@@ -2552,7 +2151,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenOperationRootSelectionSet_doesNotRenderTypenameSelection() async throws {
+  func test__render_selections__givenOperationRootSelectionSet_doesNotRenderTypenameSelection() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2579,7 +2178,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let queryRoot = try XCTUnwrap(
       operation[field: "query"] as? IR.EntityField
     )
@@ -2592,7 +2191,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Merged Sources
 
-  func test__render_mergedSources__givenMergedTypeCasesFromSingleMergedTypeCaseSource_rendersMergedSources() async throws {
+  func test__render_mergedSources__givenMergedTypeCasesFromSingleMergedTypeCaseSource_rendersMergedSources() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2644,7 +2243,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asDog_predator_asPet = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"]?[as: "Pet"]
     )
@@ -2655,7 +2254,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
-  func test__render_mergedSources__givenTypeCaseMergedFromFragmentWithOtherMergedFields_rendersMergedSources() async throws {
+  func test__render_mergedSources__givenTypeCaseMergedFromFragmentWithOtherMergedFields_rendersMergedSources() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2707,7 +2306,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let predator_asPet = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?[as: "Pet"]
     )
@@ -2729,7 +2328,7 @@ class SelectionSetTemplateTests: XCTestCase {
   ///
   /// To correct this we must always use the fully qualified name including the operation name and
   /// `Data` objects to ensure we are referring to the correct type.
-  func test__render_mergedSources__givenMergedTypeCaseWithConflictingNames_rendersMergedSourceWithFullyQualifiedName() async throws {
+  func test__render_mergedSources__givenMergedTypeCaseWithConflictingNames_rendersMergedSourceWithFullyQualifiedName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2781,7 +2380,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asDog_predator_asPet = try XCTUnwrap(
       operation[field: "query"]?[field: "predators"]?[as: "Dog"]?[field: "predator"]?[as: "Pet"]
     )
@@ -2794,7 +2393,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: - Field Accessors - Scalar
 
-  func test__render_fieldAccessors__givenScalarFields_rendersAllFieldAccessors() async throws {
+  func test__render_fieldAccessors__givenScalarFields_rendersAllFieldAccessors() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2890,7 +2489,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -2901,7 +2500,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 35, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenCustomScalarFields_rendersFieldAccessorsWithNamespaceWhenRequiredInAllConfigurations() async throws {
+  func test__render_fieldAccessors__givenCustomScalarFields_rendersFieldAccessorsWithNamespaceWhenRequiredInAllConfigurations() throws {
     // given
     schemaSDL = """
     type Query {
@@ -2954,7 +2553,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
     for test in tests {
       // when
-      try await buildSubjectAndOperation(configOutput: test)
+      try buildSubjectAndOperation(configOutput: test)
       let allAnimals = try XCTUnwrap(
         operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
       )
@@ -2966,7 +2565,7 @@ class SelectionSetTemplateTests: XCTestCase {
     }
   }
 
-  func test__render_fieldAccessors__givenEnumField_rendersFieldAccessorsWithNamespacedInAllConfigurations() async throws {
+  func test__render_fieldAccessors__givenEnumField_rendersFieldAccessorsWithNamespacedInAllConfigurations() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3022,7 +2621,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
     for test in tests {
       // when
-      try await buildSubjectAndOperation(configOutput: test)
+      try buildSubjectAndOperation(configOutput: test)
       let allAnimals = try XCTUnwrap(
         operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
       )
@@ -3034,7 +2633,7 @@ class SelectionSetTemplateTests: XCTestCase {
     }
   }
 
-  func test__render_fieldAccessors__givenFieldWithUpperCaseName_rendersFieldAccessorWithLowercaseName() async throws {
+  func test__render_fieldAccessors__givenFieldWithUpperCaseName_rendersFieldAccessorWithLowercaseName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3061,7 +2660,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "AllAnimals"] as? IR.EntityField
     )
@@ -3072,7 +2671,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenFieldWithAllUpperCaseName_rendersFieldAccessorWithLowercaseName() async throws {
+  func test__render_fieldAccessors__givenFieldWithAllUpperCaseName_rendersFieldAccessorWithLowercaseName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3097,7 +2696,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "AllAnimals"] as? IR.EntityField
     )
@@ -3108,7 +2707,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenFieldWithAlias_rendersAllFieldAccessors() async throws {
+  func test__render_fieldAccessors__givenFieldWithAlias_rendersAllFieldAccessors() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3135,7 +2734,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -3146,7 +2745,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenMergedScalarField_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenMergedScalarField_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3179,7 +2778,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let dog = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
     )
@@ -3190,7 +2789,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenFieldWithSnakeCaseName_rendersFieldAccessorAsCamelCase() async throws {
+  func test__render_fieldAccessors__givenFieldWithSnakeCaseName_rendersFieldAccessorAsCamelCase() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3215,7 +2814,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(conversionStrategies: .init(fieldAccessors: .camelCase))
+    try buildSubjectAndOperation(conversionStrategies: .init(fieldAccessors: .camelCase))
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "AllAnimals"] as? IR.EntityField
     )
@@ -3226,7 +2825,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenFieldWithSnakeCaseUppercaseName_rendersFieldAccessorAsCamelCase() async throws {
+  func test__render_fieldAccessors__givenFieldWithSnakeCaseUppercaseName_rendersFieldAccessorAsCamelCase() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3251,7 +2850,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(conversionStrategies: .init(fieldAccessors: .camelCase))
+    try buildSubjectAndOperation(conversionStrategies: .init(fieldAccessors: .camelCase))
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "AllAnimals"] as? IR.EntityField
     )
@@ -3264,7 +2863,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Field Accessors - Reserved Keywords + Special Names
 
-  func test__render_fieldAccessors__givenFieldsWithSwiftReservedKeywordNames_rendersFieldsBacktickEscaped() async throws {
+  func test__render_fieldAccessors__givenFieldsWithSwiftReservedKeywordNames_rendersFieldsBacktickEscaped() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3446,7 +3045,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -3461,7 +3060,7 @@ class SelectionSetTemplateTests: XCTestCase {
     )
   }
 
-  func test__render_fieldAccessors__givenEntityFieldWithUnderscorePrefixedName_rendersFieldWithTypeFirstUppercased() async throws {
+  func test__render_fieldAccessors__givenEntityFieldWithUnderscorePrefixedName_rendersFieldWithTypeFirstUppercased() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3494,7 +3093,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -3509,7 +3108,7 @@ class SelectionSetTemplateTests: XCTestCase {
     )
   }
 
-  func test__render_fieldAccessors__givenEntityFieldWithSwiftKeywordAndApolloReservedTypeNames_rendersFieldAccessorWithTypeNameSuffixed() async throws {
+  func test__render_fieldAccessors__givenEntityFieldWithSwiftKeywordAndApolloReservedTypeNames_rendersFieldAccessorWithTypeNameSuffixed() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3607,7 +3206,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -3624,7 +3223,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Field Accessors - Entity
 
-  func test__render_fieldAccessors__givenDirectEntityField_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenDirectEntityField_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3661,7 +3260,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -3672,7 +3271,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenDirectEntityFieldWithAlias_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenDirectEntityFieldWithAlias_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3700,7 +3299,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -3711,7 +3310,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenDirectEntityFieldAsOptional_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenDirectEntityFieldAsOptional_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3739,7 +3338,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -3750,7 +3349,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenDirectEntityFieldAsList_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenDirectEntityFieldAsList_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3778,7 +3377,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -3789,7 +3388,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenEntityFieldWithDirectSelectionsAndMergedFromFragment_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenEntityFieldWithDirectSelectionsAndMergedFromFragment_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3825,7 +3424,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -3838,7 +3437,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Field Accessors - Merged Fragment
 
-  func test__render_fieldAccessors__givenEntityFieldMergedFromFragment_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenEntityFieldMergedFromFragment_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3870,7 +3469,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -3881,7 +3480,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenEntityFieldMergedFromFragmentEntityNestedInEntity_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenEntityFieldMergedFromFragmentEntityNestedInEntity_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3924,7 +3523,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_predator = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
     )
@@ -3935,7 +3534,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenEntityFieldMergedFromFragmentInTypeCaseWithEntityNestedInEntity_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenEntityFieldMergedFromFragmentInTypeCaseWithEntityNestedInEntity_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -3981,7 +3580,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asPet_predator = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Pet"]?[field: "predator"] as? IR.EntityField
     )
@@ -3992,7 +3591,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenEntityFieldMergedFromTypeCaseInFragment_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenEntityFieldMergedFromTypeCaseInFragment_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4044,7 +3643,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_predator = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
     )
@@ -4059,7 +3658,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(allAnimals_predator_asPet_actual).to(equalLineByLine(predator_asPet_expected, atLine: 13, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenEntityFieldMergedFromFragmentWithEntityNestedInEntityTypeCase_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenEntityFieldMergedFromFragmentWithEntityNestedInEntityTypeCase_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4113,7 +3712,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_predator = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
     )
@@ -4128,7 +3727,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(allAnimals_predator_asPet_actual).to(equalLineByLine(predator_asPet_expected, atLine: 13, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenTypeCaseMergedFromFragmentWithOtherMergedFields_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenTypeCaseMergedFromFragmentWithOtherMergedFields_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4177,7 +3776,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let predator = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
     )
@@ -4189,7 +3788,7 @@ class SelectionSetTemplateTests: XCTestCase {
       .to(equalLineByLine(predator_expected, atLine: 15, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenTypeCaseMergedFromFragmentWithNoOtherMergedFields_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenTypeCaseMergedFromFragmentWithNoOtherMergedFields_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4237,7 +3836,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let predator = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
     )
@@ -4249,7 +3848,7 @@ class SelectionSetTemplateTests: XCTestCase {
       .to(equalLineByLine(predator_expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenEntityFieldMergedAsRootOfNestedFragment_rendersFieldAccessor() async throws {
+  func test__render_fieldAccessors__givenEntityFieldMergedAsRootOfNestedFragment_rendersFieldAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4297,7 +3896,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let predator_asPet = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?[as: "Pet"]
     )
@@ -4311,7 +3910,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Field Accessors - Merged From Parent
 
-  func test__render_fieldAccessors__givenEntityFieldMergedFromParent_notOperationRoot_rendersFieldAccessorWithNameNotIncludingParent() async throws {
+  func test__render_fieldAccessors__givenEntityFieldMergedFromParent_notOperationRoot_rendersFieldAccessorWithNameNotIncludingParent() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4349,7 +3948,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asDog = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
     )
@@ -4360,7 +3959,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenEntityFieldMergedFromParent_atOperationRoot_rendersFieldAccessorWithFullyQualifiedName() async throws {
+  func test__render_fieldAccessors__givenEntityFieldMergedFromParent_atOperationRoot_rendersFieldAccessorWithFullyQualifiedName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4393,7 +3992,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let query_asAdminQuery = try XCTUnwrap(
       operation[field: "query"]?[as: "AdminQuery"]
     )
@@ -4404,7 +4003,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenEntityFieldMergedFromSiblingTypeCase_notOperationRoot_rendersFieldAccessorWithNameNotIncludingSharedParent() async throws {
+  func test__render_fieldAccessors__givenEntityFieldMergedFromSiblingTypeCase_notOperationRoot_rendersFieldAccessorWithNameNotIncludingSharedParent() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4449,7 +4048,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asDog = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
     )
@@ -4460,7 +4059,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenEntityFieldMergedFromSiblingTypeCase_atOperationRoot_rendersFieldAccessorWithFullyQualifiedName() async throws {
+  func test__render_fieldAccessors__givenEntityFieldMergedFromSiblingTypeCase_atOperationRoot_rendersFieldAccessorWithFullyQualifiedName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4500,7 +4099,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let query_asAdminQuery = try XCTUnwrap(
       operation[field: "query"]?[as: "AdminQuery"]
     )
@@ -4511,7 +4110,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenEntityFieldNestedInEntityFieldMergedFromParent_rendersFieldAccessorWithCorrectName() async throws {
+  func test__render_fieldAccessors__givenEntityFieldNestedInEntityFieldMergedFromParent_rendersFieldAccessorWithCorrectName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4559,7 +4158,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asDog_predator = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IR.EntityField
     )
@@ -4570,7 +4169,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenEntityFieldNestedInEntityFieldInMatchingTypeCaseMergedFromParent_rendersFieldAccessorWithCorrectName() async throws {
+  func test__render_fieldAccessors__givenEntityFieldNestedInEntityFieldInMatchingTypeCaseMergedFromParent_rendersFieldAccessorWithCorrectName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4626,7 +4225,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asDog_predator = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IR.EntityField
     )
@@ -4639,7 +4238,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Field Accessors - Include/Skip
 
-  func test__render_fieldAccessor__givenNonNullFieldWithIncludeCondition_rendersAsOptional() async throws {
+  func test__render_fieldAccessor__givenNonNullFieldWithIncludeCondition_rendersAsOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4664,7 +4263,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -4675,7 +4274,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessor__givenNonNullFieldWithSkipCondition_rendersAsOptional() async throws {
+  func test__render_fieldAccessor__givenNonNullFieldWithSkipCondition_rendersAsOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4700,7 +4299,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -4711,7 +4310,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenEntityFieldMergedFromParentWithInclusionCondition_rendersFieldAccessorAsOptional() async throws {
+  func test__render_fieldAccessors__givenEntityFieldMergedFromParentWithInclusionCondition_rendersFieldAccessorAsOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4749,7 +4348,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asDog = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
     )
@@ -4760,7 +4359,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessor__givenNonNullFieldMergedFromParentWithIncludeConditionThatMatchesScope_rendersAsNotOptional() async throws {
+  func test__render_fieldAccessor__givenNonNullFieldMergedFromParentWithIncludeConditionThatMatchesScope_rendersAsNotOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4790,7 +4389,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_ifA = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[if: "a"]
     )
@@ -4801,7 +4400,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessor__givenNonNullFieldWithIncludeConditionThatMatchesScope_rendersAsNotOptional() async throws {
+  func test__render_fieldAccessor__givenNonNullFieldWithIncludeConditionThatMatchesScope_rendersAsNotOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4826,7 +4425,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -4837,7 +4436,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessor__givenNonNullFieldMergedFromNestedEntityInNamedFragmentWithIncludeCondition_doesNotRenderField() async throws {
+  func test__render_fieldAccessor__givenNonNullFieldMergedFromNestedEntityInNamedFragmentWithIncludeCondition_doesNotRenderField() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4876,7 +4475,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_child = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[field: "child"] as? IR.EntityField
     )
@@ -4887,7 +4486,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessor__givenNonNullFieldMergedFromNestedEntityInNamedFragmentWithIncludeCondition_inConditionalFragment_rendersFieldAsNonOptional() async throws {
+  func test__render_fieldAccessor__givenNonNullFieldMergedFromNestedEntityInNamedFragmentWithIncludeCondition_inConditionalFragment_rendersFieldAsNonOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4927,7 +4526,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_child = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[if: "a"]?[field: "child"] as? IR.EntityField
     )
@@ -4938,11 +4537,166 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
+  // MARK: Field Accessors - Deferred Inline Fragment
 
+  func test__render_fieldAccessor__givenDeferredInlineFragmentWithoutTypeCase_rendersFieldsWithinDeferredTypeCase() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+
+    // then
+    let allAnimals_deferredAsRoot = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Animal", deferred: .init(label: "root")]
+    )
+
+    let rendered = subject.render(inlineFragment: allAnimals_deferredAsRoot)
+
+    // AllAnimal
+    expect(rendered).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__deferredFragments__givenDeferredInlineFragmentOnSameTypeCase_rendersFieldsWithinDeferredTypeCase() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+
+    // then
+    let allAnimals_deferredAsRoot = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Animal", deferred: .init(label: "root")]
+    )
+
+    let rendered = subject.render(inlineFragment: allAnimals_deferredAsRoot)
+
+    // AllAnimal
+    expect(rendered).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__deferredFragments__givenDeferredInlineFragmentOnDifferentTypeCase_rendersFieldsWithinDeferredTypeCase() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[as: "Dog", deferred: .init(label: "root")]
+    )
+
+    let rendered = subject.render(inlineFragment: allAnimals_asDog_deferredAsRoot)
+
+    // AllAnimal
+    expect(rendered).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
+
+  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
+
+  // MARK: Field Accessors - Deferred Named Fragments
+
+  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
 
   // MARK: - Inline Fragment Accessors
 
-  func test__render_inlineFragmentAccessors__givenDirectTypeCases_rendersTypeCaseAccessorWithCorrectName() async throws {
+  func test__render_inlineFragmentAccessors__givenDirectTypeCases_rendersTypeCaseAccessorWithCorrectName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -4987,7 +4741,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -4998,7 +4752,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_inlineFragmentAccessors__givenMergedTypeCasesFromSingleMergedTypeCaseSource_rendersTypeCaseAccessorWithCorrectName() async throws {
+  func test__render_inlineFragmentAccessors__givenMergedTypeCasesFromSingleMergedTypeCaseSource_rendersTypeCaseAccessorWithCorrectName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5047,7 +4801,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asDog_predator = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IR.EntityField
     )
@@ -5060,7 +4814,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Inline Fragment Accessors - Include/Skip
 
-  func test__render_inlineFragmentAccessors__givenInlineFragmentOnDifferentTypeWithCondition_renders() async throws {
+  func test__render_inlineFragmentAccessors__givenInlineFragmentOnDifferentTypeWithCondition_renders() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5091,7 +4845,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -5102,7 +4856,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_inlineFragmentAccessors__givenInlineFragmentOnDifferentTypeWithSkipCondition_renders() async throws {
+  func test__render_inlineFragmentAccessors__givenInlineFragmentOnDifferentTypeWithSkipCondition_renders() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5133,7 +4887,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -5144,7 +4898,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_inlineFragmentAccessors__givenInlineFragmentOnDifferentTypeWithMultipleConditions_renders() async throws {
+  func test__render_inlineFragmentAccessors__givenInlineFragmentOnDifferentTypeWithMultipleConditions_renders() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5175,7 +4929,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -5186,7 +4940,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_inlineFragmentAccessors__givenInlineFragmentOnSameTypeWithMultipleConditions_renders() async throws {
+  func test__render_inlineFragmentAccessors__givenInlineFragmentOnSameTypeWithMultipleConditions_renders() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5217,7 +4971,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -5228,7 +4982,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_inlineFragmentAccessor__givenNamedFragmentMatchingParentTypeWithInclusionCondition_renders() async throws {
+  func test__render_inlineFragmentAccessor__givenNamedFragmentMatchingParentTypeWithInclusionCondition_renders() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5258,7 +5012,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -5269,7 +5023,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_inlineFragmentAccessor__givenInlineFragmentAndNamedFragmentOnSameTypeWithInclusionCondition_rendersBothInlineFragments() async throws {
+  func test__render_inlineFragmentAccessor__givenInlineFragmentAndNamedFragmentOnSameTypeWithInclusionCondition_rendersBothInlineFragments() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5308,7 +5062,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -5321,7 +5075,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: - Fragment Accessors
 
-  func test__render_fragmentAccessor__givenFragments_rendersFragmentAccessor() async throws {
+  func test__render_fragmentAccessor__givenFragments_rendersFragmentAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5362,7 +5116,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -5373,7 +5127,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_fragmentAccessor__givenInheritedFragmentFromParent_rendersFragmentAccessor() async throws {
+  func test__render_fragmentAccessor__givenInheritedFragmentFromParent_rendersFragmentAccessor() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5420,7 +5174,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asCat = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Cat"]
     )
@@ -5431,9 +5185,9 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
   }
 
-  // MARK: - Fragment Accessors - Include Skip
+  // MARK: Fragment Accessors - Include Skip
 
-  func test__render_fragmentAccessor__givenFragmentOnSameTypeWithInclusionCondition_rendersFragmentAccessorAsOptional() async throws {
+  func test__render_fragmentAccessor__givenFragmentOnSameTypeWithInclusionCondition_rendersFragmentAccessorAsOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5474,7 +5228,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -5485,7 +5239,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
-  func test__render_fragmentAccessor__givenFragmentOnSameTypeWithInclusionConditionThatMatchesScope_rendersFragmentAccessorAsNotOptional() async throws {
+  func test__render_fragmentAccessor__givenFragmentOnSameTypeWithInclusionConditionThatMatchesScope_rendersFragmentAccessorAsNotOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5520,7 +5274,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -5531,7 +5285,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fragmentAccessor__givenFragmentOnSameTypeWithInclusionConditionThatPartiallyMatchesScope_rendersFragmentAccessorAsOptional() async throws {
+  func test__render_fragmentAccessor__givenFragmentOnSameTypeWithInclusionConditionThatPartiallyMatchesScope_rendersFragmentAccessorAsOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5566,7 +5320,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -5577,7 +5331,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
-  func test__render_fragmentAccessor__givenFragmentMergedFromParent_withInclusionConditionThatMatchesScope_rendersFragmentAccessorAsNotOptional() async throws {
+  func test__render_fragmentAccessor__givenFragmentMergedFromParent_withInclusionConditionThatMatchesScope_rendersFragmentAccessorAsNotOptional() throws {
     // given
     schemaSDL = """
     type Query {
@@ -5612,7 +5366,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_ifA = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[if: "a"]
     )
@@ -5623,841 +5377,178 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
-  // MARK: - Fragment Accessors - Deferred Inline Fragment
-  
-  func test__render_fragmentAccessor__givenDeferredInlineFragment_rendersConvenienceDeferredFragmentAccessorAsOptional() async throws {
-    throw XCTSkip()
-    
+  // MARK: Fragment Accessors - Deferred Inline Fragment
+
+  func test__render_selections__givenDeferredInlineFragmentWithoutTypeCase_rendersDeferredFragmentAccessorAsOptional() throws {
     // given
     schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
-      """
-    
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
     document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ... on Dog @defer(label: "root") {
-            species
-          }
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... @defer(label: "root") {
+          species
         }
       }
-      """
-    
-    let expected = """
-        public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
-            __data = _dataDict
-            _root = Deferred(_dataDict: _dataDict)
-          }
-      
-          @Deferred public var root: AsDog.Root?
-        }
-      """
-    
+    }
+    """
+
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
+
+    // then
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
-    
-    let actual = subject.render(field: allAnimals)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
-  }
-  
-  func test__render_fragmentAccessor__givenDeferredInlineFragment_rendersTypeCaseDeferredFragmentAccessorAsOptional() async throws {
-    throw XCTSkip()
-    
-    // given
-    schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
+
+    let rendered = subject.render(field: allAnimals)
+
+    expect(rendered).to(equalLineByLine(
       """
-    
-    document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ... on Dog @defer(label: "root") {
-            species
-          }
-        }
-      }
-      """
-    
-    let expected = """
         public struct Fragments: FragmentContainer {
           public let __data: DataDict
           public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
-      
+
           @Deferred public var root: Root?
         }
-      """
-    
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-    
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
+      """,
+      atLine: 15,
+      ignoringExtraLines: true
+    ))
   }
-  
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentsWithDifferentLabels_rendersBothConvenienceDeferredFragmentAccessorsAsOptional() async throws {
-    throw XCTSkip()
-    
+
+  func test__deferredFragments__givenDeferredInlineFragmentOnSameTypeCase_rendersDeferredFragmentAccessorAsOptional() throws {
     // given
     schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
-      """
-    
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
     document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ... on Dog @defer(label: "one") {
-            species
-          }
-          ... on Dog @defer(label: "two") {
-            genus
-          }
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @defer(label: "root") {
+          species
         }
       }
-      """
-    
-    let expected = """
-        public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
-            __data = _dataDict
-            _one = Deferred(_dataDict: _dataDict)
-            _two = Deferred(_dataDict: _dataDict)
-          }
-      
-          @Deferred public var one: AsDog.One?
-          @Deferred public var two: AsDog.Two?
-        }
-      """
-    
+    }
+    """
+
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
+
+    // then
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
-    
-    let actual = subject.render(field: allAnimals)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
-  }
-  
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentsWithDifferentLabels_rendersBothTypeCaseDeferredFragmentAccessorsAsOptional() async throws {
-    throw XCTSkip()
-    
-    // given
-    schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
+
+    let rendered = subject.render(field: allAnimals)
+
+    expect(rendered).to(equalLineByLine(
       """
-    
-    document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ... on Dog @defer(label: "one") {
-            species
-          }
-          ... on Dog @defer(label: "two") {
-            genus
-          }
-        }
-      }
-      """
-    
-    let expected = """
-        public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
-            __data = _dataDict
-            _one = Deferred(_dataDict: _dataDict)
-            _two = Deferred(_dataDict: _dataDict)
-          }
-      
-          @Deferred public var one: One?
-          @Deferred public var two: Two?
-        }
-      """
-    
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-    
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
-  }
-  
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithCondition_rendersConvenienceDeferredFragmentAccessorAsOptional() async throws {
-    throw XCTSkip()
-    
-    // given
-    schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
-      """
-    
-    document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ... on Dog @defer(if: "a", label: "root") {
-            species
-          }
-        }
-      }
-      """
-    
-    let expected = """
         public struct Fragments: FragmentContainer {
           public let __data: DataDict
           public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
-      
-          @Deferred public var root: AsDog.Root?
-        }
-      """
-    
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
-    )
-    
-    let actual = subject.render(field: allAnimals)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
-  }
-  
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithCondition_rendersTypeCaseDeferredFragmentAccessorAsOptional() async throws {
-    throw XCTSkip()
-    
-    // given
-    schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
-      """
-    
-    document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ... on Dog @defer(if: "a", label: "root") {
-            species
-          }
-        }
-      }
-      """
-    
-    let expected = """
-        public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
-            __data = _dataDict
-            _root = Deferred(_dataDict: _dataDict)
-          }
-      
+
           @Deferred public var root: Root?
         }
-      """
-    
+      """,
+      atLine: 15,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__deferredFragments__givenDeferredInlineFragmentOnDifferentTypeCase_rendersDeferredFragmentAccessorAsOptional() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
+
+    // then
     let allAnimals_asDog = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
     )
-    
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
-  }
-  
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithTrueCondition_rendersConvenienceDeferredFragmentAccessorAsOptional() async throws {
-    throw XCTSkip()
-    
-    // given
-    schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
+
+    let rendered = subject.render(inlineFragment: allAnimals_asDog)
+
+    expect(rendered).to(equalLineByLine(
       """
-    
-    document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ... on Dog @defer(if: true, label: "root") {
-            species
-          }
-        }
-      }
-      """
-    
-    let expected = """
         public struct Fragments: FragmentContainer {
           public let __data: DataDict
           public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
-      
-          @Deferred public var root: AsDog.Root?
-        }
-      """
-    
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
-    )
-    
-    let actual = subject.render(field: allAnimals)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
-  }
-  
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithTrueCondition_rendersTypeCaseDeferredFragmentAccessorAsOptional() async throws {
-    throw XCTSkip()
-    
-    // given
-    schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
-      """
-    
-    document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ... on Dog @defer(if: true, label: "root") {
-            species
-          }
-        }
-      }
-      """
-    
-    let expected = """
-        public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
-            __data = _dataDict
-            _root = Deferred(_dataDict: _dataDict)
-          }
-      
+
           @Deferred public var root: Root?
         }
-      """
-    
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-    
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
   }
+
+  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
+
+  // MARK: Fragment Accessors - Deferred Named Fragment
   
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithFalseCondition_doesNotRenderConvenienceDeferredFragmentAccessor() async throws {
-    throw XCTSkip()
-    
-    // given
-    schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
-      """
-    
-    document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ... on Dog @defer(if: false, label: "root") {
-            species
-          }
-        }
-      }
-      """
-    
-    let expected = """
-        public var asDog: AsDog? { _asInlineFragment() }
-      
-        /// Parent Type: `Dog`
-        public struct AsDog: TestSchema.InlineFragment {
-      """
-    
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
-    )
-    
-    let actual = subject.render(field: allAnimals)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
-  }
-  
-  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithFalseCondition_doesNotRenderTypeCaseDeferredFragmentAccessor() async throws {
-    throw XCTSkip()
-    
-    // given
-    schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
-      """
-    
-    document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ... on Dog @defer(if: false, label: "root") {
-            species
-          }
-        }
-      }
-      """
-    
-    let expected = """
-          public var species: String? { __data["species"] }
-        }
-      }
-      """
-    
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-    
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
-  }
-  
-  // MARK: - Fragment Accessors - Deferred Named Fragment
-  
-  func test__render_fragmentAccessor__givenDeferredNamedFragment_rendersDeferredFragmentAccessorAsOptional() async throws {
-    throw XCTSkip()
-    
-    // given
-    schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
-      """
-    
-    document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ...DogFragment @defer(label: "root")
-        }
-      }
-      
-      fragment DogFragment on Dog {
-        species
-      }
-      """
-    
-    let expected = """
-        public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
-            __data = _dataDict
-            _dogFragment = Deferred(_dataDict: _dataDict)
-          }
-      
-          @Deferred public var dogFragment: DogFragment?
-        }
-      """
-    
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-    
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
-  }
-  
-  func test__render_fragmentAccessor__givenDeferredNamedFragmentWithCondition_rendersDeferredFragmentAccessorAsOptional() async throws {
-    throw XCTSkip()
-    
-    // given
-    schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
-      """
-    
-    document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ...DogFragment @defer(if: "a", label: "root")
-        }
-      }
-      
-      fragment DogFragment on Dog {
-        species
-      }
-      """
-    
-    let expected = """
-        public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
-            __data = _dataDict
-            _dogFragment = Deferred(_dataDict: _dataDict)
-          }
-      
-          @Deferred public var dogFragment: DogFragment?
-        }
-      """
-    
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-    
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
-  }
-  
-  func test__render_fragmentAccessor__givenDeferredNamedFragmentWithTrueCondition_rendersDeferredFragmentAccessorAsOptional() async throws {
-    throw XCTSkip()
-    
-    // given
-    schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
-      """
-    
-    document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ...DogFragment @defer(if: true, label: "root")
-        }
-      }
-      
-      fragment DogFragment on Dog {
-        species
-      }
-      """
-    
-    let expected = """
-        public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
-            __data = _dataDict
-            _dogFragment = Deferred(_dataDict: _dataDict)
-          }
-      
-          @Deferred public var dogFragment: DogFragment?
-        }
-      """
-    
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-    
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
-  }
-  
-  func test__render_fragmentAccessor__givenDeferredNamedFragmentWithFalseCondition_doesNotRenderDeferredFragmentAccessor() async throws {
-    // given
-    schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
-      
-      interface Animal {
-        id: String
-        species: String
-        genus: String
-      }
-      
-      type Dog implements Animal {
-        id: String
-        species: String
-        genus: String
-        name: String
-      }
-      """
-    
-    document = """
-      query TestOperation {
-        allAnimals {
-          __typename
-          id
-          ...DogFragment @defer(if: false, label: "root")
-        }
-      }
-      
-      fragment DogFragment on Dog {
-        species
-      }
-      """
-    
-    let expected = """
-        public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
-      
-          public var dogFragment: DogFragment { _toFragment() }
-        }
-      """
-    
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-    
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-    
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
-  }
+#warning("need more tests here - same test cases as IRRootFieldBuilderTests")
 
   // MARK: - Nested Selection Sets
 
-  func test__render_nestedSelectionSets__givenDirectEntityFieldAsList_rendersNestedSelectionSet() async throws {
+  func test__render_nestedSelectionSets__givenDirectEntityFieldAsList_rendersNestedSelectionSet() throws {
     // given
     schemaSDL = """
     type Query {
@@ -6488,7 +5579,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -6499,7 +5590,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSets__givenDirectEntityFieldAsList_withIrregularPluralizationRule_rendersNestedSelectionSetWithCorrectSingularName() async throws {
+  func test__render_nestedSelectionSets__givenDirectEntityFieldAsList_withIrregularPluralizationRule_rendersNestedSelectionSetWithCorrectSingularName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -6530,7 +5621,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -6541,7 +5632,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSets__givenDirectEntityFieldAsNonNullList_withIrregularPluralizationRule_rendersNestedSelectionSetWithCorrectSingularName() async throws {
+  func test__render_nestedSelectionSets__givenDirectEntityFieldAsNonNullList_withIrregularPluralizationRule_rendersNestedSelectionSetWithCorrectSingularName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -6572,7 +5663,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -6583,7 +5674,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSets__givenDirectEntityFieldAsList_withCustomIrregularPluralizationRule_rendersNestedSelectionSetWithCorrectSingularName() async throws {
+  func test__render_nestedSelectionSets__givenDirectEntityFieldAsList_withCustomIrregularPluralizationRule_rendersNestedSelectionSetWithCorrectSingularName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -6614,7 +5705,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(inflectionRules: [
+    try buildSubjectAndOperation(inflectionRules: [
       ApolloCodegenLib.InflectionRule.irregular(singular: "Peep", plural: "people")
     ])
 
@@ -6630,7 +5721,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   /// Explicit test for edge case surfaced in issue
   /// [#1825](https://github.com/apollographql/apollo-ios/issues/1825)
-  func test__render_nestedSelectionSets__givenDirectEntityField_withTwoObjects_oneWithPluralizedNameAsObject_oneWithSingularNameAsList_rendersNestedSelectionSetsWithCorrectNames() async throws {
+  func test__render_nestedSelectionSets__givenDirectEntityField_withTwoObjects_oneWithPluralizedNameAsObject_oneWithSingularNameAsList_rendersNestedSelectionSetsWithCorrectNames() throws {
     // given
     schemaSDL = """
     type Query {
@@ -6692,7 +5783,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
 
     let query = try XCTUnwrap(
       operation[field: "query"] as? IR.EntityField
@@ -6706,7 +5797,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   /// Explicit test for edge case surfaced in issue
   /// [#1825](https://github.com/apollographql/apollo-ios/issues/1825)
-  func test__render_nestedSelectionSets__givenDirectEntityField_withTwoObjectsNonNullFields_oneWithPluralizedNameAsObject_oneWithSingularNameAsList_rendersNestedSelectionSetsWithCorrectNames() async throws {
+  func test__render_nestedSelectionSets__givenDirectEntityField_withTwoObjectsNonNullFields_oneWithPluralizedNameAsObject_oneWithSingularNameAsList_rendersNestedSelectionSetsWithCorrectNames() throws {
     // given
     schemaSDL = """
     type Query {
@@ -6768,7 +5859,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
 
     let query = try XCTUnwrap(
       operation[field: "query"] as? IR.EntityField
@@ -6780,7 +5871,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSets__givenEntityFieldMergedFromTwoSources_rendersMergedSelectionSet() async throws {
+  func test__render_nestedSelectionSets__givenEntityFieldMergedFromTwoSources_rendersMergedSelectionSet() throws {
     // given
     schemaSDL = """
     type Query {
@@ -6853,7 +5944,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asDog_predator = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IR.EntityField
     )
@@ -6864,7 +5955,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSet__givenEntityFieldMergedFromFragment_doesNotRendersSelectionSet() async throws {
+  func test__render_nestedSelectionSet__givenEntityFieldMergedFromFragment_doesNotRendersSelectionSet() throws {
     // given
     schemaSDL = """
     type Query {
@@ -6904,7 +5995,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -6915,7 +6006,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSet__givenEntityFieldMergedFromFragmentWithLowercaseName_rendersFragmentNestedSelctionSetNameCorrectlyCased() async throws {
+  func test__render_nestedSelectionSet__givenEntityFieldMergedFromFragmentWithLowercaseName_rendersFragmentNestedSelctionSetNameCorrectlyCased() throws {
     // given
     schemaSDL = """
     type Query {
@@ -6955,7 +6046,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -6966,7 +6057,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSet__givenEntityFieldMergedFromNestedFragmentInTypeCase_withNoOtherMergedFields_doesNotRendersSelectionSet() async throws {
+  func test__render_nestedSelectionSet__givenEntityFieldMergedFromNestedFragmentInTypeCase_withNoOtherMergedFields_doesNotRendersSelectionSet() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7040,7 +6131,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -7065,7 +6156,7 @@ class SelectionSetTemplateTests: XCTestCase {
       .to(equalLineByLine(allAnimals_predator_asWarmBlooded_expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSets__givenDirectSelection_typeCase_rendersNestedSelectionSet() async throws {
+  func test__render_nestedSelectionSets__givenDirectSelection_typeCase_rendersNestedSelectionSet() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7109,7 +6200,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -7120,7 +6211,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSet__givenMergedTypeCasesFromSingleMergedTypeCaseSource_rendersTypeCaseSelectionSetAsCompositeInlineFragment() async throws {
+  func test__render_nestedSelectionSet__givenMergedTypeCasesFromSingleMergedTypeCaseSource_rendersTypeCaseSelectionSetAsCompositeInlineFragment() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7172,7 +6263,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_asDog_predator = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IR.EntityField
     )
@@ -7183,7 +6274,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSet__givenInlineFragmentOnSameTypeWithMultipleConditions_renders() async throws {
+  func test__render_nestedSelectionSet__givenInlineFragmentOnSameTypeWithMultipleConditions_renders() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7217,7 +6308,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -7228,7 +6319,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSet__givenNamedFragmentOnSameTypeWithInclusionCondition_rendersConditionalSelectionSet() async throws {
+  func test__render_nestedSelectionSet__givenNamedFragmentOnSameTypeWithInclusionCondition_rendersConditionalSelectionSet() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7259,7 +6350,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -7270,7 +6361,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 21, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSet__givenTypeCaseMergedFromFragmentWithOtherMergedFields_rendersTypeCaseAsCompositeInlineFragment() async throws {
+  func test__render_nestedSelectionSet__givenTypeCaseMergedFromFragmentWithOtherMergedFields_rendersTypeCaseAsCompositeInlineFragment() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7320,7 +6411,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let predator = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
     )
@@ -7332,7 +6423,7 @@ class SelectionSetTemplateTests: XCTestCase {
       .to(equalLineByLine(predator_expected, atLine: 24, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSet__givenTypeCaseMergedFromFragmentWithNoOtherMergedFields_rendersTypeCase() async throws {
+  func test__render_nestedSelectionSet__givenTypeCaseMergedFromFragmentWithNoOtherMergedFields_rendersTypeCase() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7381,7 +6472,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let predator = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
     )
@@ -7395,7 +6486,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Nested Selection Sets - Reserved Keywords + Special Names
 
-  func test__render_nestedSelectionSet__givenEntityFieldWithSwiftKeywordAndApolloReservedTypeNames_rendersSelectionSetWithNameSuffixed() async throws {
+  func test__render_nestedSelectionSet__givenEntityFieldWithSwiftKeywordAndApolloReservedTypeNames_rendersSelectionSetWithNameSuffixed() throws {
     let fieldNames = SwiftKeywords.TypeNamesToSuffix
     for fieldName in fieldNames {
       // given
@@ -7426,7 +6517,7 @@ class SelectionSetTemplateTests: XCTestCase {
       """
 
       // when
-      try await buildSubjectAndOperation()
+      try buildSubjectAndOperation()
       let allAnimals = try XCTUnwrap(
         operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
       )
@@ -7439,145 +6530,9 @@ class SelectionSetTemplateTests: XCTestCase {
     }
   }
 
-  // MARK: Nested Selection Sets - Deferred Inline Fragments
-
-  func test__render_nestedSelectionSet__givenDeferredInlineFragment_rendersNestedSelectionSet() async throws {
-    throw XCTSkip()
-
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(label: "root") {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public struct Root: TestSchema.InlineFragment, ApolloAPI.Deferrable {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
-
-        public typealias RootEntityType = TestOperation.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
-
-        public var species: String { __data["species"] }
-        public var id: String { __data["id"] }
-      }
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_AsDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_AsDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 27, ignoringExtraLines: true))
-  }
-
-  func test__render_nestedSelectionSet__givenDeferredInlineFragmentsWithDifferentLabels_rendersBothNestedSelectionSets() async throws {
-    throw XCTSkip()
-    
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      id: String
-      species: String
-      genus: String
-    }
-
-    type Dog implements Animal {
-      id: String
-      species: String
-      genus: String
-      name: String
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... on Dog @defer(label: "one") {
-          species
-        }
-        ... on Dog @defer(label: "two") {
-          genus
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public struct One: TestSchema.InlineFragment, ApolloAPI.Deferrable {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
-
-        public typealias RootEntityType = TestOperation.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
-
-        public var species: String { __data["species"] }
-        public var id: String? { __data["id"] }
-      }
-
-      public struct Two: TestSchema.InlineFragment, ApolloAPI.Deferrable {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
-
-        public typealias RootEntityType = TestOperation.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
-
-        public var genus: String { __data["genus"] }
-        public var id: String? { __data["id"] }
-      }
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 30, ignoringExtraLines: true))
-  }
-
   // MARK: - InlineFragment RootEntityType Tests
 
-  func test__render_nestedTypeCase__rendersRootEntityType() async throws {
+  func test__render_nestedTypeCase__rendersRootEntityType() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7614,7 +6569,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_AsPet = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Pet"]
     )
@@ -7625,7 +6580,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
   }
 
-  func test__render_doublyNestedTypeCase__rendersRootEntityType() async throws {
+  func test__render_doublyNestedTypeCase__rendersRootEntityType() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7668,7 +6623,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let allAnimals_AsPet = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "WarmBlooded"]?[as: "Pet"]
     )
@@ -7679,7 +6634,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
   }
 
-  func test__render_nestedTypeCaseWithNameConflictingWithChild__rendersRootEntityType() async throws {
+  func test__render_nestedTypeCaseWithNameConflictingWithChild__rendersRootEntityType() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7721,7 +6676,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let predators_asPet = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[field: "predators"]?[as: "Pet"]
     )
@@ -7743,7 +6698,7 @@ class SelectionSetTemplateTests: XCTestCase {
   ///
   /// To correct this we must always use the fully qualified name including the operation name and
   /// `Data` objects to ensure we are referring to the correct type.
-  func test__render_nestedTypeCaseWithNameConflictingWithChildAtQueryRoot__rendersRootEntityTypeWithFullyQualifiedName() async throws {
+  func test__render_nestedTypeCaseWithNameConflictingWithChildAtQueryRoot__rendersRootEntityTypeWithFullyQualifiedName() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7782,7 +6737,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let predators_asPet = try XCTUnwrap(
       operation[field: "query"]?[field: "predators"]?[field: "predators"]?[as: "Pet"]
     )
@@ -7793,7 +6748,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
   }
 
-  func test__render_conditionalFragmentOnQueryRoot__rendersRootEntityType() async throws {
+  func test__render_conditionalFragmentOnQueryRoot__rendersRootEntityType() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7821,7 +6776,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let query_ifA = try XCTUnwrap(
       operation[field: "query"]?[if: "a"]
     )
@@ -7832,7 +6787,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
   }
 
-  func test__render_conditionalTypeCaseFragmentOnQueryRoot__rendersRootEntityType() async throws {
+  func test__render_conditionalTypeCaseFragmentOnQueryRoot__rendersRootEntityType() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7864,7 +6819,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let query_ifA = try XCTUnwrap(
       operation[field: "query"]?[as: "AdminQuery", if: "a"]
     )
@@ -7875,7 +6830,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
   }
 
-  func test__render_typeCaseInFragmentOnQueryRoot__rendersRootEntityTypeNamespacedToFragment() async throws {
+  func test__render_typeCaseInFragmentOnQueryRoot__rendersRootEntityTypeNamespacedToFragment() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7918,7 +6873,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let detailsFragment = try XCTUnwrap(
       operation[fragment: "Details"]
     )
@@ -7940,9 +6895,11 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
   }
 
+  #warning("need more tests here - same test cases as IRRootFieldBuilderTests (inline fragment only")
+
   // MARK: - Documentation Tests
 
-  func test__render_nestedSelectionSet__givenSchemaDocumentation_include_hasDocumentation_shouldGenerateDocumentationComment() async throws {
+  func test__render_nestedSelectionSet__givenSchemaDocumentation_include_hasDocumentation_shouldGenerateDocumentationComment() throws {
     // given
     schemaSDL = """
     type Query {
@@ -7975,7 +6932,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(schemaDocumentation: .include)
+    try buildSubjectAndOperation(schemaDocumentation: .include)
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -7986,7 +6943,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSet_givenSchemaDocumentation_exclude_hasDocumentation_shouldNotGenerateDocumentationComment() async throws {
+  func test__render_nestedSelectionSet_givenSchemaDocumentation_exclude_hasDocumentation_shouldNotGenerateDocumentationComment() throws {
     // given
     schemaSDL = """
     type Query {
@@ -8017,7 +6974,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(schemaDocumentation: .exclude)
+    try buildSubjectAndOperation(schemaDocumentation: .exclude)
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -8028,7 +6985,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenSchemaDocumentation_include_hasDocumentation_shouldGenerateDocumentationComment() async throws {
+  func test__render_fieldAccessors__givenSchemaDocumentation_include_hasDocumentation_shouldGenerateDocumentationComment() throws {
     // given
     schemaSDL = """
     type Query {
@@ -8057,7 +7014,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(schemaDocumentation: .include)
+    try buildSubjectAndOperation(schemaDocumentation: .include)
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -8068,7 +7025,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenSchemaDocumentation_exclude_hasDocumentation_shouldNotGenerateDocumentationComment() async throws {
+  func test__render_fieldAccessors__givenSchemaDocumentation_exclude_hasDocumentation_shouldNotGenerateDocumentationComment() throws {
     // given
     schemaSDL = """
     type Query {
@@ -8096,7 +7053,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(schemaDocumentation: .exclude)
+    try buildSubjectAndOperation(schemaDocumentation: .exclude)
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -8109,7 +7066,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: - Deprecation Warnings
 
-  func test__render_fieldAccessors__givenWarningsOnDeprecatedUsage_include_hasDeprecatedField_withDocumentation_shouldGenerateWarningBelowDocumentation() async throws {
+  func test__render_fieldAccessors__givenWarningsOnDeprecatedUsage_include_hasDeprecatedField_withDocumentation_shouldGenerateWarningBelowDocumentation() throws {
     // given
     schemaSDL = """
     type Query {
@@ -8137,7 +7094,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(
+    try buildSubjectAndOperation(
       schemaDocumentation: .include,
       warningsOnDeprecatedUsage: .include
     )
@@ -8151,7 +7108,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
-  func test__render_fieldAccessors__givenWarningsOnDeprecatedUsage_exclude_hasDeprecatedField_shouldNotGenerateWarning() async throws {
+  func test__render_fieldAccessors__givenWarningsOnDeprecatedUsage_exclude_hasDeprecatedField_shouldNotGenerateWarning() throws {
     // given
     schemaSDL = """
     type Query {
@@ -8176,7 +7133,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(warningsOnDeprecatedUsage: .exclude)
+    try buildSubjectAndOperation(warningsOnDeprecatedUsage: .exclude)
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
     )
@@ -8187,7 +7144,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenWarningsOnDeprecatedUsage_include_usesDeprecatedArgument__shouldGenerateWarning() async throws {
+  func test__render_selections__givenWarningsOnDeprecatedUsage_include_usesDeprecatedArgument__shouldGenerateWarning() throws {
     // given
     schemaSDL = """
     type Query {
@@ -8222,7 +7179,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(
+    try buildSubjectAndOperation(
       warningsOnDeprecatedUsage: .include
     )
     let animal = try XCTUnwrap(
@@ -8235,7 +7192,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenWarningsOnDeprecatedUsage_exclude_usesDeprecatedArgument__shouldNotGenerateWarning() async throws {
+  func test__render_selections__givenWarningsOnDeprecatedUsage_exclude_usesDeprecatedArgument__shouldNotGenerateWarning() throws {
     // given
     schemaSDL = """
     type Query {
@@ -8269,7 +7226,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(
+    try buildSubjectAndOperation(
       warningsOnDeprecatedUsage: .exclude
     )
     let animal = try XCTUnwrap(
@@ -8282,7 +7239,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenWarningsOnDeprecatedUsage_include_usesMultipleDeprecatedArgumentsSameField__shouldGenerateWarningAllWarnings() async throws {
+  func test__render_selections__givenWarningsOnDeprecatedUsage_include_usesMultipleDeprecatedArgumentsSameField__shouldGenerateWarningAllWarnings() throws {
     // given
     schemaSDL = """
     type Query {
@@ -8321,7 +7278,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(
+    try buildSubjectAndOperation(
       warningsOnDeprecatedUsage: .include
     )
     let animal = try XCTUnwrap(
@@ -8334,7 +7291,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenWarningsOnDeprecatedUsage_include_usesMultipleDeprecatedArgumentsDifferentFields__shouldGenerateWarningAllWarnings() async throws {
+  func test__render_selections__givenWarningsOnDeprecatedUsage_include_usesMultipleDeprecatedArgumentsDifferentFields__shouldGenerateWarningAllWarnings() throws {
     // given
     schemaSDL = """
     type Query {
@@ -8369,7 +7326,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation(
+    try buildSubjectAndOperation(
       warningsOnDeprecatedUsage: .include
     )
     let animal = try XCTUnwrap(
@@ -8384,7 +7341,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: - Reserved Keyword Type Tests
 
-  func test__render_enumType__usingReservedKeyword_rendersAsSuffixedType() async throws {
+  func test__render_enumType__usingReservedKeyword_rendersAsSuffixedType() throws {
     // given
     schemaSDL = """
     type Query {
@@ -8420,7 +7377,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let user = try XCTUnwrap(
       operation[field: "query"]?[field: "getUser"] as? IR.EntityField
     )
@@ -8432,7 +7389,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expectedTwo, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_NamedFragmentType__usingReservedKeyword_rendersAsSuffixedType() async throws {
+  func test__render_NamedFragmentType__usingReservedKeyword_rendersAsSuffixedType() throws {
     // given
     schemaSDL = """
     type Query {
@@ -8473,7 +7430,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let user = try XCTUnwrap(
       operation[field: "query"]?[field: "getUser"] as? IR.EntityField
     )
@@ -8485,7 +7442,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expectedTwo, atLine: 19, ignoringExtraLines: true))
   }
 
-  func test__render_CustomScalarType__usingReservedKeyword_rendersAsSuffixedType() async throws {
+  func test__render_CustomScalarType__usingReservedKeyword_rendersAsSuffixedType() throws {
     // given
     schemaSDL = """
     scalar Type
@@ -8518,7 +7475,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let user = try XCTUnwrap(
       operation[field: "query"]?[field: "getUser"] as? IR.EntityField
     )
@@ -8530,7 +7487,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expectedTwo, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_InterfaceType__usingReservedKeyword_rendersAsSuffixedType() async throws {
+  func test__render_InterfaceType__usingReservedKeyword_rendersAsSuffixedType() throws {
     // given
     schemaSDL = """
     interface Type {
@@ -8559,7 +7516,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let user = try XCTUnwrap(
       operation[field: "query"]?[field: "getUser"] as? IR.EntityField
     )
@@ -8570,7 +7527,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
 
-  func test__render_UnionType__usingReservedKeyword_rendersAsSuffixedType() async throws {
+  func test__render_UnionType__usingReservedKeyword_rendersAsSuffixedType() throws {
     // given
     schemaSDL = """
     union Type = User | Admin
@@ -8609,7 +7566,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let user = try XCTUnwrap(
       operation[field: "query"]?[field: "getUser"] as? IR.EntityField
     )
@@ -8620,7 +7577,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
 
-  func test__render_ObjectType__usingReservedKeyword_rendersAsSuffixedType() async throws {
+  func test__render_ObjectType__usingReservedKeyword_rendersAsSuffixedType() throws {
     // given
     schemaSDL = """
     type Query {
@@ -8646,7 +7603,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     // when
-    try await buildSubjectAndOperation()
+    try buildSubjectAndOperation()
     let user = try XCTUnwrap(
       operation[field: "query"]?[field: "getType"] as? IR.EntityField
     )

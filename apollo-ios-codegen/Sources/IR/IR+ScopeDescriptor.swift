@@ -31,7 +31,7 @@ public struct ScopeCondition: Hashable, CustomDebugStringConvertible {
     type == nil && (conditions?.isEmpty ?? true) && deferCondition == nil
   }
 
-  var isDeferred: Bool { deferCondition != nil }
+  public var isDeferred: Bool { deferCondition != nil }
 }
 
 public typealias TypeScope = OrderedSet<GraphQLCompositeType>
@@ -74,6 +74,8 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
   let matchingConditions: InclusionConditions?
 
   public let allTypesInSchema: Schema.ReferencedTypes
+
+  public var isDeferred: Bool { scopePath.last.value.isDeferred }
 
   private init(
     typePath: LinkedList<ScopeCondition>,
