@@ -6895,6 +6895,167 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
   }
 
+  func test__render_deferredTypeCase__givenDeferredInlineFragmentWithoutTypeCase_rendersRootEntityType() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+
+    // then
+    let allAnimals_deferredAsRoot = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Animal", deferred: .init(label: "root")]
+    )
+
+    let rendered_allAnimals_deferredAsRoot = subject.render(
+      inlineFragment: allAnimals_deferredAsRoot
+    )
+
+    expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
+      """
+      /// AllAnimal.Root
+      public struct Root: TestSchema.InlineFragment {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
+        public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      """,
+      atLine: 1,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__render_deferredTypeCase__givenDeferredInlineFragmentOnSameTypeCase_rendersRootEntityType() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+
+    // then
+    let allAnimals_deferredAsRoot = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Animal", deferred: .init(label: "root")]
+    )
+
+    let rendered_allAnimals_deferredAsRoot = subject.render(
+      inlineFragment: allAnimals_deferredAsRoot
+    )
+
+    expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
+      """
+      /// AllAnimal.Root
+      public struct Root: TestSchema.InlineFragment {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
+        public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      """,
+      atLine: 1,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__render_deferredTypeCase__givenDeferredInlineFragmentOnDifferentTypeCase_rendersRootEntityType() throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[as: "Dog", deferred: .init(label: "root")]
+    )
+
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot
+    )
+
+    expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
+      """
+      /// AllAnimal.AsDog.Root
+      public struct Root: TestSchema.InlineFragment {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
+        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
+      """,
+      atLine: 1,
+      ignoringExtraLines: true
+    ))
+  }
+
   #warning("need more tests here - same test cases as IRRootFieldBuilderTests (inline fragment only")
 
   // MARK: - Documentation Tests

@@ -950,10 +950,15 @@ fileprivate struct SelectionSetNameGenerator {
 fileprivate extension IR.ScopeCondition {
 
   var selectionSetNameComponent: String {
-    return TemplateString("""
-    \(ifLet: type, { "As\($0.formattedName)" })\
-    \(ifLet: conditions, { "If\($0.typeNameComponents)"})
-    """).description
+    if let deferCondition {
+      return deferCondition.renderedTypeName
+
+    } else {
+      return TemplateString("""
+      \(ifLet: type, { "As\($0.formattedName)" })\
+      \(ifLet: conditions, { "If\($0.typeNameComponents)"})
+      """).description
+    }
   }
   
 }
