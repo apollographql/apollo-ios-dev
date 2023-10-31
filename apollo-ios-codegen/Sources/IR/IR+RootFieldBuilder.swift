@@ -4,16 +4,23 @@ import GraphQLCompiler
 import Utilities
 
 class RootFieldEntityStorage {
+  let sourceDefinition: Entity.Location.SourceDefinition
   private(set) var entitiesForFields: [Entity.Location: Entity] = [:]
 
   init(rootEntity: Entity) {
-    entitiesForFields[rootEntity.location] = rootEntity
+    self.sourceDefinition = rootEntity.location.source
+    self.entitiesForFields[rootEntity.location] = rootEntity
   }
 
   func entity(
     for field: CompilationResult.Field,
     on enclosingEntity: Entity
   ) -> Entity {
+    precondition(
+      enclosingEntity.location.source == self.sourceDefinition,
+      "Enclosing entity from other source definition is invalid."
+    )
+
     let location = enclosingEntity
       .location
       .appending(.init(name: field.responseKey, type: field.type))
@@ -33,6 +40,11 @@ class RootFieldEntityStorage {
     for entityInFragment: Entity,
     inFragmentSpreadAtTypePath fragmentSpreadTypeInfo: SelectionSet.TypeInfo
   ) -> Entity {
+    precondition(
+      fragmentSpreadTypeInfo.entity.location.source == self.sourceDefinition,
+      "Enclosing entity from fragment spread in other source definition is invalid."
+    )
+
     var location = fragmentSpreadTypeInfo.entity.location
     if let pathInFragment = entityInFragment.location.fieldPath {
       location = location.appending(pathInFragment)
@@ -56,12 +68,6 @@ class RootFieldEntityStorage {
     return entity
   }
 
-  fileprivate func mergeAllSelectionsIntoEntitySelectionTrees(from fragmentSpread: NamedFragmentSpread) {
-    for (_, fragmentEntity) in fragmentSpread.fragment.entities {
-      let entity = entity(for: fragmentEntity, inFragmentSpreadAtTypePath: fragmentSpread.typeInfo)
-      entity.selectionTree.mergeIn(fragmentEntity.selectionTree, from: fragmentSpread, using: self)
-    }
-  }
 }
 
 class RootFieldBuilder {
@@ -376,9 +382,19 @@ class RootFieldBuilder {
       isDeferred: scopeCondition.isDeferred
     )
 
-    entityStorage.mergeAllSelectionsIntoEntitySelectionTrees(from: fragmentSpread)
+    mergeAllSelectionsIntoEntitySelectionTrees(from: fragmentSpread)
 
     return fragmentSpread
+  }
+
+  private func mergeAllSelectionsIntoEntitySelectionTrees(from fragmentSpread: NamedFragmentSpread) {
+    for (_, fragmentEntity) in fragmentSpread.fragment.entities {
+      let entity = entityStorage.entity(
+        for: fragmentEntity,
+        inFragmentSpreadAtTypePath: fragmentSpread.typeInfo
+      )
+      entity.selectionTree.mergeIn(fragmentEntity.selectionTree, from: fragmentSpread)
+    }
   }
 
 }
