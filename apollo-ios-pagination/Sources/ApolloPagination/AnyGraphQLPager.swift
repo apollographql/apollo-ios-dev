@@ -78,6 +78,13 @@ public class AnyGraphQLQueryPager<Model> {
     return cancellable
   }
 
+  public func loadPrevious(
+    cachePolicy: CachePolicy = .returnCacheDataAndFetch,
+    completion: (@MainActor () -> Void)? = nil
+  ) throws {
+    try pager.loadPrevious(cachePolicy: cachePolicy, completion: completion)
+  }
+
   public func loadMore(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
     completion: (@MainActor () -> Void)? = nil

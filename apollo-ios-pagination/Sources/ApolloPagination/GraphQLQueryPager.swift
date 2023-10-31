@@ -11,6 +11,10 @@ public protocol PagerType {
 
   var canLoadNext: Bool { get }
   func cancel()
+  func loadPrevious(
+    cachePolicy: CachePolicy,
+    completion: (@MainActor () -> Void)?
+  ) throws
   func loadMore(
     cachePolicy: CachePolicy,
     completion: (@MainActor () -> Void)?
@@ -82,6 +86,16 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
+  public func loadPrevious(
+    cachePolicy: CachePolicy = .fetchIgnoringCacheData,
+    completion: (@MainActor () -> Void)? = nil
+  ) throws {
+    Task {
+      try await pager.loadPrevious(cachePolicy: cachePolicy)
+      await completion?()
+    }
+  }
+
   public func loadMore(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
     completion: (@MainActor () -> Void)? = nil
@@ -122,6 +136,9 @@ extension GraphQLQueryPager {
     let extractPageInfo: (PageExtractionData) -> PaginationInfo
     var currentPageInfo: PaginationInfo? {
       pageTransformation()
+    }
+    var previousPageInfo: PaginationInfo? {
+      previousPageTransformation()
     }
 
     @Published var currentValue: Result<Output, Error>?
@@ -180,6 +197,16 @@ extension GraphQLQueryPager {
       }
     }
 
+    public func loadPrevious(
+      cachePolicy: CachePolicy = .fetchIgnoringCacheData,
+      completion: (() -> Void)? = nil
+    ) throws {
+      Task {
+        try await loadPrevious(cachePolicy: cachePolicy)
+        completion?()
+      }
+    }
+
     public func loadAll() async throws {
       isLoadingAll = true
       await fetch()
@@ -187,6 +214,51 @@ extension GraphQLQueryPager {
       while currentPageInfo?.canLoadMore ?? false {
         try await loadMore()
       }
+
+      while currentPageInfo?.canLoadPrevious ?? false {
+        try await loadPrevious()
+      }
+    }
+
+    public func loadPrevious(
+      cachePolicy: CachePolicy = .fetchIgnoringCacheData
+    ) async throws {
+      guard let previousPageInfo else {
+        assertionFailure("No page info detected -- are you calling `loadMore` prior to calling the initial fetch?")
+        throw PaginationError.missingInitialPage
+      }
+      guard let nextPageQuery = nextPageResolver(previousPageInfo),
+            previousPageInfo.canLoadPrevious
+      else { throw PaginationError.pageHasNoMoreContent }
+      guard activeTask == nil else {
+        throw PaginationError.loadInProgress
+      }
+
+      activeTask = Task {
+        let publisher = CurrentValueSubject<Void, Never>(())
+        await withCheckedContinuation { continuation in
+          let watcher = GraphQLQueryWatcher(client: client, query: nextPageQuery) { [weak self] result in
+            guard let self else { return }
+            Task {
+              await self.onPreviousFetch(
+                cachePolicy: cachePolicy,
+                result: result,
+                publisher: publisher,
+                query: nextPageQuery
+              )
+            }
+          }
+          nextPageWatchers.append(watcher)
+          publisher.sink(receiveCompletion: { [weak self] _ in
+            continuation.resume(with: .success(()))
+            guard let self else { return }
+            Task { await self.onTaskCancellation() }
+          }, receiveValue: { })
+          .store(in: &subscribers)
+          watcher.refetch(cachePolicy: cachePolicy)
+        }
+      }
+      await activeTask?.value
     }
 
     /// Loads the next page, using the currently saved pagination information to do so.
@@ -380,6 +452,44 @@ extension GraphQLQueryPager {
       }
     }
 
+    private func onPreviousFetch(
+      cachePolicy: CachePolicy,
+      result: Result<GraphQLResult<PaginatedQuery.Data>, Error>,
+      publisher: CurrentValueSubject<Void, Never>,
+      query: PaginatedQuery
+    ) {
+      switch result {
+      case .success(let data):
+        guard let previousPageData = data.data else {
+          publisher.send(completion: .finished)
+          return
+        }
+
+        let shouldUpdate: Bool
+        if cachePolicy == .returnCacheDataAndFetch && data.source == .cache {
+          shouldUpdate = false
+        } else {
+          shouldUpdate = true
+        }
+        let variables = query.__variables?.values.compactMap { $0._jsonEncodableValue?._jsonValue } ?? []
+        varMap.updateValue(previousPageData, forKey: variables, insertingAt: 0)
+
+        if let latest {
+          let (firstPage, nextPage) = latest
+          if let canLoadPrevious = previousPageInfo?.canLoadPrevious, !canLoadPrevious {
+            isLoadingAll = false
+          }
+          currentValue = .success((firstPage, nextPage, data.source == .cache ? .cache : .fetch))
+        }
+        if shouldUpdate {
+          publisher.send(completion: .finished)
+        }
+      case .failure(let error):
+        currentValue = .failure(error)
+        publisher.send(completion: .finished)
+      }
+    }
+
     private func onTaskCancellation() {
       activeTask?.cancel()
       activeTask = nil
@@ -394,6 +504,13 @@ extension GraphQLQueryPager {
         return initialPageResult.flatMap { extractPageInfo(.initial($0)) }
       }
       return extractPageInfo(.paginated(last))
+    }
+
+    fileprivate func previousPageTransformation() -> PaginationInfo? {
+      guard let first = varMap.values.first else {
+        return initialPageResult.flatMap { extractPageInfo(.initial($0)) }
+      }
+      return extractPageInfo(.paginated(first))
     }
   }
 }
