@@ -234,6 +234,19 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     }
   }
 
+  func test_loadAll() async throws {
+    let pager = createPager()
+
+    let firstPageExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    let lastPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
+    let loadAllExpectation = expectation(description: "Load all pages")
+    await pager.subscribe(onUpdate: { _ in
+      loadAllExpectation.fulfill()
+    }).store(in: &cancellables)
+    try await pager.loadAll()
+    await fulfillment(of: [firstPageExpectation, lastPageExpectation, loadAllExpectation], timeout: 5)
+  }
+
   private func createPager() -> GraphQLQueryPager<Query, Query>.Actor {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]

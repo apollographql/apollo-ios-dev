@@ -75,7 +75,17 @@ public class MockGraphQLServer {
       requestExpectations[ObjectIdentifier(operationType)] = newValue
     }
   }
-  
+
+  private subscript<Operation: GraphQLOperation>(_ operationType: Operation) -> RequestExpectation<Operation>? {
+    get {
+      requestExpectations[operationType] as! RequestExpectation<Operation>?
+    }
+
+    set {
+      requestExpectations[operationType] = newValue
+    }
+  }
+
   public func expect<Operation: GraphQLOperation>(_ operationType: Operation.Type, file: StaticString = #filePath, line: UInt = #line, requestHandler: @escaping (HTTPRequest<Operation>) -> JSONObject) -> XCTestExpectation {
     return queue.sync {
       let expectation = RequestExpectation<Operation>(description: "Served request for \(String(describing: operationType))", file: file, line: line, handler: requestHandler)
@@ -86,11 +96,22 @@ public class MockGraphQLServer {
       return expectation
     }
   }
-  
+
+  public func expect<Operation: GraphQLOperation>(_ operation: Operation, file: StaticString = #filePath, line: UInt = #line, requestHandler: @escaping (HTTPRequest<Operation>) -> JSONObject) -> XCTestExpectation {
+    return queue.sync {
+      let expectation = RequestExpectation<Operation>(description: "Served request for \(String(describing: operation.self))", file: file, line: line, handler: requestHandler)
+      expectation.assertForOverFulfill = true
+
+      self[operation] = expectation
+
+      return expectation
+    }
+  }
+
   func serve<Operation>(request: HTTPRequest<Operation>, completionHandler: @escaping (Result<JSONObject, Error>) -> Void) where Operation: GraphQLOperation {
     let operationType = type(of: request.operation)
 
-    if let expectation = self[operationType] {
+    if let expectation = self[request.operation] ?? self[operationType] {
       // Dispatch after a small random delay to spread out concurrent requests and simulate somewhat real-world conditions.
       queue.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 10...50))) {
         completionHandler(.success(expectation.handler(request)))

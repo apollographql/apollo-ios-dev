@@ -1,10 +1,13 @@
+import ApolloAPI
 import ApolloInternalTestHelpers
 import XCTest
 
 extension Mocks.Hero.FriendsQuery {
   
   static func expectationForFirstPage(server: MockGraphQLServer) -> XCTestExpectation {
-    server.expect(MockQuery<Mocks.Hero.FriendsQuery>.self) { _ in
+    let query = MockQuery<Mocks.Hero.FriendsQuery>()
+    query.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
+    return server.expect(query) { _ in
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "endCursor": "Y3Vyc29yMg==",
@@ -47,7 +50,9 @@ extension Mocks.Hero.FriendsQuery {
   }
   
   static func expectationForSecondPage(server: MockGraphQLServer) -> XCTestExpectation {
-    server.expect(MockQuery<Mocks.Hero.FriendsQuery>.self) { _ in
+    let query = MockQuery<Mocks.Hero.FriendsQuery>()
+    query.__variables = ["id": "2001", "first": 2, "after": "Y3Vyc29yMg=="]
+    return server.expect(query) { _ in
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "endCursor": "Y3Vyc29yMw==",

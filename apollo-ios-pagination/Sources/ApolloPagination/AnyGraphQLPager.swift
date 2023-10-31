@@ -96,6 +96,10 @@ public class AnyGraphQLQueryPager<Model> {
   public func cancel() {
     pager.cancel()
   }
+
+  public func loadAll() throws {
+    try pager.loadAll()
+  }
 }
 
 extension GraphQLQueryPager.Actor {

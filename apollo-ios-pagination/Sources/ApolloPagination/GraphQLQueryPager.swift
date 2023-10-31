@@ -15,6 +15,7 @@ public protocol PagerType {
     cachePolicy: CachePolicy,
     completion: (@MainActor () -> Void)?
   ) throws
+  func loadAll() throws
   func refetch(cachePolicy: CachePolicy)
   func fetch()
 }
@@ -91,6 +92,12 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
+  public func loadAll() throws {
+    Task {
+      try await pager.loadAll()
+    }
+  }
+
   public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
     Task {
       await pager.refetch(cachePolicy: cachePolicy)
@@ -110,6 +117,7 @@ extension GraphQLQueryPager {
     private var firstPageWatcher: GraphQLQueryWatcher<InitialQuery>?
     private var nextPageWatchers: [GraphQLQueryWatcher<PaginatedQuery>] = []
     private let initialQuery: InitialQuery
+    private var isLoadingAll: Bool = false
     let nextPageResolver: (PaginationInfo) -> PaginatedQuery?
     let extractPageInfo: (PageExtractionData) -> PaginationInfo
     var currentPageInfo: PaginationInfo? {
@@ -129,6 +137,7 @@ extension GraphQLQueryPager {
     @Published var varMap: OrderedDictionary<AnyHashable, PaginatedQuery.Data> = [:]
 
     private var activeTask: Task<Void, Never>?
+    private var initialFetchTask: Task<Void, Never>?
 
     /// Designated Initializer
     /// - Parameters:
@@ -168,6 +177,15 @@ extension GraphQLQueryPager {
       Task {
         try await loadMore(cachePolicy: cachePolicy)
         completion?()
+      }
+    }
+
+    public func loadAll() async throws {
+      isLoadingAll = true
+      await fetch()
+
+      while currentPageInfo?.canLoadMore ?? false {
+        try await loadMore()
       }
     }
 
@@ -218,8 +236,12 @@ extension GraphQLQueryPager {
     }
 
     public func subscribe(onUpdate: @MainActor @escaping (Result<Output, Error>) -> Void) -> AnyCancellable {
-      $currentValue.compactMap({ $0 }).sink { result in
+      $currentValue.compactMap({ $0 }).sink { [weak self] result in
+        guard let self else { return }
+        print(result)
         Task {
+          let isLoadingAll = await self.isLoadingAll
+          guard !isLoadingAll else { return }
           await onUpdate(result)
         }
       }
@@ -227,15 +249,15 @@ extension GraphQLQueryPager {
 
     /// Reloads all data, starting at the first query, resetting pagination state.
     /// - Parameter cachePolicy: Preferred cache policy for first-page fetches. Defaults to `returnCacheDataAndFetch`
-    public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
+    public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) async {
       assert(firstPageWatcher != nil, "To create consistent product behaviors, calling `fetch` before calling `refetch` will use cached data while still refreshing.")
       cancel()
-      fetch(cachePolicy: cachePolicy)
+      await fetch(cachePolicy: cachePolicy)
     }
 
-    public func fetch() {
+    public func fetch() async {
       cancel()
-      fetch(cachePolicy: .returnCacheDataAndFetch)
+      await fetch(cachePolicy: .returnCacheDataAndFetch)
     }
 
     /// Cancel any in progress fetching operations and unsubscribe from the store.
@@ -260,30 +282,59 @@ extension GraphQLQueryPager {
 
     // MARK: - Private
 
-    private func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) {
-      if firstPageWatcher == nil {
-        firstPageWatcher = GraphQLQueryWatcher(
-          client: client,
-          query: initialQuery,
-          resultHandler: { [weak self] result in
-            guard let self else { return }
-            Task {
-              await self.onInitialFetch(result: result)
-            }
-          }
-        )
+    private func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) async {
+      guard initialFetchTask == nil else {
+        await initialFetchTask?.value
+        return
       }
-      firstPageWatcher?.refetch(cachePolicy: cachePolicy)
+      initialFetchTask = Task {
+        let publisher = CurrentValueSubject<Void, Never>(())
+        await withCheckedContinuation { continuation in
+          if firstPageWatcher == nil {
+            firstPageWatcher = GraphQLQueryWatcher(
+              client: client,
+              query: initialQuery,
+              resultHandler: { [weak self] result in
+                guard let self else { return }
+                Task {
+                  await self.onInitialFetch(cachePolicy: cachePolicy, result: result, publisher: publisher)
+                }
+              }
+            )
+          }
+          publisher.sink(receiveCompletion: { [weak self] _ in
+            continuation.resume(with: .success(()))
+            guard let self else { return }
+            Task { await self.onTaskCancellation() }
+          }, receiveValue: { })
+          .store(in: &subscribers)
+          firstPageWatcher?.refetch(cachePolicy: cachePolicy)
+        }
+      }
+      await initialFetchTask?.value
     }
 
-    private func onInitialFetch(result: Result<GraphQLResult<InitialQuery.Data>, Error>) {
+    private func onInitialFetch(
+      cachePolicy: CachePolicy,
+      result: Result<GraphQLResult<InitialQuery.Data>, Error>,
+      publisher: CurrentValueSubject<Void, Never>
+    ) {
       switch result {
       case .success(let data):
         initialPageResult = data.data
         guard let firstPageData = data.data else { return }
+        let shouldUpdate: Bool
+        if cachePolicy == .returnCacheDataAndFetch && data.source == .cache {
+          shouldUpdate = false
+        } else {
+          shouldUpdate = true
+        }
         if let latest {
           let (_, nextPage) = latest
           currentValue = .success((firstPageData, nextPage, data.source == .cache ? .cache : .fetch))
+        }
+        if shouldUpdate {
+          publisher.send(completion: .finished)
         }
       case .failure(let error):
         currentValue = .failure(error)
@@ -310,14 +361,17 @@ extension GraphQLQueryPager {
           shouldUpdate = true
         }
         let variables = query.__variables?.values.compactMap { $0._jsonEncodableValue?._jsonValue } ?? []
-        if shouldUpdate {
-          publisher.send(completion: .finished)
-        }
         varMap[variables] = nextPageData
 
         if let latest {
           let (firstPage, nextPage) = latest
+          if let canLoadMore = currentPageInfo?.canLoadMore, !canLoadMore {
+            isLoadingAll = false
+          }
           currentValue = .success((firstPage, nextPage, data.source == .cache ? .cache : .fetch))
+        }
+        if shouldUpdate {
+          publisher.send(completion: .finished)
         }
       case .failure(let error):
         currentValue = .failure(error)
@@ -328,6 +382,8 @@ extension GraphQLQueryPager {
     private func onTaskCancellation() {
       activeTask?.cancel()
       activeTask = nil
+      initialFetchTask?.cancel()
+      initialFetchTask = nil
       subscribers.forEach { $0.cancel() }
       subscribers = []
     }
