@@ -88,7 +88,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   override func setUp() async throws {
     try await AnimalKingdomSchema.shared.setUp()
-//    try await AnimalKingdomSchema.sharedWithCCN.setUp()
+    try await AnimalKingdomSchema.sharedWithCCN.setUp()
     try await super.setUp()
   }
 
