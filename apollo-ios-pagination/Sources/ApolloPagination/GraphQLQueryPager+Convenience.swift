@@ -63,8 +63,8 @@ public extension GraphQLQueryPager {
         initialTransfom: extractInitialPageInfo,
         paginatedTransform: extractPreviousPageInfo
       ),
-      nextPageResolver: previousPageResolver,
-      previousPageResolver: nil
+      nextPageResolver: nil,
+      previousPageResolver: previousPageResolver
     )
   }
 }
