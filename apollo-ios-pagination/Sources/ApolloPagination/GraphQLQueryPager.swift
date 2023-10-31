@@ -271,6 +271,8 @@ extension GraphQLQueryPager {
       initialPageResult = nil
       activeTask?.cancel()
       activeTask = nil
+      initialFetchTask?.cancel()
+      initialFetchTask = nil
       subscribers.forEach { $0.cancel() }
       subscribers.removeAll()
     }
