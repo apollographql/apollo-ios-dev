@@ -8,42 +8,36 @@ extension IRBuilder {
 
   public static func mock(
     schema: String,
-    document: String,
-    enableCCN: Bool = false
+    document: String
   ) async throws -> IRBuilder {
     let frontend = try await GraphQLJSFrontend()
     let compilationResult = try await frontend.compile(
       schema: schema,
-      document: document,
-      enableCCN: enableCCN
+      document: document
     )
     return .mock(compilationResult: compilationResult)
   }
 
   public static func mock(
     schema: String,
-    documents: [String],
-    enableCCN: Bool = false
+    documents: [String]
   ) async throws -> IRBuilder {
     let frontend = try await GraphQLJSFrontend()
     let compilationResult = try await frontend.compile(
       schema: schema,
-      documents: documents,
-      enableCCN: enableCCN
+      documents: documents
     )
     return .mock(compilationResult: compilationResult)
   }
 
   public static func mock(
     schemaJSON: String,
-    document: String,
-    enableCCN: Bool = false
+    document: String
   ) async throws -> IRBuilder {
     let frontend = try await GraphQLJSFrontend()
     let compilationResult = try await frontend.compile(
       schemaJSON: schemaJSON,
-      document: document,
-      enableCCN: enableCCN
+      document: document
     )
     return .mock(compilationResult: compilationResult)
   }
