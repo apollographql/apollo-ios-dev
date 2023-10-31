@@ -78,9 +78,9 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
       return mergedSelections
     }()
 
-    private let typeInfo: TypeInfo
+    fileprivate let typeInfo: TypeInfo
 
-    fileprivate init(
+    init(
       typeInfo: TypeInfo,
       directSelections: DirectSelections?
     ) {
@@ -102,20 +102,24 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
 
   // MARK:  - SelectionSet
 
-  public let typeInfo: TypeInfo
+  public var typeInfo: TypeInfo { selections.typeInfo }
   public let selections: Selections
+
+  init(_ selections: Selections) {
+    self.selections = selections
+  }
 
   init(
     entity: Entity,
     scopePath: LinkedList<ScopeDescriptor>,
     mergedSelectionsOnly: Bool = false
   ) {
-    self.typeInfo = TypeInfo(
+    let typeInfo = TypeInfo(
       entity: entity,
       scopePath: scopePath
     )
     self.selections = Selections(
-      typeInfo: self.typeInfo,
+      typeInfo: typeInfo,
       directSelections: mergedSelectionsOnly ? nil : DirectSelections()
     )
   }
@@ -125,12 +129,12 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
     scopePath: LinkedList<ScopeDescriptor>,
     selections: DirectSelections
   ) {
-    self.typeInfo = TypeInfo(
+    let typeInfo = TypeInfo(
       entity: entity,
       scopePath: scopePath
     )
     self.selections = Selections(
-      typeInfo: self.typeInfo,
+      typeInfo: typeInfo,
       directSelections: selections
     )
   }

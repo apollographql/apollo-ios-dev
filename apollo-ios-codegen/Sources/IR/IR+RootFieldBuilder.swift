@@ -3,6 +3,18 @@ import OrderedCollections
 import GraphQLCompiler
 import Utilities
 
+/// Remove merged selections from SelectionSet.Selections
+/// Add function to EntityStorage to compute merged selections (WIP)
+///   - Make new MergedSelections a simple struct
+///   - Turn existing MergedSelections into MergedSelectionsBuilder
+///   - Give MergedSelectionsBuilder reference to entity storage
+///   - We may not need the computeMergedSelections on EntityStorage
+///     opting for a MergedSelectionsBuilder.build(with: entityStorage)?
+/// Pass entity storage through to SelectionSetTemplate
+/// Get merged selections in template
+/// (Fix field validation)
+/// (Clean up SelectionSet initializers and properties)
+
 class RootFieldEntityStorage {
   let sourceDefinition: Entity.Location.SourceDefinition
   private(set) var entitiesForFields: [Entity.Location: Entity] = [:]
@@ -68,6 +80,24 @@ class RootFieldEntityStorage {
     return entity
   }
 
+  func computeMergedSelections(for selectionSet: SelectionSet) -> MergedSelections {
+    let location = selectionSet.typeInfo.entity.location
+
+    precondition(
+      location.source == self.sourceDefinition,
+      "Computing merged selections for selection set from other source definition is invalid."
+    )
+
+    let mergedSelections = MergedSelections(
+      directSelections: selectionSet.selections.direct?.readOnlyView,
+      typeInfo: selectionSet.typeInfo
+    )
+
+    selectionSet.entity.selectionTree.addMergedSelections(into: mergedSelections)
+
+    return mergedSelections
+  }
+
 }
 
 class RootFieldBuilder {
@@ -114,16 +144,25 @@ class RootFieldBuilder {
       givenAllTypesInSchema: schema.referencedTypes
     )
 
-    let rootIrSelectionSet = SelectionSet(
+    let typeInfo = SelectionSet.TypeInfo(
       entity: rootEntity,
       scopePath: LinkedList(rootTypePath)
     )
 
+    let directSelections = DirectSelections()
+
     await buildDirectSelections(
-      into: rootIrSelectionSet.selections.direct.unsafelyUnwrapped,
-      atTypePath: rootIrSelectionSet.typeInfo,
+      into: directSelections,
+      atTypePath: typeInfo,
       from: rootSelectionSet
     )
+
+    let selections = SelectionSet.Selections(
+      typeInfo: typeInfo,
+      directSelections: directSelections
+    )
+
+    let rootIrSelectionSet = SelectionSet(selections)
 
     return Result(
       rootField: EntityField(rootField, selectionSet: rootIrSelectionSet),
