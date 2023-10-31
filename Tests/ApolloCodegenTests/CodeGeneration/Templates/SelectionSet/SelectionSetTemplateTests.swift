@@ -6935,7 +6935,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
       """
       /// AllAnimal.Root
-      public struct Root: TestSchema.InlineFragment {
+      public struct Root: TestSchema.InlineFragment, ApolloAPI.Deferrable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -6987,7 +6987,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
       """
       /// AllAnimal.Root
-      public struct Root: TestSchema.InlineFragment {
+      public struct Root: TestSchema.InlineFragment, ApolloAPI.Deferrable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -7044,7 +7044,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
       """
       /// AllAnimal.AsDog.Root
-      public struct Root: TestSchema.InlineFragment {
+      public struct Root: TestSchema.InlineFragment, ApolloAPI.Deferrable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
