@@ -52,6 +52,7 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
     }
   }
 
+  #warning("TODO: Delete this completely?")
   public class Selections: CustomDebugStringConvertible {
     /// The selections that are directly selected by this selection set.
     public let direct: DirectSelections?
@@ -68,15 +69,16 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
     /// - Precondition: The `directSelections` for all `SelectionSet`s in the operation must be
     /// completed prior to first access of `mergedSelections`. Otherwise, the merged selections
     /// will be incomplete.
-    public private(set) lazy var merged: MergedSelections = {
-      let mergedSelections = MergedSelections(
-        directSelections: self.direct?.readOnlyView,
-        typeInfo: self.typeInfo
-      )
-      typeInfo.entity.selectionTree.addMergedSelections(into: mergedSelections)
-
-      return mergedSelections
-    }()
+    #warning("TODO: Delete")
+//    public private(set) lazy var merged: MergedSelections = {
+//      let mergedSelections = MergedSelections(
+//        directSelections: self.direct?.readOnlyView,
+//        typeInfo: self.typeInfo
+//      )
+//      typeInfo.entity.selectionTree.addMergedSelections(into: mergedSelections)
+//
+//      return mergedSelections
+//    }()
 
     fileprivate let typeInfo: TypeInfo
 
@@ -90,11 +92,7 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
 
     public var debugDescription: String {
       TemplateString("""
-        direct: {
           \(direct?.debugDescription ?? "nil")
-        }
-        merged: {
-          \(merged.debugDescription)
         }
         """).description
     }
@@ -109,35 +107,35 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
     self.selections = selections
   }
 
-  init(
-    entity: Entity,
-    scopePath: LinkedList<ScopeDescriptor>,
-    mergedSelectionsOnly: Bool = false
-  ) {
-    let typeInfo = TypeInfo(
-      entity: entity,
-      scopePath: scopePath
-    )
-    self.selections = Selections(
-      typeInfo: typeInfo,
-      directSelections: mergedSelectionsOnly ? nil : DirectSelections()
-    )
-  }
-
-  init(
-    entity: Entity,
-    scopePath: LinkedList<ScopeDescriptor>,
-    selections: DirectSelections
-  ) {
-    let typeInfo = TypeInfo(
-      entity: entity,
-      scopePath: scopePath
-    )
-    self.selections = Selections(
-      typeInfo: typeInfo,
-      directSelections: selections
-    )
-  }
+//  init(
+//    entity: Entity,
+//    scopePath: LinkedList<ScopeDescriptor>,
+//    mergedSelectionsOnly: Bool = false
+//  ) {
+//    let typeInfo = TypeInfo(
+//      entity: entity,
+//      scopePath: scopePath
+//    )
+//    self.selections = Selections(
+//      typeInfo: typeInfo,
+//      directSelections: mergedSelectionsOnly ? nil : DirectSelections()
+//    )
+//  }
+//
+//  init(
+//    entity: Entity,
+//    scopePath: LinkedList<ScopeDescriptor>,
+//    selections: DirectSelections
+//  ) {
+//    let typeInfo = TypeInfo(
+//      entity: entity,
+//      scopePath: scopePath
+//    )
+//    self.selections = Selections(
+//      typeInfo: typeInfo,
+//      directSelections: selections
+//    )
+//  }
 
   public var debugDescription: String {
     TemplateString("""

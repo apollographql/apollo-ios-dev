@@ -15,6 +15,7 @@ import Utilities
 /// (Fix field validation)
 /// (Clean up SelectionSet initializers and properties)
 
+#warning("TODO: Rename to DefinitionEntityStorage")
 class RootFieldEntityStorage {
   let sourceDefinition: Entity.Location.SourceDefinition
   private(set) var entitiesForFields: [Entity.Location: Entity] = [:]
@@ -80,23 +81,23 @@ class RootFieldEntityStorage {
     return entity
   }
 
-  func computeMergedSelections(for selectionSet: SelectionSet) -> MergedSelections {
-    let location = selectionSet.typeInfo.entity.location
-
-    precondition(
-      location.source == self.sourceDefinition,
-      "Computing merged selections for selection set from other source definition is invalid."
-    )
-
-    let mergedSelections = MergedSelections(
-      directSelections: selectionSet.selections.direct?.readOnlyView,
-      typeInfo: selectionSet.typeInfo
-    )
-
-    selectionSet.entity.selectionTree.addMergedSelections(into: mergedSelections)
-
-    return mergedSelections
-  }
+//  func computeMergedSelections(for selectionSet: SelectionSet) -> MergedSelections {
+//    let location = selectionSet.typeInfo.entity.location
+//
+//    precondition(
+//      location.source == self.sourceDefinition,
+//      "Computing merged selections for selection set from other source definition is invalid."
+//    )
+//
+//    let mergedSelections = MergedSelections(
+//      directSelections: selectionSet.selections.direct?.readOnlyView,
+//      typeInfo: selectionSet.typeInfo
+//    )
+//
+//    selectionSet.entity.selectionTree.addMergedSelections(into: mergedSelections)
+//
+//    return mergedSelections
+//  }
 
 }
 
@@ -352,7 +353,7 @@ class RootFieldBuilder {
       inclusionConditions: inclusionConditions,
       givenAllTypesInSchema: schema.referencedTypes
     )
-    let typePath = enclosingTypeInfo.scopePath.appending(typeScope)
+    let typePath = enclosingTypeInfo.scopePath.appending(typeScope)    
 
     let irSelectionSet = SelectionSet(
       entity: entity,

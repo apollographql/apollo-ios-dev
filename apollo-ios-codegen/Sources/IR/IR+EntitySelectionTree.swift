@@ -113,7 +113,7 @@ class EntitySelectionTree {
 
   // MARK: - Calculate Merged Selections From Tree
 
-  func addMergedSelections(into selections: MergedSelections) {
+  func addMergedSelections(into selections: MergedSelections.Builder) {
     let rootTypePath = selections.typeInfo.scopePath.head
     rootNode.mergeSelections(
       matchingScopePath: rootTypePath,
@@ -205,7 +205,7 @@ class EntitySelectionTree {
 
     func mergeSelections(
       matchingScopePath scopePathNode: LinkedList<ScopeDescriptor>.Node,
-      into targetSelections: MergedSelections
+      into targetSelections: MergedSelections.Builder
     ) {
       mergeSelections(
         matchingScopePath: scopePathNode,
@@ -216,7 +216,7 @@ class EntitySelectionTree {
 
     private func mergeSelections(
       matchingScopePath scopePathNode: LinkedList<ScopeDescriptor>.Node,
-      into targetSelections: IR.MergedSelections,
+      into targetSelections: MergedSelections.Builder,
       transformingSelections: ((Selections) -> Selections)?
     ) {
       switch child {
