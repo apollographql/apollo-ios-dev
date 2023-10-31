@@ -64,10 +64,19 @@ extension MergedSelections {
       directSelections: DirectSelections.ReadOnly?,
       typeInfo: SelectionSet.TypeInfo,
       entityStorage: RootFieldEntityStorage
-    ) {      
+    ) {
+      precondition(
+        typeInfo.entity.location.source == entityStorage.sourceDefinition,
+        "typeInfo and entityStorage much originate from the same definition."
+      )
       self.directSelections = directSelections
       self.typeInfo = typeInfo
       self.entityStorage = entityStorage
+    }
+
+    func build() -> MergedSelections {
+      typeInfo.entity.selectionTree.addMergedSelections(into: self)
+      return finalize()
     }
 
     func mergeIn(_ selections: EntityTreeScopeSelections, from source: MergedSource) {

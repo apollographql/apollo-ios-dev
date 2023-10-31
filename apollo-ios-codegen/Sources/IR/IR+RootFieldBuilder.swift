@@ -79,25 +79,7 @@ class RootFieldEntityStorage {
     let entity = Entity(location: location, rootTypePath: rootTypePath)
     entitiesForFields[location] = entity
     return entity
-  }
-
-//  func computeMergedSelections(for selectionSet: SelectionSet) -> MergedSelections {
-//    let location = selectionSet.typeInfo.entity.location
-//
-//    precondition(
-//      location.source == self.sourceDefinition,
-//      "Computing merged selections for selection set from other source definition is invalid."
-//    )
-//
-//    let mergedSelections = MergedSelections(
-//      directSelections: selectionSet.selections.direct?.readOnlyView,
-//      typeInfo: selectionSet.typeInfo
-//    )
-//
-//    selectionSet.entity.selectionTree.addMergedSelections(into: mergedSelections)
-//
-//    return mergedSelections
-//  }
+  } 
 
 }
 
