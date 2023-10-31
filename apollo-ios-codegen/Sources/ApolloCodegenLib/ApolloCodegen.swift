@@ -284,11 +284,7 @@ public class ApolloCodegen {
     }
 
     let documents = try await matches.concurrentCompactMap { match in
-      try await frontend.parseDocument(
-        from: URL(fileURLWithPath: match),
-        experimentalClientControlledNullability:
-          self.config.experimentalFeatures.clientControlledNullability
-      )
+      try await frontend.parseDocument(from: URL(fileURLWithPath: match))
     }
 
     return try await frontend.mergeDocuments(documents)

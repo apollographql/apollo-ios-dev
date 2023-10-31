@@ -880,30 +880,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
 
   public struct ExperimentalFeatures: Codable, Equatable {
     /**
-     * **EXPERIMENTAL**: If enabled, the parser will understand and parse Client Controlled Nullability
-     * Designators contained in Fields. They'll be represented in the
-     * `required` field of the FieldNode.
-     *
-     * The syntax looks like the following:
-     *
-     * ```graphql
-     *   {
-     *     nullableField!
-     *     nonNullableField?
-     *     nonNullableSelectionSet? {
-     *       childField!
-     *     }
-     *   }
-     * ```
-     * - Note: This feature is experimental and may change or be removed in the
-     * future.
-     */
-
-    /// TODO: Deprecate this property if #3114 will not be done
-
-    public let clientControlledNullability: Bool
-
-    /**
      * **EXPERIMENTAL**: If enabled, the generated operations will be transformed using a method
      * that attempts to maintain compatibility with the legacy behavior from
      * [`apollo-tooling`](https://github.com/apollographql/apollo-tooling)
@@ -916,32 +892,23 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
 
     /// Default property values
     public struct Default {
-      public static let clientControlledNullability: Bool = false
       public static let legacySafelistingCompatibleOperations: Bool = false
     }
 
     public init(
-      clientControlledNullability: Bool = Default.clientControlledNullability,
       legacySafelistingCompatibleOperations: Bool = Default.legacySafelistingCompatibleOperations
     ) {
-      self.clientControlledNullability = clientControlledNullability
       self.legacySafelistingCompatibleOperations = legacySafelistingCompatibleOperations
     }
 
     // MARK: Codable
 
     public enum CodingKeys: CodingKey, CaseIterable {
-      case clientControlledNullability
       case legacySafelistingCompatibleOperations
     }
 
     public init(from decoder: Decoder) throws {
       let values = try decoder.container(keyedBy: CodingKeys.self)
-
-      clientControlledNullability = try values.decodeIfPresent(
-        Bool.self,
-        forKey: .clientControlledNullability
-      ) ?? Default.clientControlledNullability
 
       legacySafelistingCompatibleOperations = try values.decodeIfPresent(
         Bool.self,

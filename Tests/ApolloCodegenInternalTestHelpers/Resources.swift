@@ -18,15 +18,6 @@ public struct Resources {
       subdirectory: "animalkingdom-graphql"
     )!
 
-    public static let CCNGraphQLOperations: [URL] = Bundle.urls(
-      forResourcesWithExtension: "graphql",
-      subdirectory: "animalkingdom-graphql/ccnGraphql"
-    )! +
-    Bundle.urls(
-      forResourcesWithExtension: "graphql",
-      subdirectory: "animalkingdom-graphql"
-    )!
-
     private static func GraphQLOperation(named name: String) -> URL {
       Resources.GraphQLOperation(named: name, subdirectory: "animalkingdom-graphql")
     }

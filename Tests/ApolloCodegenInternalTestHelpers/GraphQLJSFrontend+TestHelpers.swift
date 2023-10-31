@@ -13,10 +13,7 @@ extension GraphQLJSFrontend {
     async let documentSource = try makeSource(document, filePath: "")
 
     let schema = try await loadSchema(from: [schemaSource])
-    let document = try await parseDocument(
-      documentSource,
-      experimentalClientControlledNullability: config.experimentalFeatures.clientControlledNullability
-    )
+    let document = try await parseDocument(documentSource)
 
     return try await compile(
       schema: schema,
@@ -27,11 +24,9 @@ extension GraphQLJSFrontend {
 
   public func compile(
     schema: String,
-    document: String,
-    enableCCN: Bool = false
+    document: String
   ) async throws -> CompilationResult {
-    let config = ApolloCodegen.ConfigurationContext(
-      config: .mock(experimentalFeatures: .init(clientControlledNullability: enableCCN)))
+    let config = ApolloCodegen.ConfigurationContext(config: .mock())
 
     return try await compile(
       schema: schema,
@@ -66,10 +61,7 @@ extension GraphQLJSFrontend {
     let schema = try await loadSchema(from: [schemaSource])
 
     let documents: [GraphQLDocument] = try await definitions.asyncMap {
-      return try await parseDocument(
-        $0,
-        experimentalClientControlledNullability: config.experimentalFeatures.clientControlledNullability
-      )
+      return try await parseDocument($0)
     }
 
     let mergedDocument = try await mergeDocuments(documents)
@@ -82,11 +74,9 @@ extension GraphQLJSFrontend {
 
   public func compile(
     schema: String,
-    documents: [String],
-    enableCCN: Bool = false
+    documents: [String]
   ) async throws -> CompilationResult {
-    let config = ApolloCodegen.ConfigurationContext(
-      config: .mock(experimentalFeatures: .init(clientControlledNullability: enableCCN)))
+    let config = ApolloCodegen.ConfigurationContext(config: .mock())
 
     return try await compile(
       schema: schema,
@@ -104,9 +94,7 @@ extension GraphQLJSFrontend {
     async let schemaSource = try makeSource(schemaJSON, filePath: "schema.json")
 
     let schema = try await loadSchema(from: [schemaSource])
-    let document = try await parseDocument(
-      documentSource,
-      experimentalClientControlledNullability: config.experimentalFeatures.clientControlledNullability)
+    let document = try await parseDocument(documentSource)
 
     return try await compile(
       schema: schema,
@@ -117,11 +105,9 @@ extension GraphQLJSFrontend {
 
   public func compile(
     schemaJSON: String,
-    document: String,
-    enableCCN: Bool = false
+    document: String
   ) async throws -> CompilationResult {
-    let config = ApolloCodegen.ConfigurationContext(
-      config: .mock(experimentalFeatures: .init(clientControlledNullability: enableCCN)))
+    let config = ApolloCodegen.ConfigurationContext(config: .mock())
 
     return try await compile(
       schemaJSON: schemaJSON,

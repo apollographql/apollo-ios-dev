@@ -10,14 +10,7 @@ import ApolloCodegenInternalTestHelpers
 final class AnimalKingdomIRCreationTests: XCTestCase {
 
   actor AnimalKingdomSchema {
-    static let shared = AnimalKingdomSchema(useCCN: false)
-    static let sharedWithCCN = AnimalKingdomSchema(useCCN: true)
-
-    let useCCN: Bool
-
-    init(useCCN: Bool) {
-      self.useCCN = useCCN
-    }
+    static let shared = AnimalKingdomSchema()
 
     private var frontend: GraphQLJSFrontend!
     private(set) var schema: GraphQLSchema!
@@ -37,27 +30,17 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     }
 
     func operationDocuments() async throws -> GraphQLDocument {
-      let documents = useCCN ?
-      ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.CCNGraphQLOperations :
-      ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.GraphQLOperations
+      let documents = ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.GraphQLOperations
 
       return try await frontend.mergeDocuments(
         documents.asyncMap {
-          try await frontend.parseDocument(
-            from: $0,
-            experimentalClientControlledNullability: useCCN
-          )
+          try await frontend.parseDocument(from: $0)
         }
       )
     }
 
     func validationOptions() -> ValidationOptions {
-      return useCCN ?
-      ValidationOptions(
-        config: .init(
-          config: .mock(experimentalFeatures: .init(clientControlledNullability: true))
-        )) :
-      ValidationOptions(config: .init(config: .mock()))
+      return ValidationOptions(config: .init(config: .mock()))
 
     }
 
@@ -73,22 +56,19 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
                  typeCases: [ShallowInlineFragmentMatcher],
                  fragments: [ShallowFragmentSpreadMatcher])!
 
-  func compilationResult(useCCN: Bool = false) async -> CompilationResult {
-    let schema = useCCN ? AnimalKingdomSchema.sharedWithCCN : AnimalKingdomSchema.shared
-    return await schema.compilationResult
+  func compilationResult() async -> CompilationResult {
+    return await AnimalKingdomSchema.shared.compilationResult
   }
 
   class override func tearDown() {
     super.tearDown()
     Task {
       await AnimalKingdomSchema.shared.tearDown()
-      await AnimalKingdomSchema.sharedWithCCN.tearDown()
     }
   }
 
   override func setUp() async throws {
     try await AnimalKingdomSchema.shared.setUp()
-    try await AnimalKingdomSchema.sharedWithCCN.setUp()
     try await super.setUp()
   }
 
@@ -1062,39 +1042,6 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
     // when
     let actual = selectionSet.selections.merged
-
-    // then
-    expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
-    expect(actual).to(shallowlyMatch(self.expected))
-  }
-
-  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsClassroomPet_AsBird_Height__isCorrect_CCN() async throws {
-    throw XCTSkip("CCN tests skipped until issue #3114 done or closed.")
-
-    // given
-    let compilationResult = await compilationResult(useCCN: true)
-
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsCCN" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
-
-    let selectionSet = try XCTUnwrap(
-      rootSelectionSet[field: "allAnimals"]?[field: "height"]?.selectionSet
-    )
-
-    expected = (
-      fields: [
-        .mock("feet",
-              type: .scalar(GraphQLScalarType.integer())),
-        .mock("inches",
-              type: .nonNull(.scalar(GraphQLScalarType.integer()))),
-      ],
-      typeCases: [],
-      fragments: []
-    )
-
-    // when
-    let actual = selectionSet.selections.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
