@@ -52,90 +52,21 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
     }
   }
 
-  #warning("TODO: Delete this completely?")
-  public class Selections: CustomDebugStringConvertible {
-    /// The selections that are directly selected by this selection set.
-    public let direct: DirectSelections?
-
-    /// The selections that are available to be accessed by this selection set.
-    ///
-    /// Includes the direct `selections`, along with all selections from other related
-    /// `SelectionSet`s on the same entity that match the selection set's type scope.
-    ///
-    /// Selections in the `mergedSelections` are guaranteed to be selected if this `SelectionSet`'s
-    /// `selections` are selected. This means they can be merged into the generated object
-    /// representing this `SelectionSet` as field accessors.
-    ///
-    /// - Precondition: The `directSelections` for all `SelectionSet`s in the operation must be
-    /// completed prior to first access of `mergedSelections`. Otherwise, the merged selections
-    /// will be incomplete.
-    #warning("TODO: Delete")
-//    public private(set) lazy var merged: MergedSelections = {
-//      let mergedSelections = MergedSelections(
-//        directSelections: self.direct?.readOnlyView,
-//        typeInfo: self.typeInfo
-//      )
-//      typeInfo.entity.selectionTree.addMergedSelections(into: mergedSelections)
-//
-//      return mergedSelections
-//    }()
-
-    fileprivate let typeInfo: TypeInfo
-
-    init(
-      typeInfo: TypeInfo,
-      directSelections: DirectSelections?
-    ) {
-      self.typeInfo = typeInfo
-      self.direct = directSelections
-    }
-
-    public var debugDescription: String {
-      TemplateString("""
-          \(direct?.debugDescription ?? "nil")
-        }
-        """).description
-    }
-  }
-
   // MARK:  - SelectionSet
 
-  public var typeInfo: TypeInfo { selections.typeInfo }
-  public let selections: Selections
+  public let typeInfo: TypeInfo
+  /// The selections that are directly selected by this selection set.
+  ///
+  /// To get the merged selections, use a `MergedSelections.Builder`.
+  public let selections: DirectSelections?
 
-  init(_ selections: Selections) {
+  init(
+    typeInfo: TypeInfo,
+    selections: DirectSelections?
+  ) {
+    self.typeInfo = typeInfo
     self.selections = selections
   }
-
-//  init(
-//    entity: Entity,
-//    scopePath: LinkedList<ScopeDescriptor>,
-//    mergedSelectionsOnly: Bool = false
-//  ) {
-//    let typeInfo = TypeInfo(
-//      entity: entity,
-//      scopePath: scopePath
-//    )
-//    self.selections = Selections(
-//      typeInfo: typeInfo,
-//      directSelections: mergedSelectionsOnly ? nil : DirectSelections()
-//    )
-//  }
-//
-//  init(
-//    entity: Entity,
-//    scopePath: LinkedList<ScopeDescriptor>,
-//    selections: DirectSelections
-//  ) {
-//    let typeInfo = TypeInfo(
-//      entity: entity,
-//      scopePath: scopePath
-//    )
-//    self.selections = Selections(
-//      typeInfo: typeInfo,
-//      directSelections: selections
-//    )
-//  }
 
   public var debugDescription: String {
     TemplateString("""
@@ -147,13 +78,13 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
 
   public static func ==(lhs: SelectionSet, rhs: SelectionSet) -> Bool {
     lhs.typeInfo === rhs.typeInfo &&
-    lhs.selections.direct === rhs.selections.direct
+    lhs.selections === rhs.selections
   }
 
   public func hash(into hasher: inout Hasher) {
     hasher.combine(typeInfo)
-    if let directSelections = selections.direct {
-      hasher.combine(ObjectIdentifier(directSelections))
+    if let selections {
+      hasher.combine(ObjectIdentifier(selections))
     }
   }
 

@@ -2,6 +2,19 @@ import Foundation
 import OrderedCollections
 import Utilities
 
+#warning("TODO: Update this documentation")
+/// The selections that are available to be accessed by a selection set.
+///
+/// Includes the direct `selections`, along with all selections from other related
+/// `SelectionSet`s on the same entity that match the selection set's type scope.
+///
+/// Selections in the `mergedSelections` are guaranteed to be selected if this `SelectionSet`'s
+/// `selections` are selected. This means they can be merged into the generated object
+/// representing this `SelectionSet` as field accessors.
+///
+/// - Precondition: The `directSelections` for all `SelectionSet`s in the operation must be
+/// completed prior to first access of `mergedSelections`. Otherwise, the merged selections
+/// will be incomplete.
 public struct MergedSelections: Equatable {
   public let mergedSources: OrderedSet<MergedSource>
   public let fields: OrderedDictionary<String, Field>
@@ -88,11 +101,16 @@ extension MergedSelections {
     }
 
     private func createShallowlyMergedNestedEntityField(from field: EntityField) -> EntityField {
-      let newSelectionSet = SelectionSet(
+      let typeInfo = SelectionSet.TypeInfo(
         entity: entityStorage.entity(for: field.underlyingField, on: typeInfo.entity),
-        scopePath: self.typeInfo.scopePath.appending(field.selectionSet.typeInfo.scope),
-        mergedSelectionsOnly: true
+        scopePath: self.typeInfo.scopePath.appending(field.selectionSet.typeInfo.scope)
       )
+
+      let newSelectionSet = SelectionSet(
+        typeInfo: typeInfo,
+        selections: nil
+      )
+
       return EntityField(
         field.underlyingField,
         inclusionConditions: field.inclusionConditions,
@@ -128,14 +146,21 @@ extension MergedSelections {
 
       guard !inlineFragments.keys.contains(condition) else { return }
 
+      let typeInfo = SelectionSet.TypeInfo(
+        entity: self.typeInfo.entity,
+        scopePath: self.typeInfo.scopePath.mutatingLast { $0.appending(condition) }
+      )
+
+      let selectionSet = SelectionSet(
+        typeInfo: typeInfo,
+        selections: nil
+      )
+
       let inlineFragment = InlineFragmentSpread(
-        selectionSet: .init(
-          entity: self.typeInfo.entity,
-          scopePath: self.typeInfo.scopePath.mutatingLast { $0.appending(condition) },
-          mergedSelectionsOnly: true
-        ),
+        selectionSet: selectionSet,
         isDeferred: condition.isDeferred
       )
+
       inlineFragments[condition] = inlineFragment
     }
 

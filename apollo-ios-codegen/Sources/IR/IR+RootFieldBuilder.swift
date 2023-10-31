@@ -145,30 +145,44 @@ class RootFieldBuilder {
       givenAllTypesInSchema: schema.referencedTypes
     )
 
-    let typeInfo = SelectionSet.TypeInfo(
+    let rootIrSelectionSet = await buildSelectionSet(
+      fromCompiledSelectionSet: rootSelectionSet,
       entity: rootEntity,
       scopePath: LinkedList(rootTypePath)
     )
-
-    let directSelections = DirectSelections()
-
-    await buildDirectSelections(
-      into: directSelections,
-      atTypePath: typeInfo,
-      from: rootSelectionSet
-    )
-
-    let selections = SelectionSet.Selections(
-      typeInfo: typeInfo,
-      directSelections: directSelections
-    )
-
-    let rootIrSelectionSet = SelectionSet(selections)
 
     return Result(
       rootField: EntityField(rootField, selectionSet: rootIrSelectionSet),
       referencedFragments: referencedFragments,
       entities: entityStorage.entitiesForFields
+    )
+  }
+
+  private func buildSelectionSet(
+    fromCompiledSelectionSet compiledSelectionSet: CompilationResult.SelectionSet?,
+    entity: Entity,
+    scopePath: LinkedList<ScopeDescriptor>
+  ) async -> SelectionSet {
+    let typeInfo = SelectionSet.TypeInfo(
+      entity: rootEntity,
+      scopePath: scopePath
+    )
+
+    var directSelections: DirectSelections? = nil
+
+    if let compiledSelectionSet {
+      directSelections = DirectSelections()
+
+      await buildDirectSelections(
+        into: directSelections.unsafelyUnwrapped,
+        atTypePath: typeInfo,
+        from: compiledSelectionSet
+      )
+    }
+
+    return SelectionSet(
+      typeInfo: typeInfo,
+      selections: directSelections
     )
   }
 
@@ -234,7 +248,7 @@ class RootFieldBuilder {
 
       } else {
         let irTypeCase = await buildInlineFragmentSpread(
-          from: inlineSelectionSet,
+          fromCompiledSelectionSet: inlineSelectionSet,
           with: scope,
           inParentTypePath: typeInfo
         )
@@ -263,7 +277,7 @@ class RootFieldBuilder {
 
       } else {
         let irTypeCaseEnclosingFragment = await buildInlineFragmentSpread(
-          from: CompilationResult.SelectionSet(
+          fromCompiledSelectionSet: CompilationResult.SelectionSet(
             parentType: fragmentSpread.parentType,
             selections: [selection]
           ),
@@ -275,7 +289,10 @@ class RootFieldBuilder {
 
         if matchesType {
           typeInfo.entity.selectionTree.mergeIn(
-            selections: irTypeCaseEnclosingFragment.selectionSet.selections.direct.unsafelyUnwrapped.readOnlyView,
+            selections: irTypeCaseEnclosingFragment
+              .selectionSet
+              .selections.unsafelyUnwrapped
+              .readOnlyView,
             with: typeInfo
           )
         }
@@ -353,41 +370,28 @@ class RootFieldBuilder {
       inclusionConditions: inclusionConditions,
       givenAllTypesInSchema: schema.referencedTypes
     )
-    let typePath = enclosingTypeInfo.scopePath.appending(typeScope)    
+    let typePath = enclosingTypeInfo.scopePath.appending(typeScope)
 
-    let irSelectionSet = SelectionSet(
+    return await buildSelectionSet(
+      fromCompiledSelectionSet: fieldSelectionSet,
       entity: entity,
       scopePath: typePath
     )
-    await buildDirectSelections(
-      into: irSelectionSet.selections.direct.unsafelyUnwrapped,
-      atTypePath: irSelectionSet.typeInfo,
-      from: fieldSelectionSet
-    )
-    return irSelectionSet
   }
 
   private func buildInlineFragmentSpread(
-    from selectionSet: CompilationResult.SelectionSet?,
+    fromCompiledSelectionSet compiledSelectionSet: CompilationResult.SelectionSet?,
     with scopeCondition: ScopeCondition,
     inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo
   ) async -> InlineFragmentSpread {
     let typePath = enclosingTypeInfo.scopePath.mutatingLast {
       $0.appending(scopeCondition)
     }
-
-    let irSelectionSet = SelectionSet(
+    let irSelectionSet = await buildSelectionSet(
+      fromCompiledSelectionSet: compiledSelectionSet,
       entity: enclosingTypeInfo.entity,
       scopePath: typePath
-    )
-
-    if let selectionSet = selectionSet {
-      await buildDirectSelections(
-        into: irSelectionSet.selections.direct.unsafelyUnwrapped,
-        atTypePath: irSelectionSet.typeInfo,
-        from: selectionSet
-      )
-    }
+    )    
 
     return InlineFragmentSpread(
       selectionSet: irSelectionSet,

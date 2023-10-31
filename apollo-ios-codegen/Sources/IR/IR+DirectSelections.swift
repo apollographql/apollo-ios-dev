@@ -58,8 +58,8 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
     var mergedField = existingField
 
     if existingField.inclusionConditions == newField.inclusionConditions {
-      mergedField.selectionSet.selections.direct!
-        .mergeIn(newField.selectionSet.selections.direct!)
+      mergedField.selectionSet.selections!
+        .mergeIn(newField.selectionSet.selections!)
 
     } else if existingField.inclusionConditions != nil {
       mergedField = createInclusionWrapperField(wrapping: existingField, mergingIn: newField)
@@ -83,13 +83,20 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
       )
     }
 
+    let typeInfo = SelectionSet.TypeInfo(
+      entity: existingField.entity,
+      scopePath: wrapperScope
+    )
+
+    let selectionSet = SelectionSet(
+      typeInfo: typeInfo,
+      selections: DirectSelections()
+    )
+
     let wrapperField = EntityField(
       existingField.underlyingField,
       inclusionConditions: (existingField.inclusionConditions || newField.inclusionConditions),
-      selectionSet: SelectionSet(
-        entity: existingField.entity,
-        scopePath: wrapperScope
-      )
+      selectionSet: selectionSet
     )
 
     merge(field: existingField, intoInclusionWrapperField: wrapperField)
@@ -100,21 +107,28 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
 
   private func merge(field newField: EntityField, intoInclusionWrapperField wrapperField: EntityField) {
     if let newFieldConditions = newField.selectionSet.inclusionConditions {
-      let newFieldSelectionSet = SelectionSet(
+      let typeInfo = SelectionSet.TypeInfo(
         entity: newField.entity,
         scopePath: wrapperField.selectionSet.scopePath.mutatingLast {
           $0.appending(newFieldConditions)
-        },
-        selections: newField.selectionSet.selections.direct.unsafelyUnwrapped
+        }
       )
+
+      let newFieldSelectionSet = SelectionSet(
+        typeInfo: typeInfo,
+        selections: newField.selectionSet.selections.unsafelyUnwrapped
+      )
+
       let newFieldInlineFragment = InlineFragmentSpread(
         selectionSet: newFieldSelectionSet,
         isDeferred: false
       )
-      wrapperField.selectionSet.selections.direct?.mergeIn(newFieldInlineFragment)
+      wrapperField.selectionSet.selections?.mergeIn(newFieldInlineFragment)
 
     } else {
-      wrapperField.selectionSet.selections.direct?.mergeIn(newField.selectionSet.selections.direct.unsafelyUnwrapped)
+      wrapperField.selectionSet.selections?.mergeIn(
+        newField.selectionSet.selections.unsafelyUnwrapped
+      )
     }
   }
 
@@ -122,8 +136,8 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
     let scopeCondition = fragment.selectionSet.scope.scopePath.last.value
 
     if let existingTypeCase = inlineFragments[scopeCondition]?.selectionSet {
-      existingTypeCase.selections.direct!
-        .mergeIn(fragment.selectionSet.selections.direct!)
+      existingTypeCase.selections!
+        .mergeIn(fragment.selectionSet.selections!)
 
     } else {
       inlineFragments[scopeCondition] = fragment
