@@ -89,6 +89,19 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
     XCTAssertEqual(expectedViewModel, "Leia Organa")
   }
 
+  func test_loadAll() throws {
+    let pager = createPager()
+
+    let firstPageExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    let lastPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
+    let loadAllExpectation = expectation(description: "Load all pages")
+    pager.subscribe { _ in
+      loadAllExpectation.fulfill()
+    }
+    try pager.loadAll()
+    wait(for: [firstPageExpectation, lastPageExpectation, loadAllExpectation], timeout: 5)
+  }
+
   // MARK: - Test helpers
 
   private func createPager() -> GraphQLQueryPager<Query, Query> {
