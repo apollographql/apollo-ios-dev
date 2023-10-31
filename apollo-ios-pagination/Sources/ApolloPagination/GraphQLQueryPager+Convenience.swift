@@ -1,8 +1,8 @@
 import Apollo
 import ApolloAPI
 
-extension GraphQLQueryPager {
-  public static func makeForwardCursorQueryPager(
+public extension GraphQLQueryPager {
+  static func makeForwardCursorQueryPager(
     client: ApolloClientProtocol,
     queryProvider: @escaping (CursorBasedPagination.ForwardPagination?) -> InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ForwardPagination
@@ -16,7 +16,7 @@ extension GraphQLQueryPager {
     )
   }
 
-  public static func makeForwardCursorQueryPager(
+  static func makeForwardCursorQueryPager(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ForwardPagination,
@@ -35,7 +35,7 @@ extension GraphQLQueryPager {
     )
   }
 
-  public static func makeReverseCursorQueryPager(
+  static func makeReverseCursorQueryPager(
     client: ApolloClientProtocol,
     queryProvider: @escaping (CursorBasedPagination.ReversePagination?) -> InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ReversePagination
@@ -49,7 +49,7 @@ extension GraphQLQueryPager {
     )
   }
 
-  public static func makeReverseCursorQueryPager(
+  static func makeReverseCursorQueryPager(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ReversePagination,
