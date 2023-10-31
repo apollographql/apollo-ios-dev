@@ -826,8 +826,7 @@ class ApolloCodegenTests: XCTestCase {
                            moduleType: .swiftPackageManager),
         operations: .inSchemaModule,
         testMocks: .absolute(path: directoryURL.appendingPathComponent("TestMocks").path)
-      ),
-      experimentalFeatures: .init(clientControlledNullability: true)
+      )
     ), rootURL: nil)
 
     let subject = ApolloCodegen(
