@@ -2,11 +2,11 @@ import Apollo
 import ApolloAPI
 
 extension GraphQLQueryPager {
-  static func makeForwardCursorQueryPager(
+  public static func makeForwardCursorQueryPager(
     client: ApolloClientProtocol,
     queryProvider: @escaping (CursorBasedPagination.ForwardPagination?) -> InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ForwardPagination
-  ) -> GraphQLQueryPager.Actor where InitialQuery == PaginatedQuery {
+  ) -> GraphQLQueryPager where InitialQuery == PaginatedQuery {
     .init(
       client: client,
       initialQuery: queryProvider(nil),
@@ -16,13 +16,13 @@ extension GraphQLQueryPager {
     )
   }
 
-  static func makeForwardCursorQueryPager(
+  public static func makeForwardCursorQueryPager(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ForwardPagination,
     extractNextPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.ForwardPagination,
     nextPageResolver: @escaping (CursorBasedPagination.ForwardPagination) -> PaginatedQuery
-  ) -> GraphQLQueryPager.Actor {
+  ) -> GraphQLQueryPager {
     .init(
       client: client,
       initialQuery: initialQuery,
@@ -35,11 +35,11 @@ extension GraphQLQueryPager {
     )
   }
 
-  static func makeReverseCursorQueryPager(
+  public static func makeReverseCursorQueryPager(
     client: ApolloClientProtocol,
     queryProvider: @escaping (CursorBasedPagination.ReversePagination?) -> InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ReversePagination
-  ) -> GraphQLQueryPager.Actor where InitialQuery == PaginatedQuery {
+  ) -> GraphQLQueryPager where InitialQuery == PaginatedQuery {
     .init(
       client: client,
       initialQuery: queryProvider(nil),
@@ -49,13 +49,13 @@ extension GraphQLQueryPager {
     )
   }
 
-  static func makeReverseCursorQueryPager(
+  public static func makeReverseCursorQueryPager(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ReversePagination,
     extractPreviousPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.ReversePagination,
     previousPageResolver: @escaping (CursorBasedPagination.ReversePagination) -> PaginatedQuery
-  ) -> GraphQLQueryPager.Actor {
+  ) -> GraphQLQueryPager {
     .init(
       client: client,
       initialQuery: initialQuery,
