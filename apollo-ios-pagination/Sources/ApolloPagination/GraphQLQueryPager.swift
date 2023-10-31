@@ -238,7 +238,6 @@ extension GraphQLQueryPager {
     public func subscribe(onUpdate: @MainActor @escaping (Result<Output, Error>) -> Void) -> AnyCancellable {
       $currentValue.compactMap({ $0 }).sink { [weak self] result in
         guard let self else { return }
-        print(result)
         Task {
           let isLoadingAll = await self.isLoadingAll
           guard !isLoadingAll else { return }
