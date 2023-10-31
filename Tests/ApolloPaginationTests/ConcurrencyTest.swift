@@ -138,7 +138,8 @@ final class ConcurrencyTests: XCTestCase {
           "after": pageInfo.endCursor,
         ]
         return nextQuery
-      }
+      },
+      previousPageResolver: nil
     )
   }
 
@@ -165,7 +166,8 @@ final class ConcurrencyTests: XCTestCase {
           "after": pageInfo.endCursor,
         ]
         return nextQuery
-      }
+      },
+      previousPageResolver: nil
     )
   }
 

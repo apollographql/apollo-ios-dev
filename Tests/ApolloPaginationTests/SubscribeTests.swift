@@ -95,7 +95,8 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
           "after": pageInfo.endCursor,
         ]
         return nextQuery
-      }
+      },
+      previousPageResolver: nil
     )
   }
 }

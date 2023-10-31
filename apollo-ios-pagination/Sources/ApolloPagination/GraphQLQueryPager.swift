@@ -42,13 +42,15 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
     extractPageInfo: @escaping (PageExtractionData) -> P,
-    nextPageResolver: @escaping (P) -> PaginatedQuery
+    nextPageResolver: ((P) -> PaginatedQuery)?,
+    previousPageResolver: ((P) -> PaginatedQuery)?
   ) {
     pager = .init(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: extractPageInfo,
-      nextPageResolver: nextPageResolver
+      nextPageResolver: nextPageResolver,
+      previousPageResolver: previousPageResolver
     )
     Task {
       let varMapPublisher = await pager.$varMap
@@ -133,6 +135,7 @@ extension GraphQLQueryPager {
     private let initialQuery: InitialQuery
     private var isLoadingAll: Bool = false
     let nextPageResolver: (PaginationInfo) -> PaginatedQuery?
+    let previousPageResolver: (PaginationInfo) -> PaginatedQuery?
     let extractPageInfo: (PageExtractionData) -> PaginationInfo
     var currentPageInfo: PaginationInfo? {
       pageTransformation()
@@ -167,14 +170,19 @@ extension GraphQLQueryPager {
       client: ApolloClientProtocol,
       initialQuery: InitialQuery,
       extractPageInfo: @escaping (PageExtractionData) -> P,
-      nextPageResolver: @escaping (P) -> PaginatedQuery
+      nextPageResolver: ((P) -> PaginatedQuery)?,
+      previousPageResolver: ((P) -> PaginatedQuery)?
     ) {
       self.client = client
       self.initialQuery = initialQuery
       self.extractPageInfo = extractPageInfo
       self.nextPageResolver = { page in
         guard let page = page as? P else { return nil }
-        return nextPageResolver(page)
+        return nextPageResolver?(page)
+      }
+      self.previousPageResolver = { page in
+        guard let page = page as? P else { return nil }
+        return previousPageResolver?(page)
       }
     }
 
@@ -227,7 +235,7 @@ extension GraphQLQueryPager {
         assertionFailure("No page info detected -- are you calling `loadMore` prior to calling the initial fetch?")
         throw PaginationError.missingInitialPage
       }
-      guard let nextPageQuery = nextPageResolver(previousPageInfo),
+      guard let previousPageQuery = previousPageResolver(previousPageInfo),
             previousPageInfo.canLoadPrevious
       else { throw PaginationError.pageHasNoMoreContent }
       guard activeTask == nil else {
@@ -237,14 +245,14 @@ extension GraphQLQueryPager {
       activeTask = Task {
         let publisher = CurrentValueSubject<Void, Never>(())
         await withCheckedContinuation { continuation in
-          let watcher = GraphQLQueryWatcher(client: client, query: nextPageQuery) { [weak self] result in
+          let watcher = GraphQLQueryWatcher(client: client, query: previousPageQuery) { [weak self] result in
             guard let self else { return }
             Task {
               await self.onPreviousFetch(
                 cachePolicy: cachePolicy,
                 result: result,
                 publisher: publisher,
-                query: nextPageQuery
+                query: previousPageQuery
               )
             }
           }

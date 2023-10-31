@@ -270,7 +270,8 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
           "after": pageInfo.endCursor,
         ]
         return nextQuery
-      }
+      },
+      previousPageResolver: nil
     )
   }
 }

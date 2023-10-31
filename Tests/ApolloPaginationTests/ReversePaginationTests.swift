@@ -122,7 +122,8 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
           )
         }
       },
-      nextPageResolver: { pageInfo in
+      nextPageResolver: nil,
+      previousPageResolver: { pageInfo in
         let nextQuery = Query()
         nextQuery.__variables = [
           "id": "2001",

@@ -127,7 +127,8 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
           "after": pageInfo.endCursor,
         ]
         return nextQuery
-      }
+      },
+      previousPageResolver: nil
     )
   }
 
