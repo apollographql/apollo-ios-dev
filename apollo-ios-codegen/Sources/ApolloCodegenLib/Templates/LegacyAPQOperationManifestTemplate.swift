@@ -16,7 +16,7 @@ struct LegacyAPQOperationManifestTemplate: OperationManifestTemplate {
           return """
             "\($0.identifier)" : {
               "name": "\($0.operation.name)",
-              "source": "\($0.operation.sourceTextFormattedForManifestJSONBody)"
+              "source": "\($0.operation.sourceText(withFormat: .manifestJSONBody))"
             }
             """
         })

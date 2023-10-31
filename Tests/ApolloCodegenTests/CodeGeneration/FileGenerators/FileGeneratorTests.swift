@@ -4,18 +4,24 @@ import Nimble
 @testable import ApolloCodegenInternalTestHelpers
 
 class FileGeneratorTests: XCTestCase {
-  let fileManager = MockApolloFileManager(strict: false)  
 
+  var fileManager: MockApolloFileManager!
   var config: ApolloCodegen.ConfigurationContext!
   var fileTarget: FileTarget!
   var template: MockFileTemplate!
   var subject: MockFileGenerator!
+
+  override func setUp() {
+    super.setUp()
+    fileManager = MockApolloFileManager(strict: false)
+  }
 
   override func tearDown() {
     template = nil
     subject = nil
     fileTarget = nil
     config = nil
+    fileManager = nil
 
     super.tearDown()
   }
