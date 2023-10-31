@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  XCODE_VERSION: "15.0.0"
+  XCODE_VERSION: "15.0.1"
 
 jobs:
   tuist-generation:
@@ -152,6 +152,10 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
+    - name: Install XCBeautify
+      shell: bash
+      run: |
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
     - name: Test Codegen Configurations
       shell: bash
       run: |

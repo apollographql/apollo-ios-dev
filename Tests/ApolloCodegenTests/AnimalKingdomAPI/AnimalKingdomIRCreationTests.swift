@@ -9,60 +9,100 @@ import ApolloCodegenInternalTestHelpers
 
 final class AnimalKingdomIRCreationTests: XCTestCase {
 
-  static let frontend = try! GraphQLJSFrontend()
+  actor AnimalKingdomSchema {
+    static let shared = AnimalKingdomSchema(useCCN: false)
+    static let sharedWithCCN = AnimalKingdomSchema(useCCN: true)
 
-  static let schema = try! frontend.loadSchema(from: [
-    try! frontend.makeSource(from: ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.Schema)
-  ])
+    let useCCN: Bool
 
-  static func operationDocuments(experimentalClientControlledNullability: Bool = false) -> GraphQLDocument {
-    try! frontend.mergeDocuments(
-      ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.GraphQLOperations.map {
-        try! frontend.parseDocument(
-          from: $0,
-          experimentalClientControlledNullability: experimentalClientControlledNullability
-        )
-      }
-    )
+    init(useCCN: Bool) {
+      self.useCCN = useCCN
+    }
+
+    private var frontend: GraphQLJSFrontend!
+    private(set) var schema: GraphQLSchema!
+    private(set) var compilationResult: CompilationResult!
+
+    func setUp() async throws {
+      guard compilationResult == nil else { return }
+      self.frontend = try await GraphQLJSFrontend()
+      self.schema = try await frontend.loadSchema(from: [
+        try! frontend.makeSource(from: ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.Schema)
+      ])
+      self.compilationResult = try await frontend.compile(
+        schema: schema,
+        document: try await operationDocuments(),
+        validationOptions: validationOptions()
+      )
+    }
+
+    func operationDocuments() async throws -> GraphQLDocument {
+      let documents = useCCN ?
+      ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.CCNGraphQLOperations :
+      ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.GraphQLOperations
+
+      return try await frontend.mergeDocuments(
+        documents.asyncMap {
+          try await frontend.parseDocument(
+            from: $0,
+            experimentalClientControlledNullability: useCCN
+          )
+        }
+      )
+    }
+
+    func validationOptions() -> ValidationOptions {
+      return useCCN ?
+      ValidationOptions(
+        config: .init(
+          config: .mock(experimentalFeatures: .init(clientControlledNullability: true))
+        )) :
+      ValidationOptions(config: .init(config: .mock()))
+
+    }
+
+    func tearDown() {
+      self.frontend = nil
+      self.schema = nil
+      self.compilationResult = nil
+    }
+
   }
-
-  static func operationCCNDocuments(experimentalClientControlledNullability: Bool = false) -> GraphQLDocument {
-    try! frontend.mergeDocuments(
-      ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.CCNGraphQLOperations.map {
-        try! frontend.parseDocument(
-          from: $0,
-          experimentalClientControlledNullability: experimentalClientControlledNullability
-        )
-      }
-    )
-  }
-
-  var compilationResult: CompilationResult!
 
   var expected: (fields: [ShallowFieldMatcher],
                  typeCases: [ShallowInlineFragmentMatcher],
                  fragments: [ShallowFragmentSpreadMatcher])!
 
-  override func setUp() {
-    super.setUp()
-    compilationResult = try! Self.frontend.compile(
-      schema: Self.schema,
-      document: Self.operationDocuments(),
-      validationOptions: ValidationOptions(config: .init(config: .mock()))
-    )
+  func compilationResult(useCCN: Bool = false) async -> CompilationResult {
+    let schema = useCCN ? AnimalKingdomSchema.sharedWithCCN : AnimalKingdomSchema.shared
+    return await schema.compilationResult
+  }
+
+  class override func tearDown() {
+    super.tearDown()
+    Task {
+      await AnimalKingdomSchema.shared.tearDown()
+      await AnimalKingdomSchema.sharedWithCCN.tearDown()
+    }
+  }
+
+  override func setUp() async throws {
+    try await AnimalKingdomSchema.shared.setUp()
+//    try await AnimalKingdomSchema.sharedWithCCN.setUp()
+    try await super.setUp()
   }
 
   override func tearDown() {
-    super.tearDown()
-    compilationResult = nil
     expected = nil
+    super.tearDown()
   }
 
-  func test__directSelections_AllAnimalsQuery_RootQuery__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_RootQuery__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     expected = (
       fields: [
@@ -80,11 +120,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__mergedSelections_AllAnimalsQuery_RootQuery__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_RootQuery__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     // when
     let actual = rootSelectionSet.selections.merged
@@ -93,13 +134,14 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(beEmpty())
   }
 
-  func test__directSelections_AllAnimalsQuery_AllAnimal__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AllAnimal__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let Interface_Animal = GraphQLInterfaceType.mock("Animal")
 
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(rootSelectionSet[field: "allAnimals"]?.selectionSet)
 
@@ -134,13 +176,14 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AllAnimal__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AllAnimal__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let Interface_Animal = GraphQLInterfaceType.mock("Animal")
 
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(rootSelectionSet[field: "allAnimals"]?.selectionSet)
 
@@ -152,11 +195,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(beEmpty())
   }
 
-  func test__directSelections_AllAnimalsQuery_AllAnimal_Height__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AllAnimal_Height__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "height"]?.selectionSet
@@ -181,11 +225,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AllAnimal_Height__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AllAnimal_Height__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "height"]?.selectionSet
@@ -208,11 +253,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__directSelections_AllAnimalsQuery_AllAnimal_Predator__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AllAnimal_Predator__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "predators"]?.selectionSet
@@ -237,11 +283,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AllAnimal_Predator__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AllAnimal_Predator__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "predators"]?.selectionSet
@@ -255,11 +302,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(beEmpty())
   }
 
-  func test__directSelections_AllAnimalsQuery_AllAnimal_Predator_AsWarmBlooded__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AllAnimal_Predator_AsWarmBlooded__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "predators"]?[as: "WarmBlooded"]
@@ -286,11 +334,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AllAnimal_Predator_AsWarmBlooded__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AllAnimal_Predator_AsWarmBlooded__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "predators"]?[as: "WarmBlooded"]
@@ -319,11 +368,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__directSelections_AllAnimalsQuery_AllAnimal_AsWarmBlooded__isCorrect() throws  {
+  func test__directSelections_AllAnimalsQuery_AllAnimal_AsWarmBlooded__isCorrect() async throws  {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "WarmBlooded"]
@@ -345,11 +395,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsWarmBlooded__isCorrect() throws  {
+  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsWarmBlooded__isCorrect() async throws  {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "WarmBlooded"]
@@ -382,11 +433,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__directSelections_AllAnimalsQuery_AllAnimal_AsWarmBlooded_Height__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AllAnimal_AsWarmBlooded_Height__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "WarmBlooded"]?[field: "height"]?.selectionSet
@@ -400,11 +452,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(beNil())
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsWarmBlooded_Height__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsWarmBlooded_Height__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "WarmBlooded"]?[field: "height"]?.selectionSet
@@ -431,11 +484,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__directSelections_AllAnimalsQuery_AllAnimal_AsPet__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AllAnimal_AsPet__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]
@@ -462,11 +516,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsPet__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsPet__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]
@@ -502,11 +557,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__directSelections_AllAnimalsQuery_AllAnimal_AsPet_Height__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AllAnimal_AsPet_Height__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[field: "height"]?.selectionSet
@@ -531,11 +587,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsPet_Height__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsPet_Height__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[field: "height"]?.selectionSet
@@ -562,11 +619,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__directSelections_AllAnimalsQuery_AsPet_AsWarmBlooded__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AsPet_AsWarmBlooded__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[as: "WarmBlooded"]
@@ -588,11 +646,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AsPet_AsWarmBlooded__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AsPet_AsWarmBlooded__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[as: "WarmBlooded"]
@@ -632,11 +691,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__directSelections_AllAnimalsQuery_AllAnimal_AsPet_AsWarmBlooded_Height__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AllAnimal_AsPet_AsWarmBlooded_Height__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[as: "WarmBlooded"]?[field: "height"]?.selectionSet
@@ -650,11 +710,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(beNil())
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsPet_AsWarmBlooded_Height__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsPet_AsWarmBlooded_Height__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[as: "WarmBlooded"]?[field: "height"]?.selectionSet
@@ -685,11 +746,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__directSelections_AllAnimalsQuery_AsCat__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AsCat__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Cat"]
@@ -712,11 +774,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AsCat__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AsCat__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Cat"]
@@ -757,11 +820,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__directSelections_AllAnimalsQuery_AllAnimal_AsCat_Height__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AllAnimal_AsCat_Height__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Cat"]?[field: "height"]?.selectionSet
@@ -775,11 +839,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(beNil())
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsCat_Height__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsCat_Height__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Cat"]?[field: "height"]?.selectionSet
@@ -810,11 +875,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__directSelections_AllAnimalsQuery_AsClassroomPet__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AsClassroomPet__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]
@@ -836,11 +902,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AsClassroomPet__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AsClassroomPet__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]
@@ -872,11 +939,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__directSelections_AllAnimalsQuery_AsClassroomPet_AsBird__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AsClassroomPet_AsBird__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]?[as: "Bird"]
@@ -899,11 +967,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AsClassroomPet_AsBird__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AsClassroomPet_AsBird__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]?[as: "Bird"]
@@ -944,11 +1013,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__directSelections_AllAnimalsQuery_AllAnimal_AsClassroomPet_AsBird_Height__isCorrect() throws {
+  func test__directSelections_AllAnimalsQuery_AllAnimal_AsClassroomPet_AsBird_Height__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]?[as: "Bird"]?[field: "height"]?.selectionSet
@@ -962,11 +1032,12 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(beNil())
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsClassroomPet_AsBird_Height__isCorrect() throws {
+  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsClassroomPet_AsBird_Height__isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]?[as: "Bird"]?[field: "height"]?.selectionSet
@@ -997,26 +1068,15 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(actual).to(shallowlyMatch(self.expected))
   }
 
-  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsClassroomPet_AsBird_Height__isCorrect_CCN() throws {
+  func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsClassroomPet_AsBird_Height__isCorrect_CCN() async throws {
     throw XCTSkip("CCN tests skipped until issue #3114 done or closed.")
 
     // given
-    let enableCCN = true
+    let compilationResult = await compilationResult(useCCN: true)
 
-    compilationResult = try! Self.frontend.compile(
-      schema: Self.schema,
-      document: Self.operationCCNDocuments(
-        experimentalClientControlledNullability: enableCCN
-      ),
-      validationOptions: ValidationOptions(
-        config: .init(
-          config: .mock(experimentalFeatures: .init(clientControlledNullability: enableCCN))
-        )
-      )
-    )
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsCCN" }
     let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "height"]?.selectionSet
@@ -1043,8 +1103,9 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   // MARK: - Referenced Fragment Tests
 
-  func test__referencedFragments__AllAnimalsQuery_isCorrect() throws {
+  func test__referencedFragments__AllAnimalsQuery_isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
 
     // when
@@ -1060,16 +1121,18 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(operation?.referencedFragments).to(equal(expected))
   }
 
-  func test__referencedFragments__HeightInMeters_isCorrect() throws {
+  func test__referencedFragments__HeightInMeters_isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let fragment = compilationResult.fragments.first { $0.name == "HeightInMeters" }
 
     // then
     expect(fragment?.referencedFragments).to(beEmpty())
   }
 
-  func test__referencedFragments__WarmBloodedDetails_isCorrect() throws {
+  func test__referencedFragments__WarmBloodedDetails_isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let fragment = compilationResult.fragments.first { $0.name == "WarmBloodedDetails" }
 
     // when
@@ -1083,8 +1146,9 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     expect(fragment?.referencedFragments).to(equal(expected))
   }
 
-  func test__referencedFragments__PetDetails_isCorrect() throws {
+  func test__referencedFragments__PetDetails_isCorrect() async throws {
     // given
+    let compilationResult = await compilationResult()
     let fragment = compilationResult.fragments.first { $0.name == "PetDetails" }
 
     // then

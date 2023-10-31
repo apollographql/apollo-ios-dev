@@ -2,7 +2,7 @@ import Foundation
 import ArgumentParser
 import ApolloCodegenLib
 
-public struct FetchSchema: ParsableCommand {
+public struct FetchSchema: AsyncParsableCommand {
 
   // MARK: - Configuration
 
@@ -17,18 +17,18 @@ public struct FetchSchema: ParsableCommand {
 
   public init() { }
 
-  public func run() throws {
-    try _run()
+  public func run() async throws {
+    try await _run()
   }
 
   func _run(
     fileManager: FileManager = .default,
     schemaDownloadProvider: SchemaDownloadProvider.Type = ApolloSchemaDownloader.self,
     logger: LogLevelSetter.Type = CodegenLogger.self
-  ) throws {
+  ) async throws {
     logger.SetLoggingLevel(verbose: inputs.verbose)
 
-    try fetchSchema(
+    try await fetchSchema(
       configuration: inputs.getCodegenConfiguration(fileManager: fileManager),
       schemaDownloadProvider: schemaDownloadProvider
     )    
@@ -37,7 +37,7 @@ public struct FetchSchema: ParsableCommand {
   private func fetchSchema(
     configuration codegenConfiguration: ApolloCodegenConfiguration,
     schemaDownloadProvider: SchemaDownloadProvider.Type
-  ) throws {
+  ) async throws {
     guard let schemaDownload = codegenConfiguration.schemaDownload else {
       throw Error(errorDescription: """
         Missing schema download configuration. Hint: check the `schemaDownload` \
@@ -46,9 +46,10 @@ public struct FetchSchema: ParsableCommand {
       )
     }
 
-    try schemaDownloadProvider.fetch(
+    try await schemaDownloadProvider.fetch(
       configuration: schemaDownload,
-      withRootURL: rootOutputURL(for: inputs)
+      withRootURL: rootOutputURL(for: inputs),
+      session: nil
     )
   }
 }

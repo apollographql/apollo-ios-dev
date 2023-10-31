@@ -35,21 +35,21 @@ class CompilationTests: XCTestCase {
   func compileFrontend(
     schemaNamespace: String = "TestSchema",
     enableCCN: Bool = false
-  ) throws -> CompilationResult {
-    let frontend = try GraphQLJSFrontend()
+  ) async throws -> CompilationResult {
+    let frontend = try await GraphQLJSFrontend()
     let config = ApolloCodegen.ConfigurationContext(config: .mock(
       schemaNamespace: schemaNamespace,
       experimentalFeatures: .init(clientControlledNullability: enableCCN)
     ))
 
     if let schemaSDL = schemaSDL {
-      return try frontend.compile(
+      return try await frontend.compile(
         schema: schemaSDL,
         document: document,
         config: config
       )
     } else if let schemaJSON = schemaJSON {
-      return try frontend.compile(
+      return try await frontend.compile(
         schemaJSON: schemaJSON,
         document: document,
         config: config
@@ -61,7 +61,7 @@ class CompilationTests: XCTestCase {
 
   // MARK: - Tests
   
-  func test__compile__givenSingleQuery() throws {
+  func test__compile__givenSingleQuery() async throws {
     // given
     try useStarWarsSchema()
 
@@ -76,7 +76,7 @@ class CompilationTests: XCTestCase {
       }
       """
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
     
     let operation = try XCTUnwrap(compilationResult.operations.first)
     XCTAssertEqual(operation.name, "HeroAndFriendsNames")
@@ -102,7 +102,7 @@ class CompilationTests: XCTestCase {
                             ["Human", "Droid", "Query", "Episode", "Character", "String"])
   }
 
-  func test__compile__givenSingleQuery_withClientControlledNullability() throws {
+  func test__compile__givenSingleQuery_withClientControlledNullability() async throws {
     throw XCTSkip("CCN tests skipped until issue #3114 done or closed.")
 
     // given
@@ -118,7 +118,7 @@ class CompilationTests: XCTestCase {
       }
       """
 
-    let compilationResult = try compileFrontend(enableCCN: true)
+    let compilationResult = try await compileFrontend(enableCCN: true)
 
     let operation = try XCTUnwrap(compilationResult.operations.first)
     XCTAssertEqual(operation.name, "HeroAndFriendsNames")
@@ -148,7 +148,7 @@ class CompilationTests: XCTestCase {
                             ["ID", "Query", "Human", "Droid", "String", "Float", "Episode", "Character"])
   }
 
-  func test__compile__givenOperationWithRecognizedDirective_hasDirective() throws {
+  func test__compile__givenOperationWithRecognizedDirective_hasDirective() async throws {
     schemaSDL = """
     type Query {
       allAnimals: [Animal!]
@@ -173,7 +173,7 @@ class CompilationTests: XCTestCase {
       .mock("testDirective")
     ]
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
 
 
     let operation = try XCTUnwrap(compilationResult.operations.first)
@@ -182,7 +182,7 @@ class CompilationTests: XCTestCase {
 
   /// Tests that we automatically add the local cache mutation directive to the schema
   /// during codegen.
-  func test__compile__givenSchemaSDL_queryWithLocalCacheMutationDirective_notInSchema_hasDirective() throws {
+  func test__compile__givenSchemaSDL_queryWithLocalCacheMutationDirective_notInSchema_hasDirective() async throws {
     schemaSDL = """
     type Query {
       allAnimals: [Animal!]
@@ -205,7 +205,7 @@ class CompilationTests: XCTestCase {
       .mock("apollo_client_ios_localCacheMutation")
     ]
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
 
 
     let operation = try XCTUnwrap(compilationResult.operations.first)
@@ -214,7 +214,7 @@ class CompilationTests: XCTestCase {
 
   /// Tests that we automatically add the local cache mutation directive to the schema
   /// during codegen.
-  func test__compile__givenSchemaJSON_queryWithLocalCacheMutationDirective_notInSchema_hasDirective() throws {
+  func test__compile__givenSchemaJSON_queryWithLocalCacheMutationDirective_notInSchema_hasDirective() async throws {
     try useStarWarsSchema()
 
     document = """
@@ -231,14 +231,14 @@ class CompilationTests: XCTestCase {
       .mock("apollo_client_ios_localCacheMutation")
     ]
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
 
 
     let operation = try XCTUnwrap(compilationResult.operations.first)
     expect(operation.directives).to(equal(expectedDirectives))
   }
 
-  func test__compile__givenInputObject_withListFieldWithDefaultValueEmptyArray() throws {
+  func test__compile__givenInputObject_withListFieldWithDefaultValueEmptyArray() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -263,7 +263,7 @@ class CompilationTests: XCTestCase {
     """
 
     // when
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
 
     let inputObject = try XCTUnwrap(
       compilationResult.referencedTypes.first { $0.name == "TestInput"} as? GraphQLInputObjectType
@@ -275,7 +275,7 @@ class CompilationTests: XCTestCase {
     expect(defaultValue).to(equal(GraphQLValue.list([])))
   }
 
-  func test__compile__givenUniqueSchemaName_shouldNotThrow() throws {
+  func test__compile__givenUniqueSchemaName_shouldNotThrow() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -315,10 +315,11 @@ class CompilationTests: XCTestCase {
     """
 
     // then
-    XCTAssertNoThrow(try compileFrontend(schemaNamespace: "MySchema"))
+    await expect { try await self.compileFrontend(schemaNamespace: "MySchema") }
+      .toNot(throwError())
   }
 
-  func test__compile__givenSchemaName_matchingScalarFieldAndInputValueName_shouldNotThrow() throws {
+  func test__compile__givenSchemaName_matchingScalarFieldAndInputValueName_shouldNotThrow() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -347,10 +348,11 @@ class CompilationTests: XCTestCase {
     """
 
     // then
-    XCTAssertNoThrow(try compileFrontend(schemaNamespace: "species"))
+    await expect { try await self.compileFrontend(schemaNamespace: "species") }
+      .toNot(throwError())
   }
 
-  func test__compile__givenSchemaName_matchingEntityFieldName_shouldThrow() throws {
+  func test__compile__givenSchemaName_matchingEntityFieldName_shouldThrow() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -382,16 +384,19 @@ class CompilationTests: XCTestCase {
     """
 
     // then
-    XCTAssertThrowsError(try compileFrontend(schemaNamespace: "height")) { error in
-      XCTAssertTrue((error as! GraphQLCompiler.JavaScriptError).description.contains("""
+    await expect { try await self.compileFrontend(schemaNamespace: "height") }
+      .to(throwError { error in
+        XCTAssertTrue(
+          (error as! GraphQLCompiler.JavaScriptError).description.contains(
+        """
         Schema name "height" conflicts with name of a generated object API. \
         Please choose a different schema name.
         """
-      ))
-    }
+          ))
+      })
   }
 
-  func test__compile__givenSingularSchemaName_matchingPluralizedNullableListFieldName_shouldThrow() throws {
+  func test__compile__givenSingularSchemaName_matchingPluralizedNullableListFieldName_shouldThrow() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -423,16 +428,19 @@ class CompilationTests: XCTestCase {
     """
 
     // then
-    XCTAssertThrowsError(try compileFrontend(schemaNamespace: "predator")) { error in
-      XCTAssertTrue((error as! GraphQLCompiler.JavaScriptError).description.contains("""
+    await expect { try await self.compileFrontend(schemaNamespace: "predator") }
+      .to(throwError { error in
+        XCTAssertTrue(
+          (error as! GraphQLCompiler.JavaScriptError).description.contains(
+        """
         Schema name "predator" conflicts with name of a generated object API. \
         Please choose a different schema name.
         """
-      ))
-    }
+          ))
+      })
   }
 
-  func test__compile__givenSingularSchemaName_matchingPluralizedNonNullListFieldName_shouldThrow() throws {
+  func test__compile__givenSingularSchemaName_matchingPluralizedNonNullListFieldName_shouldThrow() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -464,16 +472,19 @@ class CompilationTests: XCTestCase {
     """
 
     // then
-    XCTAssertThrowsError(try compileFrontend(schemaNamespace: "predator")) { error in
-      XCTAssertTrue((error as! GraphQLCompiler.JavaScriptError).description.contains("""
+    await expect { try await self.compileFrontend(schemaNamespace: "predator") }
+      .to(throwError { error in
+        XCTAssertTrue(
+          (error as! GraphQLCompiler.JavaScriptError).description.contains(
+        """
         Schema name "predator" conflicts with name of a generated object API. \
         Please choose a different schema name.
         """
-      ))
-    }
+          ))
+      })
   }
 
-  func test__compile__givenPluralizedSchemaName_matchingPluralizedNullableListFieldName_shouldNotThrow() throws {
+  func test__compile__givenPluralizedSchemaName_matchingPluralizedNullableListFieldName_shouldNotThrow() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -505,10 +516,11 @@ class CompilationTests: XCTestCase {
     """
 
     // then
-    XCTAssertNoThrow(try compileFrontend(schemaNamespace: "predators"))
+    await expect { try await self.compileFrontend(schemaNamespace: "predators") }
+      .toNot(throwError())
   }
 
-  func test__compile__givenPluralizedSchemaName_matchingPluralizedNonNullListFieldName_shouldNotThrow() throws {
+  func test__compile__givenPluralizedSchemaName_matchingPluralizedNonNullListFieldName_shouldNotThrow() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -540,7 +552,8 @@ class CompilationTests: XCTestCase {
     """
 
     // then
-    XCTAssertNoThrow(try compileFrontend(schemaNamespace: "predators"))
+    await expect { try await self.compileFrontend(schemaNamespace: "predators") }
+      .toNot(throwError())
   }
 
 }

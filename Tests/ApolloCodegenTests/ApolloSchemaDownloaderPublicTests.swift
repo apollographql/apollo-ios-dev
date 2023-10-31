@@ -3,16 +3,28 @@ import ApolloInternalTestHelpers
 import ApolloCodegenInternalTestHelpers
 import ApolloCodegenLib // Do not use @testable with this import! Plain `import` ensures the correct access modifiers are used.
 
-class ApolloSchemaPublicTests: XCTestCase {
+class ApolloSchemaDownloaderPublicTests: XCTestCase {
+
+  var testFilePathBuilder: TestFilePathBuilder!
+
+  override func setUp() {
+    super.setUp()
+    testFilePathBuilder = TestFilePathBuilder(test: self)
+  }
+
+  override func tearDown() {
+    testFilePathBuilder = nil
+    super.tearDown()
+  }
 
   func testCreatingSchemaDownloadConfiguration_forIntrospectionDownload_usingDefaultParameters() throws {
     let configuration = ApolloSchemaDownloadConfiguration(
       using: .introspection(endpointURL: TestURL.mockPort8080.url),
-      outputPath: CodegenTestHelper.schemaOutputURL().path
+      outputPath: testFilePathBuilder.schemaOutputURL.path
     )
 
     XCTAssertEqual(configuration.downloadMethod, .introspection(endpointURL: TestURL.mockPort8080.url))
-    XCTAssertEqual(configuration.outputPath, CodegenTestHelper.schemaOutputURL().path)
+    XCTAssertEqual(configuration.outputPath, testFilePathBuilder.schemaOutputURL.path)
     XCTAssertTrue(configuration.headers.isEmpty)
   }
 
@@ -24,11 +36,11 @@ class ApolloSchemaPublicTests: XCTestCase {
     
     let configuration = ApolloSchemaDownloadConfiguration(
       using: .apolloRegistry(settings),
-      outputPath: CodegenTestHelper.schemaOutputURL().path
+      outputPath: testFilePathBuilder.schemaOutputURL.path
     )
 
     XCTAssertEqual(configuration.downloadMethod, .apolloRegistry(settings))
-    XCTAssertEqual(configuration.outputPath, CodegenTestHelper.schemaOutputURL().path)
+    XCTAssertEqual(configuration.outputPath, testFilePathBuilder.schemaOutputURL.path)
     XCTAssertTrue(configuration.headers.isEmpty)
   }
 
@@ -50,8 +62,9 @@ class ApolloSchemaPublicTests: XCTestCase {
     ]
 
     let schemaFileName = "different_name"
-    let outputURL = CodegenTestHelper.outputFolderURL()
+    let outputURL = testFilePathBuilder.testIsolatedOutputFolder
       .appendingPathComponent("\(schemaFileName).graphqls")
+    
     let configuration = ApolloSchemaDownloadConfiguration(
       using: .apolloRegistry(settings),
       headers: headers,

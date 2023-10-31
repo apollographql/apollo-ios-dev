@@ -40,11 +40,11 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: - Helpers
 
-  func buildSubjectRootField() throws {
-    ir = try .mock(schema: schemaSDL, document: document)
+  func buildSubjectRootField() async throws {
+    ir = try await .mock(schema: schemaSDL, document: document)
     operation = try XCTUnwrap(ir.compilationResult.operations.first)
 
-    result = IR.RootFieldBuilder.buildRootEntityField(
+    result = await IR.RootFieldBuilder.buildRootEntityField(
       forRootField: .mock(
         "query",
         type: .nonNull(.entity(operation.rootType)),
@@ -59,7 +59,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Children - Fragment Type
 
-  func test__children__initWithNamedFragmentOnTheSameType_hasNoChildTypeCase() throws {
+  func test__children__initWithNamedFragmentOnTheSameType_hasNoChildTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -84,7 +84,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = self.subject[field: "allAnimals"]?.selectionSet
 
@@ -92,7 +92,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(allAnimals?.selections.direct?.inlineFragments).to(beEmpty())
   }
 
-  func test__children__initWithNamedFragmentOnMoreSpecificType_hasChildTypeCase() throws {
+  func test__children__initWithNamedFragmentOnMoreSpecificType_hasChildTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -121,7 +121,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Object_Bird = try XCTUnwrap(schema[object: "Bird"])
     let Fragment_BirdDetails = try XCTUnwrap(ir.compilationResult[fragment: "BirdDetails"])
@@ -136,7 +136,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(child?.selections.direct?.namedFragments.values).to(shallowlyMatch([Fragment_BirdDetails]))
   }
 
-  func test__children__isObjectType_initWithNamedFragmentOnLessSpecificMatchingType_hasNoChildTypeCase() throws {
+  func test__children__isObjectType_initWithNamedFragmentOnLessSpecificMatchingType_hasNoChildTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -165,7 +165,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let birds = self.subject[field: "birds"]?.selectionSet
 
@@ -173,7 +173,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(birds?.selections.direct?.inlineFragments).to(beEmpty())
   }
 
-  func test__children__isInterfaceType_initWithNamedFragmentOnLessSpecificMatchingType_hasNoChildTypeCase() throws {
+  func test__children__isInterfaceType_initWithNamedFragmentOnLessSpecificMatchingType_hasNoChildTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -202,7 +202,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let flyingAnimals = self.subject[field: "flyingAnimals"]?.selectionSet
 
@@ -210,7 +210,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(flyingAnimals?.selections.direct?.inlineFragments).to(beEmpty())
   }
 
-  func test__children__initWithNamedFragmentOnUnrelatedType_hasChildTypeCase() throws {
+  func test__children__initWithNamedFragmentOnUnrelatedType_hasChildTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -239,7 +239,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let Fragment_AnimalDetails = try XCTUnwrap(ir.compilationResult[fragment: "AnimalDetails"])
@@ -257,7 +257,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Children Computation - Union Type
 
-  func test__children__givenIsUnionType_withNestedTypeCaseOfObjectType_hasChildrenForTypeCase() throws {
+  func test__children__givenIsUnionType_withNestedTypeCaseOfObjectType_hasChildrenForTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -288,7 +288,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Object_Bird = try XCTUnwrap(schema[object: "Bird"])
     let Union_ClassroomPet = try XCTUnwrap(schema[union: "ClassroomPet"])
@@ -311,7 +311,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Children - Type Cases
 
-  func test__children__givenInlineFragment_onSameType_mergesTypeCaseIn_doesNotHaveTypeCaseChild() throws {
+  func test__children__givenInlineFragment_onSameType_mergesTypeCaseIn_doesNotHaveTypeCaseChild() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -336,7 +336,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let aField = subject[field: "aField"]
 
@@ -344,7 +344,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(aField?.selectionSet?.selections.direct?.inlineFragments).to(beEmpty())
   }
 
-  func test__children__givenInlineFragment_onMatchingType_mergesTypeCaseIn_doesNotHaveTypeCaseChild() throws {
+  func test__children__givenInlineFragment_onMatchingType_mergesTypeCaseIn_doesNotHaveTypeCaseChild() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -374,7 +374,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Scalar_String = try XCTUnwrap(schema[scalar: "String"])
     let Object_B = try XCTUnwrap(schema[object: "B"])
@@ -393,7 +393,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(bField?.selectionSet).to(shallowlyMatch(expected))
   }
 
-  func test__children__givenInlineFragment_onNonMatchingType_doesNotMergeTypeCaseIn_hasChildTypeCase() throws {
+  func test__children__givenInlineFragment_onNonMatchingType_doesNotMergeTypeCaseIn_hasChildTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -423,7 +423,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_A = try XCTUnwrap(schema[interface: "A"])
     let Object_B = try XCTUnwrap(schema[object: "B"])
@@ -453,7 +453,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Children - Group Duplicate Type Cases
 
-  func test__children__givenInlineFragmentsWithSameType_deduplicatesChildren() throws {
+  func test__children__givenInlineFragmentsWithSameType_deduplicatesChildren() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -484,7 +484,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Object_B = try XCTUnwrap(schema[object: "B"])
     let Interface_A = try XCTUnwrap(schema[interface: "InterfaceA"])
@@ -513,7 +513,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(bField_asInterfaceA).to(shallowlyMatch(bField_asA_expected))
   }
 
-  func test__children__givenInlineFragmentsWithDifferentType_hasSeperateChildTypeCases() throws {
+  func test__children__givenInlineFragmentsWithDifferentType_hasSeperateChildTypeCases() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -547,7 +547,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Scalar_String = try XCTUnwrap(schema[scalar: "String"])
     let Field_A: ShallowSelectionMatcher = .field("A", type: .scalar(Scalar_String))
@@ -569,7 +569,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Children - Group Duplicate Fragments
 
-  func test__children__givenDuplicateNamedFragments_onNonMatchingParentType_hasDeduplicatedTypeCaseWithChildFragment() throws {
+  func test__children__givenDuplicateNamedFragments_onNonMatchingParentType_hasDeduplicatedTypeCaseWithChildFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -598,7 +598,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     }
     """
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let InterfaceB = try XCTUnwrap(schema[interface: "InterfaceB"])
     let FragmentB = try XCTUnwrap(ir.compilationResult[fragment: "FragmentB"])
@@ -613,7 +613,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(aField_asInterfaceB?.selections.direct).to(shallowlyMatch([.fragmentSpread(FragmentB)]))
   }
 
-  func test__children__givenTwoNamedFragments_onSameNonMatchingParentType_hasDeduplicatedTypeCaseWithBothChildFragments() throws {
+  func test__children__givenTwoNamedFragments_onSameNonMatchingParentType_hasDeduplicatedTypeCaseWithBothChildFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -648,7 +648,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let InterfaceB = try XCTUnwrap(schema[interface: "InterfaceB"])
     let FragmentB1 = try XCTUnwrap(ir.compilationResult[fragment: "FragmentB1"])
@@ -671,7 +671,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Selections - Group Duplicate Fields
 
-  func test__selections__givenFieldSelectionsWithSameName_scalarType_deduplicatesSelection() throws {
+  func test__selections__givenFieldSelectionsWithSameName_scalarType_deduplicatesSelection() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -697,7 +697,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ]
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let aField = subject[field: "aField"] as? IR.EntityField
 
@@ -705,7 +705,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(aField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
   }
 
-  func test__selections__givenFieldSelectionsWithSameNameDifferentAlias_scalarType_doesNotDeduplicateSelection() throws {
+  func test__selections__givenFieldSelectionsWithSameNameDifferentAlias_scalarType_doesNotDeduplicateSelection() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -732,7 +732,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ]
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let aField = subject[field: "aField"] as? IR.EntityField
 
@@ -740,7 +740,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(aField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
   }
 
-  func test__selections__givenFieldSelectionsWithSameResponseKey_onObjectWithDifferentChildSelections_mergesChildSelectionsIntoOneField() throws {
+  func test__selections__givenFieldSelectionsWithSameResponseKey_onObjectWithDifferentChildSelections_mergesChildSelectionsIntoOneField() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -773,7 +773,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ]
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Object_A = try XCTUnwrap(schema[object: "A"])
 
@@ -787,7 +787,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(aField_a?.selectionSet.selections.direct).to(shallowlyMatch(expectedAFields))
   }
 
-  func test__selections__givenFieldSelectionsWithSameResponseKey_onObjectWithSameAndDifferentChildSelections_mergesChildSelectionsAndDoesNotDuplicateFields() throws {
+  func test__selections__givenFieldSelectionsWithSameResponseKey_onObjectWithSameAndDifferentChildSelections_mergesChildSelectionsAndDoesNotDuplicateFields() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -824,7 +824,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ]
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Object_A = try XCTUnwrap(schema[object: "A"])
 
@@ -840,7 +840,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Selections - Type Cases
 
-  func test__selections__givenInlineFragment_onSameType_mergesTypeCaseIn() throws {
+  func test__selections__givenInlineFragment_onSameType_mergesTypeCaseIn() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -870,7 +870,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ]
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let aField = subject[field: "aField"] as? IR.EntityField
 
@@ -878,7 +878,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(aField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
   }
 
-  func test__selections__givenInlineFragment_onMatchingType_mergesTypeCaseIn() throws {
+  func test__selections__givenInlineFragment_onMatchingType_mergesTypeCaseIn() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -912,7 +912,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ]
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let bField = subject[field: "bField"] as? IR.EntityField
 
@@ -920,7 +920,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(bField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
   }
 
-  func test__selections__givenInlineFragment_onNonMatchingType_doesNotMergeTypeCaseIn() throws {
+  func test__selections__givenInlineFragment_onNonMatchingType_doesNotMergeTypeCaseIn() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -949,7 +949,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let aField = subject[field: "aField"] as? IR.EntityField
     let aField_asB = aField?[as: "B"]
@@ -967,7 +967,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Selections - Group Duplicate Type Cases
 
-  func test__selections__givenInlineFragmentsWithSameInterfaceType_deduplicatesSelection() throws {
+  func test__selections__givenInlineFragmentsWithSameInterfaceType_deduplicatesSelection() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -993,7 +993,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_A = try XCTUnwrap(schema[interface: "A"])
 
@@ -1007,7 +1007,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(bField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
   }
 
-  func test__selections__givenInlineFragmentsWithSameInterfaceType_deduplicatesTypeCaseMergesSelections() throws {
+  func test__selections__givenInlineFragmentsWithSameInterfaceType_deduplicatesTypeCaseMergesSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1034,7 +1034,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let expected: [ShallowSelectionMatcher] = [
       .field("a", type: .string()),
@@ -1047,7 +1047,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(actual?.selections.direct).to(shallowlyMatch(expected))
   }
 
-  func test__selections__givenInlineFragmentsWithSameObjectType_deduplicatesSelection() throws {
+  func test__selections__givenInlineFragmentsWithSameObjectType_deduplicatesSelection() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1073,7 +1073,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Object_A = try XCTUnwrap(schema[object: "A"])
 
@@ -1087,7 +1087,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(bField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
   }
 
-  func test__selections__givenInlineFragmentsWithSameUnionType_deduplicatesSelection() throws {
+  func test__selections__givenInlineFragmentsWithSameUnionType_deduplicatesSelection() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1116,7 +1116,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Union_A = try XCTUnwrap(schema[union: "UnionA"])
 
@@ -1130,7 +1130,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(bField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
   }
 
-  func test__selections__givenInlineFragmentsWithDifferentType_doesNotDeduplicateSelection() throws {
+  func test__selections__givenInlineFragmentsWithDifferentType_doesNotDeduplicateSelection() async throws {
     schemaSDL = """
     type Query {
       objField: [Object!]
@@ -1159,7 +1159,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_A = try XCTUnwrap(schema[interface: "A"])
     let Interface_B = try XCTUnwrap(schema[interface: "B"])
@@ -1175,7 +1175,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(objField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
   }
 
-  func test__selections__givenInlineFragmentsWithSameType_withSameAndDifferentChildSelections_mergesChildSelectionsIntoOneTypeCaseAndDeduplicatesChildSelections() throws {
+  func test__selections__givenInlineFragmentsWithSameType_withSameAndDifferentChildSelections_mergesChildSelectionsIntoOneTypeCaseAndDeduplicatesChildSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1215,7 +1215,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ]
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_B = try XCTUnwrap(schema[interface:"B"])
 
@@ -1229,7 +1229,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Selections - Fragments
 
-  func test__selections__givenNamedFragmentWithSelectionSet_onMatchingParentType_hasFragmentSelection() throws {
+  func test__selections__givenNamedFragmentWithSelectionSet_onMatchingParentType_hasFragmentSelection() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1254,7 +1254,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Object_A = try XCTUnwrap(schema[object: "A"])
 
@@ -1270,7 +1270,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Selections - Group Duplicate Fragments
 
-  func test__selections__givenNamedFragmentsWithSameName_onMatchingParentType_deduplicatesSelection() throws {
+  func test__selections__givenNamedFragmentsWithSameName_onMatchingParentType_deduplicatesSelection() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1296,7 +1296,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Object_A = try XCTUnwrap(schema[object: "A"])
 
@@ -1310,7 +1310,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(aField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
   }
 
-  func test__selections__givenNamedFragmentsWithDifferentNames_onMatchingParentType_doesNotDeduplicateSelection() throws {
+  func test__selections__givenNamedFragmentsWithDifferentNames_onMatchingParentType_doesNotDeduplicateSelection() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1341,7 +1341,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Object_A = try XCTUnwrap(schema[object: "A"])
 
@@ -1356,7 +1356,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(aField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
   }
 
-  func test__selections__givenNamedFragmentsWithSameName_onNonMatchingParentType_deduplicatesSelectionIntoSingleTypeCase() throws {
+  func test__selections__givenNamedFragmentsWithSameName_onNonMatchingParentType_deduplicatesSelectionIntoSingleTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1387,7 +1387,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_B = try XCTUnwrap(schema[interface: "B"])
 
@@ -1403,7 +1403,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(aField?[as: "B"]?.selections.direct).to(shallowlyMatch(expected))
   }
 
-  func test__selections__givenNamedFragmentsWithDifferentNamesAndSameParentType_onNonMatchingParentType_deduplicatesSelectionIntoSingleTypeCaseWithBothFragments() throws {
+  func test__selections__givenNamedFragmentsWithDifferentNamesAndSameParentType_onNonMatchingParentType_deduplicatesSelectionIntoSingleTypeCaseWithBothFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1438,7 +1438,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Fragment_B1 = try XCTUnwrap(ir.compilationResult[fragment: "FragmentB1"])
     let Fragment_B2 = try XCTUnwrap(ir.compilationResult[fragment: "FragmentB2"])
@@ -1456,7 +1456,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(aField?[as: "B"]?.selections.direct).to(shallowlyMatch(expected))
   }
 
-  func test__selections__givenNamedFragmentsWithDifferentNamesAndDifferentParentType_onNonMatchingParentType_doesNotDeduplicate_hasTypeCaseForEachFragment() throws {
+  func test__selections__givenNamedFragmentsWithDifferentNamesAndDifferentParentType_onNonMatchingParentType_doesNotDeduplicate_hasTypeCaseForEachFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1494,7 +1494,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Fragment_B = try XCTUnwrap(ir.compilationResult[fragment: "FragmentB"])
     let Fragment_C = try XCTUnwrap(ir.compilationResult[fragment: "FragmentC"])
@@ -1510,7 +1510,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Selections - Nested Objects
 
-  func test__selections__givenNestedObjectInRootAndTypeCase_doesNotInheritSelectionsFromRoot() throws {
+  func test__selections__givenNestedObjectInRootAndTypeCase_doesNotInheritSelectionsFromRoot() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1547,7 +1547,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let expected: [ShallowSelectionMatcher] = [
       .field("b", type: .integer())
@@ -1561,7 +1561,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: - Merged Selections
 
-  func test__mergedSelections__givenSelectionSetWithSelections_returnsSelections() throws {
+  func test__mergedSelections__givenSelectionSetWithSelections_returnsSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1582,7 +1582,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let expected_direct: [ShallowSelectionMatcher] = [
       .field("a", type: .scalar(.integer()))
@@ -1597,7 +1597,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(aField?.selectionSet.selections.merged).to(shallowlyMatch(expected_merged))
   }
 
-  func test__mergedSelections__givenSelectionSetWithSelectionsAndParentFields_returnsSelfAndParentFields() throws {
+  func test__mergedSelections__givenSelectionSetWithSelectionsAndParentFields_returnsSelfAndParentFields() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1625,7 +1625,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let expected = SelectionsMatcher(
       direct: [
@@ -1649,7 +1649,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Merged Selections - Siblings - Object Type <-> Object Type
 
-  func test__mergedSelections__givenIsObjectType_siblingSelectionSetIsDifferentObjectType_doesNotMergesSiblingSelections() throws {
+  func test__mergedSelections__givenIsObjectType_siblingSelectionSetIsDifferentObjectType_doesNotMergesSiblingSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1684,7 +1684,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let asBirdExpected: [ShallowSelectionMatcher] = [
       .field("wingspan", type: .integer()),
@@ -1706,7 +1706,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Merged Selections - Siblings - Object Type -> Interface Type
 
-  func test__mergedSelections__givenIsObjectType_siblingSelectionSetIsImplementedInterface_mergesSiblingSelections() throws {
+  func test__mergedSelections__givenIsObjectType_siblingSelectionSetIsImplementedInterface_mergesSiblingSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1741,7 +1741,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let asBird = allAnimals?[as: "Bird"]
@@ -1773,7 +1773,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(asPet).to(shallowlyMatch(asPetExpected))
   }
 
-  func test__mergedSelections__givenIsObjectType_siblingSelectionSetIsUnimplementedInterface_doesNotMergeSiblingSelections() throws {
+  func test__mergedSelections__givenIsObjectType_siblingSelectionSetIsUnimplementedInterface_doesNotMergeSiblingSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1824,7 +1824,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     )
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let asBird = allAnimals?[as: "Bird"]
@@ -1837,7 +1837,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Merged Selections - Siblings - Interface Type -> Interface Type
 
-  func test__mergedSelections__givenIsInterfaceType_siblingSelectionSetIsImplementedInterface_mergesSiblingSelections() throws {
+  func test__mergedSelections__givenIsInterfaceType_siblingSelectionSetIsImplementedInterface_mergesSiblingSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1872,7 +1872,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let asHousePet = allAnimals?[as: "HousePet"]
@@ -1903,7 +1903,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(asPet).to(shallowlyMatch(asPetExpected))
   }
 
-  func test__mergedSelections__givenIsInterfaceType_siblingSelectionSetIsUnimplementedInterface_doesNotMergeSiblingSelections() throws {
+  func test__mergedSelections__givenIsInterfaceType_siblingSelectionSetIsUnimplementedInterface_doesNotMergeSiblingSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1953,7 +1953,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     )
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let asHousePet = allAnimals?[as: "HousePet"]
@@ -1966,7 +1966,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: - Merged Selections - Parent's Sibling
 
-  func test__mergedSelections__givenIsNestedInterfaceType_uncleSelectionSetIsTheSameInterfaceType_mergesUncleSelections() throws {
+  func test__mergedSelections__givenIsNestedInterfaceType_uncleSelectionSetIsTheSameInterfaceType_mergesUncleSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2003,7 +2003,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let asWarmBlooded_asPet_actual = allAnimals?[as:"WarmBlooded"]?[as: "Pet"]
@@ -2034,7 +2034,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(asPet_actual).to(shallowlyMatch(onPet_expected))
   }
 
-  func test__mergedSelections__givenIsObjectInInterfaceType_uncleSelectionSetIsMatchingInterfaceType_mergesUncleSelections() throws {
+  func test__mergedSelections__givenIsObjectInInterfaceType_uncleSelectionSetIsMatchingInterfaceType_mergesUncleSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2077,7 +2077,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let asWarmBlooded_asBird_actual = allAnimals?[as: "WarmBlooded"]?[as: "Bird"]
@@ -2108,7 +2108,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(asPet_actual).to(shallowlyMatch(onPet_expected))
   }
 
-  func test__mergedSelections__givenIsObjectInInterfaceType_uncleSelectionSetIsNonMatchingInterfaceType_doesNotMergeUncleSelections() throws {
+  func test__mergedSelections__givenIsObjectInInterfaceType_uncleSelectionSetIsNonMatchingInterfaceType_doesNotMergeUncleSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2149,7 +2149,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let asWarmBlooded_asBird_actual = allAnimals?[as: "WarmBlooded"]?[as: "Bird"]
@@ -2178,7 +2178,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Merged Selections - Parent's Sibling - Object Type <-> Object in Union Type
 
-  func test__mergedSelections__givenIsObjectType_siblingSelectionSetIsUnionTypeWithNestedTypeCaseOfSameObjectType_mergesSiblingChildSelectionsInBothDirections() throws {
+  func test__mergedSelections__givenIsObjectType_siblingSelectionSetIsUnionTypeWithNestedTypeCaseOfSameObjectType_mergesSiblingChildSelectionsInBothDirections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2213,7 +2213,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let asBirdActual = allAnimals?[as: "Bird"]
@@ -2248,7 +2248,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(asClassroomPet_asBirdActual).to(shallowlyMatch(asClassroomPet_asBirdExpected))
   }
 
-  func test__mergedSelections__givenIsObjectType_siblingSelectionSetIsUnionTypeWithNestedTypeCaseOfDifferentObjectType_doesNotMergeSiblingChildSelectionsInEitherDirection() throws {
+  func test__mergedSelections__givenIsObjectType_siblingSelectionSetIsUnionTypeWithNestedTypeCaseOfDifferentObjectType_doesNotMergeSiblingChildSelectionsInEitherDirection() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2303,7 +2303,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     )
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
 
@@ -2317,7 +2317,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Merged Selections - Parent's Sibling - Interface in Union Type
 
-  func test__mergedSelections__givenInterfaceTypeInUnion_uncleSelectionSetIsMatchingInterfaceType_mergesUncleSelections() throws {
+  func test__mergedSelections__givenInterfaceTypeInUnion_uncleSelectionSetIsMatchingInterfaceType_mergesUncleSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2357,7 +2357,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let asWarmBlooded_actual = allAnimals?[as: "WarmBlooded"]
@@ -2388,7 +2388,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(asClassroomPet_asWarmBlooded_actual).to(shallowlyMatch(asClassroomPet_asWarmBlooded_expected))
   }
 
-  func test__mergedSelections__givenInterfaceTypeInUnion_uncleSelectionSetIsChildMatchingInterfaceType_mergesUncleSelections() throws {
+  func test__mergedSelections__givenInterfaceTypeInUnion_uncleSelectionSetIsChildMatchingInterfaceType_mergesUncleSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2435,7 +2435,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let asPet_actual = allAnimals?[as: "Pet"]
@@ -2466,7 +2466,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(asClassroomPet_asWarmBloodedPet_actual).to(shallowlyMatch(asClassroomPet_asWarmBloodedPet_expected))
   }
 
-  func test__mergedSelections__givenInterfaceTypeInUnion_uncleSelectionSetIsNonMatchingInterfaceType_doesNotMergesUncleSelections() throws {
+  func test__mergedSelections__givenInterfaceTypeInUnion_uncleSelectionSetIsNonMatchingInterfaceType_doesNotMergesUncleSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2513,7 +2513,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
 
@@ -2544,7 +2544,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: - Merged Selections - Child Fragment
 
-  func test__mergedSelections__givenChildIsNamedFragmentOnSameType_mergesFragmentFieldsAndMaintainsFragment() throws {
+  func test__mergedSelections__givenChildIsNamedFragmentOnSameType_mergesFragmentFieldsAndMaintainsFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2569,7 +2569,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let Fragment_AnimalDetails = try XCTUnwrap(allAnimals?[fragment: "AnimalDetails"])
@@ -2591,7 +2591,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(actual).to(shallowlyMatch(expected))
   }
 
-  func test__mergedSelections__givenChildIsNamedFragmentOnSameType_fragmentSpreadTypePathIsCorrect() throws {
+  func test__mergedSelections__givenChildIsNamedFragmentOnSameType_fragmentSpreadTypePathIsCorrect() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2616,7 +2616,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = subject[field: "allAnimals"]?[fragment: "AnimalDetails"]
 
@@ -2640,7 +2640,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(actual?.typeInfo.scopePath).to(equal(expectedTypePath))
   }
 
-  func test__mergedSelections__givenChildIsNamedFragmentOnMoreSpecificType_doesNotMergeFragmentFields_hasTypeCaseForNamedFragmentType() throws {
+  func test__mergedSelections__givenChildIsNamedFragmentOnMoreSpecificType_doesNotMergeFragmentFields_hasTypeCaseForNamedFragmentType() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2669,7 +2669,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let Object_Bird = try XCTUnwrap(schema[object: "Bird"])
@@ -2706,7 +2706,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(actual?[as: "Bird"]).to(shallowlyMatch(allAnimals_asBird_expected))
   }
 
-  func test__mergedSelections__givenChildIsNamedFragmentOnMultipleNestedMoreSpecificTypes_doesNotMergeFragmentFields_hasTypeCaseForNamedFragmentType() throws {
+  func test__mergedSelections__givenChildIsNamedFragmentOnMultipleNestedMoreSpecificTypes_doesNotMergeFragmentFields_hasTypeCaseForNamedFragmentType() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2741,7 +2741,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let Interface_Pet = try XCTUnwrap(schema[interface: "Pet"])
@@ -2789,7 +2789,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(actual?[as: "Pet"]?[as: "Bird"]).to(shallowlyMatch(allAnimals_asPet_asBird_expected))
   }
 
-  func test__mergedSelections__givenIsObjectType_childIsNamedFragmentOnLessSpecificMatchingType_mergesFragmentFields() throws {
+  func test__mergedSelections__givenIsObjectType_childIsNamedFragmentOnLessSpecificMatchingType_mergesFragmentFields() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2818,7 +2818,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
 
     let birds = subject[field: "birds"]
@@ -2842,7 +2842,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(actual).to(shallowlyMatch(expected))
   }
 
-  func test__mergedSelections__givenIsInterfaceType_childIsNamedFragmentOnLessSpecificMatchingType_mergesFragmentFields() throws {
+  func test__mergedSelections__givenIsInterfaceType_childIsNamedFragmentOnLessSpecificMatchingType_mergesFragmentFields() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2871,7 +2871,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
 
     let flyingAnimals = subject[field: "flyingAnimals"]
@@ -2895,7 +2895,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(actual).to(shallowlyMatch(expected))
   }
 
-  func test__mergedSelections__givenChildIsNamedFragmentOnUnrelatedType_doesNotMergeFragmentFields_hasTypeCaseForNamedFragmentType() throws {
+  func test__mergedSelections__givenChildIsNamedFragmentOnUnrelatedType_doesNotMergeFragmentFields_hasTypeCaseForNamedFragmentType() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2928,7 +2928,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Object_Bird = try XCTUnwrap(schema[object: "Bird"])
 
@@ -2951,7 +2951,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       .to(shallowlyMatch([.fragmentSpread(Fragment_BirdDetails)]))
   }
 
-  func test__mergedSelections__givenNestedNamedFragmentWithNonMatchingParentType_otherNestedNamedFragmentWithNonMatchingParentTypeWithInlineFragmentOnTypeOfFirstFragment_hasFragmentMergedSelections() throws {
+  func test__mergedSelections__givenNestedNamedFragmentWithNonMatchingParentType_otherNestedNamedFragmentWithNonMatchingParentTypeWithInlineFragmentOnTypeOfFirstFragment_hasFragmentMergedSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -3013,7 +3013,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
     
     let Fragment_FragmentB = try XCTUnwrap(ir.compilationResult[fragment: "FragmentB"])
     let Interface_BInterface = try XCTUnwrap(schema[interface: "BInterface"])
@@ -3054,7 +3054,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: - Nested Entity Field - Merged Selections
 
-  func test__mergedSelections__givenEntityFieldOnObjectAndTypeCase_withOtherNestedFieldInTypeCase_mergesParentFieldIntoNestedSelectionsInTypeCase() throws {
+  func test__mergedSelections__givenEntityFieldOnObjectAndTypeCase_withOtherNestedFieldInTypeCase_mergesParentFieldIntoNestedSelectionsInTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -3091,7 +3091,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let allAnimals_height_actual = allAnimals?[field: "height"]?.selectionSet
@@ -3122,7 +3122,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(allAnimals_asPet_height_actual).to(shallowlyMatch(allAnimals_asPet_height_expected))
   }
 
-  func test__mergedSelections__givenEntityFieldOnObjectWithSelectionSetIncludingSameFieldNameAndDifferentSelections_doesNotMergeFieldIntoNestedFieldsSelections() throws {
+  func test__mergedSelections__givenEntityFieldOnObjectWithSelectionSetIncludingSameFieldNameAndDifferentSelections_doesNotMergeFieldIntoNestedFieldsSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -3156,7 +3156,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
 
@@ -3184,7 +3184,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(predators_height_actual).to(shallowlyMatch(predators_expected))
   }
 
-  func test__mergedSelections__givenEntityFieldOnInterfaceAndTypeCase_withOtherNestedFieldInTypeCase_mergesParentFieldIntoNestedSelectionsInObjectTypeCaseMatchingInterfaceTypeCase() throws {
+  func test__mergedSelections__givenEntityFieldOnInterfaceAndTypeCase_withOtherNestedFieldInTypeCase_mergesParentFieldIntoNestedSelectionsInObjectTypeCaseMatchingInterfaceTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -3231,7 +3231,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let allAnimals_asCat_height_actual = allAnimals?[as: "Cat"]?[field: "height"]?.selectionSet
@@ -3252,7 +3252,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(allAnimals_asCat_height_actual).to(shallowlyMatch(allAnimals_asCat_height_expected))
   }
 
-  func test__mergedSelections__givenEntityFieldOnInterfaceAndTypeCase_withOtherNestedFieldInTypeCase_doesNotMergeParentFieldIntoNestedSelectionsInObjectTypeCaseNotMatchingInterfaceTypeCase() throws {
+  func test__mergedSelections__givenEntityFieldOnInterfaceAndTypeCase_withOtherNestedFieldInTypeCase_doesNotMergeParentFieldIntoNestedSelectionsInObjectTypeCaseNotMatchingInterfaceTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -3299,7 +3299,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
 
@@ -3319,7 +3319,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(allAnimals_asElephant_height_actual).to(shallowlyMatch(allAnimals_asElephant_height_expected))
   }
 
-  func test__mergedSelections__givenEntityFieldOnEntityWithDeepNestedTypeCases_eachTypeCaseHasDifferentNestedEntityFields_mergesFieldIntoMatchingNestedTypeCases() throws {
+  func test__mergedSelections__givenEntityFieldOnEntityWithDeepNestedTypeCases_eachTypeCaseHasDifferentNestedEntityFields_mergesFieldIntoMatchingNestedTypeCases() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -3374,7 +3374,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let allAnimals_height = allAnimals?[field: "height"]
@@ -3451,7 +3451,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       .to(shallowlyMatch(allAnimals_asWarmBlooded_height_expected))
   }
 
-  func test__mergedSelections__givenSiblingTypeCasesAndNestedEntityTypeCases_onlyNestedEntityFieldMergeTypeCases() throws {
+  func test__mergedSelections__givenSiblingTypeCasesAndNestedEntityTypeCases_onlyNestedEntityFieldMergeTypeCases() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -3515,7 +3515,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
     
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
 
@@ -3542,7 +3542,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(allAnimals?[as: "Pet"]?[field: "predator"]?[as: "Cat"]?[as: "Pet"]).to(beNil())
   }
 
-  func test__mergedSelections__givenSiblingTypeCasesAndNestedEntityTypeCases_withNamedFragments_mergesFragmentsIntoNestedEntityTypeCases() throws {
+  func test__mergedSelections__givenSiblingTypeCasesAndNestedEntityTypeCases_withNamedFragments_mergesFragmentsIntoNestedEntityTypeCases() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -3622,7 +3622,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
     let asCat = allAnimals?[as: "Cat"]
@@ -3654,7 +3654,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: - Nested Entity Field - Merged Selections - Calculate Type Path
 
-  func test__mergedSelections__givenEntityFieldOnTypeWithOnlyMergedSelections_mergedOnlyEntityFieldHasCorrectTypePath() throws {
+  func test__mergedSelections__givenEntityFieldOnTypeWithOnlyMergedSelections_mergedOnlyEntityFieldHasCorrectTypePath() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -3693,7 +3693,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
 
@@ -3741,7 +3741,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(allAnimals_asCat_predator_height_actual?.scopePath).to(equal(allAnimals_asCat_predator_height_expectedTypePath))
   }
 
-  func test__mergedSelections__givenEntityFieldInMatchingTypeCaseOnTypeWithOnlyMergedSelections_mergedOnlyEntityFieldHasCorrectTypePath() throws {
+  func test__mergedSelections__givenEntityFieldInMatchingTypeCaseOnTypeWithOnlyMergedSelections_mergedOnlyEntityFieldHasCorrectTypePath() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -3792,7 +3792,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = subject[field: "allAnimals"]
 
@@ -3852,7 +3852,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: - Nested Entity In Fragments - Merged Selections
 
-  func test__mergedSelections__givenEntityField_DirectSelectionsAndMergedFromNestedEntityInFragmentAndFragmentInFragment_nestedEntityFieldHasFragmentMergedSources() throws {
+  func test__mergedSelections__givenEntityField_DirectSelectionsAndMergedFromNestedEntityInFragmentAndFragmentInFragment_nestedEntityFieldHasFragmentMergedSources() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -3896,7 +3896,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let Object_Height = try XCTUnwrap(schema[object: "Height"])
@@ -3966,7 +3966,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       .to(shallowlyMatch(predator_height_expected))
   }
 
-  func test__mergedSelections__givenEntityFieldMergedFromNestedFragmentInTypeCase_withNoOtherMergedFields_hasNestedEntityMergedFields() throws {
+  func test__mergedSelections__givenEntityFieldMergedFromNestedFragmentInTypeCase_withNoOtherMergedFields_hasNestedEntityMergedFields() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4012,7 +4012,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -4087,7 +4087,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: - Nested Entity In Fragments - Merged Sources
 
-  func test__mergedSources__givenEntityField_DirectSelectonsAndMergedFromNestedEntityInFragment_nestedEntityFieldHasFragmentMergedSources() throws {
+  func test__mergedSources__givenEntityField_DirectSelectonsAndMergedFromNestedEntityInFragment_nestedEntityFieldHasFragmentMergedSources() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4125,7 +4125,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """    
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals_predator = try XCTUnwrap(
       subject?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
@@ -4146,7 +4146,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: - Referenced Fragments
 
-  func test__referencedFragments__givenUsesNoFragments_isEmpty() throws {
+  func test__referencedFragments__givenUsesNoFragments_isEmpty() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4167,13 +4167,13 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     expect(self.computedReferencedFragments).to(beEmpty())
   }
 
-  func test__referencedFragments__givenUsesFragmentAtRoot_includesFragment() throws {
+  func test__referencedFragments__givenUsesFragmentAtRoot_includesFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4198,17 +4198,17 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
-    let expected: OrderedSet = [
-      try ir.builtFragments["QueryDetails"].xctUnwrapped()
+    let expected: OrderedSet = await [
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "QueryDetails").xctUnwrapped()
     ]
 
     // then
     expect(self.computedReferencedFragments).to(equal(expected))
   }
 
-  func test__referencedFragments__givenUsesFragmentOnEntityField_includesFragment() throws {
+  func test__referencedFragments__givenUsesFragmentOnEntityField_includesFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4233,17 +4233,17 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
-    let expected: OrderedSet = [
-      try ir.builtFragments["AnimalDetails"].xctUnwrapped()
+    let expected: OrderedSet = await [
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalDetails").xctUnwrapped()
     ]
 
     // then
     expect(self.computedReferencedFragments).to(equal(expected))
   }
 
-  func test__referencedFragments__givenUsesMultipleFragmentsOnEntityField_includesFragments() throws {
+  func test__referencedFragments__givenUsesMultipleFragmentsOnEntityField_includesFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4274,18 +4274,18 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
-    let expected: OrderedSet = [
-      try ir.builtFragments["AnimalDetails"].xctUnwrapped(),
-      try ir.builtFragments["AnimalName"].xctUnwrapped(),
+    let expected: OrderedSet = await [
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalDetails").xctUnwrapped(),
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalName").xctUnwrapped(),
     ]
 
     // then
     expect(self.computedReferencedFragments).to(equal(expected))
   }
 
-  func test__referencedFragments__givenUsesFragmentsReferencingOtherFragment_includesBothFragments() throws {
+  func test__referencedFragments__givenUsesFragmentsReferencingOtherFragment_includesBothFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4316,11 +4316,11 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
-    let expected: OrderedSet = [
-      try ir.builtFragments["AnimalDetails"].xctUnwrapped(),
-      try ir.builtFragments["AnimalName"].xctUnwrapped(),
+    let expected: OrderedSet = await [
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalDetails").xctUnwrapped(),
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalName").xctUnwrapped(),
     ]
 
     // then
@@ -4329,7 +4329,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: - Deferred Fragments - hasDeferredFragments property
 
-  func test__deferredFragments__givenNoDeferredFragment_hasDeferredFragmentsFalse() throws {
+  func test__deferredFragments__givenNoDeferredFragment_hasDeferredFragmentsFalse() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4363,13 +4363,13 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     expect(self.result.containsDeferredFragment).to(beFalse())
   }
 
-  func test__deferredFragments__givenDeferredInlineFragment_hasDeferredFragmentsTrue() throws {
+  func test__deferredFragments__givenDeferredInlineFragment_hasDeferredFragmentsTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4403,13 +4403,13 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentWithCondition_hasDeferredFragmentsTrue() throws {
+  func test__deferredFragments__givenDeferredInlineFragmentWithCondition_hasDeferredFragmentsTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4443,13 +4443,13 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentWithConditionFalse_hasDeferredFragmentsFalse() throws {
+  func test__deferredFragments__givenDeferredInlineFragmentWithConditionFalse_hasDeferredFragmentsFalse() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4483,13 +4483,13 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     expect(self.result.containsDeferredFragment).to(beFalse())
   }
 
-  func test__deferredFragments__givenDeferredNamedFragment_onDifferentTypeCase_hasDeferredFragmentsTrue() throws {
+  func test__deferredFragments__givenDeferredNamedFragment_onDifferentTypeCase_hasDeferredFragmentsTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4522,13 +4522,13 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
-  func test__deferredFragments__givenDeferredInlineFragment_withinNamedFragment_hasDeferredFragmentsTrue() throws {
+  func test__deferredFragments__givenDeferredInlineFragment_withinNamedFragment_hasDeferredFragmentsTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4566,13 +4566,13 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
-  func test__deferredFragments__givenDeferredNamedFragment_withSelectionOnDifferentTypeCase_hasDeferredFragmentsTrue() throws {
+  func test__deferredFragments__givenDeferredNamedFragment_withSelectionOnDifferentTypeCase_hasDeferredFragmentsTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4617,7 +4617,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     expect(self.result.containsDeferredFragment).to(beTrue())
@@ -4625,7 +4625,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Deferred Fragments - Inline Fragments
 
-  func test__deferredFragments__givenDeferredInlineFragmentWithoutTypeCase_buildsDeferredInlineFragment() throws {
+  func test__deferredFragments__givenDeferredInlineFragmentWithoutTypeCase_buildsDeferredInlineFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4656,7 +4656,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Scalar_String = try XCTUnwrap(schema[scalar: "String"])
@@ -4675,7 +4675,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentOnSameTypeCase_buildsDeferredInlineFragment() throws {
+  func test__deferredFragments__givenDeferredInlineFragmentOnSameTypeCase_buildsDeferredInlineFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4701,7 +4701,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Scalar_String = try XCTUnwrap(schema[scalar: "String"])
@@ -4720,7 +4720,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentOnDifferentTypeCase_buildsDeferredInlineFragment() throws {
+  func test__deferredFragments__givenDeferredInlineFragmentOnDifferentTypeCase_buildsDeferredInlineFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4754,7 +4754,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Scalar_String = try XCTUnwrap(schema[scalar: "String"])
@@ -4806,7 +4806,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentWithVariableCondition_buildsDeferredInlineFragmentWithVariable() throws {
+  func test__deferredFragments__givenDeferredInlineFragmentWithVariableCondition_buildsDeferredInlineFragmentWithVariable() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4840,7 +4840,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Scalar_String = try XCTUnwrap(schema[scalar: "String"])
@@ -4892,7 +4892,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentWithTrueCondition_buildsDeferredInlineFragment() throws {
+  func test__deferredFragments__givenDeferredInlineFragmentWithTrueCondition_buildsDeferredInlineFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4926,7 +4926,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Scalar_String = try XCTUnwrap(schema[scalar: "String"])
@@ -4978,7 +4978,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentWithFalseCondition_doesNotBuildDeferredInlineFragment() throws {
+  func test__deferredFragments__givenDeferredInlineFragmentWithFalseCondition_doesNotBuildDeferredInlineFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -5012,7 +5012,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Scalar_String = try XCTUnwrap(schema[scalar: "String"])
@@ -5051,7 +5051,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(allAnimals_asDog_deferredAsRoot).to(beNil())
   }
 
-  func test__deferredFragments__givenSiblingDeferredInlineFragmentsOnSameTypeCase_doesNotMergeDeferredFragments() throws {
+  func test__deferredFragments__givenSiblingDeferredInlineFragmentsOnSameTypeCase_doesNotMergeDeferredFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -5088,7 +5088,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Scalar_String = try XCTUnwrap(schema[scalar: "String"])
@@ -5157,7 +5157,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenSiblingDeferredInlineFragmentsOnDifferentTypeCase_doesNotMergeDeferredFragments() throws {
+  func test__deferredFragments__givenSiblingDeferredInlineFragmentsOnDifferentTypeCase_doesNotMergeDeferredFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -5192,7 +5192,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -5252,7 +5252,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentWithSiblingOnSameTypeCase_doesNotMergeDeferredFragment() throws {
+  func test__deferredFragments__givenDeferredInlineFragmentWithSiblingOnSameTypeCase_doesNotMergeDeferredFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -5287,7 +5287,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -5341,7 +5341,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentWithSiblingOnDifferentTypeCase_doesNotMergeDeferredFragment() throws {
+  func test__deferredFragments__givenDeferredInlineFragmentWithSiblingOnDifferentTypeCase_doesNotMergeDeferredFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -5383,7 +5383,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -5452,7 +5452,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenNestedDeferredInlineFragments_buildsNestedDeferredFragments_doesNotMergeDeferredFragments() throws {
+  func test__deferredFragments__givenNestedDeferredInlineFragments_buildsNestedDeferredFragments_doesNotMergeDeferredFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -5496,7 +5496,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let Object_Dog = try XCTUnwrap(schema[object: "Dog"])
@@ -5569,7 +5569,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Deferred Fragments - Inline Fragments (with @include/@skip)
 
-  func test__deferredFragments__givenBothDeferAndIncludeDirectives_onSameTypeCase_buildsInclusionTypeCaseWithNestedDeferredInlineFragment() throws {
+  func test__deferredFragments__givenBothDeferAndIncludeDirectives_onSameTypeCase_buildsInclusionTypeCaseWithNestedDeferredInlineFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -5595,7 +5595,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -5630,7 +5630,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenBothDeferAndIncludeDirectives_directivesOrderShouldNotAffectGeneratedFragments() throws {
+  func test__deferredFragments__givenBothDeferAndIncludeDirectives_directivesOrderShouldNotAffectGeneratedFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -5668,14 +5668,14 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     let operations = ["IncludeFirst", "DeferFirst"]
 
-    ir = try .mock(schema: schemaSDL, document: document)
+    ir = try await .mock(schema: schemaSDL, document: document)
 
     for operationName in operations {
       operation = try XCTUnwrap(ir.compilationResult.operations.first(
         where: { $0.name == operationName }
       ))
 
-      result = IR.RootFieldBuilder.buildRootEntityField(
+      result = await IR.RootFieldBuilder.buildRootEntityField(
         forRootField: .mock(
           "query",
           type: .nonNull(.entity(operation.rootType)),
@@ -5718,7 +5718,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     }
   }
 
-  func test__deferredFragments__givenBothDeferAndIncludeDirectives_onDifferentTypeCases_shouldNotNestFragments() throws {
+  func test__deferredFragments__givenBothDeferAndIncludeDirectives_onDifferentTypeCases_shouldNotNestFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -5754,7 +5754,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -5823,7 +5823,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenBothDeferAndSkipDirectives_onSameTypeCase_buildsInclusionTypeCaseWithNestedDeferredInlineFragment() throws {
+  func test__deferredFragments__givenBothDeferAndSkipDirectives_onSameTypeCase_buildsInclusionTypeCaseWithNestedDeferredInlineFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -5849,7 +5849,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -5884,7 +5884,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenBothDeferAndSkipDirectives_directivesOrderShouldNotAffectGeneratedFragments() throws {
+  func test__deferredFragments__givenBothDeferAndSkipDirectives_directivesOrderShouldNotAffectGeneratedFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -5922,14 +5922,14 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     let operations = ["IncludeFirst", "DeferFirst"]
 
-    ir = try .mock(schema: schemaSDL, document: document)
+    ir = try await .mock(schema: schemaSDL, document: document)
 
     for operationName in operations {
       operation = try XCTUnwrap(ir.compilationResult.operations.first(
         where: { $0.name == operationName }
       ))
 
-      result = IR.RootFieldBuilder.buildRootEntityField(
+      result = await IR.RootFieldBuilder.buildRootEntityField(
         forRootField: .mock(
           "query",
           type: .nonNull(.entity(operation.rootType)),
@@ -5972,7 +5972,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     }
   }
 
-  func test__deferredFragments__givenBothDeferAndSkipDirectives_onDifferentTypeCases_shouldNotNestFragments() throws {
+  func test__deferredFragments__givenBothDeferAndSkipDirectives_onDifferentTypeCases_shouldNotNestFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -6008,7 +6008,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -6079,7 +6079,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Deferred Fragments - Named Fragments
 
-  func test__deferredFragments__givenDeferredNamedFragmentOnSameTypeCase_buildsDeferredNamedFragment() throws {
+  func test__deferredFragments__givenDeferredNamedFragmentOnSameTypeCase_buildsDeferredNamedFragment() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -6107,14 +6107,15 @@ class IRRootFieldBuilderTests: XCTestCase {
       """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let Fragment_AnimalFragment = try XCTUnwrap(ir.compilationResult[fragment: "AnimalFragment"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let animalFragment = ir.builtFragments["AnimalFragment"]
+    let animalFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "AnimalFragment").xctUnwrapped()
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6126,7 +6127,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(animalFragment?.rootField.selectionSet).to(shallowlyMatch(
+    expect(animalFragment.rootField.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Interface_Animal,
         directSelections: [
@@ -6136,7 +6137,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenDeferredNamedFragmentOnDifferentTypeCase_buildsDeferredNamedFragment() throws {
+  func test__deferredFragments__givenDeferredNamedFragmentOnDifferentTypeCase_buildsDeferredNamedFragment() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -6169,7 +6170,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -6178,7 +6179,8 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let dogFragment = ir.builtFragments["DogFragment"]
+    let dogFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "DogFragment").xctUnwrapped()
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6205,7 +6207,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(dogFragment?.rootField.selectionSet).to(shallowlyMatch(
+    expect(dogFragment.rootField.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
@@ -6215,7 +6217,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenDeferredNamedFragmentWithVariableCondition_buildsDeferredNamedFragmentWithVariable() throws {
+  func test__deferredFragments__givenDeferredNamedFragmentWithVariableCondition_buildsDeferredNamedFragmentWithVariable() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -6248,7 +6250,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -6257,7 +6259,9 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let dogFragment = ir.builtFragments["DogFragment"]
+    let dogFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "DogFragment").xctUnwrapped()
+
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6284,7 +6288,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(dogFragment?.rootField.selectionSet).to(shallowlyMatch(
+    expect(dogFragment.rootField.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
@@ -6294,7 +6298,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenDeferredNamedFragmentWithTrueCondition_buildsDeferredNamedFragment() throws {
+  func test__deferredFragments__givenDeferredNamedFragmentWithTrueCondition_buildsDeferredNamedFragment() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -6327,7 +6331,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -6336,7 +6340,8 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let dogFragment = ir.builtFragments["DogFragment"]
+    let dogFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "DogFragment").xctUnwrapped()
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6363,7 +6368,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(dogFragment?.rootField.selectionSet).to(shallowlyMatch(
+    expect(dogFragment.rootField.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
@@ -6373,7 +6378,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenDeferredNamedFragmentWithFalseCondition_doesNotBuildDeferredNamedFragment() throws {
+  func test__deferredFragments__givenDeferredNamedFragmentWithFalseCondition_doesNotBuildDeferredNamedFragment() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -6406,7 +6411,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -6444,7 +6449,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenDeferredInlineFragment_insideNamedFragment_buildsDeferredInlineFragment_insideNamedFragment() throws {
+  func test__deferredFragments__givenDeferredInlineFragment_insideNamedFragment_buildsDeferredInlineFragment_insideNamedFragment() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -6479,7 +6484,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -6487,8 +6492,9 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let dogFragment = ir.builtFragments["DogFragment"]
-    let dogFragment_asDog_deferredAsRoot = dogFragment?[as: "Dog", deferred: .init(label: "root")]
+    let dogFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "DogFragment").xctUnwrapped()
+    let dogFragment_asDog_deferredAsRoot = dogFragment[as: "Dog", deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6515,7 +6521,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(dogFragment?.rootField.selectionSet).to(shallowlyMatch(
+    expect(dogFragment.rootField.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
@@ -6534,7 +6540,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentOnDifferentTypeCase_insideNamedFragment_buildsDeferredInlineFragment_insideNamedFragment() throws {
+  func test__deferredFragments__givenDeferredInlineFragmentOnDifferentTypeCase_insideNamedFragment_buildsDeferredInlineFragment_insideNamedFragment() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -6569,15 +6575,16 @@ class IRRootFieldBuilderTests: XCTestCase {
       """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let Object_Dog = try XCTUnwrap(schema[object: "Dog"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let dogFragment = ir.builtFragments["DogFragment"]
-    let dogFragment_asDog = dogFragment?[as: "Dog"]
+    let dogFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "DogFragment").xctUnwrapped()
+    let dogFragment_asDog = dogFragment[as: "Dog"]
     let dogFragment_asDog_deferredAsRoot = dogFragment_asDog?[as: "Dog", deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
@@ -6611,7 +6618,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: Deferred Fragments - Named Fragments (with @include/@skip)
 
-  func test__deferredFragments__givenBothDeferAndIncludeDirectives_onSameNamedFragment_buildsNestedDeferredNamedFragment() throws {
+  func test__deferredFragments__givenBothDeferAndIncludeDirectives_onSameNamedFragment_buildsNestedDeferredNamedFragment() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -6639,7 +6646,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -6647,7 +6654,8 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_ifA = allAnimals?[as: "Animal", if: "a"]
-    let animalFragment = ir.builtFragments["AnimalFragment"]
+    let animalFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "AnimalFragment").xctUnwrapped()
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6675,7 +6683,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(animalFragment?.rootField.selectionSet).to(shallowlyMatch(
+    expect(animalFragment.rootField.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Interface_Animal,
         directSelections: [
@@ -6685,7 +6693,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenBothDeferAndIncludeDirectives_onDifferentNamedFragment_shouldNotNestFragment() throws {
+  func test__deferredFragments__givenBothDeferAndIncludeDirectives_onDifferentNamedFragment_shouldNotNestFragment() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -6725,7 +6733,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -6736,10 +6744,12 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_animalFragment = allAnimals?[fragment: "AnimalFragment"]
     let allAnimals_ifA = allAnimals?[if: "a"]
-    let animalFragment = ir.builtFragments["AnimalFragment"]
+    let animalFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "AnimalFragment").xctUnwrapped()
 
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let dogFragment = ir.builtFragments["DogFragment"]
+    let dogFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "DogFragment").xctUnwrapped()
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6776,7 +6786,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(animalFragment?.rootField.selectionSet).to(shallowlyMatch(
+    expect(animalFragment.rootField.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Interface_Animal,
         directSelections: [
@@ -6801,7 +6811,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(dogFragment?.rootField.selectionSet).to(shallowlyMatch(
+    expect(dogFragment.rootField.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [
@@ -6811,7 +6821,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenBothDeferAndSkipDirectives_onSameNamedFragment_buildsNestedDeferredNamedFragment() throws {
+  func test__deferredFragments__givenBothDeferAndSkipDirectives_onSameNamedFragment_buildsNestedDeferredNamedFragment() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -6839,7 +6849,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -6847,7 +6857,8 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_ifA = allAnimals?[as: "Animal", if: !"a"]
-    let animalFragment = ir.builtFragments["AnimalFragment"]
+    let animalFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "AnimalFragment").xctUnwrapped()
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6875,7 +6886,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(animalFragment?.rootField.selectionSet).to(shallowlyMatch(
+    expect(animalFragment.rootField.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Interface_Animal,
         directSelections: [
@@ -6885,7 +6896,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
-  func test__deferredFragments__givenBothDeferAndSkipDirectives_onDifferentNamedFragment_shouldNotNestFragment() throws {
+  func test__deferredFragments__givenBothDeferAndSkipDirectives_onDifferentNamedFragment_shouldNotNestFragment() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -6925,7 +6936,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     // then
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -6936,10 +6947,12 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_animalFragment = allAnimals?[fragment: "AnimalFragment"]
     let allAnimals_ifA = allAnimals?[if: !"a"]
-    let animalFragment = ir.builtFragments["AnimalFragment"]
+    let animalFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "AnimalFragment").xctUnwrapped()
 
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let dogFragment = ir.builtFragments["DogFragment"]
+    let dogFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "DogFragment").xctUnwrapped()
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6976,7 +6989,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(animalFragment?.rootField.selectionSet).to(shallowlyMatch(
+    expect(animalFragment.rootField.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Interface_Animal,
         directSelections: [
@@ -7001,7 +7014,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(dogFragment?.rootField.selectionSet).to(shallowlyMatch(
+    expect(dogFragment.rootField.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
         parentType: Object_Dog,
         directSelections: [

@@ -10,7 +10,7 @@ class IRCustomScalarTests: XCTestCase {
     let scalar = GraphQLScalarType.string()
 
     // when
-    let subject = IR.Schema.ReferencedTypes.init([scalar])
+    let subject = IR.Schema.ReferencedTypes.init([scalar], schemaRootTypes: .mock())
 
     // then
     expect(subject.scalars).to(equal([scalar]))
@@ -22,7 +22,7 @@ class IRCustomScalarTests: XCTestCase {
     let scalar = GraphQLScalarType.integer()
 
     // when
-    let subject = IR.Schema.ReferencedTypes.init([scalar])
+    let subject = IR.Schema.ReferencedTypes.init([scalar], schemaRootTypes: .mock())
 
     // then
     expect(subject.scalars).to(equal([scalar]))
@@ -34,7 +34,7 @@ class IRCustomScalarTests: XCTestCase {
     let scalar = GraphQLScalarType.boolean()
 
     // when
-    let subject = IR.Schema.ReferencedTypes.init([scalar])
+    let subject = IR.Schema.ReferencedTypes.init([scalar], schemaRootTypes: .mock())
 
     // then
     expect(subject.scalars).to(equal([scalar]))
@@ -46,7 +46,7 @@ class IRCustomScalarTests: XCTestCase {
     let scalar = GraphQLScalarType.float()
 
     // when
-    let subject = IR.Schema.ReferencedTypes.init([scalar])
+    let subject = IR.Schema.ReferencedTypes.init([scalar], schemaRootTypes: .mock())
 
     // then
     expect(subject.scalars).to(equal([scalar]))
@@ -58,7 +58,7 @@ class IRCustomScalarTests: XCTestCase {
     let scalar = GraphQLScalarType.mock(name: "ID")
 
     // when
-    let subject = IR.Schema.ReferencedTypes.init([scalar])
+    let subject = IR.Schema.ReferencedTypes.init([scalar], schemaRootTypes: .mock())
 
     // then
     expect(subject.scalars).to(equal([scalar]))
@@ -70,7 +70,7 @@ class IRCustomScalarTests: XCTestCase {
     let scalar = GraphQLScalarType.mock(name: "CustomScalar")
 
     // when
-    let subject = IR.Schema.ReferencedTypes.init([scalar])
+    let subject = IR.Schema.ReferencedTypes.init([scalar], schemaRootTypes: .mock())
 
     // then
     expect(subject.customScalars).to(equal([scalar]))
@@ -85,7 +85,7 @@ class IRCustomScalarTests: XCTestCase {
     )
 
     // when
-    let subject = IR.Schema.ReferencedTypes.init([scalar])
+    let subject = IR.Schema.ReferencedTypes.init([scalar], schemaRootTypes: .mock())
 
     // then
     expect(subject.customScalars).to(equal([scalar]))

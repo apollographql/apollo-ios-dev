@@ -5,8 +5,9 @@ import ApolloCodegenLib
 public protocol SchemaDownloadProvider {
   static func fetch(
     configuration: ApolloSchemaDownloadConfiguration,
-    withRootURL rootURL: URL?
-  ) throws
+    withRootURL rootURL: URL?,
+    session: NetworkSession?
+  ) async throws
 }
 
 extension ApolloSchemaDownloader: SchemaDownloadProvider { }

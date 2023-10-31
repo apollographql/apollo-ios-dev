@@ -1,6 +1,6 @@
 import XCTest
 import Nimble
-import IR
+import GraphQLCompiler
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
 
@@ -24,9 +24,9 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
 
   // MARK: Render tests
 
-  func test__render__givenSingleOperation_shouldOutputJSONFormat() throws {
+  func test__render__givenSingleOperation_shouldOutputJSONFormat() async throws {
     // given
-    let operation = IR.Operation.mock(
+    let operation = CompilationResult.OperationDefinition.mock(
       name: "TestQuery",
       type: .query,
       source: """
@@ -51,10 +51,10 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
       }
       """
 
-    let operations = [operation].map {
-      OperationManifestItem(
-        operation: $0,
-        identifier: self.operationIdentiferFactory.identifier(for: $0)
+    let operations = try await [operation].asyncMap {
+      OperationManifestTemplate.OperationManifestItem(
+        operation: OperationDescriptor($0),
+        identifier: try await self.operationIdentiferFactory.identifier(for: $0)
       )
     }
 
@@ -64,10 +64,10 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(expected))
   }
 
-  func test__render__givenMultipleOperations_shouldOutputJSONFormat() throws {
+  func test__render__givenMultipleOperations_shouldOutputJSONFormat() async throws {
     // given
-    let operations = [
-      IR.Operation.mock(
+    let operations = try await [
+      CompilationResult.OperationDefinition.mock(
         name: "TestQuery",
         type: .query,
         source: """
@@ -76,7 +76,7 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
         }
         """
       ),
-      IR.Operation.mock(
+      CompilationResult.OperationDefinition.mock(
         name: "TestMutation",
         type: .mutation,
         source: """
@@ -87,7 +87,7 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
         }
         """
       ),
-      IR.Operation.mock(
+      CompilationResult.OperationDefinition.mock(
         name: "TestSubscription",
         type: .subscription,
         source: """
@@ -96,10 +96,10 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
         }
         """
       )
-    ].map {
-      OperationManifestItem(
-        operation: $0,
-        identifier: self.operationIdentiferFactory.identifier(for: $0)
+    ].asyncMap {
+      OperationManifestTemplate.OperationManifestItem(
+        operation: OperationDescriptor($0),
+        identifier: try await self.operationIdentiferFactory.identifier(for: $0)
       )
     }
 
@@ -136,10 +136,10 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(expected))
   }
 
-  func test__render__givenReferencedFragments_shouldOutputJSONFormat() throws {
+  func test__render__givenReferencedFragments_shouldOutputJSONFormat() async throws {
     // given
-    let operations = [
-      IR.Operation.mock(
+    let operations = try await [
+      CompilationResult.OperationDefinition.mock(
         name: "Friends",
         type: .query,
         source: """
@@ -161,10 +161,10 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
           )
         ]
       )
-    ].map {
-      OperationManifestItem(
-        operation: $0,
-        identifier: self.operationIdentiferFactory.identifier(for: $0)
+    ].asyncMap {
+      OperationManifestTemplate.OperationManifestItem(
+        operation: OperationDescriptor($0),
+        identifier: try await self.operationIdentiferFactory.identifier(for: $0)
       )
     }
 
@@ -189,14 +189,14 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(expected))
   }
 
-  func test__render__givenOperations_shouldOutputJSONFormatBodyFormatted() throws {
+  func test__render__givenOperations_shouldOutputJSONFormatBodyFormatted() async throws {
     // given
     subject = PersistedQueriesOperationManifestTemplate(
       config: .init(config: .mock())
     )
 
-    let operations = [
-      IR.Operation.mock(
+    let operations = try await [
+      CompilationResult.OperationDefinition.mock(
         name: "Friends",
         type: .query,
         source: """
@@ -218,10 +218,10 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
           )
         ]
       )
-    ].map {
-      OperationManifestItem(
-        operation: $0,
-        identifier: self.operationIdentiferFactory.identifier(for: $0)
+    ].asyncMap {
+      OperationManifestTemplate.OperationManifestItem(
+        operation: OperationDescriptor($0),
+        identifier: try await self.operationIdentiferFactory.identifier(for: $0)
       )
     }
 
@@ -239,6 +239,48 @@ class PersistedQueriesOperationManifestTemplateTests: XCTestCase {
         ]
       }
       """#
+
+    // when
+    let rendered = subject.render(operations: operations)
+
+    expect(rendered).to(equalLineByLine(expected))
+  }
+
+  // MARK: Character Escaping Tests
+
+  func test__render__givenOperationWithQuotationMarks_shouldEscapeQuotes() async throws {
+    // given
+    let operation = CompilationResult.OperationDefinition.mock(
+      name: "TestQuery",
+      type: .query,
+      source: """
+        query TestQuery {
+          test(param: "string")
+        }
+        """
+    )
+
+    let expected = #"""
+      {
+        "format": "apollo-persisted-query-manifest",
+        "version": 1,
+        "operations": [
+          {
+            "id": "acb5e747550912f7afd3f0a8d11430c4fd50741d1fd7c8d42e5dfcaf96cf8dc1",
+            "body": "query TestQuery { test(param: \"string\") }",
+            "name": "TestQuery",
+            "type": "query"
+          }
+        ]
+      }
+      """#
+
+    let operations = try await [operation].asyncMap {
+      OperationManifestTemplate.OperationManifestItem(
+        operation: OperationDescriptor($0),
+        identifier: try await self.operationIdentiferFactory.identifier(for: $0)
+      )
+    }
 
     // when
     let rendered = subject.render(operations: operations)

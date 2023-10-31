@@ -73,7 +73,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
   /// to be included.
   let matchingConditions: InclusionConditions?
 
-  let allTypesInSchema: Schema.ReferencedTypes
+  public let allTypesInSchema: Schema.ReferencedTypes
 
   private init(
     typePath: LinkedList<ScopeCondition>,

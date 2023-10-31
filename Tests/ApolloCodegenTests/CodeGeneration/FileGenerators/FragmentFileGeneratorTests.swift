@@ -34,7 +34,7 @@ class FragmentFileGeneratorTests: XCTestCase {
 
   // MARK: Test Helpers
 
-  private func buildSubject() throws {
+  private func buildSubject() async throws {
     let schemaSDL = """
     type Animal {
       species: String
@@ -45,8 +45,8 @@ class FragmentFileGeneratorTests: XCTestCase {
     }
     """
 
-    let ir = try IRBuilder.mock(schema: schemaSDL, document: operationDocument)
-    irFragment = ir.build(fragment: ir.compilationResult.fragments[0])
+    let ir = try await IRBuilder.mock(schema: schemaSDL, document: operationDocument)
+    irFragment = await ir.build(fragment: ir.compilationResult.fragments[0])
     
     subject = FragmentFileGenerator(
       irFragment: irFragment,
@@ -56,9 +56,9 @@ class FragmentFileGeneratorTests: XCTestCase {
 
   // MARK: Property Tests
 
-  func test__properties__shouldReturnTargetType_fragment() throws {
+  func test__properties__shouldReturnTargetType_fragment() async throws {
     // given
-    try buildSubject()
+    try await buildSubject()
 
     let expected: FileTarget = .fragment(irFragment.definition)
 
@@ -66,9 +66,9 @@ class FragmentFileGeneratorTests: XCTestCase {
     expect(self.subject.target).to(equal(expected))
   }
 
-  func test__properties__givenGraphQLFragment_shouldReturnFileName_matchingFragmentDefinitionName() throws {
+  func test__properties__givenGraphQLFragment_shouldReturnFileName_matchingFragmentDefinitionName() async throws {
     // given
-    try buildSubject()
+    try await buildSubject()
 
     let expected = irFragment.definition.name
 
@@ -76,9 +76,9 @@ class FragmentFileGeneratorTests: XCTestCase {
     expect(self.subject.fileName).to(equal(expected))
   }
 
-  func test__properties__givenGraphQLFragment_shouldOverwrite() throws {
+  func test__properties__givenGraphQLFragment_shouldOverwrite() async throws {
     // given
-    try buildSubject()
+    try await buildSubject()
 
     // then
     expect(self.subject.overwrite).to(beTrue())

@@ -36,8 +36,8 @@ class IROperationBuilderTests: XCTestCase {
   func buildSubjectOperation(
     named operationName: String? = nil,
     fromJSONSchema json: Bool = false
-  ) throws {
-    ir = json ?
+  ) async throws {
+    ir = await json ?
     try .mock(schemaJSON: schemaSDL, document: document) :
     try .mock(schema: schemaSDL, document: document)
 
@@ -46,10 +46,10 @@ class IROperationBuilderTests: XCTestCase {
     } else {
       operation = try XCTUnwrap(ir.compilationResult.operations.first)
     }
-    subject = ir.build(operation: operation)
+    subject = await ir.build(operation: operation)
   }
 
-  func test__buildOperation__givenQuery_hasRootFieldAsQuery() throws {
+  func test__buildOperation__givenQuery_hasRootFieldAsQuery() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -70,7 +70,7 @@ class IROperationBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectOperation()
+    try await buildSubjectOperation()
 
     let Object_Query = GraphQLObjectType.mock("Query")
 
@@ -89,7 +89,7 @@ class IROperationBuilderTests: XCTestCase {
       .to(equal(.init(source: .operation(self.subject.definition), fieldPath: nil)))
   }
 
-  func test__buildOperation__givenSubscription_hasRootFieldAsSubscription() throws {
+  func test__buildOperation__givenSubscription_hasRootFieldAsSubscription() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -114,7 +114,7 @@ class IROperationBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectOperation()
+    try await buildSubjectOperation()
 
     let Object_Subscription = GraphQLObjectType.mock("Subscription")
 
@@ -133,7 +133,7 @@ class IROperationBuilderTests: XCTestCase {
       .to(equal(.init(source: .operation(self.subject.definition), fieldPath: nil)))
   }
 
-  func test__buildOperation__givenMutation_hasRootFieldAsMutation() throws {
+  func test__buildOperation__givenMutation_hasRootFieldAsMutation() async throws {
     // given
     schemaSDL = """
     type Mutation {
@@ -158,7 +158,7 @@ class IROperationBuilderTests: XCTestCase {
     """
 
     // when
-    try buildSubjectOperation()
+    try await buildSubjectOperation()
 
     let Object_Mutation = GraphQLObjectType.mock("Mutation")
 

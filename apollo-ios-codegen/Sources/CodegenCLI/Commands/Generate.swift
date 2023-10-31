@@ -2,7 +2,7 @@ import Foundation
 import ArgumentParser
 import ApolloCodegenLib
 
-public struct Generate: ParsableCommand {
+public struct Generate: AsyncParsableCommand {
 
   // MARK: - Configuration
   
@@ -22,23 +22,25 @@ public struct Generate: ParsableCommand {
 
   public init() { }
 
-  public func run() throws {
-    try _run()
+  public func run() async throws {
+    try await _run()
   }
 
   func _run(
     fileManager: FileManager = .default,
+    projectRootURL: URL? = nil,
     codegenProvider: CodegenProvider.Type = ApolloCodegen.self,
     schemaDownloadProvider: SchemaDownloadProvider.Type = ApolloSchemaDownloader.self,
     logger: LogLevelSetter.Type = CodegenLogger.self
-  ) throws {
+  ) async throws {
     logger.SetLoggingLevel(verbose: inputs.verbose)
 
     try checkForCLIVersionMismatch(
-      with: inputs
+      with: inputs,
+      projectRootURL: projectRootURL
     )
 
-    try generate(
+    try await generate(
       configuration: inputs.getCodegenConfiguration(fileManager: fileManager),
       codegenProvider: codegenProvider,
       schemaDownloadProvider: schemaDownloadProvider
@@ -49,7 +51,7 @@ public struct Generate: ParsableCommand {
     configuration: ApolloCodegenConfiguration,
     codegenProvider: CodegenProvider.Type,
     schemaDownloadProvider: SchemaDownloadProvider.Type
-  ) throws {
+  ) async throws {
     if fetchSchema {
       guard
         let schemaDownload = configuration.schemaDownload
@@ -61,7 +63,7 @@ public struct Generate: ParsableCommand {
         )
       }
 
-      try fetchSchema(
+      try await fetchSchema(
         configuration: schemaDownload,
         schemaDownloadProvider: schemaDownloadProvider
       )
@@ -74,17 +76,22 @@ public struct Generate: ParsableCommand {
       itemsToGenerate.insert(.operationManifest)
     }
 
-    try codegenProvider.build(
+    try await codegenProvider.build(
       with: configuration,
       withRootURL: rootOutputURL(for: inputs),
-      itemsToGenerate: itemsToGenerate
+      itemsToGenerate: itemsToGenerate,
+      operationIdentifierProvider: nil
     )
   }
 
   private func fetchSchema(
     configuration: ApolloSchemaDownloadConfiguration,
     schemaDownloadProvider: SchemaDownloadProvider.Type
-  ) throws {
-    try schemaDownloadProvider.fetch(configuration: configuration, withRootURL: rootOutputURL(for: inputs))
+  ) async throws {
+    try await schemaDownloadProvider.fetch(
+      configuration: configuration,
+      withRootURL: rootOutputURL(for: inputs),
+      session: nil
+    )
   }
 }

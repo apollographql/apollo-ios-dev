@@ -1,6 +1,7 @@
 import Foundation
 import XCTest
 import ApolloCodegenInternalTestHelpers
+import ApolloInternalTestHelpers
 @testable import ApolloCodegenLib
 
 class URLExtensionsTests: XCTestCase {
@@ -8,7 +9,7 @@ class URLExtensionsTests: XCTestCase {
   func testGettingParentFolderURL() {
     let apolloCodegenTests = FileFinder.findParentFolder()
     
-    let expectedParent = CodegenTestHelper.sourceRootURL()
+    let expectedParent = TestFileHelper.sourceRootURL()
       .appendingPathComponent("Tests")
     
     let parent = apolloCodegenTests.parentFolderURL()
@@ -16,7 +17,7 @@ class URLExtensionsTests: XCTestCase {
   }
   
   func testGettingChildFolderURL() {
-    let testsFolderURL = CodegenTestHelper.sourceRootURL()
+    let testsFolderURL = TestFileHelper.sourceRootURL()
       .appendingPathComponent("Tests")
     
     let expectedChild = FileFinder.findParentFolder()
@@ -36,8 +37,8 @@ class URLExtensionsTests: XCTestCase {
   }
   
   func testGettingChildFileURLWithEmptyFilenameThrows() {
-    let starWars = CodegenTestHelper.starWarsFolderURL()
-    
+    let starWars = TestFileHelper.starWarsFolderURL()
+
     do {
       _ = try starWars.childFileURL(fileName: "")
       XCTFail("That should have thrown")
