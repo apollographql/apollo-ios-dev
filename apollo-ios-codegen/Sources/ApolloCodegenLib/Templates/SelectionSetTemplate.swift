@@ -99,7 +99,8 @@ struct SelectionSetTemplate {
     let selections = selectionSet.selections
     let scope = selectionSet.typeInfo.scope
     return """
-    \(BodyDataFieldAndInitializerTemplate())
+    \(DataPropertyTemplate())
+    \(InitializerTemplate())
 
     \(RootEntityTypealias(selectionSet))
     \(ParentTypeTemplate(selectionSet.parentType))
@@ -119,42 +120,29 @@ struct SelectionSetTemplate {
     \(section: ChildTypeCaseSelectionSets(selections))
     """
   }
-  
-  private func BodyDataFieldAndInitializerTemplate() -> String {
-    DataFieldAndInitializerTemplate({ " __data = _dataDict " }())
-  }
 
-  private func FragmentDataFieldAndInitializerTemplate(
-    _ selections: IR.SelectionSet.Selections
+  private func InitializerTemplate(
+    _ propertiesTemplate: @autoclosure () -> TemplateString? = { nil }()
   ) -> String {
-    if let inlineFragments = selections.direct?.inlineFragments, inlineFragments.containsDeferredFragment {
-      return DataFieldAndInitializerTemplate({ TemplateString("""
-
-        __data = _dataDict
-        \(inlineFragments.values.deferConditionMap {
-          guard let deferCondition = $0.typeInfo.deferCondition else {
-            fatalError("Expected scope with defer condition, got \($0.typeInfo.scope)")
-          }
-
-          return "_\(deferCondition.label) = Deferred(_dataDict: _dataDict)"
-        }, separator: "\n")
-
-      """).description }())
-
-    } else {
-      return BodyDataFieldAndInitializerTemplate()
-    }
-  }
-
-  private func DataFieldAndInitializerTemplate(
-    _ propertiesTemplate: @autoclosure @escaping () -> String
-  ) -> String {
-    let accessControl = renderAccessControl()
+    let dataInitStatement = TemplateString("__data = _dataDict")
 
     return TemplateString("""
-    \(accessControl)\(isMutable ? "var" : "let") __data: DataDict
-    \(accessControl)init(_dataDict: DataDict) {\(propertiesTemplate())}
+    \(renderAccessControl())init(_dataDict: DataDict) {\
+    \(ifLet: propertiesTemplate(), where: { !$0.isEmpty }, {
+      """
+
+        \(dataInitStatement)
+        \($0)
+
+      """
+    },
+    else: " \(dataInitStatement) "
+    )}
     """).description
+  }
+
+  private func DataPropertyTemplate() -> TemplateString {
+    "\(renderAccessControl())\(isMutable ? "var" : "let") __data: DataDict"
   }
 
   private func RootEntityTypealias(_ selectionSet: IR.SelectionSet) -> TemplateString {
@@ -418,7 +406,8 @@ struct SelectionSetTemplate {
 
     return """
     \(renderAccessControl())struct Fragments: FragmentContainer {
-      \(FragmentDataFieldAndInitializerTemplate(selections))
+      \(DataPropertyTemplate())
+      \(FragmentInitializerTemplate(selections))
 
       \(ifLet: selections.direct?.namedFragments.values, {
         "\($0.map { NamedFragmentAccessorTemplate($0, in: scope) }, separator: "\n")"
@@ -426,11 +415,36 @@ struct SelectionSetTemplate {
       \(selections.merged.namedFragments.values.map {
         NamedFragmentAccessorTemplate($0, in: scope)
       }, separator: "\n")
-      \(ifLet: selections.direct?.inlineFragments.values, {
-        "\($0.deferConditionMap { DeferredFragmentAccessorTemplate($0) }, separator: "\n")"
+      \(forEachIn: selections.direct?.inlineFragments.values.elements ?? [], {
+        "\(ifLet: $0.typeInfo.deferCondition, DeferredFragmentAccessorTemplate)"
       })
     }
     """
+  }
+
+  private func FragmentInitializerTemplate(
+    _ selections: IR.SelectionSet.Selections
+  ) -> String {
+    if let inlineFragments = selections.direct?.inlineFragments,
+       inlineFragments.containsDeferredFragment {
+      return InitializerTemplate("""
+      \(forEachIn: inlineFragments.values, {
+        guard let deferCondition = $0.typeInfo.deferCondition else {
+          return nil
+        }
+        return DeferredPropertyInitializationStatement(deferCondition)
+      })
+      """)
+
+    } else {
+      return InitializerTemplate()
+    }
+  }
+
+  private func DeferredPropertyInitializationStatement(
+    _ deferCondition: CompilationResult.DeferCondition
+  ) -> TemplateString {
+    "_\(deferCondition.label) = Deferred(_dataDict: _dataDict)"
   }
 
   private func NamedFragmentAccessorTemplate(
@@ -465,13 +479,9 @@ struct SelectionSetTemplate {
   }
 
   private func DeferredFragmentAccessorTemplate(
-    _ inlineFragment: IR.InlineFragmentSpread
+    _ deferCondition: CompilationResult.DeferCondition
   ) -> TemplateString {
-    guard let deferCondition = inlineFragment.typeInfo.deferCondition else {
-      fatalError("Expected defer condition for \(inlineFragment)")
-    }
-
-    return "@Deferred public var \(deferCondition.label): \(deferCondition.renderedTypeName)?"
+    "@Deferred public var \(deferCondition.label): \(deferCondition.renderedTypeName)?"
   }
 
   // MARK: - SelectionSet Initializer
@@ -1066,20 +1076,5 @@ fileprivate extension CompilationResult.DeferCondition {
 fileprivate extension OrderedDictionary<ScopeCondition, InlineFragmentSpread> {
   var containsDeferredFragment: Bool {
     keys.contains(where: { $0.isDeferred })
-  }
-}
-
-fileprivate extension Sequence<InlineFragmentSpread> {
-  /// Maps the closure over the inline fragments that have a defer condition.
-  func deferConditionMap<T>(_ transform: (Element) -> T) -> [T] {
-    var result = [T]()
-
-    for element in self {
-      if element.typeInfo.deferCondition != nil {
-        result.append(transform(element))
-      }
-    }
-
-    return result
   }
 }
