@@ -94,7 +94,6 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     var nextCount = await pager.nextPageVarMap.values.count
     XCTAssertEqual(nextCount, 1)
 
-
     let previousPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
     let previousPageFetch = expectation(description: "Previous Page")
     previousPageFetch.assertForOverFulfill = false
@@ -135,13 +134,13 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     let previousPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
     let lastPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
 
-    //        let loadAllExpectation = expectation(description: "Load all pages")
+    let loadAllExpectation = expectation(description: "Load all pages")
     await pager.subscribe(onUpdate: { _ in
-      //            loadAllExpectation.fulfill()
+      loadAllExpectation.fulfill()
     }).store(in: &cancellables)
     try await pager.loadAll()
     await fulfillment(
-      of: [firstPageExpectation, lastPageExpectation, previousPageExpectation,],
+      of: [firstPageExpectation, lastPageExpectation, previousPageExpectation, loadAllExpectation],
       timeout: 5
     )
 
@@ -178,7 +177,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
           "id": "2001",
           "first": 1,
           "after": pageInfo.endCursor,
-          "before": GraphQLNullable<String>.null
+          "before": GraphQLNullable<String>.null,
         ]
         return nextQuery
       },
@@ -188,7 +187,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
           "id": "2001",
           "first": 1,
           "before": pageInfo.startCursor,
-          "after": GraphQLNullable<String>.null
+          "after": GraphQLNullable<String>.null,
         ]
         return previousQuery
       }
