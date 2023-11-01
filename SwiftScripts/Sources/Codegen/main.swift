@@ -2,6 +2,7 @@ import Foundation
 import ApolloCodegenLib
 import ArgumentParser
 import TargetConfig
+import SwiftScriptHelpers
 
 // In a typical app, you'll only need to do this for one target, so you'd
 // set these up directly within this file. Here, we're using more than one
@@ -22,7 +23,7 @@ struct Codegen: ParsableCommand {
   )
   var packageManager: String = "SPM"
 
-  mutating func run() throws {
+    mutating func run() async throws {
     let targets = targetNames.isEmpty ?
     Target.allCases :
     try targetNames.map { try Target(name: $0) }
@@ -53,7 +54,7 @@ struct Codegen: ParsableCommand {
       try ApolloFileManager.default.createDirectoryIfNeeded(atPath: targetURL.path)
 
       // Actually attempt to generate code.
-      try ApolloCodegen.build(
+      try await ApolloCodegen.build(
         with: ApolloCodegenConfiguration(
           schemaNamespace: target.moduleName,
           input: inputConfig,
