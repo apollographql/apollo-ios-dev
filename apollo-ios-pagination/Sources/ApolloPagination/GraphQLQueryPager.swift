@@ -77,10 +77,10 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
       previousPageVarMapPublisher.combineLatest(initialPublisher, nextPageVarMapPublisher).sink { [weak self] _ in
         guard let self else { return }
         Task {
-          let canLoadNext = await self.pager.pageTransformation()?.canLoadMore
-          let canLoadPrevious = await self.pager.previousPageTransformation()?.canLoadPrevious
-          self.canLoadNextSubject.send(canLoadNext ?? false)
-          self.canLoadPreviousSubject.send(canLoadPrevious ?? false)
+          let canLoadNext = await self.pager.canLoadNext
+          let canLoadPrevious = await self.pager.canLoadPrevious
+          self.canLoadNextSubject.send(canLoadNext)
+          self.canLoadPreviousSubject.send(canLoadPrevious)
         }
       }.store(in: &cancellables)
     }
@@ -568,14 +568,14 @@ extension GraphQLQueryPager {
       subscribers = []
     }
 
-    fileprivate func pageTransformation() -> PaginationInfo? {
+    private func pageTransformation() -> PaginationInfo? {
       guard let last = nextPageVarMap.values.last else {
         return initialPageResult.flatMap { extractPageInfo(.initial($0)) }
       }
       return extractPageInfo(.paginated(last))
     }
 
-    fileprivate func previousPageTransformation() -> PaginationInfo? {
+    private func previousPageTransformation() -> PaginationInfo? {
       guard let first = previousPageVarMap.values.last else {
         return initialPageResult.flatMap { extractPageInfo(.initial($0)) }
       }
