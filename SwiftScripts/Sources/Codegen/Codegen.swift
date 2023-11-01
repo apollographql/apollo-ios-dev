@@ -8,7 +8,8 @@ import SwiftScriptHelpers
 // set these up directly within this file. Here, we're using more than one
 // target, so we're using an arg parser to figure out which one to build,
 // and an enum to hold related options.
-struct Codegen: ParsableCommand {
+@main
+struct Codegen: AsyncParsableCommand {
   @Option(
     wrappedValue: [],
     name: [.customLong("target"), .customShort("t")],
@@ -66,5 +67,3 @@ struct Codegen: ParsableCommand {
     }
   }
 }
-
-Codegen.main()

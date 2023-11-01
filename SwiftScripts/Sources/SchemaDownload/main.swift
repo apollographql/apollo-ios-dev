@@ -1,6 +1,7 @@
 import Foundation
 import ApolloCodegenLib
 import TargetConfig
+import SwiftScriptHelpers
 
 for target in Target.allCases {
 
