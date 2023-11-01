@@ -19,7 +19,7 @@ public class AnyGraphQLQueryPager<Model> {
   ///   - transform: Transformation from an initial page and array of paginated pages to a given view model.
   public init<Pager: GraphQLQueryPager<InitialQuery, NextQuery>, InitialQuery, NextQuery>(
     pager: Pager,
-    transform: @escaping (InitialQuery.Data, [NextQuery.Data]) throws -> Model
+    transform: @escaping ([NextQuery.Data], InitialQuery.Data, [NextQuery.Data]) throws -> Model
   ) {
     self.pager = pager
     pager.subscribe { result in
@@ -28,7 +28,7 @@ public class AnyGraphQLQueryPager<Model> {
       switch result {
       case let .success(output):
         do {
-          let transformedModels = try transform(output.initialPage, output.nextPages)
+          let transformedModels = try transform(output.previousPages, output.initialPage, output.nextPages)
           returnValue = .success((transformedModels, output.updateSource))
         } catch {
           returnValue = .failure(error)
@@ -42,7 +42,7 @@ public class AnyGraphQLQueryPager<Model> {
   }
 
   /// Type-erases a given pager, transforming the initial page to an array of models, and the
-  /// subsequent pagination to an additional array of models, concatenating the results of each into one array.
+  /// subsequent pagination to an adition array of models, concatenating the results of each into one array.
   /// - Parameters:
   ///   - pager: Pager to type-erase.
   ///   - initialTransform: Initial transformation from the initial page to an array of models.
@@ -55,14 +55,15 @@ public class AnyGraphQLQueryPager<Model> {
   >(
     pager: Pager,
     initialTransform: @escaping (InitialQuery.Data) throws -> Model,
-    nextPageTransform: @escaping (NextQuery.Data) throws -> Model
+    pageTransform: @escaping (NextQuery.Data) throws -> Model
   ) where Model: RangeReplaceableCollection, Model.Element == Element {
     self.init(
       pager: pager,
-      transform: { initialData, nextData in
+      transform: { previousData, initialData, nextData in
+        let previous = try previousData.flatMap { try pageTransform($0) }
         let initial = try initialTransform(initialData)
-        let next = try nextData.flatMap { try nextPageTransform($0) }
-        return initial + next
+        let next = try nextData.flatMap { try pageTransform($0) }
+        return previous + initial + next
       }
     )
   }
@@ -110,7 +111,7 @@ public class AnyGraphQLQueryPager<Model> {
 
 extension GraphQLQueryPager.Actor {
   nonisolated func eraseToAnyPager<T>(
-    transform: @escaping (InitialQuery.Data, [PaginatedQuery.Data]) throws -> T
+    transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> T
   ) -> AnyGraphQLQueryPager<T> {
     AnyGraphQLQueryPager(
       pager: GraphQLQueryPager(pager: self),
@@ -120,12 +121,12 @@ extension GraphQLQueryPager.Actor {
 
   nonisolated func eraseToAnyPager<T, S: RangeReplaceableCollection>(
     initialTransform: @escaping (InitialQuery.Data) throws -> S,
-    nextPageTransform: @escaping (PaginatedQuery.Data) throws -> S
+    pageTransform: @escaping (PaginatedQuery.Data) throws -> S
   ) -> AnyGraphQLQueryPager<S> where T == S.Element {
     AnyGraphQLQueryPager(
       pager: GraphQLQueryPager(pager: self),
       initialTransform: initialTransform,
-      nextPageTransform: nextPageTransform
+      pageTransform: pageTransform
     )
   }
 
@@ -135,14 +136,14 @@ extension GraphQLQueryPager.Actor {
     AnyGraphQLQueryPager(
       pager: GraphQLQueryPager(pager: self),
       initialTransform: transform,
-      nextPageTransform: transform
+      pageTransform: transform
     )
   }
 }
 
 public extension GraphQLQueryPager {
   func eraseToAnyPager<T>(
-    transform: @escaping (InitialQuery.Data, [PaginatedQuery.Data]) throws -> T
+    transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> T
   ) -> AnyGraphQLQueryPager<T> {
     AnyGraphQLQueryPager(pager: self, transform: transform)
   }
@@ -154,7 +155,7 @@ public extension GraphQLQueryPager {
     AnyGraphQLQueryPager(
       pager: self,
       initialTransform: initialTransform,
-      nextPageTransform: nextPageTransform
+      pageTransform: nextPageTransform
     )
   }
 
@@ -164,7 +165,7 @@ public extension GraphQLQueryPager {
     AnyGraphQLQueryPager(
       pager: self,
       initialTransform: transform,
-      nextPageTransform: transform
+      pageTransform: transform
     )
   }
 }

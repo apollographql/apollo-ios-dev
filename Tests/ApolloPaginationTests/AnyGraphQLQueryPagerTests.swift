@@ -55,7 +55,7 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
   }
 
   func test_passesBackSeparateData() throws {
-    let anyPager = createPager().eraseToAnyPager { initial, next in
+    let anyPager = createPager().eraseToAnyPager { _, initial, next in
       if let latestPage = next.last {
         return latestPage.hero.friendsConnection.friends.last?.name
       }
