@@ -171,6 +171,7 @@ public struct TemplateString: ExpressibleByStringInterpolation, CustomStringConv
 
     public mutating func appendInterpolation<T>(
       forEachIn sequence: T,
+      where whereBlock: ((T.Element) -> Bool)? = nil,
       separator: String = ",\n",
       terminator: String? = nil,
       _ template: (T.Element) throws -> TemplateString?
@@ -178,8 +179,13 @@ public struct TemplateString: ExpressibleByStringInterpolation, CustomStringConv
       var iterator = sequence.makeIterator()
       var resultString = ""
 
-      while let element = iterator.next(),
-            let elementString = try template(element)?.description {
+      while let element = iterator.next() {
+        guard 
+          (whereBlock?(element) ?? true),
+          let elementString = try template(element)?.description else {
+          continue
+        }
+
         resultString.append(
           resultString.isEmpty ?
           elementString : separator + elementString
