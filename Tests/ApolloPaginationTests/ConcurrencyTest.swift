@@ -25,7 +25,7 @@ final class ConcurrencyTests: XCTestCase {
 
   func test_concurrentFetches() async throws {
     let pager = createPager()
-    var results: [Result<(Query.Data, [Query.Data], UpdateSource), Error>] = []
+    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
     let resultsExpectation = expectation(description: "Results arrival")
     resultsExpectation.expectedFulfillmentCount = 2
     await pager.subscribe { result in
@@ -48,7 +48,7 @@ final class ConcurrencyTests: XCTestCase {
 
   func test_concurrentFetches_nonisolated() throws {
     let pager = createNonisolatedPager()
-    var results: [Result<(Query.Data, [Query.Data], UpdateSource), Error>] = []
+    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
     let initialExpectation = expectation(description: "Initial")
     initialExpectation.assertForOverFulfill = false
     let nextExpectation = expectation(description: "Next")

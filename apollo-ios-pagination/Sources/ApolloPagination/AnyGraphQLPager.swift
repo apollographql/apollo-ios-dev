@@ -5,11 +5,13 @@ import Combine
 /// Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.
 public class AnyGraphQLQueryPager<Model> {
   public typealias Output = Result<(Model, UpdateSource), Error>
-  public var canLoadNext: Bool { pager.canLoadNext }
 
   private var _subject: CurrentValueSubject<Output?, Never>? = .init(nil)
   private var cancellables = [AnyCancellable]()
   private var pager: any PagerType
+
+  public var canLoadNext: Bool { pager.canLoadNext }
+  public var canLoadPrevious: Bool { pager.canLoadPrevious }
 
   /// Type-erases a given pager, transforming data to a model as pagination receives new results.
   /// - Parameters:
@@ -24,11 +26,10 @@ public class AnyGraphQLQueryPager<Model> {
       let returnValue: Output
 
       switch result {
-      case let .success(value):
-        let (initial, next, updateSource) = value
+      case let .success(output):
         do {
-          let transformedModels = try transform(initial, next)
-          returnValue = .success((transformedModels, updateSource))
+          let transformedModels = try transform(output.initialPage, output.nextPages)
+          returnValue = .success((transformedModels, output.updateSource))
         } catch {
           returnValue = .failure(error)
         }
@@ -66,11 +67,9 @@ public class AnyGraphQLQueryPager<Model> {
     )
   }
 
-  /// Subscribe to new pagination `Output`s.
-  /// - Parameter completion: Receives a new `Output` for the consumer of the API.
-  /// - Returns: A `Combine` `AnyCancellable`, such that the caller can manage its own susbcription.
   @discardableResult public func subscribe(completion: @escaping (Output) -> Void) -> AnyCancellable {
     guard let _subject else { return AnyCancellable({ }) }
+
     let cancellable = _subject.compactMap({ $0 }).sink { result in
       completion(result)
     }
@@ -78,18 +77,18 @@ public class AnyGraphQLQueryPager<Model> {
     return cancellable
   }
 
-  public func loadPrevious(
-    cachePolicy: CachePolicy = .returnCacheDataAndFetch,
-    completion: (@MainActor () -> Void)? = nil
-  ) throws {
-    try pager.loadPrevious(cachePolicy: cachePolicy, completion: completion)
-  }
-
   public func loadMore(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
     completion: (@MainActor () -> Void)? = nil
   ) throws {
     try pager.loadMore(cachePolicy: cachePolicy, completion: completion)
+  }
+
+  public func loadPrevious(
+    cachePolicy: CachePolicy = .returnCacheDataAndFetch,
+    completion: (@MainActor () -> Void)? = nil
+  ) throws {
+    try pager.loadPrevious(cachePolicy: cachePolicy, completion: completion)
   }
 
   public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {

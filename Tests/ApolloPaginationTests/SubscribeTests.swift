@@ -62,12 +62,11 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [serverExpectation, initialFetchExpectation], timeout: 1.0)
     XCTAssertFalse(results.isEmpty)
     let result = try XCTUnwrap(results.first)
-    XCTAssertSuccessResult(result) { value in
-      let (first, next, source) = value
-      XCTAssertTrue(next.isEmpty)
-      XCTAssertEqual(first.hero.friendsConnection.friends.count, 2)
-      XCTAssertEqual(first.hero.friendsConnection.totalCount, 3)
-      XCTAssertEqual(source, .fetch)
+    XCTAssertSuccessResult(result) { output in
+      XCTAssertTrue(output.nextPages.isEmpty)
+      XCTAssertEqual(output.initialPage.hero.friendsConnection.friends.count, 2)
+      XCTAssertEqual(output.initialPage.hero.friendsConnection.totalCount, 3)
+      XCTAssertEqual(output.updateSource, .fetch)
       XCTAssertEqual(results.count, otherResults.count)
     }
   }
