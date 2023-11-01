@@ -26,7 +26,7 @@ class FetchSchemaTests: XCTestCase {
 
   // MARK: - FetchSchema Tests
 
-  func test__fetchSchema__givenParameters_pathCustom_shouldBuildWithFileData() throws {
+  func test__fetchSchema__givenParameters_pathCustom_shouldBuildWithFileData() async throws {
     // given
     let inputPath = "./config.json"
 
@@ -56,7 +56,7 @@ class FetchSchemaTests: XCTestCase {
     // when
     let command = try parse(options)
 
-    try command._run(
+    try await command._run(
       fileManager: mockFileManager.base,
       schemaDownloadProvider: MockApolloSchemaDownloader.self
     )
@@ -65,7 +65,7 @@ class FetchSchemaTests: XCTestCase {
     expect(didCallFetch).to(beTrue())
   }
 
-  func test__fetchSchema__givenParameters_stringCustom_shouldBuildWithStringData() throws {
+  func test__fetchSchema__givenParameters_stringCustom_shouldBuildWithStringData() async throws {
     // given
     let mockConfiguration = ApolloCodegenConfiguration.mock()
 
@@ -88,13 +88,13 @@ class FetchSchemaTests: XCTestCase {
     // when
     let command = try parse(options)
 
-    try command._run(schemaDownloadProvider: MockApolloSchemaDownloader.self)
+    try await command._run(schemaDownloadProvider: MockApolloSchemaDownloader.self)
 
     // then
     expect(didCallFetch).to(beTrue())
   }
 
-  func test__fetchSchema__givenParameters_bothPathAndString_shouldBuildWithStringData() throws {
+  func test__fetchSchema__givenParameters_bothPathAndString_shouldBuildWithStringData() async throws {
     // given
     let mockConfiguration = ApolloCodegenConfiguration.mock()
 
@@ -118,13 +118,13 @@ class FetchSchemaTests: XCTestCase {
     // when
     let command = try parse(options)
 
-    try command._run(schemaDownloadProvider: MockApolloSchemaDownloader.self)
+    try await command._run(schemaDownloadProvider: MockApolloSchemaDownloader.self)
 
     // then
     expect(didCallFetch).to(beTrue())
   }
 
-  func test__fetchSchema__givenDefaultParameter_verbose_shouldSetLogLevelWarning() throws {
+  func test__fetchSchema__givenDefaultParameter_verbose_shouldSetLogLevelWarning() async throws {
     // given
     let mockConfiguration = ApolloCodegenConfiguration.mock()
 
@@ -147,16 +147,16 @@ class FetchSchemaTests: XCTestCase {
     // when
     let command = try parse(options)
 
-    try command._run(
+    try await command._run(
       schemaDownloadProvider: MockApolloSchemaDownloader.self,
       logger: CodegenLogger.mock
     )
 
     // then
-    expect(level).toEventually(equal(.warning))
+    await expect(level).toEventually(equal(.warning))
   }
 
-  func test__fetchSchema__givenParameter_verbose_shouldSetLogLevelDebug() throws {
+  func test__fetchSchema__givenParameter_verbose_shouldSetLogLevelDebug() async throws {
     // given
     let mockConfiguration = ApolloCodegenConfiguration.mock()
 
@@ -180,12 +180,12 @@ class FetchSchemaTests: XCTestCase {
     // when
     let command = try parse(options)
 
-    try command._run(
+    try await command._run(
       schemaDownloadProvider: MockApolloSchemaDownloader.self,
       logger: CodegenLogger.mock
     )
 
     // then
-    expect(level).toEventually(equal(.debug))
+    await expect(level).toEventually(equal(.debug))
   }
 }

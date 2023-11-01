@@ -4,19 +4,24 @@ import Nimble
 @testable import ApolloCodegenInternalTestHelpers
 
 class FileGeneratorTests: XCTestCase {
-  let fileManager = MockApolloFileManager(strict: false)
-  let directoryURL = CodegenTestHelper.outputFolderURL()
 
+  var fileManager: MockApolloFileManager!
   var config: ApolloCodegen.ConfigurationContext!
   var fileTarget: FileTarget!
   var template: MockFileTemplate!
   var subject: MockFileGenerator!
+
+  override func setUp() {
+    super.setUp()
+    fileManager = MockApolloFileManager(strict: false)
+  }
 
   override func tearDown() {
     template = nil
     subject = nil
     fileTarget = nil
     config = nil
+    fileManager = nil
 
     super.tearDown()
   }
@@ -26,8 +31,7 @@ class FileGeneratorTests: XCTestCase {
   private func buildConfig() {
     let mockedConfig = ApolloCodegenConfiguration.mock(output: .mock(
       moduleType: .swiftPackageManager,      
-      operations: .inSchemaModule,
-      path: directoryURL.path
+      operations: .inSchemaModule
     ))
 
     config = ApolloCodegen.ConfigurationContext(config: mockedConfig)
@@ -46,7 +50,7 @@ class FileGeneratorTests: XCTestCase {
 
   // MARK: - Tests
 
-  func test__generate__shouldWriteToCorrectPath() throws {
+  func test__generate__shouldWriteToCorrectPath() async throws {
     // given
     buildConfig()
     buildSubject()
@@ -62,13 +66,13 @@ class FileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(forConfig: config, fileManager: fileManager)
+    try await subject.generate(forConfig: config, fileManager: fileManager)
 
     // then
     expect(self.fileManager.allClosuresCalled).to(beTrue())
   }
 
-  func test__generate__shouldFirstUppercaseFilename() throws {
+  func test__generate__shouldFirstUppercaseFilename() async throws {
     // given
     buildConfig()
     buildSubject()
@@ -84,13 +88,13 @@ class FileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(forConfig: config, fileManager: fileManager)
+    try await subject.generate(forConfig: config, fileManager: fileManager)
 
     // then
     expect(self.fileManager.allClosuresCalled).to(beTrue())
   }
 
-  func test__generate__shouldAddExtensionToFilePath() throws {
+  func test__generate__shouldAddExtensionToFilePath() async throws {
     // given
     buildConfig()
     buildSubject(extension: "test")
@@ -106,13 +110,13 @@ class FileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(forConfig: config, fileManager: fileManager)
+    try await subject.generate(forConfig: config, fileManager: fileManager)
 
     // then
     expect(self.fileManager.allClosuresCalled).to(beTrue())
   }
 
-  func test__generate__shouldWriteRenderedTemplate() throws {
+  func test__generate__shouldWriteRenderedTemplate() async throws {
     // given
     buildConfig()
     buildSubject()
@@ -127,7 +131,7 @@ class FileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try subject.generate(forConfig: config, fileManager: fileManager)
+    try await subject.generate(forConfig: config, fileManager: fileManager)
 
     // then
     expect(self.fileManager.allClosuresCalled).to(beTrue())

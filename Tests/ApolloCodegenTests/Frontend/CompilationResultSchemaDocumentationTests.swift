@@ -24,9 +24,9 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
 
   // MARK: - Helpers
 
-  func compileFrontend() throws -> CompilationResult {
-    let frontend = try GraphQLJSFrontend()
-    return try frontend.compile(
+  func compileFrontend() async throws -> CompilationResult {
+    let frontend = try await GraphQLJSFrontend()
+    return try await frontend.compile(
       schema: schemaSDL,
       document: document
     )
@@ -34,7 +34,7 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
 
   // MARK: - Tests
 
-  func testCompile_givenSchemaTypeDocumentation_includesSchemaDocumentation() throws {
+  func testCompile_givenSchemaTypeDocumentation_includesSchemaDocumentation() async throws {
     let documentation = "The Schema Docs"
 
     schemaSDL = """
@@ -54,12 +54,12 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
     }
     """
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
 
     expect(compilationResult.schemaDocumentation).to(equal(documentation))
   }
 
-  func testCompile_givenMultilineDocumentation_includesDocumentation() throws {
+  func testCompile_givenMultilineDocumentation_includesDocumentation() async throws {
     let documentation = """
     The Root Query Object
     What a great object!
@@ -80,13 +80,13 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
     }
     """
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
     let actual = compilationResult[type: "Query"]
 
     expect(actual?.documentation).to(equal(documentation))
   }
 
-  func testCompile_givenObjectTypeWithDocumentation_includesDocumentation() throws {
+  func testCompile_givenObjectTypeWithDocumentation_includesDocumentation() async throws {
     let documentation = "This is some great documentation!"
 
     schemaSDL = """
@@ -102,13 +102,13 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
     }
     """
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
     let actual = compilationResult[type: "Query"]
 
     expect(actual?.documentation).to(equal(documentation))
   }
 
-  func testCompile_givenInterfaceTypeWithDocumentation_includesDocumentation() throws {
+  func testCompile_givenInterfaceTypeWithDocumentation_includesDocumentation() async throws {
     let documentation = "This is some great documentation!"
 
     schemaSDL = """
@@ -130,13 +130,13 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
     }
     """
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
     let actual = compilationResult[type: "CustomInterface"]
 
     expect(actual?.documentation).to(equal(documentation))
   }
 
-  func testCompile_givenUnionTypeWithDocumentation_includesDocumentation() throws {
+  func testCompile_givenUnionTypeWithDocumentation_includesDocumentation() async throws {
     let documentation = "This is some great documentation!"
 
     schemaSDL = """
@@ -166,13 +166,13 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
     }
     """
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
     let actual = compilationResult[type: "CustomUnion"]
 
     expect(actual?.documentation).to(equal(documentation))
   }
 
-  func testCompile_givenScalarTypeWithDocumentation_includesDocumentation() throws {
+  func testCompile_givenScalarTypeWithDocumentation_includesDocumentation() async throws {
     let documentation = "This is some great documentation!"
 
     schemaSDL = """
@@ -190,13 +190,13 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
     }
     """
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
     let actual = compilationResult[type: "CustomScalar"]
 
     expect(actual?.documentation).to(equal(documentation))
   }
 
-  func testCompile_givenEnumTypeWithDocumentation_includesDocumentation() throws {
+  func testCompile_givenEnumTypeWithDocumentation_includesDocumentation() async throws {
     let documentation = "This is some great documentation!"
 
     schemaSDL = """
@@ -217,13 +217,13 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
     }
     """
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
     let actual = compilationResult[type: "TestEnum"]
 
     expect(actual?.documentation).to(equal(documentation))
   }
 
-  func testCompile_givenEnumValuesWithDocumentation_includesDocumentation() throws {
+  func testCompile_givenEnumValuesWithDocumentation_includesDocumentation() async throws {
     let documentation_A = "Enum case A"
     let documentation_B = "Enum case B"
 
@@ -246,14 +246,14 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
     }
     """
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
     let TestEnum = compilationResult[type: "TestEnum"] as? GraphQLEnumType
 
     expect(TestEnum?.values[0].documentation).to(equal(documentation_A))
     expect(TestEnum?.values[1].documentation).to(equal(documentation_B))
   }
 
-  func testCompile_givenInputObjectTypeWithDocumentation_includesDocumentation() throws {
+  func testCompile_givenInputObjectTypeWithDocumentation_includesDocumentation() async throws {
     let documentation = "This is some great documentation!"
 
     schemaSDL = """
@@ -273,13 +273,13 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
     }
     """
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
     let actual = compilationResult[type: "CustomInput"]
 
     expect(actual?.documentation).to(equal(documentation))
   }
 
-  func testCompile_givenInputFieldWithDocumentation_includesDocumentation() throws {
+  func testCompile_givenInputFieldWithDocumentation_includesDocumentation() async throws {
     let documentation = "This is some great documentation!"
 
     schemaSDL = """
@@ -299,14 +299,14 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
     }
     """
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
     let CustomInput = compilationResult[type: "CustomInput"] as? GraphQLInputObjectType
     let actual = CustomInput?.fields["b"]
 
     expect(actual?.documentation).to(equal(documentation))
   }
 
-  func testCompile_givenFieldWithDocumentation_includesDocumentation() throws {
+  func testCompile_givenFieldWithDocumentation_includesDocumentation() async throws {
     let documentation = "This is some great documentation!"
 
     schemaSDL = """
@@ -328,14 +328,14 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
     }
     """
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
     let CustomType = compilationResult[type: "CustomType"] as? GraphQLObjectType
     let actual = CustomType?.fields["b"]
 
     expect(actual?.documentation).to(equal(documentation))
   }
 
-  func testCompile_givenFieldArgumentWithDocumentation_includesDocumentation() throws {
+  func testCompile_givenFieldArgumentWithDocumentation_includesDocumentation() async throws {
     let documentation = "This is some great documentation!"
 
     schemaSDL = """
@@ -359,7 +359,7 @@ class CompilationResultSchemaDocumentationTests: XCTestCase {
     }
     """
 
-    let compilationResult = try compileFrontend()
+    let compilationResult = try await compileFrontend()
     let CustomType = compilationResult[type: "CustomType"] as? GraphQLObjectType
     let actual = CustomType?.fields["b"]?.arguments.first
 

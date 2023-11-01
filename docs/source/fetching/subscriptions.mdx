@@ -79,8 +79,9 @@ Note that this must be set **when the `WebSocketTransport` is created**. If you 
 let webSocketTransport: WebSocketTransport = {
   let url = URL(string: "ws://localhost:8080/websocket")!
   let webSocketClient = WebSocket(url: url, protocol: .graphql_transport_ws)
-  let authPayload = ["authToken": myAuthToken]
-  return WebSocketTransport(websocket: webSocketClient, connectingPayload: authPayload)
+  let authPayload: JSONEncodableDictionary = ["authToken": myAuthToken]
+  let config = WebSocketTransport.Configuration(connectingPayload: authPayload)
+  return WebSocketTransport(websocket: webSocketClient, config: config)
 }()
 ```
 

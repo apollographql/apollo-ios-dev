@@ -47,10 +47,10 @@ class FragmentTemplateTests: XCTestCase {
   private func buildSubjectAndFragment(
     named fragmentName: String = "TestFragment",
     config: ApolloCodegenConfiguration = .mock()
-  ) throws {
-    ir = try .mock(schema: schemaSDL, document: document)
+  ) async throws {
+    ir = try await .mock(schema: schemaSDL, document: document)
     let fragmentDefinition = try XCTUnwrap(ir.compilationResult[fragment: fragmentName])
-    fragment = ir.build(fragment: fragmentDefinition)
+    fragment = await ir.build(fragment: fragmentDefinition)
     subject = FragmentTemplate(
       fragment: fragment,
       config: ApolloCodegen.ConfigurationContext(config: config)
@@ -63,7 +63,7 @@ class FragmentTemplateTests: XCTestCase {
 
   // MARK: Fragment Definition
 
-  func test__render__givenFragment_generatesFragmentDeclarationDefinitionAndBoilerplate() throws {
+  func test__render__givenFragment_generatesFragmentDeclarationDefinitionAndBoilerplate() async throws {
     // given
     let expected =
     """
@@ -77,7 +77,7 @@ class FragmentTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndFragment()
+    try await buildSubjectAndFragment()
 
     let actual = renderSubject()
 
@@ -86,7 +86,7 @@ class FragmentTemplateTests: XCTestCase {
     expect(String(actual.reversed())).to(equalLineByLine("\n}", ignoringExtraLines: true))
   }
 
-  func test__render__givenLowercaseFragment_generatesTitleCaseTypeName() throws {
+  func test__render__givenLowercaseFragment_generatesTitleCaseTypeName() async throws {
     // given
     document = """
     fragment testFragment on Query {
@@ -104,7 +104,7 @@ class FragmentTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndFragment(named: "testFragment")
+    try await buildSubjectAndFragment(named: "testFragment")
 
     let actual = renderSubject()
 
@@ -112,7 +112,7 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__render__givenFragmentWithUnderscoreInName_rendersDeclarationWithName() throws {
+  func test__render__givenFragmentWithUnderscoreInName_rendersDeclarationWithName() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -135,14 +135,14 @@ class FragmentTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndFragment(named: "Test_Fragment")
+    try await buildSubjectAndFragment(named: "Test_Fragment")
     let actual = renderSubject()
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__render_parentType__givenFragmentTypeConditionAs_Object_rendersParentType() throws {
+  func test__render_parentType__givenFragmentTypeConditionAs_Object_rendersParentType() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -165,14 +165,14 @@ class FragmentTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndFragment()
+    try await buildSubjectAndFragment()
     let actual = renderSubject()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }
 
-  func test__render_parentType__givenFragmentTypeConditionAs_Interface_rendersParentType() throws {
+  func test__render_parentType__givenFragmentTypeConditionAs_Interface_rendersParentType() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -195,14 +195,14 @@ class FragmentTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndFragment()
+    try await buildSubjectAndFragment()
     let actual = renderSubject()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }
 
-  func test__render_parentType__givenFragmentTypeConditionAs_Union_rendersParentType() throws {
+  func test__render_parentType__givenFragmentTypeConditionAs_Union_rendersParentType() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -229,14 +229,14 @@ class FragmentTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndFragment()
+    try await buildSubjectAndFragment()
     let actual = renderSubject()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }
 
-  func test__render__givenFragmentOnRootOperationTypeWithOnlyTypenameField_generatesFragmentDefinition_withNoSelections() throws {
+  func test__render__givenFragmentOnRootOperationTypeWithOnlyTypenameField_generatesFragmentDefinition_withNoSelections() async throws {
     // given
     document = """
     fragment TestFragment on Query {
@@ -244,7 +244,7 @@ class FragmentTemplateTests: XCTestCase {
     }
     """
 
-    try buildSubjectAndFragment()
+    try await buildSubjectAndFragment()
 
     let expected = """
     struct TestFragment: TestSchema.SelectionSet, Fragment {
@@ -269,7 +269,7 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__render__givenFragmentWithOnlyTypenameField_generatesFragmentDefinition_withTypeNameSelection() throws {
+  func test__render__givenFragmentWithOnlyTypenameField_generatesFragmentDefinition_withTypeNameSelection() async throws {
     // given
     document = """
     fragment TestFragment on Animal {
@@ -277,7 +277,7 @@ class FragmentTemplateTests: XCTestCase {
     }
     """
 
-    try buildSubjectAndFragment()
+    try await buildSubjectAndFragment()
 
     let expected = """
     struct TestFragment: TestSchema.SelectionSet, Fragment {
@@ -305,9 +305,9 @@ class FragmentTemplateTests: XCTestCase {
 
   // MARK: Access Level Tests
 
-  func test__render__givenModuleType_swiftPackageManager_generatesFragmentDefinition_withPublicAccess() throws {
+  func test__render__givenModuleType_swiftPackageManager_generatesFragmentDefinition_withPublicAccess() async throws {
     // given
-    try buildSubjectAndFragment(config: .mock(.swiftPackageManager))
+    try await buildSubjectAndFragment(config: .mock(.swiftPackageManager))
 
     let expected = """
     public struct TestFragment: TestSchema.SelectionSet, Fragment {
@@ -321,9 +321,9 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__render__givenModuleType_other_generatesFragmentDefinition_withPublicAccess() throws {
+  func test__render__givenModuleType_other_generatesFragmentDefinition_withPublicAccess() async throws {
     // given
-    try buildSubjectAndFragment(config: .mock(.other))
+    try await buildSubjectAndFragment(config: .mock(.other))
 
     let expected = """
     public struct TestFragment: TestSchema.SelectionSet, Fragment {
@@ -337,9 +337,9 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__render__givenModuleType_embeddedInTarget_withInternalAccessModifier_generatesFragmentDefinition_withInternalAccess() throws {
+  func test__render__givenModuleType_embeddedInTarget_withInternalAccessModifier_generatesFragmentDefinition_withInternalAccess() async throws {
     // given
-    try buildSubjectAndFragment(
+    try await buildSubjectAndFragment(
       config: .mock(.embeddedInTarget(name: "TestTarget", accessModifier: .internal))
     )
 
@@ -355,9 +355,9 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__render__givenModuleType_embeddedInTarget_withPublicAccessModifier_generatesFragmentDefinition_withPublicAccess() throws {
+  func test__render__givenModuleType_embeddedInTarget_withPublicAccessModifier_generatesFragmentDefinition_withPublicAccess() async throws {
     // given
-    try buildSubjectAndFragment(
+    try await buildSubjectAndFragment(
       config: .mock(.embeddedInTarget(name: "TestTarget", accessModifier: .public))
     )
 
@@ -375,7 +375,7 @@ class FragmentTemplateTests: XCTestCase {
 
   // MARK: Initializer Tests
 
-  func test__render_givenInitializerConfigIncludesNamedFragments_rendersInitializer() throws {
+  func test__render_givenInitializerConfigIncludesNamedFragments_rendersInitializer() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -411,7 +411,7 @@ class FragmentTemplateTests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndFragment(
+    try await buildSubjectAndFragment(
       config: .mock(options: .init(
         selectionSetInitializers: [.namedFragments]
       )))
@@ -422,7 +422,7 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
-  func test__render_givenNamedFragment_configIncludesSpecificFragment_rendersInitializer() throws {
+  func test__render_givenNamedFragment_configIncludesSpecificFragment_rendersInitializer() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -458,7 +458,7 @@ class FragmentTemplateTests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndFragment(
+    try await buildSubjectAndFragment(
       config: .mock(options: .init(
         selectionSetInitializers: [.fragment(named: "TestFragment")]
       )))
@@ -469,7 +469,7 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
-  func test__render_givenNamedFragment_configDoesNotIncludeNamedFragments_doesNotRenderInitializer() throws {
+  func test__render_givenNamedFragment_configDoesNotIncludeNamedFragments_doesNotRenderInitializer() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -488,7 +488,7 @@ class FragmentTemplateTests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndFragment(
+    try await buildSubjectAndFragment(
       config: .mock(options: .init(
         selectionSetInitializers: [.operations]
       )))
@@ -499,7 +499,7 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_givenNamedFragments_configIncludeSpecificFragmentWithOtherName_doesNotRenderInitializer() throws {
+  func test__render_givenNamedFragments_configIncludeSpecificFragmentWithOtherName_doesNotRenderInitializer() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -518,7 +518,7 @@ class FragmentTemplateTests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndFragment(
+    try await buildSubjectAndFragment(
       config: .mock(options: .init(
         selectionSetInitializers: [.fragment(named: "OtherFragment")]
       )))
@@ -529,7 +529,7 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_givenNamedFragments_asLocalCacheMutation_configIncludeLocalCacheMutations_rendersInitializer() throws {
+  func test__render_givenNamedFragments_asLocalCacheMutation_configIncludeLocalCacheMutations_rendersInitializer() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -565,7 +565,7 @@ class FragmentTemplateTests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndFragment(
+    try await buildSubjectAndFragment(
       config: .mock(options: .init(
         selectionSetInitializers: [.localCacheMutations]
       )))
@@ -577,7 +577,7 @@ class FragmentTemplateTests: XCTestCase {
   }
 
   // MARK: Local Cache Mutation Tests
-  func test__render__givenFragment__asLocalCacheMutation_generatesFragmentDeclarationDefinitionAsMutableSelectionSetAndBoilerplate() throws {
+  func test__render__givenFragment__asLocalCacheMutation_generatesFragmentDeclarationDefinitionAsMutableSelectionSetAndBoilerplate() async throws {
     // given
     document = """
     fragment TestFragment on Query @apollo_client_ios_localCacheMutation {
@@ -593,7 +593,7 @@ class FragmentTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndFragment()
+    try await buildSubjectAndFragment()
 
     let actual = renderSubject()
 
@@ -602,7 +602,7 @@ class FragmentTemplateTests: XCTestCase {
     expect(String(actual.reversed())).to(equalLineByLine("\n}", ignoringExtraLines: true))
   }
 
-  func test__render__givenFragment__asLocalCacheMutation_generatesFragmentDefinitionStrippingLocalCacheMutationDirective() throws {
+  func test__render__givenFragment__asLocalCacheMutation_generatesFragmentDefinitionStrippingLocalCacheMutationDirective() async throws {
     // given
     document = """
     fragment TestFragment on Query @apollo_client_ios_localCacheMutation {
@@ -621,7 +621,7 @@ class FragmentTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndFragment()
+    try await buildSubjectAndFragment()
 
     let actual = renderSubject()
 
@@ -630,7 +630,7 @@ class FragmentTemplateTests: XCTestCase {
     expect(String(actual.reversed())).to(equalLineByLine("\n}", ignoringExtraLines: true))
   }
 
-  func test__render__givenFragment__asLocalCacheMutation_generatesFragmentDefinitionAsMutableSelectionSet() throws {
+  func test__render__givenFragment__asLocalCacheMutation_generatesFragmentDefinitionAsMutableSelectionSet() async throws {
     // given
     document = """
     fragment TestFragment on Query @apollo_client_ios_localCacheMutation {
@@ -657,7 +657,7 @@ class FragmentTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndFragment()
+    try await buildSubjectAndFragment()
 
     let actual = renderSubject()
 
@@ -667,9 +667,9 @@ class FragmentTemplateTests: XCTestCase {
 
   // MARK: Casing
 
-  func test__casing__givenLowercasedSchemaName_generatesWithFirstUppercasedNamespace() throws {
+  func test__casing__givenLowercasedSchemaName_generatesWithFirstUppercasedNamespace() async throws {
     // given
-    try buildSubjectAndFragment(config: .mock(schemaNamespace: "mySchema"))
+    try await buildSubjectAndFragment(config: .mock(schemaNamespace: "mySchema"))
 
     // then
     let expected = """
@@ -681,9 +681,9 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__casing__givenUppercasedSchemaName_generatesWithUppercasedNamespace() throws {
+  func test__casing__givenUppercasedSchemaName_generatesWithUppercasedNamespace() async throws {
     // given
-    try buildSubjectAndFragment(config: .mock(schemaNamespace: "MY_SCHEMA"))
+    try await buildSubjectAndFragment(config: .mock(schemaNamespace: "MY_SCHEMA"))
 
     // then
     let expected = """
@@ -695,9 +695,9 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__casing__givenCapitalizedSchemaName_generatesWithCapitalizedNamespace() throws {
+  func test__casing__givenCapitalizedSchemaName_generatesWithCapitalizedNamespace() async throws {
     // given
-    try buildSubjectAndFragment(config: .mock(schemaNamespace: "MySchema"))
+    try await buildSubjectAndFragment(config: .mock(schemaNamespace: "MySchema"))
 
     // then
     let expected = """
@@ -711,10 +711,10 @@ class FragmentTemplateTests: XCTestCase {
   
   // MARK: - Reserved Keyword Tests
   
-  func test__render__givenFragmentReservedKeywordName_rendersEscapedName() throws {
+  func test__render__givenFragmentReservedKeywordName_rendersEscapedName() async throws {
     let keywords = ["Type", "type"]
     
-    try keywords.forEach { keyword in
+    try await keywords.asyncForEach { keyword in
       // given
       schemaSDL = """
       type Query {
@@ -738,7 +738,7 @@ class FragmentTemplateTests: XCTestCase {
       """
 
       // when
-      try buildSubjectAndFragment(named: keyword)
+      try await buildSubjectAndFragment(named: keyword)
       let actual = renderSubject()
 
       // then

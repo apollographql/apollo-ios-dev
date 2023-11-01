@@ -2,7 +2,7 @@ import Foundation
 import ArgumentParser
 import ApolloCodegenLib
 
-public struct Initialize: ParsableCommand {
+public struct Initialize: AsyncParsableCommand {
 
   // MARK: - Configuration
 
@@ -99,11 +99,11 @@ public struct Initialize: ParsableCommand {
     }
   }
 
-  public func run() throws {
-    try _run()
+  public func run() async throws {
+    try await _run()
   }
 
-  func _run(fileManager: ApolloFileManager = .default, output: OutputClosure? = nil) throws {
+  func _run(fileManager: ApolloFileManager = .default, output: OutputClosure? = nil) async throws {
     let encoded = try ApolloCodegenConfiguration
       .minimalJSON(schemaNamespace: schemaNamespace, moduleType: moduleType, targetName: targetName)
       .asData()
@@ -116,7 +116,7 @@ public struct Initialize: ParsableCommand {
       return
     }
 
-    try write(
+    try await write(
       data: encoded,
       toPath: path,
       overwrite: overwrite,
@@ -131,7 +131,7 @@ public struct Initialize: ParsableCommand {
     overwrite: Bool,
     fileManager: ApolloFileManager,
     output: OutputClosure? = nil
-  ) throws {
+  ) async throws {
     if !overwrite && fileManager.doesFileExist(atPath: path) {
       throw Error(
         errorDescription: """
@@ -141,7 +141,7 @@ public struct Initialize: ParsableCommand {
       )
     }
 
-    try fileManager.createFile(
+    try await fileManager.createFile(
       atPath: path,
       data: data
     )

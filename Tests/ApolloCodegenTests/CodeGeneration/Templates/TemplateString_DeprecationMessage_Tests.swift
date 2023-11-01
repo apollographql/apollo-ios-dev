@@ -247,7 +247,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
   // There is a test here for all the places that the GraphQL schema supports the @deprecated
   // directive.
 
-  func test__field__givenSDLDeprecationMessageWithDoubleQuotes_shouldEscapeDoubleQuotes() throws {
+  func test__field__givenSDLDeprecationMessageWithDoubleQuotes_shouldEscapeDoubleQuotes() async throws {
     // given
     let schemaSDL = #"""
       type Query {
@@ -267,8 +267,8 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       }
       """
 
-    let ir = try IRBuilder.mock(schema: schemaSDL, document: document)
-    let operation = ir.build(operation: try XCTUnwrap(ir.compilationResult[operation: "GetAnimal"]))
+    let ir = try await IRBuilder.mock(schema: schemaSDL, document: document)
+    let operation = await ir.build(operation: try XCTUnwrap(ir.compilationResult[operation: "GetAnimal"]))
     let subject = SelectionSetTemplate(
       definition: .operation(operation),
       generateInitializers: true,
@@ -290,7 +290,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
-  func test__inputField_givenSDLDeprecationMessageWithDoubleQuotes_shouldEscapeDoubleQuotes() throws {
+  func test__inputField_givenSDLDeprecationMessageWithDoubleQuotes_shouldEscapeDoubleQuotes() async throws {
     // given
     let schemaSDL = #"""
       type Query {
@@ -314,7 +314,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       }
       """
 
-    let ir = try IRBuilder.mock(schema: schemaSDL, document: document)
+    let ir = try await IRBuilder.mock(schema: schemaSDL, document: document)
     let inputObject = ir.schema.referencedTypes.inputObjects[0]
 
     let subject = InputObjectTemplate(graphqlInputObject: inputObject, config: config)
@@ -329,7 +329,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 23, ignoringExtraLines: true))
   }
 
-  func test__enum__givenSDLDeprecationMessageWithDoubleQuotes_shouldNotEscapeDoubleQuotes() throws {
+  func test__enum__givenSDLDeprecationMessageWithDoubleQuotes_shouldNotEscapeDoubleQuotes() async throws {
     // given
     let schemaSDL = #"""
       type Query {
@@ -357,7 +357,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       }
       """
 
-    let ir = try IRBuilder.mock(schema: schemaSDL, document: document)
+    let ir = try await IRBuilder.mock(schema: schemaSDL, document: document)
     let `enum` = ir.schema.referencedTypes.enums[0]
 
     let subject = EnumTemplate(graphqlEnum: `enum`, config: config)
@@ -372,7 +372,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
-  func test__argument__givenSDLDeprecationMessageWithDoubleQuotes_shouldEscapeDoubleQuotes() throws {
+  func test__argument__givenSDLDeprecationMessageWithDoubleQuotes_shouldEscapeDoubleQuotes() async throws {
     // given
     let schemaSDL = #"""
       type Query {
@@ -396,8 +396,8 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       }
       """
 
-    let ir = try IRBuilder.mock(schema: schemaSDL, document: document)
-    let operation = ir.build(operation: try XCTUnwrap(ir.compilationResult[operation: "GetAnimal"]))
+    let ir = try await IRBuilder.mock(schema: schemaSDL, document: document)
+    let operation = await ir.build(operation: try XCTUnwrap(ir.compilationResult[operation: "GetAnimal"]))
     let subject = SelectionSetTemplate(
       definition: .operation(operation),
       generateInitializers: true,

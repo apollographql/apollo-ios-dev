@@ -26,7 +26,7 @@ public class NamedFragment: Hashable, CustomDebugStringConvertible {
     definition: CompilationResult.FragmentDefinition,
     rootField: EntityField,
     referencedFragments: OrderedSet<NamedFragment>,
-    containsDeferredFragment: Bool = false,
+    containsDeferredFragment: Bool,
     entities: [Entity.Location: Entity]
   ) {
     self.definition = definition

@@ -9,31 +9,22 @@ public class IRBuilder {
 
   public let fieldCollector = FieldCollector()
 
-  var builtFragments: [String: NamedFragment] = [:]
+  let builtFragmentStorage = BuiltFragmentStorage()
 
   public init(compilationResult: CompilationResult) {
     self.compilationResult = compilationResult
     self.schema = Schema(
-      referencedTypes: .init(compilationResult.referencedTypes),
+      referencedTypes: .init(
+        compilationResult.referencedTypes,
+        schemaRootTypes: compilationResult.schemaRootTypes
+      ),
       documentation: compilationResult.schemaDocumentation
     )
-    self.processRootTypes()
-  }
-  
-  private func processRootTypes() {
-    let rootTypes = compilationResult.rootTypes
-    let typeList = [rootTypes.queryType.name, rootTypes.mutationType?.name, rootTypes.subscriptionType?.name].compactMap { $0 }
-    
-    compilationResult.operations.forEach { op in
-      op.rootType.isRootFieldType = typeList.contains(op.rootType.name)
-    }
-    
-    compilationResult.fragments.forEach { fragment in
-      fragment.type.isRootFieldType = typeList.contains(fragment.type.name)
-    }
   }
 
-  public func build(operation operationDefinition: CompilationResult.OperationDefinition) -> Operation {
+  public func build(
+    operation operationDefinition: CompilationResult.OperationDefinition
+  ) async -> Operation {
     let rootField = CompilationResult.Field(
       name: operationDefinition.operationType.rawValue,
       type: .nonNull(.entity(operationDefinition.rootType)),
@@ -44,7 +35,7 @@ public class IRBuilder {
       source: .operation(operationDefinition)
     )
 
-    let result = RootFieldBuilder.buildRootEntityField(
+    let result = await RootFieldBuilder.buildRootEntityField(
       forRootField: rootField,
       onRootEntity: rootEntity,
       inIR: self
@@ -58,38 +49,68 @@ public class IRBuilder {
     )
   }
 
-  public func build(fragment fragmentDefinition: CompilationResult.FragmentDefinition) -> NamedFragment {
-    if let fragment = builtFragments[fragmentDefinition.name] {
+  actor BuiltFragmentStorage {
+    enum CacheEntry {
+      case inProgress(Task<NamedFragment, Never>)
+      case ready(NamedFragment)
+    }
+
+    var fragmentCache: [String: CacheEntry] = [:]
+
+    func getFragment(named name: String, builder: @escaping () async -> NamedFragment) async -> NamedFragment {
+      if let cachedFragment = fragmentCache[name] {
+        switch cachedFragment {
+        case let .ready(fragment): return fragment
+        case let .inProgress(task): return await task.value
+        }
+      }
+
+      let task = Task {
+        await builder()
+      }
+
+      fragmentCache[name] = .inProgress(task)
+
+      let fragment = await task.value
+      fragmentCache[name] = .ready(fragment)
       return fragment
     }
 
-    let rootField = CompilationResult.Field(
-      name: fragmentDefinition.name,
-      type: .nonNull(.entity(fragmentDefinition.type)),
-      selectionSet: fragmentDefinition.selectionSet
-    )
-
-    let rootEntity = Entity(
-      source: .namedFragment(fragmentDefinition)
-    )
-
-    let result = RootFieldBuilder.buildRootEntityField(
-      forRootField: rootField,
-      onRootEntity: rootEntity,
-      inIR: self
-    )
-
-    let irFragment = NamedFragment(
-      definition: fragmentDefinition,
-      rootField: result.rootField,
-      referencedFragments: result.referencedFragments,
-      containsDeferredFragment: result.containsDeferredFragment,
-      entities: result.entities
-    )
-
-    builtFragments[irFragment.name] = irFragment
-    return irFragment
+    func getFragmentIfBuilt(named name: String) -> NamedFragment? {
+      guard case let .ready(cachedFragment) = fragmentCache[name] else {
+        return nil
+      }
+      return cachedFragment
+    }
   }
 
-  
+  public func build(fragment fragmentDefinition: CompilationResult.FragmentDefinition) async -> NamedFragment {
+    await builtFragmentStorage.getFragment(named: fragmentDefinition.name) {
+      let rootField = CompilationResult.Field(
+        name: fragmentDefinition.name,
+        type: .nonNull(.entity(fragmentDefinition.type)),
+        selectionSet: fragmentDefinition.selectionSet
+      )
+
+      let rootEntity = Entity(
+        source: .namedFragment(fragmentDefinition)
+      )
+
+      let result = await RootFieldBuilder.buildRootEntityField(
+        forRootField: rootField,
+        onRootEntity: rootEntity,
+        inIR: self
+      )
+
+      return NamedFragment(
+        definition: fragmentDefinition,
+        rootField: result.rootField,
+        referencedFragments: result.referencedFragments,
+        containsDeferredFragment: result.containsDeferredFragment,
+        entities: result.entities
+      )
+    }
+  }
+
+
 }

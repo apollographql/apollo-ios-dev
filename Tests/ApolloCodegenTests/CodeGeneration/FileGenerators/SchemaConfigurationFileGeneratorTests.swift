@@ -4,7 +4,7 @@ import Nimble
 @testable import ApolloCodegenLib
 
 class SchemaConfigurationFileGeneratorTests: XCTestCase {
-  let irSchema = IR.Schema(referencedTypes: .init([]))
+  let irSchema = IR.Schema(referencedTypes: .init([], schemaRootTypes: .mock()))
 
   var subject: SchemaConfigurationFileGenerator!
 

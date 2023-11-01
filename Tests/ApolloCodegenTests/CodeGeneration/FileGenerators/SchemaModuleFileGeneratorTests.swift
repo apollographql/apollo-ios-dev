@@ -1,21 +1,31 @@
 import XCTest
 @testable import ApolloCodegenLib
 import ApolloCodegenInternalTestHelpers
+import ApolloInternalTestHelpers
 import Nimble
 
 class SchemaModuleFileGeneratorTests: XCTestCase {
-  let rootURL = URL(fileURLWithPath: CodegenTestHelper.outputFolderURL().path)
-  let mockFileManager = MockApolloFileManager(strict: false)
+  var mockFileManager: MockApolloFileManager!
+
+  var testFilePathBuilder: TestFilePathBuilder!
+
+  var rootURL: URL { testFilePathBuilder.testIsolatedOutputFolder }
+
+  override func setUp() {
+    super.setUp()
+    testFilePathBuilder = TestFilePathBuilder(test: self)
+    mockFileManager = MockApolloFileManager(strict: false)
+  }
 
   override func tearDown() {
-    CodegenTestHelper.deleteExistingOutputFolder()
-
+    testFilePathBuilder = nil
+    mockFileManager = nil
     super.tearDown()
   }
 
   // MARK: - Tests
 
-  func test__generate__givenModuleType_swiftPackageManager_shouldGeneratePackageFile() throws {
+  func test__generate__givenModuleType_swiftPackageManager_shouldGeneratePackageFile() async throws {
     // given
     let fileURL = rootURL.appendingPathComponent("Package.swift")
 
@@ -32,13 +42,13 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
+    try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
     expect(self.mockFileManager.allClosuresCalled).to(beTrue())
   }
 
-  func test__generate__givenModuleTypeEmbeddedInTarget_lowercaseSchemaName_shouldGenerateNamespaceFileWithCapitalizedName() throws {
+  func test__generate__givenModuleTypeEmbeddedInTarget_lowercaseSchemaName_shouldGenerateNamespaceFileWithCapitalizedName() async throws {
     // given
     let fileURL = rootURL.appendingPathComponent("Schema.graphql.swift")
 
@@ -56,13 +66,13 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
+    try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
     expect(self.mockFileManager.allClosuresCalled).to(beTrue())
   }
 
-  func test__generate__givenModuleTypeEmbeddedInTarget_uppercaseSchemaName_shouldGenerateNamespaceFileWithUppercaseName() throws {
+  func test__generate__givenModuleTypeEmbeddedInTarget_uppercaseSchemaName_shouldGenerateNamespaceFileWithUppercaseName() async throws {
     // given
     let fileURL = rootURL.appendingPathComponent("SCHEMA.graphql.swift")
 
@@ -80,13 +90,13 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
+    try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
     expect(self.mockFileManager.allClosuresCalled).to(beTrue())
   }
 
-  func test__generate__givenModuleTypeEmbeddedInTarget_capitalizedSchemaName_shouldGenerateNamespaceFileWithCapitalizedName() throws {
+  func test__generate__givenModuleTypeEmbeddedInTarget_capitalizedSchemaName_shouldGenerateNamespaceFileWithCapitalizedName() async throws {
     // given
     let fileURL = rootURL.appendingPathComponent("MySchema.graphql.swift")
 
@@ -104,14 +114,19 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
+    try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
     expect(self.mockFileManager.allClosuresCalled).to(beTrue())
   }
 
-  func test__generate__givenModuleType_other_shouldNotGenerateFile() throws {
+  func test__generate__givenModuleType_other_shouldNotGenerateFile() async throws {
     // given
+    mockFileManager = MockApolloFileManager(
+      strict: false,
+      requireAllClosuresCalled: false
+    )
+
     let configuration = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(
       .other,
       to: rootURL.path
@@ -125,7 +140,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
+    try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
     expect(self.mockFileManager.allClosuresCalled).to(beFalse())

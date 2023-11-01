@@ -7,6 +7,8 @@ struct MockObjectFileGenerator: FileGenerator {
   /// Source GraphQL object.
   let graphqlObject: GraphQLObjectType
 
+  let fields: [(String, GraphQLType, deprecationReason: String?)]
+
   let ir: IRBuilder
 
   let config: ApolloCodegen.ConfigurationContext
@@ -14,6 +16,7 @@ struct MockObjectFileGenerator: FileGenerator {
   var template: TemplateRenderer {
     MockObjectTemplate(
       graphqlObject: graphqlObject,
+      fields: fields,
       config: config,
       ir: ir
     )

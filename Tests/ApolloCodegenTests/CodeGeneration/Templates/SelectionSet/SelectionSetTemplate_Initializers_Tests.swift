@@ -32,10 +32,10 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     schemaNamespace: String = "TestSchema",
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackageManager,
     operations: ApolloCodegenConfiguration.OperationsFileOutput = .inSchemaModule
-  ) throws {
-    ir = try .mock(schema: schemaSDL, document: document)
+  ) async throws {
+    ir = try await .mock(schema: schemaSDL, document: document)
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
-    operation = ir.build(operation: operationDefinition)
+    operation = await ir.build(operation: operationDefinition)
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       output: .mock(moduleType: moduleType, operations: operations),
@@ -59,10 +59,10 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     schemaNamespace: String = "TestSchema",
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackageManager,
     operations: ApolloCodegenConfiguration.OperationsFileOutput = .inSchemaModule
-  ) throws -> IR.NamedFragment {
-    ir = try .mock(schema: schemaSDL, document: document)
+  ) async throws -> IR.NamedFragment {
+    ir = try await .mock(schema: schemaSDL, document: document)
     let fragmentDefinition = try XCTUnwrap(ir.compilationResult[fragment: fragmentName])
-    let fragment = ir.build(fragment: fragmentDefinition)
+    let fragment = await ir.build(fragment: fragmentDefinition)
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       output: .mock(moduleType: moduleType, operations: operations),
@@ -104,7 +104,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
   
   // MARK: - Access Level Tests
 
-  func test__render__givenSelectionSet_whenModuleType_swiftPackageManager_andOperations_inSchemaModule_shouldRenderWithPublicAccess() throws {
+  func test__render__givenSelectionSet_whenModuleType_swiftPackageManager_andOperations_inSchemaModule_shouldRenderWithPublicAccess() async throws {
     // given
     buildSimpleObjectSchemaAndDocument()
 
@@ -112,7 +112,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       public init(
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .inSchemaModule
     )
@@ -126,7 +126,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render__givenSelectionSet_whenModuleType_EmbededInTargetWithPublicAccessModifier_andOperations_inSchemaModule_shouldRenderWithPublicAccess() throws {
+  func test__render__givenSelectionSet_whenModuleType_EmbededInTargetWithPublicAccessModifier_andOperations_inSchemaModule_shouldRenderWithPublicAccess() async throws {
     // given
     buildSimpleObjectSchemaAndDocument()
 
@@ -134,7 +134,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       public init(
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .embeddedInTarget(name: "TestTarget", accessModifier: .public),
       operations: .inSchemaModule
     )
@@ -148,7 +148,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render__givenSelectionSet_whenModuleType_EmbededInTargetWithInternalAccessModifier_andOperations_inSchemaModule_shouldRenderWithInternalAccess() throws {
+  func test__render__givenSelectionSet_whenModuleType_EmbededInTargetWithInternalAccessModifier_andOperations_inSchemaModule_shouldRenderWithInternalAccess() async throws {
     // given
     buildSimpleObjectSchemaAndDocument()
 
@@ -156,7 +156,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       init(
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .embeddedInTarget(name: "TestTarget", accessModifier: .internal),
       operations: .inSchemaModule
     )
@@ -170,7 +170,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render__givenSelectionSet_whenModuleType_swiftPackageManager_andOperations_relativeWithPublicAccessModifier_shouldRenderWithPublicAccess() throws {
+  func test__render__givenSelectionSet_whenModuleType_swiftPackageManager_andOperations_relativeWithPublicAccessModifier_shouldRenderWithPublicAccess() async throws {
     // given
     buildSimpleObjectSchemaAndDocument()
 
@@ -178,7 +178,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       public init(
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .relative(subpath: nil, accessModifier: .public)
     )
@@ -192,7 +192,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render__givenSelectionSet_whenModuleType_swiftPackageManager_andOperations_relativeWithInternalAccessModifier_shouldRenderWithInternalAccess() throws {
+  func test__render__givenSelectionSet_whenModuleType_swiftPackageManager_andOperations_relativeWithInternalAccessModifier_shouldRenderWithInternalAccess() async throws {
     // given
     buildSimpleObjectSchemaAndDocument()
 
@@ -200,7 +200,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       init(
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .relative(subpath: nil, accessModifier: .internal)
     )
@@ -214,7 +214,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render__givenSelectionSet_whenModuleType_swiftPackageManager_andOperations_absoluteWithPublicAccessModifier_shouldRenderWithPublicAccess() throws {
+  func test__render__givenSelectionSet_whenModuleType_swiftPackageManager_andOperations_absoluteWithPublicAccessModifier_shouldRenderWithPublicAccess() async throws {
     // given
     buildSimpleObjectSchemaAndDocument()
 
@@ -222,7 +222,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       public init(
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .absolute(path: "", accessModifier: .public)
     )
@@ -236,7 +236,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render__givenSelectionSet_whenModuleType_swiftPackageManager_andOperations_absoluteWithInternalAccessModifier_shouldRenderWithInternalAccess() throws {
+  func test__render__givenSelectionSet_whenModuleType_swiftPackageManager_andOperations_absoluteWithInternalAccessModifier_shouldRenderWithInternalAccess() async throws {
     // given
     buildSimpleObjectSchemaAndDocument()
 
@@ -244,7 +244,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       init(
     """
 
-    try buildSubjectAndOperation(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .absolute(path: "", accessModifier: .internal)
     )
@@ -260,7 +260,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
   
   // MARK: Object Type Tests
   
-  func test__render_givenSelectionSetOnObjectType_parametersDoNotIncludeTypenameFieldAndObjectTypeIsRenderedDirectly() throws {
+  func test__render_givenSelectionSetOnObjectType_parametersDoNotIncludeTypenameFieldAndObjectTypeIsRenderedDirectly() async throws {
     // given
     buildSimpleObjectSchemaAndDocument()
     
@@ -282,7 +282,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
     
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
     
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -294,7 +294,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
   
-  func test__render_givenSelectionSetOnInterfaceType_parametersIncludeTypenameField() throws {
+  func test__render_givenSelectionSetOnInterfaceType_parametersIncludeTypenameField() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -333,7 +333,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
     
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
     
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -345,7 +345,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_givenSelectionSetOnUnionType_parametersIncludeFulfilledFragmentsWithUnion() throws {
+  func test__render_givenSelectionSetOnUnionType_parametersIncludeFulfilledFragmentsWithUnion() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -402,7 +402,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals_asAnimalUnion_asDog = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "AnimalUnion"]?[as: "Dog"]
@@ -414,7 +414,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
-  func test__render_givenNestedTypeCaseSelectionSetOnInterfaceTypeNotInheritingFromParentInterface_fulfilledFragmentsIncludesAllTypeCasesInScope() throws {
+  func test__render_givenNestedTypeCaseSelectionSetOnInterfaceTypeNotInheritingFromParentInterface_fulfilledFragmentsIncludesAllTypeCasesInScope() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -467,7 +467,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
     
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
     
     let allAnimals_asPet_asWarmBlooded = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Pet"]?[as: "WarmBlooded"]
@@ -479,7 +479,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_givenNestedTypeCasesMergedFromSibling_fulfilledFragmentsIncludesAllTypeCasesInScope() throws {
+  func test__render_givenNestedTypeCasesMergedFromSibling_fulfilledFragmentsIncludesAllTypeCasesInScope() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -542,7 +542,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals_asCat = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Cat"]
@@ -556,7 +556,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
   
   // MARK: Selection Tests
   
-  func test__render_given_scalarFieldSelections_rendersInitializer() throws {
+  func test__render_given_scalarFieldSelections_rendersInitializer() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -687,7 +687,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
     
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
     
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -699,7 +699,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 62, ignoringExtraLines: true))
   }
   
-  func test__render_given_differentCasedFields_rendersInitializerWithCorrectCasing() throws {
+  func test__render_given_differentCasedFields_rendersInitializerWithCorrectCasing() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -744,7 +744,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
     
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
     
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -756,7 +756,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 20, ignoringExtraLines: true))
   }
 
-  func test__render_given_fieldWithAlias_rendersInitializer() throws {
+  func test__render_given_fieldWithAlias_rendersInitializer() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -793,7 +793,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -805,7 +805,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_given_listField_rendersInitializerWithListFieldTransformedToFieldData() throws {
+  func test__render_given_listField_rendersInitializerWithListFieldTransformedToFieldData() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -845,7 +845,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -857,7 +857,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_given_optionalListField_rendersInitializerWithListFieldTransformedToFieldData() throws {
+  func test__render_given_optionalListField_rendersInitializerWithListFieldTransformedToFieldData() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -897,7 +897,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -909,7 +909,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_given_optionalListOfOptionalsField_rendersInitializerWithListFieldTransformedToFieldData() throws {
+  func test__render_given_optionalListOfOptionalsField_rendersInitializerWithListFieldTransformedToFieldData() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -949,7 +949,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -961,7 +961,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
   
-  func test__render_given_entityFieldSelection_rendersInitializer() throws {
+  func test__render_given_entityFieldSelection_rendersInitializer() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1001,7 +1001,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -1013,7 +1013,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_given_abstractEntityFieldSelectionWithNoFields_rendersInitializer() throws {
+  func test__render_given_abstractEntityFieldSelectionWithNoFields_rendersInitializer() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1059,7 +1059,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -1071,7 +1071,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_given_entityFieldListSelection_rendersInitializer() throws {
+  func test__render_given_entityFieldListSelection_rendersInitializer() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1111,7 +1111,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """#
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -1123,7 +1123,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_given_entityFieldSelection_nullable_rendersInitializer() throws {
+  func test__render_given_entityFieldSelection_nullable_rendersInitializer() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1163,7 +1163,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -1176,7 +1176,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
   }
 
 
-  func test__render_given_mergedSelection_rendersInitializer() throws {
+  func test__render_given_mergedSelection_rendersInitializer() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1227,7 +1227,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals_asPet = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Pet"]
@@ -1239,7 +1239,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
-  func test__render_given_mergedOnly_SelectionSet_rendersInitializer() throws {
+  func test__render_given_mergedOnly_SelectionSet_rendersInitializer() async throws {
     // given
     // given
     schemaSDL = """
@@ -1306,7 +1306,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let asCat_height = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Cat"]?[field: "height"] as? IR.EntityField
@@ -1320,7 +1320,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
 
   // MARK: Named Fragment Tests
 
-  func test__render_givenNamedFragmentSelection_fulfilledFragmentsIncludesNamedFragment() throws {
+  func test__render_givenNamedFragmentSelection_fulfilledFragmentsIncludesNamedFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1364,7 +1364,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -1376,7 +1376,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 23, ignoringExtraLines: true))
   }
 
-  func test__render_givenNamedFragmentSelectionNestedInNamedFragment_fulfilledFragmentsIncludesNamedFragment() throws {
+  func test__render_givenNamedFragmentSelectionNestedInNamedFragment_fulfilledFragmentsIncludesNamedFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1429,7 +1429,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -1441,7 +1441,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 25, ignoringExtraLines: true))
   }
 
-  func test__render_givenTypeCaseWithNamedFragmentMergedFromParent_fulfilledFragmentsIncludesNamedFragment() throws {
+  func test__render_givenTypeCaseWithNamedFragmentMergedFromParent_fulfilledFragmentsIncludesNamedFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1492,7 +1492,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals_asPet = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[as: "Pet"]
@@ -1504,7 +1504,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 23, ignoringExtraLines: true))
   }
 
-  func test__render_givenNamedFragmentWithNonMatchingType_fulfilledFragmentsOnlyIncludesNamedFragmentOnTypeCase() throws {
+  func test__render_givenNamedFragmentWithNonMatchingType_fulfilledFragmentsOnlyIncludesNamedFragmentOnTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1569,7 +1569,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -1594,7 +1594,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
   ///
   /// In this test, we are verifying that the `PredatorFragment.AsPet` selection set is included in
   /// `fulfilledFragments`.
-  func test__render_givenNamedFragmentReferencingNamedFragmentInitializedAsTypeCaseFromChildFragment_fulfilledFragmentsIncludesChildFragmentTypeCase() throws {
+  func test__render_givenNamedFragmentReferencingNamedFragmentInitializedAsTypeCaseFromChildFragment_fulfilledFragmentsIncludesChildFragmentTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1659,7 +1659,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     // when
-    let fragment = try buildSubjectAndFragment(named: "Fragment1")
+    let fragment = try await buildSubjectAndFragment(named: "Fragment1")
 
     let predators_asPet = try XCTUnwrap(
       fragment[field: "predators"]?[as: "Pet"]
@@ -1678,7 +1678,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
   ///
   /// In this test, we are verifying that the `PredatorFragment.Predator.AsPet` selection set is included in
   /// `fulfilledFragments`.
-  func test__render_givenNamedFragmentWithNestedFieldMergedFromChildNamedFragmentInitializedAsTypeCaseFromChildFragment_fulfilledFragmentsIncludesChildFragmentTypeCase() throws {
+  func test__render_givenNamedFragmentWithNestedFieldMergedFromChildNamedFragmentInitializedAsTypeCaseFromChildFragment_fulfilledFragmentsIncludesChildFragmentTypeCase() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1743,7 +1743,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     // when
-    let fragment = try buildSubjectAndFragment(named: "Fragment1")
+    let fragment = try await buildSubjectAndFragment(named: "Fragment1")
 
     let predators_asPet = try XCTUnwrap(
       fragment[field: "predators"]?[as: "Pet"]
@@ -1757,7 +1757,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
 
   // MARK: - Include/Skip Tests
 
-  func test__render_given_fieldWithInclusionCondition_rendersInitializerWithOptionalParameter() throws {
+  func test__render_given_fieldWithInclusionCondition_rendersInitializerWithOptionalParameter() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1796,7 +1796,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
@@ -1808,7 +1808,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_given_inlineFragmentWithInclusionCondition_rendersInitializerWithFulfilledFragments() throws {
+  func test__render_given_inlineFragmentWithInclusionCondition_rendersInitializerWithFulfilledFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1855,7 +1855,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[if: "a"]
@@ -1867,7 +1867,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
-  func test__render_given_inlineFragmentWithMultipleInclusionConditions_rendersInitializerWithFulfilledFragments() throws {
+  func test__render_given_inlineFragmentWithMultipleInclusionConditions_rendersInitializerWithFulfilledFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1914,7 +1914,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[if: "a" && !"b"]
@@ -1926,7 +1926,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
-  func test__render_given_inlineFragmentWithNestedInclusionConditions_rendersInitializerWithFulfilledFragments() throws {
+  func test__render_given_inlineFragmentWithNestedInclusionConditions_rendersInitializerWithFulfilledFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1976,7 +1976,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[if: "a"]?[if: !"b"]
@@ -1988,7 +1988,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
-  func test__render_given_inlineFragmentWithInclusionConditionNestedInEntityWithOtherInclusionCondition_rendersInitializerWithFulfilledFragments() throws {
+  func test__render_given_inlineFragmentWithInclusionConditionNestedInEntityWithOtherInclusionCondition_rendersInitializerWithFulfilledFragments() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2037,7 +2037,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals_friend = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[if: "a"]?[field: "friend"]?[if: !"b"]
@@ -2051,7 +2051,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
 
   // MARK: Named Fragment & Include/Skip Tests
 
-  func test__render_givenNamedFragmentWithInclusionCondition_fulfilledFragmentsOnlyIncludesNamedFragmentOnInlineFragmentForInclusionCondition() throws {
+  func test__render_givenNamedFragmentWithInclusionCondition_fulfilledFragmentsOnlyIncludesNamedFragmentOnInlineFragmentForInclusionCondition() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2116,7 +2116,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField

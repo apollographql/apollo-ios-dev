@@ -78,8 +78,8 @@ class RootFieldBuilder {
     forRootField rootField: CompilationResult.Field,
     onRootEntity rootEntity: Entity,
     inIR ir: IRBuilder
-  ) -> Result {
-    return RootFieldBuilder(ir: ir, rootEntity: rootEntity)
+  ) async -> Result {
+    return await RootFieldBuilder(ir: ir, rootEntity: rootEntity)
       .build(rootField: rootField)
   }
 
@@ -99,7 +99,7 @@ class RootFieldBuilder {
 
   private func build(
     rootField: CompilationResult.Field
-  ) -> Result {
+  ) async -> Result {
     guard let rootSelectionSet = rootField.selectionSet else {
       fatalError("Root field must have a selection set.")
     }
@@ -115,7 +115,7 @@ class RootFieldBuilder {
       scopePath: LinkedList(rootTypePath)
     )
 
-    buildDirectSelections(
+    await buildDirectSelections(
       into: rootIrSelectionSet.selections.direct.unsafelyUnwrapped,
       atTypePath: rootIrSelectionSet.typeInfo,
       from: rootSelectionSet
@@ -133,8 +133,12 @@ class RootFieldBuilder {
     into target: DirectSelections,
     atTypePath typeInfo: SelectionSet.TypeInfo,
     from selectionSet: CompilationResult.SelectionSet
-  ) {
-    addSelections(from: selectionSet, to: target, atTypePath: typeInfo)
+  ) async {
+    await addSelections(
+      from: selectionSet,
+      to: target,
+      atTypePath: typeInfo
+    )
 
     if typeInfo.deferCondition == nil {
       typeInfo.entity.selectionTree.mergeIn(
@@ -148,30 +152,37 @@ class RootFieldBuilder {
     from selectionSet: CompilationResult.SelectionSet,
     to target: DirectSelections,
     atTypePath typeInfo: SelectionSet.TypeInfo
-  ) {
+  ) async {
     for selection in selectionSet.selections {
-      add(selection, to: target, atTypePath: typeInfo)
+      await add(
+        selection,
+        to: target,
+        atTypePath: typeInfo
+      )
     }
 
-    ir.fieldCollector.collectFields(from: selectionSet)
+    await self.ir.fieldCollector.collectFields(from: selectionSet)
   }
 
   private func add(
     _ selection: CompilationResult.Selection,
     to target: DirectSelections,
     atTypePath typeInfo: SelectionSet.TypeInfo
-  ) {
+  ) async {
     switch selection {
     case let .field(field):
-      if let irField = buildField(from: field, atTypePath: typeInfo) {
+      if let irField = await buildField(
+        from: field,
+        atTypePath: typeInfo
+      ) {
         target.mergeIn(irField)
       }
 
     case let .inlineFragment(inlineFragment):
-      add(inlineFragment, from: selection, to: target, atTypePath: typeInfo)
+      await add(inlineFragment, from: selection, to: target, atTypePath: typeInfo)
 
     case let .fragmentSpread(fragmentSpread):
-      add(fragmentSpread, from: selection, to: target, atTypePath: typeInfo)
+      await add(fragmentSpread, from: selection, to: target, atTypePath: typeInfo)
     }
   }
 
@@ -180,7 +191,7 @@ class RootFieldBuilder {
     from selection: CompilationResult.Selection,
     to target: DirectSelections,
     atTypePath typeInfo: SelectionSet.TypeInfo
-  ) {
+  ) async {
     guard let scope = scopeCondition(
       for: inlineFragment,
       in: typeInfo,
@@ -200,7 +211,7 @@ class RootFieldBuilder {
         return condition
       }
 
-      let irTypeCase = buildInlineFragmentSpread(
+      let irTypeCase = await buildInlineFragmentSpread(
         from: inlineSelectionSet,
         with: scope,
         inParentTypePath: typeInfo,
@@ -209,10 +220,10 @@ class RootFieldBuilder {
       target.mergeIn(irTypeCase)
 
     case (true, nil):
-      addSelections(from: inlineSelectionSet, to: target, atTypePath: typeInfo)
+      await addSelections(from: inlineSelectionSet, to: target, atTypePath: typeInfo)
 
     case (false, .some):
-      let irTypeCase = buildInlineFragmentSpread(
+      let irTypeCase = await buildInlineFragmentSpread(
         toWrap: selection,
         with: scope,
         inParentTypePath: typeInfo
@@ -226,7 +237,7 @@ class RootFieldBuilder {
     from selection: CompilationResult.Selection,
     to target: DirectSelections,
     atTypePath typeInfo: SelectionSet.TypeInfo
-  ) {
+  ) async {
     guard let scope = scopeCondition(
       for: fragmentSpread,
       in: typeInfo,
@@ -246,7 +257,7 @@ class RootFieldBuilder {
         return condition
       }
 
-      let irFragmentSpread = buildNamedFragmentSpread(
+      let irFragmentSpread = await buildNamedFragmentSpread(
         fromFragment: fragmentSpread,
         with: scope,
         spreadIntoParentWithTypePath: typeInfo,
@@ -255,7 +266,7 @@ class RootFieldBuilder {
       target.mergeIn(irFragmentSpread)
 
     case (false, .some):
-      let irTypeCase = buildInlineFragmentSpread(
+      let irTypeCase = await buildInlineFragmentSpread(
         toWrap: selection,
         with: scope,
         inParentTypePath: typeInfo
@@ -263,7 +274,7 @@ class RootFieldBuilder {
       target.mergeIn(irTypeCase)
 
     case (false, nil):
-      let irTypeCaseEnclosingFragment = buildInlineFragmentSpread(
+      let irTypeCaseEnclosingFragment = await buildInlineFragmentSpread(
         from: CompilationResult.SelectionSet(
           parentType: fragmentSpread.parentType,
           selections: [selection]
@@ -325,7 +336,7 @@ class RootFieldBuilder {
   private func buildField(
     from field: CompilationResult.Field,
     atTypePath enclosingTypeInfo: SelectionSet.TypeInfo
-  ) -> Field? {
+  ) async -> Field? {
     let inclusionResult = inclusionResult(for: field.inclusionConditions)
     guard inclusionResult != .skipped else {
       return nil
@@ -334,7 +345,7 @@ class RootFieldBuilder {
     let inclusionConditions = inclusionResult.conditions
 
     if field.type.namedType is GraphQLCompositeType {
-      let irSelectionSet = buildSelectionSet(
+      let irSelectionSet = await buildSelectionSet(
         forField: field,
         with: inclusionConditions,
         atTypePath: enclosingTypeInfo
@@ -355,7 +366,7 @@ class RootFieldBuilder {
     forField field: CompilationResult.Field,
     with inclusionConditions: InclusionConditions?,
     atTypePath enclosingTypeInfo: SelectionSet.TypeInfo
-  ) -> SelectionSet {
+  ) async -> SelectionSet {
     guard let fieldSelectionSet = field.selectionSet else {
       preconditionFailure("SelectionSet cannot be created for non-entity type field \(field).")
     }
@@ -373,7 +384,7 @@ class RootFieldBuilder {
       entity: entity,
       scopePath: typePath
     )
-    buildDirectSelections(
+    await buildDirectSelections(
       into: irSelectionSet.selections.direct.unsafelyUnwrapped,
       atTypePath: irSelectionSet.typeInfo,
       from: fieldSelectionSet
@@ -386,7 +397,7 @@ class RootFieldBuilder {
     with scopeCondition: ScopeCondition,
     inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo,
     deferCondition: CompilationResult.DeferCondition? = nil
-  ) -> InlineFragmentSpread {
+  ) async -> InlineFragmentSpread {
     let scope = ScopeCondition(
       type: scopeCondition.type,
       conditions: (deferCondition == nil ? scopeCondition.conditions : nil),
@@ -405,7 +416,7 @@ class RootFieldBuilder {
     )
 
     if let selectionSet = selectionSet {
-      buildDirectSelections(
+      await buildDirectSelections(
         into: irSelectionSet.selections.direct.unsafelyUnwrapped,
         atTypePath: irSelectionSet.typeInfo,
         from: selectionSet
@@ -419,7 +430,7 @@ class RootFieldBuilder {
     toWrap selection: CompilationResult.Selection,
     with scopeCondition: ScopeCondition,
     inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo
-  ) -> InlineFragmentSpread {
+  ) async -> InlineFragmentSpread {
     let typePath = enclosingTypeInfo.scopePath.mutatingLast {
       $0.appending(scopeCondition)
     }
@@ -429,7 +440,7 @@ class RootFieldBuilder {
       scopePath: typePath
     )
 
-    add(
+    await add(
       selection,
       to: irSelectionSet.selections.direct.unsafelyUnwrapped,
       atTypePath: irSelectionSet.typeInfo
@@ -443,8 +454,8 @@ class RootFieldBuilder {
     with scopeCondition: ScopeCondition,
     spreadIntoParentWithTypePath parentTypeInfo: SelectionSet.TypeInfo,
     deferCondition: CompilationResult.DeferCondition? = nil
-  ) -> NamedFragmentSpread {
-    let fragment = ir.build(fragment: fragmentSpread.fragment)
+  ) async -> NamedFragmentSpread {
+    let fragment = await ir.build(fragment: fragmentSpread.fragment)
     referencedFragments.append(fragment)
     referencedFragments.append(contentsOf: fragment.referencedFragments)
 

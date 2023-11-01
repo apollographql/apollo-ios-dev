@@ -10,14 +10,14 @@ class ApolloCodegenTests: XCTestCase {
   private var directoryURL: URL { testFileManager.directoryURL }
   private var testFileManager: TestIsolatedFileManager!
 
-  override func setUpWithError() throws {    
+  override func setUpWithError() throws {
+    try super.setUpWithError()
     testFileManager = try testIsolatedFileManager()
-
-    testFileManager.fileManager.changeCurrentDirectoryPath(directoryURL.path)
   }
 
   override func tearDownWithError() throws {
     testFileManager = nil
+    try super.tearDownWithError()
   }
 
   // MARK: Helpers
@@ -105,7 +105,7 @@ class ApolloCodegenTests: XCTestCase {
 
   // MARK: CompilationResult Tests
 
-  func test_compileResults_givenOperation_withGraphQLErrors_shouldThrow() throws {
+  func test_compileResults_givenOperation_withGraphQLErrors_shouldThrow() async throws {
     // given
     let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -125,13 +125,19 @@ class ApolloCodegenTests: XCTestCase {
       operationSearchPaths: [directoryURL.appendingPathComponent("*.graphql").path]
     )), rootURL: nil)
 
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
     // with
     //
     // Fetching `books.name` will cause a GraphQL validation error because `name`
     // is not a property of the `Book` type.
 
     // then
-    expect(try ApolloCodegen.compileGraphQLResult(config))
+    await expect { try await subject.compileGraphQLResult() }
       .to(throwError { error in
         guard case let ApolloCodegen.Error.graphQLSourceValidationFailure(lines) = error else {
           fail("Expected .graphQLSourceValidationFailure, got .\(error)")
@@ -141,7 +147,7 @@ class ApolloCodegenTests: XCTestCase {
       })
   }
 
-  func test_compileResults_givenOperations_withNoErrors_shouldReturn() throws {
+  func test_compileResults_givenOperations_withNoErrors_shouldReturn() async throws {
     // given
     let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -170,11 +176,17 @@ class ApolloCodegenTests: XCTestCase {
       operationSearchPaths: [directoryURL.appendingPathComponent("*.graphql").path]
     )), rootURL: nil)
 
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
     // then
-    expect(try ApolloCodegen.compileGraphQLResult(config).operations).to(haveCount(2))
+    await expect { try await subject.compileGraphQLResult().operations }.to(haveCount(2))
   }
 
-  func test_compileResults_givenRelativeSearchPath_relativeToRootURL_hasOperations_shouldReturnOperationsRelativeToRoot() throws {
+  func test_compileResults_givenRelativeSearchPath_relativeToRootURL_hasOperations_shouldReturnOperationsRelativeToRoot() async throws {
     // given
     let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -205,87 +217,20 @@ class ApolloCodegenTests: XCTestCase {
       operationSearchPaths: ["./**/*.graphql"]
     )), rootURL: rootURL)
 
-    let actual = try ApolloCodegen.compileGraphQLResult(config).operations
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
+    let actual = try await subject.compileGraphQLResult().operations
 
     // then
     expect(actual).to(haveCount(1))
     expect(actual.first?.name).to(equal("getBooks"))
   }
 
-  func test_CCN_compileResults_givenOperations_withNoErrors_shouldReturn() throws {
-    throw XCTSkip("CCN tests skipped until issue #3114 done or closed.")
-
-    let schemaData: Data = {
-      """
-      type Query {
-        author: Author
-      }
-
-      type Author {
-        name: String
-        age: Int
-      }
-      """
-    }().data(using: .utf8)!
-    // given
-    let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
-
-    let authorsData: Data =
-      """
-      query getAuthors {
-        author! {
-          name!
-        }
-      }
-      """.data(using: .utf8)!
-    try createFile(containing: authorsData, named: "authors-operation.graphql")
-
-    let config = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(input: .init(
-      schemaPath: schemaPath,
-      operationSearchPaths: [directoryURL.appendingPathComponent("*.graphql").path]
-    )), rootURL: nil)
-
-    let compiledDocument = try ApolloCodegen.compileGraphQLResult(
-      config,
-      experimentalFeatures: .init(clientControlledNullability: true)
-    )
-
-    // then
-    expect(compiledDocument.operations).to(haveCount(1))
-  }
-
-  func test_CCN_compileResults_givenOperations_withErrors_shouldError() throws {
-    throw XCTSkip("CCN tests skipped until issue #3114 done or closed.")
-
-    // given
-    let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
-
-    let authorsData: Data =
-      """
-      query getAuthors {
-        authors {
-          name!
-        }
-      }
-      """.data(using: .utf8)!
-    try createFile(containing: authorsData, named: "authors-operation.graphql")
-
-    let config = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(input: .init(
-      schemaPath: schemaPath,
-      operationSearchPaths: [directoryURL.appendingPathComponent("*.graphql").path]
-    )), rootURL: nil)
-
-    // then
-    expect(try ApolloCodegen.compileGraphQLResult(config).operations).to(throwError { error in
-      guard let error = error as? GraphQLError else {
-        fail("Expected .graphQLSourceValidationFailure because we attempted to compile a document that uses CCN without CCN enabled, got \(error)")
-        return
-      }
-      expect(error.message).to(equal("Syntax Error: Expected Name, found \"!\"."))
-    })
-  }
-
-  func test_compileResults_givenRelativeSchemaSearchPath_relativeToRootURL_shouldReturnSchemaRelativeToRoot() throws {
+  func test_compileResults_givenRelativeSchemaSearchPath_relativeToRootURL_shouldReturnSchemaRelativeToRoot() async throws {
     // given
     try createFile(
       body: """
@@ -314,14 +259,20 @@ class ApolloCodegenTests: XCTestCase {
       operationSearchPaths: [directoryURL.appendingPathComponent("*.graphql").path]
     )), rootURL: rootURL)
 
-    let actual = try ApolloCodegen.compileGraphQLResult(config)
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
+    let actual = try await subject.compileGraphQLResult()
 
     // then
     expect(actual.operations).to(haveCount(1))
     expect(actual.referencedTypes).to(haveCount(3))
   }
 
-  func test__compileResults__givenMultipleSchemaFiles_withDependentTypes_compilesResult() throws {
+  func test__compileResults__givenMultipleSchemaFiles_withDependentTypes_compilesResult() async throws {
     // given
     try createFile(
       body: """
@@ -362,11 +313,17 @@ class ApolloCodegenTests: XCTestCase {
       operationSearchPaths: [directoryURL.appendingPathComponent("*.graphql").path]
     )), rootURL: nil)
 
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
     // then
-    expect(try ApolloCodegen.compileGraphQLResult(config).referencedTypes.count).to(equal(3))
+    await expect { try await subject.compileGraphQLResult().referencedTypes.count }.to(equal(3))
   }
 
-  func test__compileResults__givenMultipleSchemaFiles_withDifferentRootTypes_compilesResult() throws {
+  func test__compileResults__givenMultipleSchemaFiles_withDifferentRootTypes_compilesResult() async throws {
     // given
     try createFile(
       body: """
@@ -406,13 +363,19 @@ class ApolloCodegenTests: XCTestCase {
       operationSearchPaths: [directoryURL.appendingPathComponent("*.graphql").path]
     )), rootURL: nil)
 
-    let result = try ApolloCodegen.compileGraphQLResult(config)
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
+    let result = try await subject.compileGraphQLResult()
 
     // then
     expect(result.operations.count).to(equal(2))
   }
 
-  func test__compileResults__givenMultipleSchemaFiles_withSchemaTypeExtension_compilesResultWithExtension() throws {
+  func test__compileResults__givenMultipleSchemaFiles_withSchemaTypeExtension_compilesResultWithExtension() async throws {
     // given
     try createFile(
       body: """
@@ -445,18 +408,24 @@ class ApolloCodegenTests: XCTestCase {
       operationSearchPaths: [directoryURL.appendingPathComponent("*.graphql").path]
     )), rootURL: nil)
 
-    let result = try ApolloCodegen.compileGraphQLResult(config)
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
+    let result = try await subject.compileGraphQLResult()
 
     // then
     expect(result.operations.count).to(equal(1))
   }
 
-  func test__compileResults__givenMultipleSchemaFilesWith_introspectionJSONSchema_withSchemaTypeExtension_compilesResultWithExtension() throws {
+  func test__compileResults__givenMultipleSchemaFilesWith_introspectionJSONSchema_withSchemaTypeExtension_compilesResultWithExtension() async throws {
     // given
     let introspectionJSON = try String(
       contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema
     )
-    
+
     try createFile(body: introspectionJSON, filename: "schemaJSON.json")
 
     try createFile(
@@ -484,13 +453,19 @@ class ApolloCodegenTests: XCTestCase {
       operationSearchPaths: [directoryURL.appendingPathComponent("*.graphql").path]
     )), rootURL: nil)
 
-    let result = try ApolloCodegen.compileGraphQLResult(config)
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
+    let result = try await subject.compileGraphQLResult()
 
     // then
     expect(result.operations.count).to(equal(1))
   }
 
-  func test__compileResults__givenMultipleIntrospectionJSONSchemaFiles_throwsError() throws {
+  func test__compileResults__givenMultipleIntrospectionJSONSchemaFiles_throwsError() async throws {
     // given
     let introspectionJSON = try String(
       contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema
@@ -508,21 +483,33 @@ class ApolloCodegenTests: XCTestCase {
       operationSearchPaths: [directoryURL.appendingPathComponent("*.graphql").path]
     )), rootURL: nil)
 
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
     // then
-    expect(try ApolloCodegen.compileGraphQLResult(config)).to(throwError())
+    await expect { try await subject.compileGraphQLResult() }.to(throwError())
   }
 
-  func test__compileResults__givenSchemaSearchPath_withNoMatches_throwsError() throws {
+  func test__compileResults__givenSchemaSearchPath_withNoMatches_throwsError() async throws {
     // given
     let config = ApolloCodegen.ConfigurationContext(config: .mock(
       input: .init(schemaPath: directoryURL.appendingPathComponent("file_does_not_exist").path)))
 
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
     // then
-    expect(try ApolloCodegen.compileGraphQLResult(config))
+    await expect { try await subject.compileGraphQLResult() }
       .to(throwError(ApolloCodegen.Error.cannotLoadSchema))
   }
 
-  func test__compileResults__givenSchemaSearchPaths_withMixedMatches_doesNotThrowError() throws {
+  func test__compileResults__givenSchemaSearchPaths_withMixedMatches_doesNotThrowError() async throws {
     // given
     let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -541,26 +528,38 @@ class ApolloCodegenTests: XCTestCase {
         operationSearchPaths: [operationPath]
       )))
 
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
     // then
-    expect(try ApolloCodegen.compileGraphQLResult(config))
-      .notTo(throwError())
+    await expect { try await subject.compileGraphQLResult() }.notTo(throwError())
   }
 
-  func test__compileResults__givenOperationSearchPath_withNoMatches_throwsError() throws {
+  func test__compileResults__givenOperationSearchPath_withNoMatches_throwsError() async throws {
     // given
     let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
 
     let config = ApolloCodegen.ConfigurationContext(config: .mock(
       input: .init(
         schemaPath: schemaPath,
-        operationSearchPaths: [directoryURL.appendingPathComponent("file_does_not_exist").path])))
+        operationSearchPaths: [directoryURL.appendingPathComponent("file_does_not_exist").path])
+    ))
+
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
 
     // then
-    expect(try ApolloCodegen.compileGraphQLResult(config))
+    await expect { try await subject.compileGraphQLResult() }
       .to(throwError(ApolloCodegen.Error.cannotLoadOperations))
   }
 
-  func test__compileResults__givenOperationSearchPaths_withMixedMatches_doesNotThrowError() throws {
+  func test__compileResults__givenOperationSearchPaths_withMixedMatches_doesNotThrowError() async throws {
     // given
     let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -578,14 +577,19 @@ class ApolloCodegenTests: XCTestCase {
           directoryURL.appendingPathComponent("file_does_not_exist").path
         ])))
 
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
     // then
-    expect(try ApolloCodegen.compileGraphQLResult(config))
-      .notTo(throwError())
+    await expect { try await subject.compileGraphQLResult() }.notTo(throwError())
   }
 
   // MARK: File Generator Tests
 
-  func test_fileGenerators_givenSchemaAndMultipleOperationDocuments_operations_inSchemaModule_shouldGenerateSchemaAndOperationsFiles() throws {
+  func test_fileGenerators_givenSchemaAndMultipleOperationDocuments_operations_inSchemaModule_shouldGenerateSchemaAndOperationsFiles() async throws {
     // given
     let schemaPath = ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.Schema.path
     let operationsPath = ApolloCodegenInternalTestHelpers.Resources.url
@@ -605,11 +609,22 @@ class ApolloCodegenTests: XCTestCase {
       )
     ), rootURL: nil)
 
+
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
     let fileManager = MockApolloFileManager(strict: false)
 
-    var filePaths: Set<String> = []
+    let filePathStore = ApolloFileManager.WrittenFiles()
+    let concurrentTasks = ConcurrentTaskContainer()
+
     fileManager.mock(closure: .createFile({ path, data, attributes in
-      filePaths.insert(path)
+      concurrentTasks.dispatch {
+        await filePathStore.addWrittenFile(path: path)
+      }
       return true
     }))
 
@@ -646,7 +661,7 @@ class ApolloCodegenTests: XCTestCase {
 
       directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/CustomDate.swift").path,
       directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/Object.swift").path,
-      
+
       directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsIncludeSkipQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Queries/ClassroomPetsQuery.graphql.swift").path,
@@ -670,24 +685,24 @@ class ApolloCodegenTests: XCTestCase {
     ]
 
     // when
-    let compilationResult = try ApolloCodegen.compileGraphQLResult(config)
+    let compilationResult = try await subject.compileGraphQLResult()
 
     let ir = IRBuilder(compilationResult: compilationResult)
 
-    try ApolloCodegen.generateFiles(
+    try await subject.generateFiles(
       compilationResult: compilationResult,
       ir: ir,
-      config: config,
-      fileManager: fileManager,
-      itemsToGenerate: [.code]
+      fileManager: fileManager
     )
+    await concurrentTasks.waitForAllTasks()
+    let filePaths = await filePathStore.value
 
     // then
     expect(filePaths).to(equal(expectedPaths))
     expect(fileManager.allClosuresCalled).to(beTrue())
   }
 
-  func test_fileGenerators_givenSchemaAndMultipleOperationDocuments_operations_absolute_shouldGenerateSchemaAndOperationsFiles() throws {
+  func test_fileGenerators_givenSchemaAndMultipleOperationDocuments_operations_absolute_shouldGenerateSchemaAndOperationsFiles() async throws {
     // given
     let schemaPath = ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.Schema.path
     let operationsPath = ApolloCodegenInternalTestHelpers.Resources.url
@@ -709,11 +724,21 @@ class ApolloCodegenTests: XCTestCase {
       )
     ), rootURL: nil)
 
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
     let fileManager = MockApolloFileManager(strict: false)
 
-    var filePaths: Set<String> = []
+    let filePathStore = ApolloFileManager.WrittenFiles()
+    let concurrentTasks = ConcurrentTaskContainer()
+
     fileManager.mock(closure: .createFile({ path, data, attributes in
-      filePaths.insert(path)
+      concurrentTasks.dispatch {
+        await filePathStore.addWrittenFile(path: path)
+      }
       return true
     }))
 
@@ -769,131 +794,24 @@ class ApolloCodegenTests: XCTestCase {
     ]
 
     // when
-    let compilationResult = try ApolloCodegen.compileGraphQLResult(config)
+    let compilationResult = try await subject.compileGraphQLResult()
 
     let ir = IRBuilder(compilationResult: compilationResult)
 
-    try ApolloCodegen.generateFiles(
+    try await subject.generateFiles(
       compilationResult: compilationResult,
       ir: ir,
-      config: config,
-      fileManager: fileManager,
-      itemsToGenerate: [.code]
+      fileManager: fileManager
     )
+    await concurrentTasks.waitForAllTasks()
+    let filePaths = await filePathStore.value
 
     // then
     expect(filePaths).to(equal(expectedPaths))
     expect(fileManager.allClosuresCalled).to(beTrue())
   }
 
-  func test_fileGenerators_givenSchemaAndMultipleOperationDocuments_shouldGenerateSchemaAndOperationsFiles_CCN() throws {
-    throw XCTSkip("CCN-related tests skipped until issue #3114 done or closed - need to bring back the CCN operations in AnimalKingdomAPI.")
-
-    // given
-    let schemaPath = ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.Schema.path
-    let operationsPath = ApolloCodegenInternalTestHelpers.Resources.url
-      .appendingPathComponent("animalkingdom-graphql")
-      .appendingPathComponent("**/*.graphql").path
-
-    let config =  ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration(
-      schemaNamespace: "AnimalKingdomAPI",
-      input: .init(schemaPath: schemaPath, operationSearchPaths: [operationsPath]),
-      output: .mock(
-        moduleType: .swiftPackageManager,
-        operations: .inSchemaModule,
-        path: directoryURL.path
-      )
-    ), rootURL: nil)
-
-    let fileManager = MockApolloFileManager(strict: false)
-
-    var filePaths: Set<String> = []
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      filePaths.insert(path)
-      return true
-    }))
-
-    let expectedPaths: Set<String> = [
-      directoryURL.appendingPathComponent("Sources/Schema/SchemaMetadata.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/SchemaConfiguration.swift").path,
-
-      directoryURL.appendingPathComponent("Sources/Schema/Interfaces/Pet.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Interfaces/Animal.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Interfaces/WarmBlooded.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Interfaces/HousePet.graphql.swift").path,
-
-      directoryURL.appendingPathComponent("Sources/Schema/Enums/SkinCovering.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Enums/RelativeSize.graphql.swift").path,
-
-      directoryURL.appendingPathComponent("Sources/Schema/Unions/ClassroomPet.graphql.swift").path,
-
-      directoryURL.appendingPathComponent("Sources/Schema/InputObjects/PetAdoptionInput.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/InputObjects/PetSearchFilters.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/InputObjects/MeasurementsInput.graphql.swift").path,
-
-      directoryURL.appendingPathComponent("Sources/Schema/Objects/Height.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Objects/Query.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Objects/Cat.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Objects/Human.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Objects/Bird.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Objects/Rat.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Objects/PetRock.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Objects/Mutation.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Objects/Dog.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Objects/Fish.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/Objects/Crocodile.graphql.swift").path,
-
-      directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/CustomDate.swift").path,
-      directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/Object.swift").path,
-
-      directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsQuery.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Operations/Queries/DogQuery.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Operations/Queries/ClassroomPetsQuery.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Operations/Queries/PetSearchQuery.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Operations/Queries/PetSearchQuery.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsIncludeSkipQuery.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsCCNQuery.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Operations/Queries/ClassroomPetsCCNQuery.graphql.swift").path,
-
-      directoryURL.appendingPathComponent("Sources/Operations/Mutations/PetAdoptionMutation.graphql.swift").path,
-
-      directoryURL.appendingPathComponent("Sources/Fragments/ClassroomPetDetailsCCN.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Fragments/PetDetails.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Fragments/DogFragment.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Fragments/ClassroomPetDetails.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Fragments/HeightInMeters.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Fragments/WarmBloodedDetails.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Fragments/CrocodileFragment.graphql.swift").path,
-
-      directoryURL.appendingPathComponent("Sources/LocalCacheMutations/AllAnimalsLocalCacheMutation.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/LocalCacheMutations/PetDetailsMutation.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/LocalCacheMutations/PetSearchLocalCacheMutation.graphql.swift").path,
-
-      directoryURL.appendingPathComponent("Package.swift").path,
-    ]
-
-    // when
-    let compilationResult = try ApolloCodegen.compileGraphQLResult(
-      config,
-      experimentalFeatures: .init(clientControlledNullability: true)
-    )
-
-    let ir = IRBuilder(compilationResult: compilationResult)
-
-    try ApolloCodegen.generateFiles(
-      compilationResult: compilationResult,
-      ir: ir,
-      config: config,
-      fileManager: fileManager,
-      itemsToGenerate: [.code]
-    )
-
-    // then
-    expect(filePaths).to(equal(expectedPaths))
-    expect(fileManager.allClosuresCalled).to(beTrue())
-  }
-
-  func test_fileGenerators_givenTestMockOutput_absolutePath_shouldGenerateTestMocks() throws {
+  func test_fileGenerators_givenTestMockOutput_absolutePath_shouldGenerateTestMocks() async throws {
     // given
     let schemaPath = ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.Schema.path
     let operationsPath = ApolloCodegenInternalTestHelpers.Resources.url
@@ -911,12 +829,22 @@ class ApolloCodegenTests: XCTestCase {
       )
     ), rootURL: nil)
 
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
     let fileManager = MockApolloFileManager(strict: false)
 
-    var filePaths: Set<String> = []
+    let filePathStore = ApolloFileManager.WrittenFiles()
+    let concurrentTasks = ConcurrentTaskContainer()
+
     fileManager.mock(closure: .createFile({ path, data, attributes in
       if path.contains("/TestMocks/") {
-        filePaths.insert(path)
+        concurrentTasks.dispatch {
+          await filePathStore.addWrittenFile(path: path)
+        }
       }
       return true
     }))
@@ -938,20 +866,17 @@ class ApolloCodegenTests: XCTestCase {
     ]
 
     // when
-    let compilationResult = try ApolloCodegen.compileGraphQLResult(
-      config,
-      experimentalFeatures: .init(clientControlledNullability: true)
-    )
+    let compilationResult = try await subject.compileGraphQLResult()
 
     let ir = IRBuilder(compilationResult: compilationResult)
 
-    try ApolloCodegen.generateFiles(
+    try await subject.generateFiles(
       compilationResult: compilationResult,
       ir: ir,
-      config: config,
-      fileManager: fileManager,
-      itemsToGenerate: [.code]
+      fileManager: fileManager
     )
+    await concurrentTasks.waitForAllTasks()
+    let filePaths = await filePathStore.value
 
     // then
     expect(filePaths).to(equal(expectedPaths))
@@ -960,7 +885,7 @@ class ApolloCodegenTests: XCTestCase {
 
   // MARK: Custom Root URL Tests
 
-  func test_fileGenerators_givenCustomRootDirectoryPath_operations_inSchemaModule__shouldGenerateFilesWithCustomRootPath() throws {
+  func test_fileGenerators_givenCustomRootDirectoryPath_operations_inSchemaModule__shouldGenerateFilesWithCustomRootPath() async throws {
     // given
     let schemaPath = ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.Schema.path
     let operationsPath = ApolloCodegenInternalTestHelpers.Resources.url
@@ -980,11 +905,21 @@ class ApolloCodegenTests: XCTestCase {
       )
     ), rootURL: directoryURL)
 
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
     let fileManager = MockApolloFileManager(strict: false)
 
-    var filePaths: Set<String> = []
+    let filePathStore = ApolloFileManager.WrittenFiles()
+    let concurrentTasks = ConcurrentTaskContainer()
+
     fileManager.mock(closure: .createFile({ path, data, attributes in
-      filePaths.insert(path)
+      concurrentTasks.dispatch {
+        await filePathStore.addWrittenFile(path: path)
+      }
       return true
     }))
 
@@ -1045,24 +980,24 @@ class ApolloCodegenTests: XCTestCase {
     ]
 
     // when
-    let compilationResult = try ApolloCodegen.compileGraphQLResult(config)
+    let compilationResult = try await subject.compileGraphQLResult()
 
     let ir = IRBuilder(compilationResult: compilationResult)
 
-    try ApolloCodegen.generateFiles(
+    try await subject.generateFiles(
       compilationResult: compilationResult,
       ir: ir,
-      config: config,
-      fileManager: fileManager,
-      itemsToGenerate: [.code]
+      fileManager: fileManager
     )
+    await concurrentTasks.waitForAllTasks()
+    let filePaths = await filePathStore.value
 
     // then
     expect(filePaths).to(equal(expectedPaths))
     expect(fileManager.allClosuresCalled).to(beTrue())
   }
 
-  func test_fileGenerators_givenCustomRootDirectoryPath_operations_absolute__shouldGenerateFilesWithCustomRootPath() throws {
+  func test_fileGenerators_givenCustomRootDirectoryPath_operations_absolute__shouldGenerateFilesWithCustomRootPath() async throws {
     // given
     let schemaPath = ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.Schema.path
     let operationsPath = ApolloCodegenInternalTestHelpers.Resources.url
@@ -1082,11 +1017,21 @@ class ApolloCodegenTests: XCTestCase {
       )
     ), rootURL: directoryURL)
 
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
     let fileManager = MockApolloFileManager(strict: false)
 
-    var filePaths: Set<String> = []
+    let filePathStore = ApolloFileManager.WrittenFiles()
+    let concurrentTasks = ConcurrentTaskContainer()
+
     fileManager.mock(closure: .createFile({ path, data, attributes in
-      filePaths.insert(path)
+      concurrentTasks.dispatch {
+        await filePathStore.addWrittenFile(path: path)
+      }
       return true
     }))
 
@@ -1147,17 +1092,17 @@ class ApolloCodegenTests: XCTestCase {
     ]
 
     // when
-    let compilationResult = try ApolloCodegen.compileGraphQLResult(config)
+    let compilationResult = try await subject.compileGraphQLResult()
 
     let ir = IRBuilder(compilationResult: compilationResult)
 
-    try ApolloCodegen.generateFiles(
+    try await subject.generateFiles(
       compilationResult: compilationResult,
       ir: ir,
-      config: config,
-      fileManager: fileManager,
-      itemsToGenerate: [.code]
+      fileManager: fileManager
     )
+    await concurrentTasks.waitForAllTasks()
+    let filePaths = await filePathStore.value
 
     // then
     expect(filePaths).to(equal(expectedPaths))
@@ -1166,7 +1111,7 @@ class ApolloCodegenTests: XCTestCase {
 
   // MARK: Old File Deletion Tests
 
-  func test__fileDeletion__givenPruneGeneratedFiles_false__doesNotDeleteUnusedGeneratedFiles() throws {
+  func test__fileDeletion__givenPruneGeneratedFiles_false__doesNotDeleteUnusedGeneratedFiles() async throws {
     // given
     try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -1203,7 +1148,7 @@ class ApolloCodegenTests: XCTestCase {
       options: .init(pruneGeneratedFiles: false)
     )
 
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
     expect(ApolloFileManager.default.doesFileExist(atPath: testFile)).to(beTrue())
@@ -1211,7 +1156,7 @@ class ApolloCodegenTests: XCTestCase {
     expect(ApolloFileManager.default.doesFileExist(atPath: testInOtherFolderFile)).to(beTrue())
   }
 
-  func test__fileDeletion__givenGeneratedFilesExist_InSchemaModuleDirectory_deletesOnlyGeneratedFiles() throws {
+  func test__fileDeletion__givenGeneratedFilesExist_InSchemaModuleDirectory_deletesOnlyGeneratedFiles() async throws {
     // given
     try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -1260,7 +1205,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
 
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
     expect(ApolloFileManager.default.doesFileExist(atPath: testFile)).to(beFalse())
@@ -1272,7 +1217,7 @@ class ApolloCodegenTests: XCTestCase {
     expect(ApolloFileManager.default.doesFileExist(atPath: testInOtherFolderUserFile)).to(beTrue())
   }
 
-  func test__fileDeletion__givenGeneratedFilesExist_InOperationAbsoluteDirectory_deletesOnlyGeneratedFiles() throws {
+  func test__fileDeletion__givenGeneratedFilesExist_InOperationAbsoluteDirectory_deletesOnlyGeneratedFiles() async throws {
     // given
     let absolutePath = "OperationPath"
     try createFile(containing: schemaData, named: "schema.graphqls")
@@ -1314,7 +1259,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
 
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
     expect(ApolloFileManager.default.doesFileExist(atPath: testFile)).to(beFalse())
@@ -1324,7 +1269,7 @@ class ApolloCodegenTests: XCTestCase {
     expect(ApolloFileManager.default.doesFileExist(atPath: testInChildUserFile)).to(beTrue())
   }
 
-  func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectories_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() throws {
+  func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectories_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() async throws {
     // given
     try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -1383,7 +1328,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
 
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
     expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath)).to(beFalse())
@@ -1398,7 +1343,7 @@ class ApolloCodegenTests: XCTestCase {
     expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath)).to(beTrue())
   }
 
-  func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectories_operationSearchPathWithoutDirectories_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() throws {
+  func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectories_operationSearchPathWithoutDirectories_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() async throws {
     // given
     try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -1456,7 +1401,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
 
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
     expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath)).to(beFalse())
@@ -1470,8 +1415,8 @@ class ApolloCodegenTests: XCTestCase {
     expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInChildPath)).to(beTrue())
     expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath)).to(beTrue())
   }
-  
-  func test__fileDeletion__inOperationRelativeDirectory__whenSymlinkIsUsed() throws {
+
+  func test__fileDeletion__inOperationRelativeDirectory__whenSymlinkIsUsed() async throws {
     // given
     try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -1479,7 +1424,7 @@ class ApolloCodegenTests: XCTestCase {
     let codeDirectory = "code"
     let relativeSubPath = "Operations"
     let operationFilename = "TestQuery.graphql"
-    
+
     try createOperationFile(
       type: .query,
       named: "TestQuery",
@@ -1490,11 +1435,11 @@ class ApolloCodegenTests: XCTestCase {
     let symLinkURL = directoryURL.appendingPathComponent("/\(codeDirectory)/\(relativeSubPath)/")
     let symLinkDestURL = directoryURL.appendingPathComponent("\(schemaDirectory)/Sources/Operations/")
     let fileValidationPath = symLinkDestURL.appendingPathComponent("\(operationFilename).swift").path
-    
+
     //setup symlink folder
     try testFileManager.fileManager.createDirectory(at: symLinkDestURL, withIntermediateDirectories: true)
     try testFileManager.fileManager.createSymbolicLink(at: symLinkURL, withDestinationURL: symLinkDestURL)
-    
+
     // when
     let config = ApolloCodegenConfiguration.mock(
       input: .init(
@@ -1512,20 +1457,20 @@ class ApolloCodegenTests: XCTestCase {
     )
 
     // then
-    
+
     // running codegen multiple times to validate symlink related file creation/deletion bug
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
     expect(ApolloFileManager.default.doesFileExist(atPath: fileValidationPath)).to(beTrue())
-    
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
     expect(ApolloFileManager.default.doesFileExist(atPath: fileValidationPath)).to(beTrue())
-    
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
     expect(ApolloFileManager.default.doesFileExist(atPath: fileValidationPath)).to(beTrue())
 
   }
 
-  func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectoriesWithSubPath_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() throws {
+  func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectoriesWithSubPath_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() async throws {
     // given
     try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -1605,7 +1550,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
 
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
     expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath)).to(beTrue())
@@ -1627,7 +1572,7 @@ class ApolloCodegenTests: XCTestCase {
     expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath)).to(beTrue())
   }
 
-  func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectoriesWithSubPath_operationSearchPathWithNoDirectories_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() throws {
+  func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectoriesWithSubPath_operationSearchPathWithNoDirectories_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() async throws {
     // given
     try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -1713,7 +1658,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
 
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
     expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath)).to(beTrue())
@@ -1735,7 +1680,7 @@ class ApolloCodegenTests: XCTestCase {
     expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath)).to(beTrue())
   }
 
-  func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectoriesWithSubPath_operationSearchPathWithoutGlobstar_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() throws {
+  func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectoriesWithSubPath_operationSearchPathWithoutGlobstar_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() async throws {
     // given
     try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -1815,7 +1760,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
 
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
     expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath)).to(beTrue())
@@ -1837,7 +1782,7 @@ class ApolloCodegenTests: XCTestCase {
     expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath)).to(beTrue())
   }
 
-  func test__fileDeletion__givenGeneratedTestMockFilesExist_InAbsoluteDirectory_deletesOnlyGeneratedFiles() throws {
+  func test__fileDeletion__givenGeneratedTestMockFilesExist_InAbsoluteDirectory_deletesOnlyGeneratedFiles() async throws {
     // given
     let absolutePath = "TestMocksPath"
     try createFile(containing: schemaData, named: "schema.graphqls")
@@ -1880,7 +1825,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
 
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
     expect(ApolloFileManager.default.doesFileExist(atPath: testFile)).to(beFalse())
@@ -1890,7 +1835,7 @@ class ApolloCodegenTests: XCTestCase {
     expect(ApolloFileManager.default.doesFileExist(atPath: testInChildUserFile)).to(beTrue())
   }
 
-  func test__fileDeletion__givenGeneratedTestMockFilesExist_InSwiftPackageDirectory_deletesOnlyGeneratedFiles() throws {
+  func test__fileDeletion__givenGeneratedTestMockFilesExist_InSwiftPackageDirectory_deletesOnlyGeneratedFiles() async throws {
     // given
     try createFile(containing: schemaData, named: "schema.graphqls")
 
@@ -1936,7 +1881,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
 
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
     expect(ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderFile)).to(beFalse())
@@ -1947,7 +1892,7 @@ class ApolloCodegenTests: XCTestCase {
     expect(ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderUserFile)).to(beTrue())
   }
 
-  func test__fileDeletion__givenGeneratedTestMockFilesExist_InSwiftPackageWithCustomTargetNameDirectory_deletesOnlyGeneratedFiles() throws {
+  func test__fileDeletion__givenGeneratedTestMockFilesExist_InSwiftPackageWithCustomTargetNameDirectory_deletesOnlyGeneratedFiles() async throws {
     // given
     let testMockTargetName = "ApolloTestTarget"
     try createFile(containing: schemaData, named: "schema.graphqls")
@@ -1994,7 +1939,7 @@ class ApolloCodegenTests: XCTestCase {
       )
     )
 
-    try ApolloCodegen.build(with: config, withRootURL: directoryURL)
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
     expect(ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderFile)).to(beFalse())
@@ -2097,9 +2042,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaName_matchingObjectName_shouldThrow() throws {
     // given
     let object = GraphQLObjectType.mock("Rocket")
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.referencedTypes.append(object)
+    let compilationResult = CompilationResult.mock(referencedTypes: [object])
 
     // then
     for name in conflictingSchemaNames {
@@ -2107,7 +2050,7 @@ class ApolloCodegenTests: XCTestCase {
         schemaNamespace: name
       ), rootURL: nil)
 
-      expect(try ApolloCodegen.validate(configContext, with: compilationResult))
+      expect(try configContext.validate(compilationResult))
         .to(throwError(ApolloCodegen.Error.schemaNameConflict(name: configContext.schemaNamespace)))
     }
   }
@@ -2115,9 +2058,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaName_matchingInterfaceName_shouldThrow() throws {
     // given
     let interface = GraphQLInterfaceType.mock("Rocket")
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.referencedTypes.append(interface)
+    let compilationResult = CompilationResult.mock(referencedTypes: [interface])
 
     // then
     for name in conflictingSchemaNames {
@@ -2125,7 +2066,7 @@ class ApolloCodegenTests: XCTestCase {
         schemaNamespace: name
       ), rootURL: nil)
 
-      expect(try ApolloCodegen.validate(configContext, with: compilationResult))
+      expect(try configContext.validate(compilationResult))
         .to(throwError(ApolloCodegen.Error.schemaNameConflict(name: configContext.schemaNamespace)))
     }
   }
@@ -2133,9 +2074,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaName_matchingUnionName_shouldThrow() throws {
     // given
     let union = GraphQLUnionType.mock("Rocket")
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.referencedTypes.append(union)
+    let compilationResult = CompilationResult.mock(referencedTypes: [union])
 
     // then
     for name in conflictingSchemaNames {
@@ -2143,7 +2082,7 @@ class ApolloCodegenTests: XCTestCase {
         schemaNamespace: name
       ), rootURL: nil)
 
-      expect(try ApolloCodegen.validate(configContext, with: compilationResult))
+      expect(try configContext.validate(compilationResult))
         .to(throwError(ApolloCodegen.Error.schemaNameConflict(name: configContext.schemaNamespace)))
     }
   }
@@ -2151,9 +2090,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaName_matchingEnumName_shouldThrow() throws {
     // given
     let `enum` = GraphQLEnumType.mock(name: "Rocket", values: ["one", "two"])
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.referencedTypes.append(`enum`)
+    let compilationResult = CompilationResult.mock(referencedTypes: [`enum`])
 
     // then
     for name in conflictingSchemaNames {
@@ -2161,7 +2098,7 @@ class ApolloCodegenTests: XCTestCase {
         schemaNamespace: name
       ), rootURL: nil)
 
-      expect(try ApolloCodegen.validate(configContext, with: compilationResult))
+      expect(try configContext.validate(compilationResult))
         .to(throwError(ApolloCodegen.Error.schemaNameConflict(name: configContext.schemaNamespace)))
     }
   }
@@ -2169,9 +2106,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaName_matchingInputObjectName_shouldThrow() throws {
     // given
     let inputObject = GraphQLInputObjectType.mock("Rocket")
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.referencedTypes.append(inputObject)
+    let compilationResult = CompilationResult.mock(referencedTypes: [inputObject])
 
     // then
     for name in conflictingSchemaNames {
@@ -2179,7 +2114,7 @@ class ApolloCodegenTests: XCTestCase {
         schemaNamespace: name
       ), rootURL: nil)
 
-      expect(try ApolloCodegen.validate(configContext, with: compilationResult))
+      expect(try configContext.validate(compilationResult))
         .to(throwError(ApolloCodegen.Error.schemaNameConflict(name: configContext.schemaNamespace)))
     }
   }
@@ -2187,9 +2122,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaName_matchingCustomScalarName_shouldThrow() throws {
     // given
     let customScalar = GraphQLScalarType.mock(name: "Rocket")
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.referencedTypes.append(customScalar)
+    let compilationResult = CompilationResult.mock(referencedTypes: [customScalar])
 
     // then
     for name in conflictingSchemaNames {
@@ -2197,7 +2130,7 @@ class ApolloCodegenTests: XCTestCase {
         schemaNamespace: name
       ), rootURL: nil)
 
-      expect(try ApolloCodegen.validate(configContext, with: compilationResult))
+      expect(try configContext.validate(compilationResult))
         .to(throwError(ApolloCodegen.Error.schemaNameConflict(name: configContext.schemaNamespace)))
     }
   }
@@ -2207,9 +2140,7 @@ class ApolloCodegenTests: XCTestCase {
     let fragmentDefinition = CompilationResult.FragmentDefinition.mock(
       "Rocket",
       type: .mock("MockType"))
-    let compilationResult = CompilationResult.mock()
-
-    compilationResult.fragments.append(fragmentDefinition)
+    let compilationResult = CompilationResult.mock(fragments: [fragmentDefinition])
 
     // then
     for name in conflictingSchemaNames {
@@ -2217,7 +2148,7 @@ class ApolloCodegenTests: XCTestCase {
         schemaNamespace: name
       ), rootURL: nil)
 
-      expect(try ApolloCodegen.validate(configContext, with: compilationResult))
+      expect(try configContext.validate(compilationResult))
         .to(throwError(ApolloCodegen.Error.schemaNameConflict(name: configContext.schemaNamespace)))
     }
   }
@@ -2235,11 +2166,11 @@ class ApolloCodegenTests: XCTestCase {
         .to(throwError(ApolloCodegen.Error.schemaNameConflict(name: config.schemaNamespace)))
     }
   }
-  
+
   func test__validation__givenTargetName_matchingDisallowedTargetName_shouldThrow() throws {
     // given
     let disallowedNames = ["apollo", "Apollo", "apolloapi", "ApolloAPI"]
-    
+
     // when
     for name in disallowedNames {
       let config = ApolloCodegenConfiguration.mock(
@@ -2247,7 +2178,7 @@ class ApolloCodegenTests: XCTestCase {
           moduleType: .embeddedInTarget(name: name)
         )
       )
-      
+
       // then
       expect(try ApolloCodegen._validate(config: config))
         .to(throwError(ApolloCodegen.Error.targetNameConflict(name: name)))
@@ -2289,25 +2220,25 @@ class ApolloCodegenTests: XCTestCase {
     let fragmentDefinition = CompilationResult.FragmentDefinition.mock(
       "MockFragmentDefinition",
       type: .mock("MockType"))
-    let compilationResult = CompilationResult.mock()
 
-    compilationResult.referencedTypes.append(contentsOf: [
-      object,
-      interface,
-      union,
-      `enum`,
-      inputObject,
-      customScalar
-    ])
-    compilationResult.fragments.append(fragmentDefinition)
+    let compilationResult = CompilationResult.mock(
+      referencedTypes: [
+        object,
+        interface,
+        union,
+        `enum`,
+        inputObject,
+        customScalar
+      ],
+      fragments: [fragmentDefinition]
+    )
 
     // then
     let configContext = ApolloCodegen.ConfigurationContext(config: .mock(
       schemaNamespace: "MySchema"
     ), rootURL: nil)
 
-    expect(try ApolloCodegen.validate(configContext, with: compilationResult))
-    .notTo(throwError())
+    expect(try configContext.validate(compilationResult)).notTo(throwError())
   }
 
   func test__validation__givenSchemaTypesModule_swiftPackageManager_withCocoapodsCompatibleImportStatements_true_shouldThrow() throws {
@@ -2358,8 +2289,8 @@ class ApolloCodegenTests: XCTestCase {
     // then
     expect(try ApolloCodegen._validate(config: config)).notTo(throwError())
   }
-  
-  func test__validation__selectionSet_typeConflicts_shouldThrowError() throws {
+
+  func test__validation__selectionSet_typeConflicts_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -2383,7 +2314,7 @@ class ApolloCodegenTests: XCTestCase {
       }
       """
     }().data(using: .utf8)!
-    
+
     let operationData: Data =
       """
       query ConflictingQuery {
@@ -2404,10 +2335,10 @@ class ApolloCodegenTests: XCTestCase {
           }
       }
       """.data(using: .utf8)!
-    
+
     try createFile(containing: schemaDefData, named: "schema.graphqls")
     try createFile(containing: operationData, named: "operation.graphql")
-    
+
     let config = ApolloCodegenConfiguration.mock(
       input: .init(
         schemaSearchPaths: ["schema*.graphqls"],
@@ -2419,20 +2350,22 @@ class ApolloCodegenTests: XCTestCase {
         operations: .inSchemaModule
       )
     )
-    
-    expect(try ApolloCodegen.build(with: config))
-      .to(throwError { error in
-        guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
-          fail("Expected .typeNameConflict, got .\(error)")
-          return
-        }
-        expect(name).to(equal("value"))
-        expect(conflictingName).to(equal("values"))
-        expect(containingObject).to(equal("ConflictingQuery"))
-      })
+
+    await expect {
+      try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
+    }
+    .to(throwError { error in
+      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+        fail("Expected .typeNameConflict, got .\(error)")
+        return
+      }
+      expect(name).to(equal("value"))
+      expect(conflictingName).to(equal("values"))
+      expect(containingObject).to(equal("ConflictingQuery"))
+    })
   }
-  
-  func test__validation__selectionSet_typeConflicts_withDirectInlineFragment_shouldThrowError() throws {
+
+  func test__validation__selectionSet_typeConflicts_withDirectInlineFragment_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -2456,7 +2389,7 @@ class ApolloCodegenTests: XCTestCase {
       }
       """
     }().data(using: .utf8)!
-    
+
     let operationData: Data =
       """
       query ConflictingQuery {
@@ -2478,10 +2411,10 @@ class ApolloCodegenTests: XCTestCase {
         }
       }
       """.data(using: .utf8)!
-    
+
     try createFile(containing: schemaDefData, named: "schema.graphqls")
     try createFile(containing: operationData, named: "operation.graphql")
-    
+
     let config = ApolloCodegenConfiguration.mock(
       input: .init(
         schemaSearchPaths: ["schema*.graphqls"],
@@ -2493,20 +2426,22 @@ class ApolloCodegenTests: XCTestCase {
         operations: .inSchemaModule
       )
     )
-    
-    expect(try ApolloCodegen.build(with: config))
-      .to(throwError { error in
-        guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
-          fail("Expected .typeNameConflict, got .\(error)")
-          return
-        }
-        expect(name).to(equal("values"))
-        expect(conflictingName).to(equal("value"))
-        expect(containingObject).to(equal("ConflictingQuery"))
-      })
+
+    await expect {
+      try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
+    }
+    .to(throwError { error in
+      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+        fail("Expected .typeNameConflict, got .\(error)")
+        return
+      }
+      expect(name).to(equal("values"))
+      expect(conflictingName).to(equal("value"))
+      expect(containingObject).to(equal("ConflictingQuery"))
+    })
   }
-  
-  func test__validation__selectionSet_typeConflicts_withMergedInlineFragment_shouldThrowError() throws {
+
+  func test__validation__selectionSet_typeConflicts_withMergedInlineFragment_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -2533,7 +2468,7 @@ class ApolloCodegenTests: XCTestCase {
       }
       """
     }().data(using: .utf8)!
-    
+
     let operationData: Data =
       """
       query ConflictingQuery {
@@ -2559,10 +2494,10 @@ class ApolloCodegenTests: XCTestCase {
         }
       }
       """.data(using: .utf8)!
-    
+
     try createFile(containing: schemaDefData, named: "schema.graphqls")
     try createFile(containing: operationData, named: "operation.graphql")
-    
+
     let config = ApolloCodegenConfiguration.mock(
       input: .init(
         schemaSearchPaths: ["schema*.graphqls"],
@@ -2574,20 +2509,22 @@ class ApolloCodegenTests: XCTestCase {
         operations: .inSchemaModule
       )
     )
-    
-    expect(try ApolloCodegen.build(with: config))
-      .to(throwError { error in
-        guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
-          fail("Expected .typeNameConflict, got .\(error)")
-          return
-        }
-        expect(name).to(equal("values"))
-        expect(conflictingName).to(equal("value"))
-        expect(containingObject).to(equal("ConflictingQuery"))
-      })
+
+    await expect {
+      try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
+    }
+    .to(throwError { error in
+      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+        fail("Expected .typeNameConflict, got .\(error)")
+        return
+      }
+      expect(name).to(equal("values"))
+      expect(conflictingName).to(equal("value"))
+      expect(containingObject).to(equal("ConflictingQuery"))
+    })
   }
-  
-  func test__validation__selectionSet_typeConflicts_withDirectNamedFragment_shouldThrowError() throws {
+
+  func test__validation__selectionSet_typeConflicts_withDirectNamedFragment_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -2609,7 +2546,7 @@ class ApolloCodegenTests: XCTestCase {
       }
       """
     }().data(using: .utf8)!
-    
+
     let operationData: Data =
       """
       query ConflictingQuery {
@@ -2625,7 +2562,7 @@ class ApolloCodegenTests: XCTestCase {
           }
         }
       }
-      
+
       fragment ContainerFields on Container {
         values {
           propertyA
@@ -2633,10 +2570,10 @@ class ApolloCodegenTests: XCTestCase {
         }
       }
       """.data(using: .utf8)!
-    
+
     try createFile(containing: schemaDefData, named: "schema.graphqls")
     try createFile(containing: operationData, named: "operation.graphql")
-    
+
     let config = ApolloCodegenConfiguration.mock(
       input: .init(
         schemaSearchPaths: ["schema*.graphqls"],
@@ -2648,20 +2585,22 @@ class ApolloCodegenTests: XCTestCase {
         operations: .inSchemaModule
       )
     )
-    
-    expect(try ApolloCodegen.build(with: config))
-      .to(throwError { error in
-        guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
-          fail("Expected .typeNameConflict, got .\(error)")
-          return
-        }
-        expect(name).to(equal("value"))
-        expect(conflictingName).to(equal("values"))
-        expect(containingObject).to(equal("ConflictingQuery"))
-      })
+
+    await expect {
+      try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
+    }
+    .to(throwError { error in
+      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+        fail("Expected .typeNameConflict, got .\(error)")
+        return
+      }
+      expect(name).to(equal("value"))
+      expect(conflictingName).to(equal("values"))
+      expect(containingObject).to(equal("ConflictingQuery"))
+    })
   }
-  
-  func test__validation__selectionSet_typeConflicts_withNamedFragment_shouldThrowError() throws {
+
+  func test__validation__selectionSet_typeConflicts_withNamedFragment_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -2683,7 +2622,7 @@ class ApolloCodegenTests: XCTestCase {
       }
       """
     }().data(using: .utf8)!
-    
+
     let operationData: Data =
       """
       fragment ContainerFields on Container {
@@ -2699,10 +2638,10 @@ class ApolloCodegenTests: XCTestCase {
         }
       }
       """.data(using: .utf8)!
-    
+
     try createFile(containing: schemaDefData, named: "schema.graphqls")
     try createFile(containing: operationData, named: "operation.graphql")
-    
+
     let config = ApolloCodegenConfiguration.mock(
       input: .init(
         schemaSearchPaths: ["schema*.graphqls"],
@@ -2714,20 +2653,22 @@ class ApolloCodegenTests: XCTestCase {
         operations: .inSchemaModule
       )
     )
-    
-    expect(try ApolloCodegen.build(with: config))
-      .to(throwError { error in
-        guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
-          fail("Expected .typeNameConflict, got .\(error)")
-          return
-        }
-        expect(name).to(equal("value"))
-        expect(conflictingName).to(equal("values"))
-        expect(containingObject).to(equal("ContainerFields"))
-      })
+
+    await expect {
+      try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
+    }
+    .to(throwError { error in
+      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+        fail("Expected .typeNameConflict, got .\(error)")
+        return
+      }
+      expect(name).to(equal("value"))
+      expect(conflictingName).to(equal("values"))
+      expect(containingObject).to(equal("ContainerFields"))
+    })
   }
-  
-  func test__validation__selectionSet_typeConflicts_withNamedFragmentFieldCollisionWithinInlineFragment_shouldThrowError() throws {
+
+  func test__validation__selectionSet_typeConflicts_withNamedFragmentFieldCollisionWithinInlineFragment_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -2756,7 +2697,7 @@ class ApolloCodegenTests: XCTestCase {
       }
       """
     }().data(using: .utf8)!
-    
+
     let operationData: Data =
       """
       query ConflictingQuery {
@@ -2782,10 +2723,10 @@ class ApolloCodegenTests: XCTestCase {
           }
       }
       """.data(using: .utf8)!
-    
+
     try createFile(containing: schemaDefData, named: "schema.graphqls")
     try createFile(containing: operationData, named: "operation.graphql")
-    
+
     let config = ApolloCodegenConfiguration.mock(
       input: .init(
         schemaSearchPaths: ["schema*.graphqls"],
@@ -2797,20 +2738,22 @@ class ApolloCodegenTests: XCTestCase {
         operations: .inSchemaModule
       )
     )
-    
-    expect(try ApolloCodegen.build(with: config))
-      .to(throwError { error in
-        guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
-          fail("Expected .typeNameConflict, got .\(error)")
-          return
-        }
-        expect(name).to(equal("value"))
-        expect(conflictingName).to(equal("values"))
-        expect(containingObject).to(equal("ConflictingQuery"))
-      })
+
+    await expect {
+      try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
+    }
+    .to(throwError { error in
+      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+        fail("Expected .typeNameConflict, got .\(error)")
+        return
+      }
+      expect(name).to(equal("value"))
+      expect(conflictingName).to(equal("values"))
+      expect(containingObject).to(equal("ConflictingQuery"))
+    })
   }
-  
-  func test__validation__selectionSet_typeConflicts_withNamedFragmentWithinInlineFragmentTypeCollision_shouldThrowError() throws {
+
+  func test__validation__selectionSet_typeConflicts_withNamedFragmentWithinInlineFragmentTypeCollision_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -2845,7 +2788,7 @@ class ApolloCodegenTests: XCTestCase {
       }
       """
     }().data(using: .utf8)!
-    
+
     let operationData: Data =
       """
       query ConflictingQuery {
@@ -2870,10 +2813,10 @@ class ApolloCodegenTests: XCTestCase {
           description
       }
       """.data(using: .utf8)!
-    
+
     try createFile(containing: schemaDefData, named: "schema.graphqls")
     try createFile(containing: operationData, named: "operation.graphql")
-    
+
     let config = ApolloCodegenConfiguration.mock(
       input: .init(
         schemaSearchPaths: ["schema*.graphqls"],
@@ -2885,20 +2828,22 @@ class ApolloCodegenTests: XCTestCase {
         operations: .inSchemaModule
       )
     )
-    
-    expect(try ApolloCodegen.build(with: config))
-      .to(throwError { error in
-        guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
-          fail("Expected .typeNameConflict, got .\(error)")
-          return
-        }
-        expect(name).to(equal("value"))
-        expect(conflictingName).to(equal("value"))
-        expect(containingObject).to(equal("ConflictingQuery"))
-      })
+
+    await expect {
+      try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
+    }
+    .to(throwError { error in
+      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+        fail("Expected .typeNameConflict, got .\(error)")
+        return
+      }
+      expect(name).to(equal("value"))
+      expect(conflictingName).to(equal("value"))
+      expect(containingObject).to(equal("ConflictingQuery"))
+    })
   }
-  
-  func test__validation__selectionSet_typeConflicts_withFieldUsingNamedFragmentCollision_shouldThrowError() throws {
+
+  func test__validation__selectionSet_typeConflicts_withFieldUsingNamedFragmentCollision_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
       type Query {
@@ -2921,7 +2866,7 @@ class ApolloCodegenTests: XCTestCase {
       }
       """
     }().data(using: .utf8)!
-    
+
     let operationData: Data =
       """
       query ConflictingQuery {
@@ -2940,10 +2885,10 @@ class ApolloCodegenTests: XCTestCase {
           propertyD
       }
       """.data(using: .utf8)!
-    
+
     try createFile(containing: schemaDefData, named: "schema.graphqls")
     try createFile(containing: operationData, named: "operation.graphql")
-    
+
     let config = ApolloCodegenConfiguration.mock(
       input: .init(
         schemaSearchPaths: ["schema*.graphqls"],
@@ -2955,17 +2900,19 @@ class ApolloCodegenTests: XCTestCase {
         operations: .inSchemaModule
       )
     )
-    
-    expect(try ApolloCodegen.build(with: config))
-      .to(throwError { error in
-        guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
-          fail("Expected .typeNameConflict, got .\(error)")
-          return
-        }
-        expect(name).to(equal("info"))
-        expect(conflictingName).to(equal("Info"))
-        expect(containingObject).to(equal("ConflictingQuery"))
-      })
+
+    await expect {
+      try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
+    }
+    .to(throwError { error in
+      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+        fail("Expected .typeNameConflict, got .\(error)")
+        return
+      }
+      expect(name).to(equal("info"))
+      expect(conflictingName).to(equal("Info"))
+      expect(containingObject).to(equal("ConflictingQuery"))
+    })
   }
 
   // MARK: Path Match Exclusion Tests

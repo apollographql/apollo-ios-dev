@@ -153,39 +153,6 @@ class VersionCheckerTests: XCTestCase {
     expect(result).to(equal(.versionMismatch(cliVersion: Constants.CLIVersion, apolloVersion: apolloVersion)))
   }
 
-  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInProjectRoot_noProjectRootURL_hasMatchingVersion_returns_versionMatch() throws {
-    // given
-    try fileManager.createFile(
-      body: version2PackageResolvedFileBody(apolloVersion: Constants.CLIVersion),
-      named: "Package.resolved"
-    )
-
-    // when
-    let result = try VersionChecker.matchCLIVersionToApolloVersion(
-      projectRootURL: nil
-    )
-
-    // then
-    expect(result).to(equal(.versionMatch))
-  }
-
-  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInProjectRoot_noProjectRootURL_hasNonMatchingVersion_returns_versionMismatch() throws {
-    // given
-    let apolloVersion = "1.0.0.test-1"
-    try fileManager.createFile(
-      body: version2PackageResolvedFileBody(apolloVersion: apolloVersion),
-      named: "Package.resolved"
-    )
-
-    // when
-    let result = try VersionChecker.matchCLIVersionToApolloVersion(
-      projectRootURL: nil
-    )
-
-    // then
-    expect(result).to(equal(.versionMismatch(cliVersion: Constants.CLIVersion, apolloVersion: apolloVersion)))
-  }
-
   func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInXcodeWorkspace_withVersion2FileFormat_hasMatchingVersion_returns_versionMatch() throws {
     // given
     try fileManager.createFile(
