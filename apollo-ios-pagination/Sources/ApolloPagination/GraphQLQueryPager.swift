@@ -458,6 +458,7 @@ extension GraphQLQueryPager {
           publisher.send(completion: .finished)
         }
       case .failure(let error):
+        publisher.send(completion: .finished)
         currentValue = .failure(error)
       }
     }
@@ -533,9 +534,6 @@ extension GraphQLQueryPager {
 
         if let latest {
           let (previousPages, firstPage, nextPage) = latest
-          if let canLoadPrevious = previousPageInfo?.canLoadPrevious, !canLoadPrevious {
-            isLoadingAll = false
-          }
           let value: Result<Output, Error> = .success(
             Output(
               previousPages: previousPages,
