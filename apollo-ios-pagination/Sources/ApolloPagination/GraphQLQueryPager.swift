@@ -32,7 +32,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     public let nextPages: [PaginatedQuery.Data]
     public let updateSource: UpdateSource
 
-    init(
+    public init(
       previousPages: [PaginatedQuery.Data],
       initialPage: InitialQuery.Data,
       nextPages: [PaginatedQuery.Data],
