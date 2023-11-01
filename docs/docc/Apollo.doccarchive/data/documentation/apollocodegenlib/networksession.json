@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "A wrapper to facilitate downloading a GraphQL schema.",
+      "text" : "A protocol to abstract the underlying network provider.",
       "type" : "text"
     }
   ],
@@ -14,15 +14,15 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloader"
+    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/NetworkSession"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloCodegenLib0A16SchemaDownloaderV",
+    "externalID" : "s:16ApolloCodegenLib14NetworkSessionP",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "struct"
+        "text" : "protocol"
       },
       {
         "kind" : "text",
@@ -30,7 +30,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "ApolloSchemaDownloader"
+        "text" : "NetworkSession"
       }
     ],
     "modules" : [
@@ -41,13 +41,13 @@
     "navigatorTitle" : [
       {
         "kind" : "identifier",
-        "text" : "ApolloSchemaDownloader"
+        "text" : "NetworkSession"
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Structure",
-    "symbolKind" : "struct",
-    "title" : "ApolloSchemaDownloader"
+    "roleHeading" : "Protocol",
+    "symbolKind" : "protocol",
+    "title" : "NetworkSession"
   },
   "primaryContentSections" : [
     {
@@ -62,7 +62,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "struct"
+              "text" : "protocol"
             },
             {
               "kind" : "text",
@@ -70,12 +70,22 @@
             },
             {
               "kind" : "identifier",
-              "text" : "ApolloSchemaDownloader"
+              "text" : "NetworkSession"
             }
           ]
         }
       ],
       "kind" : "declarations"
+    }
+  ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URLSession"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforming Types",
+      "type" : "conformingTypes"
     }
   ],
   "schemaVersion" : {
@@ -89,21 +99,15 @@
   "topicSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloader\/fetch(configuration:withRootURL:session:)"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/NetworkSession\/loadData(with:completionHandler:)"
       ],
-      "title" : "Type Methods"
-    },
-    {
-      "identifiers" : [
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloader\/SchemaDownloadError"
-      ],
-      "title" : "Enumerations"
+      "title" : "Instance Methods"
     }
   ],
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollocodegenlib\/apolloschemadownloader"
+        "\/documentation\/apollocodegenlib\/networksession"
       ],
       "traits" : [
         {
@@ -128,48 +132,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloSchemaDownloader": {
-  "abstract" : [
-    {
-      "text" : "A wrapper to facilitate downloading a GraphQL schema.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "struct"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "ApolloSchemaDownloader"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloader",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "ApolloSchemaDownloader"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "ApolloSchemaDownloader",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apolloschemadownloader"
-},
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloSchemaDownloader/SchemaDownloadError": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Foundation/URLSession": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "enum"
+      "text" : "extension"
     },
     {
       "kind" : "text",
@@ -177,38 +147,65 @@
     },
     {
       "kind" : "identifier",
-      "text" : "SchemaDownloadError"
+      "preciseIdentifier" : "c:objc(cs)NSURLSession",
+      "text" : "URLSession"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloader\/SchemaDownloadError",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URLSession",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "SchemaDownloadError"
+      "text" : "URLSession"
     }
   ],
   "role" : "symbol",
-  "title" : "ApolloSchemaDownloader.SchemaDownloadError",
+  "title" : "URLSession",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apolloschemadownloader\/schemadownloaderror"
+  "url" : "\/documentation\/apollocodegenlib\/foundation\/urlsession"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloSchemaDownloader/fetch(configuration:withRootURL:session:)": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/NetworkSession": {
   "abstract" : [
     {
-      "text" : "Downloads your schema using the specified configuration object.",
+      "text" : "A protocol to abstract the underlying network provider.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "static"
+      "text" : "protocol"
     },
     {
       "kind" : "text",
       "text" : " "
     },
+    {
+      "kind" : "identifier",
+      "text" : "NetworkSession"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/NetworkSession",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "NetworkSession"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "NetworkSession",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/networksession"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/NetworkSession/loadData(with:completionHandler:)": {
+  "abstract" : [
+    {
+      "text" : "Load data via the abstracted network provider",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
     {
       "kind" : "keyword",
       "text" : "func"
@@ -219,7 +216,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "fetch"
+      "text" : "loadData"
     },
     {
       "kind" : "text",
@@ -227,7 +224,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "configuration"
+      "text" : "with"
     },
     {
       "kind" : "text",
@@ -235,8 +232,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:16ApolloCodegenLib0A27SchemaDownloadConfigurationV",
-      "text" : "ApolloSchemaDownloadConfiguration"
+      "preciseIdentifier" : "s:10Foundation10URLRequestV",
+      "text" : "URLRequest"
     },
     {
       "kind" : "text",
@@ -244,57 +241,65 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "withRootURL"
+      "text" : "completionHandler"
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": ("
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:10Foundation3URLV",
-      "text" : "URL"
+      "preciseIdentifier" : "s:10Foundation4DataV",
+      "text" : "Data"
     },
     {
       "kind" : "text",
       "text" : "?, "
     },
     {
-      "kind" : "externalParam",
-      "text" : "session"
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)NSURLResponse",
+      "text" : "URLResponse"
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : "?, "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:16ApolloCodegenLib14NetworkSessionP",
-      "text" : "NetworkSession"
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
     },
     {
       "kind" : "text",
-      "text" : "?) "
+      "text" : "?) -> "
     },
     {
-      "kind" : "keyword",
-      "text" : "async"
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s4Voida",
+      "text" : "Void"
     },
     {
       "kind" : "text",
-      "text" : " "
+      "text" : ") -> "
     },
     {
-      "kind" : "keyword",
-      "text" : "throws"
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)NSURLSessionDataTask",
+      "text" : "URLSessionDataTask"
+    },
+    {
+      "kind" : "text",
+      "text" : "?"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloader\/fetch(configuration:withRootURL:session:)",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/NetworkSession\/loadData(with:completionHandler:)",
   "kind" : "symbol",
+  "required" : true,
   "role" : "symbol",
-  "title" : "fetch(configuration:withRootURL:session:)",
+  "title" : "loadData(with:completionHandler:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apolloschemadownloader\/fetch(configuration:withrooturl:session:)"
+  "url" : "\/documentation\/apollocodegenlib\/networksession\/loaddata(with:completionhandler:)"
 }
 }
 }
