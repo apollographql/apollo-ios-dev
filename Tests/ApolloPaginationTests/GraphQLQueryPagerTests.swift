@@ -10,7 +10,6 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     private typealias ReverseQuery = MockQuery<Mocks.Hero.ReverseFriendsQuery>
     private typealias ForwardQuery = MockQuery<Mocks.Hero.FriendsQuery>
 
-
     var cacheType: TestCacheProvider.Type {
         InMemoryTestCacheProvider.self
     }
