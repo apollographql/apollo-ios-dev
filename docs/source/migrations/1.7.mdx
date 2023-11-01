@@ -125,7 +125,7 @@ CustomCodegenScript.main()
 
 `main.swift` file usage is not compatible with `AsyncParsableCommand`. You will need to:
 
-1. Change the name of the file to something other than `main.swift`
+1. Change the name of the `main.swift` file to the the name of your command, for example: `CustomCodegenScript.swift`
 2. Add the `@main` annotation to the root command of your executable
 3. Remove the call to your script's `main()` function.
 
