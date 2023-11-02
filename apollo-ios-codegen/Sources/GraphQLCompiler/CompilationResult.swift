@@ -307,6 +307,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
     public let directives: [Directive]?
 
+    public let deferCondition: DeferCondition?
+
     static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
       self.init(
         selectionSet: .fromJSValue(jsValue["selectionSet"], bridge: bridge),
@@ -314,8 +316,6 @@ public final class CompilationResult: JavaScriptObjectDecodable {
         directives: .fromJSValue(jsValue["directives"], bridge: bridge)
       )
     }
-
-    public let deferCondition: DeferCondition?
 
     init(
       selectionSet: SelectionSet,

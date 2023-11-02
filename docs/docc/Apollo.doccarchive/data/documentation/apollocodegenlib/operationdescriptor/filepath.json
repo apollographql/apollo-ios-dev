@@ -1,34 +1,19 @@
 {
-  "abstract" : [
-    {
-      "text" : "The paths for the files written to by the ",
-      "type" : "text"
-    },
-    {
-      "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager",
-      "isActive" : true,
-      "type" : "reference"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager\/writtenFiles"
+    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/filePath"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloCodegenLib0A11FileManagerC12writtenFilesShySSGvp",
+    "externalID" : "s:16ApolloCodegenLib19OperationDescriptorV8filePathSSvp",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -40,7 +25,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "writtenFiles"
+        "text" : "filePath"
       },
       {
         "kind" : "text",
@@ -48,21 +33,8 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:Sh",
-        "text" : "Set"
-      },
-      {
-        "kind" : "text",
-        "text" : "<"
-      },
-      {
-        "kind" : "typeIdentifier",
         "preciseIdentifier" : "s:SS",
         "text" : "String"
-      },
-      {
-        "kind" : "text",
-        "text" : ">"
       }
     ],
     "modules" : [
@@ -73,7 +45,7 @@
     "role" : "symbol",
     "roleHeading" : "Instance Property",
     "symbolKind" : "property",
-    "title" : "writtenFiles"
+    "title" : "filePath"
   },
   "primaryContentSections" : [
     {
@@ -96,20 +68,11 @@
             },
             {
               "kind" : "identifier",
-              "text" : "writtenFiles"
+              "text" : "filePath"
             },
             {
               "kind" : "text",
               "text" : ": "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:Sh",
-              "text" : "Set"
-            },
-            {
-              "kind" : "text",
-              "text" : "<"
             },
             {
               "kind" : "typeIdentifier",
@@ -118,19 +81,11 @@
             },
             {
               "kind" : "text",
-              "text" : "> { "
+              "text" : " { "
             },
             {
               "kind" : "keyword",
               "text" : "get"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "async"
             },
             {
               "kind" : "text",
@@ -153,7 +108,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollocodegenlib\/apollofilemanager\/writtenfiles"
+        "\/documentation\/apollocodegenlib\/operationdescriptor\/filepath"
       ],
       "traits" : [
         {
@@ -178,14 +133,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloFileManager": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/OperationDescriptor": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -193,37 +148,25 @@
     },
     {
       "kind" : "identifier",
-      "text" : "ApolloFileManager"
+      "text" : "OperationDescriptor"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "ApolloFileManager"
+      "text" : "OperationDescriptor"
     }
   ],
   "role" : "symbol",
-  "title" : "ApolloFileManager",
+  "title" : "OperationDescriptor",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollofilemanager"
+  "url" : "\/documentation\/apollocodegenlib\/operationdescriptor"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloFileManager/writtenFiles": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/OperationDescriptor/filePath": {
   "abstract" : [
-    {
-      "text" : "The paths for the files written to by the ",
-      "type" : "text"
-    },
-    {
-      "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager",
-      "isActive" : true,
-      "type" : "reference"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
@@ -236,7 +179,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "writtenFiles"
+      "text" : "filePath"
     },
     {
       "kind" : "text",
@@ -244,29 +187,16 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sh",
-      "text" : "Set"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
       "preciseIdentifier" : "s:SS",
       "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager\/writtenFiles",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/filePath",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "writtenFiles",
+  "title" : "filePath",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollofilemanager\/writtenfiles"
+  "url" : "\/documentation\/apollocodegenlib\/operationdescriptor\/filepath"
 }
 }
 }

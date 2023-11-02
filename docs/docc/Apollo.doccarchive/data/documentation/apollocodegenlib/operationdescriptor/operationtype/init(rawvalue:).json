@@ -1,13 +1,12 @@
 {
   "abstract" : [
     {
-      "text" : "The paths for the files written to by the ",
+      "text" : "Inherited from ",
       "type" : "text"
     },
     {
-      "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager",
-      "isActive" : true,
-      "type" : "reference"
+      "code" : "RawRepresentable.init(rawValue:)",
+      "type" : "codeVoice"
     },
     {
       "text" : ".",
@@ -18,42 +17,34 @@
     "paths" : [
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/OperationType"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager\/writtenFiles"
+    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/OperationType\/init(rawValue:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloCodegenLib0A11FileManagerC12writtenFilesShySSGvp",
+    "externalID" : "s:16ApolloCodegenLib19OperationDescriptorV0D4TypeO8rawValueAESgSS_tcfc",
     "fragments" : [
       {
-        "kind" : "keyword",
-        "text" : "var"
+        "kind" : "identifier",
+        "text" : "init"
       },
       {
         "kind" : "text",
-        "text" : " "
+        "text" : "?("
       },
       {
-        "kind" : "identifier",
-        "text" : "writtenFiles"
+        "kind" : "externalParam",
+        "text" : "rawValue"
       },
       {
         "kind" : "text",
         "text" : ": "
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:Sh",
-        "text" : "Set"
-      },
-      {
-        "kind" : "text",
-        "text" : "<"
       },
       {
         "kind" : "typeIdentifier",
@@ -62,7 +53,7 @@
       },
       {
         "kind" : "text",
-        "text" : ">"
+        "text" : ")"
       }
     ],
     "modules" : [
@@ -71,9 +62,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Instance Property",
-    "symbolKind" : "property",
-    "title" : "writtenFiles"
+    "roleHeading" : "Initializer",
+    "symbolKind" : "init",
+    "title" : "init(rawValue:)"
   },
   "primaryContentSections" : [
     {
@@ -88,28 +79,19 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "var"
+              "text" : "init"
             },
             {
               "kind" : "text",
-              "text" : " "
+              "text" : "?("
             },
             {
-              "kind" : "identifier",
-              "text" : "writtenFiles"
+              "kind" : "externalParam",
+              "text" : "rawValue"
             },
             {
               "kind" : "text",
               "text" : ": "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:Sh",
-              "text" : "Set"
-            },
-            {
-              "kind" : "text",
-              "text" : "<"
             },
             {
               "kind" : "typeIdentifier",
@@ -118,23 +100,7 @@
             },
             {
               "kind" : "text",
-              "text" : "> { "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "get"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "async"
-            },
-            {
-              "kind" : "text",
-              "text" : " }"
+              "text" : ")"
             }
           ]
         }
@@ -153,7 +119,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollocodegenlib\/apollofilemanager\/writtenfiles"
+        "\/documentation\/apollocodegenlib\/operationdescriptor\/operationtype\/init(rawvalue:)"
       ],
       "traits" : [
         {
@@ -178,14 +144,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloFileManager": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/OperationDescriptor": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -193,42 +159,30 @@
     },
     {
       "kind" : "identifier",
-      "text" : "ApolloFileManager"
+      "text" : "OperationDescriptor"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "ApolloFileManager"
+      "text" : "OperationDescriptor"
     }
   ],
   "role" : "symbol",
-  "title" : "ApolloFileManager",
+  "title" : "OperationDescriptor",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollofilemanager"
+  "url" : "\/documentation\/apollocodegenlib\/operationdescriptor"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloFileManager/writtenFiles": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/OperationDescriptor/OperationType": {
   "abstract" : [
-    {
-      "text" : "The paths for the files written to by the ",
-      "type" : "text"
-    },
-    {
-      "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager",
-      "isActive" : true,
-      "type" : "reference"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "var"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -236,20 +190,42 @@
     },
     {
       "kind" : "identifier",
-      "text" : "writtenFiles"
+      "text" : "OperationType"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/OperationType",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "OperationType"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OperationDescriptor.OperationType",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/operationdescriptor\/operationtype"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/OperationDescriptor/OperationType/init(rawValue:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "?("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "rawValue"
     },
     {
       "kind" : "text",
       "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sh",
-      "text" : "Set"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
     },
     {
       "kind" : "typeIdentifier",
@@ -258,15 +234,15 @@
     },
     {
       "kind" : "text",
-      "text" : ">"
+      "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager\/writtenFiles",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/OperationType\/init(rawValue:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "writtenFiles",
+  "title" : "init(rawValue:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollofilemanager\/writtenfiles"
+  "url" : "\/documentation\/apollocodegenlib\/operationdescriptor\/operationtype\/init(rawvalue:)"
 }
 }
 }

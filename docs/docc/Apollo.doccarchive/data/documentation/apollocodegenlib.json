@@ -86,18 +86,25 @@
     },
     {
       "identifiers" : [
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/NetworkSession"
+      ],
+      "title" : "Protocols"
+    },
+    {
+      "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloadConfiguration",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloader",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/CodegenLogger",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileFinder",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Glob"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Glob",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor"
       ],
       "title" : "Structures"
     },
     {
       "identifiers" : [
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileAttributes"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileAttributes",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationIdentifierProvider"
       ],
       "title" : "Type Aliases"
     },
@@ -407,37 +414,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/fileattributes"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileFinder": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "struct"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "FileFinder"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileFinder",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "FileFinder"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "FileFinder",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/filefinder"
-},
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileManagerPathError": {
   "abstract" : [
 
@@ -547,6 +523,113 @@
   "title" : "InflectionRule",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/inflectionrule"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/NetworkSession": {
+  "abstract" : [
+    {
+      "text" : "A protocol to abstract the underlying network provider.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "NetworkSession"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/NetworkSession",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "NetworkSession"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "NetworkSession",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/networksession"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/OperationDescriptor": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "OperationDescriptor"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "OperationDescriptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OperationDescriptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/operationdescriptor"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/OperationIdentifierProvider": {
+  "abstract" : [
+    {
+      "text" : "An async closure used to compute the operation identifiers for operations",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "in the persisted queries manifest",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "OperationIdentifierProvider"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationIdentifierProvider",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "OperationIdentifierProvider"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OperationIdentifierProvider",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/operationidentifierprovider"
 }
 }
 }
