@@ -2,6 +2,10 @@
 import ApolloAPI
 #endif
 
+public enum RootSelectionSetInitializeError: Error {
+  case hasNonHashableValue
+}
+
 extension RootSelectionSet {
   // Initializes a `SelectionSet` with a raw Dictionary.
   ///
@@ -16,21 +20,23 @@ extension RootSelectionSet {
     dict: [String: Any],
     variables: GraphQLOperation.Variables? = nil
   ) throws {
-    let jsonObject = Self.convertDictToJSONObject(dict: dict)
+    let jsonObject = try Self.convertDictToJSONObject(dict: dict)
     try self.init(data: jsonObject, variables: variables)
   }
 
   /// Convert dictionary type [String: Any] to JSONObject
   /// - Parameter dict: dictionary value
   /// - Returns: converted JSONObject
-  static func convertDictToJSONObject(dict: [String: Any]) -> JSONObject {
+  static func convertDictToJSONObject(dict: [String: Any]) throws -> JSONObject {
     var result = JSONObject()
 
     for (key, value) in dict {
       if let hashableValue = value as? AnyHashable {
         result[key] = hashableValue
       } else if let dictValue = value as? [String: Any] {
-        result[key] = convertDictToJSONObject(dict: dictValue)
+        result[key] = try convertDictToJSONObject(dict: dictValue)
+      } else {
+        throw RootSelectionSetInitializeError.hasNonHashableValue
       }
     }
     return result
