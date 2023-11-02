@@ -35,6 +35,8 @@ extension RootSelectionSet {
         result[key] = hashableValue
       } else if let dictValue = value as? [String: Any] {
         result[key] = try convertDictToJSONObject(dict: dictValue)
+      } else if let dictArrayValue = value as? [[String: Any]] {
+        result[key] = try dictArrayValue.map { try convertDictToJSONObject(dict: $0)}
       } else {
         throw RootSelectionSetInitializeError.hasNonHashableValue
       }
