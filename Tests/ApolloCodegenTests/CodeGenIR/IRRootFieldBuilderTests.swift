@@ -4663,6 +4663,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
     let allAnimals = self.subject[field: "allAnimals"]
+    let allAnimals_deferredAsRoot = allAnimals?[as: "Animal", deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -4670,6 +4671,21 @@ class IRRootFieldBuilderTests: XCTestCase {
         directSelections: [
           .field("id", type: .nonNull(.scalar(Scalar_String))),
           .deferred(Interface_Animal, label: "root"),
+        ]
+      )
+    ))
+
+    expect(allAnimals_deferredAsRoot).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("species", type: .nonNull(.scalar(Scalar_String))),
+        ],
+        mergedSelections: [
+          .field("id", type: .nonNull(.scalar(Scalar_String))),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
         ]
       )
     ))
@@ -4708,6 +4724,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
     let allAnimals = self.subject[field: "allAnimals"]
+    let allAnimals_deferredAsRoot = allAnimals?[as: "Animal", deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -4715,6 +4732,21 @@ class IRRootFieldBuilderTests: XCTestCase {
         directSelections: [
           .field("id", type: .nonNull(.scalar(Scalar_String))),
           .deferred(Interface_Animal, label: "root"),
+        ]
+      )
+    ))
+
+    expect(allAnimals_deferredAsRoot).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("species", type: .nonNull(.scalar(Scalar_String))),
+        ],
+        mergedSelections: [
+          .field("id", type: .nonNull(.scalar(Scalar_String))),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
         ]
       )
     ))
