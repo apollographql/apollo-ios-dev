@@ -9,6 +9,7 @@ import {
   VariableDefinitionNode,
   InlineFragmentNode,
   GraphQLDeferDirective,
+  FragmentSpreadNode,
 } from "graphql";
 
 const specifiedRulesToBeRemoved: [ValidationRule] = [NoUnusedFragmentsRule];
@@ -31,8 +32,7 @@ export function defaultValidationRules(options: ValidationOptions): ValidationRu
   return [
     NoAnonymousQueries,
     NoTypenameAlias,
-    DeferredInlineFragmentNoTypeCondition,
-    DeferredInlineFragmentMissingLabelArgument,
+    DisallowDeferDirective,
     ...(disallowedFieldNamesRule ? [disallowedFieldNamesRule] : []),
     ...(disallowedInputParameterNamesRule ? [disallowedInputParameterNamesRule] : []),
     ...specifiedRules.filter((rule) => !specifiedRulesToBeRemoved.includes(rule)),
@@ -69,15 +69,15 @@ export function NoTypenameAlias(context: ValidationContext) {
   };
 }
 
-export function DeferredInlineFragmentNoTypeCondition(context: ValidationContext) {
+export function DisallowDeferDirective(context: ValidationContext) {
   return {
     InlineFragment(node: InlineFragmentNode) {
       if (node.directives) {
         for (const directive of node.directives) {
-          if (directive.name.value == GraphQLDeferDirective.name && node.typeCondition == undefined) {
+          if (directive.name.value == GraphQLDeferDirective.name) {
             context.reportError(
               new GraphQLError(
-                "Apollo does not support deferred inline fragments without a type condition. Please add a type condition to this inline fragment.",
+                "@defer support is disabled until the implementation is complete.",
                 { nodes: node }
               )
             )
@@ -85,20 +85,13 @@ export function DeferredInlineFragmentNoTypeCondition(context: ValidationContext
         }
       }
     },
-  };
-}
-
-export function DeferredInlineFragmentMissingLabelArgument(context: ValidationContext) {
-  return {
-    InlineFragment(node: InlineFragmentNode) {
+    FragmentSpread(node: FragmentSpreadNode) {
       if (node.directives) {
         for (const directive of node.directives) {
-          if (directive.name.value == GraphQLDeferDirective.name && !(directive.arguments?.find((element) =>
-            element.name.value == 'label'
-          ))) {
+          if (directive.name.value == GraphQLDeferDirective.name) {
             context.reportError(
               new GraphQLError(
-                "Apollo does not support deferred inline fragments without a 'label' argument. Please add a 'label' argument to the @defer directive on this inline fragment.",
+                "@defer support is disabled until the implementation is complete.",
                 { nodes: node }
               )
             )
