@@ -215,6 +215,8 @@ class EntitySelectionTree {
 
         if let conditionalScopes = scopeConditions {
           for (condition, node) in conditionalScopes {
+            guard !node.scope.isDeferred else { continue }
+
             if scopePathNode.value.matches(condition) {
               node.mergeSelections(matchingScopePath: scopePathNode, into: targetSelections)
 
@@ -229,6 +231,8 @@ class EntitySelectionTree {
 
       if let scopeConditions = scopeConditions {
         for (condition, node) in scopeConditions {
+          guard !node.scope.isDeferred else { continue }
+
           if scopePathNode.value.matches(condition) {
             node.mergeSelections(matchingScopePath: scopePathNode, into: targetSelections)
           }
@@ -257,7 +261,7 @@ class EntitySelectionTree {
       let nodeCondition = ScopeCondition(
         type: condition.type == self.type ? nil : condition.type,
         conditions: condition.conditions,
-        isDeferred: condition.isDeferred
+        deferCondition: condition.deferCondition
       )
 
       func createNode() -> EntityNode {
@@ -408,8 +412,7 @@ extension EntitySelectionTree.EntityNode {
       for conditionGroup in inclusionConditions.elements {
         let scope = ScopeCondition(
           type: rootTypesMatch ? nil : fragmentType,
-          conditions: conditionGroup,
-          isDeferred: fragment.isDeferred
+          conditions: conditionGroup
         )
         let nextNode = rootNodeToStartMerge.scopeConditionNode(for: scope)
 
@@ -424,7 +427,7 @@ extension EntitySelectionTree.EntityNode {
       let nextNode = rootTypesMatch ?
       rootNodeToStartMerge :
       rootNodeToStartMerge.scopeConditionNode(
-        for: ScopeCondition(type: fragmentType, isDeferred: fragment.isDeferred)
+        for: ScopeCondition(type: fragmentType)
       )
 
       nextNode.mergeIn(
@@ -516,8 +519,7 @@ extension EntitySelectionTree.EntityNode {
             entity: entity,
             scopePath: oldFragment.typeInfo.scopePath
           ),
-          inclusionConditions: oldFragment.inclusionConditions,
-          isDeferred: oldFragment.isDeferred
+          inclusionConditions: oldFragment.inclusionConditions
         )
       }
 

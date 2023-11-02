@@ -33,14 +33,10 @@ class CompilationTests: XCTestCase {
   }
 
   func compileFrontend(
-    schemaNamespace: String = "TestSchema",
-    enableCCN: Bool = false
+    schemaNamespace: String = "TestSchema"
   ) async throws -> CompilationResult {
     let frontend = try await GraphQLJSFrontend()
-    let config = ApolloCodegen.ConfigurationContext(config: .mock(
-      schemaNamespace: schemaNamespace,
-      experimentalFeatures: .init(clientControlledNullability: enableCCN)
-    ))
+    let config = ApolloCodegen.ConfigurationContext(config: .mock(schemaNamespace: schemaNamespace))
 
     if let schemaSDL = schemaSDL {
       return try await frontend.compile(
@@ -100,50 +96,6 @@ class CompilationTests: XCTestCase {
     
     XCTAssertEqualUnordered(compilationResult.referencedTypes.map(\.name),
                             ["Human", "Droid", "Query", "Episode", "Character", "String"])
-  }
-
-  func test__compile__givenSingleQuery_withClientControlledNullability() async throws {
-    // given
-    try useStarWarsSchema()
-
-    document = """
-      query HeroAndFriendsNames($id: ID) {
-        human(id: $id) {
-          name
-          mass!
-          appearsIn[!]?
-        }
-      }
-      """
-
-    let compilationResult = try await compileFrontend(enableCCN: true)
-
-    let operation = try XCTUnwrap(compilationResult.operations.first)
-    XCTAssertEqual(operation.name, "HeroAndFriendsNames")
-    XCTAssertEqual(operation.operationType, .query)
-    XCTAssertEqual(operation.rootType.name, "Query")
-
-    XCTAssertEqual(operation.variables[0].name, "id")
-    XCTAssertEqual(operation.variables[0].type.typeReference, "ID")
-
-    let heroField = try XCTUnwrap(operation.selectionSet.firstField(for: "human"))
-    XCTAssertEqual(heroField.name, "human")
-    XCTAssertEqual(heroField.type.typeReference, "Human")
-
-    let episodeArgument = try XCTUnwrap(heroField.arguments?.first)
-    XCTAssertEqual(episodeArgument.name, "id")
-    XCTAssertEqual(episodeArgument.value, .variable("id"))
-
-    let friendsField = try XCTUnwrap(heroField.selectionSet?.firstField(for: "mass"))
-    XCTAssertEqual(friendsField.name, "mass")
-    XCTAssertEqual(friendsField.type.typeReference, "Float!")
-
-    let appearsInField = try XCTUnwrap(heroField.selectionSet?.firstField(for: "appearsIn"))
-    XCTAssertEqual(appearsInField.name, "appearsIn")
-    XCTAssertEqual(appearsInField.type.typeReference, "[Episode!]")
-
-    XCTAssertEqualUnordered(compilationResult.referencedTypes.map(\.name),
-                            ["ID", "Query", "Human", "Droid", "String", "Float", "Episode", "Character"])
   }
 
   func test__compile__givenOperationWithRecognizedDirective_hasDirective() async throws {
