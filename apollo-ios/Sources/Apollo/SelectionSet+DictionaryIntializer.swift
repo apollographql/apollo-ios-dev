@@ -1,6 +1,5 @@
 #if !COCOAPODS
 import ApolloAPI
-import Apollo
 #endif
 
 extension RootSelectionSet {
@@ -12,6 +11,7 @@ extension RootSelectionSet {
   ///   - dict: A dictionary representing a dictionary response for a GraphQL object.
   ///   - variables: [Optional] The operation variables that would be used to obtain
   ///                the given JSON response data.
+  @_disfavoredOverload
   public init(
     dict: [String: Any],
     variables: GraphQLOperation.Variables? = nil
