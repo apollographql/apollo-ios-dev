@@ -34,7 +34,7 @@ extension RootSelectionSet {
     
     for (key, value) in dict {
       if let arrayValue = value as? [Any] {
-        result[key] = try convertToAnyHashableArray(data: arrayValue)
+        result[key] = try convertToAnyHashableArray(array: arrayValue)
       } else  {
         if let dictValue = value as? [String: Any] {
           result[key] = try convertToAnyHashableValueDict(dict: dictValue)
@@ -49,13 +49,13 @@ extension RootSelectionSet {
   }
 
   /// Convert Any type Array type to AnyHashable type Array
-  /// - Parameter data: Any type Array
+  /// - Parameter array: Any type Array
   /// - Returns: AnyHashable type Array
-  private static func convertToAnyHashableArray(data: [Any]) throws -> [AnyHashable] {
+  private static func convertToAnyHashableArray(array: [Any]) throws -> [AnyHashable] {
     var result: [AnyHashable] = []
-    for value in data {
+    for value in array {
       if let array = value as? [Any] {
-        result.append(try convertToAnyHashableArray(data: array))
+        result.append(try convertToAnyHashableArray(array: array))
       } else if let dict = value as? [String: Any] {
         result.append(try convertToAnyHashableValueDict(dict: dict))
       } else if let hashable = value as? AnyHashable {
