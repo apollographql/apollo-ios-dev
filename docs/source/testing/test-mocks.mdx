@@ -38,7 +38,7 @@ let data: [String: Any] = [
     ]
 ]
 
-let model = HeroAndFriendsQuery.Data(dict: data)
+let model = try HeroAndFriendsQuery.Data(data: data)
 
 XCTAssertEqual(model.hero.friends[1].name, "C-3PO")
 ```
