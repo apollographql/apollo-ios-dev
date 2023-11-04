@@ -1946,12 +1946,12 @@ class SelectionSetTests: XCTestCase {
 
     let object: [String: Any] = [
       "__typename": "Human",
-      "nestedList": [
+      "nestedList": [[
         [
           "__typename": "Human",
           "nestedList": [[]]
         ]
-      ]
+      ]]
     ]
     
     let expected = try! Hero(
