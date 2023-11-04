@@ -7,36 +7,59 @@ public enum RootSelectionSetInitializeError: Error {
 }
 
 extension RootSelectionSet {
-  // Initializes a `SelectionSet` with a raw Dictionary.
+  /// Initializes a `SelectionSet` with a raw JSON response object.
   ///
-  /// We could pass dictionary object to create a mock object for GraphQL object.
+  /// The process of converting a JSON response into `SelectionSetData` is done by using a
+  /// `GraphQLExecutor` with a`GraphQLSelectionSetMapper` to parse, validate, and transform
+  /// the JSON response data into the format expected by `SelectionSet`.
   ///
   /// - Parameters:
-  ///   - dict: A dictionary representing a dictionary response for a GraphQL object.
+  ///   - data: A dictionary representing a JSON response object for a GraphQL object.
   ///   - variables: [Optional] The operation variables that would be used to obtain
   ///                the given JSON response data.
   @_disfavoredOverload
   public init(
-    dict: [String: Any],
+    data: [String: Any],
     variables: GraphQLOperation.Variables? = nil
   ) throws {
-    let jsonObject = try Self.convertDictToJSONObject(dict: dict)
+    let jsonObject = try Self.convertToAnyHashableValueDict(dict: data)
     try self.init(data: jsonObject, variables: variables)
   }
-
-  /// Convert dictionary type [String: Any] to JSONObject
-  /// - Parameter dict: dictionary value
-  /// - Returns: converted JSONObject
-  static func convertDictToJSONObject(dict: [String: Any]) throws -> JSONObject {
-    var result = JSONObject()
-
+  
+  /// Convert dictionary type [String: Any] to [String: AnyHashable]
+  /// - Parameter dict: [String: Any] type dictionary
+  /// - Returns: converted [String: AnyHashable] type dictionary
+  public static func convertToAnyHashableValueDict(dict: [String: Any]) throws -> [String: AnyHashable] {
+    var result = [String: AnyHashable]()
+    
     for (key, value) in dict {
-      if let hashableValue = value as? AnyHashable {
-        result[key] = hashableValue
-      } else if let dictValue = value as? [String: Any] {
-        result[key] = try convertDictToJSONObject(dict: dictValue)
-      } else if let dictArrayValue = value as? [[String: Any]] {
-        result[key] = try dictArrayValue.map { try convertDictToJSONObject(dict: $0)}
+      if let arrayValue = value as? [Any] {
+        result[key] = try convertToAnyHashableArray(data: arrayValue)
+      } else  {
+        if let dictValue = value as? [String: Any] {
+          result[key] = try convertToAnyHashableValueDict(dict: dictValue)
+        } else if let hashableValue = value as? AnyHashable {
+          result[key] = hashableValue
+        } else {
+          throw RootSelectionSetInitializeError.hasNonHashableValue
+        }
+      }
+    }
+    return result
+  }
+
+  /// Convert Any type Array type to AnyHashable type Array
+  /// - Parameter data: Any type Array
+  /// - Returns: AnyHashable type Array
+  public static func convertToAnyHashableArray(data: [Any]) throws -> [AnyHashable] {
+    var result: [AnyHashable] = []
+    for value in data {
+      if let array = value as? [Any] {
+        result.append(try convertToAnyHashableArray(data: array))
+      } else if let dict = value as? [String: Any] {
+        result.append(try convertToAnyHashableValueDict(dict: dict))
+      } else if let hashable = value as? AnyHashable {
+        result.append(hashable)
       } else {
         throw RootSelectionSetInitializeError.hasNonHashableValue
       }
