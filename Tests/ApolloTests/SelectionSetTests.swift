@@ -1715,4 +1715,281 @@ class SelectionSetTests: XCTestCase {
     expect(condition).to(equal(expected))
   }
 
+  // MARK Selection dict intializer
+  func test__selectionDictInitializer_givenNonOptionalEntityField_givenValue__setsFieldDataCorrectly() {
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("name", String?.self)
+      ]}
+
+      var name: String? { __data["name"] }
+    }
+
+    let object: [String: Any] = [
+      "__typename": "Human",
+      "name": "Johnny Tsunami"
+    ]
+
+    // when
+    let actual = try! Hero(data: object)
+
+    // then
+    expect(actual.name).to(equal("Johnny Tsunami"))
+  }
+  
+  func test__selectionDictInitializer_givenOptionalEntityField_givenNilValue__returnsNil() {
+    // given
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("friend", Hero?.self)
+      ]}
+
+      var friend: Hero? { __data["friend"] }
+    }
+
+    let object: [String: Any] = [
+      "__typename": "Human"
+    ]
+
+    // when
+    let actual = try! Hero(data: object)
+
+    // then
+    expect(actual.friend).to(beNil())
+  }
+  
+  func test__selectionDictInitializer_giveDictionaryEntityFiled_givenNonOptionalValue__setsFieldDataCorrectly() {
+    // given
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("friend", Friend.self)
+      ]}
+
+      var friend: Friend { __data["friend"] }
+
+      class Friend: MockSelectionSet {
+        typealias Schema = MockSchemaMetadata
+
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+        ]}
+      }
+    }
+
+    let object: [String: Any] = [
+      "__typename": "Human",
+      "friend": ["__typename": "Human"]
+    ]
+
+    // when
+    let actual = try! Hero(data: object)
+
+    // then
+    expect(actual.friend.__typename).to(equal("Human"))
+  }
+  
+  func test__selectionDictInitializer_giveOptionalDictionaryEntityFiled_givenNilValue__returnsNil() {
+    // given
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("friend", Friend?.self)
+      ]}
+
+      var friend: Friend? { __data["friend"] }
+
+      class Friend: MockSelectionSet {
+        typealias Schema = MockSchemaMetadata
+
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+        ]}
+      }
+    }
+
+    let object: [String: Any] = [
+      "__typename": "Human",
+    ]
+
+    // when
+    let actual = try! Hero(data: object)
+
+    // then
+    expect(actual.friend).to(beNil())
+  }
+  
+  func test__selectionDictInitializer_giveDictionaryArrayEntityField_givenNonOptionalValue__setsFieldDataCorrectly() {
+    // given
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("friends", [Friend].self)
+      ]}
+
+      var friends: [Friend] { __data["friends"] }
+
+      class Friend: MockSelectionSet {
+        typealias Schema = MockSchemaMetadata
+
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+        ]}
+      }
+    }
+
+    let object: [String: Any] = [
+      "__typename": "Human",
+      "friends": [
+        ["__typename": "Human"],
+        ["__typename": "Human"],
+        ["__typename": "Human"]
+      ]
+    ]
+    
+    // when
+    let actual = try! Hero(data: object)
+
+    // then
+    expect(actual.friends.count).to(equal(3))
+  }
+  
+  func test__selectionDictInitializer_giveOptionalDictionaryArrayEntityField_givenNilValue__returnsNil() {
+    // given
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("friends", [Friend]?.self)
+      ]}
+
+      var friends: [Friend]? { __data["friends"] }
+
+      class Friend: MockSelectionSet {
+        typealias Schema = MockSchemaMetadata
+
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+        ]}
+      }
+    }
+
+    let object: [String: Any] = [
+      "__typename": "Human"
+    ]
+    
+    // when
+    let actual = try! Hero(data: object)
+
+    // then
+    expect(actual.friends).to(beNil())
+  }
+  
+  func test__selectionDictInitializer_giveDictionaryArrayEntityField_givenEmptyValue__returnsEmpty() {
+    // given
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("friends", [Friend].self)
+      ]}
+
+      var friends: [Friend] { __data["friends"] }
+
+      class Friend: MockSelectionSet {
+        typealias Schema = MockSchemaMetadata
+
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+        ]}
+      }
+    }
+
+    let object: [String: Any] = [
+      "__typename": "Human",
+      "friends": []
+    ]
+
+    // when
+    let actual = try! Hero(data: object)
+
+    // then
+    expect(actual.friends).to(beEmpty())
+  }
+
+  func test__selectionDictInitializer_giveNestedListEntityField_givenNonOptionalValue__setsFieldDataCorrectly() {
+    // given
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("nestedList", [[Hero]].self)
+      ]}
+
+      var nestedList: [[Hero]] { __data["nestedList"] }
+    }
+
+    let object: [String: Any] = [
+      "__typename": "Human",
+      "nestedList": [
+        [
+          "__typename": "Human",
+          "nestedList": [[]]
+        ]
+      ]
+    ]
+    
+    let expected = try! Hero(
+      data: [
+        "__typename": "Human",
+        "nestedList": [[]]
+      ],
+      variables: nil
+    )
+
+    // when
+    let actual = try! Hero(data: object)
+
+    // then
+    expect(actual.nestedList).to(equal([[expected]]))
+  }
+  
+  func test__selectionDictInitializer_giveOptionalNestedListEntityField_givenNilValue__returnsNil() {
+    // given
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("nestedList", [[Hero]]?.self)
+      ]}
+
+      var nestedList: [[Hero]]? { __data["nestedList"] }
+    }
+
+    let object: [String: Any] = [
+      "__typename": "Human",
+    ]
+  
+    // when
+    let actual = try! Hero(data: object)
+
+    // then
+    expect(actual.nestedList).to(beNil())
+  }
 }
