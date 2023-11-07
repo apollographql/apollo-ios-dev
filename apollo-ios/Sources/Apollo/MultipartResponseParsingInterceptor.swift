@@ -24,7 +24,8 @@ public struct MultipartResponseParsingInterceptor: ApolloInterceptor {
   }
 
   private static let responseParsers: [String: MultipartResponseSpecificationParser.Type] = [
-    MultipartResponseSubscriptionParser.protocolSpec: MultipartResponseSubscriptionParser.self
+    MultipartResponseSubscriptionParser.protocolSpec: MultipartResponseSubscriptionParser.self,
+    MultipartResponseDeferParser.protocolSpec: MultipartResponseDeferParser.self,
   ]
 
   public var id: String = UUID().uuidString
