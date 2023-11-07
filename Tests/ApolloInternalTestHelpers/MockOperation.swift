@@ -43,16 +43,6 @@ open class MockSubscription<SelectionSet: RootSelectionSet>: MockOperation<Selec
   }
 }
 
-open class MockDeferredQuery<SelectionSet: RootSelectionSet>: MockOperation<SelectionSet>, GraphQLQuery {
-
-  public override class var operationType: GraphQLOperationType { .query }
-  public override class var hasDeferredFragments: Bool { true }
-
-  public static func mock() -> MockDeferredQuery<MockSelectionSet> where SelectionSet == MockSelectionSet {
-    MockDeferredQuery<MockSelectionSet>()
-  }
-}
-
 // MARK: - MockSelectionSets
 
 @dynamicMemberLookup
