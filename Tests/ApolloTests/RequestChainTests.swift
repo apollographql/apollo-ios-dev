@@ -371,7 +371,7 @@ class RequestChainTests: XCTestCase {
     wait(for: [expectation], timeout: 1)
   }
 
-  func test__request__givenDeferredOperation_shouldAddMultipartAcceptHeader() {
+  func test__request__givenQuery_shouldAddMultipartAcceptHeader() {
     let expectation = self.expectation(description: "Request header verified")
 
     let interceptor = RequestTrapInterceptor { request in
@@ -389,14 +389,39 @@ class RequestChainTests: XCTestCase {
       endpointURL: TestURL.mockServer.url
     )
 
-    _ = transport.send(operation: MockDeferredQuery.mock()) { result in
+    _ = transport.send(operation: MockQuery.mock()) { result in
       // noop
     }
 
     wait(for: [expectation], timeout: 1)
   }
 
-  func test__request__givenDeferredOperation_whenTransportInitializedWithAdditionalHeaders_shouldOverwriteOnlyAcceptHeader() {
+  func test__request__givenMutation_shouldAddMultipartAcceptHeader() {
+    let expectation = self.expectation(description: "Request header verified")
+
+    let interceptor = RequestTrapInterceptor { request in
+      guard let header = request.allHTTPHeaderFields?["Accept"] else {
+        XCTFail()
+        return
+      }
+
+      XCTAssertEqual(header, "multipart/mixed;boundary=\"graphql\";\(MultipartResponseDeferParser.protocolSpec),application/json")
+      expectation.fulfill()
+    }
+
+    let transport = RequestChainNetworkTransport(
+      interceptorProvider: MockInterceptorProvider([interceptor]),
+      endpointURL: TestURL.mockServer.url
+    )
+
+    _ = transport.send(operation: MockMutation.mock()) { result in
+      // noop
+    }
+
+    wait(for: [expectation], timeout: 1)
+  }
+
+  func test__request__givenQuery_whenTransportInitializedWithAdditionalHeaders_shouldOverwriteOnlyAcceptHeader() {
     let expectation = self.expectation(description: "Request header verified")
 
     let interceptor = RequestTrapInterceptor { request in
@@ -419,29 +444,6 @@ class RequestChainTests: XCTestCase {
       ]
     )
 
-    _ = transport.send(operation: MockDeferredQuery.mock()) { result in
-      // noop
-    }
-
-    wait(for: [expectation], timeout: 1)
-  }
-
-  func test__request__givenQuery_shouldNotAddMultipartAcceptHeader() {
-    let expectation = self.expectation(description: "Request header verified")
-
-    let interceptor = RequestTrapInterceptor { request in
-      if let header = request.allHTTPHeaderFields?["Accept"] {
-        XCTAssertFalse(header.contains("multipart/mixed"))
-      }
-
-      expectation.fulfill()
-    }
-
-    let transport = RequestChainNetworkTransport(
-      interceptorProvider: MockInterceptorProvider([interceptor]),
-      endpointURL: TestURL.mockServer.url
-    )
-
     _ = transport.send(operation: MockQuery.mock()) { result in
       // noop
     }
@@ -449,20 +451,27 @@ class RequestChainTests: XCTestCase {
     wait(for: [expectation], timeout: 1)
   }
 
-  func test__request__givenMutation_shouldNotAddMultipartAcceptHeader() {
+  func test__request__givenMutation_whenTransportInitializedWithAdditionalHeaders_shouldOverwriteOnlyAcceptHeader() {
     let expectation = self.expectation(description: "Request header verified")
 
     let interceptor = RequestTrapInterceptor { request in
-      if let header = request.allHTTPHeaderFields?["Accept"] {
-        XCTAssertFalse(header.contains("multipart/mixed"))
+      guard let header = request.allHTTPHeaderFields?["Accept"] else {
+        XCTFail()
+        return
       }
 
+      XCTAssertEqual(header, "multipart/mixed;boundary=\"graphql\";\(MultipartResponseDeferParser.protocolSpec),application/json")
+      XCTAssertNotNil(request.allHTTPHeaderFields?["Random"])
       expectation.fulfill()
     }
 
     let transport = RequestChainNetworkTransport(
       interceptorProvider: MockInterceptorProvider([interceptor]),
-      endpointURL: TestURL.mockServer.url
+      endpointURL: TestURL.mockServer.url,
+      additionalHeaders: [
+        "Accept": "multipart/mixed",
+        "Random": "still-here"
+      ]
     )
 
     _ = transport.send(operation: MockMutation.mock()) { result in
