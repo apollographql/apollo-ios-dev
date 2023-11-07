@@ -4327,6 +4327,60 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.computedReferencedFragments).to(equal(expected))
   }
 
+  func test__referencedFragments__givenMultipleFragments_hasFragmentsInAlphbeticalOrder() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      name: String!
+    }
+    """
+
+    document =
+    """
+    query NameQuery {
+      ...Fragment4
+      ...Fragment1
+    }
+
+    fragment Fragment4 on Query {
+      name
+      ...Fragment3
+    }
+
+    fragment Fragment3 on Query {
+      name
+      ...Fragment2
+    }
+
+    fragment Fragment2 on Query {
+      name
+    }
+
+    fragment Fragment1 on Query {
+      name
+      ...Fragment5
+    }
+
+    fragment Fragment5 on Query {
+      name
+    }
+    """
+
+    // when
+    try await buildSubjectRootField()
+
+    let expected: OrderedSet = await [
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "Fragment1").xctUnwrapped(),
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "Fragment2").xctUnwrapped(),
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "Fragment3").xctUnwrapped(),
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "Fragment4").xctUnwrapped(),
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "Fragment5").xctUnwrapped(),
+    ]
+
+    // then
+    expect(self.computedReferencedFragments).to(equal(expected))
+  }
+
   // MARK: - Deferred Fragments - hasDeferredFragments property
 
   func test__deferredFragments__givenNoDeferredFragment_hasDeferredFragmentsFalse() async throws {
