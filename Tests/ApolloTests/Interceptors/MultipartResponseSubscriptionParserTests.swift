@@ -4,7 +4,7 @@ import Nimble
 import ApolloAPI
 import ApolloInternalTestHelpers
 
-final class MultipartResponseSubscriptionTests: XCTestCase {
+final class MultipartResponseSubscriptionParserTests: XCTestCase {
 
   let defaultTimeout = 0.5
 
