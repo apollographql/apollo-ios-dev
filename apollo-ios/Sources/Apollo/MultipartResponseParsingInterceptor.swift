@@ -126,7 +126,13 @@ protocol MultipartResponseSpecificationParser {
   /// in an HTTP response.
   static var protocolSpec: String { get }
 
-  /// Function called to process each data line of the chunked response.
+  /// Called to process each chunk in a multipart response.
+  ///
+  /// The return value is a `Result` type that indicates whether the chunk was successfully parsed
+  /// or not. It is possible to return `.success` with a `nil` data value. This should only happen
+  /// when the chunk was successfully parsed but there is no action to take on the message, such as
+  /// a heartbeat message. Successful results with a `nil` data value will not be returned to the
+  /// user.
   static func parse(_ chunk: String) -> Result<Data?, Error>
 }
 
