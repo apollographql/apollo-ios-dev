@@ -56,28 +56,15 @@ public final class GraphQLJSFrontend {
 
   /// Parses a GraphQL document from a source, returning a reference to the parsed AST that can be passed on to validation and compilation.
   /// Syntax errors will result in throwing a `GraphQLError`.
-  public func parseDocument(
-    _ source: GraphQLSource,
-    experimentalClientControlledNullability: Bool = false
-  ) async throws -> GraphQLDocument {
-    return try await library.call(
-      "parseOperationDocument",
-      with: source,
-      experimentalClientControlledNullability
-    )
+  public func parseDocument(_ source: GraphQLSource) async throws -> GraphQLDocument {
+    return try await library.call("parseOperationDocument", with: source)
   }
 
   /// Parses a GraphQL document from a file, returning a reference to the parsed AST that can be passed on to validation and compilation.
   /// Syntax errors will result in throwing a `GraphQLError`.
-  public func parseDocument(
-    from fileURL: URL,
-    experimentalClientControlledNullability: Bool = false
-  ) async throws -> GraphQLDocument {
+  public func parseDocument(from fileURL: URL) async throws -> GraphQLDocument {
     let source = try await makeSource(from: fileURL)
-    return try await parseDocument(
-      source,
-      experimentalClientControlledNullability: experimentalClientControlledNullability
-    )
+    return try await parseDocument(source)
   }
 
   /// Validation and compilation take a single document, but you can merge documents, and operations and fragments will remember their source.

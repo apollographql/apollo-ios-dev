@@ -1,5 +1,6 @@
 import Foundation
 import ApolloCodegenLib
+import SwiftScriptHelpers
 
 enum Target: String, CaseIterable {
   case Apollo

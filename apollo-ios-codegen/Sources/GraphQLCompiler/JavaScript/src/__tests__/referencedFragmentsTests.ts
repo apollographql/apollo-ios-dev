@@ -25,8 +25,7 @@ describe("operation with referencedFragments", () => {
       ...FragmentA
       ...FragmentC
     }
-    `, "OperationA", { line: 1, column: 1 }),
-    false
+    `, "OperationA", { line: 1, column: 1 })
   );
 
   const fragmentADocument: DocumentNode = parseOperationDocument(
@@ -35,8 +34,7 @@ describe("operation with referencedFragments", () => {
       a
       ...FragmentB
     }
-    `, "FragmentA", { line: 1, column: 1 }),
-    false
+    `, "FragmentA", { line: 1, column: 1 })
   );
 
   const fragmentBDocument: DocumentNode = parseOperationDocument(
@@ -44,8 +42,7 @@ describe("operation with referencedFragments", () => {
     fragment FragmentB on Query {
       b
     }
-    `, "FragmentB", { line: 1, column: 1 }),
-    false
+    `, "FragmentB", { line: 1, column: 1 })
   );
 
   const fragmentCDocument: DocumentNode = parseOperationDocument(
@@ -53,8 +50,7 @@ describe("operation with referencedFragments", () => {
     fragment FragmentC on Query {
       c
     }
-    `, "FragmentC", { line: 1, column: 1 }),
-    false
+    `, "FragmentC", { line: 1, column: 1 })
   );
 
   const schema: GraphQLSchema = loadSchemaFromSources([new Source(`
@@ -109,8 +105,7 @@ describe("operation with referencedFragments on child entity selection sets", ()
       }
       ...FragmentC
     }
-    `, "OperationA", { line: 1, column: 1 }),
-    false
+    `, "OperationA", { line: 1, column: 1 })
   );
 
   const fragmentADocument: DocumentNode = parseOperationDocument(
@@ -121,8 +116,7 @@ describe("operation with referencedFragments on child entity selection sets", ()
         ...FragmentB
       }
     }
-    `, "FragmentA", { line: 1, column: 1 }),
-    false
+    `, "FragmentA", { line: 1, column: 1 })
   );
 
   const fragmentBDocument: DocumentNode = parseOperationDocument(
@@ -130,8 +124,7 @@ describe("operation with referencedFragments on child entity selection sets", ()
     fragment FragmentB on B {
       B
     }
-    `, "FragmentB", { line: 1, column: 1 }),
-    false
+    `, "FragmentB", { line: 1, column: 1 })
   );
 
   const fragmentCDocument: DocumentNode = parseOperationDocument(
@@ -139,8 +132,7 @@ describe("operation with referencedFragments on child entity selection sets", ()
     fragment FragmentC on Query {
       c
     }
-    `, "FragmentC", { line: 1, column: 1 }),
-    false
+    `, "FragmentC", { line: 1, column: 1 })
   );
 
   const schema: GraphQLSchema = loadSchemaFromSources([new Source(`

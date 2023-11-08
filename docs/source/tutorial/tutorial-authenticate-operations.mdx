@@ -24,6 +24,7 @@ import Apollo
 import ApolloAPI
 
 class AuthorizationInterceptor: ApolloInterceptor {
+    public var id: String = UUID().uuidString
     
     func interceptAsync<Operation>(
         chain: RequestChain,
@@ -51,9 +52,11 @@ if let token = keychain.get(LoginView.loginKeychainKey) {
     request.addHeader(name: "Authorization", value: token)
 }
 
-chain.proceedAsync(request: request,
-                    response: response,
-                    completion: completion)
+chain.proceedAsync(
+    request: request,
+    response: response,
+    interceptor: self,
+    completion: completion)
 ```
 
 An array of `ApolloInterceptor`s which are handed off to each request to perform in order is set up by an object conforming to the `InterceptorProvider` protocol. There's a `DefaultInterceptorProvider` which has an array with most of the Interceptors you'd want to use.
