@@ -4,8 +4,12 @@ import TemplateString
 /// The output of the frontend compiler.
 public final class CompilationResult: JavaScriptObjectDecodable {
 
-  private enum Constants {
-    static let LocalCacheMutationDirectiveName = "apollo_client_ios_localCacheMutation"
+  /// String constants used to match JavaScriptObject instances.
+  fileprivate enum Constants {
+    enum DirectiveNames {
+      static let LocalCacheMutation = "apollo_client_ios_localCacheMutation"
+      static let Defer = "defer"
+    }
   }
 
   public let schemaRootTypes: RootTypeDefinition
@@ -140,7 +144,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.source = source
       self.filePath = filePath
       self.isLocalCacheMutation = directives?
-        .contains { $0.name == Constants.LocalCacheMutationDirectiveName } ?? false
+        .contains { $0.name == Constants.DirectiveNames.LocalCacheMutation } ?? false
     }
 
     public var debugDescription: String {
@@ -208,7 +212,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     public let filePath: String
 
     public var isLocalCacheMutation: Bool {
-      directives?.contains { $0.name == Constants.LocalCacheMutationDirectiveName } ?? false
+      directives?.contains { $0.name == Constants.DirectiveNames.LocalCacheMutation } ?? false
     }
 
     init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
@@ -295,25 +299,33 @@ public final class CompilationResult: JavaScriptObjectDecodable {
   }
 
   public final class InlineFragment:
-    JavaScriptObjectDecodable, Sendable, Hashable, CustomDebugStringConvertible {
+    JavaScriptObjectDecodable, Sendable, Hashable, CustomDebugStringConvertible, Deferrable {
 
     public let selectionSet: SelectionSet
 
     public let inclusionConditions: [InclusionCondition]?
 
+    public let directives: [Directive]?
+
+    public let deferCondition: DeferCondition?
+
     static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
       self.init(
         selectionSet: .fromJSValue(jsValue["selectionSet"], bridge: bridge),
-        inclusionConditions: jsValue["inclusionConditions"]
+        inclusionConditions: jsValue["inclusionConditions"],
+        directives: .fromJSValue(jsValue["directives"], bridge: bridge)
       )
     }
 
     init(
       selectionSet: SelectionSet,
-      inclusionConditions: [InclusionCondition]?
+      inclusionConditions: [InclusionCondition]?,
+      directives: [Directive]?
     ) {
       self.selectionSet = selectionSet
       self.inclusionConditions = inclusionConditions
+      self.directives = directives
+      self.deferCondition = Self.getDeferCondition(from: directives)
     }
 
     public var debugDescription: String {
@@ -333,12 +345,14 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
   /// Represents an individual selection that includes a named fragment in a selection set.
   /// (ie. `...FragmentName`)
-  public final class FragmentSpread: JavaScriptObjectDecodable, Sendable, Hashable, CustomDebugStringConvertible {
+  public final class FragmentSpread: JavaScriptObjectDecodable, Sendable, Hashable, CustomDebugStringConvertible, Deferrable {
     public let fragment: FragmentDefinition
 
     public let inclusionConditions: [InclusionCondition]?
 
     public let directives: [Directive]?
+
+    public let deferCondition: DeferCondition?
 
     @inlinable public var parentType: GraphQLCompositeType { fragment.type }
 
@@ -358,6 +372,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.fragment = fragment
       self.inclusionConditions = inclusionConditions
       self.directives = directives
+      self.deferCondition = Self.getDeferCondition(from: directives)
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -591,7 +606,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
           self = .skipped
           return
         default:
-          preconditionFailure("Unrecognized value for include condition. Got \(value)")          
+          preconditionFailure("Unrecognized value for include condition. Got \(value)")
         }
       }
 
@@ -609,4 +624,77 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     }
   }
 
+  public struct DeferCondition: Hashable, CustomDebugStringConvertible, Sendable {
+    /// String constants used to match JavaScriptObject instances.
+    fileprivate enum Constants {
+      enum ArgumentNames {
+        static let Label = "label"
+        static let `If` = "if"
+      }
+    }
+
+    public let label: String
+    public let variable: String?
+
+    public init(label: String, variable: String? = nil) {
+      self.label = label
+      self.variable = variable
+    }
+
+    public var debugDescription: String {
+      var string = "Defer \"\(label)\""
+      if let variable {
+        string += " - if \"\(variable)\""
+      }
+
+      return string
+    }
+  }
+
+}
+
+fileprivate protocol Deferrable { }
+
+fileprivate extension Deferrable {
+  static func getDeferCondition(
+    from directives: [CompilationResult.Directive]?
+  ) -> CompilationResult.DeferCondition? {
+    guard let directive = directives?.first(
+      where: { $0.name == CompilationResult.Constants.DirectiveNames.Defer }
+    ) else {
+      return nil
+    }
+
+    guard
+      let labelArgument = directive.arguments?.first(
+        where: { $0.name == CompilationResult.DeferCondition.Constants.ArgumentNames.Label }),
+      case let .string(labelValue) = labelArgument.value
+    else {
+      preconditionFailure("Incorrect `label` argument. Either missing or value is not a String.")
+    }
+
+    guard let variableArgument = directive.arguments?.first(
+      where: { $0.name == CompilationResult.DeferCondition.Constants.ArgumentNames.If }
+    ) else {
+      return .init(label: labelValue)
+    }
+
+    switch (variableArgument.value) {
+    case let .boolean(value):
+      if value {
+        return .init(label: labelValue)
+      } else {
+        return nil
+      }
+
+    case let .string(value), let .variable(value):
+      return .init(label: labelValue, variable: value)
+
+    default:
+      preconditionFailure("""
+        Incompatible variable value. Expected Boolean, String or Variable,
+        got \(variableArgument.value).
+        """)
+    }
+  }
 }

@@ -215,7 +215,9 @@ public enum ShallowSelectionMatcher {
     inclusionConditions: [IR.InclusionCondition]? = nil
   ) -> ShallowSelectionMatcher {
     .shallowInlineFragment(ShallowInlineFragmentMatcher(
-      parentType: parentType, inclusionConditions: inclusionConditions
+      parentType: parentType,
+      inclusionConditions: inclusionConditions,
+      deferCondition: nil
     ))
   }
 
@@ -227,7 +229,8 @@ public enum ShallowSelectionMatcher {
     .shallowFragmentSpread(ShallowFragmentSpreadMatcher(
       name: name,
       type: type,
-      inclusionConditions: inclusionConditions
+      inclusionConditions: inclusionConditions,
+      deferCondition: nil
     ))
   }
 
@@ -238,7 +241,8 @@ public enum ShallowSelectionMatcher {
     .shallowFragmentSpread(ShallowFragmentSpreadMatcher(
       name: fragment.name,
       type: fragment.type,
-      inclusionConditions: inclusionConditions
+      inclusionConditions: inclusionConditions,
+      deferCondition: nil
     ))
   }
 
@@ -249,7 +253,33 @@ public enum ShallowSelectionMatcher {
     .shallowFragmentSpread(ShallowFragmentSpreadMatcher(
       name: fragment.name,
       type: fragment.type,
-      inclusionConditions: inclusionConditions
+      inclusionConditions: inclusionConditions,
+      deferCondition: nil
+    ))
+  }
+
+  public static func deferred(
+    _ parentType: GraphQLCompositeType,
+    label: String,
+    variable: String? = nil
+  ) -> ShallowSelectionMatcher {
+    .shallowInlineFragment(ShallowInlineFragmentMatcher(
+      parentType: parentType,
+      inclusionConditions: nil,
+      deferCondition: CompilationResult.DeferCondition(label: label, variable: variable)
+    ))
+  }
+
+  public static func deferred(
+    _ fragment: CompilationResult.FragmentDefinition,
+    label: String,
+    variable: String? = nil
+  ) -> ShallowSelectionMatcher {
+    .shallowFragmentSpread(ShallowFragmentSpreadMatcher(
+      name: fragment.name,
+      type: fragment.type,
+      inclusionConditions: nil,
+      deferCondition: CompilationResult.DeferCondition(label: label, variable: variable)
     ))
   }
 }
@@ -349,12 +379,16 @@ fileprivate func shallowlyMatch(expected: ShallowFieldMatcher, actual: IR.Field)
 public struct ShallowInlineFragmentMatcher: Equatable, CustomDebugStringConvertible {
   let parentType: GraphQLCompositeType
   let inclusionConditions: IR.InclusionConditions?
+  let deferCondition: CompilationResult.DeferCondition?
 
   init(
     parentType: GraphQLCompositeType,
-    inclusionConditions: [IR.InclusionCondition]?
+    inclusionConditions: [IR.InclusionCondition]?,
+    deferCondition: CompilationResult.DeferCondition?
   ) {
     self.parentType = parentType
+    self.deferCondition = deferCondition
+
     if let inclusionConditions = inclusionConditions {
       self.inclusionConditions = IR.InclusionConditions.allOf(inclusionConditions).conditions
     } else {
@@ -364,14 +398,21 @@ public struct ShallowInlineFragmentMatcher: Equatable, CustomDebugStringConverti
 
   public static func mock(
     parentType: GraphQLCompositeType,
-    inclusionConditions: [IR.InclusionCondition]? = nil
+    inclusionConditions: [IR.InclusionCondition]? = nil,
+    deferCondition: CompilationResult.DeferCondition? = nil
   ) -> ShallowInlineFragmentMatcher {
-    self.init(parentType: parentType, inclusionConditions: inclusionConditions)
+    self.init(
+      parentType: parentType,
+      inclusionConditions: inclusionConditions,
+      deferCondition: deferCondition
+    )
   }
 
   public var debugDescription: String {
     TemplateString("""
-      ... on \(parentType.debugDescription)\(ifLet: inclusionConditions, { " \($0.debugDescription)"})
+      ... on \(parentType.debugDescription)\
+      \(ifLet: inclusionConditions, { " \($0.debugDescription)"})\
+      \(ifLet: deferCondition, { " \($0.debugDescription)"})
       """).description
   }
 }
@@ -408,9 +449,13 @@ fileprivate func shallowlyMatch<T: Collection>(
   return PredicateResult(status: .matches, message: message)
 }
 
-fileprivate func shallowlyMatch(expected: ShallowInlineFragmentMatcher, actual: IR.SelectionSet) -> Bool {
-  return expected.parentType == actual.typeInfo.parentType &&
-  expected.inclusionConditions == actual.inclusionConditions
+fileprivate func shallowlyMatch(
+  expected: ShallowInlineFragmentMatcher,
+  actual: IR.SelectionSet
+) -> Bool {
+  return expected.parentType == actual.typeInfo.parentType
+    && expected.inclusionConditions == actual.inclusionConditions
+    && expected.deferCondition == actual.deferCondition
 }
 
 // MARK: - Shallow Fragment Spread Matcher
@@ -419,14 +464,18 @@ public struct ShallowFragmentSpreadMatcher: Equatable, CustomDebugStringConverti
   let name: String
   let type: GraphQLCompositeType
   let inclusionConditions: AnyOf<IR.InclusionConditions>?
+  let deferCondition: CompilationResult.DeferCondition?
 
   init(
     name: String,
     type: GraphQLCompositeType,
-    inclusionConditions: [IR.InclusionCondition]?
+    inclusionConditions: [IR.InclusionCondition]?,
+    deferCondition: CompilationResult.DeferCondition?
   ) {
     self.name = name
     self.type = type
+    self.deferCondition = deferCondition
+
     if let inclusionConditions = inclusionConditions,
      let evaluatedConditions = IR.InclusionConditions.allOf(inclusionConditions).conditions {
       self.inclusionConditions = AnyOf(evaluatedConditions)
@@ -435,36 +484,51 @@ public struct ShallowFragmentSpreadMatcher: Equatable, CustomDebugStringConverti
     }
   }
 
+  @_disfavoredOverload
   init(
     name: String,
     type: GraphQLCompositeType,
-    inclusionConditions: AnyOf<IR.InclusionConditions>?
+    inclusionConditions: AnyOf<IR.InclusionConditions>?,
+    deferCondition: CompilationResult.DeferCondition?
   ) {
     self.name = name
     self.type = type
     self.inclusionConditions = inclusionConditions
+    self.deferCondition = deferCondition
   }
 
   public static func mock(
     _ name: String,
     type: GraphQLCompositeType,
-    inclusionConditions: AnyOf<IR.InclusionConditions>? = nil
+    inclusionConditions: AnyOf<IR.InclusionConditions>? = nil,
+    deferCondition: CompilationResult.DeferCondition? = nil
   ) -> ShallowFragmentSpreadMatcher {
-    self.init(name: name, type: type, inclusionConditions: inclusionConditions)
+    self.init(
+      name: name,
+      type: type,
+      inclusionConditions: inclusionConditions,
+      deferCondition: deferCondition
+    )
   }
 
   public static func mock(
     _ fragment: CompilationResult.FragmentDefinition,
-    inclusionConditions: AnyOf<IR.InclusionConditions>? = nil
+    inclusionConditions: AnyOf<IR.InclusionConditions>? = nil,
+    deferCondition: CompilationResult.DeferCondition? = nil
   ) -> ShallowFragmentSpreadMatcher {
-    self.init(name: fragment.name, type: fragment.type, inclusionConditions: inclusionConditions)
+    self.init(
+      name: fragment.name,
+      type: fragment.type,
+      inclusionConditions: inclusionConditions,
+      deferCondition: deferCondition
+    )
   }
 
   public var debugDescription: String {
     TemplateString("""
-    fragment \(name) on \(type.debugDescription)\(ifLet: inclusionConditions, {
-      " \($0.debugDescription)"
-      })
+    fragment \(name) on \(type.debugDescription)\
+    \(ifLet: inclusionConditions, { " \($0.debugDescription)" })
+    \(ifLet: deferCondition, { " \($0.debugDescription)" })
     """).description
   }
 }
@@ -510,9 +574,10 @@ fileprivate func shallowlyMatch<T: Collection>(
 }
 
 fileprivate func shallowlyMatch(expected: ShallowFragmentSpreadMatcher, actual: IR.NamedFragmentSpread) -> Bool {
-  return expected.name == actual.fragment.name &&
-  expected.type == actual.fragment.type &&
-  expected.inclusionConditions == actual.inclusionConditions
+  return expected.name == actual.fragment.name 
+  && expected.type == actual.fragment.type
+  && expected.inclusionConditions == actual.inclusionConditions
+  && expected.deferCondition == actual.typeInfo.deferCondition
 }
 
 // MARK: - Predicate Mapping

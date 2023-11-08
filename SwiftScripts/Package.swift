@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
   name: "SwiftScripts",
   platforms: [
-    .macOS(.v10_15)
+    .macOS(.v12)
   ],
   dependencies: [
     .package(name: "Apollo", path: "../apollo-ios"),
@@ -19,25 +19,29 @@ let package = Package(
             dependencies: [
               .product(name: "ApolloCodegenLib", package: "ApolloCodegen"),
             ]),
-    .target(name: "Codegen",
+    .target(name: "SwiftScriptHelpers"
+           ),
+    .executableTarget(name: "Codegen",
             dependencies: [
               .product(name: "ApolloCodegenLib", package: "ApolloCodegen"),
               .product(name: "ArgumentParser", package: "swift-argument-parser"),
               .target(name: "TargetConfig"),
+              .target(name: "SwiftScriptHelpers")
             ]),
-    .target(name: "SchemaDownload",
+    .executableTarget(name: "SchemaDownload",
             dependencies: [
               .product(name: "ApolloCodegenLib", package: "ApolloCodegen"),
               .target(name: "TargetConfig"),
             ]),    
-    .target(name: "DocumentationGenerator",
+    .executableTarget(name: "DocumentationGenerator",
             dependencies: [
               .product(name: "ApolloCodegenLib", package: "ApolloCodegen"),
               .product(name: "Apollo", package: "Apollo"),
               .product(name: "ApolloAPI", package: "Apollo"),
               .product(name: "ApolloSQLite", package: "Apollo"),
-              .product(name: "ApolloWebSocket", package: "Apollo")
-            ]            
+              .product(name: "ApolloWebSocket", package: "Apollo"),
+              .target(name: "SwiftScriptHelpers")
+            ]
            ),
     .testTarget(name: "CodegenTests",
                 dependencies: [
