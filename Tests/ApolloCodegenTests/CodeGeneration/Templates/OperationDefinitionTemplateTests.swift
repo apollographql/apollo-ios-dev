@@ -282,7 +282,129 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  // MARK: Selection Set Declaration
+  // MARK: - Defer Properties
+
+  func test__generate__givenQueryWithDeferredInlineFragment_generatesDeferredPropertyTrue() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+    }
+
+    type Dog implements Animal {
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public static let hasDeferredFragments: Bool = true
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
+  }
+
+  func test__generate__givenQueryWithDeferredNamedFragment_generatesDeferredPropertyTrue() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+    }
+
+    type Dog implements Animal {
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... DogFragment @defer(label: "root")
+      }
+    }
+
+    fragment DogFragment on Dog {
+      species
+    }
+    """
+
+    let expected = """
+      public static let hasDeferredFragments: Bool = true
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
+  }
+
+  func test__generate__givenQueryWithNamedFragment_withDeferredTypeCase_generatesDeferredPropertyTrue() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+    }
+
+    type Dog implements Animal {
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... DogFragment
+      }
+    }
+
+    fragment DogFragment on Animal {
+      ... on Dog @defer(label: "root") {
+        species
+      }
+    }
+    """
+
+    let expected = """
+      public static let hasDeferredFragments: Bool = true
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
+  }
+
+  // MARK: - Selection Set Declaration
 
   func test__generate__givenOperationSelectionSet_rendersDeclaration() async throws {
     // given

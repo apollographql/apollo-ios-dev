@@ -89,7 +89,7 @@
   "topicSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloader\/fetch(configuration:withRootURL:)"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloader\/fetch(configuration:withRootURL:session:)"
       ],
       "title" : "Type Methods"
     },
@@ -193,7 +193,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apolloschemadownloader\/schemadownloaderror"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloSchemaDownloader/fetch(configuration:withRootURL:)": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloSchemaDownloader/fetch(configuration:withRootURL:session:)": {
   "abstract" : [
     {
       "text" : "Downloads your schema using the specified configuration object.",
@@ -257,19 +257,44 @@
     },
     {
       "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "session"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:16ApolloCodegenLib14NetworkSessionP",
+      "text" : "NetworkSession"
+    },
+    {
+      "kind" : "text",
       "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloader\/fetch(configuration:withRootURL:)",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloader\/fetch(configuration:withRootURL:session:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "fetch(configuration:withRootURL:)",
+  "title" : "fetch(configuration:withRootURL:session:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apolloschemadownloader\/fetch(configuration:withrooturl:)"
+  "url" : "\/documentation\/apollocodegenlib\/apolloschemadownloader\/fetch(configuration:withrooturl:session:)"
 }
 }
 }

@@ -54,8 +54,9 @@ struct SelectionSetTemplate {
     \(SelectionSetNameDocumentation(inlineFragment))
     \(renderAccessControl())\
     struct \(inlineFragment.renderedTypeName): \(SelectionSetType(asInlineFragment: true))\
-    \(if: inlineFragment.isCompositeSelectionSet, ", \(config.ApolloAPITargetName).CompositeInlineFragment") \
-    {
+    \(if: inlineFragment.isCompositeSelectionSet, ", \(config.ApolloAPITargetName).CompositeInlineFragment")\
+    \(if: inlineFragment.isDeferred, ", \(config.ApolloAPITargetName).Deferrable")\
+     {
       \(BodyTemplate(inlineFragment))
     }
     """
@@ -98,7 +99,8 @@ struct SelectionSetTemplate {
     let selections = selectionSet.selections
     let scope = selectionSet.typeInfo.scope
     return """
-    \(DataFieldAndInitializerTemplate())
+    \(DataPropertyTemplate())
+    \(InitializerTemplate())
 
     \(RootEntityTypealias(selectionSet))
     \(ParentTypeTemplate(selectionSet.parentType))
@@ -119,13 +121,28 @@ struct SelectionSetTemplate {
     """
   }
 
-  private func DataFieldAndInitializerTemplate() -> String {
-    let accessControl = renderAccessControl()
+  private func InitializerTemplate(
+    _ propertiesTemplate: @autoclosure () -> TemplateString? = { nil }()
+  ) -> String {
+    let dataInitStatement = TemplateString("__data = _dataDict")
 
-    return """
-    \(accessControl)\(isMutable ? "var" : "let") __data: DataDict
-    \(accessControl)init(_dataDict: DataDict) { __data = _dataDict }
-    """
+    return TemplateString("""
+    \(renderAccessControl())init(_dataDict: DataDict) {\
+    \(ifLet: propertiesTemplate(), where: { !$0.isEmpty }, {
+      """
+
+        \(dataInitStatement)
+        \($0)
+
+      """
+    },
+    else: " \(dataInitStatement) "
+    )}
+    """).description
+  }
+
+  private func DataPropertyTemplate() -> TemplateString {
+    "\(renderAccessControl())\(isMutable ? "var" : "let") __data: DataDict"
   }
 
   private func RootEntityTypealias(_ selectionSet: IR.SelectionSet) -> TemplateString {
@@ -285,14 +302,29 @@ struct SelectionSetTemplate {
   }
 
   private func InlineFragmentSelectionTemplate(_ inlineFragment: IR.SelectionSet) -> TemplateString {
-    """
-    .inlineFragment(\(inlineFragment.renderedTypeName).self)
-    """
+    if let deferCondition = inlineFragment.deferCondition {
+      return DeferredInlineFragmentSelectionTemplate(deferCondition)
+
+    } else {
+      return """
+      .inlineFragment(\(inlineFragment.renderedTypeName).self)
+      """
+    }
   }
 
   private func FragmentSelectionTemplate(_ fragment: IR.NamedFragmentSpread) -> TemplateString {
     """
     .fragment(\(fragment.definition.name.asFragmentName).self)
+    """
+  }
+
+  private func DeferredInlineFragmentSelectionTemplate(
+    _ deferCondition: CompilationResult.DeferCondition
+  ) -> TemplateString {
+    """
+    .deferred(\
+    \(ifLet: deferCondition.variable, { "if: \"\($0)\", " })\
+    \(deferCondition.renderedTypeName).self, label: "\(deferCondition.label)")
     """
   }
 
@@ -343,6 +375,8 @@ struct SelectionSetTemplate {
   }
 
   private func InlineFragmentAccessorTemplate(_ inlineFragment: IR.SelectionSet) -> TemplateString {
+    guard !inlineFragment.typeInfo.scope.isDeferred else { return "" }
+
     let typeName = inlineFragment.renderedTypeName
     return """
     \(renderAccessControl())var \(typeName.firstLowercased): \(typeName)? {\
@@ -362,23 +396,55 @@ struct SelectionSetTemplate {
     _ selections: IR.SelectionSet.Selections,
     in scope: IR.ScopeDescriptor
   ) -> TemplateString {
-    guard !(selections.direct?.namedFragments.isEmpty ?? true) ||
-            !selections.merged.namedFragments.isEmpty else {
+    guard
+      !(selections.direct?.namedFragments.isEmpty ?? true)
+      || !selections.merged.namedFragments.isEmpty
+      || (selections.direct?.inlineFragments.containsDeferredFragment ?? false)
+    else {
       return ""
     }
 
     return """
     \(renderAccessControl())struct Fragments: FragmentContainer {
-      \(DataFieldAndInitializerTemplate())
+      \(DataPropertyTemplate())
+      \(FragmentInitializerTemplate(selections))
 
       \(ifLet: selections.direct?.namedFragments.values, {
         "\($0.map { NamedFragmentAccessorTemplate($0, in: scope) }, separator: "\n")"
-        })
+      })
       \(selections.merged.namedFragments.values.map {
-          NamedFragmentAccessorTemplate($0, in: scope)
-        }, separator: "\n")
+        NamedFragmentAccessorTemplate($0, in: scope)
+      }, separator: "\n")
+      \(forEachIn: selections.direct?.inlineFragments.values.elements ?? [], {
+        "\(ifLet: $0.typeInfo.deferCondition, DeferredFragmentAccessorTemplate)"
+      })
     }
     """
+  }
+
+  private func FragmentInitializerTemplate(
+    _ selections: IR.SelectionSet.Selections
+  ) -> String {
+    if let inlineFragments = selections.direct?.inlineFragments,
+       inlineFragments.containsDeferredFragment {
+      return InitializerTemplate("""
+      \(forEachIn: inlineFragments.values, {
+        guard let deferCondition = $0.typeInfo.deferCondition else {
+          return nil
+        }
+        return DeferredPropertyInitializationStatement(deferCondition)
+      })
+      """)
+
+    } else {
+      return InitializerTemplate()
+    }
+  }
+
+  private func DeferredPropertyInitializationStatement(
+    _ deferCondition: CompilationResult.DeferCondition
+  ) -> TemplateString {
+    "_\(deferCondition.label) = Deferred(_dataDict: _dataDict)"
   }
 
   private func NamedFragmentAccessorTemplate(
@@ -410,6 +476,12 @@ struct SelectionSetTemplate {
       else: " _toFragment() }"
     )
     """
+  }
+
+  private func DeferredFragmentAccessorTemplate(
+    _ deferCondition: CompilationResult.DeferCondition
+  ) -> TemplateString {
+    "@Deferred public var \(deferCondition.label): \(deferCondition.renderedTypeName)?"
   }
 
   // MARK: - SelectionSet Initializer
@@ -892,10 +964,15 @@ fileprivate struct SelectionSetNameGenerator {
 fileprivate extension IR.ScopeCondition {
 
   var selectionSetNameComponent: String {
-    return TemplateString("""
-    \(ifLet: type, { "As\($0.formattedName)" })\
-    \(ifLet: conditions, { "If\($0.typeNameComponents)"})
-    """).description
+    if let deferCondition {
+      return deferCondition.renderedTypeName
+
+    } else {
+      return TemplateString("""
+      \(ifLet: type, { "As\($0.formattedName)" })\
+      \(ifLet: conditions, { "If\($0.typeNameComponents)"})
+      """).description
+    }
   }
   
 }
@@ -987,5 +1064,17 @@ extension IR.SelectionSet.Selections {
       return (direct?.isEmpty ?? true) && merged.isEmpty
     }
 
+  }
+}
+
+fileprivate extension CompilationResult.DeferCondition {
+  var renderedTypeName: String {
+    self.label.convertToCamelCase().firstUppercased.asSelectionSetName
+  }
+}
+
+fileprivate extension OrderedDictionary<ScopeCondition, InlineFragmentSpread> {
+  var containsDeferredFragment: Bool {
+    keys.contains(where: { $0.isDeferred })
   }
 }

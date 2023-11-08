@@ -1,7 +1,15 @@
 {
   "abstract" : [
     {
-      "text" : "Version that works if you’re using the 5.3 compiler or above",
+      "text" : "Inherited from ",
+      "type" : "text"
+    },
+    {
+      "code" : "Equatable.!=(_:_:)",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
       "type" : "text"
     }
   ],
@@ -9,17 +17,20 @@
     "paths" : [
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileFinder"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/SourceFormat",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/SourceFormat\/Equatable-Implementations"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileFinder\/findParentFolder(from:)-yioi"
+    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/SourceFormat\/!=(_:_:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloCodegenLib10FileFinderV16findParentFolder4from10Foundation3URLVs12StaticStringV_tFZ",
+    "extendedModule" : "Swift",
+    "externalID" : "s:SQsE2neoiySbx_xtFZ::SYNTHESIZED::s:16ApolloCodegenLib19OperationDescriptorV12SourceFormatO",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -39,24 +50,27 @@
       },
       {
         "kind" : "identifier",
-        "text" : "findParentFolder"
+        "text" : "!="
+      },
+      {
+        "kind" : "text",
+        "text" : " "
       },
       {
         "kind" : "text",
         "text" : "("
       },
       {
-        "kind" : "externalParam",
-        "text" : "from"
+        "kind" : "typeIdentifier",
+        "text" : "Self"
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : ", "
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:s12StaticStringV",
-        "text" : "StaticString"
+        "text" : "Self"
       },
       {
         "kind" : "text",
@@ -64,19 +78,22 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:10Foundation3URLV",
-        "text" : "URL"
+        "preciseIdentifier" : "s:Sb",
+        "text" : "Bool"
       }
     ],
     "modules" : [
       {
-        "name" : "ApolloCodegenLib"
+        "name" : "ApolloCodegenLib",
+        "relatedModules" : [
+          "Swift"
+        ]
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Type Method",
-    "symbolKind" : "method",
-    "title" : "findParentFolder(from:)"
+    "roleHeading" : "Operator",
+    "symbolKind" : "op",
+    "title" : "!=(_:_:)"
   },
   "primaryContentSections" : [
     {
@@ -107,23 +124,19 @@
             },
             {
               "kind" : "identifier",
-              "text" : "findParentFolder"
-            },
-            {
-              "kind" : "text",
-              "text" : "("
-            },
-            {
-              "kind" : "externalParam",
-              "text" : "from"
+              "text" : "!="
             },
             {
               "kind" : "text",
               "text" : " "
             },
             {
+              "kind" : "text",
+              "text" : "("
+            },
+            {
               "kind" : "internalParam",
-              "text" : "filePath"
+              "text" : "lhs"
             },
             {
               "kind" : "text",
@@ -131,16 +144,23 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:s12StaticStringV",
-              "text" : "StaticString"
+              "text" : "Self"
             },
             {
               "kind" : "text",
-              "text" : " = "
+              "text" : ", "
             },
             {
-              "kind" : "keyword",
-              "text" : "#filePath"
+              "kind" : "internalParam",
+              "text" : "rhs"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Self"
             },
             {
               "kind" : "text",
@@ -148,60 +168,13 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:10Foundation3URLV",
-              "text" : "URL"
+              "preciseIdentifier" : "s:Sb",
+              "text" : "Bool"
             }
           ]
         }
       ],
       "kind" : "declarations"
-    },
-    {
-      "kind" : "parameters",
-      "parameters" : [
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The full file path of the file to find. Defaults to the ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "#filePath",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : " of the caller.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "filePath"
-        }
-      ]
-    },
-    {
-      "content" : [
-        {
-          "anchor" : "return-value",
-          "level" : 2,
-          "text" : "Return Value",
-          "type" : "heading"
-        },
-        {
-          "inlineContent" : [
-            {
-              "text" : "The file URL for the parent folder.",
-              "type" : "text"
-            }
-          ],
-          "type" : "paragraph"
-        }
-      ],
-      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -215,7 +188,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollocodegenlib\/filefinder\/findparentfolder(from:)-yioi"
+        "\/documentation\/apollocodegenlib\/operationdescriptor\/sourceformat\/!=(_:_:)"
       ],
       "traits" : [
         {
@@ -240,7 +213,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileFinder": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/OperationDescriptor": {
   "abstract" : [
 
   ],
@@ -255,28 +228,56 @@
     },
     {
       "kind" : "identifier",
-      "text" : "FileFinder"
+      "text" : "OperationDescriptor"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileFinder",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "FileFinder"
+      "text" : "OperationDescriptor"
     }
   ],
   "role" : "symbol",
-  "title" : "FileFinder",
+  "title" : "OperationDescriptor",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/filefinder"
+  "url" : "\/documentation\/apollocodegenlib\/operationdescriptor"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileFinder/findParentFolder(from:)-yioi": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/OperationDescriptor/SourceFormat": {
   "abstract" : [
+
+  ],
+  "fragments" : [
     {
-      "text" : "Version that works if you’re using the 5.3 compiler or above",
-      "type" : "text"
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "SourceFormat"
     }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/SourceFormat",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "SourceFormat"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OperationDescriptor.SourceFormat",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/operationdescriptor\/sourceformat"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/OperationDescriptor/SourceFormat/!=(_:_:)": {
+  "abstract" : [
+
   ],
   "fragments" : [
     {
@@ -297,24 +298,27 @@
     },
     {
       "kind" : "identifier",
-      "text" : "findParentFolder"
+      "text" : "!="
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "text",
       "text" : "("
     },
     {
-      "kind" : "externalParam",
-      "text" : "from"
+      "kind" : "typeIdentifier",
+      "text" : "Self"
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ", "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s12StaticStringV",
-      "text" : "StaticString"
+      "text" : "Self"
     },
     {
       "kind" : "text",
@@ -322,16 +326,27 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:10Foundation3URLV",
-      "text" : "URL"
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileFinder\/findParentFolder(from:)-yioi",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/SourceFormat\/!=(_:_:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "findParentFolder(from:)",
+  "title" : "!=(_:_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/filefinder\/findparentfolder(from:)-yioi"
+  "url" : "\/documentation\/apollocodegenlib\/operationdescriptor\/sourceformat\/!=(_:_:)"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/OperationDescriptor/SourceFormat/Equatable-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/SourceFormat\/Equatable-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "Equatable Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/operationdescriptor\/sourceformat\/equatable-implementations"
 }
 }
 }

@@ -75,14 +75,16 @@ public extension CompilationResult.InlineFragment {
   class func mock(
     parentType: GraphQLCompositeType = GraphQLObjectType.mock(),
     inclusionConditions: [CompilationResult.InclusionCondition]? = nil,
-    selections: [CompilationResult.Selection] = []
+    selections: [CompilationResult.Selection] = [],
+    directives: [CompilationResult.Directive] = []
   ) -> CompilationResult.InlineFragment {
     CompilationResult.InlineFragment(
       selectionSet: CompilationResult.SelectionSet(
         parentType: parentType,
         selections: selections
       ),
-      inclusionConditions: inclusionConditions
+      inclusionConditions: inclusionConditions,
+      directives: directives
     )
   }
 }

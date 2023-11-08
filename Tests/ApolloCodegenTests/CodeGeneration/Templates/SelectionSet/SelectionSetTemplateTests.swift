@@ -331,7 +331,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expected = """
       public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Nested }
-    
+
     """
 
     // when
@@ -345,7 +345,7 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
-  
+
   func test__render_selections__givenCustomRootTypes_doesNotGenerateTypenameField() async throws {
     // given
     schemaSDL = """
@@ -353,11 +353,11 @@ class SelectionSetTemplateTests: XCTestCase {
       query: RootQueryType
       mutation: RootMutationType
     }
-    
+
     type RootQueryType {
       allAnimals: [Animal!]
     }
-    
+
     type RootMutationType {
       feedAnimal: Animal!
     }
@@ -404,7 +404,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
     type Animal {
       string: String!
-      string_optional: String      
+      string_optional: String
       int: Int!
       int_optional: Int
       float: Float!
@@ -504,7 +504,7 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
-  
+
   func test__render_selections__givenAllUppercase_generatesCorrectCasing() async throws {
     // given
     schemaSDL = """
@@ -1488,6 +1488,223 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
+  // MARK: Selections - Deferred Inline Fragment
+
+  func test__render_selections__givenDeferredInlineFragmentWithoutTypeCase_rendersDeferredFragmentSelectionAndFieldSelectionInDeferredFragment() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+    )
+    let allAnimals_deferredAsRoot = try XCTUnwrap(
+      allAnimals[as: "Animal", deferred: .init(label: "root")]
+    )
+
+    let rendered_allAnimals = subject.render(field: allAnimals)
+    let rendered_allAnimals_deferredAsRoot = subject.render(
+      inlineFragment: allAnimals_deferredAsRoot
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__render_selections__givenDeferredInlineFragmentOnSameTypeCase_rendersDeferredFragmentSelectionAndFieldSelectionInDeferredFragment() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+    )
+    let allAnimals_deferredAsRoot = try XCTUnwrap(
+      allAnimals[as: "Animal", deferred: .init(label: "root")]
+    )
+
+    let rendered_allAnimals = subject.render(field: allAnimals)
+    let rendered_allAnimals_deferredAsRoot = subject.render(
+      inlineFragment: allAnimals_deferredAsRoot
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__render_selections__givenDeferredInlineFragmentOnDifferentTypeCase_rendersTypeCaseSelectionAndDeferredFragmentSelectionAndFieldSelectionInDeferredFragment() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+    )
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(
+      allAnimals_asDog[as: "Dog", deferred: .init(label: "root")]
+    )
+
+    let rendered_allAnimals = subject.render(field: allAnimals)
+    let rendered_allAnimals_asDog = subject.render(inlineFragment: allAnimals_asDog)
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+
+  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
+
+  // MARK: Selections - Deferred Named Fragment
+
+  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
+
   // MARK: Selections - Include/Skip
 
   func test__render_selections__givenFieldWithIncludeCondition_rendersFieldSelections() async throws {
@@ -2453,7 +2670,7 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
-  
+
   func test__render_fieldAccessors__givenFieldWithAllUpperCaseName_rendersFieldAccessorWithLowercaseName() async throws {
     // given
     schemaSDL = """
@@ -2571,7 +2788,7 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
-  
+
   func test__render_fieldAccessors__givenFieldWithSnakeCaseName_rendersFieldAccessorAsCamelCase() async throws {
     // given
     schemaSDL = """
@@ -2607,7 +2824,7 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
-  
+
   func test__render_fieldAccessors__givenFieldWithSnakeCaseUppercaseName_rendersFieldAccessorAsCamelCase() async throws {
     // given
     schemaSDL = """
@@ -4319,8 +4536,163 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
-  
-  
+
+  // MARK: Field Accessors - Deferred Inline Fragment
+
+  func test__render_fieldAccessor__givenDeferredInlineFragmentWithoutTypeCase_rendersFieldsWithinDeferredTypeCase() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_deferredAsRoot = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Animal", deferred: .init(label: "root")]
+    )
+
+    let rendered = subject.render(inlineFragment: allAnimals_deferredAsRoot)
+
+    // AllAnimal
+    expect(rendered).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__render_fieldAccessor__givenDeferredInlineFragmentOnSameTypeCase_rendersFieldsWithinDeferredTypeCase() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_deferredAsRoot = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Animal", deferred: .init(label: "root")]
+    )
+
+    let rendered = subject.render(inlineFragment: allAnimals_deferredAsRoot)
+
+    // AllAnimal
+    expect(rendered).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__render_fieldAccessor__givenDeferredInlineFragmentOnDifferentTypeCase_rendersFieldsWithinDeferredTypeCase() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[as: "Dog", deferred: .init(label: "root")]
+    )
+
+    let rendered = subject.render(inlineFragment: allAnimals_asDog_deferredAsRoot)
+
+    // AllAnimal
+    expect(rendered).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
+
+  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
+
+  // MARK: Field Accessors - Deferred Named Fragments
+
+  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
 
   // MARK: - Inline Fragment Accessors
 
@@ -5004,6 +5376,175 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
+
+  // MARK: Fragment Accessors - Deferred Inline Fragment
+
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithoutTypeCase_rendersDeferredFragmentAccessorAsOptional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+    )
+
+    let rendered = subject.render(field: allAnimals)
+
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _root = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var root: Root?
+        }
+      """,
+      atLine: 15,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentOnSameTypeCase_rendersDeferredFragmentAccessorAsOptional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+    )
+
+    let rendered = subject.render(field: allAnimals)
+
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _root = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var root: Root?
+        }
+      """,
+      atLine: 15,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentOnDifferentTypeCase_rendersDeferredFragmentAccessorAsOptional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let rendered = subject.render(inlineFragment: allAnimals_asDog)
+
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _root = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var root: Root?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+  }
+
+  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
+
+  // MARK: Fragment Accessors - Deferred Named Fragment
+
+  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
 
   // MARK: - Nested Selection Sets
 
@@ -6233,7 +6774,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
       public typealias RootEntityType = TestOperationQuery.Data
     """
-    
+
     // when
     try await buildSubjectAndOperation()
     let query_ifA = try XCTUnwrap(
@@ -6353,6 +6894,169 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
   }
+
+  func test__render_deferredTypeCase__givenDeferredInlineFragmentWithoutTypeCase_rendersRootEntityType() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_deferredAsRoot = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Animal", deferred: .init(label: "root")]
+    )
+
+    let rendered_allAnimals_deferredAsRoot = subject.render(
+      inlineFragment: allAnimals_deferredAsRoot
+    )
+
+    expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
+      """
+      /// AllAnimal.Root
+      public struct Root: TestSchema.InlineFragment, ApolloAPI.Deferrable {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
+        public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      """,
+      atLine: 1,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__render_deferredTypeCase__givenDeferredInlineFragmentOnSameTypeCase_rendersRootEntityType() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_deferredAsRoot = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Animal", deferred: .init(label: "root")]
+    )
+
+    let rendered_allAnimals_deferredAsRoot = subject.render(
+      inlineFragment: allAnimals_deferredAsRoot
+    )
+
+    expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
+      """
+      /// AllAnimal.Root
+      public struct Root: TestSchema.InlineFragment, ApolloAPI.Deferrable {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
+        public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      """,
+      atLine: 1,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__render_deferredTypeCase__givenDeferredInlineFragmentOnDifferentTypeCase_rendersRootEntityType() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[as: "Dog", deferred: .init(label: "root")]
+    )
+
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot
+    )
+
+    expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
+      """
+      /// AllAnimal.AsDog.Root
+      public struct Root: TestSchema.InlineFragment, ApolloAPI.Deferrable {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
+        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
+      """,
+      atLine: 1,
+      ignoringExtraLines: true
+    ))
+  }
+
+  #warning("need more tests here - same test cases as IRRootFieldBuilderTests (inline fragment only")
 
   // MARK: - Documentation Tests
 
@@ -6795,9 +7499,9 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
-  
+
   // MARK: - Reserved Keyword Type Tests
-  
+
   func test__render_enumType__usingReservedKeyword_rendersAsSuffixedType() async throws {
     // given
     schemaSDL = """
@@ -6828,7 +7532,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let expectedOne = """
         .field("type", GraphQLEnum<TestSchema.Type_Enum>.self),
     """
-    
+
     let expectedTwo = """
       public var type: GraphQLEnum<TestSchema.Type_Enum> { __data["type"] }
     """
@@ -6845,7 +7549,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expectedOne, atLine: 9, ignoringExtraLines: true))
     expect(actual).to(equalLineByLine(expectedTwo, atLine: 12, ignoringExtraLines: true))
   }
-  
+
   func test__render_NamedFragmentType__usingReservedKeyword_rendersAsSuffixedType() async throws {
     // given
     schemaSDL = """
@@ -6881,7 +7585,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let expectedOne = """
         .fragment(Type_Fragment.self),
     """
-    
+
     let expectedTwo = """
         public var type: Type_Fragment { _toFragment() }
     """
@@ -6898,7 +7602,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expectedOne, atLine: 9, ignoringExtraLines: true))
     expect(actual).to(equalLineByLine(expectedTwo, atLine: 19, ignoringExtraLines: true))
   }
-  
+
   func test__render_CustomScalarType__usingReservedKeyword_rendersAsSuffixedType() async throws {
     // given
     schemaSDL = """
@@ -6926,7 +7630,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let expectedOne = """
         .field("type", TestSchema.Type_Scalar.self),
     """
-    
+
     let expectedTwo = """
       public var type: TestSchema.Type_Scalar { __data["type"] }
     """
@@ -6943,7 +7647,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expectedOne, atLine: 9, ignoringExtraLines: true))
     expect(actual).to(equalLineByLine(expectedTwo, atLine: 12, ignoringExtraLines: true))
   }
-  
+
   func test__render_InterfaceType__usingReservedKeyword_rendersAsSuffixedType() async throws {
     // given
     schemaSDL = """
@@ -6983,7 +7687,7 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
-  
+
   func test__render_UnionType__usingReservedKeyword_rendersAsSuffixedType() async throws {
     // given
     schemaSDL = """
@@ -7033,7 +7737,7 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
-  
+
   func test__render_ObjectType__usingReservedKeyword_rendersAsSuffixedType() async throws {
     // given
     schemaSDL = """
@@ -7070,5 +7774,5 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
-  
+
 }
