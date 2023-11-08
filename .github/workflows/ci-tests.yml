@@ -8,6 +8,20 @@ env:
   XCODE_VERSION: "15.0.1"
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      pagination: ${{ steps.filter.outputs.pagination }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            pagination:
+              - 'apollo-ios-pagination/**'
+              - 'Tests/ApolloInternalTestHelpers/**'
+              - 'apollo-ios/**'
   tuist-generation:
     runs-on: macos-13
     timeout-minutes: 8
@@ -56,7 +70,7 @@ jobs:
 
   build-and-unit-test:
     runs-on: macos-13
-    needs: tuist-generation
+    needs: [tuist-generation, changes]
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -68,18 +82,28 @@ jobs:
             test-plan: Apollo-CITestPlan
             name: Apollo Unit Tests - macOS
             run-js-tests: false
+            should-run: true
           # Codegen CLI Test
           - destination: platform=macOS,arch=x86_64
             scheme: CodegenCLITests
             test-plan: CodegenCLITestPlan
             name: Codegen CLI Unit Tests - macOS
             run-js-tests: false
+            should-run: true
           # CodegenLib Test
           - destination: platform=macOS,arch=x86_64
             scheme: ApolloCodegenTests
             test-plan: Apollo-Codegen-CITestPlan
             name: Codegen Lib Unit Tests - macOS
             run-js-tests: true
+            should-run: true
+          # ApolloPagination Tests
+          - destination: platform=macOS,arch=x86_64
+            scheme: ApolloPaginationTests
+            test-plan: Apollo-PaginationTestPlan
+            name: ApolloPagination Unit Tests - macOS
+            run-js-tests: false
+            should-run: ${{ needs.changes.outputs.pagination }}
     name: ${{ matrix.name }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
@@ -107,6 +131,7 @@ jobs:
     #       command: 'generate'
     #       arguments: ''
     - name: Build and Test
+      if: ${{ matrix.should-run == true || matrix.should-run == 'true' }}
       uses: ./.github/actions/build-and-run-unit-tests
       with:
         destination: ${{ matrix.destination }}

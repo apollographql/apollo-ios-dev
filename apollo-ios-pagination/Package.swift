@@ -18,6 +18,10 @@ let package = Package(
       url: "https://github.com/apollographql/apollo-ios.git",
       .upToNextMajor(from: "1.2.0")
     ),
+    .package(
+      url: "https://github.com/apple/swift-collections",
+      .upToNextMajor(from: "1.0.0")
+    ),
   ],
   targets: [
     .target(
@@ -25,6 +29,7 @@ let package = Package(
       dependencies: [
         .product(name: "Apollo", package: "apollo-ios"),
         .product(name: "ApolloAPI", package: "apollo-ios"),
+        .product(name: "OrderedCollections", package: "swift-collections"),
       ]
     ),
   ]
