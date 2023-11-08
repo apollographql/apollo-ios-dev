@@ -40,7 +40,7 @@ jobs:
   tuist-generation:
     runs-on: macos-13
     needs: [changes]
-    if: ${{ needs.changes.outputs.ios || needs.changes.outputs.codegen || needs.changes.outputs.pagination }}
+    if: ${{ needs.changes.outputs.ios == 'true' || needs.changes.outputs.codegen  == 'true' || needs.changes.outputs.pagination  == 'true' }}
     timeout-minutes: 8
     name: Run Tuist Generation
     steps:
@@ -192,7 +192,7 @@ jobs:
   run-codegen-test-configurations:
     runs-on: macos-13
     needs: [changes]
-    if: ${{ needs.changes.outputs.codegen }}
+    if: ${{ needs.changes.outputs.codegen  == 'true' }}
     timeout-minutes: 20
     name: Codegen Test Configurations - macOS
     steps:
@@ -233,7 +233,7 @@ jobs:
   run-integration-tests:
     runs-on: macos-13
     needs: [tuist-generation, changes]
-    if: ${{ needs.changes.outputs.ios }}
+    if: ${{ needs.changes.outputs.ios  == 'true' }}
     timeout-minutes: 20
     name: Apollo Integration Tests - macOS
     steps:
