@@ -14,7 +14,6 @@ jobs:
       ios: ${{ steps.filter.outputs.ios }}
       codegen: ${{ steps.filter.outputs.codegen }}
       pagination: ${{ steps.filter.outputs.pagination }}
-      any: ${{ steps.filter.outputs.ios || steps.filter.outputs.codegen || steps.filter.outputs.pagination }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v2
@@ -41,7 +40,7 @@ jobs:
   tuist-generation:
     runs-on: macos-13
     needs: [changes]
-    if: ${{ needs.changes.outputs.any }}
+    if: ${{ needs.changes.outputs.ios || needs.changes.outputs.codegen || needs.changes.outputs.pagination }}
     timeout-minutes: 8
     name: Run Tuist Generation
     steps:
