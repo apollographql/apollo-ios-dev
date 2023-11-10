@@ -8,8 +8,39 @@ env:
   XCODE_VERSION: "15.0.1"
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      ios: ${{ steps.filter.outputs.ios }}
+      codegen: ${{ steps.filter.outputs.codegen }}
+      pagination: ${{ steps.filter.outputs.pagination }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            ios:
+              - 'apollo-ios/**'
+              - 'Tests/ApolloInternalTestHelpers/**'
+              - 'Tests/ApolloServerIntegrationTests/**'
+              - 'Tests/ApolloTests/**'
+            codegen:
+              - 'apollo-ios-codegen/**'
+              - 'Tests/ApolloCodegenInternalTestHelpers/**'
+              - 'Tests/ApolloCodegenTests/**'
+              - 'Tests/CodegenCLITests/**'
+              - 'Tests/CodegenIntegrationTests/**'
+              - 'Tests/TestCodeGenConfigurations/**'
+            pagination:
+              - 'apollo-ios-pagination/**'
+              - 'Tests/ApolloInternalTestHelpers/**'
+              - 'apollo-ios/**'
+
   tuist-generation:
     runs-on: macos-13
+    needs: [changes]
+    if: ${{ needs.changes.outputs.ios == 'true' || needs.changes.outputs.codegen  == 'true' || needs.changes.outputs.pagination  == 'true' }}
     timeout-minutes: 8
     name: Run Tuist Generation
     steps:
@@ -56,7 +87,7 @@ jobs:
 
   build-and-unit-test:
     runs-on: macos-13
-    needs: tuist-generation
+    needs: [tuist-generation, changes]
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -68,18 +99,28 @@ jobs:
             test-plan: Apollo-CITestPlan
             name: Apollo Unit Tests - macOS
             run-js-tests: false
+            should-run: ${{ needs.changes.outputs.ios }}
           # Codegen CLI Test
           - destination: platform=macOS,arch=x86_64
             scheme: CodegenCLITests
             test-plan: CodegenCLITestPlan
             name: Codegen CLI Unit Tests - macOS
             run-js-tests: false
+            should-run: ${{ needs.changes.outputs.codegen }}
           # CodegenLib Test
           - destination: platform=macOS,arch=x86_64
             scheme: ApolloCodegenTests
             test-plan: Apollo-Codegen-CITestPlan
             name: Codegen Lib Unit Tests - macOS
             run-js-tests: true
+            should-run: ${{ needs.changes.outputs.codegen }}
+          # ApolloPagination Tests
+          - destination: platform=macOS,arch=x86_64
+            scheme: ApolloPaginationTests
+            test-plan: Apollo-PaginationTestPlan
+            name: ApolloPagination Unit Tests - macOS
+            run-js-tests: false
+            should-run: ${{ needs.changes.outputs.pagination }}
     name: ${{ matrix.name }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
@@ -107,6 +148,8 @@ jobs:
     #       command: 'generate'
     #       arguments: ''
     - name: Build and Test
+      if: ${{ matrix.should-run == true || matrix.should-run == 'true' }}
+      id: build-and-test
       uses: ./.github/actions/build-and-run-unit-tests
       with:
         destination: ${{ matrix.destination }}
@@ -119,23 +162,27 @@ jobs:
       run: |
         npm install && npm test
     - name: Save xcodebuild logs
+      if: ${{ steps.build-and-test.outcome != 'skipped' }}
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.name }}-logs
         path: |
           DerivedData/Logs/Build
     - name: Save crash logs
+      if: ${{ steps.build-and-test.outcome != 'skipped' }}
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.name }}-crashes
         path: |
           ~/Library/Logs/DiagnosticReports
     - name: Zip Result Bundle
+      if: ${{ steps.build-and-test.outcome != 'skipped' }}
       shell: bash
       working-directory: TestResults
       run: |
         zip -r ResultBundle.zip ResultBundle.xcresult
     - name: Save test results
+      if: ${{ steps.build-and-test.outcome != 'skipped' }}
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.name }}-results
@@ -144,6 +191,8 @@ jobs:
 
   run-codegen-test-configurations:
     runs-on: macos-13
+    needs: [changes]
+    if: ${{ needs.changes.outputs.codegen  == 'true' }}
     timeout-minutes: 20
     name: Codegen Test Configurations - macOS
     steps:
@@ -183,7 +232,8 @@ jobs:
 
   run-integration-tests:
     runs-on: macos-13
-    needs: tuist-generation
+    needs: [tuist-generation, changes]
+    if: ${{ needs.changes.outputs.ios  == 'true' }}
     timeout-minutes: 20
     name: Apollo Integration Tests - macOS
     steps:

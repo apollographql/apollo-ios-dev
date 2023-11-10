@@ -1,4 +1,5 @@
 public enum PaginationError: Error {
-    case missingInitialPage
-    case pageHasNoMoreContent
+  case missingInitialPage
+  case pageHasNoMoreContent
+  case loadInProgress
 }

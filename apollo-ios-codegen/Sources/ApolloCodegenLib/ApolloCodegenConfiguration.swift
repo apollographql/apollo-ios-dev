@@ -669,7 +669,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   /// schema in generated code.
   public struct ConversionStrategies: Codable, Equatable {
 
-    /// ``ApolloCodegenConfiguration/ConversionStrategies/EnumCase`` is used to specify the strategy
+    /// ``ApolloCodegenConfiguration/ConversionStrategies/EnumCases`` is used to specify the strategy
     /// used to convert the casing of enum cases in a GraphQL schema into generated Swift code.
     public enum EnumCases: String, Codable, Equatable {
       /// Generates swift code using the exact name provided in the GraphQL schema
@@ -695,12 +695,12 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     
     /// Determines how the names of enum cases in the GraphQL schema will be converted into
     /// cases on the generated Swift enums.
-    /// Defaultss to ``ApolloCodegenConfiguration/CaseConversionStrategy/camelCase``
+    /// Defaults to ``ApolloCodegenConfiguration/ConversionStrategies/CaseConversionStrategy/camelCase``
     public let enumCases: EnumCases
     
     /// Determines how the names of fields in the GraphQL schema will be converted into
     /// properties in the generated Swift code.
-    /// Defaults to ``ApolloCodegenConfiguration/CaseConversionStrategy/camelCase``
+    /// Defaults to ``ApolloCodegenConfiguration/ConversionStrategies/FieldAccessors/idiomatic``
     public let fieldAccessors: FieldAccessors
 
     /// Default property values
@@ -1448,7 +1448,7 @@ extension ApolloCodegenConfiguration.ConversionStrategies {
   
   /// ``CaseConversionStrategy`` is used to specify the strategy used to convert the casing of
   /// GraphQL schema values into generated Swift code.
-  @available(*, deprecated, message: "Use EnumCaseConversionStrategy instead.")
+  @available(*, deprecated, message: "Use EnumCases instead.")
     public enum CaseConversionStrategy: String, Codable, Equatable {
       /// Generates swift code using the exact name provided in the GraphQL schema
       /// performing no conversion.
