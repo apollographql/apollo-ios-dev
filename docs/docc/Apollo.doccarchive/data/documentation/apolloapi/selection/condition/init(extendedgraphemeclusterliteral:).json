@@ -62,7 +62,7 @@
       ]
     },
     "extendedModule" : "Swift",
-    "externalID" : "s:s26ExpressibleByStringLiteralPs0cD4TypeQz023ExtendedGraphemeClusterdE0RtzrlE08extendedghD0xAF_tcfc::SYNTHESIZED::s:9ApolloAPI9SelectionO9ConditionV",
+    "externalID" : "s:s26ExpressibleByStringLiteralPs0cD4TypeQz023ExtendedGraphemeClusterdE0RtzrlE08extendedghD0xAF_tcfc::SYNTHESIZED::s:9ApolloAPI9SelectionO9ConditionO",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -279,7 +279,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "struct"
+      "text" : "enum"
     },
     {
       "kind" : "text",
