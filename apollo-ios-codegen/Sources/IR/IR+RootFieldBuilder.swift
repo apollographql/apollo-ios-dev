@@ -5,7 +5,7 @@ import Utilities
 
 /// Remove merged selections from SelectionSet.Selections
 /// Add function to EntityStorage to compute merged selections (WIP)
-///   - Make new MergedSelections a simple struct
+///   - Make new MergedSelections a simple struct (class? run perf tests)
 ///   - Turn existing MergedSelections into MergedSelectionsBuilder
 ///   - Give MergedSelectionsBuilder reference to entity storage
 ///   - We may not need the computeMergedSelections on EntityStorage
