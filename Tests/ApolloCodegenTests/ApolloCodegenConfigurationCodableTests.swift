@@ -53,7 +53,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           markOperationDefinitionsAsFinal: true
         ),
         experimentalFeatures: .init(
-          clientControlledNullability: true,
           legacySafelistingCompatibleOperations: true
         ),
         operationManifest: .init(
@@ -68,7 +67,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
       """
       {
         "experimentalFeatures" : {
-          "clientControlledNullability" : true,
           "legacySafelistingCompatibleOperations" : true
         },
         "input" : {

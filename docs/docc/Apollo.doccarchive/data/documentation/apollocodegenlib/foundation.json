@@ -34,7 +34,8 @@
   "topicSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/FileHandle"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/FileHandle",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URLSession"
       ],
       "title" : "Extended Classes"
     },
@@ -147,6 +148,38 @@
   "title" : "URL",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/foundation\/url"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Foundation/URLSession": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "extension"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "preciseIdentifier" : "c:objc(cs)NSURLSession",
+      "text" : "URLSession"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URLSession",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "URLSession"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "URLSession",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/foundation\/urlsession"
 }
 }
 }

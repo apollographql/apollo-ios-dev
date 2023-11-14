@@ -120,8 +120,7 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
       )
 
       let newFieldInlineFragment = InlineFragmentSpread(
-        selectionSet: newFieldSelectionSet,
-        isDeferred: false
+        selectionSet: newFieldSelectionSet
       )
       wrapperField.selectionSet.selections?.mergeIn(newFieldInlineFragment)
 

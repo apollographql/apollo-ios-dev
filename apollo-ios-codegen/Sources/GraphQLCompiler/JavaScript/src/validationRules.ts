@@ -7,6 +7,9 @@ import {
   OperationDefinitionNode,
   ValidationContext,
   VariableDefinitionNode,
+  InlineFragmentNode,
+  GraphQLDeferDirective,
+  FragmentSpreadNode,
 } from "graphql";
 
 const specifiedRulesToBeRemoved: [ValidationRule] = [NoUnusedFragmentsRule];
@@ -29,6 +32,7 @@ export function defaultValidationRules(options: ValidationOptions): ValidationRu
   return [
     NoAnonymousQueries,
     NoTypenameAlias,
+    DisallowDeferDirective,
     ...(disallowedFieldNamesRule ? [disallowedFieldNamesRule] : []),
     ...(disallowedInputParameterNamesRule ? [disallowedInputParameterNamesRule] : []),
     ...specifiedRules.filter((rule) => !specifiedRulesToBeRemoved.includes(rule)),
@@ -42,8 +46,7 @@ export function NoAnonymousQueries(context: ValidationContext) {
         context.reportError(
           new GraphQLError(
             "Apollo does not support anonymous operations because operation names are used during code generation. Please give this operation a name.",
-            node
-          )
+            { nodes: node })
         );
       }
       return false;
@@ -59,12 +62,44 @@ export function NoTypenameAlias(context: ValidationContext) {
         context.reportError(
           new GraphQLError(
             "Apollo needs to be able to insert __typename when needed, so using it as an alias is not supported.",
-            node
-          )
+            { nodes: node })
         );
       }
     },
   };
+}
+
+export function DisallowDeferDirective(context: ValidationContext) {
+  return {
+    InlineFragment(node: InlineFragmentNode) {
+      if (node.directives) {
+        for (const directive of node.directives) {
+          if (directive.name.value == GraphQLDeferDirective.name) {
+            context.reportError(
+              new GraphQLError(
+                "@defer support is disabled until the implementation is complete.",
+                { nodes: node }
+              )
+            )
+          }
+        }
+      }
+    },
+    FragmentSpread(node: FragmentSpreadNode) {
+      if (node.directives) {
+        for (const directive of node.directives) {
+          if (directive.name.value == GraphQLDeferDirective.name) {
+            context.reportError(
+              new GraphQLError(
+                "@defer support is disabled until the implementation is complete.",
+                { nodes: node }
+              )
+            )
+          }
+        }
+      }
+    }
+  }
 }
 
 function ApolloIOSDisallowedFieldNames(fieldNames?: Array<string>) {
@@ -77,8 +112,9 @@ function ApolloIOSDisallowedFieldNames(fieldNames?: Array<string>) {
           const responseKeyFirstLowercase = responseKey.charAt(0).toLowerCase() + responseKey.slice(1)
           if (disallowedFieldNames.includes(responseKeyFirstLowercase)) {
             context.reportError(
-              new GraphQLError(`Field name "${responseKey}" is not allowed because it conflicts with generated object APIs. Please use an alias to change the field name.`,
-               { nodes: node })
+              new GraphQLError(
+                `Field name "${responseKey}" is not allowed because it conflicts with generated object APIs. Please use an alias to change the field name.`,
+                { nodes: node })
             );
           }
         },
@@ -98,8 +134,9 @@ function ApolloIOSDisallowedInputParameterNames(names?: Array<string>) {
           const parameterNameFirstLowercase = parameterName.charAt(0).toLowerCase() + parameterName.slice(1)
           if (disallowedNames.includes(parameterNameFirstLowercase)) {
             context.reportError(
-              new GraphQLError(`Input Parameter name "${parameterName}" is not allowed because it conflicts with generated object APIs.`,
-               { nodes: node })
+              new GraphQLError(
+                `Input Parameter name "${parameterName}" is not allowed because it conflicts with generated object APIs.`,
+                { nodes: node })
             );
           }
         },

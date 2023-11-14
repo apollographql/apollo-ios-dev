@@ -232,6 +232,8 @@ class EntitySelectionTree {
 
         if let conditionalScopes = scopeConditions {
           for (condition, node) in conditionalScopes {
+            guard !node.scope.isDeferred else { continue }
+
             if scopePathNode.value.matches(condition) {
               node.mergeSelections(
                 matchingScopePath: scopePathNode,
@@ -250,6 +252,8 @@ class EntitySelectionTree {
 
       if let scopeConditions = scopeConditions {
         for (condition, node) in scopeConditions {
+          guard !node.scope.isDeferred else { continue }
+
           if scopePathNode.value.matches(condition) {
             node.mergeSelections(
               matchingScopePath: scopePathNode,
@@ -316,7 +320,7 @@ class EntitySelectionTree {
       let nodeCondition = ScopeCondition(
         type: condition.type == self.type ? nil : condition.type,
         conditions: condition.conditions,
-        isDeferred: condition.isDeferred
+        deferCondition: condition.deferCondition
       )
 
       func createNode() -> EntityNode {
@@ -462,8 +466,7 @@ extension EntitySelectionTree.EntityNode {
       for conditionGroup in inclusionConditions.elements {
         let scope = ScopeCondition(
           type: rootTypesMatch ? nil : fragmentType,
-          conditions: conditionGroup,
-          isDeferred: fragmentSpread.isDeferred
+          conditions: conditionGroup
         )
         let nodeForMerge = rootNodeToStartMerge.scopeConditionNode(for: scope)
 
@@ -474,7 +477,7 @@ extension EntitySelectionTree.EntityNode {
       let nodeForMerge = rootTypesMatch ?
       rootNodeToStartMerge :
       rootNodeToStartMerge.scopeConditionNode(
-        for: ScopeCondition(type: fragmentType, isDeferred: fragmentSpread.isDeferred)
+        for: ScopeCondition(type: fragmentType)
       )
 
       nodeForMerge.mergedFragmentTrees[fragmentSpread] = fragmentTree

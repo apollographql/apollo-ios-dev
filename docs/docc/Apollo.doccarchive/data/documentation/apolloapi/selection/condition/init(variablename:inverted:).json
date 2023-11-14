@@ -14,7 +14,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI9SelectionO9ConditionV12variableName8invertedAESS_Sbtcfc",
+    "externalID" : "s:9ApolloAPI9SelectionO9ConditionO12variableName8invertedAESS_Sbtcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -240,7 +240,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "struct"
+      "text" : "enum"
     },
     {
       "kind" : "text",

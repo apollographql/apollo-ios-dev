@@ -669,7 +669,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   /// schema in generated code.
   public struct ConversionStrategies: Codable, Equatable {
 
-    /// ``ApolloCodegenConfiguration/ConversionStrategies/EnumCase`` is used to specify the strategy
+    /// ``ApolloCodegenConfiguration/ConversionStrategies/EnumCases`` is used to specify the strategy
     /// used to convert the casing of enum cases in a GraphQL schema into generated Swift code.
     public enum EnumCases: String, Codable, Equatable {
       /// Generates swift code using the exact name provided in the GraphQL schema
@@ -695,12 +695,12 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     
     /// Determines how the names of enum cases in the GraphQL schema will be converted into
     /// cases on the generated Swift enums.
-    /// Defaultss to ``ApolloCodegenConfiguration/CaseConversionStrategy/camelCase``
+    /// Defaults to ``ApolloCodegenConfiguration/ConversionStrategies/CaseConversionStrategy/camelCase``
     public let enumCases: EnumCases
     
     /// Determines how the names of fields in the GraphQL schema will be converted into
     /// properties in the generated Swift code.
-    /// Defaults to ``ApolloCodegenConfiguration/CaseConversionStrategy/camelCase``
+    /// Defaults to ``ApolloCodegenConfiguration/ConversionStrategies/FieldAccessors/idiomatic``
     public let fieldAccessors: FieldAccessors
 
     /// Default property values
@@ -880,27 +880,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
 
   public struct ExperimentalFeatures: Codable, Equatable {
     /**
-     * **EXPERIMENTAL**: If enabled, the parser will understand and parse Client Controlled Nullability
-     * Designators contained in Fields. They'll be represented in the
-     * `required` field of the FieldNode.
-     *
-     * The syntax looks like the following:
-     *
-     * ```graphql
-     *   {
-     *     nullableField!
-     *     nonNullableField?
-     *     nonNullableSelectionSet? {
-     *       childField!
-     *     }
-     *   }
-     * ```
-     * - Note: This feature is experimental and may change or be removed in the
-     * future.
-     */
-    public let clientControlledNullability: Bool
-
-    /**
      * **EXPERIMENTAL**: If enabled, the generated operations will be transformed using a method
      * that attempts to maintain compatibility with the legacy behavior from
      * [`apollo-tooling`](https://github.com/apollographql/apollo-tooling)
@@ -913,32 +892,23 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
 
     /// Default property values
     public struct Default {
-      public static let clientControlledNullability: Bool = false
       public static let legacySafelistingCompatibleOperations: Bool = false
     }
 
     public init(
-      clientControlledNullability: Bool = Default.clientControlledNullability,
       legacySafelistingCompatibleOperations: Bool = Default.legacySafelistingCompatibleOperations
     ) {
-      self.clientControlledNullability = clientControlledNullability
       self.legacySafelistingCompatibleOperations = legacySafelistingCompatibleOperations
     }
 
     // MARK: Codable
 
     public enum CodingKeys: CodingKey, CaseIterable {
-      case clientControlledNullability
       case legacySafelistingCompatibleOperations
     }
 
     public init(from decoder: Decoder) throws {
       let values = try decoder.container(keyedBy: CodingKeys.self)
-
-      clientControlledNullability = try values.decodeIfPresent(
-        Bool.self,
-        forKey: .clientControlledNullability
-      ) ?? Default.clientControlledNullability
 
       legacySafelistingCompatibleOperations = try values.decodeIfPresent(
         Bool.self,
@@ -1478,7 +1448,7 @@ extension ApolloCodegenConfiguration.ConversionStrategies {
   
   /// ``CaseConversionStrategy`` is used to specify the strategy used to convert the casing of
   /// GraphQL schema values into generated Swift code.
-  @available(*, deprecated, message: "Use EnumCaseConversionStrategy instead.")
+  @available(*, deprecated, message: "Use EnumCases instead.")
     public enum CaseConversionStrategy: String, Codable, Equatable {
       /// Generates swift code using the exact name provided in the GraphQL schema
       /// performing no conversion.

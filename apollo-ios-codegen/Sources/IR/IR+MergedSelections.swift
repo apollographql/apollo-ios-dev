@@ -166,8 +166,7 @@ extension MergedSelections {
       )
 
       let inlineFragment = InlineFragmentSpread(
-        selectionSet: selectionSet,
-        isDeferred: condition.isDeferred
+        selectionSet: selectionSet
       )
 
       inlineFragments[condition] = inlineFragment
