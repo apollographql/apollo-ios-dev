@@ -441,7 +441,8 @@ The top-level properties are:
 	"warningsOnDeprecatedUsage": "include",
 	"conversionStrategies": {
 		"enumCases": "camelCase",
-		"fieldAccessors": "default"
+		"fieldAccessors": "default",
+		"inputObjects": "camelCase"
 	},
 	"pruneGeneratedFiles": true,
 	"markOperationDefinitionsAsFinal": true
@@ -470,7 +471,8 @@ let configuration = ApolloCodegenConfiguration(
 		warningsOnDeprecatedUsage: .include,
 		conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies(
 			enumCases: .camelCase,
-			fieldAccessors: .default
+			fieldAccessors: .default,
+			inputObjects: .camelCase
 		),
 		pruneGeneratedFiles: true,
 		markOperationDefinitionsAsFinal: true
@@ -741,7 +743,8 @@ Below is an example that illustrates an `apollo-codegen-config.json` where every
     "cocoapodsCompatibleImportStatements" : true,
     "conversionStrategies" : {
       "enumCases" : "none",
-      "fieldAccessors" : "camelCase"
+      "fieldAccessors" : "camelCase",
+			"inputObjects": "camelCase"
     },
     "deprecatedEnumCases" : "exclude",
     "operationDocumentFormat" : [
