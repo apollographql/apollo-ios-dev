@@ -37,11 +37,11 @@ struct SelectionSetTemplate {
   // MARK: - Field
   func render(field: IR.EntityField) -> String {
     #warning("TODO: Compute merged selections")
-    let selections: ComputedSelections! = nil // MergedSelections.Builder.build(selectionSet)
+    let selectionSet: ComputedSelectionSet! = nil // MergedSelections.Builder.build(selectionSet)
 
     let fieldSelectionSetName = nameCache.selectionSetName(for: field.selectionSet)
 
-    if let referencedSelectionSetName = selections.nameForReferencedSelectionSet(config: config) {
+    if let referencedSelectionSetName = selectionSet.nameForReferencedSelectionSet(config: config) {
       #warning("TODO: Test and implement `renderAccessControl()`")
       return "public typealias \(fieldSelectionSetName) = \(referencedSelectionSetName)"
     }
@@ -105,30 +105,30 @@ struct SelectionSetTemplate {
   }
 
   // MARK: - Body
-  func BodyTemplate(_ selectionSet: IR.SelectionSet) -> TemplateString {
+  func BodyTemplate(_ irSelectionSet: IR.SelectionSet) -> TemplateString {
     #warning("TODO: Compute merged selections")
-    let selections: ComputedSelections! = nil // MergedSelections.Builder.build(selectionSet)
-    let scope = selectionSet.typeInfo.scope
+    let computedSelectionSet: ComputedSelectionSet! = nil // MergedSelections.Builder.build(selectionSet)
+    let scope = irSelectionSet.typeInfo.scope
     return """
     \(DataPropertyTemplate())
     \(DesignatedInitializerTemplate())
 
-    \(RootEntityTypealias(selectionSet))
-    \(ParentTypeTemplate(selectionSet.parentType))
-    \(ifLet: selections.direct, { DirectSelectionsMetadataTemplate($0, scope: scope) })
-    \(if: selectionSet.isCompositeInlineFragment, MergedSourcesTemplate(selections.merged.mergedSources))
+    \(RootEntityTypealias(irSelectionSet))
+    \(ParentTypeTemplate(irSelectionSet.parentType))
+    \(ifLet: computedSelectionSet.direct, { DirectSelectionsMetadataTemplate($0, scope: scope) })
+    \(if: irSelectionSet.isCompositeInlineFragment, MergedSourcesTemplate(computedSelectionSet.merged.mergedSources))
 
-    \(section: FieldAccessorsTemplate(selections))
+    \(section: FieldAccessorsTemplate(computedSelectionSet))
 
-    \(section: InlineFragmentAccessorsTemplate(selections))
+    \(section: InlineFragmentAccessorsTemplate(computedSelectionSet))
 
-    \(section: FragmentAccessorsTemplate(selections))
+    \(section: FragmentAccessorsTemplate(computedSelectionSet))
 
-    \(section: "\(if: generateInitializers, InitializerTemplate(selections))")
+    \(section: "\(if: generateInitializers, InitializerTemplate(computedSelectionSet))")
 
-    \(section: ChildEntityFieldSelectionSets(selections))
+    \(section: ChildEntityFieldSelectionSets(computedSelectionSet))
 
-    \(section: ChildTypeCaseSelectionSets(selections))
+    \(section: ChildTypeCaseSelectionSets(computedSelectionSet))
     """
   }
 
@@ -345,14 +345,14 @@ struct SelectionSetTemplate {
 
   // MARK: - Accessors
   private func FieldAccessorsTemplate(
-    _ selections: ComputedSelections
+    _ selectionSet: ComputedSelectionSet
   ) -> TemplateString {
-    let scope = selections.typeInfo.scope
+    let scope = selectionSet.typeInfo.scope
     return """
-    \(ifLet: selections.direct?.fields.values, {
+    \(ifLet: selectionSet.direct?.fields.values, {
       "\($0.map { FieldAccessorTemplate($0, in: scope) }, separator: "\n")"
       })
-    \(selections.merged.fields.values.map { FieldAccessorTemplate($0, in: scope) }, separator: "\n")
+    \(selectionSet.merged.fields.values.map { FieldAccessorTemplate($0, in: scope) }, separator: "\n")
     """
   }
 
@@ -379,13 +379,13 @@ struct SelectionSetTemplate {
   }
 
   private func InlineFragmentAccessorsTemplate(
-    _ selections: ComputedSelections
+    _ selectionSet: ComputedSelectionSet
   ) -> TemplateString {
     """
-    \(ifLet: selections.direct?.inlineFragments.values, {
+    \(ifLet: selectionSet.direct?.inlineFragments.values, {
       "\($0.map { InlineFragmentAccessorTemplate($0.selectionSet) }, separator: "\n")"
       })
-    \(selections.merged.inlineFragments.values.map { InlineFragmentAccessorTemplate($0.selectionSet) }, separator: "\n")
+    \(selectionSet.merged.inlineFragments.values.map { InlineFragmentAccessorTemplate($0.selectionSet) }, separator: "\n")
     """
   }
 
@@ -408,30 +408,30 @@ struct SelectionSetTemplate {
   }
 
   private func FragmentAccessorsTemplate(
-    _ selections: ComputedSelections
+    _ selectionSet: ComputedSelectionSet
   ) -> TemplateString {
     guard
-      !(selections.direct?.namedFragments.isEmpty ?? true)
-      || !selections.merged.namedFragments.isEmpty
-      || (selections.direct?.inlineFragments.containsDeferredFragment ?? false)
+      !(selectionSet.direct?.namedFragments.isEmpty ?? true)
+      || !selectionSet.merged.namedFragments.isEmpty
+      || (selectionSet.direct?.inlineFragments.containsDeferredFragment ?? false)
     else {
       return ""
     }
 
-    let scope = selections.typeInfo.scope
+    let scope = selectionSet.typeInfo.scope
 
     return """
     \(renderAccessControl())struct Fragments: FragmentContainer {
       \(DataPropertyTemplate())
-      \(FragmentInitializerTemplate(selections))
+      \(FragmentInitializerTemplate(selectionSet))
 
-      \(ifLet: selections.direct?.namedFragments.values, {
+      \(ifLet: selectionSet.direct?.namedFragments.values, {
         "\($0.map { NamedFragmentAccessorTemplate($0, in: scope) }, separator: "\n")"
       })
-      \(selections.merged.namedFragments.values.map {
+      \(selectionSet.merged.namedFragments.values.map {
         NamedFragmentAccessorTemplate($0, in: scope)
       }, separator: "\n")
-      \(forEachIn: selections.direct?.inlineFragments.values.elements ?? [], {
+      \(forEachIn: selectionSet.direct?.inlineFragments.values.elements ?? [], {
         "\(ifLet: $0.typeInfo.deferCondition, DeferredFragmentAccessorTemplate)"
       })
     }
@@ -439,9 +439,9 @@ struct SelectionSetTemplate {
   }
 
   private func FragmentInitializerTemplate(
-    _ selections: ComputedSelections
+    _ selectionSet: ComputedSelectionSet
   ) -> String {
-    if let inlineFragments = selections.direct?.inlineFragments,
+    if let inlineFragments = selectionSet.direct?.inlineFragments,
        inlineFragments.containsDeferredFragment {
       return DesignatedInitializerTemplate("""
       \(forEachIn: inlineFragments.values, {
@@ -503,32 +503,32 @@ struct SelectionSetTemplate {
   // MARK: - SelectionSet Initializer
 
   private func InitializerTemplate(
-    _ selections: ComputedSelections
+    _ selectionSet: ComputedSelectionSet
   ) -> TemplateString {
     return """
     \(renderAccessControl())init(
-      \(InitializerSelectionParametersTemplate(selections))
+      \(InitializerSelectionParametersTemplate(selectionSet))
     ) {
       self.init(_dataDict: DataDict(
         data: [
-          \(InitializerDataDictTemplate(selections))
+          \(InitializerDataDictTemplate(selectionSet))
         ],
-        fulfilledFragments: \(InitializerFulfilledFragments(selections))
+        fulfilledFragments: \(InitializerFulfilledFragments(selectionSet))
       ))
     }
     """
   }
 
   private func InitializerSelectionParametersTemplate(
-    _ selections: ComputedSelections
+    _ selectionSet: ComputedSelectionSet
   ) -> TemplateString {
-    let isConcreteType = selections.typeInfo.parentType is GraphQLObjectType
-    let allFields = selections.makeFieldIterator()
+    let isConcreteType = selectionSet.typeInfo.parentType is GraphQLObjectType
+    let allFields = selectionSet.makeFieldIterator()
 
     return TemplateString("""
     \(if: !isConcreteType, "__typename: String\(if: !allFields.isEmpty, ",")")
     \(IteratorSequence(allFields).map({
-      InitializerParameterTemplate($0, scope: selections.typeInfo.scope)
+      InitializerParameterTemplate($0, scope: selectionSet.typeInfo.scope)
     }))
     """
     )
@@ -546,15 +546,15 @@ struct SelectionSetTemplate {
   }
 
   private func InitializerDataDictTemplate(
-    _ selections: ComputedSelections
+    _ selectionSet: ComputedSelectionSet
   ) -> TemplateString {
-    let isConcreteType = selections.typeInfo.parentType is GraphQLObjectType
-    let allFields = selections.makeFieldIterator()
+    let isConcreteType = selectionSet.typeInfo.parentType is GraphQLObjectType
+    let allFields = selectionSet.makeFieldIterator()
 
     return TemplateString("""
     "__typename": \
     \(if: isConcreteType,
-      "\(GeneratedSchemaTypeReference(selections.typeInfo.parentType)).typename,",
+      "\(GeneratedSchemaTypeReference(selectionSet.typeInfo.parentType)).typename,",
       else: "__typename,")
     \(IteratorSequence(allFields).map(InitializerDataDictFieldTemplate(_:)), terminator: ",")
     """
@@ -578,16 +578,16 @@ struct SelectionSetTemplate {
   }
 
   private func InitializerFulfilledFragments(
-    _ selections: ComputedSelections
+    _ selectionSet: ComputedSelectionSet
   ) -> TemplateString {
     var fulfilledFragments: OrderedSet<String> = []
 
-    var currentNode = Optional(selections.typeInfo.scopePath.last.value.scopePath.head)
+    var currentNode = Optional(selectionSet.typeInfo.scopePath.last.value.scopePath.head)
     while let node = currentNode {
       defer { currentNode = node.next }
 
       let selectionSetName = SelectionSetNameGenerator.generatedSelectionSetName(
-        for: selections,
+        for: selectionSet,
         to: node,
         format: .fullyQualified,
         pluralizer: config.pluralizer
@@ -596,7 +596,7 @@ struct SelectionSetTemplate {
       fulfilledFragments.append(selectionSetName)
     }
 
-    for source in selections.merged.mergedSources {
+    for source in selectionSet.merged.mergedSources {
       fulfilledFragments
         .append(contentsOf: source.generatedSelectionSetNamesOfFullfilledFragments(
           pluralizer: config.pluralizer
@@ -612,9 +612,9 @@ struct SelectionSetTemplate {
 
   // MARK: - Nested Selection Sets
   private func ChildEntityFieldSelectionSets(
-    _ selections: ComputedSelections
+    _ selectionSet: ComputedSelectionSet
   ) -> TemplateString {
-    let allFields = selections.makeFieldIterator { field in
+    let allFields = selectionSet.makeFieldIterator { field in
       field is IR.EntityField
     }
 
@@ -626,13 +626,13 @@ struct SelectionSetTemplate {
   }
 
   private func ChildTypeCaseSelectionSets(
-    _ selections: ComputedSelections
+    _ selectionSet: ComputedSelectionSet
   ) -> TemplateString {
     """
-    \(ifLet: selections.direct?.inlineFragments.values, {
+    \(ifLet: selectionSet.direct?.inlineFragments.values, {
       "\($0.map { render(inlineFragment: $0.selectionSet) }, separator: "\n\n")"
       })
-    \(selections.merged.inlineFragments.values.map {
+    \(selectionSet.merged.inlineFragments.values.map {
         render(inlineFragment: $0.selectionSet)
       }, separator: "\n\n")
     """
@@ -687,7 +687,12 @@ fileprivate class SelectionSetNameCache {
 
 /// A data structure representing the computed selections for a `SelectionSet`.
 /// This includes both the direct and merged selections.
-fileprivate struct ComputedSelections {
+///
+/// Because the computed merged selections are expected to have a large number of duplicated
+/// selections, they use a large amount of memory. Storing them on the `IR.SelectionSet` would
+/// retained them outside of the scope they are needed. Instead, we use this class to compute them
+/// for the scope they are needed in, then release them when we are done with them.
+fileprivate struct ComputedSelectionSet {
 
   let direct: IR.DirectSelections?
   let merged: IR.MergedSelections
@@ -936,13 +941,13 @@ fileprivate struct SelectionSetNameGenerator {
   }
 
   static func generatedSelectionSetName(
-    for selections: ComputedSelections,
+    for selectionSet: ComputedSelectionSet,
     to toNode: LinkedList<IR.ScopeCondition>.Node? = nil,
     format: Format,
     pluralizer: Pluralizer
   ) -> String {
     generatedSelectionSetName(
-      for: selections.typeInfo,
+      for: selectionSet.typeInfo,
       to: toNode,
       format: format,
       pluralizer: pluralizer
