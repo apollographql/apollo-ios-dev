@@ -693,6 +693,16 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case camelCase
     }
     
+    /// ``ApolloCodegenConfiguration/ConversionStrategies/InputObjects`` is used to specify
+    ///  the strategy used to convert the casing of input objects in a GraphQL schema into generated Swift code.
+    public enum InputObjects: String, Codable, Equatable {
+      /// Generates swift code using the exact name provided in the GraphQL schema
+      ///  performing no conversion
+      case none
+      /// Convert to lower camel case from `snake_case`, `UpperCamelCase`, or `UPPERCASE`.
+      case camelCase
+    }
+    
     /// Determines how the names of enum cases in the GraphQL schema will be converted into
     /// cases on the generated Swift enums.
     /// Defaults to ``ApolloCodegenConfiguration/ConversionStrategies/CaseConversionStrategy/camelCase``
@@ -702,19 +712,27 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     /// properties in the generated Swift code.
     /// Defaults to ``ApolloCodegenConfiguration/ConversionStrategies/FieldAccessors/idiomatic``
     public let fieldAccessors: FieldAccessors
+    
+    /// Determines how the names of input objects in the GraphQL schema will be converted into
+    /// the generated Swift code.
+    /// Defaults to ``ApolloCodegenConfiguration/ConversionStrategies/InputObjects/camelCase``
+    public let inputObjects: InputObjects
 
     /// Default property values
     public struct Default {
       public static let enumCases: EnumCases = .camelCase
       public static let fieldAccessors: FieldAccessors = .idiomatic
+      public static let inputObjects: InputObjects = .camelCase
     }
       
     public init(
       enumCases: EnumCases = Default.enumCases,
-      fieldAccessors: FieldAccessors = Default.fieldAccessors
+      fieldAccessors: FieldAccessors = Default.fieldAccessors,
+      inputObjects: InputObjects = Default.inputObjects
     ) {
       self.enumCases = enumCases
       self.fieldAccessors = fieldAccessors
+      self.inputObjects = inputObjects
     }
 
     // MARK: Codable
@@ -722,6 +740,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public enum CodingKeys: CodingKey {
       case enumCases
       case fieldAccessors
+      case inputObjects
     }
 
     @available(*, deprecated) // Deprecation attribute added to supress warning.
@@ -756,6 +775,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         FieldAccessors.self,
         forKey: .fieldAccessors
       ) ?? Default.fieldAccessors
+      
+      inputObjects = try values.decodeIfPresent(
+        InputObjects.self,
+        forKey: .inputObjects
+      ) ?? Default.inputObjects
     }
   }
   
@@ -1444,6 +1468,7 @@ extension ApolloCodegenConfiguration.ConversionStrategies {
       self.enumCases = .camelCase
     }
     self.fieldAccessors = Default.fieldAccessors
+    self.inputObjects = Default.inputObjects
   }
   
   /// ``CaseConversionStrategy`` is used to specify the strategy used to convert the casing of
