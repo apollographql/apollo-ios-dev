@@ -36,11 +36,21 @@ struct SelectionSetTemplate {
 
   // MARK: - Field
   func render(field: IR.EntityField) -> String {
-    TemplateString(
+    #warning("TODO: Compute merged selections")
+    let selections: ComputedSelections! = nil // MergedSelections.Builder.build(selectionSet)
+
+    let fieldSelectionSetName = nameCache.selectionSetName(for: field.selectionSet)
+
+    if let referencedSelectionSetName = selections.nameForReferencedSelectionSet(config: config) {
+      #warning("TODO: Test and implement `renderAccessControl()`")
+      return "public typealias \(fieldSelectionSetName) = \(referencedSelectionSetName)"
+    }
+
+    return TemplateString(
     """
     \(SelectionSetNameDocumentation(field.selectionSet))
     \(renderAccessControl())\
-    struct \(field.formattedSelectionSetName(with: config.pluralizer)): \(SelectionSetType()) {
+    struct \(fieldSelectionSetName): \(SelectionSetType()) {
       \(BodyTemplate(field.selectionSet))
     }
     """
@@ -604,14 +614,13 @@ struct SelectionSetTemplate {
   private func ChildEntityFieldSelectionSets(
     _ selections: ComputedSelections
   ) -> TemplateString {
-    """
-    \(ifLet: selections.direct?.fields.values.compactMap { $0 as? IR.EntityField }, {
-      "\($0.map { render(field: $0) }, separator: "\n\n")"
-    })
-    \(selections.merged.fields.values.compactMap { field -> String? in
-      guard let field = field as? IR.EntityField,
-        field.selectionSet.shouldBeRendered else { return nil }
-      return render(field: field)
+    let allFields = selections.makeFieldIterator { field in
+      field is IR.EntityField
+    }
+
+    return """
+    \(IteratorSequence(allFields).map { field in
+      render(field: unsafeDowncast(field, to: IR.EntityField.self))
     }, separator: "\n\n")
     """
   }
@@ -666,35 +675,118 @@ fileprivate class SelectionSetNameCache {
 
   // MARK: Name Computation
   func computeGeneratedSelectionSetName(for selectionSet: IR.SelectionSet) -> String {
-    if selectionSet.shouldBeRendered {
-      let location = selectionSet.entity.location
-      return location.fieldPath?.last.value
-        .formattedSelectionSetName(with: config.pluralizer) ??
-      location.source.formattedSelectionSetName()
-
-    } else {
-      return selectionSet.selections.merged.mergedSources
-        .first.unsafelyUnwrapped
-        .generatedSelectionSetNamePath(
-          from: selectionSet.typeInfo,
-          pluralizer: config.pluralizer
-        )
-    }
+    let location = selectionSet.entity.location
+    return location.fieldPath?.last.value
+      .formattedSelectionSetName(with: config.pluralizer) ??
+    location.source.formattedSelectionSetName()
   }
+  
+}
+
+// MARK: -
+
+/// A data structure representing the computed selections for a `SelectionSet`.
+/// This includes both the direct and merged selections.
+fileprivate struct ComputedSelections {
+
+  let direct: IR.DirectSelections?
+  let merged: IR.MergedSelections
+
+  /// The `TypeInfo` for the selection set of the computed selections
+  let typeInfo: IR.SelectionSet.TypeInfo
+
+  fileprivate func makeFieldIterator(
+    filter: ((IR.Field) -> Bool)? = nil
+  ) -> SelectionsIterator<IR.Field> {
+    SelectionsIterator(
+      direct: direct?.fields,
+      merged: merged.fields,
+      filter: filter
+    )
+  }
+
+  fileprivate func makeFragmentIterator(
+    filter: ((IR.NamedFragmentSpread) -> Bool)? = nil
+  ) -> SelectionsIterator<IR.NamedFragmentSpread> {
+    SelectionsIterator(
+      direct: direct?.namedFragments,
+      merged: merged.namedFragments,
+      filter: filter
+    )
+  }
+
+  fileprivate struct SelectionsIterator<SelectionType>: IteratorProtocol {
+    typealias SelectionDictionary = OrderedDictionary<String, SelectionType>
+
+    private let direct: SelectionDictionary?
+    private let merged: SelectionDictionary
+    private var directIterator: IndexingIterator<SelectionDictionary.Values>?
+    private var mergedIterator: IndexingIterator<SelectionDictionary.Values>
+    private let filter: ((SelectionType) -> Bool)?
+
+    fileprivate init(
+      direct: SelectionDictionary?,
+      merged: SelectionDictionary,
+      filter: ((SelectionType) -> Bool)?
+    ) {
+      self.direct = direct
+      self.merged = merged
+      self.directIterator = self.direct?.values.makeIterator()
+      self.mergedIterator = self.merged.values.makeIterator()
+      self.filter = filter
+    }
+
+    mutating func next() -> SelectionType? {
+      guard let filter else {
+        return directIterator?.next() ?? mergedIterator.next()
+      }
+
+      while let next = directIterator?.next() {
+        if filter(next) { return next }
+      }
+
+      while let next = mergedIterator.next() {
+        if filter(next) { return next }
+      }
+
+      return nil
+    }
+
+    var isEmpty: Bool {
+      return (direct?.isEmpty ?? true) && merged.isEmpty
+    }
+
+  }
+
+  var shouldBeRendered: Bool {
+    return direct != nil || merged.mergedSources.count != 1
+  }
+
+  /// If the SelectionSet is a reference to another rendered SelectionSet, returns the qualified
+  /// name of the referenced SelectionSet.
+  ///
+  /// If `nil` the SelectionSet should be rendered by the template engine.
+  ///
+  /// If a value is returned, references to the selection set can point to another rendered
+  /// selection set with the returned name.
+  func nameForReferencedSelectionSet(config: ApolloCodegen.ConfigurationContext) -> String? {
+    guard direct == nil && merged.mergedSources.count == 1 else {
+      return nil
+    }
+
+    return merged.mergedSources
+      .first.unsafelyUnwrapped
+      .generatedSelectionSetNamePath(
+        from: typeInfo,
+        pluralizer: config.pluralizer
+      )
+  }
+
 }
 
 // MARK: - Helper Extensions
 
 fileprivate extension IR.SelectionSet {
-
-  /// Indicates if the SelectionSet should be rendered by the template engine.
-  ///
-  /// If `false`, references to the selection set can point to another rendered selection set.
-  /// Use `nameCache.selectionSetName(for:)` to get the name of the rendered selection set that
-  /// should be referenced.
-  var shouldBeRendered: Bool {
-    return selections.direct != nil || selections.merged.mergedSources.count != 1
-  }
 
   var renderedTypeName: String {
     self.scope.scopePath.last.value.selectionSetNameComponent
@@ -1038,53 +1130,6 @@ fileprivate extension IR.Field {
   func isConditionallyIncluded(in scope: IR.ScopeDescriptor) -> Bool {
     guard let conditions = self.inclusionConditions else { return false }
     return !scope.matches(conditions)
-  }
-}
-
-/// A data structure representing the computed selections for a `SelectionSet`.
-/// This includes both the direct and merged selections.
-struct ComputedSelections {
-
-  let direct: IR.DirectSelections?
-  let merged: IR.MergedSelections
-
-  /// The `TypeInfo` for the selection set of the computed selections
-  let typeInfo: IR.SelectionSet.TypeInfo
-
-  fileprivate func makeFieldIterator() -> SelectionsIterator<IR.Field> {
-    SelectionsIterator(direct: direct?.fields, merged: merged.fields)
-  }
-
-  fileprivate func makeFragmentIterator() -> SelectionsIterator<IR.NamedFragmentSpread> {
-    SelectionsIterator(direct: direct?.namedFragments, merged: merged.namedFragments)
-  }
-
-  fileprivate struct SelectionsIterator<SelectionType>: IteratorProtocol {
-    typealias SelectionDictionary = OrderedDictionary<String, SelectionType>
-
-    private let direct: SelectionDictionary?
-    private let merged: SelectionDictionary
-    private var directIterator: IndexingIterator<SelectionDictionary.Values>?
-    private var mergedIterator: IndexingIterator<SelectionDictionary.Values>
-
-    fileprivate init(
-      direct: SelectionDictionary?,
-      merged: SelectionDictionary
-    ) {
-      self.direct = direct
-      self.merged = merged
-      self.directIterator = self.direct?.values.makeIterator()
-      self.mergedIterator = self.merged.values.makeIterator()
-    }
-
-    mutating func next() -> SelectionType? {
-      directIterator?.next() ?? mergedIterator.next()
-    }
-
-    var isEmpty: Bool {
-      return (direct?.isEmpty ?? true) && merged.isEmpty
-    }
-
   }
 }
 
