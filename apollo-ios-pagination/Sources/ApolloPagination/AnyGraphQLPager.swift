@@ -68,6 +68,11 @@ public class AnyGraphQLQueryPager<Model> {
     )
   }
 
+  deinit {
+    cancellables.forEach { $0.cancel() }
+    cancel()
+  }
+
   @discardableResult public func subscribe(completion: @escaping (Output) -> Void) -> AnyCancellable {
     guard let _subject else { return AnyCancellable({ }) }
 
