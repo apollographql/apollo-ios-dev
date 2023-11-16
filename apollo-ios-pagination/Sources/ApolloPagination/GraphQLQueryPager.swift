@@ -13,13 +13,13 @@ public protocol PagerType {
   func cancel()
   func loadPrevious(
     cachePolicy: CachePolicy,
-    completion: (@MainActor () -> Void)?
-  ) throws
+    completion: (@MainActor (Error?) -> Void)?
+  )
   func loadMore(
     cachePolicy: CachePolicy,
-    completion: (@MainActor () -> Void)?
-  ) throws
-  func loadAll() throws
+    completion: (@MainActor (Error?) -> Void)?
+  )
+  func loadAll(completion: (@MainActor (Error?) -> Void)?)
   func refetch(cachePolicy: CachePolicy)
   func fetch()
 }
@@ -112,27 +112,40 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 
   public func loadPrevious(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-    completion: (@MainActor () -> Void)? = nil
-  ) throws {
-    Task {
-      try await pager.loadPrevious(cachePolicy: cachePolicy)
-      await completion?()
+    completion: (@MainActor (Error?) -> Void)? = nil
+  ) {
+    Task<_, Never> {
+      do {
+        try await pager.loadPrevious(cachePolicy: cachePolicy)
+        await completion?(nil)
+      } catch {
+        await completion?(error)
+      }
     }
   }
 
   public func loadMore(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-    completion: (@MainActor () -> Void)? = nil
-  ) throws {
-    Task {
-      try await pager.loadMore(cachePolicy: cachePolicy)
-      await completion?()
+    completion: (@MainActor (Error?) -> Void)? = nil
+  ) {
+    Task<_, Never> {
+      do {
+        try await pager.loadMore(cachePolicy: cachePolicy)
+        await completion?(nil)
+      } catch {
+        await completion?(error)
+      }
     }
   }
 
-  public func loadAll() throws {
-    Task {
-      try await pager.loadAll()
+  public func loadAll(completion: (@MainActor (Error?) -> Void)? = nil) {
+    Task<_, Never> {
+      do {
+        try await pager.loadAll()
+        await completion?(nil)
+      } catch {
+        await completion?(error)
+      }
     }
   }
 
@@ -182,6 +195,7 @@ extension GraphQLQueryPager {
 
     private var activeTask: Task<Void, Never>?
     private var initialFetchTask: Task<Void, Never>?
+    private var activeContinuation: CheckedContinuation<Void, Never>?
 
     /// Designated Initializer
     /// - Parameters:
@@ -214,30 +228,10 @@ extension GraphQLQueryPager {
       nextPageWatchers.forEach { $0.cancel() }
       firstPageWatcher?.cancel()
       subscribers.forEach { $0.cancel() }
+      activeContinuation?.resume(with: .success(()))
     }
 
     // MARK: - Public API
-
-    /// A convenience wrapper around the asynchronous `loadMore` function.
-    public func loadMore(
-      cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-      completion: (() -> Void)? = nil
-    ) throws {
-      Task {
-        try await loadMore(cachePolicy: cachePolicy)
-        completion?()
-      }
-    }
-
-    public func loadPrevious(
-      cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-      completion: (() -> Void)? = nil
-    ) throws {
-      Task {
-        try await loadPrevious(cachePolicy: cachePolicy)
-        completion?()
-      }
-    }
 
     public func loadAll() async throws {
       isLoadingAll = true
@@ -266,15 +260,16 @@ extension GraphQLQueryPager {
       guard let previousPageQuery = previousPageResolver(previousPageInfo),
             previousPageInfo.canLoadPrevious
       else { throw PaginationError.pageHasNoMoreContent }
-      guard activeTask == nil else {
+      guard activeTask == nil, activeContinuation == nil else {
         throw PaginationError.loadInProgress
       }
 
       let task = Task {
         let publisher = CurrentValueSubject<Void, Never>(())
         await withCheckedContinuation { continuation in
+          activeContinuation = continuation
           let watcher = GraphQLQueryWatcher(client: client, query: previousPageQuery) { [weak self] result in
-            guard let self else { return }
+            guard let self else { return continuation.resume() }
             Task {
               await self.onPreviousFetch(
                 cachePolicy: cachePolicy,
@@ -286,10 +281,10 @@ extension GraphQLQueryPager {
           }
           nextPageWatchers.append(watcher)
           publisher.sink(receiveCompletion: { [weak self] _ in
-            guard let self else { return continuation.resume(with: .success(())) }
+            guard let self else { return continuation.resume() }
             Task {
+              await self.continuationResumption()
               await self.onTaskCancellation()
-              continuation.resume(with: .success(()))
             }
           }, receiveValue: { })
           .store(in: &subscribers)
@@ -315,15 +310,16 @@ extension GraphQLQueryPager {
       guard let nextPageQuery = nextPageResolver(currentPageInfo),
             currentPageInfo.canLoadMore
       else { throw PaginationError.pageHasNoMoreContent }
-      guard activeTask == nil else {
+      guard activeTask == nil, activeContinuation == nil else {
         throw PaginationError.loadInProgress
       }
 
       let task = Task {
         let publisher = CurrentValueSubject<Void, Never>(())
         await withCheckedContinuation { continuation in
+          activeContinuation = continuation
           let watcher = GraphQLQueryWatcher(client: client, query: nextPageQuery) { [weak self] result in
-            guard let self else { return }
+            guard let self else { return continuation.resume() }
             Task {
               await self.onSubsequentFetch(
                 cachePolicy: cachePolicy,
@@ -335,10 +331,10 @@ extension GraphQLQueryPager {
           }
           nextPageWatchers.append(watcher)
           publisher.sink(receiveCompletion: { [weak self] _ in
-            guard let self else { return continuation.resume(with: .success(())) }
+            guard let self else { return continuation.resume() }
             Task {
+              await self.continuationResumption()
               await self.onTaskCancellation()
-              continuation.resume(with: .success(()))
             }
           }, receiveValue: { })
           .store(in: &subscribers)
@@ -379,7 +375,7 @@ extension GraphQLQueryPager {
       nextPageWatchers = []
       firstPageWatcher?.cancel()
       firstPageWatcher = nil
-
+      continuationResumption()
       previousPageVarMap = [:]
       nextPageVarMap = [:]
       initialPageResult = nil
@@ -403,19 +399,20 @@ extension GraphQLQueryPager {
     // MARK: - Private
 
     private func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) async {
-      guard initialFetchTask == nil else {
+      guard initialFetchTask == nil, activeContinuation == nil else {
         await initialFetchTask?.value
         return
       }
       let task = Task {
         let publisher = CurrentValueSubject<Void, Never>(())
         await withCheckedContinuation { continuation in
+          activeContinuation = continuation
           if firstPageWatcher == nil {
             firstPageWatcher = GraphQLQueryWatcher(
               client: client,
               query: initialQuery,
               resultHandler: { [weak self] result in
-                guard let self else { return }
+                guard let self else { return continuation.resume() }
                 Task {
                   await self.onInitialFetch(cachePolicy: cachePolicy, result: result, publisher: publisher)
                 }
@@ -423,10 +420,10 @@ extension GraphQLQueryPager {
             )
           }
           publisher.sink(receiveCompletion: { [weak self] _ in
-            guard let self else { return continuation.resume(with: .success(())) }
+            guard let self else { return continuation.resume() }
             Task {
+              await self.continuationResumption()
               await self.onTaskCancellation()
-              continuation.resume(with: .success(()))
             }
           }, receiveValue: { })
           .store(in: &subscribers)
@@ -590,6 +587,11 @@ extension GraphQLQueryPager {
         return initialPageResult.flatMap { extractPageInfo(.initial($0)) }
       }
       return extractPageInfo(.paginated(first))
+    }
+
+    private func continuationResumption() {
+      activeContinuation?.resume(with: .success(()))
+      activeContinuation = nil
     }
   }
 }

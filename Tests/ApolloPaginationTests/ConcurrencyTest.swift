@@ -108,7 +108,7 @@ final class ConcurrencyTests: XCTestCase {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
 
     (0..<5).forEach { _ in
-      try? pager.loadMore()
+      pager.loadMore()
     }
     wait(for: [serverExpectation], timeout: 1.0)
   }

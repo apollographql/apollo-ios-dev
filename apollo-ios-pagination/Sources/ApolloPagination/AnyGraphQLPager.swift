@@ -22,7 +22,8 @@ public class AnyGraphQLQueryPager<Model> {
     transform: @escaping ([NextQuery.Data], InitialQuery.Data, [NextQuery.Data]) throws -> Model
   ) {
     self.pager = pager
-    pager.subscribe { result in
+    pager.subscribe { [weak self] result in
+      guard let self else { return }
       let returnValue: Output
 
       switch result {
@@ -37,7 +38,7 @@ public class AnyGraphQLQueryPager<Model> {
         returnValue = .failure(error)
       }
 
-      self._subject?.send(returnValue)
+      _subject?.send(returnValue)
     }
   }
 
@@ -70,7 +71,7 @@ public class AnyGraphQLQueryPager<Model> {
 
   deinit {
     cancellables.forEach { $0.cancel() }
-    cancel()
+    pager.cancel()
   }
 
   @discardableResult public func subscribe(completion: @escaping (Output) -> Void) -> AnyCancellable {
@@ -85,16 +86,22 @@ public class AnyGraphQLQueryPager<Model> {
 
   public func loadMore(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
-    completion: (@MainActor () -> Void)? = nil
-  ) throws {
-    try pager.loadMore(cachePolicy: cachePolicy, completion: completion)
+    completion: (@MainActor (Error?) -> Void)? = nil
+  ) {
+    pager.loadMore(cachePolicy: cachePolicy, completion: completion)
   }
 
   public func loadPrevious(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
-    completion: (@MainActor () -> Void)? = nil
-  ) throws {
-    try pager.loadPrevious(cachePolicy: cachePolicy, completion: completion)
+    completion: (@MainActor (Error?) -> Void)? = nil
+  ) {
+    pager.loadPrevious(cachePolicy: cachePolicy, completion: completion)
+  }
+
+  public func loadAll(
+    completion: (@MainActor (Error?) -> Void)? = nil
+  ) {
+    pager.loadAll(completion: completion)
   }
 
   public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
@@ -107,10 +114,6 @@ public class AnyGraphQLQueryPager<Model> {
 
   public func cancel() {
     pager.cancel()
-  }
-
-  public func loadAll() throws {
-    try pager.loadAll()
   }
 }
 
