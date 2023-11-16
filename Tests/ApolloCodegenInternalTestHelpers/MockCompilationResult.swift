@@ -1,33 +1,36 @@
 @testable import ApolloCodegenLib
-import GraphQLCompiler
+@testable import GraphQLCompiler
 
 public extension CompilationResult {
 
   class func mock(
-    rootTypes: RootTypeDefinition = RootTypeDefinition.mock()
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.rootTypes = rootTypes
-    mock.referencedTypes = []
-    mock.fragments = []
-    mock.operations = []
-    return mock
+    rootTypes: RootTypeDefinition = RootTypeDefinition.mock(),
+    referencedTypes: [GraphQLNamedType] = [],
+    fragments: [CompilationResult.FragmentDefinition] = []
+  ) -> CompilationResult {
+    CompilationResult(
+      schemaRootTypes: rootTypes,
+      referencedTypes: referencedTypes + rootTypes.allRootTypes,
+      operations: [],
+      fragments: fragments,
+      schemaDocumentation: nil
+    )
   }
 
 }
 
 public extension CompilationResult.RootTypeDefinition {
-  
+
   class func mock(
     queryName: String = "Query",
     mutationName: String = "Mutation",
     subscriptionName: String = "Subscription"
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.queryType = GraphQLCompositeType.mock(queryName)
-    mock.mutationType = GraphQLCompositeType.mock(mutationName)
-    mock.subscriptionType = GraphQLCompositeType.mock(subscriptionName)
-    return mock
+  ) -> CompilationResult.RootTypeDefinition {
+    CompilationResult.RootTypeDefinition(
+      queryType: GraphQLObjectType.mock(queryName),
+      mutationType: GraphQLObjectType.mock(mutationName),
+      subscriptionType: GraphQLObjectType.mock(subscriptionName)
+    )
   }
   
 }
@@ -35,33 +38,30 @@ public extension CompilationResult.RootTypeDefinition {
 public extension CompilationResult.OperationDefinition {
 
   class func mock(
+    name: String = "",
     type: CompilationResult.OperationType = .query,
     selections: [CompilationResult.Selection] = [],
+    source: String = "",
+    referencedFragments: [CompilationResult.FragmentDefinition] = [],
     path: String = ""
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.operationType = type
-    mock.rootType = type.mockRootType()
-    mock.selectionSet = CompilationResult.SelectionSet(
-      parentType: mock.rootType,
-      selections: selections
+  ) -> CompilationResult.OperationDefinition {
+    let rootType = type.mockRootType()
+    return CompilationResult.OperationDefinition(
+      name: name,
+      operationType: type,
+      variables: [],
+      rootType: rootType,
+      selectionSet: CompilationResult.SelectionSet(
+        parentType: rootType,
+        selections: selections
+      ),
+      directives: nil,
+      referencedFragments: referencedFragments,
+      source: source,
+      filePath: path
     )
-    mock.filePath = path
-    return mock
   }
 
-  class func mock(
-    name: String,
-    type: CompilationResult.OperationType,
-    source: String
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    mock.operationType = type
-    mock.source = source
-
-    return mock
-  }
 }
 
 public extension CompilationResult.OperationType {
@@ -75,15 +75,17 @@ public extension CompilationResult.InlineFragment {
   class func mock(
     parentType: GraphQLCompositeType = GraphQLObjectType.mock(),
     inclusionConditions: [CompilationResult.InclusionCondition]? = nil,
-    selections: [CompilationResult.Selection] = []
-  ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.selectionSet = CompilationResult.SelectionSet(
-      parentType: parentType,
-      selections: selections
+    selections: [CompilationResult.Selection] = [],
+    directives: [CompilationResult.Directive] = []
+  ) -> CompilationResult.InlineFragment {
+    CompilationResult.InlineFragment(
+      selectionSet: CompilationResult.SelectionSet(
+        parentType: parentType,
+        selections: selections
+      ),
+      inclusionConditions: inclusionConditions,
+      directives: directives
     )
-    mock.inclusionConditions = inclusionConditions
-    return mock
   }
 }
 
@@ -110,29 +112,16 @@ public extension CompilationResult.Field {
     selectionSet: CompilationResult.SelectionSet = .mock(),
     deprecationReason: String? = nil
   ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    mock.alias = alias
-    mock.arguments = arguments
-    mock.type = type
-    mock.selectionSet = selectionSet
-    mock.directives = nil
-    mock.inclusionConditions = nil
-    mock.deprecationReason = deprecationReason
-    return mock
-  }
-
-  class func mock(
-    _ name: String = "",
-    alias: String? = nil,
-    arguments: [CompilationResult.Argument]? = nil,
-    type: GraphQLScalarType
-  ) -> Self {
-    Self.mock(
-      name,
+    Self(
+      name: name,
       alias: alias,
       arguments: arguments,
-      type: .scalar(type)
+      inclusionConditions: nil,
+      directives: nil,
+      type: type,
+      selectionSet: selectionSet,
+      deprecationReason: deprecationReason,
+      documentation: nil
     )
   }
 }
@@ -148,18 +137,20 @@ public extension CompilationResult.FragmentDefinition {
 
   class func mock(
     _ name: String = "NameFragment",
-    type: GraphQLCompositeType = .emptyMockObject(),
+    type: GraphQLCompositeType = GraphQLObjectType.mock("MOCK"),
     selections: [CompilationResult.Selection] = [],
-    path: String = "",
-    source: String? = nil
+    source: String = "",
+    path: String = ""
   ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    mock.type = type
-    mock.selectionSet = .mock(parentType: type, selections: selections)
-    mock.source = source ?? Self.mockDefinition(name: name)
-    mock.filePath = path
-    return mock
+    Self(
+      name: name,
+      type: type,
+      selectionSet: .mock(parentType: type, selections: selections),
+      directives: nil,
+      referencedFragments: [],
+      source: source,
+      filePath: path
+    )
   }
 }
 
@@ -168,10 +159,11 @@ public extension CompilationResult.FragmentSpread {
     _ fragment: CompilationResult.FragmentDefinition = .mock(),
     inclusionConditions: [CompilationResult.InclusionCondition]? = nil
   ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.fragment = fragment
-    mock.inclusionConditions = inclusionConditions
-    return mock
+    Self(
+      fragment: fragment,
+      inclusionConditions: inclusionConditions,
+      directives: nil
+    )
   }
 }
 
@@ -189,27 +181,27 @@ public extension CompilationResult.Selection {
 
 
 public extension CompilationResult.VariableDefinition {
-  class func mock(
+  static func mock(
     _ name: String,
     type: GraphQLType,
     defaultValue: GraphQLValue?
   ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    mock.type = type
-    mock.defaultValue = defaultValue
-    return mock
+    Self(
+      name: name,
+      type: type,
+      defaultValue: defaultValue
+    )
   }
 }
 
 public extension CompilationResult.Directive {
-  class func mock(
+  static func mock(
     _ name: String,
     arguments: [CompilationResult.Argument]? = nil
   ) -> Self {
-    let mock = Self.emptyMockObject()
-    mock.name = name
-    mock.arguments = arguments    
-    return mock
+    Self(
+      name: name,
+      arguments: arguments
+    )    
   }
 }

@@ -4,7 +4,7 @@ import Nimble
 
 public func throwUserValidationError(
   _ expectedError: ValidationError
-) -> Predicate<ParsableCommand> {
+) -> Nimble.Predicate<ParsableCommand> {
   return Predicate { actualExpression in
     var actualError: Error?
     do {
@@ -41,7 +41,7 @@ public func throwUserValidationError(
   }
 }
 
-public func throwUnknownOptionError() -> Predicate<ParsableCommand> {
+public func throwUnknownOptionError() -> Nimble.Predicate<ParsableCommand> {
   return Predicate { actualExpression in
     var actualError: Error?
     do {
@@ -77,7 +77,7 @@ public func throwUnknownOptionError() -> Predicate<ParsableCommand> {
 public func throwError(
   localizedDescription: String,
   ignoringExtraCharacters: Bool = false
-) -> Predicate<Any> {
+) -> Nimble.Predicate<Any> {
   return Predicate { actualExpression in
     var actualError: Error?
     do {

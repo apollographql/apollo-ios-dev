@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A repository-topic connects a repository to a topic.
-  static let RepositoryTopic = Object(
+  static let RepositoryTopic = ApolloAPI.Object(
     typename: "RepositoryTopic",
     implementedInterfaces: [
       Interfaces.Node.self,

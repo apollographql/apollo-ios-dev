@@ -1,5 +1,5 @@
 import XCTest
-import Nimble
+@testable import Nimble
 @testable import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
@@ -63,103 +63,118 @@ class AutomaticPersistedQueriesTests: XCTestCase {
   }
 
   // MARK: - Helper Methods
-  
-  private func validatePostBody<O: GraphQLOperation>(with request: URLRequest,
-                                operation: O,
-                                queryDocument: Bool = false,
-                                persistedQuery: Bool = false,
-                                file: StaticString = #filePath,
-                                line: UInt = #line) throws {
-    
+
+  private func validatePostBody<O: GraphQLOperation>(
+    with request: URLRequest,
+    operation: O,
+    queryDocument: Bool = false,
+    persistedQuery: Bool = false,
+    file: Nimble.FileString = #filePath,
+    line: UInt = #line
+  ) throws {
+
     guard
       let httpBody = request.httpBody,
       let jsonBody = try? JSONSerializationFormat.deserialize(data: httpBody) as? JSONObject else {
-        XCTFail("httpBody invalid",
-                file: file,
-                line: line)
-        return
+      fail(
+        "httpBody invalid",
+        location: SourceLocation(file: file, line: line)
+      )
+      return
     }
     
     let queryString = jsonBody["query"] as? String
     if queryDocument {
-      XCTAssertEqual(queryString,
-                     O.definition?.queryDocument,
-                     file: file,
-                     line: line)
+      expect(file: file, line: line, queryString)
+      .to(equal(O.definition?.queryDocument))
     }
     
     if let query = operation as? MockHeroNameQuery{
       if let variables = jsonBody["variables"] as? JSONObject {
-        XCTAssertEqual(variables["episode"] as? String,
-                       query.episode.rawValue,
-                       file: file,
-                       line: line)
+
+        if let episode = query.episode.rawValue {
+          expect(file: file, line: line, variables["episode"] as? String)
+            .to(equal(episode))
+        } else {
+          expect(file: file, line: line, variables["episode"] as? String).to(beNil())
+        }
+
       } else {
-        XCTFail("variables should not be nil",
-                file: file,
-                line: line)
+        fail(
+          "variables should not be nil",
+          location: SourceLocation(file: file, line: line)
+        )
       }
     }
     
     let ext = jsonBody["extensions"] as? JSONObject
     if persistedQuery {
-      let ext = try XCTUnwrap(ext,
-                              "extensions json data should not be nil",
-                              file: file,
-                              line: line)
+      guard let ext = ext else {
+        fail(
+          "extensions json data should not be nil",
+          location: SourceLocation(file: file, line: line)
+        )
+        return
+      }
       
-      let persistedQuery = try XCTUnwrap(ext["persistedQuery"] as? JSONObject,
-                                         "persistedQuery is missing",
-                                         file: file,
-                                         line: line)
-      
-      let version = try XCTUnwrap(persistedQuery["version"] as? Int,
-                                  "version is missing",
-                                  file: file,
-                                  line: line)
+      guard let persistedQuery = ext["persistedQuery"] as? JSONObject else {
+        fail(
+          "persistedQuery is missing",
+          location: SourceLocation(file: file, line: line)
+        )
+        return
+      }
 
-      let sha256Hash = try XCTUnwrap(persistedQuery["sha256Hash"] as? String,
-                                     "sha256Hash is missing",
-                                     file: file,
-                                     line: line)
-      
-      XCTAssertEqual(version, 1,
-                     file: file,
-                     line: line)
-      XCTAssertEqual(sha256Hash,
-                     O.operationIdentifier,
-                     file: file,
-                     line: line)
+      guard let version = persistedQuery["version"] as? Int else {
+        fail(
+          "version is missing",
+          location: SourceLocation(file: file, line: line)
+        )
+        return
+      }
+
+      guard let sha256Hash = persistedQuery["sha256Hash"] as? String else {
+        fail(
+          "sha256Hash is missing",
+          location: SourceLocation(file: file, line: line)
+        )
+        return
+      }
+
+
+      expect(file: file, line: line, version).to(equal(1))
+
+      expect(file: file, line: line, sha256Hash).to(equal(O.operationIdentifier))
+
     } else {
-      XCTAssertNil(ext,
-                   "extensions should be nil",
-                   file: file,
-                   line: line)
+      expect(file: file, line: line, ext).to(beNil())
     }
   }
   
-  private func validateUrlParams(with request: URLRequest,
-                                 query: MockHeroNameQuery,
-                                 queryDocument: Bool = false,
-                                 persistedQuery: Bool = false,
-                                 file: StaticString = #filePath,
-                                 line: UInt = #line) throws {
-    let url = try XCTUnwrap(request.url,
-                            "URL not valid",
-                            file: file,
-                            line: line)
-    
+  private func validateUrlParams(
+    with request: URLRequest,
+    query: MockHeroNameQuery,
+    queryDocument: Bool = false,
+    persistedQuery: Bool = false,
+    file: Nimble.FileString = #filePath,
+    line: UInt = #line
+  ) throws {
+    guard let url = request.url else {
+      fail(
+        "URL not valid",
+        location: SourceLocation(file: file, line: line)
+      )
+      return
+    }
+
     let queryString = url.queryItemDictionary?["query"]
     if queryDocument {
-      XCTAssertEqual(queryString,
-                     MockHeroNameQuery.definition?.queryDocument,
-                     file: file,
-                     line: line)
+      expect(file: file, line: line, queryString)
+        .to(equal(MockHeroNameQuery.definition?.queryDocument))
+
     } else {
-      XCTAssertNil(queryString,
-                   "query string should be nil",
-                   file: file,
-                   line: line)
+      expect(file: file, line: line, queryString).to(beNil())
+
     }
     
     if let variables = url.queryItemDictionary?["variables"] {
@@ -176,9 +191,10 @@ class AutomaticPersistedQueriesTests: XCTestCase {
         expectation.to(equal("{\"episode\":null}"))
       }
     } else {
-      XCTFail("variables should not be nil",
-              file: file,
-              line: line)
+      fail(
+        "variables should not be nil",
+        location: SourceLocation(file: file, line: line)
+      )
     }
     
     let ext = url.queryItemDictionary?["extensions"]
@@ -188,38 +204,43 @@ class AutomaticPersistedQueriesTests: XCTestCase {
         let data = ext.data(using: .utf8),
         let jsonBody = try? JSONSerializationFormat.deserialize(data: data) as? JSONObject
         else {
-          XCTFail("extensions json data should not be nil",
-                  file: file,
-                  line: line)
-          return
+        fail(
+          "extensions json data should not be nil",
+          location: SourceLocation(file: file, line: line)
+        )
+        return
       }
       
-      let persistedQuery = try XCTUnwrap(jsonBody["persistedQuery"] as? JSONObject,
-                                         "persistedQuery is missing",
-                                         file: file,
-                                         line: line)
+      guard let persistedQuery = jsonBody["persistedQuery"] as? JSONObject else {
+        fail(
+          "persistedQuery is missing",
+          location: SourceLocation(file: file, line: line)
+        )
+        return
+      }
+
+      guard let sha256Hash = persistedQuery["sha256Hash"] as? String else {
+        fail(
+          "sha256Hash is missing",
+          location: SourceLocation(file: file, line: line)
+        )
+        return
+      }
+
+      guard let version = persistedQuery["version"] as? Int else {
+        fail(
+          "version is missing",
+          location: SourceLocation(file: file, line: line)
+        )
+        return
+      }
       
-      let sha256Hash = try XCTUnwrap(persistedQuery["sha256Hash"] as? String,
-                                     "sha256Hash is missing",
-                                     file: file,
-                                     line: line)
-      
-      let version = try XCTUnwrap(persistedQuery["version"] as? Int,
-                                  "version is missing",
-                                  file: file,
-                                  line: line)
-      
-      XCTAssertEqual(version, 1,
-                     file: file,
-                     line: line)
-      XCTAssertEqual(sha256Hash, MockHeroNameQuery.operationIdentifier,
-                     file: file,
-                     line: line)
+      expect(file: file, line: line, version).to(equal(1))
+
+      expect(file: file, line: line, sha256Hash).to(equal(MockHeroNameQuery.operationIdentifier))
+
     } else {
-      XCTAssertNil(ext,
-                   "extension should be nil",
-                   file: file,
-                   line: line)
+      expect(file: file, line: line, ext).to(beNil())
     }
   }
 

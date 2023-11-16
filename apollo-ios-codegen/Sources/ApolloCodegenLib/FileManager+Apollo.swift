@@ -6,10 +6,24 @@ public class ApolloFileManager {
 
   public static var `default` = ApolloFileManager(base: FileManager.default)
 
-  /// The paths for the files written to by the ``ApolloFileManager``.
-  public private(set) var writtenFiles: Set<String> = []
-
   public let base: FileManager
+
+  actor WrittenFiles {
+    public fileprivate(set) var value: Set<String> = []
+
+    func addWrittenFile(path: String) {
+      value.insert(path)
+    }
+  }
+
+  private let _writtenFiles = WrittenFiles()
+
+  /// The paths for the files written to by the ``ApolloFileManager``.
+  public var writtenFiles: Set<String> {
+    get async {
+      await _writtenFiles.value
+    }
+  }
 
   init(base: FileManager) {
     self.base = base
@@ -81,7 +95,7 @@ public class ApolloFileManager {
   ///       If `false` the function will exit without writing the file if it already exists.
   ///       This will not throw an error.
   ///       Defaults to `false.
-  public func createFile(atPath path: String, data: Data? = nil, overwrite: Bool = true) throws {
+  public func createFile(atPath path: String, data: Data? = nil, overwrite: Bool = true) async throws {
     try createContainingDirectoryIfNeeded(forPath: path)
 
     if !overwrite && doesFileExist(atPath: path) { return }
@@ -89,7 +103,7 @@ public class ApolloFileManager {
     guard base.createFile(atPath: path, contents: data, attributes: nil) else {
       throw FileManagerPathError.cannotCreateFile(at: path)
     }
-    writtenFiles.insert(path)
+    await _writtenFiles.addWrittenFile(path: path)
   }
 
   /// Creates the containing directory (including all intermediate directories) for the given file URL if necessary. This method will not

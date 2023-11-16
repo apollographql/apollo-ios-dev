@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a org.remove_outside_collaborator event.
-  static let OrgRemoveOutsideCollaboratorAuditEntry = Object(
+  static let OrgRemoveOutsideCollaboratorAuditEntry = ApolloAPI.Object(
     typename: "OrgRemoveOutsideCollaboratorAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

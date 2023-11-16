@@ -7,6 +7,8 @@ struct MockObjectTemplate: TemplateRenderer {
   /// IR representation of source [GraphQL Object](https://spec.graphql.org/draft/#sec-Objects).
   let graphqlObject: GraphQLObjectType
 
+  let fields: [(String, GraphQLType, deprecationReason: String?)]
+
   let config: ApolloCodegen.ConfigurationContext
 
   let ir: IRBuilder
@@ -24,8 +26,8 @@ struct MockObjectTemplate: TemplateRenderer {
 
   var template: TemplateString {
     let objectName = graphqlObject.formattedName
-    let fields: [TemplateField] = ir.fieldCollector
-      .collectedFields(for: graphqlObject)
+    let fields: [TemplateField] = fields
+      .sorted { $0.0 < $1.0 }
       .map {
          (
           responseKey: $0.0,
@@ -41,7 +43,7 @@ struct MockObjectTemplate: TemplateRenderer {
 
     return """
     \(accessControlModifier(for: .parent))class \(objectName): MockObject {
-      \(memberAccessControl)static let objectType: Object = \(config.schemaNamespace.firstUppercased).Objects.\(objectName)
+      \(memberAccessControl)static let objectType: \(config.ApolloAPITargetName).Object = \(config.schemaNamespace.firstUppercased).Objects.\(objectName)
       \(memberAccessControl)static let _mockFields = MockFields()
       \(memberAccessControl)typealias MockValueCollectionType = Array<Mock<\(objectName)>>
 

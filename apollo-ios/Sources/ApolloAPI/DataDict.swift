@@ -1,3 +1,5 @@
+import Foundation
+
 /// A structure that wraps the underlying data for a ``SelectionSet``.
 public struct DataDict: Hashable {
   @usableFromInline var _storage: _Storage
@@ -42,20 +44,35 @@ public struct DataDict: Hashable {
     _storage.fulfilledFragments
   }
 
+  @inlinable public var _deferredFragments: Set<ObjectIdentifier> {
+    _storage.deferredFragments
+  }
+
+  #warning("TODO, remove deferredFragments default value when we set these up in executor")
   public init(
     data: [String: AnyHashable],
-    fulfilledFragments: Set<ObjectIdentifier>
+    fulfilledFragments: Set<ObjectIdentifier>,
+    deferredFragments: Set<ObjectIdentifier> = []
   ) {
-    self._storage = .init(data: data, fulfilledFragments: fulfilledFragments)
+    self._storage = .init(
+      data: data,
+      fulfilledFragments: fulfilledFragments,
+      deferredFragments: deferredFragments
+    )
   }
 
   @inlinable public subscript<T: AnyScalarType & Hashable>(_ key: String) -> T {
     get {
-#if swift(>=5.4)
-        _data[key] as! T
-#else
-        _data[key]?.base as! T
-#endif
+      if DataDict._AnyHashableCanBeCoerced {
+        return _data[key] as! T
+      } else {        
+        let value = _data[key]
+        if value == DataDict._NullValue {
+          return (Optional<T>.none as Any) as! T
+        } else {
+          return (value?.base as? T) ?? (value._asAnyHashable as! T)
+        }
+      }
     }
     set {
       _data[key] = newValue
@@ -66,7 +83,7 @@ public struct DataDict: Hashable {
       yield &value
     }
   }
-  
+
   @inlinable public subscript<T: SelectionSetEntityValue>(_ key: String) -> T {
     get { T.init(_fieldData: _data[key]) }
     set {
@@ -101,29 +118,66 @@ public struct DataDict: Hashable {
   @usableFromInline class _Storage: Hashable {
     @usableFromInline var data: [String: AnyHashable]
     @usableFromInline let fulfilledFragments: Set<ObjectIdentifier>
+    @usableFromInline let deferredFragments: Set<ObjectIdentifier>
 
     init(
       data: [String: AnyHashable],
-      fulfilledFragments: Set<ObjectIdentifier>
+      fulfilledFragments: Set<ObjectIdentifier>,
+      deferredFragments: Set<ObjectIdentifier>
     ) {
       self.data = data
       self.fulfilledFragments = fulfilledFragments
+      self.deferredFragments = deferredFragments
     }
 
     @usableFromInline static func ==(lhs: DataDict._Storage, rhs: DataDict._Storage) -> Bool {
       lhs.data == rhs.data &&
-      lhs.fulfilledFragments == rhs.fulfilledFragments
+      lhs.fulfilledFragments == rhs.fulfilledFragments &&
+      lhs.deferredFragments == rhs.deferredFragments
     }
 
     @usableFromInline func hash(into hasher: inout Hasher) {
       hasher.combine(data)
       hasher.combine(fulfilledFragments)
+      hasher.combine(deferredFragments)
     }
 
     @usableFromInline func copy() -> _Storage {
-      _Storage(data: self.data, fulfilledFragments: self.fulfilledFragments)
+      _Storage(
+        data: self.data,
+        fulfilledFragments: self.fulfilledFragments,
+        deferredFragments: self.deferredFragments
+      )
     }
   }
+}
+
+// MARK: - Null Value Definition
+extension DataDict {
+  /// A common value used to represent a null value in a `DataDict`.
+  ///
+  /// This value can be cast to `NSNull` and will bridge automatically.
+  public static let _NullValue = {
+    if DataDict._AnyHashableCanBeCoerced {
+      return AnyHashable(Optional<AnyHashable>.none)
+    } else {
+      return NSNull()
+    }
+  }()
+
+  /// Indicates if `AnyHashable` can be coerced via casting into its underlying type.
+  ///
+  /// In iOS versions 14.4 and lower, `AnyHashable` coercion does not work. On these platforms,
+  /// we need to do some additional unwrapping and casting of the values to avoid crashes and other
+  /// run time bugs.
+  public static let _AnyHashableCanBeCoerced: Bool = {
+    if #available(iOS 14.5, *) {
+      return true
+    } else {
+      return false
+    }
+  }()
+
 }
 
 // MARK: - Value Conversion Helpers
@@ -160,11 +214,13 @@ extension Optional: SelectionSetEntityValue where Wrapped: SelectionSetEntityVal
       case .none:
         self = .none
       case .some(let hashable):
-        if let optional = hashable.base as? Optional<AnyHashable>, optional == nil {
-          self = .none
-          return
-        }
+      if !DataDict._AnyHashableCanBeCoerced && hashable == DataDict._NullValue {
+        self = .none
+      } else if let optional = hashable.base as? Optional<AnyHashable>, optional == nil {
+        self = .none
+      } else {
         self = .some(Wrapped.init(_fieldData: data))
+      }
     }
   }
 
@@ -179,11 +235,11 @@ extension Array: SelectionSetEntityValue where Element: SelectionSetEntityValue 
       fatalError("\(Self.self) expected list of data for entity.")
     }
     self = data.map {
-#if swift(>=5.4)
-        Element.init(_fieldData:$0)
-#else
-        Element.init(_fieldData:$0?.base as? AnyHashable)
-#endif
+      if DataDict._AnyHashableCanBeCoerced {
+        return Element.init(_fieldData:$0)
+      } else {
+        return Element.init(_fieldData:$0?.base as? AnyHashable)
+      }
     }
   }
 

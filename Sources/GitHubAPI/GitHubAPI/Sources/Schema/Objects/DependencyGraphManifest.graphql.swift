@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Dependency manifest for a repository
-  static let DependencyGraphManifest = Object(
+  static let DependencyGraphManifest = ApolloAPI.Object(
     typename: "DependencyGraphManifest",
     implementedInterfaces: [Interfaces.Node.self]
   )

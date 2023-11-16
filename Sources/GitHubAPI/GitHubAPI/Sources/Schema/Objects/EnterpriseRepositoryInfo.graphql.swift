@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A subset of repository information queryable from an enterprise.
-  static let EnterpriseRepositoryInfo = Object(
+  static let EnterpriseRepositoryInfo = ApolloAPI.Object(
     typename: "EnterpriseRepositoryInfo",
     implementedInterfaces: [Interfaces.Node.self]
   )

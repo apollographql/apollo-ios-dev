@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a org.disable_saml event.
-  static let OrgDisableSamlAuditEntry = Object(
+  static let OrgDisableSamlAuditEntry = ApolloAPI.Object(
     typename: "OrgDisableSamlAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

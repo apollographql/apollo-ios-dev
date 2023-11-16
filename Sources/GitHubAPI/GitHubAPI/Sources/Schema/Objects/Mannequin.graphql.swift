@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A placeholder user for attribution of imported data on GitHub.
-  static let Mannequin = Object(
+  static let Mannequin = ApolloAPI.Object(
     typename: "Mannequin",
     implementedInterfaces: [
       Interfaces.Actor.self,

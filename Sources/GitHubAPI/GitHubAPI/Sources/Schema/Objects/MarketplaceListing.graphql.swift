@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A listing in the GitHub integration marketplace.
-  static let MarketplaceListing = Object(
+  static let MarketplaceListing = ApolloAPI.Object(
     typename: "MarketplaceListing",
     implementedInterfaces: [Interfaces.Node.self]
   )

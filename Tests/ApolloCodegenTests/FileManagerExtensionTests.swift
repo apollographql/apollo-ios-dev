@@ -1,23 +1,36 @@
 import Foundation
 import XCTest
 import ApolloCodegenInternalTestHelpers
+import ApolloInternalTestHelpers
 @testable import ApolloCodegenLib
 import Nimble
 
 class FileManagerExtensionTests: XCTestCase {
-  lazy var uniquePath: String = {
-    CodegenTestHelper.outputFolderURL().appendingPathComponent(UUID().uuidString)
-  }().path
+  var uniquePath: String { testFilePathBuilder.testIsolatedOutputFolder.path }
 
-  lazy var uniqueError: Error = {
+  lazy var uniqueError: Error! = {
     NSError(domain: "FileManagerExtensionTest", code: Int.random(in: 1...100))
   }()
 
-  lazy var uniqueData: Data = {
+  lazy var uniqueData: Data! = {
     let length = Int(128)
     let bytes = [UInt32](repeating: 0, count: length).map { _ in arc4random() }
     return Data(bytes: bytes, count: length)
   }()
+
+  var testFilePathBuilder: TestFilePathBuilder!
+
+  override func setUp() {
+    super.setUp()
+    testFilePathBuilder = TestFilePathBuilder(test: self)
+  }
+
+  override func tearDown() {
+    testFilePathBuilder = nil
+    uniqueError = nil
+    uniqueData = nil
+    super.tearDown()
+  }
 
   // MARK: Presence
 
@@ -354,7 +367,7 @@ class FileManagerExtensionTests: XCTestCase {
 
   // MARK: Creation
 
-  func test_createFile_givenContainingDirectoryDoesExistAndFileCreated_shouldNotThrow() throws {
+  func test_createFile_givenContainingDirectoryDoesExistAndFileCreated_shouldNotThrow() async throws {
     // given
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
@@ -377,13 +390,13 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(
-      try mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
-    ).notTo(throwError())
+    await expect {
+      try await mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
+    }.notTo(throwError())
     expect(mocked.allClosuresCalled).to(beTrue())
   }
 
-  func test_createFile_givenContainingDirectoryDoesExistAndFileNotCreated_shouldThrow() throws {
+  func test_createFile_givenContainingDirectoryDoesExistAndFileNotCreated_shouldThrow() async throws {
     // given
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
@@ -406,13 +419,13 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(
-      try mocked.createFile(atPath: self.uniquePath, data:self.uniqueData
-    )).to(throwError(FileManagerPathError.cannotCreateFile(at: self.uniquePath)))
+    await expect {
+      try await mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
+    }.to(throwError(FileManagerPathError.cannotCreateFile(at: self.uniquePath)))
     expect(mocked.allClosuresCalled).to(beTrue())
   }
 
-  func test_createFile_givenContainingDirectoryDoesNotExistAndFileCreated_shouldNotThrow() throws {
+  func test_createFile_givenContainingDirectoryDoesNotExistAndFileCreated_shouldNotThrow() async throws {
     // given
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
@@ -440,13 +453,13 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(
-      try mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
-    ).notTo(throwError())
+    await expect {
+      try await mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
+    }.notTo(throwError())
     expect(mocked.allClosuresCalled).to(beTrue())
   }
 
-  func test_createFile_givenContainingDirectoryDoesNotExistAndFileNotCreated_shouldThrow() throws {
+  func test_createFile_givenContainingDirectoryDoesNotExistAndFileNotCreated_shouldThrow() async throws {
     // given
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
@@ -474,13 +487,13 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(
-      try mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
-    ).to(throwError(FileManagerPathError.cannotCreateFile(at: self.uniquePath)))
+    await expect {
+      try await mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
+    }.to(throwError(FileManagerPathError.cannotCreateFile(at: self.uniquePath)))
     expect(mocked.allClosuresCalled).to(beTrue())
   }
 
-  func test_createFile_givenContainingDirectoryDoesNotExistAndError_shouldThrow() throws {
+  func test_createFile_givenContainingDirectoryDoesNotExistAndError_shouldThrow() async throws {
     // given
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
@@ -502,18 +515,17 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(try mocked.createFile(
-      atPath: self.uniquePath,
-      data:self.uniqueData
-    )).to(throwError(self.uniqueError))
+    await expect{
+      try await mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
+    }.to(throwError(self.uniqueError))
     expect(mocked.allClosuresCalled).to(beTrue())
   }
 
-  func test_createFile_givenOverwriteFalse_whenFileExists_shouldNotThrow_shouldNotOverwrite() throws {
+  func test_createFile_givenOverwriteFalse_whenFileExists_shouldNotThrow_shouldNotOverwrite() async throws {
     // given
     let filePath = URL(fileURLWithPath: self.uniquePath).path
     let directoryPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
-    let mocked = MockApolloFileManager(strict: true)
+    let mocked = MockApolloFileManager(strict: true, requireAllClosuresCalled: false)
 
     mocked.mock(closure: .fileExists({ path, isDirectory in
       switch path {
@@ -532,13 +544,13 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(
-      try mocked.createFile(
+    await expect {
+      try await mocked.createFile(
         atPath: self.uniquePath,
         data:self.uniqueData,
         overwrite: false
       )
-    ).notTo(throwError())
+    }.notTo(throwError())
   }
 
   func test_createContainingDirectory_givenFileExistsAndIsDirectory_shouldReturnEarly() throws {

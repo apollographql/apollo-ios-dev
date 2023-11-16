@@ -49,12 +49,13 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
   // MARK: - Helpers
 
-  private func buildSubjectAndOperation(named operationName: String = "TestOperation") throws {
-    ir = try .mock(schema: schemaSDL, document: document)
+  private func buildSubjectAndOperation(named operationName: String = "TestOperation") async throws {
+    ir = try await .mock(schema: schemaSDL, document: document)
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
-    operation = ir.build(operation: operationDefinition)
+    operation = await ir.build(operation: operationDefinition)
     subject = OperationDefinitionTemplate(
       operation: operation,
+      operationIdentifier: nil,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
@@ -65,7 +66,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
   // MARK: - Operation Definition
 
-  func test__generate__givenQuery_generatesQueryOperation() throws {
+  func test__generate__givenQuery_generatesQueryOperation() async throws {
     // given
     let expected =
     """
@@ -74,7 +75,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -82,7 +83,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate_givenQuery_configIncludesMarkOperationDefinitionsAsFinal_generatesFinalQueryDefinitions() throws {
+  func test__generate_givenQuery_configIncludesMarkOperationDefinitionsAsFinal_generatesFinalQueryDefinitions() async throws {
     // given
     let expected =
     """
@@ -93,7 +94,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     config = .mock(options: .init(markOperationDefinitionsAsFinal: true))
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -101,7 +102,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQueryWithNameEndingInQuery_generatesQueryOperationWithoutDoubledTypeSuffix() throws {
+  func test__generate__givenQueryWithNameEndingInQuery_generatesQueryOperationWithoutDoubledTypeSuffix() async throws {
     // given
     document = """
     query TestOperationQuery {
@@ -118,7 +119,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation(named: "TestOperationQuery")
+    try await buildSubjectAndOperation(named: "TestOperationQuery")
 
     let actual = renderSubject()
 
@@ -126,7 +127,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenMutationWithNameEndingInQuery_generatesQueryOperationWithBothSuffixes() throws {
+  func test__generate__givenMutationWithNameEndingInQuery_generatesQueryOperationWithBothSuffixes() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -157,7 +158,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation(named: "TestOperationQuery")
+    try await buildSubjectAndOperation(named: "TestOperationQuery")
 
     let actual = renderSubject()
 
@@ -165,7 +166,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenMutation_generatesMutationOperation() throws {
+  func test__generate__givenMutation_generatesMutationOperation() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -196,7 +197,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -204,7 +205,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenSubscription_generatesSubscriptionOperation() throws {
+  func test__generate__givenSubscription_generatesSubscriptionOperation() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -235,7 +236,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -243,7 +244,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQueryWithLowercasing_generatesCorrectlyCasedQueryOperation() throws {
+  func test__generate__givenQueryWithLowercasing_generatesCorrectlyCasedQueryOperation() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -273,7 +274,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation(named: "lowercaseOperation")
+    try await buildSubjectAndOperation(named: "lowercaseOperation")
 
     let actual = renderSubject()
 
@@ -281,9 +282,131 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  // MARK: Selection Set Declaration
+  // MARK: - Defer Properties
 
-  func test__generate__givenOperationSelectionSet_rendersDeclaration() throws {
+  func test__generate__givenQueryWithDeferredInlineFragment_generatesDeferredPropertyTrue() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+    }
+
+    type Dog implements Animal {
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public static let hasDeferredFragments: Bool = true
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
+  }
+
+  func test__generate__givenQueryWithDeferredNamedFragment_generatesDeferredPropertyTrue() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+    }
+
+    type Dog implements Animal {
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... DogFragment @defer(label: "root")
+      }
+    }
+
+    fragment DogFragment on Dog {
+      species
+    }
+    """
+
+    let expected = """
+      public static let hasDeferredFragments: Bool = true
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
+  }
+
+  func test__generate__givenQueryWithNamedFragment_withDeferredTypeCase_generatesDeferredPropertyTrue() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+    }
+
+    type Dog implements Animal {
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... DogFragment
+      }
+    }
+
+    fragment DogFragment on Animal {
+      ... on Dog @defer(label: "root") {
+        species
+      }
+    }
+    """
+
+    let expected = """
+      public static let hasDeferredFragments: Bool = true
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
+  }
+
+  // MARK: - Selection Set Declaration
+
+  func test__generate__givenOperationSelectionSet_rendersDeclaration() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -312,7 +435,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
     let actual = renderSubject()
 
     // then
@@ -321,7 +444,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
   // MARK: - Selection Set Initializers
 
-  func test__generate_givenOperationSelectionSet_configIncludesOperations_rendersInitializer() throws {
+  func test__generate_givenOperationSelectionSet_configIncludesOperations_rendersInitializer() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -361,7 +484,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     config = .mock(options: .init(selectionSetInitializers: [.operations]))
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -369,7 +492,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 50, ignoringExtraLines: true))
   }
 
-  func test__generate_givenOperationSelectionSet_configIncludesSpecificOperation_rendersInitializer() throws {
+  func test__generate_givenOperationSelectionSet_configIncludesSpecificOperation_rendersInitializer() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -411,7 +534,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     ]))
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -419,7 +542,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 50, ignoringExtraLines: true))
   }
 
-  func test__render_givenOperationSelectionSet_configDoesNotIncludeOperations_doesNotRenderInitializer() throws {
+  func test__render_givenOperationSelectionSet_configDoesNotIncludeOperations_doesNotRenderInitializer() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -442,7 +565,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     config = .mock(options: .init(selectionSetInitializers: [.namedFragments]))
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -450,7 +573,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine("    }", atLine: 35, ignoringExtraLines: true))
   }
 
-  func test__render_givenOperationSelectionSet_configIncludeSpecificOperationWithOtherName_doesNotRenderInitializer() throws {
+  func test__render_givenOperationSelectionSet_configIncludeSpecificOperationWithOtherName_doesNotRenderInitializer() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -475,7 +598,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     ]))
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -485,7 +608,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
   // MARK: - Variables
 
-  func test__generate__givenQueryWithScalarVariable_generatesQueryOperationWithVariable() throws {
+  func test__generate__givenQueryWithScalarVariable_generatesQueryOperationWithVariable() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -517,7 +640,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -525,7 +648,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQueryWithMutlipleScalarVariables_generatesQueryOperationWithVariables() throws {
+  func test__generate__givenQueryWithMutlipleScalarVariables_generatesQueryOperationWithVariables() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -570,7 +693,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -578,7 +701,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQueryWithNullableScalarVariable_generatesQueryOperationWithVariable() throws {
+  func test__generate__givenQueryWithNullableScalarVariable_generatesQueryOperationWithVariable() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -610,7 +733,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -618,7 +741,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQueryWithCapitalizedVariable_generatesQueryOperationWithLowercaseVariable() throws {
+  func test__generate__givenQueryWithCapitalizedVariable_generatesQueryOperationWithLowercaseVariable() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -650,7 +773,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -660,7 +783,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
   // MARK: Variables - Reserved Keywords + Special Names
 
-  func test__generate__givenQueryWithSwiftReservedKeywordNames_generatesQueryOperationWithVariablesBackticked() throws {
+  func test__generate__givenQueryWithSwiftReservedKeywordNames_generatesQueryOperationWithVariablesBackticked() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -944,7 +1067,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
 
     let actual = renderSubject()
 
@@ -954,7 +1077,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
   
   // MARK: - Reserved Keyword Tests
   
-  func test__generate__givenInputObjectUsingReservedKeyword_rendersAsEscapedType() throws {
+  func test__generate__givenInputObjectUsingReservedKeyword_rendersAsEscapedType() async throws {
     // given
     schemaSDL = """
     input Type {
@@ -989,7 +1112,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    try buildSubjectAndOperation()
+    try await buildSubjectAndOperation()
     let actual = renderSubject()
 
     // then

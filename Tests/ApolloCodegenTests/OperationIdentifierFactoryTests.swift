@@ -12,8 +12,7 @@ class OperationIdentifierFactoryTests: XCTestCase {
   var schemaSDL: String!
   var document: String!
   var ir: IRBuilder!
-  var operationDefinition: CompilationResult.OperationDefinition!
-  var operation: IR.Operation!
+  var operation: CompilationResult.OperationDefinition!
   var subject: OperationIdentifierFactory!
 
   override func setUp() {
@@ -25,68 +24,68 @@ class OperationIdentifierFactoryTests: XCTestCase {
     subject = nil
     schemaSDL = nil
     document = nil
-    operationDefinition = nil
     operation = nil
+    ir = nil
     super.tearDown()
   }
 
-  // MARK: = Helpers
+  // MARK: - Helpers
 
-  func buildOperation(
+  func getOperation(
     named operationName: String? = nil,
     fromJSONSchema json: Bool = false
-  ) throws {
+  ) async throws {
     ir = json ?
-    try .mock(schemaJSON: schemaSDL, document: document) :
-    try .mock(schema: schemaSDL, document: document)
+    try await .mock(schemaJSON: schemaSDL, document: document) :
+    try await .mock(schema: schemaSDL, document: document)
 
     if let operationName = operationName {
-      operationDefinition = try XCTUnwrap(ir.compilationResult.operations.first {$0.name == operationName})
+      operation = try XCTUnwrap(ir.compilationResult.operations.first {$0.name == operationName})
     } else {
-      operationDefinition = try XCTUnwrap(ir.compilationResult.operations.first)
+      operation = try XCTUnwrap(ir.compilationResult.operations.first)
     }
-    operation = ir.build(operation: operationDefinition)
   }
 
   // MARK: - Default Operation Identifier Computation Tests
 
-    func test__buildOperation__givenOperationWithNoFragments__hasCorrectOperationIdentifier() throws {
-      // given
-      document = try String(
-        contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroAndFriendsNames")
-      )
+  func test__identifierForOperation__givenOperationWithNoFragments__hasCorrectOperationIdentifier() async throws {
+    // given
+    document = try String(
+      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroAndFriendsNames")
+    )
 
-      schemaSDL = try String(
-        contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema)
+    schemaSDL = try String(
+      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema)
 
-      let expected = "1e36c3331171b74c012b86caa04fbb01062f37c61227655d9c0729a62c6f7285"
-      try buildOperation(named: "HeroAndFriendsNames", fromJSONSchema: true)
+    let expected = "1e36c3331171b74c012b86caa04fbb01062f37c61227655d9c0729a62c6f7285"
+    try await getOperation(named: "HeroAndFriendsNames", fromJSONSchema: true)
 
-      // when
-      let actual = subject.identifier(for: operation)
+    // when
+    let actual = try await subject.identifier(for: operation)
 
-      // then
-      expect(actual).to(equal(expected))
-    }
+    // then
+    expect(actual).to(equal(expected))
+  }
 
-    func test__buildOperation__givenOperationWithFragment__hasCorrectOperationIdentifier() throws {
-      // given
-      document = try String(
-        contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroAndFriendsNamesWithFragment")
-      ) + "\n" + String(
-        contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroName")
-      )
+  func test__identifierForOperation__givenOperationWithFragment__hasCorrectOperationIdentifier() async throws {
+    // given
+    document = try String(
+      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroAndFriendsNamesWithFragment")
+    ) + "\n" + String(
+      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroName")
+    )
 
-      schemaSDL = try String(
-        contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema)
+    schemaSDL = try String(
+      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema)
 
-      let expected = "599cd7d91ede7a5508cdb26b424e3b8e99e6c2c5575b799f6090695289ff8e99"
-      try buildOperation(named: "HeroAndFriendsNamesWithFragment", fromJSONSchema: true)
+    let expected = "599cd7d91ede7a5508cdb26b424e3b8e99e6c2c5575b799f6090695289ff8e99"
+    try await getOperation(named: "HeroAndFriendsNamesWithFragment", fromJSONSchema: true)
 
-      // when
-      let actual = subject.identifier(for: operation)
+    // when
+    let actual = try await subject.identifier(for: operation)
 
-      // then
-      expect(actual).to(equal(expected))
-    }
+    // then
+    expect(actual).to(equal(expected))
+  }
+
 }

@@ -1,7 +1,10 @@
 name: "PR Subtree Push"
 
+permissions:
+  contents: write
+
 on:
-  pull_request:
+  pull_request_target:
     branches:
         - main
     types: [closed]
@@ -13,7 +16,7 @@ jobs:
     name: Split and Push Subtrees
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: main
         fetch-depth: 0
@@ -24,28 +27,43 @@ jobs:
           ${{ secrets.APOLLO_IOS_DEPLOY_KEY }}
           ${{ secrets.APOLLO_IOS_CODEGEN_DEPLOY_KEY }}
           ${{ secrets.APOLLO_IOS_DEV_DEPLOY_KEY }}
+          ${{ secrets.APOLLO_IOS_PAGINATION_DEPLOY_KEY }}
+    - name: Configure Git
+      uses: ./.github/actions/configure-git
     - name: Update Merge Commit Message
       shell: bash
       run: |
-        git commit --amend -m "${{ github.event.pull_request.title }} (apollographql/apollo-ios-dev#${{ github.event.pull_request.number }})"
+        git commit --allow-empty --amend -m "${{ github.event.pull_request.title }} (apollographql/apollo-ios-dev#${{ github.event.pull_request.number }})"
         git push --force-with-lease
     - name: Subtree - Apollo iOS
       uses: ./.github/actions/subtree-split-push
       with:
         subtree: apollo-ios
         remote: git@github.com:apollographql/apollo-ios.git
-        target-branch: project-breakup
+        target-branch: main
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Subtree - Apollo iOS Codegen
+      if: always()
       uses: ./.github/actions/subtree-split-push
       with:
         subtree: apollo-ios-codegen
         remote: git@github.com:apollographql/apollo-ios-codegen.git
-        target-branch: project-breakup
+        target-branch: main
+        pr-number: ${{ github.event.pull_request.number }}
+        pr-title: ${{ github.event.pull_request.title }}
+    - name: Subtree - Apollo iOS Pagination
+      if: always()
+      uses: ./.github/actions/subtree-split-push
+      with:
+        subtree: apollo-ios-pagination
+        remote: git@github.com:apollographql/apollo-ios-pagination.git
+        target-branch: main
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Push Updated History
+      if: always()
       shell: bash
       run: |
+        git fetch
         git push

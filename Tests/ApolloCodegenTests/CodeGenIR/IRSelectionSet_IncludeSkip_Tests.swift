@@ -32,11 +32,11 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
 
   // MARK: = Helpers
 
-  func buildSubjectRootField() throws {
-    ir = try .mock(schema: schemaSDL, document: document)
+  func buildSubjectRootField() async throws {
+    ir = try await .mock(schema: schemaSDL, document: document)
     operation = try XCTUnwrap(ir.compilationResult.operations.first)
 
-    let result = IR.RootFieldBuilder.buildRootEntityField(
+    let result = await IR.RootFieldBuilder.buildRootEntityField(
       forRootField: .mock(
         "query",
         type: .nonNull(.entity(operation.rootType)),
@@ -50,7 +50,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
 
   // MARK: - Scalar Fields
 
-  func test__selections__givenIncludeIfVariable_onScalarField_createsSelectionWithInclusionCondition() throws {
+  func test__selections__givenIncludeIfVariable_onScalarField_createsSelectionWithInclusionCondition() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -71,7 +71,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = self.subject[field: "allAnimals"]?[field: "species"]
 
@@ -83,7 +83,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?.inclusionConditions).to(equal(expected))
   }
 
-  func test__selections__givenSkipIfVariable_onScalarField_createsSelectionWithInclusionCondition() throws {
+  func test__selections__givenSkipIfVariable_onScalarField_createsSelectionWithInclusionCondition() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -104,7 +104,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = self.subject[field: "allAnimals"]?[field: "species"]
 
@@ -118,7 +118,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?.inclusionConditions).to(equal(expected))
   }
 
-  func test__selections__givenTwoIncludeVariables_onScalarField_createsSelectionWithBothInclusionConditions() throws {
+  func test__selections__givenTwoIncludeVariables_onScalarField_createsSelectionWithBothInclusionConditions() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -139,7 +139,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = self.subject[field: "allAnimals"]?[field: "species"]
 
@@ -154,7 +154,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?.inclusionConditions).to(equal(expected))
   }
 
-  func test__selections__givenTwoSkipVariables_onScalarField_createsSelectionWithBothInclusionConditions() throws {
+  func test__selections__givenTwoSkipVariables_onScalarField_createsSelectionWithBothInclusionConditions() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -175,7 +175,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = self.subject[field: "allAnimals"]?[field: "species"]
 
@@ -190,7 +190,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?.inclusionConditions).to(equal(expected))
   }
 
-  func test__selections__givenTwoIncludeWithSameVariable_onScalarField_createsSelectionWithOneInclusionConditions() throws {
+  func test__selections__givenTwoIncludeWithSameVariable_onScalarField_createsSelectionWithOneInclusionConditions() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -211,7 +211,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = self.subject[field: "allAnimals"]?[field: "species"]
 
@@ -225,7 +225,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?.inclusionConditions).to(equal(expected))
   }
 
-  func test__selections__givenDuplicateSelection_includeWithSameVariableFirst_onScalarField_createsSelectionWithNoInclusionConditions() throws {
+  func test__selections__givenDuplicateSelection_includeWithSameVariableFirst_onScalarField_createsSelectionWithNoInclusionConditions() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -247,7 +247,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = self.subject[field: "allAnimals"]?[field: "species"]
 
@@ -256,7 +256,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?.inclusionConditions).to(beNil())
   }
 
-  func test__selections__givenDuplicateSelection_includeWithSameVariableSecond_onScalarField_includeFieldWithNoConditions() throws {
+  func test__selections__givenDuplicateSelection_includeWithSameVariableSecond_onScalarField_includeFieldWithNoConditions() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -278,7 +278,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = self.subject[field: "allAnimals"]?[field: "species"]
 
@@ -289,7 +289,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
 
   // MARK: - Omit Skipped Fields
 
-  func test__selections__givenIncludeIfFalse_onScalarField_omitFieldFromSelectionSet() throws {
+  func test__selections__givenIncludeIfFalse_onScalarField_omitFieldFromSelectionSet() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -310,7 +310,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = self.subject[field: "allAnimals"]
 
@@ -319,7 +319,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[field: "species"]).to(beNil())
   }
 
-  func test__selections__givenIncludeIfTrue_onScalarField_doesNotOmitFieldFromSelectionSet() throws {
+  func test__selections__givenIncludeIfTrue_onScalarField_doesNotOmitFieldFromSelectionSet() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -340,7 +340,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = self.subject[field: "allAnimals"]?[field: "species"]
 
@@ -349,7 +349,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?.inclusionConditions).to(beNil())
   }
 
-  func test__selections__givenSkipIfTrue_onScalarField_omitFieldFromSelectionSet() throws {
+  func test__selections__givenSkipIfTrue_onScalarField_omitFieldFromSelectionSet() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -370,7 +370,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = self.subject[field: "allAnimals"]
 
@@ -379,7 +379,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[field: "species"]).to(beNil())
   }
 
-  func test__selections__givenSkipIfFalse_onScalarField_doesNotOmitFieldFromSelectionSet() throws {
+  func test__selections__givenSkipIfFalse_onScalarField_doesNotOmitFieldFromSelectionSet() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -400,7 +400,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = self.subject[field: "allAnimals"]?[field: "species"]
 
@@ -409,7 +409,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?.inclusionConditions).to(beNil())
   }
 
-  func test__selections__givenIncludeAndSkipOnSameVariable_onScalarField_omitFieldFromSelectionSet() throws {
+  func test__selections__givenIncludeAndSkipOnSameVariable_onScalarField_omitFieldFromSelectionSet() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -430,7 +430,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = self.subject[field: "allAnimals"]
 
@@ -439,7 +439,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[field: "species"]).to(beNil())
   }
 
-  func test__selections__givenDuplicateSelectionIncludeAndSkipOnSameVariable_onScalarField_includeFieldWithConditions() throws {
+  func test__selections__givenDuplicateSelectionIncludeAndSkipOnSameVariable_onScalarField_includeFieldWithConditions() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -461,7 +461,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = self.subject[field: "allAnimals"]?[field: "species"]
 
@@ -475,7 +475,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?.inclusionConditions).to(equal(expected))
   }
 
-  func test__selections__givenDuplicateSelectionIncludeAndSkipOnSameVariableWithOtherInclude_onScalarField_doesNotReduceConditions() throws {
+  func test__selections__givenDuplicateSelectionIncludeAndSkipOnSameVariableWithOtherInclude_onScalarField_doesNotReduceConditions() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -497,7 +497,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = self.subject[field: "allAnimals"]?[field: "species"]
 
@@ -513,7 +513,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
 
   // MARK: - Entity Fields
 
-  func test__selections__givenIncludeIfVariable_onEntityField_createsSelectionWithInclusionCondition() throws {
+  func test__selections__givenIncludeIfVariable_onEntityField_createsSelectionWithInclusionCondition() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -537,7 +537,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = self.subject[field: "allAnimals"]?[field: "friend"]
 
@@ -550,7 +550,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?[field: "species"]).toNot(beNil())
   }
 
-  func test__selections__givenMergingFieldWithNoConditionIntoFieldWithCondition_onEntityField_createsWrapperSelectionSet() throws {
+  func test__selections__givenMergingFieldWithNoConditionIntoFieldWithCondition_onEntityField_createsWrapperSelectionSet() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -578,7 +578,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
@@ -609,7 +609,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
       .to(shallowlyMatch(expected_friendIfA_selections))
   }
 
-  func test__selections__givenMergingFieldWithConditionIntoFieldWithNoCondition_onEntityField_createsMergedFieldAsConditionalChildSelectionSet() throws {
+  func test__selections__givenMergingFieldWithConditionIntoFieldWithNoCondition_onEntityField_createsMergedFieldAsConditionalChildSelectionSet() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -637,7 +637,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
@@ -668,7 +668,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?[if: "a"]).to(shallowlyMatch(expected_friendIfA))
   }
 
-  func test__selections__givenTwoEntityFieldsIncludeIfVariableAndSkipIfSameVariable_onEntityField_createsSelectionWithInclusionConditionsWithNestedSelectionSetsWithEachInclusionCondition() throws {
+  func test__selections__givenTwoEntityFieldsIncludeIfVariableAndSkipIfSameVariable_onEntityField_createsSelectionWithInclusionConditionsWithNestedSelectionSetsWithEachInclusionCondition() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -696,7 +696,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
@@ -733,7 +733,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?[if: !"a"]).to(shallowlyMatch(friend_ifNotA_expected))
   }
 
-  func test__selections__givenMergeTwoEntityFieldsWithTwoConditions_createsSelectionWithInclusionConditionsWithNestedSelectionSetsWithEachInclusionCondition() throws {
+  func test__selections__givenMergeTwoEntityFieldsWithTwoConditions_createsSelectionWithInclusionConditionsWithNestedSelectionSetsWithEachInclusionCondition() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -761,7 +761,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
@@ -804,7 +804,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?[if: "c" && "d"]).to(shallowlyMatch(friend_ifCAndD_expected))
   }
 
-  func test__selections__givenMergeThreeFieldsWithConditions_onEntityField_createsSelectionWithInclusionConditionsWithNestedSelectionSetsWithEachInclusionCondition() throws {
+  func test__selections__givenMergeThreeFieldsWithConditions_onEntityField_createsSelectionWithInclusionConditionsWithNestedSelectionSetsWithEachInclusionCondition() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -836,7 +836,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
@@ -883,7 +883,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?[if: "c"]).to(shallowlyMatch(friend_ifC_expected))
   }
 
-  func test__selections__givenMergingFieldWithIncludeIfTrueIntoFieldWithNoCondition_onEntityField_mergesSelectionsDirectly() throws {
+  func test__selections__givenMergingFieldWithIncludeIfTrueIntoFieldWithNoCondition_onEntityField_mergesSelectionsDirectly() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -911,7 +911,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
@@ -931,7 +931,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?.selectionSet).to(shallowlyMatch(expected_friend))
   }
 
-  func test__selections__givenMergingFieldWithConditionIntoFieldWithIncludeIfTrue_onEntityField_createsMergedFieldAsConditionalChildSelectionSet() throws {
+  func test__selections__givenMergingFieldWithConditionIntoFieldWithIncludeIfTrue_onEntityField_createsMergedFieldAsConditionalChildSelectionSet() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -959,7 +959,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
@@ -992,7 +992,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
 
   // MARK: Merged Fields
 
-  func test__selections__givenIncludeIfVariable_onEntityField_mergedFromParent_createsMergedSelectionWithInclusionCondition() throws {
+  func test__selections__givenIncludeIfVariable_onEntityField_mergedFromParent_createsMergedSelectionWithInclusionCondition() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1023,7 +1023,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let actual = self.subject[field: "allAnimals"]?[as: "Pet"]?[field: "friend"]
 
@@ -1038,7 +1038,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
 
   // MARK: - Inline Fragments
 
-  func test__selections__givenIncludeIfVariable_onInlineFragment_createsSelectionWithInclusionCondition() throws {
+  func test__selections__givenIncludeIfVariable_onInlineFragment_createsSelectionWithInclusionCondition() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1062,7 +1062,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
@@ -1092,7 +1092,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[if: "a"]).to(shallowlyMatch(expected_allAnimal_ifA))
   }
 
-  func test__selections__givenDuplicateConditions_onInlineFragments_deduplicatesSelectionSet() throws {
+  func test__selections__givenDuplicateConditions_onInlineFragments_deduplicatesSelectionSet() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1119,7 +1119,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
@@ -1150,7 +1150,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[if: "a"]).to(shallowlyMatch(expected_allAnimal_ifA))
   }
 
-  func test__selections__givenConditionThatIsSupersetOfOtherCondition_onInlineFragments_createsSeperateSelectionsWithInclusionConditions() throws {
+  func test__selections__givenConditionThatIsSupersetOfOtherCondition_onInlineFragments_createsSeperateSelectionsWithInclusionConditions() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1177,7 +1177,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
@@ -1228,7 +1228,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[if: "a" && "b"]).to(shallowlyMatch(expected_allAnimal_ifAAndB))
   }
 
-  func test__selections__givenConditionNotMatchingOtherCondition_onInlineFragments_doesNotMergeInSelections() throws {
+  func test__selections__givenConditionNotMatchingOtherCondition_onInlineFragments_doesNotMergeInSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1255,7 +1255,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
@@ -1302,7 +1302,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[if: "b"]).to(shallowlyMatch(expected_allAnimal_ifB))
   }
 
-  func test__selections__givenDuplicateConditionsNestedInsideOtherCondition_onInlineFragments_hasNestedConditionalSelectionSets() throws {
+  func test__selections__givenDuplicateConditionsNestedInsideOtherCondition_onInlineFragments_hasNestedConditionalSelectionSets() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1333,7 +1333,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
@@ -1399,7 +1399,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[if: "b"]).to(shallowlyMatch(expected_allAnimal_ifB))
   }
 
-  func test__selections__givenConditionNotMatchingNestedCondition_onInlineFragments_doesNotMergeSelections() throws {
+  func test__selections__givenConditionNotMatchingNestedCondition_onInlineFragments_doesNotMergeSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1430,7 +1430,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
@@ -1495,7 +1495,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
   }
 
 
-  func test__selections__givenSiblingTypeCaseAndCondition_onInlineFragments_doesNotMergeSiblings() throws {
+  func test__selections__givenSiblingTypeCaseAndCondition_onInlineFragments_doesNotMergeSiblings() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1527,7 +1527,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let Interface_Pet = try XCTUnwrap(schema[interface: "Pet"])
@@ -1575,7 +1575,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[if: "b"]).to(shallowlyMatch(expected_allAnimal_ifB))
   }
 
-  func test__selections__givenTypeCaseAndCondition_siblingWithMatchingCondition_onInlineFragments_mergesConditionSelections() throws {
+  func test__selections__givenTypeCaseAndCondition_siblingWithMatchingCondition_onInlineFragments_mergesConditionSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1607,7 +1607,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let Interface_Pet = try XCTUnwrap(schema[interface: "Pet"])
@@ -1658,7 +1658,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[if: "b"]).to(shallowlyMatch(expected_allAnimal_ifB))
   }
 
-  func test__selections__givenTypeCaseAndCondition_siblingWithNonMatchingCondition_onInlineFragments_doesNotMergesConditionSelections() throws {
+  func test__selections__givenTypeCaseAndCondition_siblingWithNonMatchingCondition_onInlineFragments_doesNotMergesConditionSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1690,7 +1690,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let Interface_Pet = try XCTUnwrap(schema[interface: "Pet"])
@@ -1739,7 +1739,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
 
   // MARK: - Named Fragments
 
-  func test__selections__givenIncludeIfVariable_onNamedFragment_createsSelectionWithInclusionCondition() throws {
+  func test__selections__givenIncludeIfVariable_onNamedFragment_createsSelectionWithInclusionCondition() async throws {
     // given
     schemaSDL = """
      type Query {
@@ -1765,7 +1765,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
      """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let FragmentA = try XCTUnwrap(ir.compilationResult[fragment: "FragmentA"])
@@ -1807,7 +1807,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[if: "a"]).to(shallowlyMatch(expected_allAnimal_ifA))
   }
 
-  func test__selections__givenIncludeIfVariable_onNamedFragmentOfDifferentType_createsTypeCaseSelectionWithInclusionCondition_typeCaseDoesNotContainAdditionalInlineFragmentForInclusionCondition() throws {
+  func test__selections__givenIncludeIfVariable_onNamedFragmentOfDifferentType_createsTypeCaseSelectionWithInclusionCondition_typeCaseDoesNotContainAdditionalInlineFragmentForInclusionCondition() async throws {
     // given
     schemaSDL = """
      type Query {
@@ -1838,7 +1838,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
      """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let Object_Dog = try XCTUnwrap(schema[object: "Dog"])
@@ -1878,7 +1878,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[as: "Dog", if: "a"]).to(shallowlyMatch(expected_allAnimal_asDog))
   }
 
-  func test__selections__givenDuplicateIncludeIfVariable_onNamedFragment_createsSelectionWithDeduplicatedInclusionCondition() throws {
+  func test__selections__givenDuplicateIncludeIfVariable_onNamedFragment_createsSelectionWithDeduplicatedInclusionCondition() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1905,7 +1905,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let FragmentA = try XCTUnwrap(ir.compilationResult[fragment: "FragmentA"])
@@ -1947,7 +1947,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[if: "a"]).to(shallowlyMatch(expected_allAnimal_ifA))
   }
 
-  func test__selections__givenDuplicateNamedFragmentWithDifferentConditions_createsDeduplicatedInclusionCondition() throws {
+  func test__selections__givenDuplicateNamedFragmentWithDifferentConditions_createsDeduplicatedInclusionCondition() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1974,7 +1974,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let FragmentA = try XCTUnwrap(ir.compilationResult[fragment: "FragmentA"])
@@ -2032,7 +2032,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[if: "b"]).to(shallowlyMatch(expected_allAnimal_ifB))
   }
 
-  func test__selections__givenNamedFragmentWithCompoundConditionsAndDuplicateWithDifferentConditions_createsDeduplicatedInclusionCondition() throws {
+  func test__selections__givenNamedFragmentWithCompoundConditionsAndDuplicateWithDifferentConditions_createsDeduplicatedInclusionCondition() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2059,7 +2059,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let FragmentA = try XCTUnwrap(ir.compilationResult[fragment: "FragmentA"])
@@ -2117,7 +2117,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[if: "c"]).to(shallowlyMatch(expected_allAnimal_ifC))
   }
 
-  func test__selections__givenTwoIncludeIfNamedFragments_withSameCondition_createsSelectionWithInclusionCondition() throws {
+  func test__selections__givenTwoIncludeIfNamedFragments_withSameCondition_createsSelectionWithInclusionCondition() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2149,7 +2149,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let FragmentA = try XCTUnwrap(ir.compilationResult[fragment: "FragmentA"])
@@ -2196,7 +2196,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[if: "a"]).to(shallowlyMatch(expected_allAnimal_ifA))
   }
 
-  func test__selections__namedFragmentWithConditionMergedIntoTypeCase_doesNotMergeNamedFragment() throws {
+  func test__selections__namedFragmentWithConditionMergedIntoTypeCase_doesNotMergeNamedFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2230,7 +2230,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let Interface_Pet = try XCTUnwrap(schema[interface: "Pet"])
@@ -2291,7 +2291,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
 
   // MARK: Merged Named Fragments
 
-  func test__selections__givenIncludeIfVariableOnNamedFragment_merged_createsSelectionWithInclusionCondition() throws {
+  func test__selections__givenIncludeIfVariableOnNamedFragment_merged_createsSelectionWithInclusionCondition() async throws {
     // given
     schemaSDL = """
      type Query {
@@ -2317,7 +2317,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
      """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let FragmentA = try XCTUnwrap(ir.compilationResult[fragment: "FragmentA"])
@@ -2359,7 +2359,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(allAnimals?[if: "a"]).to(shallowlyMatch(expected_allAnimal_ifA))
   }
 
-  func test__selections__givenNonNullFieldMergedFromNestedEntityInNamedFragmentWithIncludeCondition_createsSelections() throws {
+  func test__selections__givenNonNullFieldMergedFromNestedEntityInNamedFragmentWithIncludeCondition_createsSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2399,7 +2399,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = try XCTUnwrap(
       self.subject[field: "allAnimals"] as? IR.EntityField
@@ -2482,7 +2482,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
       .to(shallowlyMatch(expected_allAnimals_ifB_child))
   }
 
-  func test__selections__givenFragmentMergedInEntityRootWithInclusionConditionAndInOtherFragmentWithOtherInclusionCondition_mergesSelections() throws {
+  func test__selections__givenFragmentMergedInEntityRootWithInclusionConditionAndInOtherFragmentWithOtherInclusionCondition_mergesSelections() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2527,7 +2527,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = try XCTUnwrap(
       self.subject[field: "allAnimals"] as? IR.EntityField
@@ -2652,7 +2652,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
       .to(shallowlyMatch(expected_allAnimals_ifWarmBloodedAndC_child))
   }
 
-  func test__selections__givenFragmentMergedFromEntityRootWithInclusionConditionAndFromInTypeCaseWithNoInclusionCondition_mergesFragmentIntoBothConditionalSelectionSets() throws {
+  func test__selections__givenFragmentMergedFromEntityRootWithInclusionConditionAndFromInTypeCaseWithNoInclusionCondition_mergesFragmentIntoBothConditionalSelectionSets() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2699,7 +2699,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let allAnimals = try XCTUnwrap(
       self.subject[field: "allAnimals"] as? IR.EntityField
@@ -2823,7 +2823,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
 
   // MARK: - Group By Inclusion Conditions
 
-  func test__groupedByInclusionConditions__groupsInclusionConditionsCorrectly() throws {
+  func test__groupedByInclusionConditions__groupsInclusionConditionsCorrectly() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -2891,7 +2891,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     """
 
     // when
-    try buildSubjectRootField()
+    try await buildSubjectRootField()
 
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
     let Interface_Pet = try XCTUnwrap(schema[interface: "Pet"])

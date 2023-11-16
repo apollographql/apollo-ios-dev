@@ -323,6 +323,59 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/conversionstrategies\/caseconversionstrategy"
 },
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ConversionStrategies/CaseConversionStrategy/camelCase": {
+  "abstract" : [
+    {
+      "text" : "Convert to lower camel case from ",
+      "type" : "text"
+    },
+    {
+      "code" : "snake_case",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ", ",
+      "type" : "text"
+    },
+    {
+      "code" : "UpperCamelCase",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ", or ",
+      "type" : "text"
+    },
+    {
+      "code" : "UPPERCASE",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "camelCase"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/CaseConversionStrategy\/camelCase",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "ApolloCodegenConfiguration.ConversionStrategies.CaseConversionStrategy.camelCase",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/conversionstrategies\/caseconversionstrategy\/camelcase"
+},
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ConversionStrategies/CodingKeys": {
   "abstract" : [
 
@@ -391,8 +444,9 @@
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ConversionStrategies/EnumCases-swift.enum": {
   "abstract" : [
     {
-      "code" : "ApolloCodegenConfiguration\/ConversionStrategies\/EnumCase",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/EnumCases-swift.enum",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
       "text" : " is used to specify the strategy",
@@ -500,6 +554,34 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/conversionstrategies\/fieldaccessors-swift.enum"
 },
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ConversionStrategies/FieldAccessors-swift.enum/idiomatic": {
+  "abstract" : [
+    {
+      "text" : "This conversion strategy will:",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "idiomatic"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/FieldAccessors-swift.enum\/idiomatic",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "ApolloCodegenConfiguration.ConversionStrategies.FieldAccessors.idiomatic",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/conversionstrategies\/fieldaccessors-swift.enum\/idiomatic"
+},
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ConversionStrategies/enumCases-swift.property": {
   "abstract" : [
     {
@@ -519,12 +601,13 @@
       "type" : "text"
     },
     {
-      "text" : "Defaultss to ",
+      "text" : "Defaults to ",
       "type" : "text"
     },
     {
-      "code" : "ApolloCodegenConfiguration\/CaseConversionStrategy\/camelCase",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/CaseConversionStrategy\/camelCase",
+      "isActive" : true,
+      "type" : "reference"
     }
   ],
   "fragments" : [
@@ -598,8 +681,9 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloCodegenConfiguration\/CaseConversionStrategy\/camelCase",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/FieldAccessors-swift.enum\/idiomatic",
+      "isActive" : true,
+      "type" : "reference"
     }
   ],
   "fragments" : [
@@ -802,6 +886,7 @@
   "abstract" : [
 
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "identifier",

@@ -9,27 +9,29 @@ import Utilities
 public struct ScopeCondition: Hashable, CustomDebugStringConvertible {
   public let type: GraphQLCompositeType?
   public let conditions: InclusionConditions?
-  public let isDeferred: IsDeferred
+  public let deferCondition: CompilationResult.DeferCondition?
 
   init(
     type: GraphQLCompositeType? = nil,
     conditions: InclusionConditions? = nil,
-    isDeferred: IsDeferred = false
+    deferCondition: CompilationResult.DeferCondition? = nil
   ) {
     self.type = type
     self.conditions = conditions
-    self.isDeferred = isDeferred
+    self.deferCondition = deferCondition
   }
 
   public var debugDescription: String {
-    [type?.debugDescription, conditions?.debugDescription]
+    [type?.debugDescription, conditions?.debugDescription, deferCondition?.debugDescription]
       .compactMap { $0 }
       .joined(separator: " ")
   }
 
   var isEmpty: Bool {
-    type == nil && (conditions?.isEmpty ?? true)
+    type == nil && (conditions?.isEmpty ?? true) && deferCondition == nil
   }
+
+  public var isDeferred: Bool { deferCondition != nil }
 }
 
 public typealias TypeScope = OrderedSet<GraphQLCompositeType>
@@ -71,7 +73,9 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
   /// to be included.
   let matchingConditions: InclusionConditions?
 
-  let allTypesInSchema: Schema.ReferencedTypes
+  public let allTypesInSchema: Schema.ReferencedTypes
+
+  public var isDeferred: Bool { scopePath.last.value.isDeferred }
 
   private init(
     typePath: LinkedList<ScopeCondition>,
@@ -143,7 +147,9 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
   ///
   /// This should be used to create a `ScopeDescriptor` for a conditional `SelectionSet` inside
   /// of an entity, by appending the conditions to the parent `SelectionSet`'s `ScopeDescriptor`.
-  func appending(_ scopeCondition: ScopeCondition) -> ScopeDescriptor {
+  func appending(
+    _ scopeCondition: ScopeCondition
+  ) -> ScopeDescriptor {
     let matchingTypes: TypeScope
     if let newType = scopeCondition.type {
       matchingTypes = Self.typeScope(
@@ -209,6 +215,10 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
     return false
   }
 
+  public func matches(_ otherDeferCondition: CompilationResult.DeferCondition) -> Bool {
+    otherDeferCondition == self.scopePath.last.value.deferCondition
+  }
+
   /// Indicates if the receiver is of the given type. If the receiver matches a given type,
   /// then selections for a `SelectionSet` of that type can be merged in to the receiver's
   /// `SelectionSet`.
@@ -218,6 +228,10 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
     }
 
     if let inclusionConditions = condition.conditions, !self.matches(inclusionConditions) {
+      return false
+    }
+
+    if let deferConditions = condition.deferCondition, !self.matches(deferConditions) {
       return false
     }
 

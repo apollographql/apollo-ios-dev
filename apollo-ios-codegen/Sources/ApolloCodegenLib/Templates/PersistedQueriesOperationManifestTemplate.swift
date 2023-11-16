@@ -18,13 +18,13 @@ struct PersistedQueriesOperationManifestTemplate: OperationManifestTemplate {
         "format": "apollo-persisted-query-manifest",
         "version": 1,
         "operations": [
-          \(forEachIn: operations, { operation in
+          \(forEachIn: operations, {
             return """
             {
-              "id": "\(operation.identifier)",
-              "body": "\(operation.source)",
-              "name": "\(operation.name)",
-              "type": "\(operation.type.rawValue)"
+              "id": "\($0.identifier)",
+              "body": "\($0.operation.sourceText(withFormat: .manifestJSONBody))",
+              "name": "\($0.operation.name)",
+              "type": "\($0.operation.type.rawValue)"
             }
             """
           })

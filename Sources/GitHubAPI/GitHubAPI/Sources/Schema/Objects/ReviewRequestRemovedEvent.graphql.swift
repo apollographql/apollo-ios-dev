@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents an 'review_request_removed' event on a given pull request.
-  static let ReviewRequestRemovedEvent = Object(
+  static let ReviewRequestRemovedEvent = ApolloAPI.Object(
     typename: "ReviewRequestRemovedEvent",
     implementedInterfaces: [Interfaces.Node.self]
   )

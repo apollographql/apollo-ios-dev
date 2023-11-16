@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A Gist.
-  static let Gist = Object(
+  static let Gist = ApolloAPI.Object(
     typename: "Gist",
     implementedInterfaces: [
       Interfaces.Node.self,

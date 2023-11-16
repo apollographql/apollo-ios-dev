@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a Git blob.
-  static let Blob = Object(
+  static let Blob = ApolloAPI.Object(
     typename: "Blob",
     implementedInterfaces: [
       Interfaces.GitObject.self,

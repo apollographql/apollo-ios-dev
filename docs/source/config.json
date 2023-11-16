@@ -12,7 +12,10 @@
       {
         "v1.0": "/migrations/1.0",
         "v1.2": "/migrations/1.2",
-        "v1.3": "/migrations/1.3"
+        "v1.3": "/migrations/1.3",
+        "v1.5": "/migrations/1.5",
+        "v1.6": "/migrations/1.6",
+        "v1.7": "/migrations/1.7"
       },
       true
     ],
@@ -58,7 +61,8 @@
         "The Codegen CLI": "/code-generation/codegen-cli",
         "Configuration": "/code-generation/codegen-configuration",
         "Downloading a Schema": "/code-generation/downloading-schema",
-        "Running Code Generation in Swift Code": "/code-generation/run-codegen-in-swift-code"
+        "Running Code Generation in Swift Code": "/code-generation/run-codegen-in-swift-code",
+        "Code Generation Troubleshooting": "/troubleshooting/codegen-troubleshooting"
       },
       true
     ],
@@ -93,8 +97,7 @@
     ],
     "Networking": [
       {
-        "Creating a Client": "/networking/client-creation",
-        "Advanced Network Configuration": "/networking/request-pipeline"
+        "Creating a Client": "/networking/client-creation"
       },
       true
     ],
@@ -104,9 +107,10 @@
       },
       true
     ],
-    "Troubleshooting": [
+    "Advanced": [
       {
-        "Code Generation": "/troubleshooting/codegen-troubleshooting"
+        "File Uploads": "/file-uploads",
+        "Request Chain Customization": "/networking/request-pipeline"
       },
       true
     ]

@@ -29,6 +29,10 @@ This repo provides the code necessary to do GraphQL code generation for the [Apo
 
 However, if you plan to handle your code generation through Swift scripting, you will now need to include the `apollo-ios-codegen` package as a dependency as it is no longer packaged as part of `apollo-ios`. In order to get start with scripting your code generation check out our guide [here](https://www.apollographql.com/docs/ios/code-generation/run-codegen-in-swift-code).
 
+## Issues
+
+To report an issue, bug, or feature request ou can do so in the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repo.
+
 ## Releases and changelog
 
 Release of the Apollo iOS Codegen repo are tied to the releases of the [Apollo iOS](https://github.com/apollographql/apollo-ios) repo.

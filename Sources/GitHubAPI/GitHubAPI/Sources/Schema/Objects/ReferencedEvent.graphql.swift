@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'referenced' event on a given `ReferencedSubject`.
-  static let ReferencedEvent = Object(
+  static let ReferencedEvent = ApolloAPI.Object(
     typename: "ReferencedEvent",
     implementedInterfaces: [Interfaces.Node.self]
   )

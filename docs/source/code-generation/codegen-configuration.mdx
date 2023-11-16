@@ -391,9 +391,10 @@ This option outputs all of your generated test mocks in a single directory.
 
 Specify the directory for your test mocks using the `path` parameter. This is resolved as a relative path from the directory containing your `apollo-codegen-config.json` file when using the CLI. Use the `accessModifier` property to control the visibility of the generated code.
 
-> **Note:** When using this option, you are responsible for ensuring the generated test mocks are linked to your test target.
->
-> Test mocks generated this way may also be manually embedded in a test utility module that is imported by your test target.
+> **Note:** 
+> * When using this option, you are responsible for ensuring the generated test mocks are linked to your test target.
+> * Test mocks generated this way may also be manually embedded in a test utility module that is imported by your test target.
+> * Test mocks are required to be in a target or module that is separate from the schema module and will always include `import` statements linking the schema module.
 
 ## Output options
 

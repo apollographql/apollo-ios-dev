@@ -22,4 +22,3 @@ runs:
     shell: bash
     run: |
       xcodebuild clean test -resultBundlePath TestResults/ResultBundle.xcresult -derivedDataPath DerivedData -workspace "ApolloDev.xcworkspace" -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}" -testPlan "${{ inputs.test-plan }}" | xcbeautify
-  # Add step for saving build/test artifacts

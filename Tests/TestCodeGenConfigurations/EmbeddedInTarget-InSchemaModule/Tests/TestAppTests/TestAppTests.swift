@@ -16,6 +16,7 @@ final class TestAppTests: XCTestCase {
             "id": "1",
             "skinCovering": "Fur",
             "species": "Canine",
+            "houseDetails": "Single Level Ranch"
           ]
         ]
       ]])
@@ -52,6 +53,7 @@ class MockNetworkTransport: NetworkTransport {
     operation: Operation,
     cachePolicy: CachePolicy,
     contextIdentifier: UUID?,
+    context: RequestContext?,
     callbackQueue: DispatchQueue,
     completionHandler: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
   ) -> Cancellable where Operation : GraphQLOperation {

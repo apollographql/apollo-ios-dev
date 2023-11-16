@@ -47,13 +47,13 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           warningsOnDeprecatedUsage: .exclude,
           conversionStrategies:.init(
             enumCases: .none,
-            fieldAccessors: .camelCase
+            fieldAccessors: .camelCase,
+            inputObjects: .none
           ),
           pruneGeneratedFiles: false,
           markOperationDefinitionsAsFinal: true
         ),
         experimentalFeatures: .init(
-          clientControlledNullability: true,
           legacySafelistingCompatibleOperations: true
         ),
         operationManifest: .init(
@@ -68,7 +68,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
       """
       {
         "experimentalFeatures" : {
-          "clientControlledNullability" : true,
           "legacySafelistingCompatibleOperations" : true
         },
         "input" : {
@@ -96,7 +95,8 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "cocoapodsCompatibleImportStatements" : true,
           "conversionStrategies" : {
             "enumCases" : "none",
-            "fieldAccessors" : "camelCase"
+            "fieldAccessors" : "camelCase",
+            "inputObjects" : "none"
           },
           "deprecatedEnumCases" : "exclude",
           "markOperationDefinitionsAsFinal" : true,

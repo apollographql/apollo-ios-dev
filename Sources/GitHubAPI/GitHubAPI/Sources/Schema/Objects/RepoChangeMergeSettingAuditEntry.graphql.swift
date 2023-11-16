@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a repo.change_merge_setting event.
-  static let RepoChangeMergeSettingAuditEntry = Object(
+  static let RepoChangeMergeSettingAuditEntry = ApolloAPI.Object(
     typename: "RepoChangeMergeSettingAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

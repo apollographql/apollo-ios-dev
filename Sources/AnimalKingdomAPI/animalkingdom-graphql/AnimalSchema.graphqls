@@ -10,6 +10,8 @@ type Mutation {
 
 scalar CustomDate
 
+scalar Object
+
 input PetAdoptionInput {
   ownerID: ID!
   petID: ID!
@@ -121,6 +123,7 @@ type Dog implements Animal & Pet & HousePet & WarmBlooded {
   rival: Cat
   livesWith: Bird
   birthdate: CustomDate
+  houseDetails: Object
 }
 
 type Bird implements Animal & Pet & WarmBlooded {

@@ -38,7 +38,6 @@ import {
 } from "graphql";
 import * as ir from "./ir";
 import { valueFromValueNode } from "./values";
-import { applyRequiredStatus } from "graphql/utilities/applyRequiredStatus";
 import { ValidationOptions } from "../validationRules";
 
 function filePathForNode(node: ASTNode): string | undefined {
@@ -298,8 +297,8 @@ export function compileToIR(
           );
         }
 
-        const fieldType = applyRequiredStatus(fieldDef.type, selectionNode.required);
-        const unwrappedFieldType = getNamedType(fieldType);
+        const fieldType = fieldDef.type;
+        const unwrappedFieldType = getNamedType(fieldDef.type);
 
         addReferencedType(getNamedType(unwrappedFieldType));
 

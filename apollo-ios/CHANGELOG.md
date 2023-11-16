@@ -1,5 +1,63 @@
 # Change Log
 
+## v1.7.1
+
+### Fixed
+
+- **Fixed inconsistent ordering of fragments in generated operation definitions  ([#130](https://github.com/apollographql/apollo-ios-dev/pull/130)):** In order to make the ordering of fragments consistent, they are now alphabetized. This is a change to the data that gets sent over the wire when making a network request for an operation with fragments. **[Persisted Queries](https://www.apollographql.com/docs/ios/fetching/persisted-queries) users should re-register their queries when upgrading to this version.** _Thank you to [@scottasoutherland](https://github.com/scottasoutherland) for reporting the issue._
+
+### Improvement
+
+- **Add initializer for `SelectionSet` that takes a `[String: Any]` JSON object ([#102](https://github.com/apollographql/apollo-ios-dev/pull/102)):** _Thank you to [@Cookiezby](https://github.com/Cookiezby) for the contribution._
+ 
+
+## v1.7.0
+
+**`ApolloCodegenLib` Now Uses Swift Concurrency**
+To improve the performance of the code generation, the `ApolloCodegenLib` now uses `async/await`. Code generation is now parallelized and should complete much faster for users with a large number of GraphQL files.
+This means that the entry point function, `ApolloCodegen.build(with configuration:)` is now an `async` function. For users using the `ApolloCodegenLib` directly, you will need to make your call sites into this function use `async/await`. In most cases, this requires minimal code changes. Please see the [1.7.0 migration guide](https://www.apollographql.com/docs/ios/migrations/1.7) for information on how to upgrade.
+
+See PR [#57](https://github.com/apollographql/apollo-ios-dev/pull/57).
+
+### Fixed
+
+- **Fixed a bug with ApolloAPI.Object clashing with custom objects name Object ([#94](https://github.com/apollographql/apollo-ios-dev/pull/94)):** _Thank you to [215eight](https://github.com/215eight) for reporting the issue._
+
+## v1.6.1
+
+### Fixed
+
+- **Fix bug with AnyHashable coercion ([#68](https://github.com/apollographql/apollo-ios-dev/pull/68)):** This is an additional fix for the crashes on iOS 14.4.1.
+
+## v1.6.0
+
+The Apollo iOS ecosystem is changing in the 1.6.0 release in order to provide a better development experience for users. For most users nothing will change, while some users will see a minor difference. The biggest change is that the `ApolloCodegenLib` is now in a separate repo/package that will need to be included as its own dependency from [apollo-ios-codegen](https://github.com/apollographql/apollo-ios-codegen) if you are doing your code generation through Swift. If you are using the codegen CLI then no changes are necessary.
+
+For a detailed breakdown of the changes please see this [GitHub Issue](https://github.com/apollographql/apollo-ios/issues/3240).
+
+### Fixed
+
+- **Fixed crashes in iOS 14.4 and below ([#61](https://github.com/apollographql/apollo-ios-dev/pull/61)):** _Thank you to [matijakregarGH](https://github.com/matijakregarGH) for reporting the issue._
+
+## v1.5.2
+
+The purpose of this release is to provide a deprecation message to users of `ApolloCodegenLib` who are scripting their code generation in advance of an upcoming change to our libraries and repo structure. Beginning with the upcoming 1.6.0 release the code generation libraries will be their own SPM package in their own repo which will require you to add a new dependency to you project in order for your code generation scripting to compile. More information can be found in our [announcement](https://github.com/apollographql/apollo-ios/issues/3240) of this change.
+
+**If you would like to avoid this deprecation warning in your builds feel free to stay on 1.5.1 or earlier, this warning will be gone in the 1.6.0 release**
+
+PR containing deprecation warning for reference: [#3243](https://github.com/apollographql/apollo-ios/pull/3243).
+
+## v1.5.1
+
+### Improvement
+
+- **Added `OutputOptions` property to codegen for marking generated classes as `final` ([#3189](https://github.com/apollographql/apollo-ios/pull/3189)):** _Thank you to [@Mordil](https://github.com/Mordil) for the contribution._
+
+### Fixed
+
+- **Codegen `itemsToGenerate` option for `.all` not generating an operation manifest ([#3215](https://github.com/apollographql/apollo-ios/pull/3215)):** _Thank you to [@TizianoCoroneo](https://github.com/TizianoCoroneo) for finding and fixing the issue._
+- **Codegen operation manifest inadvertantly being generated twice ([#3225](https://github.com/apollographql/apollo-ios/pull/3225)):** _Thank you to [@jimisaacs](https://github.com/jimisaacs) for finding and fixing the issue._
+
 ## v1.5.0
 
 ### New

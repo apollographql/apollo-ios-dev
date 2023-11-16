@@ -26,6 +26,7 @@ class TestMockUsageTests: XCTestCase {
                             bodyTemperature: 70,
                             favoriteToy: "Ball",
                             height: mockHeight,
+                            houseDetails: "Single Level Ranch",
                             humanName: "Lucky",
                             id: "Dog",
                             laysEggs: false,
@@ -47,6 +48,7 @@ class TestMockUsageTests: XCTestCase {
     XCTAssertEqual(mockDog.predators?.count, 2)
     XCTAssertEqual(mockDog.skinCovering, .case(.fur))
     XCTAssertEqual(mockDog.species, "Lab")
+    XCTAssertEqual(mockDog.houseDetails, "Single Level Ranch")
   
   }
 

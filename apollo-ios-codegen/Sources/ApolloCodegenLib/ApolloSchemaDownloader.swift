@@ -48,31 +48,35 @@ public struct ApolloSchemaDownloader {
   ///   - configuration: The `ApolloSchemaDownloadConfiguration` used to download the schema.
   ///   - rootURL: The root `URL` to resolve relative `URL`s in the configuration's paths against.
   ///     If `nil`, the current working directory of the executing process will be used.
+  ///   - session: The network session to use for the download. If `nil` the `URLSession.Shared` will be used by default.
   /// - Returns: Output from a successful fetch or throws an error.
   /// - Throws: Any error which occurs during the fetch.
   public static func fetch(
     configuration: ApolloSchemaDownloadConfiguration,
-    withRootURL rootURL: URL? = nil
-  ) throws {
+    withRootURL rootURL: URL? = nil,
+    session: NetworkSession? = nil
+  ) async throws {
     try ApolloFileManager.default.createContainingDirectoryIfNeeded(
       forPath: configuration.outputPath
     )
 
     switch configuration.downloadMethod {
     case .introspection(let endpointURL, let httpMethod, _, let includeDeprecatedInputValues):
-      try self.downloadFrom(
+      try await self.downloadFrom(
         introspection: endpointURL,
         httpMethod: httpMethod,
         includeDeprecatedInputValues: includeDeprecatedInputValues,
         configuration: configuration,
-        withRootURL: rootURL
+        withRootURL: rootURL,
+        session: session
       )
 
     case .apolloRegistry(let settings):
-      try self.downloadFrom(
+      try await self.downloadFrom(
         registry: settings,
         configuration: configuration,
-        withRootURL: rootURL
+        withRootURL: rootURL,
+        session: session
       )
     }
   }
@@ -101,7 +105,7 @@ public struct ApolloSchemaDownloader {
     path: String,
     rootURL: URL?,
     fileManager: ApolloFileManager = .default
-  ) throws {
+  ) async throws {
 
     let outputURL: URL
     if let rootURL = rootURL {
@@ -114,7 +118,7 @@ public struct ApolloSchemaDownloader {
       throw SchemaDownloadError.couldNotCreateSDLDataToWrite(schema: string)
     }
 
-    try fileManager.createFile(atPath: outputURL.path, data: data, overwrite: true)
+    try await fileManager.createFile(atPath: outputURL.path, data: data, overwrite: true)
   }
 
   // MARK: - Schema Registry
@@ -138,8 +142,9 @@ public struct ApolloSchemaDownloader {
   static func downloadFrom(
     registry: ApolloSchemaDownloadConfiguration.DownloadMethod.ApolloRegistrySettings,
     configuration: ApolloSchemaDownloadConfiguration,
-    withRootURL rootURL: URL?
-  ) throws {
+    withRootURL rootURL: URL?,
+    session: NetworkSession? = nil
+  ) async throws {
     CodegenLogger.log("Downloading schema from registry", logLevel: .debug)
 
     let urlRequest = try registryRequest(with: registry, headers: configuration.headers)
@@ -147,13 +152,13 @@ public struct ApolloSchemaDownloader {
       .parentFolderURL()
       .appendingPathComponent("registry_response.json")
 
-    try URLDownloader().downloadSynchronously(
+    try URLDownloader(session: session).downloadSynchronously(
       urlRequest,
       to: jsonOutputURL,
       timeout: configuration.downloadTimeout
     )
 
-    try self.convertFromRegistryJSONToSDLFile(
+    try await self.convertFromRegistryJSONToSDLFile(
       jsonFileURL: jsonOutputURL,
       configuration: configuration,
       withRootURL: rootURL
@@ -199,7 +204,7 @@ public struct ApolloSchemaDownloader {
     jsonFileURL: URL,
     configuration: ApolloSchemaDownloadConfiguration,
     withRootURL rootURL: URL?
-  ) throws {
+  ) async throws {
     let jsonData: Data
 
     do {
@@ -230,7 +235,7 @@ public struct ApolloSchemaDownloader {
       throw SchemaDownloadError.couldNotExtractSDLFromRegistryJSON
     }
 
-    try write(sdlSchema, path: configuration.outputPath, rootURL: rootURL)
+    try await write(sdlSchema, path: configuration.outputPath, rootURL: rootURL)
   }
 
   // MARK: - Schema Introspection
@@ -341,8 +346,9 @@ public struct ApolloSchemaDownloader {
     httpMethod: ApolloSchemaDownloadConfiguration.DownloadMethod.HTTPMethod,
     includeDeprecatedInputValues: Bool,
     configuration: ApolloSchemaDownloadConfiguration,
-    withRootURL: URL?
-  ) throws {
+    withRootURL: URL?,
+    session: NetworkSession? = nil
+  ) async throws {
 
     CodegenLogger.log("Downloading schema via introspection from \(endpoint)", logLevel: .debug)
 
@@ -363,15 +369,14 @@ public struct ApolloSchemaDownloader {
       }
     }()
 
-    
-    try URLDownloader().downloadSynchronously(
+    try URLDownloader(session: session).downloadSynchronously(
       urlRequest,
       to: jsonOutputURL,
       timeout: configuration.downloadTimeout
     )
 
     if configuration.outputFormat == .SDL {
-      try convertFromIntrospectionJSONToSDLFile(
+      try await convertFromIntrospectionJSONToSDLFile(
         jsonFileURL: jsonOutputURL,
         configuration: configuration,
         withRootURL: withRootURL
@@ -426,17 +431,17 @@ public struct ApolloSchemaDownloader {
     jsonFileURL: URL,
     configuration: ApolloSchemaDownloadConfiguration,
     withRootURL rootURL: URL?
-  ) throws {
+  ) async throws {
 
     defer {
       try? FileManager.default.removeItem(at: jsonFileURL)
     }
 
-    let frontend = try GraphQLJSFrontend()
+    let frontend = try await GraphQLJSFrontend()
     let schema: GraphQLSchema
 
     do {
-      schema = try frontend.loadSchema(from: [try frontend.makeSource(from: jsonFileURL)])
+      schema = try await frontend.loadSchema(from: [try frontend.makeSource(from: jsonFileURL)])
     } catch {
       throw SchemaDownloadError.downloadedIntrospectionJSONFileNotFound(underlying: error)
     }
@@ -444,12 +449,12 @@ public struct ApolloSchemaDownloader {
     let sdlSchema: String
 
     do {
-      sdlSchema = try frontend.printSchemaAsSDL(schema: schema)
+      sdlSchema = try await frontend.printSchemaAsSDL(schema: schema)
     } catch {
       throw SchemaDownloadError.couldNotConvertIntrospectionJSONToSDL(underlying: error)
     }
 
-    try write(sdlSchema, path: configuration.outputPath, rootURL: rootURL)
+    try await write(sdlSchema, path: configuration.outputPath, rootURL: rootURL)
   }
 }
 #endif

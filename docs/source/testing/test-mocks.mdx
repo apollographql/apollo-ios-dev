@@ -6,14 +6,14 @@ When unit testing code that uses your generated operation models, you will often
 
 ## Purpose
 
-Generated test mocks provide a type-safe way to mock your response models. Rather than dealing with cumbersome and error prone JSON data, test mocks make mocking safer,more concise, and reusable. They are mutable, offer code completion in Xcode, and update with new fields automatically as your schema and operations change.
+Generated test mocks provide a type-safe way to mock your response models. Rather than dealing with cumbersome and error prone JSON data, test mocks make mocking safer, more concise, and reusable. They are mutable, offer code completion in Xcode, and update with new fields automatically as your schema and operations change.
 
 ### Mocking GraphQL responses with JSON
 
 Because the generated response models are backed by a JSON dictionary, initializing them with mock data without generated test mocks is verbose and error-prone. You need to create stringly-typed JSON dictionaries that are structured exactly like the expected network response to ensure the your models parse properly.
 
 ```swift
-let data: [String: AnyHashable] = [
+let data: [String: Any] = [
     "data": [
         "__typename": "Query",
         "hero": [
@@ -36,7 +36,7 @@ let data: [String: AnyHashable] = [
     ]
 ]
 
-let model = HeroAndFriendsQuery.Data(data: DataDict(data))
+let model = try HeroAndFriendsQuery.Data(data: data)
 
 XCTAssertEqual(model.hero.friends[1].name, "C-3PO")
 ```

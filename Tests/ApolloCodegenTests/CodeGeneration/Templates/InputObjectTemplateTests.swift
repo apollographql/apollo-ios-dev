@@ -1792,7 +1792,11 @@ class InputObjectTemplateTests: XCTestCase {
 
     buildSubject(
       fields: fields,
-      config: .mock(.swiftPackageManager, schemaNamespace: "TestSchema")
+      config: .mock(.swiftPackageManager,
+                    options: .init(
+                      conversionStrategies: .init(inputObjects: .none)
+                    ),
+                    schemaNamespace: "TestSchema")
     )
 
     let expected = """
@@ -2176,6 +2180,73 @@ class InputObjectTemplateTests: XCTestCase {
 
   // MARK: Casing Tests
 
+  func test__casing__givenSchemaName_generatesWithNoCaseConversion() throws {
+    // given
+    let fields: [GraphQLInputField] = [
+      GraphQLInputField.mock(
+        "InputField",
+        type: .inputObject(.mock(
+          "InnerInputObject",
+          fields: [
+            GraphQLInputField.mock("InnerStringField", type: .scalar(.string()), defaultValue: nil)
+          ]
+        )),
+        defaultValue: nil
+      ),
+      GraphQLInputField.mock(
+        "inputField",
+        type: .inputObject(.mock(
+          "InnerInputObject",
+          fields: [
+            GraphQLInputField.mock("innerStringField", type: .scalar(.string()), defaultValue: nil)
+          ]
+        )),
+        defaultValue: nil
+      )
+    ]
+
+    buildSubject(
+      fields: fields,
+      config: .mock(schemaNamespace: "testschema", 
+                    output: .mock(
+                      moduleType: .swiftPackageManager,
+                      operations: .relative(subpath: nil)
+                    ),
+                    options: .init(
+                      conversionStrategies: .init(inputObjects: .none)
+                    )
+                   )
+    )
+
+    let expected = """
+      public init(
+        InputField: GraphQLNullable<Testschema.InnerInputObject> = nil,
+        inputField: GraphQLNullable<Testschema.InnerInputObject> = nil
+      ) {
+        __data = InputDict([
+          "InputField": InputField,
+          "inputField": inputField
+        ])
+      }
+
+      public var InputField: GraphQLNullable<Testschema.InnerInputObject> {
+        get { __data["InputField"] }
+        set { __data["InputField"] = newValue }
+      }
+
+      public var inputField: GraphQLNullable<Testschema.InnerInputObject> {
+        get { __data["inputField"] }
+        set { __data["inputField"] = newValue }
+      }
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
+  }
+  
   func test__casing__givenSchemaNameLowercased_nonListField_generatesWithFirstUppercasedNamespace() throws {
     // given
     let fields: [GraphQLInputField] = [

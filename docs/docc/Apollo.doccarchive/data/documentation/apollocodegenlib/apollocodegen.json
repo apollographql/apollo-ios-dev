@@ -95,7 +95,7 @@
     },
     {
       "identifiers" : [
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/build(with:withRootURL:itemsToGenerate:)"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/build(with:withRootURL:itemsToGenerate:operationIdentifierProvider:)"
       ],
       "title" : "Type Methods"
     },
@@ -204,7 +204,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/ItemsToGenerate": {
   "abstract" : [
-
+    {
+      "text" : "OptionSet used to configure what items should be generated during code generation.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -233,7 +236,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/itemstogenerate"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/build(with:withRootURL:itemsToGenerate:)": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/build(with:withRootURL:itemsToGenerate:operationIdentifierProvider:)": {
   "abstract" : [
     {
       "text" : "Executes the code generation engine with a specified configuration.",
@@ -323,19 +326,44 @@
     },
     {
       "kind" : "text",
-      "text" : ") "
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "operationIdentifierProvider"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:16ApolloCodegenLib27OperationIdentifierProvidera",
+      "text" : "OperationIdentifierProvider"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/build(with:withRootURL:itemsToGenerate:)",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/build(with:withRootURL:itemsToGenerate:operationIdentifierProvider:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "build(with:withRootURL:itemsToGenerate:)",
+  "title" : "build(with:withRootURL:itemsToGenerate:operationIdentifierProvider:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/build(with:withrooturl:itemstogenerate:)"
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/build(with:withrooturl:itemstogenerate:operationidentifierprovider:)"
 }
 }
 }

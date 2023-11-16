@@ -8,30 +8,46 @@ import ApolloCodegenInternalTestHelpers
 
 class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
 
+  var schemaSDL: String!
+  var document: String!
+  var ir: IRBuilder!
+  var operation: IR.Operation!
   var config: ApolloCodegenConfiguration!
-  var definition: CompilationResult.OperationDefinition!
-  var referencedFragments: OrderedSet<IR.NamedFragment>!
-  var operationIdentifier: String!
+  var subject: OperationDefinitionTemplate!
 
   override func setUp() {
     super.setUp()
-    definition = CompilationResult.OperationDefinition.mock()
+    schemaSDL = """
+    type Query {
+      name: String!
+    }
+    """
+
+    config = .mock()
   }
 
   override func tearDown() {
-    super.tearDown()
+    schemaSDL = nil
+    document = nil
+    ir = nil
+    operation = nil
     config = nil
-    definition = nil
-    referencedFragments = nil
-    operationIdentifier = nil
+    subject = nil
+    super.tearDown()
   }
 
-  func buildConfig(
+  private func buildSubjectAndOperation(
+    named operationName: String = "NameQuery",
+    operationIdentifier: String? = nil,
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackageManager,
     operations: ApolloCodegenConfiguration.OperationsFileOutput = .inSchemaModule,
     operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat = .definition,
     cocoapodsCompatibleImportStatements: Bool = false
-  ) {
+  ) async throws {
+    ir = try await .mock(schema: schemaSDL, document: document)
+    let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
+    operation = await ir.build(operation: operationDefinition)
+
     config = .mock(
       output: .mock(moduleType: moduleType, operations: operations),
       options: .init(
@@ -39,37 +55,30 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
         cocoapodsCompatibleImportStatements: cocoapodsCompatibleImportStatements
       )
     )
+
+    subject = OperationDefinitionTemplate(
+      operation: operation,
+      operationIdentifier: operationIdentifier,
+      config: ApolloCodegen.ConfigurationContext(config: config)
+    )
   }
 
   func renderDocumentType() throws -> String {
-    let config = ApolloCodegen.ConfigurationContext(config: config)
-    let mockTemplateRenderer = MockTemplateRenderer(
-      target: .operationFile,
-      template: "",
-      config: config
-    )
-
-    return OperationDefinitionTemplate.DocumentType.render(
-      try XCTUnwrap(definition),
-      identifier: operationIdentifier,
-      fragments: referencedFragments ?? [],
-      config: config,
-      accessControlRenderer: mockTemplateRenderer.accessControlModifier(for: .member)
-    ).description
+    return subject.DocumentType().description
   }
 
   // MARK: Query string formatting tests
 
-  func test__generate__givenSingleLineFormat_generatesWithOperationDefinition() throws {
+  func test__generate__givenSingleLineFormat_generatesWithOperationDefinition() async throws {
     // given
-    definition.source =
+    document =
     """
     query NameQuery {
       name
     }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       operationDocumentFormat: .definition
     )
 
@@ -87,16 +96,16 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__generate__givenSingleLineFormat_withInLineQuotes_generatesWithOperationDefinition_withInLineQuotes() throws {
+  func test__generate__givenSingleLineFormat_withInLineQuotes_generatesWithOperationDefinition_withInLineQuotes() async throws {
     // given
-    definition.source =
+    document =
     """
     query NameQuery($filter: String = "MyName") {
       name
     }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       operationDocumentFormat: .definition
     )
 
@@ -114,20 +123,20 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__generate__givenIncludesFragment_formatSingleLine_generatesWithOperationDefinitionAndFragment() throws {
+  func test__generate__givenIncludesFragment_formatSingleLine_generatesWithOperationDefinitionAndFragment() async throws {
     // given
-    referencedFragments = [
-      .mock("NameFragment"),
-    ]
-
-    definition.source =
+    document =
     """
     query NameQuery {
       ...NameFragment
     }
+
+    fragment NameFragment on Query {
+      name
+    }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       operationDocumentFormat: .definition
     )
 
@@ -146,20 +155,20 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__generate__givenIncludesFragment_fragmentNameStartsWithLowercase_generatesWithOperationDefinitionAndFragment_withFirstUppercased() throws {
+  func test__generate__givenIncludesFragment_fragmentNameStartsWithLowercase_generatesWithOperationDefinitionAndFragment_withFirstUppercased() async throws {
     // given
-    referencedFragments = [
-      .mock("nameFragment"),
-    ]
-
-    definition.source =
+    document =
     """
     query NameQuery {
       ...nameFragment
     }
+
+    fragment nameFragment on Query {
+      name
+    }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       operationDocumentFormat: .definition
     )
 
@@ -178,17 +187,9 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__generate__givenIncludesManyFragments_formatSingleLine_generatesWithOperationDefinitionAndFragment() throws {
+  func test__generate__givenIncludesManyFragments_formatSingleLine_generatesWithOperationDefinitionAndFragment() async throws {
     // given
-    referencedFragments = [
-      .mock("Fragment1"),
-      .mock("Fragment2"),
-      .mock("Fragment3"),
-      .mock("Fragment4"),
-      .mock("FragmentWithLongName1234123412341234123412341234"),
-    ]
-
-    definition.source =
+    document =
     """
     query NameQuery {
       ...Fragment1
@@ -197,9 +198,29 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
       ...Fragment4
       ...FragmentWithLongName1234123412341234123412341234
     }
+
+    fragment Fragment1 on Query {
+      name
+    }
+
+    fragment Fragment2 on Query {
+      name
+    }
+
+    fragment Fragment3 on Query {
+      name
+    }
+
+    fragment Fragment4 on Query {
+      name
+    }
+
+    fragment FragmentWithLongName1234123412341234123412341234 on Query {
+      name
+    }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       operationDocumentFormat: .definition
     )
 
@@ -218,17 +239,18 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__generate__givenAPQ_automaticallyPersist_generatesWithOperationDefinitionAndIdentifier() throws {
+  func test__generate__givenAPQ_automaticallyPersist_generatesWithOperationDefinitionAndIdentifier() async throws {
     // given
-    operationIdentifier = "1ec89997a185c50bacc5f62ad41f27f3070f4a950d72e4a1510a4c64160812d5"
-    definition.source =
+    let operationIdentifier = "1ec89997a185c50bacc5f62ad41f27f3070f4a950d72e4a1510a4c64160812d5"
+    document =
     """
     query NameQuery {
       name
     }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
+      operationIdentifier: operationIdentifier,
       operationDocumentFormat: [.definition, .operationId]
     )
 
@@ -247,17 +269,18 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__generate__givenAPQ_persistedOperationsOnly_generatesWithIdentifierOnly() throws {
+  func test__generate__givenAPQ_persistedOperationsOnly_generatesWithIdentifierOnly() async throws {
     // given
-    operationIdentifier = "1ec89997a185c50bacc5f62ad41f27f3070f4a950d72e4a1510a4c64160812d5"
-    definition.source =
+    let operationIdentifier = "1ec89997a185c50bacc5f62ad41f27f3070f4a950d72e4a1510a4c64160812d5"
+    document =
     """
     query NameQuery {
       name
     }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
+      operationIdentifier: operationIdentifier,
       operationDocumentFormat: .operationId
     )
 
@@ -276,16 +299,16 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
 
   // MARK: Namespacing tests
 
-  func test__generate__givenCocoapodsCompatibleImportStatements_true_shouldUseCorrectNamespace() throws {
+  func test__generate__givenCocoapodsCompatibleImportStatements_true_shouldUseCorrectNamespace() async throws {
     // given
-    definition.source =
+    document =
     """
     query NameQuery {
       name
     }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       cocoapodsCompatibleImportStatements: true
     )
 
@@ -300,16 +323,16 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenCocoapodsCompatibleImportStatements_false_shouldUseCorrectNamespace() throws {
+  func test__generate__givenCocoapodsCompatibleImportStatements_false_shouldUseCorrectNamespace() async throws {
     // given
-    definition.source =
+    document =
     """
     query NameQuery {
       name
     }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       cocoapodsCompatibleImportStatements: false
     )
 
@@ -326,16 +349,16 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
 
   // MARK: Access Level Tests
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsInSchemaModule_shouldRenderWithPublicAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsInSchemaModule_shouldRenderWithPublicAccess() async throws {
     // given
-    definition.source =
+    document =
     """
     query NameQuery {
       name
     }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .inSchemaModule
     )
@@ -351,16 +374,16 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsEmbeddedInTargetWithPublicAccessModifier_andOperationsInSchemaModule_shouldRenderWithPublicAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsEmbeddedInTargetWithPublicAccessModifier_andOperationsInSchemaModule_shouldRenderWithPublicAccess() async throws {
     // given
-    definition.source =
+    document =
     """
     query NameQuery {
       name
     }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       moduleType: .embeddedInTarget(name: "TestTarget", accessModifier: .public),
       operations: .inSchemaModule
     )
@@ -376,16 +399,16 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsEmbeddedInTargetWithInternalAccessModifier_andOperationsInSchemaModule_shouldRenderWithInternalAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsEmbeddedInTargetWithInternalAccessModifier_andOperationsInSchemaModule_shouldRenderWithInternalAccess() async throws {
     // given
-    definition.source =
+    document =
     """
     query NameQuery {
       name
     }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       moduleType: .embeddedInTarget(name: "TestTarget", accessModifier: .internal),
       operations: .inSchemaModule
     )
@@ -401,16 +424,16 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithPublicAccessModifier_shouldRenderWithPublicAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithPublicAccessModifier_shouldRenderWithPublicAccess() async throws {
     // given
-    definition.source =
+    document =
     """
     query NameQuery {
       name
     }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .relative(subpath: nil, accessModifier: .public)
     )
@@ -426,16 +449,16 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithInternalAccessModifier_shouldRenderWithInternalAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithInternalAccessModifier_shouldRenderWithInternalAccess() async throws {
     // given
-    definition.source =
+    document =
     """
     query NameQuery {
       name
     }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .relative(subpath: nil, accessModifier: .internal)
     )
@@ -451,16 +474,16 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithPublicAccessModifier_shouldRenderWithPublicAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithPublicAccessModifier_shouldRenderWithPublicAccess() async throws {
     // given
-    definition.source =
+    document =
     """
     query NameQuery {
       name
     }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .absolute(path: "", accessModifier: .public)
     )
@@ -476,16 +499,16 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithInternalAccessModifier_shouldRenderWithInternalAccess() throws {
+  func test__accessLevel__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithInternalAccessModifier_shouldRenderWithInternalAccess() async throws {
     // given
-    definition.source =
+    document =
     """
     query NameQuery {
       name
     }
     """
 
-    buildConfig(
+    try await buildSubjectAndOperation(
       moduleType: .swiftPackageManager,
       operations: .absolute(path: "", accessModifier: .internal)
     )

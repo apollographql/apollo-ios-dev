@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a Git commit.
-  static let Commit = Object(
+  static let Commit = ApolloAPI.Object(
     typename: "Commit",
     implementedInterfaces: [
       Interfaces.GitObject.self,

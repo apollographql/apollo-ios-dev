@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A team of users in an organization.
-  static let Team = Object(
+  static let Team = ApolloAPI.Object(
     typename: "Team",
     implementedInterfaces: [
       Interfaces.MemberStatusable.self,

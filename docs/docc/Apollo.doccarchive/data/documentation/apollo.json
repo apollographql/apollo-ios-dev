@@ -96,6 +96,7 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache",
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestBodyCreator",
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestContext",
         "doc:\/\/Apollo\/documentation\/Apollo\/UploadingNetworkTransport"
       ],
       "title" : "Protocols"
@@ -138,7 +139,9 @@
     {
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLHTTPRequestError"
+        "doc:\/\/Apollo\/documentation\/Apollo\/Constants",
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLHTTPRequestError",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RootSelectionSetInitializeError"
       ],
       "title" : "Enumerations"
     },
@@ -692,6 +695,37 @@
   "title" : "Cancellable",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/cancellable"
+},
+"doc://Apollo/documentation/Apollo/Constants": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Constants"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Constants",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Constants"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "Constants",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/constants"
 },
 "doc://Apollo/documentation/Apollo/DefaultInterceptorProvider": {
   "abstract" : [
@@ -1786,6 +1820,40 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport"
 },
+"doc://Apollo/documentation/Apollo/RequestContext": {
+  "abstract" : [
+    {
+      "text" : "A marker protocol to set up an object to pass through the request chain.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "RequestContext"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestContext",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "RequestContext"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "RequestContext",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestcontext"
+},
 "doc://Apollo/documentation/Apollo/ResponseCodeInterceptor": {
   "abstract" : [
     {
@@ -1853,6 +1921,37 @@
   "title" : "ResponsePath",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/responsepath"
+},
+"doc://Apollo/documentation/Apollo/RootSelectionSetInitializeError": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "RootSelectionSetInitializeError"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RootSelectionSetInitializeError",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "RootSelectionSetInitializeError"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "RootSelectionSetInitializeError",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/rootselectionsetinitializeerror"
 },
 "doc://Apollo/documentation/Apollo/Swift": {
   "abstract" : [
