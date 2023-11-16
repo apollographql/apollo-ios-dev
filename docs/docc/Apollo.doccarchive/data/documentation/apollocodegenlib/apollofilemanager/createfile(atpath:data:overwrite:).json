@@ -35,7 +35,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloCodegenLib0A11FileManagerC06createD06atPath4data9overwriteySS_10Foundation4DataVSgSbtKF",
+    "externalID" : "s:16ApolloCodegenLib0A11FileManagerC06createD06atPath4data9overwriteySS_10Foundation4DataVSgSbtYaKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -103,6 +103,14 @@
       {
         "kind" : "text",
         "text" : ") "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
       },
       {
         "kind" : "keyword",
@@ -204,6 +212,14 @@
             {
               "kind" : "text",
               "text" : " = true) "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
             },
             {
               "kind" : "keyword",
@@ -451,6 +467,14 @@
     {
       "kind" : "text",
       "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

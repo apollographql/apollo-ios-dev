@@ -19,7 +19,7 @@ public class IRBuilder {
         schemaRootTypes: compilationResult.schemaRootTypes
       ),
       documentation: compilationResult.schemaDocumentation
-    )    
+    )
   }
 
   public func build(
@@ -44,7 +44,8 @@ public class IRBuilder {
     return Operation(
       definition: operationDefinition,
       rootField: result.rootField,
-      referencedFragments: result.referencedFragments
+      referencedFragments: result.referencedFragments,
+      containsDeferredFragment: result.containsDeferredFragment
     )
   }
 
@@ -105,10 +106,10 @@ public class IRBuilder {
         definition: fragmentDefinition,
         rootField: result.rootField,
         referencedFragments: result.referencedFragments,
+        containsDeferredFragment: result.containsDeferredFragment,
         entities: result.entities
       )
     }
   }
 
-  
 }

@@ -8,42 +8,36 @@ extension IRBuilder {
 
   public static func mock(
     schema: String,
-    document: String,
-    enableCCN: Bool = false
+    document: String
   ) async throws -> IRBuilder {
     let frontend = try await GraphQLJSFrontend()
     let compilationResult = try await frontend.compile(
       schema: schema,
-      document: document,
-      enableCCN: enableCCN
+      document: document
     )
     return .mock(compilationResult: compilationResult)
   }
 
   public static func mock(
     schema: String,
-    documents: [String],
-    enableCCN: Bool = false
+    documents: [String]
   ) async throws -> IRBuilder {
     let frontend = try await GraphQLJSFrontend()
     let compilationResult = try await frontend.compile(
       schema: schema,
-      documents: documents,
-      enableCCN: enableCCN
+      documents: documents
     )
     return .mock(compilationResult: compilationResult)
   }
 
   public static func mock(
     schemaJSON: String,
-    document: String,
-    enableCCN: Bool = false
+    document: String
   ) async throws -> IRBuilder {
     let frontend = try await GraphQLJSFrontend()
     let compilationResult = try await frontend.compile(
       schemaJSON: schemaJSON,
-      document: document,
-      enableCCN: enableCCN
+      document: document
     )
     return .mock(compilationResult: compilationResult)
   }
@@ -85,6 +79,7 @@ extension IR.NamedFragment {
       definition: definition,
       rootField: rootEntityField,
       referencedFragments: [],
+      containsDeferredFragment: false,
       entities: [rootEntity.location: rootEntity]
     )
   }
@@ -94,7 +89,8 @@ extension IR.Operation {
 
   public static func mock(
     definition: CompilationResult.OperationDefinition? = nil,
-    referencedFragments: OrderedSet<IR.NamedFragment> = []
+    referencedFragments: OrderedSet<IR.NamedFragment> = [],
+    containsDeferredFragment: Bool = false
   ) -> IR.Operation {
     let definition = definition ?? .mock()
     return IR.Operation.init(
@@ -113,7 +109,8 @@ extension IR.Operation {
             givenAllTypesInSchema: .init([], schemaRootTypes: .mock()))
           ])
       ),
-      referencedFragments: referencedFragments
+      referencedFragments: referencedFragments,
+      containsDeferredFragment: containsDeferredFragment
     )
   }
 

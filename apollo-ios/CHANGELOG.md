@@ -1,5 +1,28 @@
 # Change Log
 
+## v1.7.1
+
+### Fixed
+
+- **Fixed inconsistent ordering of fragments in generated operation definitions  ([#130](https://github.com/apollographql/apollo-ios-dev/pull/130)):** In order to make the ordering of fragments consistent, they are now alphabetized. This is a change to the data that gets sent over the wire when making a network request for an operation with fragments. **[Persisted Queries](https://www.apollographql.com/docs/ios/fetching/persisted-queries) users should re-register their queries when upgrading to this version.** _Thank you to [@scottasoutherland](https://github.com/scottasoutherland) for reporting the issue._
+
+### Improvement
+
+- **Add initializer for `SelectionSet` that takes a `[String: Any]` JSON object ([#102](https://github.com/apollographql/apollo-ios-dev/pull/102)):** _Thank you to [@Cookiezby](https://github.com/Cookiezby) for the contribution._
+ 
+
+## v1.7.0
+
+**`ApolloCodegenLib` Now Uses Swift Concurrency**
+To improve the performance of the code generation, the `ApolloCodegenLib` now uses `async/await`. Code generation is now parallelized and should complete much faster for users with a large number of GraphQL files.
+This means that the entry point function, `ApolloCodegen.build(with configuration:)` is now an `async` function. For users using the `ApolloCodegenLib` directly, you will need to make your call sites into this function use `async/await`. In most cases, this requires minimal code changes. Please see the [1.7.0 migration guide](https://www.apollographql.com/docs/ios/migrations/1.7) for information on how to upgrade.
+
+See PR [#57](https://github.com/apollographql/apollo-ios-dev/pull/57).
+
+### Fixed
+
+- **Fixed a bug with ApolloAPI.Object clashing with custom objects name Object ([#94](https://github.com/apollographql/apollo-ios-dev/pull/94)):** _Thank you to [215eight](https://github.com/215eight) for reporting the issue._
+
 ## v1.6.1
 
 ### Fixed

@@ -525,7 +525,7 @@ class FileManagerExtensionTests: XCTestCase {
     // given
     let filePath = URL(fileURLWithPath: self.uniquePath).path
     let directoryPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
-    let mocked = MockApolloFileManager(strict: true)
+    let mocked = MockApolloFileManager(strict: true, requireAllClosuresCalled: false)
 
     mocked.mock(closure: .fileExists({ path, isDirectory in
       switch path {

@@ -24,20 +24,33 @@ public class MockApolloFileManager: ApolloFileManager {
     }
   }
 
-  /// If `true` then all called closures must be mocked otherwise the call will fail. When `false` any called closure
-  /// that is not mocked will fall through to `super`. As a byproduct of `false`, all mocked closures must be called otherwise
-  /// the test will fail.
+  /// If `true` then any function on the file manager called that is not mocked will
+  ///  result in a test failure. If `false`, any called closure that is not mocked will fall
+  ///  through to `super`. Defaults to `true`.
   var strict: Bool { _base.strict }
+
+  /// If `true` all mocked closures must be called otherwise the test
+  ///  will fail. Defaults to `true`.
+  var requireAllClosuresCalled: Bool { _base.requireAllClosuresCalled }
+
   var _base: MockFileManager { unsafeDowncast(base, to: MockFileManager.self) }
 
   /// Designated initializer.
   ///
   /// - Parameters:
-  ///  - strict: If `true` then all called closures must be mocked otherwise the call will fail.
-  ///  When `false` any called closure that is not mocked will fall through to `super`. As a
-  ///  byproduct of `false`, all mocked closures must be called otherwise the test will fail.
-  public init(strict: Bool = true) {
-    super.init(base: MockFileManager(strict: strict))
+  ///  - strict: If `true` then any function on the file manager called that is not mocked will
+  ///  result in a test failure. If `false`, any called closure that is not mocked will fall
+  ///  through to `super`. Defaults to `true`.
+  ///  - requireAllClosuresCalled: If `true` all mocked closures must be called otherwise the test
+  ///  will fail. Defaults to `true`.
+  public init(
+    strict: Bool = true,
+    requireAllClosuresCalled: Bool = true
+  ) {
+    super.init(base: MockFileManager(
+      strict: strict,
+      requireAllClosuresCalled: requireAllClosuresCalled
+    ))
   }
 
   /// Provide a mock closure for the `FileManager` function.
@@ -58,21 +71,26 @@ public class MockApolloFileManager: ApolloFileManager {
 
   class MockFileManager: FileManager {
 
+    private let lock = NSLock()
+
     fileprivate var closures: [String: Closure] = [:]
     fileprivate var closuresToBeCalled: Set<String> = []
 
-    /// If `true` then all called closures must be mocked otherwise the call will fail. When `false` any called closure
-    /// that is not mocked will fall through to `super`. As a byproduct of `false`, all mocked closures must be called otherwise
-    /// the test will fail.
     let strict: Bool
 
-    fileprivate init(strict: Bool = true) {
+    let requireAllClosuresCalled: Bool
+
+    fileprivate init(
+      strict: Bool = true,
+      requireAllClosuresCalled: Bool = true
+    ) {
       self.strict = strict
+      self.requireAllClosuresCalled = requireAllClosuresCalled
     }
 
     deinit {
-      if strict == false && allClosuresCalled == false {
-        XCTFail("Non-strict mode requires that all mocked closures are called! Check \(closuresToBeCalled) in your MockFileManager instance.")
+      if requireAllClosuresCalled && !allClosuresCalled {
+        XCTFail("`requireAllClosuresCalled` is `true`, but not all mocked closures are called! Check \(closuresToBeCalled) in your MockFileManager instance.")
       }
     }
 
@@ -80,17 +98,23 @@ public class MockApolloFileManager: ApolloFileManager {
     ///
     /// - Parameter closure: The mocked function closure.
     fileprivate func mock(closure: Closure) {
-      closures[closure.description] = closure
-      closuresToBeCalled.insert(closure.description)
+      lock.withLock {
+        closures[closure.description] = closure
+        closuresToBeCalled.insert(closure.description)
+      }
     }
 
     fileprivate func didCall(closure: Closure) {
-      closuresToBeCalled.remove(closure.description)
+      lock.withLock {
+        _ = closuresToBeCalled.remove(closure.description)
+      }
     }
 
     /// Check whether all mocked closures were called during the lifetime of an instance.
     fileprivate var allClosuresCalled: Bool {
-      return closuresToBeCalled.isEmpty
+      return lock.withLock {
+        return closuresToBeCalled.isEmpty
+      }
     }
 
     // MARK: FileManager overrides

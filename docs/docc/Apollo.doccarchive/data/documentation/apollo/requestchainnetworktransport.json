@@ -479,7 +479,7 @@
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/constructRequest(for:cachePolicy:contextIdentifier:context:)": {
   "abstract" : [
     {
-      "text" : "Constructs a default (ie, non-multipart) GraphQL request.",
+      "text" : "Constructs a GraphQL request for the given operation.",
       "type" : "text"
     }
   ],
