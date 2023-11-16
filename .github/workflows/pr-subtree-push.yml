@@ -65,4 +65,5 @@ jobs:
       if: always()
       shell: bash
       run: |
+        git fetch
         git push

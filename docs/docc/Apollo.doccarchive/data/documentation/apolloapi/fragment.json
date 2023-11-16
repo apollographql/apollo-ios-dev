@@ -86,10 +86,10 @@
               "text" : " : "
             },
             {
-              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet",
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferrable",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP",
-              "text" : "SelectionSet"
+              "preciseIdentifier" : "s:9ApolloAPI10DeferrableP",
+              "text" : "Deferrable"
             }
           ]
         }
@@ -159,6 +159,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferrable",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet",
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/SH"
@@ -259,6 +260,37 @@
   "title" : "ApolloAPI",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/Deferrable": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Deferrable"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferrable",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Deferrable"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "Deferrable",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/deferrable"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Fragment": {
   "abstract" : [
