@@ -121,6 +121,10 @@ class RootFieldBuilder {
       from: rootSelectionSet
     )
 
+    referencedFragments.sort(by: {
+      $0.name < $1.name
+    })
+    
     return Result(
       rootField: EntityField(rootField, selectionSet: rootIrSelectionSet),
       referencedFragments: referencedFragments,

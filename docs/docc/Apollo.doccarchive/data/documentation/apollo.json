@@ -140,7 +140,8 @@
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
         "doc:\/\/Apollo\/documentation\/Apollo\/Constants",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLHTTPRequestError"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLHTTPRequestError",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RootSelectionSetInitializeError"
       ],
       "title" : "Enumerations"
     },
@@ -1920,6 +1921,37 @@
   "title" : "ResponsePath",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/responsepath"
+},
+"doc://Apollo/documentation/Apollo/RootSelectionSetInitializeError": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "RootSelectionSetInitializeError"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RootSelectionSetInitializeError",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "RootSelectionSetInitializeError"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "RootSelectionSetInitializeError",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/rootselectionsetinitializeerror"
 },
 "doc://Apollo/documentation/Apollo/Swift": {
   "abstract" : [

@@ -53,6 +53,22 @@ extension String {
     return propertyName.escapeIf(in: SwiftKeywords.FieldAccessorNamesToEscape)
   }
   
+  func renderAsInputObjectName(
+    config: ApolloCodegenConfiguration
+  ) -> String {
+    var propertyName = self
+
+    switch config.options.conversionStrategies.inputObjects {
+    case .none:
+      break
+    case .camelCase:
+      propertyName = propertyName.convertToCamelCase()
+      break
+    }
+    
+    return propertyName.escapeIf(in: SwiftKeywords.FieldAccessorNamesToEscape)
+  }
+  
   /// Convert to `camelCase` from a number of different `snake_case` variants.
   ///
   /// All inner `_` characters will be removed, each 'word' will be capitalized, returning a final
