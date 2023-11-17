@@ -61,13 +61,13 @@ public struct TemplateString: ExpressibleByStringInterpolation, CustomStringConv
       appendInterpolation(string.description)
     }
 
-    public mutating func appendInterpolation(_ template: TemplateString) {
-      if template.isEmpty {
+    public mutating func appendInterpolation(_ template: TemplateString?) {
+      guard let template, !template.isEmpty else {
         removeLineIfEmpty()
-
-      } else {
-        appendInterpolation(template.description)
+        return
       }
+      
+      appendInterpolation(template.description)
     }
 
     public mutating func appendInterpolation(section: TemplateString) {
