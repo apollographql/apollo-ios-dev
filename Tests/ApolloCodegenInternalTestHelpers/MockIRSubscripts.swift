@@ -2,26 +2,78 @@
 @testable import IR
 import GraphQLCompiler
 
-public protocol ScopeConditionalSubscriptAccessing {
+// MARK: - IR Test Wrapper
+@dynamicMemberLookup
+public class IRTestWrapper<T: ScopedChildSelectionSetAccessible> {
+  public let irObject: T
+  public let entityStorage: RootFieldEntityStorage
 
-  subscript(conditions: IR.ScopeCondition) -> IR.SelectionSet? { get }
+  init?(
+    irObject: T?,
+    entityStorage: RootFieldEntityStorage
+  ) {
+    guard let irObject else { return nil }
+    self.irObject = irObject
+    self.entityStorage = entityStorage
+  }
+
+  public subscript<V>(dynamicMember keyPath: KeyPath<T, V>) -> V {
+    irObject[keyPath: keyPath]
+  }
+
+  fileprivate func childSelectionSet(
+    with conditions: IR.ScopeCondition
+  ) -> SelectionSetTestWrapper? {
+    irObject.childSelectionSet(with: conditions, entityStorage: entityStorage)
+  }
 
 }
 
-extension ScopeConditionalSubscriptAccessing {
+@dynamicMemberLookup
+public class SelectionSetTestWrapper: IRTestWrapper<IR.SelectionSet> {
+  public let selections: ComputedSelectionSet
 
-  public subscript(as typeCase: String) -> IR.SelectionSet? {
+  override init?(
+    irObject selectionSet: SelectionSet?,
+    entityStorage: RootFieldEntityStorage
+  ) {
+    guard let selectionSet else { return nil }
+    let mergedBuilder = MergedSelections.Builder(
+      directSelections: selectionSet.selections?.readOnlyView,
+      typeInfo: selectionSet.typeInfo,
+      entityStorage: entityStorage
+    )
+    self.selections = ComputedSelectionSet(
+      direct: selectionSet.selections,
+      merged: mergedBuilder.build(),
+      typeInfo: selectionSet.typeInfo
+    )
+
+    super.init(irObject: selectionSet, entityStorage: entityStorage)
+  }
+
+  override func childSelectionSet(
+    with conditions: ScopeCondition
+  ) -> SelectionSetTestWrapper? {
+    self.selections.childSelectionSet(with: conditions, entityStorage: entityStorage)
+  }
+}
+
+// MARK: -
+extension IRTestWrapper {
+
+  public subscript(as typeCase: String) -> SelectionSetTestWrapper? {
     guard let scope = self.scopeCondition(type: typeCase, conditions: nil) else {
       return nil
     }
 
-    return self[scope]
+    return childSelectionSet(with: scope)
   }
 
   public subscript(
     as typeCase: String? = nil,
     if condition: IR.InclusionCondition? = nil
-  ) -> IR.SelectionSet? {
+  ) -> SelectionSetTestWrapper? {
     let conditions: IR.InclusionConditions.Result?
     if let condition = condition {
       conditions = .conditional(.init(condition))
@@ -32,24 +84,24 @@ extension ScopeConditionalSubscriptAccessing {
     guard let scope = self.scopeCondition(type: typeCase, conditions: conditions) else {
       return nil
     }
-    return self[scope]
+    return childSelectionSet(with: scope)
   }
 
   public subscript(
     as typeCase: String? = nil,
     if conditions: IR.InclusionConditions.Result? = nil
-  ) -> IR.SelectionSet? {
+  ) -> SelectionSetTestWrapper? {
     guard let scope = self.scopeCondition(type: typeCase, conditions: conditions) else {
       return nil
     }
 
-    return self[scope]
+    return childSelectionSet(with: scope)
   }
 
   public subscript(
     as typeCase: String? = nil,
     deferred deferCondition: CompilationResult.DeferCondition? = nil
-  ) -> IR.SelectionSet? {
+  ) -> SelectionSetTestWrapper? {
     guard let scope = self.scopeCondition(
       type: typeCase,
       conditions: nil,
@@ -58,7 +110,7 @@ extension ScopeConditionalSubscriptAccessing {
       return nil
     }
 
-    return self[scope]
+    return childSelectionSet(with: scope)
   }
 
   private func scopeCondition(
@@ -88,135 +140,116 @@ extension ScopeConditionalSubscriptAccessing {
 
     return IR.ScopeCondition(type: type, conditions: conditions, deferCondition: deferCondition)
   }
-
 }
 
-extension IR.DirectSelections: ScopeConditionalSubscriptAccessing {
-  public subscript(field field: String) -> IR.Field? {
-    fields[field]
+// MARK: - Test Wrapper Subscripts
+
+//extension IRTestWrapper<IR.DirectSelections>{
+//  public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
+//    IRTestWrapper<IR.Field>(
+//      irObject: irObject.fields[field],
+//      entityStorage: entityStorage
+//    )
+//  }
+//
+//  public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
+//    IRTestWrapper<IR.NamedFragmentSpread>(
+//      irObject: irObject.namedFragments[fragment],
+//      entityStorage: entityStorage
+//    )
+//  }
+//}
+//
+//extension IRTestWrapper<IR.MergedSelections> {
+//  public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
+//    IRTestWrapper<IR.Field>(
+//      irObject: irObject.fields[field],
+//      entityStorage: entityStorage
+//    )
+//  }
+//
+//  public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
+//    IRTestWrapper<IR.NamedFragmentSpread>(
+//      irObject: irObject.namedFragments[fragment],
+//      entityStorage: entityStorage
+//    )
+//  }
+//}
+
+extension IRTestWrapper<IR.Field> {
+  public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
+    self.selectionSet?[field: field]
   }
 
-  public subscript(conditions: IR.ScopeCondition) -> IR.SelectionSet? {
-    inlineFragments[conditions]?.selectionSet
+  public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
+    self.selectionSet?[fragment: fragment]
   }
 
-  public subscript(fragment fragment: String) -> IR.NamedFragmentSpread? {
-    namedFragments[fragment]
-  }
-}
-
-extension IR.MergedSelections: ScopeConditionalSubscriptAccessing {
-  public subscript(field field: String) -> IR.Field? {
-    fields[field]
-  }
-
-  public subscript(conditions: IR.ScopeCondition) -> IR.SelectionSet? {
-    inlineFragments[conditions]?.selectionSet
-  }
-
-  public subscript(fragment fragment: String) -> IR.NamedFragmentSpread? {
-    namedFragments[fragment]
-  }
-}
-
-extension IR.EntityTreeScopeSelections {
-  public subscript(field field: String) -> IR.Field? {
-    fields[field]
-  }
-
-  public subscript(fragment fragment: String) -> IR.NamedFragmentSpread? {
-    namedFragments[fragment]
-  }
-}
-
-
-extension IR.Field: ScopeConditionalSubscriptAccessing {
-  public subscript(field field: String) -> IR.Field? {
-    return selectionSet?[field: field]
-  }
-
-  public subscript(conditions: IR.ScopeCondition) -> IR.SelectionSet? {
-    return selectionSet?[conditions]
-  }
-
-  public subscript(fragment fragment: String) -> IR.NamedFragmentSpread? {
-    return selectionSet?[fragment: fragment]
-  }
-
-  public var selectionSet: IR.SelectionSet? {
-    guard let entityField = self as? IR.EntityField else { return nil }
-    return entityField.selectionSet as IR.SelectionSet
-  }
-}
-
-extension IR.SelectionSet: ScopeConditionalSubscriptAccessing {
-  public subscript(field field: String) -> IR.Field? {
-    selections[field: field]
-  }
-
-  public subscript(conditions: IR.ScopeCondition) -> IR.SelectionSet? {
-    selections[conditions]
-  }
-
-  public subscript(fragment fragment: String) -> IR.NamedFragmentSpread? {
-    selections[fragment: fragment]
-  }
-
-  public subscript(
-    deferredAs label: String,
-    withVariable variable: String? = nil
-  ) -> IR.SelectionSet? {
-    let scope = ScopeCondition(
-      type: self.parentType,
-      conditions: self.inclusionConditions,
-      deferCondition: CompilationResult.DeferCondition(label: label, variable: variable)
+  fileprivate var selectionSet: SelectionSetTestWrapper? {
+    guard let entityField = self.irObject as? IR.EntityField else { return nil }
+    #warning("TODO: this re-creates every time. Bad perf")
+    return SelectionSetTestWrapper(
+      irObject: entityField.selectionSet,
+      entityStorage: entityStorage
     )
-    return selections[scope]
   }
 }
 
-extension IR.SelectionSet.Selections: ScopeConditionalSubscriptAccessing {
-  public subscript(field field: String) -> IR.Field? {
-    direct?.fields[field] ?? merged.fields[field]
+extension IRTestWrapper<IR.NamedFragmentSpread> {
+  public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
+    rootField?[field: field]    
   }
 
-  public subscript(conditions: IR.ScopeCondition) -> IR.SelectionSet? {
-    return direct?.inlineFragments[conditions]?.selectionSet ??
-    merged.inlineFragments[conditions]?.selectionSet
+  public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
+    rootField?[fragment: fragment]
   }
 
-  public subscript(fragment fragment: String) -> IR.NamedFragmentSpread? {
-    direct?.namedFragments[fragment] ?? merged.namedFragments[fragment]
+  fileprivate var rootField: IRTestWrapper<IR.Field>? {
+    return IRTestWrapper<IR.Field>(
+      irObject: irObject.fragment.rootField,
+      entityStorage: entityStorage
+    )
   }
 }
 
-extension IR.Operation: ScopeConditionalSubscriptAccessing {
-  public subscript(field field: String) -> IR.Field? {
-    return rootField.underlyingField.name == field ? rootField : nil
+extension IRTestWrapper<IR.Operation> {
+  public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
+    guard irObject.rootField.underlyingField.name == field else { return nil }
+
+    return rootField
   }
 
-  public subscript(conditions: IR.ScopeCondition) -> IR.SelectionSet? {
-    rootField[conditions]
+  public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
+    rootField?[fragment: fragment]
   }
 
-  public subscript(fragment fragment: String) -> IR.NamedFragmentSpread? {
-    rootField[fragment: fragment]
+  fileprivate var rootField: IRTestWrapper<IR.Field>? {
+    return IRTestWrapper<IR.Field>(
+      irObject: irObject.rootField,
+      entityStorage: entityStorage
+    )
   }
 }
 
-extension IR.NamedFragment: ScopeConditionalSubscriptAccessing {
-  public subscript(field field: String) -> IR.Field? {
-    return rootField.selectionSet[field: field]
+extension SelectionSetTestWrapper {
+  public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
+    IRTestWrapper<IR.Field>(
+      irObject: 
+        selections.direct?.fields[field] ?? selections.merged.fields[field],
+      entityStorage: entityStorage
+    )
   }
 
-  public subscript(conditions: IR.ScopeCondition) -> IR.SelectionSet? {
-    return rootField.selectionSet[conditions]
-  }
-
-  public subscript(fragment fragment: String) -> IR.NamedFragmentSpread? {
-    rootField.selectionSet[fragment: fragment]
+  public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
+    IRTestWrapper<IR.NamedFragmentSpread>(
+      irObject: 
+        selections.direct?.namedFragments[fragment] ?? selections.merged.namedFragments[fragment],
+      entityStorage: entityStorage
+    )
   }
 }
+
+// MARK: - Other Subscript Accessors
 
 extension IR.Schema {
   public subscript(object name: String) -> GraphQLObjectType? {
@@ -256,5 +289,15 @@ extension CompilationResult {
 
   public subscript(fragment name: String) -> CompilationResult.FragmentDefinition? {
     return fragments.first { $0.name == name }
+  }
+}
+
+extension IR.EntityTreeScopeSelections {
+  public subscript(field field: String) -> IR.Field? {
+    fields[field]
+  }
+
+  public subscript(fragment fragment: String) -> IR.NamedFragmentSpread? {
+    namedFragments[fragment]
   }
 }

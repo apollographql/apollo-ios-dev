@@ -63,17 +63,24 @@ extension IR.NamedFragment {
       location: .init(source: .namedFragment(definition), fieldPath: nil),
       rootTypePath: LinkedList(type)
     )
+    let typeInfo = SelectionSet.TypeInfo(
+      entity: rootEntity,
+      scopePath: [
+        .descriptor(
+          forType: type,
+          inclusionConditions: nil,
+          givenAllTypesInSchema: .init([type], schemaRootTypes: .mock())
+        )
+      ]
+    )
     let rootEntityField = IR.EntityField.init(
       rootField,
       inclusionConditions: nil,
       selectionSet: .init(
-        entity: rootEntity,
-        scopePath: LinkedList(
-          .descriptor(
-            forType: type,
-            inclusionConditions: nil,
-            givenAllTypesInSchema: .init([type], schemaRootTypes: .mock())
-          ))))
+        typeInfo: typeInfo,
+        selections: DirectSelections()
+      )
+    )
 
     return IR.NamedFragment(
       definition: definition,
@@ -93,21 +100,26 @@ extension IR.Operation {
     containsDeferredFragment: Bool = false
   ) -> IR.Operation {
     let definition = definition ?? .mock()
+    let typeInfo = SelectionSet.TypeInfo(
+      entity: .init(
+        location: .init(source: .operation(definition), fieldPath: nil),
+        rootTypePath: [.mock()]
+      ),
+      scopePath: [.descriptor(
+        forType: .mock(),
+        inclusionConditions: nil,
+        givenAllTypesInSchema: .init([], schemaRootTypes: .mock()))
+      ]
+    )
     return IR.Operation.init(
       definition: definition,
       rootField: .init(
         .mock(),
         inclusionConditions: nil,
         selectionSet: .init(
-          entity: .init(
-            location: .init(source: .operation(definition), fieldPath: nil),
-            rootTypePath: [.mock()]
-          ),
-          scopePath: [.descriptor(
-            forType: .mock(),
-            inclusionConditions: nil,
-            givenAllTypesInSchema: .init([], schemaRootTypes: .mock()))
-          ])
+          typeInfo: typeInfo,
+          selections: DirectSelections()
+        )
       ),
       referencedFragments: referencedFragments,
       containsDeferredFragment: containsDeferredFragment

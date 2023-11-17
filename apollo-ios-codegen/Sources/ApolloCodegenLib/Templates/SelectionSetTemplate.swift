@@ -692,7 +692,7 @@ fileprivate class SelectionSetNameCache {
 /// selections, they use a large amount of memory. Storing them on the `IR.SelectionSet` would
 /// retained them outside of the scope they are needed. Instead, we use this class to compute them
 /// for the scope they are needed in, then release them when we are done with them.
-fileprivate struct ComputedSelectionSet {
+struct ComputedSelectionSet {
 
   let direct: IR.DirectSelections?
   let merged: IR.MergedSelections
