@@ -3,6 +3,7 @@ import Nimble
 import TemplateString
 import IR
 @testable import ApolloCodegenLib
+import ApolloCodegenInternalTestHelpers
 
 final class TemplateString_DeprecationMessage_Tests: XCTestCase {
 
@@ -267,10 +268,10 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       }
       """
 
-    let ir = try await IRBuilder.mock(schema: schemaSDL, document: document)
+    let ir = try await IRBuilderTestWrapper(IRBuilder.mock(schema: schemaSDL, document: document))
     let operation = await ir.build(operation: try XCTUnwrap(ir.compilationResult[operation: "GetAnimal"]))
     let subject = SelectionSetTemplate(
-      definition: .operation(operation),
+      definition: operation.irObject,
       generateInitializers: true,
       config: config,
       renderAccessControl: { "does not matter" }()
@@ -282,10 +283,10 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
 
     // then
     let animal = try XCTUnwrap(
-      operation[field: "query"]?[field: "animal"] as? IR.EntityField
+      operation[field: "query"]?[field: "animal"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: animal)
+    let actual = subject.render(field: animal.selectionSet.computed)
 
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
@@ -396,10 +397,10 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       }
       """
 
-    let ir = try await IRBuilder.mock(schema: schemaSDL, document: document)
+    let ir = try await IRBuilderTestWrapper(IRBuilder.mock(schema: schemaSDL, document: document))
     let operation = await ir.build(operation: try XCTUnwrap(ir.compilationResult[operation: "GetAnimal"]))
     let subject = SelectionSetTemplate(
-      definition: .operation(operation),
+      definition: operation.irObject,
       generateInitializers: true,
       config: config,
       renderAccessControl: { "does not matter" }()
@@ -411,9 +412,9 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
 
     // then
     let animal = try XCTUnwrap(
-      operation[field: "query"]?[field: "animal"] as? IR.EntityField
+      operation[field: "query"]?[field: "animal"] as? IRTestWrapper<IR.EntityField>
     )
-    let actual = subject.render(field: animal)
+    let actual = subject.render(field: animal.selectionSet.computed)
 
     expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }

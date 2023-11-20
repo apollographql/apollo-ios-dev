@@ -8,8 +8,8 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IRBuilder!
-  var operation: IR.Operation!
+  var ir: IRBuilderTestWrapper!
+  var operation: IRTestWrapper<IR.Operation>!
   var subject: SelectionSetTemplate!
 
   override func setUp() {
@@ -33,7 +33,7 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackageManager,
     operations: ApolloCodegenConfiguration.OperationsFileOutput = .inSchemaModule
   ) async throws {
-    ir = try await .mock(schema: schemaSDL, document: document)
+    ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
     operation = await ir.build(operation: operationDefinition)
     let config = ApolloCodegen.ConfigurationContext(
@@ -48,7 +48,7 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
       config: config
     )
     subject = SelectionSetTemplate(
-      definition: .operation(self.operation),
+      definition: self.operation.irObject,
       generateInitializers: false,
       config: config,
       renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
@@ -90,10 +90,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.render(field: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 2, ignoringExtraLines: true))
@@ -132,10 +132,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.render(field: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
@@ -171,10 +171,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.render(field: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 3, ignoringExtraLines: true))
@@ -214,10 +214,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.render(field: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
@@ -253,10 +253,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.render(field: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -298,10 +298,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.render(field: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -343,10 +343,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.render(field: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 21, ignoringExtraLines: true))
@@ -388,10 +388,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.render(field: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 21, ignoringExtraLines: true))
@@ -428,10 +428,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(schemaNamespace: "myschema")
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.render(field: allAnimals.selectionSet.computed)
 
     // then
     let expected = """
@@ -470,10 +470,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(schemaNamespace: "MYSCHEMA")
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.render(field: allAnimals.selectionSet.computed)
 
     // then
     let expected = """
@@ -512,10 +512,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(schemaNamespace: "MySchema")
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.render(field: allAnimals.selectionSet.computed)
 
     // then
     let expected = """
