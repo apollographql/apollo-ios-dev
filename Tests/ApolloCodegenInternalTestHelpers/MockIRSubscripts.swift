@@ -2,19 +2,27 @@
 @testable import IR
 import GraphQLCompiler
 
+#warning("TODO: clean up and rename file, remove commented out code, document")
 // MARK: - IR Test Wrapper
 @dynamicMemberLookup
 public class IRTestWrapper<T: ScopedChildSelectionSetAccessible> {
   public let irObject: T
   public let entityStorage: DefinitionEntityStorage
 
-  init?(
+  init(
+    irObject: T,
+    entityStorage: DefinitionEntityStorage
+  ) {
+    self.irObject = irObject
+    self.entityStorage = entityStorage
+  }
+
+  convenience init?(
     irObject: T?,
     entityStorage: DefinitionEntityStorage
   ) {
     guard let irObject else { return nil }
-    self.irObject = irObject
-    self.entityStorage = entityStorage
+    self.init(irObject: irObject, entityStorage: entityStorage)
   }
 
   public subscript<V>(dynamicMember keyPath: KeyPath<T, V>) -> V {
@@ -30,24 +38,18 @@ public class IRTestWrapper<T: ScopedChildSelectionSetAccessible> {
 }
 
 @dynamicMemberLookup
-public class SelectionSetTestWrapper: IRTestWrapper<IR.SelectionSet> {
-  public let selections: ComputedSelectionSet
+public class SelectionSetTestWrapper: IRTestWrapper<IR.SelectionSet> {  
+  public let computed: ComputedSelectionSet
 
-  override init?(
-    irObject selectionSet: SelectionSet?,
+  override init(
+    irObject selectionSet: SelectionSet,
     entityStorage: DefinitionEntityStorage
   ) {
-    guard let selectionSet else { return nil }
-    let mergedBuilder = MergedSelections.Builder(
+    self.computed = ComputedSelectionSet.Builder(
       directSelections: selectionSet.selections?.readOnlyView,
       typeInfo: selectionSet.typeInfo,
       entityStorage: entityStorage
-    )
-    self.selections = ComputedSelectionSet(
-      direct: selectionSet.selections,
-      merged: mergedBuilder.build(),
-      typeInfo: selectionSet.typeInfo
-    )
+    ).build()
 
     super.init(irObject: selectionSet, entityStorage: entityStorage)
   }
@@ -55,7 +57,7 @@ public class SelectionSetTestWrapper: IRTestWrapper<IR.SelectionSet> {
   override func childSelectionSet(
     with conditions: ScopeCondition
   ) -> SelectionSetTestWrapper? {
-    self.selections.childSelectionSet(with: conditions, entityStorage: entityStorage)
+    self.computed.childSelectionSet(with: conditions, entityStorage: entityStorage)
   }
 }
 
@@ -185,7 +187,7 @@ extension IRTestWrapper<IR.Field> {
     self.selectionSet?[fragment: fragment]
   }
 
-  fileprivate var selectionSet: SelectionSetTestWrapper? {
+  public var selectionSet: SelectionSetTestWrapper? {
     guard let entityField = self.irObject as? IR.EntityField else { return nil }
     #warning("TODO: this re-creates every time. Bad perf")
     return SelectionSetTestWrapper(
@@ -195,17 +197,35 @@ extension IRTestWrapper<IR.Field> {
   }
 }
 
-extension IRTestWrapper<IR.NamedFragmentSpread> {
+extension IRTestWrapper<IR.EntityField> {
   public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
-    rootField?[field: field]    
+    self.selectionSet[field: field]
   }
 
   public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
-    rootField?[fragment: fragment]
+    self.selectionSet[fragment: fragment]
   }
 
-  fileprivate var rootField: IRTestWrapper<IR.Field>? {
-    return IRTestWrapper<IR.Field>(
+  public var selectionSet: SelectionSetTestWrapper {
+    #warning("TODO: this re-creates every time. Bad perf")
+    return SelectionSetTestWrapper(
+      irObject: irObject.selectionSet,
+      entityStorage: entityStorage
+    )
+  }
+}
+
+extension IRTestWrapper<IR.NamedFragmentSpread> {
+  public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
+    rootField[field: field]
+  }
+
+  public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
+    rootField[fragment: fragment]
+  }
+
+  public var rootField: IRTestWrapper<IR.EntityField> {
+    return IRTestWrapper<IR.EntityField>(
       irObject: irObject.fragment.rootField,
       entityStorage: entityStorage
     )
@@ -213,18 +233,37 @@ extension IRTestWrapper<IR.NamedFragmentSpread> {
 }
 
 extension IRTestWrapper<IR.Operation> {
-  public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
+  public subscript(field field: String) -> IRTestWrapper<IR.EntityField>? {
     guard irObject.rootField.underlyingField.name == field else { return nil }
 
     return rootField
   }
 
   public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
-    rootField?[fragment: fragment]
+    rootField[fragment: fragment]
   }
 
-  fileprivate var rootField: IRTestWrapper<IR.Field>? {
-    return IRTestWrapper<IR.Field>(
+  public var rootField: IRTestWrapper<IR.EntityField> {
+    return IRTestWrapper<IR.EntityField>(
+      irObject: irObject.rootField,
+      entityStorage: entityStorage
+    )
+  }
+}
+
+extension IRTestWrapper<IR.NamedFragment> {
+  public subscript(field field: String) -> IRTestWrapper<IR.EntityField>? {
+    guard irObject.rootField.underlyingField.name == field else { return nil }
+
+    return rootField
+  }
+
+  public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
+    rootField[fragment: fragment]
+  }
+
+  public var rootField: IRTestWrapper<IR.EntityField> {
+    return IRTestWrapper<IR.EntityField>(
       irObject: irObject.rootField,
       entityStorage: entityStorage
     )
@@ -235,7 +274,7 @@ extension SelectionSetTestWrapper {
   public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
     IRTestWrapper<IR.Field>(
       irObject: 
-        selections.direct?.fields[field] ?? selections.merged.fields[field],
+        computed.direct?.fields[field] ?? computed.merged.fields[field],
       entityStorage: entityStorage
     )
   }
@@ -243,7 +282,7 @@ extension SelectionSetTestWrapper {
   public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
     IRTestWrapper<IR.NamedFragmentSpread>(
       irObject: 
-        selections.direct?.namedFragments[fragment] ?? selections.merged.namedFragments[fragment],
+        computed.direct?.namedFragments[fragment] ?? computed.merged.namedFragments[fragment],
       entityStorage: entityStorage
     )
   }

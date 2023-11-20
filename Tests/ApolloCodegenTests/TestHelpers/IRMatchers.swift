@@ -6,6 +6,7 @@ import GraphQLCompiler
 import TemplateString
 @testable import ApolloCodegenLib
 import ApolloInternalTestHelpers
+import ApolloCodegenInternalTestHelpers
 
 protocol SelectionShallowMatchable {
   typealias Field = IR.Field
@@ -95,19 +96,19 @@ struct SelectionsMatcher {
 
 func shallowlyMatch(
   _ expectedValue: SelectionsMatcher
-) -> Nimble.Predicate<IR.SelectionSet> {
-  let directPredicate: Nimble.Predicate<IR.DirectSelections> = expectedValue.direct == nil
+) -> Nimble.Predicate<SelectionSetTestWrapper> {
+  let directPredicate: Nimble.Predicate<IR.DirectSelections.ReadOnly> = expectedValue.direct == nil
   ? beNil()
   : shallowlyMatch(expectedValue.direct!)
 
-  var matchers: [Nimble.Predicate<IR.SelectionSet>] = [
-    directPredicate.mappingActualTo { $0?.selections.direct },
+  var matchers: [Nimble.Predicate<SelectionSetTestWrapper>] = [
+    directPredicate.mappingActualTo { $0?.computed.direct },
   ]
 
   if !expectedValue.ignoreMergedSelections {
     matchers.append(contentsOf: [
-      shallowlyMatch(expectedValue.merged).mappingActualTo { $0?.selections.merged },
-      equal(expectedValue.mergedSources).mappingActualTo { $0?.selections.merged.mergedSources }
+      shallowlyMatch(expectedValue.merged).mappingActualTo { $0?.computed.merged },
+      equal(expectedValue.mergedSources).mappingActualTo { $0?.computed.merged.mergedSources }
     ])
   }
 
@@ -174,7 +175,7 @@ struct SelectionSetMatcher {
 
 func shallowlyMatch(
   _ expectedValue: SelectionSetMatcher
-) -> Nimble.Predicate<IR.SelectionSet> {
+) -> Nimble.Predicate<SelectionSetTestWrapper> {
   let expectedInclusionConditions = IR.InclusionConditions.allOf(
     expectedValue.inclusionConditions ?? []
   ).conditions

@@ -42,10 +42,10 @@ extension IRBuilder {
     return .mock(compilationResult: compilationResult)
   }
 
-  public static func mock(    
+  public static func mock(
     compilationResult: CompilationResult
   ) -> IRBuilder {
-    return IRBuilder(compilationResult: compilationResult)
+    return IRBuilder(compilationResult: compilationResult)    
   }
 
 }

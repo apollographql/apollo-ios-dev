@@ -62,7 +62,7 @@ extension IR.SelectionSet: ScopedChildSelectionSetAccessible {
       irObject: self,
       entityStorage: entityStorage
     )
-    return wrapper?.childSelectionSet(with: conditions)
+    return wrapper.childSelectionSet(with: conditions)
   }
 
 #warning("TODO: do we need this?")
@@ -104,19 +104,14 @@ extension IR.Operation: ScopedChildSelectionSetAccessible {
   }
 }
 
-//extension IR.NamedFragment: ScopedChildSelectionSetAccessible {
-//  fileprivate subscript(field field: String) -> IR.Field? {
-//    return rootField.selectionSet[field: field]
-//  }
-//
-//  public func childSelectionSet(with conditions: IR.ScopeCondition) -> IR.SelectionSet? {
-//    return rootField.selectionSet.childSelectionSet(with: conditions)
-//  }
-//
-//  fileprivate subscript(fragment fragment: String) -> IR.NamedFragmentSpread? {
-//    rootField.selectionSet[fragment: fragment]
-//  }
-//}
+extension IR.NamedFragment: ScopedChildSelectionSetAccessible {
+  public func childSelectionSet(
+    with conditions: IR.ScopeCondition,
+    entityStorage: IR.DefinitionEntityStorage
+  ) -> SelectionSetTestWrapper? {
+    return rootField.childSelectionSet(with: conditions, entityStorage: entityStorage)
+  }
+}
 
 extension IR.NamedFragmentSpread: ScopedChildSelectionSetAccessible {
   public func childSelectionSet(
