@@ -12,6 +12,10 @@ import Utilities
 public class IRBuilderTestWrapper {
   public let irBuilder: IRBuilder
 
+  public private(set) lazy var builtFragmentStorage : BuiltFragmentStorage = {
+    BuiltFragmentStorage(self.irBuilder.builtFragmentStorage)
+  }()
+
   public init(_ irBuilder: IRBuilder) {
     self.irBuilder = irBuilder
   }
@@ -32,5 +36,24 @@ public class IRBuilderTestWrapper {
 
   public subscript<T>(dynamicMember keyPath: KeyPath<IRBuilder, T>) -> T {
     irBuilder[keyPath: keyPath]
+  }
+
+  public class BuiltFragmentStorage {
+    private var wrappedStorage: IRBuilder.BuiltFragmentStorage    
+
+    fileprivate init(_ wrappedStorage: IRBuilder.BuiltFragmentStorage) {
+      self.wrappedStorage = wrappedStorage
+    }
+
+    public func getFragmentIfBuilt(named name: String) async -> IRTestWrapper<NamedFragment>? {
+      guard let fragment = await wrappedStorage.getFragmentIfBuilt(named: name) else {
+        return nil
+      }
+
+      return IRTestWrapper(
+        irObject: fragment,
+        entityStorage: fragment.entityStorage
+      )
+    }
   }
 }

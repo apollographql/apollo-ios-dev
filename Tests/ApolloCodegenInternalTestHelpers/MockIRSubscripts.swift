@@ -9,7 +9,7 @@ public class IRTestWrapper<T: ScopedChildSelectionSetAccessible> {
   public let irObject: T
   public let entityStorage: DefinitionEntityStorage
 
-  init(
+  public init(
     irObject: T,
     entityStorage: DefinitionEntityStorage
   ) {
@@ -17,7 +17,7 @@ public class IRTestWrapper<T: ScopedChildSelectionSetAccessible> {
     self.entityStorage = entityStorage
   }
 
-  convenience init?(
+  public convenience init?(
     irObject: T?,
     entityStorage: DefinitionEntityStorage
   ) {

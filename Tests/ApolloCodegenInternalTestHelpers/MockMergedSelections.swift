@@ -6,7 +6,7 @@ import XCTest
 extension IR.MergedSelections.MergedSource {
 
   public static func mock(
-    _ field: IR.Field?,
+    _ field: IRTestWrapper<IR.Field>?,
     file: StaticString = #file,
     line: UInt = #line
   ) throws -> Self {
@@ -17,7 +17,7 @@ extension IR.MergedSelections.MergedSource {
   }
 
   public static func mock(
-    _ typeCase: IR.SelectionSet?,
+    _ typeCase: IRTestWrapper<IR.SelectionSet>?,
     file: StaticString = #file,
     line: UInt = #line
   ) throws -> Self {
@@ -28,7 +28,7 @@ extension IR.MergedSelections.MergedSource {
   }
 
   public static func mock(
-    _ fragment: IR.NamedFragmentSpread?,
+    _ fragment: IRTestWrapper<IR.NamedFragmentSpread>?,
     file: StaticString = #file,
     line: UInt = #line
   ) throws -> Self {
@@ -40,13 +40,25 @@ extension IR.MergedSelections.MergedSource {
   }
 
   public static func mock(
-    for field: IR.Field?,
-    from fragment: IR.NamedFragmentSpread?,
+    for field: IRTestWrapper<IR.Field>?,
+    from fragment: IRTestWrapper<IR.NamedFragmentSpread>?,
     file: StaticString = #file,
     line: UInt = #line
   ) throws -> Self {
     self.init(
       typeInfo: try XCTUnwrap(field?.selectionSet?.typeInfo, file: file, line: line),
+      fragment: try XCTUnwrap(fragment?.fragment, file: file, line: line)
+    )
+  }
+
+  public static func mock(
+    for field: IRTestWrapper<IR.EntityField>?,
+    from fragment: IRTestWrapper<IR.NamedFragmentSpread>?,
+    file: StaticString = #file,
+    line: UInt = #line
+  ) throws -> Self {
+    self.init(
+      typeInfo: try XCTUnwrap(field?.selectionSet.typeInfo, file: file, line: line),
       fragment: try XCTUnwrap(fragment?.fragment, file: file, line: line)
     )
   }

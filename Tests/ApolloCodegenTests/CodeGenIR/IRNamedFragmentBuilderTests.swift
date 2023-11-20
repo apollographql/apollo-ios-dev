@@ -13,9 +13,9 @@ class IRNamedFragmentBuilderTests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IRBuilder!
+  var ir: IRBuilderTestWrapper!
   var fragment: CompilationResult.FragmentDefinition!
-  var subject: IR.NamedFragment!
+  var subject: IRTestWrapper<IR.NamedFragment>!
 
   var schema: IR.Schema { ir.schema }
 
@@ -34,7 +34,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
   // MARK: - Helpers
 
   func buildSubjectFragment() async throws {
-    ir = try await .mock(schema: schemaSDL, document: document)
+    ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     fragment = try XCTUnwrap(ir.compilationResult[fragment: "TestFragment"])
     subject = await ir.build(fragment: fragment)
   }
@@ -102,7 +102,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     let actual = await ir.builtFragmentStorage.getFragmentIfBuilt(named: "TestFragment")
 
     // then
-    expect(actual).to(beIdenticalTo(self.subject))
+    expect(actual?.irObject).to(beIdenticalTo(self.subject.irObject))
   }
 
   func test__buildFragment__givenAlreadyBuiltFragment_returnsExistingBuiltFragment() async throws {
@@ -129,7 +129,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     let actual = await ir.build(fragment: fragment)
 
     // then
-    expect(actual).to(beIdenticalTo(self.subject))
+    expect(actual.irObject).to(beIdenticalTo(self.subject.irObject))
   }
 
   func test__referencedFragments__givenUsesFragmentsReferencingOtherFragment_includesBothFragments() async throws {
@@ -163,13 +163,13 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     // when
     try await buildSubjectFragment()
 
-    let expected: OrderedSet = await [
+    let expected = await [
       try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalDetails").xctUnwrapped(),
       try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalName").xctUnwrapped(),
-    ]
+    ].map(\.irObject)
 
     // then
-    expect(self.subject.referencedFragments).to(equal(expected))
+    expect(Array(self.subject.referencedFragments)).to(equal(expected))
   }
 
   func test__entities__givenUsesMultipleNestedEntities_includingEntitiesInNestedFragments_includesAllEntities() async throws {
@@ -253,7 +253,7 @@ class IRNamedFragmentBuilderTests: XCTestCase {
     ]
 
     // then
-    expect(self.subject.entities).to(match(expected))
+    expect(self.subject.entityStorage.entitiesForFields).to(match(expected))
   }
 
 }

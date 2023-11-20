@@ -12,9 +12,9 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IRBuilder!
+  var ir: IRBuilderTestWrapper!
   var operation: CompilationResult.OperationDefinition!
-  var subject: IR.EntityField!
+  var subject: IRTestWrapper<IR.EntityField>!
 
   var schema: IR.Schema { ir.schema }
 
@@ -33,7 +33,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
   // MARK: = Helpers
 
   func buildSubjectRootField() async throws {
-    ir = try await .mock(schema: schemaSDL, document: document)
+    ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     operation = try XCTUnwrap(ir.compilationResult.operations.first)
 
     let result = await IR.RootFieldBuilder.buildRootEntityField(
@@ -43,9 +43,9 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
         selectionSet: operation.selectionSet
       ),
       onRootEntity: IR.Entity(source: .operation(operation)),
-      inIR: ir
+      inIR: ir.irBuilder
     )
-    subject = result.rootField
+    subject = IRTestWrapper(irObject: result.rootField, entityStorage: result.entityStorage)
   }
 
   // MARK: - Scalar Fields
@@ -602,10 +602,10 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     // then
     expect(actual?.inclusionConditions).to(beNil())
     expect(actual?.selectionSet?.inclusionConditions).to(beNil())
-    expect(actual?.selectionSet?.selections.direct).to(shallowlyMatch(expected_friend_selections))
+    expect(actual?.selectionSet?.computed.direct).to(shallowlyMatch(expected_friend_selections))
 
     expect(actual?[if: "a"]?.inclusionConditions).to(equal(friend_ifA_expectedConditions))
-    expect(actual?[if: "a"]?.selections.direct)
+    expect(actual?[if: "a"]?.computed.direct)
       .to(shallowlyMatch(expected_friendIfA_selections))
   }
 
@@ -727,7 +727,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?.inclusionConditions).to(equal(friend_expected))
     expect(actual?.selectionSet?.inclusionConditions).to(beNil())
 
-    expect(actual?.selectionSet?.selections.direct?.fields).to(beEmpty())    
+    expect(actual?.selectionSet?.computed.direct?.fields).to(beEmpty())
 
     expect(actual?[if: "a"]).to(shallowlyMatch(friend_ifA_expected))
     expect(actual?[if: !"a"]).to(shallowlyMatch(friend_ifNotA_expected))
@@ -798,7 +798,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?.inclusionConditions).to(equal(friend_expected))
     expect(actual?.selectionSet?.inclusionConditions).to(beNil())
 
-    expect(actual?.selectionSet?.selections.direct?.fields).to(beEmpty())
+    expect(actual?.selectionSet?.computed.direct?.fields).to(beEmpty())
 
     expect(actual?[if: "a" && "b"]).to(shallowlyMatch(friend_ifAAndB_expected))
     expect(actual?[if: "c" && "d"]).to(shallowlyMatch(friend_ifCAndD_expected))
@@ -876,7 +876,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     expect(actual?.inclusionConditions).to(equal(friend_expected))
     expect(actual?.selectionSet?.inclusionConditions).to(beNil())
 
-    expect(actual?.selectionSet?.selections.direct?.fields).to(beEmpty())
+    expect(actual?.selectionSet?.computed.direct?.fields).to(beEmpty())
 
     expect(actual?[if: "a"]).to(shallowlyMatch(friend_ifA_expected))
     expect(actual?[if: !"b"]).to(shallowlyMatch(friend_ifNotB_expected))
@@ -2402,11 +2402,11 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     try await buildSubjectRootField()
 
     let allAnimals = try XCTUnwrap(
-      self.subject[field: "allAnimals"] as? IR.EntityField
+      self.subject[field: "allAnimals"]
     )
 
     let allAnimals_child = try XCTUnwrap(
-      allAnimals[field: "child"] as? IR.EntityField
+      allAnimals[field: "child"]
     )
 
     let Object_Child = try XCTUnwrap(schema[object: "Child"])
@@ -2450,7 +2450,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
       ],
       mergedSources: [
         .mock(allAnimals[field: "child"]),
-        .mock(for: ChildFragment.fragment[field: "child"],
+        .mock(for: ChildFragment[field: "child"],
               from: ChildFragment),
       ]
     )
@@ -2467,7 +2467,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
       ],
       mergedSources: [
         .mock(allAnimals[field: "child"]),
-        .mock(for: ChildFragment.fragment[field: "child"],
+        .mock(for: ChildFragment[field: "child"],
               from: ChildFragment),
       ]
     )
@@ -2530,11 +2530,11 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     try await buildSubjectRootField()
 
     let allAnimals = try XCTUnwrap(
-      self.subject[field: "allAnimals"] as? IR.EntityField
+      self.subject[field: "allAnimals"]
     )
 
     let allAnimals_child = try XCTUnwrap(
-      allAnimals[field: "child"] as? IR.EntityField
+      allAnimals[field: "child"]
     )
 
     let allAnimals_asWarmBloodedIfC = allAnimals[as: "WarmBlooded", if: "c"]
@@ -2588,7 +2588,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
       ],
       mergedSources: [
         .mock(allAnimals),
-        .mock(for: ChildFragment.fragment.rootField,
+        .mock(for: ChildFragment.rootField,
               from: ChildFragment),
       ]
     )
@@ -2603,7 +2603,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
       ],
       mergedSources: [
         .mock(allAnimals[field: "child"]),
-        .mock(for: ChildFragment.fragment[field: "child"],
+        .mock(for: ChildFragment[field: "child"],
               from: ChildFragment),
       ]
     )
@@ -2636,7 +2636,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
       ],
       mergedSources: [
         .mock(allAnimals[field: "child"]),
-        .mock(for: ChildFragment.fragment[field: "child"],
+        .mock(for: ChildFragment[field: "child"],
               from: ChildFragment),
       ]
     )
@@ -2702,7 +2702,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     try await buildSubjectRootField()
 
     let allAnimals = try XCTUnwrap(
-      self.subject[field: "allAnimals"] as? IR.EntityField
+      self.subject[field: "allAnimals"]
     )
 
     let allAnimals_asPet = try XCTUnwrap(
@@ -2714,7 +2714,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     )
 
     let allAnimals_child = try XCTUnwrap(
-      allAnimals[field: "child"] as? IR.EntityField
+      allAnimals[field: "child"]
     )
 
     let allAnimals_asWarmBloodedIfNotB = allAnimals[as: "WarmBlooded", if: !"b"]
@@ -2806,7 +2806,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
       ],
       mergedSources: [
         .mock(allAnimals[field: "child"]),
-        .mock(for: WarmBloodedDetails.fragment[field: "child"],
+        .mock(for: WarmBloodedDetails[field: "child"],
               from: WarmBloodedDetails),
       ]
     )
@@ -2971,7 +2971,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
         fragments: []),
     ]
 
-    let actual = allAnimals?.selectionSet?.selections.direct?.groupedByInclusionCondition
+    let actual = allAnimals?.selectionSet?.computed.direct?.groupedByInclusionCondition
 
     // then
     expect(actual?.unconditionalSelections).to(shallowlyMatch(expectedUnconditional))
