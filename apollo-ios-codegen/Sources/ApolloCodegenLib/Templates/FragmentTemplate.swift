@@ -13,20 +13,18 @@ struct FragmentTemplate: TemplateRenderer {
   let target: TemplateTarget = .operationFile
 
   var template: TemplateString {
-    let definition = IR.Definition.namedFragment(fragment)
-
     return TemplateString(
     """
     \(accessControlModifier(for: .parent))\
     struct \(fragment.generatedDefinitionName.asFragmentName): \
-    \(definition.renderedSelectionSetType(config)), Fragment {
+    \(fragment.renderedSelectionSetType(config)), Fragment {
       \(accessControlModifier(for: .member))\
     static var fragmentDefinition: StaticString {
         #"\(fragment.definition.source.convertedToSingleLine())"#
       }
 
       \(SelectionSetTemplate(
-        definition: definition,
+        definition: fragment,
         generateInitializers: config.options.shouldGenerateSelectionSetInitializers(for: fragment),
         config: config,
         renderAccessControl: { accessControlModifier(for: .member) }()

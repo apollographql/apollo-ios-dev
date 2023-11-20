@@ -17,8 +17,6 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
   let target: TemplateTarget = .operationFile
 
   var template: TemplateString {
-    let definition = IR.Definition.operation(operation)
-
     return TemplateString(
     """
     \(OperationDeclaration())
@@ -32,9 +30,9 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
 
       \(section: VariableAccessors(operation.definition.variables))
 
-      \(accessControlModifier(for: .member))struct Data: \(definition.renderedSelectionSetType(config)) {
+      \(accessControlModifier(for: .member))struct Data: \(operation.renderedSelectionSetType(config)) {
         \(SelectionSetTemplate(
-            definition: definition,
+            definition: operation,
             generateInitializers: config.options.shouldGenerateSelectionSetInitializers(for: operation),
             config: config,
             renderAccessControl: { accessControlModifier(for: .member) }()

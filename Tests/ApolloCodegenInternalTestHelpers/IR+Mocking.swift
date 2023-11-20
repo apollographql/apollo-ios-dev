@@ -86,8 +86,8 @@ extension IR.NamedFragment {
       definition: definition,
       rootField: rootEntityField,
       referencedFragments: [],
-      containsDeferredFragment: false,
-      entities: [rootEntity.location: rootEntity]
+      entityStorage: .init(rootEntity: rootEntity),
+      containsDeferredFragment: false
     )
   }
 }
@@ -111,17 +111,19 @@ extension IR.Operation {
         givenAllTypesInSchema: .init([], schemaRootTypes: .mock()))
       ]
     )
+    let rootField = IR.EntityField(
+      .mock(),
+      inclusionConditions: nil,
+      selectionSet: .init(
+        typeInfo: typeInfo,
+        selections: DirectSelections()
+      )
+    )
     return IR.Operation.init(
       definition: definition,
-      rootField: .init(
-        .mock(),
-        inclusionConditions: nil,
-        selectionSet: .init(
-          typeInfo: typeInfo,
-          selections: DirectSelections()
-        )
-      ),
+      rootField: rootField,
       referencedFragments: referencedFragments,
+      entityStorage: .init(rootEntity: rootField.entity),
       containsDeferredFragment: containsDeferredFragment
     )
   }

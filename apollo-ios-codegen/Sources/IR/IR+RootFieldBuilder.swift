@@ -3,6 +3,7 @@ import OrderedCollections
 import GraphQLCompiler
 import Utilities
 
+#warning("TODO: List")
 /// Remove merged selections from SelectionSet.Selections
 /// Add function to EntityStorage to compute merged selections (WIP)
 ///   - Make new MergedSelections a simple struct (class? run perf tests)
@@ -15,79 +16,12 @@ import Utilities
 /// (Fix field validation)
 /// (Clean up SelectionSet initializers and properties)
 
-#warning("TODO: Rename to DefinitionEntityStorage")
-class RootFieldEntityStorage {
-  let sourceDefinition: Entity.Location.SourceDefinition
-  private(set) var entitiesForFields: [Entity.Location: Entity] = [:]
-
-  init(rootEntity: Entity) {
-    self.sourceDefinition = rootEntity.location.source
-    self.entitiesForFields[rootEntity.location] = rootEntity
-  }
-
-  func entity(
-    for field: CompilationResult.Field,
-    on enclosingEntity: Entity
-  ) -> Entity {
-    precondition(
-      enclosingEntity.location.source == self.sourceDefinition,
-      "Enclosing entity from other source definition is invalid."
-    )
-
-    let location = enclosingEntity
-      .location
-      .appending(.init(name: field.responseKey, type: field.type))
-
-    var rootTypePath: LinkedList<GraphQLCompositeType> {
-      guard let fieldType = field.selectionSet?.parentType else {
-        fatalError("Entity cannot be created for non-entity type field \(field).")
-      }
-      return enclosingEntity.rootTypePath.appending(fieldType)
-    }
-
-    return entitiesForFields[location] ??
-    createEntity(location: location, rootTypePath: rootTypePath)
-  }
-
-  func entity(
-    for entityInFragment: Entity,
-    inFragmentSpreadAtTypePath fragmentSpreadTypeInfo: SelectionSet.TypeInfo
-  ) -> Entity {
-    precondition(
-      fragmentSpreadTypeInfo.entity.location.source == self.sourceDefinition,
-      "Enclosing entity from fragment spread in other source definition is invalid."
-    )
-
-    var location = fragmentSpreadTypeInfo.entity.location
-    if let pathInFragment = entityInFragment.location.fieldPath {
-      location = location.appending(pathInFragment)
-    }
-
-    var rootTypePath: LinkedList<GraphQLCompositeType> {
-      let otherRootTypePath = entityInFragment.rootTypePath.dropFirst()
-      return fragmentSpreadTypeInfo.entity.rootTypePath.appending(otherRootTypePath)
-    }
-
-    return entitiesForFields[location] ??
-    createEntity(location: location, rootTypePath: rootTypePath)
-  }
-
-  private func createEntity(
-    location: Entity.Location,
-    rootTypePath: LinkedList<GraphQLCompositeType>
-  ) -> Entity {
-    let entity = Entity(location: location, rootTypePath: rootTypePath)
-    entitiesForFields[location] = entity
-    return entity
-  } 
-
-}
 
 class RootFieldBuilder {
   struct Result {
     let rootField: EntityField
     let referencedFragments: ReferencedFragments
-    let entities: [Entity.Location: Entity]
+    let entityStorage: DefinitionEntityStorage
     let containsDeferredFragment: Bool
   }
 
@@ -104,7 +38,7 @@ class RootFieldBuilder {
 
   private let ir: IRBuilder
   private let rootEntity: Entity
-  private let entityStorage: RootFieldEntityStorage
+  private let entityStorage: DefinitionEntityStorage
   private var referencedFragments: ReferencedFragments = []
   @IsEverTrue private var containsDeferredFragment: Bool
 
@@ -113,7 +47,7 @@ class RootFieldBuilder {
   private init(ir: IRBuilder, rootEntity: Entity) {
     self.ir = ir
     self.rootEntity = rootEntity
-    self.entityStorage = RootFieldEntityStorage(rootEntity: rootEntity)
+    self.entityStorage = DefinitionEntityStorage(rootEntity: rootEntity)
   }
 
   private func build(
@@ -142,7 +76,7 @@ class RootFieldBuilder {
     return Result(
       rootField: EntityField(rootField, selectionSet: rootIrSelectionSet),
       referencedFragments: referencedFragments,
-      entities: entityStorage.entitiesForFields,
+      entityStorage: entityStorage,
       containsDeferredFragment: containsDeferredFragment
     )
   }
@@ -524,7 +458,7 @@ class RootFieldBuilder {
   }
 
   private func mergeAllSelectionsIntoEntitySelectionTrees(from fragmentSpread: NamedFragmentSpread) {
-    for (_, fragmentEntity) in fragmentSpread.fragment.entities {
+    for (_, fragmentEntity) in fragmentSpread.fragment.entityStorage.entitiesForFields {
       let entity = entityStorage.entity(
         for: fragmentEntity,
         inFragmentSpreadAtTypePath: fragmentSpread.typeInfo

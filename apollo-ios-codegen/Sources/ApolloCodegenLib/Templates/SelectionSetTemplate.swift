@@ -690,7 +690,7 @@ fileprivate class SelectionSetNameCache {
 ///
 /// Because the computed merged selections are expected to have a large number of duplicated
 /// selections, they use a large amount of memory. Storing them on the `IR.SelectionSet` would
-/// retained them outside of the scope they are needed. Instead, we use this class to compute them
+/// retain them outside of the scope they are needed. Instead, we use this class to compute them
 /// for the scope they are needed in, then release them when we are done with them.
 struct ComputedSelectionSet {
 

@@ -53,7 +53,7 @@ extension MergedSelections {
   public class Builder {
     let typeInfo: SelectionSet.TypeInfo
     private let directSelections: DirectSelections.ReadOnly?
-    private let entityStorage: RootFieldEntityStorage
+    private let entityStorage: DefinitionEntityStorage
 
     public fileprivate(set) var mergedSources: OrderedSet<MergedSource> = []
     public fileprivate(set) var fields: OrderedDictionary<String, Field> = [:]
@@ -63,7 +63,7 @@ extension MergedSelections {
     init(
       directSelections: DirectSelections.ReadOnly?,
       typeInfo: SelectionSet.TypeInfo,
-      entityStorage: RootFieldEntityStorage
+      entityStorage: DefinitionEntityStorage
     ) {
       precondition(
         typeInfo.entity.location.source == entityStorage.sourceDefinition,

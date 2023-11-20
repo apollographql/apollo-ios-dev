@@ -6,11 +6,11 @@ import GraphQLCompiler
 @dynamicMemberLookup
 public class IRTestWrapper<T: ScopedChildSelectionSetAccessible> {
   public let irObject: T
-  public let entityStorage: RootFieldEntityStorage
+  public let entityStorage: DefinitionEntityStorage
 
   init?(
     irObject: T?,
-    entityStorage: RootFieldEntityStorage
+    entityStorage: DefinitionEntityStorage
   ) {
     guard let irObject else { return nil }
     self.irObject = irObject
@@ -35,7 +35,7 @@ public class SelectionSetTestWrapper: IRTestWrapper<IR.SelectionSet> {
 
   override init?(
     irObject selectionSet: SelectionSet?,
-    entityStorage: RootFieldEntityStorage
+    entityStorage: DefinitionEntityStorage
   ) {
     guard let selectionSet else { return nil }
     let mergedBuilder = MergedSelections.Builder(

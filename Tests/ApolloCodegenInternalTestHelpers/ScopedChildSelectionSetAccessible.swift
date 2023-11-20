@@ -6,7 +6,7 @@ public protocol ScopedChildSelectionSetAccessible {
 
   func childSelectionSet(
     with conditions: IR.ScopeCondition,
-    entityStorage: RootFieldEntityStorage
+    entityStorage: DefinitionEntityStorage
   ) -> SelectionSetTestWrapper?
 
 }
@@ -40,7 +40,7 @@ public protocol ScopedChildSelectionSetAccessible {
 extension IR.Field: ScopedChildSelectionSetAccessible {
   public func childSelectionSet(
     with conditions: IR.ScopeCondition,
-    entityStorage: IR.RootFieldEntityStorage
+    entityStorage: IR.DefinitionEntityStorage
   ) -> SelectionSetTestWrapper? {
     selectionSet?.childSelectionSet(with: conditions, entityStorage: entityStorage)
   }
@@ -55,7 +55,7 @@ extension IR.SelectionSet: ScopedChildSelectionSetAccessible {
 
   public func childSelectionSet(
     with conditions: IR.ScopeCondition,
-    entityStorage: IR.RootFieldEntityStorage
+    entityStorage: IR.DefinitionEntityStorage
   ) -> SelectionSetTestWrapper? {
 #warning("TODO: this re-creates every time. Bad perf")
     let wrapper = SelectionSetTestWrapper(
@@ -82,7 +82,7 @@ extension IR.SelectionSet: ScopedChildSelectionSetAccessible {
 extension ComputedSelectionSet: ScopedChildSelectionSetAccessible {
   public func childSelectionSet(
     with conditions: IR.ScopeCondition,
-    entityStorage: IR.RootFieldEntityStorage
+    entityStorage: IR.DefinitionEntityStorage
   ) -> SelectionSetTestWrapper? {
     let selectionSet = direct?.inlineFragments[conditions]?.selectionSet ??
     merged.inlineFragments[conditions]?.selectionSet
@@ -98,7 +98,7 @@ extension ComputedSelectionSet: ScopedChildSelectionSetAccessible {
 extension IR.Operation: ScopedChildSelectionSetAccessible {
   public func childSelectionSet(
     with conditions: IR.ScopeCondition,
-    entityStorage: IR.RootFieldEntityStorage
+    entityStorage: IR.DefinitionEntityStorage
   ) -> SelectionSetTestWrapper? {
     rootField.childSelectionSet(with: conditions, entityStorage: entityStorage)
   }
@@ -121,7 +121,7 @@ extension IR.Operation: ScopedChildSelectionSetAccessible {
 extension IR.NamedFragmentSpread: ScopedChildSelectionSetAccessible {
   public func childSelectionSet(
     with conditions: IR.ScopeCondition,
-    entityStorage: IR.RootFieldEntityStorage
+    entityStorage: IR.DefinitionEntityStorage
   ) -> SelectionSetTestWrapper? {
     return fragment.rootField.childSelectionSet(with: conditions, entityStorage: entityStorage)
   }
