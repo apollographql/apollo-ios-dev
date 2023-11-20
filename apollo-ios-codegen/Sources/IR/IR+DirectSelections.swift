@@ -194,11 +194,12 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
     public var inlineFragments: OrderedDictionary<ScopeCondition, InlineFragmentSpread> { value.inlineFragments }
     public var namedFragments: OrderedDictionary<String, NamedFragmentSpread> { value.namedFragments }
     public var isEmpty: Bool { value.isEmpty }
+
+    public var groupedByInclusionCondition: GroupedByInclusionCondition {
+      GroupedByInclusionCondition(self)
+    }
   }
 
-  public var groupedByInclusionCondition: GroupedByInclusionCondition {
-    GroupedByInclusionCondition(self)
-  }
 
   public class GroupedByInclusionCondition: Equatable {
 
@@ -208,7 +209,7 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
     public private(set) var inclusionConditionGroups:
     OrderedDictionary<AnyOf<InclusionConditions>, DirectSelections.ReadOnly> = [:]
 
-    init(_ directSelections: DirectSelections) {
+    init(_ directSelections: DirectSelections.ReadOnly) {
       for selection in directSelections.fields {
         if let condition = selection.value.inclusionConditions {
           inclusionConditionGroups.updateValue(
