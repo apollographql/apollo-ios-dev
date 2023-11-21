@@ -49,10 +49,10 @@ extension GraphQLResult: Equatable where Data: Equatable {
 extension GraphQLResult: Hashable where Data: Hashable {}
 
 extension GraphQLResult {
-  public func asDictionary() -> [String: Any] {
+  public func asJSONDictionary() -> [String: Any] {
     var dict: [String: Any] = [:]
     if let data { dict["data"] = convert(value: data.__data) }
-    if let errors { dict["errors"] = errors.map { $0.asDictionary() } }
+    if let errors { dict["errors"] = errors.map { $0.asJSONDictionary() } }
     if let extensions { dict["extensions"] = extensions }
     return dict
   }
