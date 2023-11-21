@@ -3952,18 +3952,18 @@ class IRRootFieldBuilderTests: XCTestCase {
       parentType: Object_Height,
       directSelections: nil,
       mergedSelections: [
-        .field("meters", type: .integer()),
         .field("feet", type: .integer()),
+        .field("meters", type: .integer()),
         .fragmentSpread(Fragment_PredatorDetails_HeightInMeters.definition),
       ],
       mergedSources: [
         try .mock(
-          for: Fragment_PredatorDetails_HeightInMeters.rootField,
-          from: Fragment_PredatorDetails_HeightInMeters
-        ),
-        try .mock(
           for: PredatorDetails_Predator_Height,
           from: Fragment_PredatorDetails
+        ),
+        try .mock(
+          for: Fragment_PredatorDetails_HeightInMeters.rootField,
+          from: Fragment_PredatorDetails_HeightInMeters
         ),
       ]
     )
@@ -4029,7 +4029,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Object_Height = try XCTUnwrap(schema[object: "Height"])
 
     let allAnimals = try XCTUnwrap(
-      subject?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
+      subject?[field: "allAnimals"]
     )
     let allAnimals_predator = try XCTUnwrap(
       allAnimals[field: "predator"]
@@ -4137,12 +4137,12 @@ class IRRootFieldBuilderTests: XCTestCase {
     try await buildSubjectRootField()
 
     let allAnimals_predator = try XCTUnwrap(
-      subject?[field: "allAnimals"]?[field: "predator"] as? IRTestWrapper<IR.EntityField>
+      subject?[field: "allAnimals"]?[field: "predator"]
     )
 
     let Fragment_PredatorDetails = subject?[field: "allAnimals"]?[fragment: "PredatorDetails"]
     let PredatorDetails_predator = try XCTUnwrap(
-      Fragment_PredatorDetails?[field: "predator"] as? IRTestWrapper<IR.EntityField>
+      Fragment_PredatorDetails?[field: "predator"]
     )
 
     let expected: OrderedSet<IR.MergedSelections.MergedSource> = [
@@ -4150,7 +4150,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ]
 
     // then
-    expect(allAnimals_predator.selectionSet.computed.merged.mergedSources).to(equal(expected))
+    expect(allAnimals_predator.selectionSet?.computed.merged.mergedSources).to(equal(expected))
   }
 
   // MARK: - Referenced Fragments
@@ -4726,7 +4726,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let allAnimals_deferredAsRoot = allAnimals?[as: "Animal", deferred: .init(label: "root")]
+    let allAnimals_deferredAsRoot = allAnimals?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -4787,7 +4787,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let allAnimals_deferredAsRoot = allAnimals?[as: "Animal", deferred: .init(label: "root")]
+    let allAnimals_deferredAsRoot = allAnimals?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -4858,7 +4858,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferredAs: "root"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -4944,7 +4944,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferredAs: "root", withVariable: "a"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferred: .init(label: "root", variable: "a")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5030,7 +5030,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferredAs: "root"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5116,7 +5116,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferredAs: "root"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5192,8 +5192,8 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsOne = allAnimals_asDog?[deferredAs: "one"]
-    let allAnimals_asDog_deferredAsTwo = allAnimals_asDog?[deferredAs: "two"]
+    let allAnimals_asDog_deferredAsOne = allAnimals_asDog?[deferred: .init(label: "one")]
+    let allAnimals_asDog_deferredAsTwo = allAnimals_asDog?[deferred: .init(label: "two")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5297,8 +5297,8 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asBird = allAnimals?[as: "Bird"]
     let allAnimals_asCat = allAnimals?[as: "Cat"]
-    let allAnimals_asBird_deferredAsBird = allAnimals_asBird?[deferredAs: "bird"]
-    let allAnimals_asCat_deferredAsCat = allAnimals_asCat?[deferredAs: "cat"]
+    let allAnimals_asBird_deferredAsBird = allAnimals_asBird?[deferred: .init(label: "bird")]
+    let allAnimals_asCat_deferredAsCat = allAnimals_asCat?[deferred: .init(label: "cat")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5390,7 +5390,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferredAs: "root"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5488,7 +5488,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asPet = allAnimals?[as: "Pet"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferredAs: "root"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5599,9 +5599,10 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsOuter = allAnimals_asDog?[deferredAs: "outer"]
+    let allAnimals_asDog_deferredAsOuter = allAnimals_asDog?[deferred: .init(label: "outer")]
     let allAnimals_asDog_deferredAsOuter_asCat = allAnimals_asDog_deferredAsOuter?[field: "friend"]?[as: "Cat"]
-    let allAnimals_asDog_deferredAsOuter_asCat_deferredAsInner = allAnimals_asDog_deferredAsOuter_asCat?[deferredAs: "inner"]
+    let allAnimals_asDog_deferredAsOuter_asCat_deferredAsInner =
+    allAnimals_asDog_deferredAsOuter_asCat?[deferred: .init(label: "inner")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5696,7 +5697,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let allAnimals_ifA = allAnimals?[as: "Animal", if: "a"]
+    let allAnimals_ifA = allAnimals?[if: "a"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5784,7 +5785,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
       let allAnimals = self.subject[field: "allAnimals"]
-      let allAnimals_ifA = allAnimals?[as: "Animal", if: "a"]
+      let allAnimals_ifA = allAnimals?[if: "a"]
 
       let expectedInclusion = SelectionSetMatcher(
         parentType: Interface_Animal,
@@ -5858,7 +5859,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_ifA = allAnimals?[if: "a"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals?[as: "Dog"]?[deferredAs: "root"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals?[as: "Dog"]?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5950,7 +5951,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let allAnimals_skipIfA = allAnimals?[as: "Animal", if: !"a"]
+    let allAnimals_skipIfA = allAnimals?[if: !"a"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6038,7 +6039,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
       let allAnimals = self.subject[field: "allAnimals"]
-      let allAnimals_skipIfA = allAnimals?[as: "Animal", if: !"a"]
+      let allAnimals_skipIfA = allAnimals?[if: !"a"]
 
       let expectedInclusion = SelectionSetMatcher(
         parentType: Interface_Animal,
@@ -6112,7 +6113,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_skipIfA = allAnimals?[if: !"a"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals?[as: "Dog"]?[deferredAs: "root"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals?[as: "Dog"]?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6589,7 +6590,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals_asDog = allAnimals?[as: "Dog"]
     let dogFragment = try await ir.builtFragmentStorage
       .getFragmentIfBuilt(named: "DogFragment").xctUnwrapped()
-    let dogFragment_asDog_deferredAsRoot = dogFragment[as: "Dog", deferred: .init(label: "root")]
+    let dogFragment_asDog_deferredAsRoot = dogFragment[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6680,7 +6681,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let dogFragment = try await ir.builtFragmentStorage
       .getFragmentIfBuilt(named: "DogFragment").xctUnwrapped()
     let dogFragment_asDog = dogFragment[as: "Dog"]
-    let dogFragment_asDog_deferredAsRoot = dogFragment_asDog?[as: "Dog", deferred: .init(label: "root")]
+    let dogFragment_asDog_deferredAsRoot = dogFragment_asDog?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6748,7 +6749,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Fragment_AnimalFragment = try XCTUnwrap(ir.compilationResult[fragment: "AnimalFragment"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let allAnimals_ifA = allAnimals?[as: "Animal", if: "a"]
+    let allAnimals_ifA = allAnimals?[if: "a"]
     let animalFragment = try await ir.builtFragmentStorage
       .getFragmentIfBuilt(named: "AnimalFragment").xctUnwrapped()
 
@@ -6758,7 +6759,8 @@ class IRRootFieldBuilderTests: XCTestCase {
         directSelections: [
           .field("id", type: .string()),
           .inlineFragment(parentType: Interface_Animal, inclusionConditions: [.include(if: "a")]),
-        ]
+        ],
+        mergedSelections: []
       )
     ))
 
@@ -6951,7 +6953,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Fragment_AnimalFragment = try XCTUnwrap(ir.compilationResult[fragment: "AnimalFragment"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let allAnimals_ifA = allAnimals?[as: "Animal", if: !"a"]
+    let allAnimals_ifA = allAnimals?[if: !"a"]
     let animalFragment = try await ir.builtFragmentStorage
       .getFragmentIfBuilt(named: "AnimalFragment").xctUnwrapped()
 

@@ -258,19 +258,7 @@ extension SelectionSetTestWrapper {
         computed.direct?.namedFragments[fragment] ?? computed.merged.namedFragments[fragment],
       entityStorage: entityStorage
     )
-  }
-
-  public subscript(
-    deferredAs label: String,
-    withVariable variable: String? = nil
-  ) -> SelectionSetTestWrapper? {
-    let scope = ScopeCondition(
-      type: self.parentType,
-      conditions: self.inclusionConditions,
-      deferCondition: CompilationResult.DeferCondition(label: label, variable: variable)
-    )
-    return childSelectionSet(with: scope)
-  }
+  }  
 }
 
 // MARK: - Other Subscript Accessors
