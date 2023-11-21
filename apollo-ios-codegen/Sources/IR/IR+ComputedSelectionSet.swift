@@ -46,7 +46,7 @@ extension ComputedSelectionSet {
     ) {
       precondition(
         typeInfo.entity.location.source == entityStorage.sourceDefinition,
-        "typeInfo and entityStorage much originate from the same definition."
+        "typeInfo and entityStorage must originate from the same definition."
       )
       self.directSelections = directSelections
       self.typeInfo = typeInfo
@@ -177,5 +177,14 @@ extension ComputedSelectionSet {
         typeInfo: typeInfo
       )
     }
+  }
+}
+
+extension ComputedSelectionSet: CustomDebugStringConvertible {
+  public var debugDescription: String {
+    """
+    Direct: \(direct.debugDescription)
+    Merged: \(merged.debugDescription)
+    """
   }
 }

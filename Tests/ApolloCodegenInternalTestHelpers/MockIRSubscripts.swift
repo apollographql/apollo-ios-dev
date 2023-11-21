@@ -5,7 +5,7 @@ import GraphQLCompiler
 #warning("TODO: clean up and rename file, remove commented out code, document")
 // MARK: - IR Test Wrapper
 @dynamicMemberLookup
-public class IRTestWrapper<T: ScopedChildSelectionSetAccessible> {
+public class IRTestWrapper<T: ScopedChildSelectionSetAccessible>: CustomDebugStringConvertible {
   public let irObject: T
   public let entityStorage: DefinitionEntityStorage
 
@@ -35,10 +35,12 @@ public class IRTestWrapper<T: ScopedChildSelectionSetAccessible> {
     irObject.childSelectionSet(with: conditions, entityStorage: entityStorage)
   }
 
+  public var debugDescription: String { irObject.debugDescription }
+
 }
 
 @dynamicMemberLookup
-public class SelectionSetTestWrapper: IRTestWrapper<IR.SelectionSet> {  
+public class SelectionSetTestWrapper: IRTestWrapper<IR.SelectionSet> {
   public let computed: ComputedSelectionSet
 
   override init(
@@ -59,6 +61,8 @@ public class SelectionSetTestWrapper: IRTestWrapper<IR.SelectionSet> {
   ) -> SelectionSetTestWrapper? {
     self.computed.childSelectionSet(with: conditions, entityStorage: entityStorage)
   }
+
+  public override var debugDescription: String { computed.debugDescription }
 }
 
 // MARK: -
@@ -146,38 +150,6 @@ extension IRTestWrapper {
 
 // MARK: - Test Wrapper Subscripts
 
-//extension IRTestWrapper<IR.DirectSelections>{
-//  public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
-//    IRTestWrapper<IR.Field>(
-//      irObject: irObject.fields[field],
-//      entityStorage: entityStorage
-//    )
-//  }
-//
-//  public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
-//    IRTestWrapper<IR.NamedFragmentSpread>(
-//      irObject: irObject.namedFragments[fragment],
-//      entityStorage: entityStorage
-//    )
-//  }
-//}
-//
-//extension IRTestWrapper<IR.MergedSelections> {
-//  public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
-//    IRTestWrapper<IR.Field>(
-//      irObject: irObject.fields[field],
-//      entityStorage: entityStorage
-//    )
-//  }
-//
-//  public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
-//    IRTestWrapper<IR.NamedFragmentSpread>(
-//      irObject: irObject.namedFragments[fragment],
-//      entityStorage: entityStorage
-//    )
-//  }
-//}
-
 extension IRTestWrapper<IR.Field> {
   public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
     self.selectionSet?[field: field]
@@ -226,10 +198,11 @@ extension IRTestWrapper<IR.NamedFragmentSpread> {
 
   public var rootField: IRTestWrapper<IR.EntityField> {
     return IRTestWrapper<IR.EntityField>(
-      irObject: irObject.fragment.rootField,
-      entityStorage: entityStorage
+      irObject:  irObject.fragment.rootField,
+      entityStorage: irObject.fragment.entityStorage
     )
   }
+  
 }
 
 extension IRTestWrapper<IR.Operation> {
@@ -285,6 +258,18 @@ extension SelectionSetTestWrapper {
         computed.direct?.namedFragments[fragment] ?? computed.merged.namedFragments[fragment],
       entityStorage: entityStorage
     )
+  }
+
+  public subscript(
+    deferredAs label: String,
+    withVariable variable: String? = nil
+  ) -> SelectionSetTestWrapper? {
+    let scope = ScopeCondition(
+      type: self.parentType,
+      conditions: self.inclusionConditions,
+      deferCondition: CompilationResult.DeferCondition(label: label, variable: variable)
+    )
+    return childSelectionSet(with: scope)
   }
 }
 

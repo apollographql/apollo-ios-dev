@@ -35,3 +35,13 @@ public class Operation: Definition {
     self.containsDeferredFragment = containsDeferredFragment
   }
 }
+
+extension Operation: CustomDebugStringConvertible {
+  public var debugDescription: String {
+    """
+    \(definition.debugDescription) {
+      \(rootField.debugDescription)
+    }
+    """
+  }
+}

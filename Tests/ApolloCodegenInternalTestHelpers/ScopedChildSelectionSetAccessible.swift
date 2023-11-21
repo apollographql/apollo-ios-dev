@@ -2,7 +2,7 @@
 @testable import IR
 import GraphQLCompiler
 
-public protocol ScopedChildSelectionSetAccessible {
+public protocol ScopedChildSelectionSetAccessible: CustomDebugStringConvertible {
 
   func childSelectionSet(
     with conditions: IR.ScopeCondition,
@@ -12,30 +12,6 @@ public protocol ScopedChildSelectionSetAccessible {
 }
 
 // MARK: - Conformance Extensions
-
-//extension IR.DirectSelections: ScopedChildSelectionSetAccessible {
-//  public func childSelectionSet(
-//    with conditions: IR.ScopeCondition,
-//    entityStorage: IR.RootFieldEntityStorage
-//  ) -> SelectionSetTestWrapper? {
-//    SelectionSetTestWrapper(
-//      irObject: inlineFragments[conditions]?.selectionSet,
-//      entityStorage: entityStorage
-//    )
-//  }
-//}
-//
-//extension IR.MergedSelections: ScopedChildSelectionSetAccessible {
-//  public func childSelectionSet(
-//    with conditions: IR.ScopeCondition,
-//    entityStorage: IR.RootFieldEntityStorage
-//  ) -> SelectionSetTestWrapper? {
-//    SelectionSetTestWrapper(
-//      irObject: inlineFragments[conditions]?.selectionSet,
-//      entityStorage: entityStorage
-//    )
-//  }
-//}
 
 extension IR.Field: ScopedChildSelectionSetAccessible {
   public func childSelectionSet(
@@ -65,18 +41,6 @@ extension IR.SelectionSet: ScopedChildSelectionSetAccessible {
     return wrapper.childSelectionSet(with: conditions)
   }
 
-#warning("TODO: do we need this?")
-//  fileprivate subscript(
-//    deferredAs label: String,
-//    withVariable variable: String? = nil
-//  ) -> IR.SelectionSet? {
-//    let scope = ScopeCondition(
-//      type: self.parentType,
-//      conditions: self.inclusionConditions,
-//      deferCondition: CompilationResult.DeferCondition(label: label, variable: variable)
-//    )
-//    return selections[scope]
-//  }
 }
 
 extension ComputedSelectionSet: ScopedChildSelectionSetAccessible {
