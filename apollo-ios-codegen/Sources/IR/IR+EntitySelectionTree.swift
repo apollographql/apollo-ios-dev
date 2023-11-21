@@ -117,7 +117,8 @@ class EntitySelectionTree {
     let rootTypePath = selections.typeInfo.scopePath.head
     rootNode.mergeSelections(
       matchingScopePath: rootTypePath,
-      into: selections
+      into: selections,
+      transformingSelections: nil
     )
   }
 
@@ -205,24 +206,17 @@ class EntitySelectionTree {
 
     func mergeSelections(
       matchingScopePath scopePathNode: LinkedList<ScopeDescriptor>.Node,
-      into targetSelections: ComputedSelectionSet.Builder
-    ) {
-      mergeSelections(
-        matchingScopePath: scopePathNode,
-        into: targetSelections,
-        transformingSelections: nil
-      )
-    }
-
-    private func mergeSelections(
-      matchingScopePath scopePathNode: LinkedList<ScopeDescriptor>.Node,
       into targetSelections: ComputedSelectionSet.Builder,
       transformingSelections: ((Selections) -> Selections)?
     ) {
       switch child {
       case let .entity(entityNode):
         guard let nextScopePathNode = scopePathNode.next else { return }
-        entityNode.mergeSelections(matchingScopePath: nextScopePathNode, into: targetSelections)
+        entityNode.mergeSelections(
+          matchingScopePath: nextScopePathNode,
+          into: targetSelections,
+          transformingSelections: transformingSelections
+        )
 
       case let .selections(selections):
         let selections = transformingSelections?(selections) ?? selections
@@ -501,7 +495,7 @@ extension EntitySelectionTree.EntityNode: CustomDebugStringConvertible {
   var debugDescription: String {
     TemplateString("""
     \(scope.debugDescription) {
-      \(child?.debugDescription ?? "nil")
+      \(child?.debugDescription ?? "child: nil")
       \(ifLet: scopeConditions?.values, where: { !$0.isEmpty },
          "conditionalScopes: [\(list: scopeConditions?.values.elements ?? [])]"
       )
