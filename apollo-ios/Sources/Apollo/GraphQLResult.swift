@@ -49,6 +49,10 @@ extension GraphQLResult: Equatable where Data: Equatable {
 extension GraphQLResult: Hashable where Data: Hashable {}
 
 extension GraphQLResult {
+  
+  /// Converts a ``GraphQLResult`` into a basic JSON dictionary for use.
+  ///
+  /// - Returns: A `[String: Any]` JSON dictionary representing the ``GraphQLResult``.
   public func asJSONDictionary() -> [String: Any] {
     var dict: [String: Any] = [:]
     if let data { dict["data"] = convert(value: data.__data) }
