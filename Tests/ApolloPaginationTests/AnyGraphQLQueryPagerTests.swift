@@ -98,7 +98,9 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
     pager.subscribe { _ in
       loadAllExpectation.fulfill()
     }
-    pager.loadAll()
+    pager.loadAll { error in
+      XCTAssertNil(error)
+    }
     wait(for: [firstPageExpectation, lastPageExpectation, loadAllExpectation], timeout: 5)
   }
 
@@ -140,7 +142,7 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
 
   private func fetchSecondPage<T>(pager: AnyGraphQLQueryPager<T>) throws {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
-    pager.loadMore()
+    pager.loadMore { error in XCTAssertNil(error) }
     wait(for: [serverExpectation], timeout: 1.0)
   }
 }

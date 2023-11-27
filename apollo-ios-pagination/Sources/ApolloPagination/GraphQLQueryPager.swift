@@ -196,6 +196,7 @@ extension GraphQLQueryPager {
     private var activeTask: Task<Void, Never>?
     private var initialFetchTask: Task<Void, Never>?
     private var activeContinuation: CheckedContinuation<Void, Never>?
+    private var initialContinuation: CheckedContinuation<Void, Never>?
 
     /// Designated Initializer
     /// - Parameters:
@@ -229,6 +230,7 @@ extension GraphQLQueryPager {
       firstPageWatcher?.cancel()
       subscribers.forEach { $0.cancel() }
       activeContinuation?.resume(with: .success(()))
+      initialContinuation?.resume(with: .success(()))
     }
 
     // MARK: - Public API
@@ -376,6 +378,7 @@ extension GraphQLQueryPager {
       firstPageWatcher?.cancel()
       firstPageWatcher = nil
       continuationResumption()
+      initialContinuationResumption()
       previousPageVarMap = [:]
       nextPageVarMap = [:]
       initialPageResult = nil
@@ -406,7 +409,7 @@ extension GraphQLQueryPager {
       let task = Task {
         let publisher = CurrentValueSubject<Void, Never>(())
         await withCheckedContinuation { continuation in
-          activeContinuation = continuation
+          initialContinuation = continuation
           if firstPageWatcher == nil {
             firstPageWatcher = GraphQLQueryWatcher(
               client: client,
@@ -422,7 +425,7 @@ extension GraphQLQueryPager {
           publisher.sink(receiveCompletion: { [weak self] _ in
             guard let self else { return continuation.resume() }
             Task {
-              await self.continuationResumption()
+              await self.initialContinuationResumption()
               await self.onTaskCancellation()
             }
           }, receiveValue: { })
@@ -592,6 +595,11 @@ extension GraphQLQueryPager {
     private func continuationResumption() {
       activeContinuation?.resume(with: .success(()))
       activeContinuation = nil
+    }
+
+    private func initialContinuationResumption() {
+      initialContinuation?.resume(with: .success(()))
+      initialContinuation = nil
     }
   }
 }
