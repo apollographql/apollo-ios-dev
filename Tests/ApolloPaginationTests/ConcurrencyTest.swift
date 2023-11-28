@@ -75,11 +75,11 @@ final class ConcurrencyTests: XCTestCase {
   ) async {
     await withTaskGroup(of: Void.self) { group in
       let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
-      group.addTask { try? await pager.loadMore() }
-      group.addTask { try? await pager.loadMore() }
-      group.addTask { try? await pager.loadMore() }
-      group.addTask { try? await pager.loadMore() }
-      group.addTask { try? await pager.loadMore() }
+      group.addTask { try? await pager.loadNext() }
+      group.addTask { try? await pager.loadNext() }
+      group.addTask { try? await pager.loadNext() }
+      group.addTask { try? await pager.loadNext() }
+      group.addTask { try? await pager.loadNext() }
 
       group.addTask { await self.fulfillment(of: [serverExpectation, expectation], timeout: 100) }
       await group.waitForAll()
@@ -91,11 +91,11 @@ final class ConcurrencyTests: XCTestCase {
   ) async throws {
     try await withThrowingTaskGroup(of: Void.self) { group in
       let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
-      group.addTask(priority: .userInitiated) { try await pager.loadMore() }
-      group.addTask { try await pager.loadMore() }
-      group.addTask { try await pager.loadMore() }
-      group.addTask { try await pager.loadMore() }
-      group.addTask { try await pager.loadMore() }
+      group.addTask(priority: .userInitiated) { try await pager.loadNext() }
+      group.addTask { try await pager.loadNext() }
+      group.addTask { try await pager.loadNext() }
+      group.addTask { try await pager.loadNext() }
+      group.addTask { try await pager.loadNext() }
 
       group.addTask { await self.fulfillment(of: [serverExpectation], timeout: 100) }
       try await group.waitForAll()
@@ -108,7 +108,7 @@ final class ConcurrencyTests: XCTestCase {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
 
     (0..<5).forEach { _ in
-      pager.loadMore()
+      pager.loadNext()
     }
     wait(for: [serverExpectation], timeout: 1.0)
   }
@@ -124,13 +124,14 @@ final class ConcurrencyTests: XCTestCase {
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):
-          return CursorBasedPagination.ForwardPagination(
+          return CursorBasedPagination.Forward(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor
           )
         }
       },
-      nextPageResolver: { pageInfo in
+      pageResolver: { pageInfo, direction in
+        guard direction == .next else { return nil }
         let nextQuery = Query()
         nextQuery.__variables = [
           "id": "2001",
@@ -138,8 +139,7 @@ final class ConcurrencyTests: XCTestCase {
           "after": pageInfo.endCursor,
         ]
         return nextQuery
-      },
-      previousPageResolver: nil
+      }
     )
   }
 
@@ -152,13 +152,14 @@ final class ConcurrencyTests: XCTestCase {
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):
-          return CursorBasedPagination.ForwardPagination(
+          return CursorBasedPagination.Forward(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor
           )
         }
       },
-      nextPageResolver: { pageInfo in
+      pageResolver: { pageInfo, direction in
+        guard direction == .next else { return nil }
         let nextQuery = Query()
         nextQuery.__variables = [
           "id": "2001",
@@ -166,8 +167,7 @@ final class ConcurrencyTests: XCTestCase {
           "after": pageInfo.endCursor,
         ]
         return nextQuery
-      },
-      previousPageResolver: nil
+      }
     )
   }
 

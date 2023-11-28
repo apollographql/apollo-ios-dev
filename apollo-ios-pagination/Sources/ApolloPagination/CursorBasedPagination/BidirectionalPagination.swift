@@ -1,11 +1,11 @@
 extension CursorBasedPagination {
-  public struct BidirectionalPagination: PaginationInfo, Hashable {
+  public struct Bidirectional: PaginationInfo, Hashable {
     public let hasNext: Bool
     public let endCursor: String?
     public let hasPrevious: Bool
     public let startCursor: String?
 
-    public var canLoadMore: Bool { hasNext }
+    public var canLoadNext: Bool { hasNext }
     public var canLoadPrevious: Bool { hasPrevious }
 
     public init(

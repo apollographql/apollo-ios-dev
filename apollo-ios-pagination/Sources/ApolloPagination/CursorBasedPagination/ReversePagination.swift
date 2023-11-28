@@ -1,9 +1,9 @@
 extension CursorBasedPagination {
-  public struct ReversePagination: PaginationInfo, Hashable {
+  public struct Reverse: PaginationInfo, Hashable {
     public let hasPrevious: Bool
     public let startCursor: String?
 
-    public var canLoadMore: Bool { false }
+    public var canLoadNext: Bool { false }
     public var canLoadPrevious: Bool { hasPrevious }
 
     public init(hasPrevious: Bool, startCursor: String?) {

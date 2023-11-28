@@ -115,13 +115,14 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):
-          return CursorBasedPagination.ForwardPagination(
+          return CursorBasedPagination.Forward(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor
           )
         }
       },
-      nextPageResolver: { pageInfo in
+      pageResolver: { pageInfo, direction in
+        guard direction == .next else { return nil }
         let nextQuery = Query()
         nextQuery.__variables = [
           "id": "2001",
@@ -129,8 +130,7 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
           "after": pageInfo.endCursor,
         ]
         return nextQuery
-      },
-      previousPageResolver: nil
+      }
     )
   }
 
@@ -142,7 +142,7 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
 
   private func fetchSecondPage<T>(pager: AnyGraphQLQueryPager<T>) throws {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
-    pager.loadMore { error in XCTAssertNil(error) }
+    pager.loadNext { error in XCTAssertNil(error) }
     wait(for: [serverExpectation], timeout: 1.0)
   }
 }

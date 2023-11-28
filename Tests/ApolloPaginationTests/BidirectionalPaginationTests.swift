@@ -70,7 +70,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
       secondPageFetch.fulfill()
     })
 
-    try await pager.loadMore()
+    try await pager.loadNext()
     await fulfillment(of: [secondPageExpectation, secondPageFetch], timeout: 1)
     subscription.cancel()
 
@@ -163,7 +163,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):
-          return CursorBasedPagination.BidirectionalPagination(
+          return CursorBasedPagination.Bidirectional(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor,
             hasPrevious: data.hero.friendsConnection.pageInfo.hasPreviousPage,
@@ -171,25 +171,27 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
           )
         }
       },
-      nextPageResolver: { pageInfo in
-        let nextQuery = Query()
-        nextQuery.__variables = [
-          "id": "2001",
-          "first": 1,
-          "after": pageInfo.endCursor,
-          "before": GraphQLNullable<String>.null,
-        ]
-        return nextQuery
-      },
-      previousPageResolver: { pageInfo in
-        let previousQuery = Query()
-        previousQuery.__variables = [
-          "id": "2001",
-          "first": 1,
-          "before": pageInfo.startCursor,
-          "after": GraphQLNullable<String>.null,
-        ]
-        return previousQuery
+      pageResolver: { pageInfo, direction in
+        switch direction {
+        case .next:
+          let nextQuery = Query()
+          nextQuery.__variables = [
+            "id": "2001",
+            "first": 1,
+            "after": pageInfo.endCursor,
+            "before": GraphQLNullable<String>.null,
+          ]
+          return nextQuery
+        case .previous:
+          let previousQuery = Query()
+          previousQuery.__variables = [
+            "id": "2001",
+            "first": 1,
+            "before": pageInfo.startCursor,
+            "after": GraphQLNullable<String>.null,
+          ]
+          return previousQuery
+        }
       }
     )
   }

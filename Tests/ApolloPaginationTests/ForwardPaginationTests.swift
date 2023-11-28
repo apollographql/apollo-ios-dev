@@ -71,7 +71,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       secondPageFetch.fulfill()
     })
 
-    try await pager.loadMore()
+    try await pager.loadNext()
     await fulfillment(of: [secondPageExpectation, secondPageFetch], timeout: 1)
     subscription.cancel()
 
@@ -110,7 +110,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     let subscription = await pager.subscribe(onUpdate: { _ in
       secondPageFetch.fulfill()
     })
-    try await pager.loadMore(cachePolicy: .fetchIgnoringCacheData)
+    try await pager.loadNext(cachePolicy: .fetchIgnoringCacheData)
     await fulfillment(of: [secondPageExpectation, secondPageFetch])
     subscription.cancel()
 
@@ -124,8 +124,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     ]
 
     let expectedVariables = nextQuery.__variables?.values.compactMap { $0._jsonEncodableValue?._jsonValue } ?? []
-    let firstKey = await pager.nextPageVarMap.keys.first as? [JSONValue]
-    let actualVariables = try XCTUnwrap(firstKey)
+    let actualVariables = try await XCTUnwrapping(await pager.nextPageVarMap.keys.first as? [JSONValue])
 
     XCTAssertEqual(expectedVariables.count, actualVariables.count)
     XCTAssertEqual(expectedVariables.count, 3)
@@ -145,8 +144,8 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [serverExpectation])
 
     currentPageInfo = try await XCTUnwrapping(await pager.currentPageInfo)
-    var page = try XCTUnwrap(currentPageInfo as? CursorBasedPagination.ForwardPagination)
-    let expectedFirstPage = CursorBasedPagination.ForwardPagination(
+    var page = try XCTUnwrap(currentPageInfo as? CursorBasedPagination.Forward)
+    let expectedFirstPage = CursorBasedPagination.Forward(
       hasNext: true,
       endCursor: "Y3Vyc29yMg=="
     )
@@ -158,13 +157,13 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     let subscription = await pager.subscribe(onUpdate: { _ in
       secondPageFetch.fulfill()
     })
-    try await pager.loadMore(cachePolicy: .fetchIgnoringCacheData)
+    try await pager.loadNext(cachePolicy: .fetchIgnoringCacheData)
     await fulfillment(of: [secondPageExpectation, secondPageFetch])
     subscription.cancel()
 
     currentPageInfo = try await XCTUnwrapping(await pager.currentPageInfo)
-    page = try XCTUnwrap(currentPageInfo as? CursorBasedPagination.ForwardPagination)
-    let expectedSecondPage = CursorBasedPagination.ForwardPagination(
+    page = try XCTUnwrap(currentPageInfo as? CursorBasedPagination.Forward)
+    let expectedSecondPage = CursorBasedPagination.Forward(
       hasNext: false,
       endCursor: "Y3Vyc29yMw=="
     )
@@ -198,7 +197,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       secondPageFetch.fulfill()
     })
 
-    try await pager.loadMore()
+    try await pager.loadNext()
     await fulfillment(of: [secondPageExpectation, secondPageFetch], timeout: 1)
     subscription.cancel()
     let newResult = try await XCTUnwrapping(await pager.currentValue)
@@ -248,6 +247,45 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [firstPageExpectation, lastPageExpectation, loadAllExpectation], timeout: 5)
   }
 
+  func test_failingFetch_finishes() async throws {
+    let initialQuery = Query()
+    initialQuery.__variables = ["id": "2001", "flirst": 2, "after": GraphQLNullable<String>.none]
+    let pager = GraphQLQueryPager<Query, Query>.Actor(
+      client: client,
+      initialQuery: initialQuery,
+      extractPageInfo: { data in
+        switch data {
+        case .initial(let data), .paginated(let data):
+          return CursorBasedPagination.Forward(
+            hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
+            endCursor: data.hero.friendsConnection.pageInfo.endCursor
+          )
+        }
+      },
+      pageResolver: { pageInfo, direction in
+        guard direction == .next else { return nil }
+        let nextQuery = Query()
+        nextQuery.__variables = [
+          "id": "2001",
+          "first": 2,
+          "after": pageInfo.endCursor,
+        ]
+        return nextQuery
+      }
+    )
+    let lastPageExpectation = Mocks.Hero.FriendsQuery.failingExpectation(server: server)
+
+    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
+    await pager
+      .subscribe(onUpdate: { results.append($0) })
+      .store(in: &cancellables)
+    await pager.fetch()
+    await fulfillment(of: [lastPageExpectation])
+    XCTAssertFalse(results.isEmpty)
+    let result = try XCTUnwrap(results.first)
+    await XCTAssertThrowsError(try result.get())
+  }
+
   private func createPager() -> GraphQLQueryPager<Query, Query>.Actor {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
@@ -257,13 +295,14 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):
-          return CursorBasedPagination.ForwardPagination(
+          return CursorBasedPagination.Forward(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor
           )
         }
       },
-      nextPageResolver: { pageInfo in
+      pageResolver: { pageInfo, direction in
+        guard direction == .next else { return nil }
         let nextQuery = Query()
         nextQuery.__variables = [
           "id": "2001",
@@ -271,8 +310,54 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
           "after": pageInfo.endCursor,
         ]
         return nextQuery
-      },
-      previousPageResolver: nil
+      }
     )
+  }
+}
+
+private extension Mocks.Hero.FriendsQuery {
+  static func failingExpectation(server: MockGraphQLServer) -> XCTestExpectation {
+    let query = MockQuery<Mocks.Hero.FriendsQuery>()
+    query.__variables = ["id": "2001", "flirst": 2, "after": GraphQLNullable<String>.none]
+    return server.expect(query) { _ in
+      let pageInfo: [AnyHashable: AnyHashable] = [
+        "__typename": "PageInfo",
+        "endCursor": "Y3Vyc29yMg==",
+        "hasNextPage": true,
+      ]
+      let friends: [[String: AnyHashable]] = [
+        [
+          "__typename": "Human",
+          "name": "Luke Skywalker",
+          "id": "1000",
+        ],
+        [
+          "__typename": "Human",
+          "name": "Han Solo",
+          "id": "1002",
+        ],
+      ]
+      let friendsConnection: [String: AnyHashable] = [
+        "__typename": "FriendsConnection",
+        "totalCount": 3,
+        "friends": friends,
+        "pageInfo": pageInfo,
+      ]
+
+      let hero: [String: AnyHashable] = [
+        "__typename": "Droid",
+        "id": "2001",
+        "name": "R2-D2",
+        "friendsConnection": friendsConnection,
+      ]
+
+      let data: [String: AnyHashable] = [
+        "hero": hero
+      ]
+
+      return [
+        "data": data
+      ]
+    }
   }
 }

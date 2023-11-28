@@ -43,7 +43,7 @@ public class AnyGraphQLQueryPager<Model> {
   }
 
   /// Type-erases a given pager, transforming the initial page to an array of models, and the
-  /// subsequent pagination to an adition array of models, concatenating the results of each into one array.
+  /// subsequent pagination to an additional array of models, concatenating the results of each into one array.
   /// - Parameters:
   ///   - pager: Pager to type-erase.
   ///   - initialTransform: Initial transformation from the initial page to an array of models.
@@ -73,23 +73,20 @@ public class AnyGraphQLQueryPager<Model> {
     pager.cancel()
   }
 
-  @discardableResult public func subscribe(completion: @MainActor @escaping (Output) -> Void) -> AnyCancellable {
-    guard let _subject else { return AnyCancellable({ }) }
-
-    let cancellable = _subject.compactMap({ $0 }).sink { result in
+  public func subscribe(completion: @MainActor @escaping (Output) -> Void) {
+    guard let _subject else { return }
+    _subject.compactMap({ $0 }).sink { result in
       Task {
         await completion(result)
       }
-    }
-    cancellable.store(in: &cancellables)
-    return cancellable
+    }.store(in: &cancellables)
   }
 
-  public func loadMore(
+  public func loadNext(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
     completion: (@MainActor (Error?) -> Void)? = nil
   ) {
-    pager.loadMore(cachePolicy: cachePolicy, completion: completion)
+    pager.loadNext(cachePolicy: cachePolicy, completion: completion)
   }
 
   public func loadPrevious(

@@ -1,9 +1,9 @@
 extension CursorBasedPagination {
-  public struct ForwardPagination: PaginationInfo, Hashable {
+  public struct Forward: PaginationInfo, Hashable {
     public let hasNext: Bool
     public let endCursor: String?
 
-    public var canLoadMore: Bool { hasNext }
+    public var canLoadNext: Bool { hasNext }
     public var canLoadPrevious: Bool { false }
 
     public init(hasNext: Bool, endCursor: String?) {

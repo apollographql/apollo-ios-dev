@@ -7,46 +7,46 @@ import XCTest
 @testable import ApolloPagination
 
 final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
-  
+
   private typealias Query = MockQuery<Mocks.Hero.ReverseFriendsQuery>
-  
+
   var cacheType: TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
-  
+
   var cache: NormalizedCache!
   var server: MockGraphQLServer!
   var client: ApolloClient!
   var cancellables: [AnyCancellable] = []
-  
+
   override func setUpWithError() throws {
     try super.setUpWithError()
-    
+
     cache = try makeNormalizedCache()
     let store = ApolloStore(cache: cache)
-    
+
     server = MockGraphQLServer()
     let networkTransport = MockNetworkTransport(server: server, store: store)
-    
+
     client = ApolloClient(networkTransport: networkTransport, store: store)
     MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
   }
-  
+
   override func tearDownWithError() throws {
     cache = nil
     server = nil
     client = nil
     cancellables.forEach { $0.cancel() }
     cancellables = []
-    
+
     try super.tearDownWithError()
   }
-  
+
   func test_fetchMultiplePages() async throws {
     let pager = createPager()
-    
+
     let serverExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForLastItem(server: server)
-    
+
     var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
     let firstPageExpectation = expectation(description: "First page")
     var subscription = await pager.subscribe(onUpdate: { _ in
@@ -63,25 +63,25 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertEqual(output.initialPage.hero.friendsConnection.totalCount, 3)
       XCTAssertEqual(output.updateSource, .fetch)
     }
-    
+
     let secondPageExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForPreviousItem(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
     subscription = await pager.subscribe(onUpdate: { _ in
       secondPageFetch.fulfill()
     })
-    
+
     try await pager.loadPrevious()
     await fulfillment(of: [secondPageExpectation, secondPageFetch], timeout: 1)
     subscription.cancel()
-    
+
     result = try await XCTUnwrapping(await pager.currentValue)
     results.append(result)
-    
+
     try XCTAssertSuccessResult(result) { output in
       // Assert first page is unchanged
       XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
-      
+
       XCTAssertFalse(output.previousPages.isEmpty)
       XCTAssertEqual(output.previousPages.count, 1)
       XCTAssertTrue(output.nextPages.isEmpty)
@@ -95,10 +95,10 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
     let nextCount = await pager.nextPageVarMap.values.count
     XCTAssertEqual(nextCount, 0)
   }
-  
+
   func test_loadAll() async throws {
     let pager = createPager()
-    
+
     let firstPageExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForLastItem(server: server)
     let lastPageExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForPreviousItem(server: server)
     let loadAllExpectation = expectation(description: "Load all pages")
@@ -108,7 +108,7 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
     try await pager.loadAll()
     await fulfillment(of: [firstPageExpectation, lastPageExpectation, loadAllExpectation], timeout: 5)
   }
-  
+
   private func createPager() -> GraphQLQueryPager<Query, Query>.Actor {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "before": "Y3Vyc29yMw=="]
@@ -118,14 +118,14 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):
-          return CursorBasedPagination.ReversePagination(
+          return CursorBasedPagination.Reverse(
             hasPrevious: data.hero.friendsConnection.pageInfo.hasPreviousPage,
             startCursor: data.hero.friendsConnection.pageInfo.startCursor
           )
         }
       },
-      nextPageResolver: nil,
-      previousPageResolver: { pageInfo in
+      pageResolver: { pageInfo, direction in
+        guard direction == .previous else { return nil }
         let nextQuery = Query()
         nextQuery.__variables = [
           "id": "2001",
