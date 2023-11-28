@@ -90,10 +90,6 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     self.pager = pager
   }
 
-  deinit {
-    cancellables.forEach { $0.cancel() }
-  }
-
   public func subscribe(onUpdate: @MainActor @escaping (Result<Output, Error>) -> Void) {
     Task {
       await pager.subscribe(onUpdate: onUpdate)
@@ -228,16 +224,16 @@ extension GraphQLQueryPager {
     deinit {
       nextPageWatchers.forEach { $0.cancel() }
       firstPageWatcher?.cancel()
-      subscribers.forEach { $0.cancel() }
       activeContinuation?.resume(with: .success(()))
       initialContinuation?.resume(with: .success(()))
     }
 
     // MARK: - Public API
 
-    public func loadAll() async throws {
+    public func loadAll(cachePolicy: CachePolicy = .fetchIgnoringCacheData) async throws {
       isLoadingAll = true
-      await fetch()
+      cancel()
+      await fetch(cachePolicy: cachePolicy)
 
       while currentPageInfo?.canLoadMore ?? false {
         try await loadMore()
@@ -386,7 +382,6 @@ extension GraphQLQueryPager {
       activeTask = nil
       initialFetchTask?.cancel()
       initialFetchTask = nil
-      subscribers.forEach { $0.cancel() }
       subscribers.removeAll()
     }
 
@@ -457,7 +452,7 @@ extension GraphQLQueryPager {
         }
         if let latest {
           let (previousPages, _, nextPage) = latest
-          currentValue = .success(
+          let value: Result<Output, Error> = .success(
             Output(
               previousPages: previousPages,
               initialPage: firstPageData,
@@ -465,6 +460,11 @@ extension GraphQLQueryPager {
               updateSource: data.source == .cache ? .cache : .fetch
             )
           )
+          if isLoadingAll {
+            queuedValue = value
+          } else {
+            currentValue = value
+          }
         }
         if shouldUpdate {
           publisher.send(completion: .finished)
@@ -574,8 +574,7 @@ extension GraphQLQueryPager {
       activeTask = nil
       initialFetchTask?.cancel()
       initialFetchTask = nil
-      subscribers.forEach { $0.cancel() }
-      subscribers = []
+      subscribers.removeAll()
     }
 
     private func pageTransformation() -> PaginationInfo? {

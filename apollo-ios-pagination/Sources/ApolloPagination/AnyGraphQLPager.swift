@@ -70,7 +70,6 @@ public class AnyGraphQLQueryPager<Model> {
   }
 
   deinit {
-    cancellables.forEach { $0.cancel() }
     pager.cancel()
   }
 
