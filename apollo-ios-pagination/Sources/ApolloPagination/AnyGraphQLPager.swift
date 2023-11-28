@@ -73,11 +73,13 @@ public class AnyGraphQLQueryPager<Model> {
     pager.cancel()
   }
 
-  @discardableResult public func subscribe(completion: @escaping (Output) -> Void) -> AnyCancellable {
+  @discardableResult public func subscribe(completion: @MainActor @escaping (Output) -> Void) -> AnyCancellable {
     guard let _subject else { return AnyCancellable({ }) }
 
     let cancellable = _subject.compactMap({ $0 }).sink { result in
-      completion(result)
+      Task {
+        await completion(result)
+      }
     }
     cancellable.store(in: &cancellables)
     return cancellable
