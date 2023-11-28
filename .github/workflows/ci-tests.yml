@@ -191,8 +191,6 @@ jobs:
 
   run-codegen-test-configurations:
     runs-on: macos-13
-    needs: [changes]
-    if: ${{ needs.changes.outputs.codegen  == 'true' }}
     timeout-minutes: 20
     name: Codegen Test Configurations - macOS
     steps:
