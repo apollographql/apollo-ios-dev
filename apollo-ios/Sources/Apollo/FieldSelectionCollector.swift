@@ -67,7 +67,6 @@ struct DefaultFieldSelectionCollector: FieldSelectionCollector {
     info: ObjectExecutionInfo
   ) throws {
     for selection in selections {
-      print("selection:\(selection)")
       switch selection {
       case let .field(field):
         groupedFields.append(field: field, withInfo: info)
