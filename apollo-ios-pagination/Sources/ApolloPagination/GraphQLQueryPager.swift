@@ -19,7 +19,7 @@ public protocol PagerType {
     cachePolicy: CachePolicy,
     completion: (@MainActor (Error?) -> Void)?
   )
-  func loadAll(completion: (@MainActor (Error?) -> Void)?)
+  func loadAll(reload: Bool, completion: (@MainActor (Error?) -> Void)?)
   func refetch(cachePolicy: CachePolicy)
   func fetch()
 }
@@ -134,7 +134,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
-  public func loadAll(completion: (@MainActor (Error?) -> Void)? = nil) {
+  public func loadAll(reload: Bool = true, completion: (@MainActor (Error?) -> Void)? = nil) {
     Task<_, Never> {
       do {
         try await pager.loadAll()

@@ -73,6 +73,9 @@ public class AnyGraphQLQueryPager<Model> {
     pager.cancel()
   }
 
+  /// Subscribe to the results of the pager, returning an `AnyCancellable` for the caller to manage.
+  /// - Parameter completion: The closure to trigger when new values come in.
+  /// - Returns: an `AnyCancellable` value that has not been stored internal to the `AnyGraphQLPager`.
   public func sink(completion: @MainActor @escaping (Output) -> Void) -> AnyCancellable {
     guard let _subject else { return AnyCancellable({ }) }
     return _subject.compactMap({ $0 }).sink { result in
@@ -82,10 +85,16 @@ public class AnyGraphQLQueryPager<Model> {
     }
   }
 
+  /// Subscribe to the results of the pager, with the management of the subscriber being stored internally to the `AnyGraphQLQueryPager`.
+  /// - Parameter completion: The closure to trigger when new values come in.
   public func subscribe(completion: @MainActor @escaping (Output) -> Void) {
     sink(completion: completion).store(in: &cancellables)
   }
 
+  /// Load the next page, if available.
+  /// - Parameters:
+  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
+  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
     completion: (@MainActor (Error?) -> Void)? = nil
@@ -93,6 +102,10 @@ public class AnyGraphQLQueryPager<Model> {
     pager.loadNext(cachePolicy: cachePolicy, completion: completion)
   }
 
+  /// Load the previous page, if available.
+  /// - Parameters:
+  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
+  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
     completion: (@MainActor (Error?) -> Void)? = nil
@@ -100,20 +113,29 @@ public class AnyGraphQLQueryPager<Model> {
     pager.loadPrevious(cachePolicy: cachePolicy, completion: completion)
   }
 
+  /// Loads all pages.
+  /// - Parameters:
+  ///   - reload: Whether or not to begin loading from the initial query. Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
+  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadAll(
+    reload: Bool = true,
     completion: (@MainActor (Error?) -> Void)? = nil
   ) {
-    pager.loadAll(completion: completion)
+    pager.loadAll(reload: reload, completion: completion)
   }
 
+  /// Discards pagination state and fetches the first page from scratch.
+  /// - Parameter cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `fetchIgnoringCacheData`.
   public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
     pager.refetch(cachePolicy: cachePolicy)
   }
 
+  /// Fetches the first page.
   public func fetch() {
     pager.fetch()
   }
 
+  /// Resets pagination state and cancels further updates from the pager.
   public func cancel() {
     pager.cancel()
   }
