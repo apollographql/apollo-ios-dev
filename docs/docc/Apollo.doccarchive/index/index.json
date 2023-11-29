@@ -3292,33 +3292,13 @@
                     "type" : "groupMarker"
                   },
                   {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/cannotparsechunkdata",
-                    "title" : "case cannotParseChunkData",
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/cannotparseresponse",
+                    "title" : "case cannotParseResponse",
                     "type" : "case"
                   },
                   {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/cannotparsepayloaddata",
-                    "title" : "case cannotParsePayloadData",
-                    "type" : "case"
-                  },
-                  {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/cannotparseresponsedata",
-                    "title" : "case cannotParseResponseData",
-                    "type" : "case"
-                  },
-                  {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/irrecoverableerror(message:)",
-                    "title" : "case irrecoverableError(message: String?)",
-                    "type" : "case"
-                  },
-                  {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/noresponsetoparse",
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/noresponsetoparse",
                     "title" : "case noResponseToParse",
-                    "type" : "case"
-                  },
-                  {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/unsupportedcontenttype(type:)",
-                    "title" : "case unsupportedContentType(type: String)",
                     "type" : "case"
                   },
                   {
@@ -3326,7 +3306,7 @@
                     "type" : "groupMarker"
                   },
                   {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/errordescription",
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/errordescription",
                     "title" : "var errorDescription: String?",
                     "type" : "property"
                   },
@@ -3341,12 +3321,12 @@
                         "type" : "groupMarker"
                       },
                       {
-                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/!=(_:_:)",
+                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/!=(_:_:)",
                         "title" : "static func != (Self, Self) -> Bool",
                         "type" : "op"
                       }
                     ],
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/equatable-implementations",
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/equatable-implementations",
                     "title" : "Equatable Implementations",
                     "type" : "symbol"
                   },
@@ -3357,12 +3337,12 @@
                         "type" : "groupMarker"
                       },
                       {
-                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/localizeddescription",
+                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/localizeddescription",
                         "title" : "var localizedDescription: String",
                         "type" : "property"
                       }
                     ],
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/error-implementations",
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/error-implementations",
                     "title" : "Error Implementations",
                     "type" : "symbol"
                   },
@@ -3373,28 +3353,28 @@
                         "type" : "groupMarker"
                       },
                       {
-                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/failurereason",
+                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/failurereason",
                         "title" : "var failureReason: String?",
                         "type" : "property"
                       },
                       {
-                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/helpanchor",
+                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/helpanchor",
                         "title" : "var helpAnchor: String?",
                         "type" : "property"
                       },
                       {
-                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/recoverysuggestion",
+                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/recoverysuggestion",
                         "title" : "var recoverySuggestion: String?",
                         "type" : "property"
                       }
                     ],
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/localizederror-implementations",
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/localizederror-implementations",
                     "title" : "LocalizedError Implementations",
                     "type" : "symbol"
                   }
                 ],
-                "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror",
-                "title" : "MultipartResponseParsingInterceptor.MultipartResponseParsingError",
+                "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror",
+                "title" : "MultipartResponseParsingInterceptor.ParsingError",
                 "type" : "enum"
               }
             ],
@@ -4111,6 +4091,58 @@
             "type" : "enum"
           },
           {
+            "children" : [
+              {
+                "title" : "Enumeration Cases",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/rootselectionsetinitializeerror\/hasnonhashablevalue",
+                "title" : "case hasNonHashableValue",
+                "type" : "case"
+              },
+              {
+                "title" : "Default Implementations",
+                "type" : "groupMarker"
+              },
+              {
+                "children" : [
+                  {
+                    "title" : "Operators",
+                    "type" : "groupMarker"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/rootselectionsetinitializeerror\/!=(_:_:)",
+                    "title" : "static func != (Self, Self) -> Bool",
+                    "type" : "op"
+                  }
+                ],
+                "path" : "\/documentation\/apollo\/rootselectionsetinitializeerror\/equatable-implementations",
+                "title" : "Equatable Implementations",
+                "type" : "symbol"
+              },
+              {
+                "children" : [
+                  {
+                    "title" : "Instance Properties",
+                    "type" : "groupMarker"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/rootselectionsetinitializeerror\/localizeddescription",
+                    "title" : "var localizedDescription: String",
+                    "type" : "property"
+                  }
+                ],
+                "path" : "\/documentation\/apollo\/rootselectionsetinitializeerror\/error-implementations",
+                "title" : "Error Implementations",
+                "type" : "symbol"
+              }
+            ],
+            "path" : "\/documentation\/apollo\/rootselectionsetinitializeerror",
+            "title" : "RootSelectionSetInitializeError",
+            "type" : "enum"
+          },
+          {
             "title" : "Extended Modules",
             "type" : "groupMarker"
           },
@@ -4127,8 +4159,13 @@
                     "type" : "groupMarker"
                   },
                   {
-                    "path" : "\/documentation\/apollo\/apolloapi\/rootselectionset\/init(data:variables:)",
+                    "path" : "\/documentation\/apollo\/apolloapi\/rootselectionset\/init(data:variables:)-5dodp",
                     "title" : "init(data: JSONObject, variables: [String : GraphQLOperationVariableValue]?) throws",
+                    "type" : "init"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/apolloapi\/rootselectionset\/init(data:variables:)-7xsfq",
+                    "title" : "init(data: [String : Any], variables: [String : GraphQLOperationVariableValue]?) throws",
                     "type" : "init"
                   }
                 ],

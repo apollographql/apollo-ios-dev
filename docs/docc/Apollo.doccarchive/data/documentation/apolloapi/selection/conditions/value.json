@@ -14,7 +14,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI9SelectionO10ConditionsV5valueSaySayAC9ConditionVGGvp",
+    "externalID" : "s:9ApolloAPI9SelectionO10ConditionsV5valueSaySayAC9ConditionOGGvp",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -43,7 +43,7 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+        "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
         "text" : "Condition"
       },
       {
@@ -101,7 +101,7 @@
             {
               "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+              "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
               "text" : "Condition"
             },
             {
@@ -226,7 +226,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "struct"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -324,7 +324,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
       "text" : "Condition"
     },
     {

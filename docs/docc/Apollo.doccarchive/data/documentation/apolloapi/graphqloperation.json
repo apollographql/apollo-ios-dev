@@ -127,6 +127,7 @@
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/definition",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/document",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/hasDeferredFragments-78tn2",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationDocument",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationIdentifier",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationName",
@@ -457,6 +458,50 @@
   "title" : "document",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqloperation\/document"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/hasDeferredFragments-78tn2": {
+  "abstract" : [
+
+  ],
+  "defaultImplementations" : 1,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "hasDeferredFragments"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/hasDeferredFragments-78tn2",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "hasDeferredFragments",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqloperation\/hasdeferredfragments-78tn2"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/operationDocument": {
   "abstract" : [
