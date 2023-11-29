@@ -6,7 +6,7 @@ import Combine
 public class AnyGraphQLQueryPager<Model> {
   public typealias Output = Result<(Model, UpdateSource), Error>
 
-  private var _subject: CurrentValueSubject<Output?, Never>? = .init(nil)
+  private var _subject: CurrentValueSubject<Output?, Never> = .init(nil)
   private var cancellables = [AnyCancellable]()
   private var pager: any PagerType
 
@@ -38,7 +38,7 @@ public class AnyGraphQLQueryPager<Model> {
         returnValue = .failure(error)
       }
 
-      _subject?.send(returnValue)
+      _subject.send(returnValue)
     }
   }
 
@@ -77,7 +77,6 @@ public class AnyGraphQLQueryPager<Model> {
   /// - Parameter completion: The closure to trigger when new values come in.
   /// - Returns: an `AnyCancellable` value that has not been stored internal to the `AnyGraphQLPager`.
   public func sink(completion: @MainActor @escaping (Output) -> Void) -> AnyCancellable {
-    guard let _subject else { return AnyCancellable({ }) }
     return _subject.compactMap({ $0 }).sink { result in
       Task {
         await completion(result)
