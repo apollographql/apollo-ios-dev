@@ -1,13 +1,17 @@
+import os
 import Foundation
 
 /// Helper to get logs printing to stdout so they can be read from the command line.
 enum PaginationLogger {
-  enum LogLevel: Int {
+  @available(macOS 11.0, *)
+  private static let logger = Logger()
+
+  enum LogLevel: Hashable, CustomStringConvertible, Comparable {
     case error
     case warning
     case debug
 
-    var name: String {
+    var description: String {
       switch self {
       case .error:
         return "ERROR"
@@ -30,17 +34,22 @@ enum PaginationLogger {
   /// - Parameter file: The file where this function was called. Defaults to the direct caller.
   /// - Parameter line: The line where this function was called. Defaults to the direct caller.
   static func log(
-    _ logString: @autoclosure () -> String,
+    _ logString: @autoclosure @escaping () -> String,
     logLevel: LogLevel = .debug,
-    file: StaticString = #file,
+    file: StaticString = #fileID,
     line: UInt = #line
   ) {
-    guard logLevel.rawValue <= PaginationLogger.level.rawValue else { return }
-
-    let standardOutput = FileHandle.standardOutput
-    let string = "[\(logLevel.name) - ApolloPagination:\(file.lastPathComponent):\(line)] - \(logString())"
-    guard let data = string.data(using: .utf8) else { return }
-    standardOutput.write(data)
+    guard logLevel <= PaginationLogger.level else { return }
+    if #available(macOS 11.0, iOS 14.0, iOSApplicationExtension 14.0, tvOS 14.0, watchOS 7.0, *) {
+      logger.debug("[\(logLevel) - ApolloPagination:\(file.lastPathComponent):\(line)] - \(logString())")
+    } else {
+      os_log(
+        "[%@ - ApolloPagination:%@:%@] - %@)",
+        log: .default,
+        type: .debug,
+        logLevel.description, file.lastPathComponent, line, logString()
+      )
+    }
   }
 }
 
