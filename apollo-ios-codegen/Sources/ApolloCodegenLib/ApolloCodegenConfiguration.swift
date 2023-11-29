@@ -945,6 +945,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
 
   /// Name used to scope the generated schema type files.
   public let schemaNamespace: String
+  /// Names used to add additional scopes to the generated schema type files.
+  public let additionalImportedModuleNamespaces: [String]
   /// The input files required for code generation.
   public let input: FileInput
   /// The paths and files output by code generation.
@@ -984,6 +986,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   ///  - experimentalFeatures: Allows users to enable experimental features.
   public init(
     schemaNamespace: String,
+    additionalImportedModuleNamespaces: [String] = [],
     input: FileInput,
     output: FileOutput,
     options: OutputOptions = Default.options,
@@ -992,6 +995,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     operationManifest: OperationManifestConfiguration? = Default.operationManifest
   ) {
     self.schemaNamespace = schemaNamespace
+    self.additionalImportedModuleNamespaces = additionalImportedModuleNamespaces
     self.input = input
     self.output = output
     self.options = options
