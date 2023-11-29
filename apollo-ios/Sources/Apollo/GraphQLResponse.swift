@@ -2,16 +2,32 @@
 import ApolloAPI
 #endif
 
+/// Indicates which deferred fragments were received in the incremental response and have been
+/// fulfilled.
+public enum FulfilledFragments {
+  /// All deferred fragments.
+  case all
+  /// Only the deferred fragments with matching labels.
+  case labels([String])
+}
+
 /// Represents a GraphQL response received from a server.
 public final class GraphQLResponse<Data: RootSelectionSet> {
 
   public let body: JSONObject
+  public let fulfilledFragments: FulfilledFragments
 
   private let rootKey: CacheReference
   private let variables: GraphQLOperation.Variables?
 
-  public init<Operation: GraphQLOperation>(operation: Operation, body: JSONObject) where Operation.Data == Data {
+  public init<Operation: GraphQLOperation>(
+    operation: Operation,
+    body: JSONObject,
+    fulfilledFragments: FulfilledFragments = .labels([])
+  ) where Operation.Data == Data {
     self.body = body
+    self.fulfilledFragments = fulfilledFragments
+
     rootKey = CacheReference.rootCacheReference(for: Operation.operationType)
     variables = operation.__variables
   }
@@ -41,11 +57,14 @@ public final class GraphQLResponse<Data: RootSelectionSet> {
 
     let executor = GraphQLExecutor(executionSource: NetworkResponseExecutionSource())
 
-    return try executor.execute(selectionSet: Data.self,
-                                on: dataEntry,
-                                withRootCacheReference: rootKey,
-                                variables: variables,
-                                accumulator: accumulator)
+    return try executor.execute(
+      selectionSet: Data.self,
+      on: dataEntry,
+      expecting: fulfilledFragments,
+      withRootCacheReference: rootKey,
+      variables: variables,
+      accumulator: accumulator
+    )
   }
 
   private func makeResult(data: Data?, dependentKeys: Set<CacheKey>?) -> GraphQLResult<Data> {

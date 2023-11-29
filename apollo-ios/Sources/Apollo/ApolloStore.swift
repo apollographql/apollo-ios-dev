@@ -232,6 +232,7 @@ public class ApolloStore {
       return try executor.execute(
         selectionSet: type,
         on: object,
+        expecting: .all,
         withRootCacheReference: CacheReference(key),
         variables: variables,
         accumulator: accumulator
@@ -304,9 +305,11 @@ public class ApolloStore {
                 variables: operation.__variables)
     }
 
+    #warning("Revisit fulfilledFragments default value in #3149")
     public func write<SelectionSet: RootSelectionSet>(
       selectionSet: SelectionSet,
       withKey key: CacheKey,
+      fulfilledFragments: FulfilledFragments = .labels([]),
       variables: GraphQLOperation.Variables? = nil
     ) throws {
       let normalizer = ResultNormalizerFactory.selectionSetDataNormalizer()
@@ -316,6 +319,7 @@ public class ApolloStore {
       let records = try executor.execute(
         selectionSet: SelectionSet.self,
         on: selectionSet.__data,
+        expecting: fulfilledFragments,
         withRootCacheReference: CacheReference(key),
         variables: variables,
         accumulator: normalizer

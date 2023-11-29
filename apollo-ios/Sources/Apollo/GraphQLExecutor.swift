@@ -164,9 +164,14 @@ public struct GraphQLExecutionError: Error, LocalizedError {
   }
 }
 
-/// A GraphQL executor is responsible for executing a selection set and generating a result. It is initialized with a resolver closure that gets called repeatedly to resolve field values.
+/// A GraphQL executor is responsible for executing a selection set and generating a result. It is 
+/// initialized with a resolver closure that gets called repeatedly to resolve field values.
 ///
-/// An executor is used both to parse a response received from the server, and to read from the normalized cache. It can also be configured with an accumulator that receives events during execution, and these execution events are used by `GraphQLResultNormalizer` to normalize a response into a flat set of records and by `GraphQLDependencyTracker` keep track of dependent keys.
+/// An executor is used both to parse a response received from the server, and to read from the 
+/// normalized cache. It can also be configured with an accumulator that receives events during 
+/// execution, and these execution events are used by `GraphQLResultNormalizer` to normalize a 
+/// response into a flat set of records and by `GraphQLDependencyTracker` keep track of dependent 
+/// keys.
 ///
 /// The methods in this class closely follow the
 /// [execution algorithm described in the GraphQL specification]
@@ -187,6 +192,7 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
   >(
     selectionSet: SelectionSet.Type,
     on data: Source.RawObjectData,
+    expecting fulfilledFragments: FulfilledFragments,
     withRootCacheReference root: CacheReference? = nil,
     variables: GraphQLOperation.Variables? = nil,
     accumulator: Accumulator
@@ -201,6 +207,7 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
     let rootValue = execute(
       selections: selectionSet.__selections,
       on: data,
+      expecting: fulfilledFragments,
       info: info,
       accumulator: accumulator
     )
@@ -211,11 +218,17 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
   private func execute<Accumulator: GraphQLResultAccumulator>(
     selections: [Selection],
     on object: Source.RawObjectData,
+    expecting fulfilledFragments: FulfilledFragments,
     info: ObjectExecutionInfo,
     accumulator: Accumulator
   ) -> PossiblyDeferred<Accumulator.ObjectResult> {
     do {
-      let groupedFields = try groupFields(selections, on: object, info: info)
+      let groupedFields = try groupFields(
+        selections,
+        on: object,
+        expecting: fulfilledFragments,
+        info: info
+      )
       info.fulfilledFragments = groupedFields.fulfilledFragments
 
       var fieldEntries: [PossiblyDeferred<Accumulator.FieldEntry?>] = []
@@ -246,6 +259,7 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
   private func groupFields(
     _ selections: [Selection],
     on object: Source.RawObjectData,
+    expecting fulfilledFragments: FulfilledFragments,
     info: ObjectExecutionInfo
   ) throws -> FieldSelectionGrouping {
     var grouping = FieldSelectionGrouping(info: info)
@@ -254,6 +268,7 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
       from: selections,
       into: &grouping,
       for: object,
+      expecting: fulfilledFragments,
       info: info
     )
     return grouping
@@ -400,6 +415,7 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
     return execute(
       selections: selections,
       on: object,
+      expecting: .labels([]),
       info: childExecutionInfo,
       accumulator: accumulator
     )

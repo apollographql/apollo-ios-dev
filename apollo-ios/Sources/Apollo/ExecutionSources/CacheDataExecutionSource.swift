@@ -75,12 +75,14 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
       from selections: [Selection],
       into groupedFields: inout FieldSelectionGrouping,
       for object: Record,
+      expecting fulfilledFragments: FulfilledFragments,
       info: ObjectExecutionInfo
     ) throws {
       return try DefaultFieldSelectionCollector.collectFields(
         from: selections,
         into: &groupedFields,
         for: object.fields,
+        expecting: fulfilledFragments,
         info: info
       )
     }

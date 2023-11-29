@@ -52,6 +52,7 @@ protocol FieldSelectionCollector<ObjectData> {
     from selections: [Selection],
     into groupedFields: inout FieldSelectionGrouping,
     for object: ObjectData,
+    expecting fulfilledFragments: FulfilledFragments,
     info: ObjectExecutionInfo
   ) throws
 
@@ -62,39 +63,76 @@ struct DefaultFieldSelectionCollector: FieldSelectionCollector {
     from selections: [Selection],
     into groupedFields: inout FieldSelectionGrouping,
     for object: JSONObject,
+    expecting fulfilledFragments: FulfilledFragments,
     info: ObjectExecutionInfo
   ) throws {
     for selection in selections {
+      print("selection:\(selection)")
       switch selection {
       case let .field(field):
         groupedFields.append(field: field, withInfo: info)
 
       case let .conditional(conditions, conditionalSelections):
         if conditions.evaluate(with: info.variables) {
-          try collectFields(from: conditionalSelections,
-                            into: &groupedFields,
-                            for: object,
-                            info: info)
+          try collectFields(
+            from: conditionalSelections,
+            into: &groupedFields,
+            for: object,
+            expecting: fulfilledFragments,
+            info: info
+          )
         }
 
-      case .deferred(_, _, _):
-        assertionFailure("Defer execution must be implemented (#3145).")
+      case let .deferred(condition, typeCase, label):
+        switch fulfilledFragments {
+        case .all:
+          preconditionFailure(".all hasn't been implemented yet!")
+          if condition?.evaluate(with: info.variables) ?? true {
+            groupedFields.addFulfilledFragment(typeCase)
+            try collectFields(
+              from: typeCase.__selections,
+              into: &groupedFields,
+              for: object,
+              expecting: fulfilledFragments,
+              info: info
+            )
+          }
+
+        case let .labels(fulfilled):
+          if fulfilled.contains(label) {
+            groupedFields.addFulfilledFragment(typeCase)
+            try collectFields(
+              from: typeCase.__selections,
+              into: &groupedFields,
+              for: object,
+              expecting: fulfilledFragments,
+              info: info
+            )
+          }
+        }
+
       case let .fragment(fragment):
         groupedFields.addFulfilledFragment(fragment)
-        try collectFields(from: fragment.__selections,
-                          into: &groupedFields,
-                          for: object,
-                          info: info)
+        try collectFields(
+          from: fragment.__selections,
+          into: &groupedFields,
+          for: object,
+          expecting: fulfilledFragments,
+          info: info
+        )
 
-      // TODO: _ is fine for now but will need to be handled in #3145
       case let .inlineFragment(typeCase):
         if let runtimeType = info.runtimeObjectType(for: object),
-           typeCase.__parentType.canBeConverted(from: runtimeType) {
+           typeCase.__parentType.canBeConverted(from: runtimeType) 
+        {
           groupedFields.addFulfilledFragment(typeCase)
-          try collectFields(from: typeCase.__selections,
-                            into: &groupedFields,
-                            for: object,
-                            info: info)
+          try collectFields(
+            from: typeCase.__selections,
+            into: &groupedFields,
+            for: object,
+            expecting: fulfilledFragments,
+            info: info
+          )
         }
       }
     }
@@ -113,6 +151,7 @@ struct CustomCacheDataWritingFieldSelectionCollector: FieldSelectionCollector {
     from selections: [Selection],
     into groupedFields: inout FieldSelectionGrouping,
     for object: DataDict,
+    expecting fulfilledFragments: FulfilledFragments,
     info: ObjectExecutionInfo
   ) throws {
     groupedFields.fulfilledFragments = object._fulfilledFragments
@@ -150,6 +189,7 @@ struct CustomCacheDataWritingFieldSelectionCollector: FieldSelectionCollector {
                           asConditionalFields: true)
       case .deferred(_, _, _):
         assertionFailure("Defer execution must be implemented (#3145).")
+        // evaluate do we have the whole response
       case let .fragment(fragment):
         if groupedFields.fulfilledFragments.contains(type: fragment) {
           try collectFields(from: fragment.__selections,

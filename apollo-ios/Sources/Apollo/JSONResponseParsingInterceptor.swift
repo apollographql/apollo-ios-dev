@@ -56,7 +56,11 @@ public struct JSONResponseParsingInterceptor: ApolloInterceptor {
         throw JSONResponseParsingError.couldNotParseToJSON(data: createdResponse.rawData)
       }
 
-      let graphQLResponse = GraphQLResponse(operation: request.operation, body: body)
+      let graphQLResponse = GraphQLResponse(
+        operation: request.operation,
+        body: body,
+        fulfilledFragments: createdResponse.fulfilledFragments
+      )
       createdResponse.legacyResponse = graphQLResponse
 
 

@@ -16,6 +16,7 @@ extension RootSelectionSet {
   ///                the given JSON response data.
   public init(
     data: JSONObject,
+    fulfilledFragments: FulfilledFragments = .labels([]),
     variables: GraphQLOperation.Variables? = nil
   ) throws {
     let accumulator = GraphQLSelectionSetMapper<Self>(
@@ -26,6 +27,7 @@ extension RootSelectionSet {
     self = try executor.execute(
       selectionSet: Self.self,
       on: data,
+      expecting: fulfilledFragments,
       variables: variables,
       accumulator: accumulator
     )
