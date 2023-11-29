@@ -38,7 +38,7 @@ struct SelectionSetTemplate {
     return BodyTemplate(computedRootSelectionSet)
   }
 
-  // MARK: - Child Entity  
+  // MARK: - Child Entity
   func render(childEntity selectionSet: IR.ComputedSelectionSet) -> String {
     let fieldSelectionSetName = nameCache.selectionSetName(for: selectionSet.typeInfo)
 
@@ -791,7 +791,7 @@ fileprivate extension IR.ComputedSelectionSet {
   /// If a value is returned, references to the selection set can point to another rendered
   /// selection set with the returned name.
   func nameForReferencedSelectionSet(config: ApolloCodegen.ConfigurationContext) -> String? {
-    guard direct == nil && merged.mergedSources.count == 1 else {
+    guard !shouldBeRendered else {
       return nil
     }
 

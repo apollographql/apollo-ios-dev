@@ -105,11 +105,10 @@ extension IRTestWrapper {
   }
 
   public subscript(
-    as typeCase: String? = nil,
     deferred deferCondition: CompilationResult.DeferCondition? = nil
   ) -> SelectionSetTestWrapper? {
     guard let scope = self.scopeCondition(
-      type: typeCase,
+      type: nil,
       conditions: nil,
       deferCondition: deferCondition
     ) else {
@@ -225,18 +224,18 @@ extension IRTestWrapper<IR.Operation> {
 }
 
 extension IRTestWrapper<IR.NamedFragment> {
-  public subscript(field field: String) -> IRTestWrapper<IR.EntityField>? {
-    guard irObject.rootField.underlyingField.name == field else { return nil }
+  public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
+    if irObject.rootField.underlyingField.name == field { return rootField }
 
-    return rootField
+    return rootField[field: field]
   }
 
   public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
     rootField[fragment: fragment]
   }
 
-  public var rootField: IRTestWrapper<IR.EntityField> {
-    return IRTestWrapper<IR.EntityField>(
+  public var rootField: IRTestWrapper<IR.Field> {
+    return IRTestWrapper<IR.Field>(
       irObject: irObject.rootField,
       entityStorage: entityStorage
     )

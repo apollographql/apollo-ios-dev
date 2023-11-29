@@ -90,10 +90,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 2, ignoringExtraLines: true))
@@ -132,10 +132,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
@@ -171,10 +171,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 3, ignoringExtraLines: true))
@@ -214,10 +214,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
@@ -253,10 +253,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -298,10 +298,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -343,10 +343,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 21, ignoringExtraLines: true))
@@ -388,10 +388,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 21, ignoringExtraLines: true))
@@ -428,10 +428,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(schemaNamespace: "myschema")
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.computed)
 
     // then
     let expected = """
@@ -470,10 +470,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(schemaNamespace: "MYSCHEMA")
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.computed)
 
     // then
     let expected = """
@@ -512,10 +512,10 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(schemaNamespace: "MySchema")
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.computed)
 
     // then
     let expected = """
