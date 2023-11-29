@@ -5,7 +5,6 @@ import os
 enum PaginationLogger {
   @available(macOS 11.0, *)
   private static let logger = Logger()
-
   enum LogLevel: Hashable, CustomStringConvertible, Comparable {
     case error
     case warning
@@ -41,20 +40,14 @@ enum PaginationLogger {
   ) {
     guard logLevel <= PaginationLogger.level else { return }
     if #available(macOS 11.0, iOS 14.0, iOSApplicationExtension 14.0, tvOS 14.0, watchOS 7.0, *) {
-      logger.debug("[\(logLevel) - ApolloPagination:\(file.lastPathComponent):\(line)] - \(logString())")
+      logger.debug("[\(logLevel) - ApolloPagination:\(file):\(line)] - \(logString())")
     } else {
       os_log(
         "[%@ - ApolloPagination:%@:%@] - %@)",
         log: .default,
         type: .debug,
-        logLevel.description, file.lastPathComponent, line, logString()
+        logLevel.description, file.description, line, logString()
       )
     }
-  }
-}
-
-private extension StaticString {
-  var lastPathComponent: String {
-    return (description as NSString).lastPathComponent
   }
 }
