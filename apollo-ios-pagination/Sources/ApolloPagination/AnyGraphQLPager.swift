@@ -73,7 +73,7 @@ public class AnyGraphQLQueryPager<Model> {
     pager.cancel()
   }
 
-  public func subscribe(completion: @MainActor @escaping (Output) -> Void) -> AnyCancellable {
+  public func sink(completion: @MainActor @escaping (Output) -> Void) -> AnyCancellable {
     guard let _subject else { return AnyCancellable({ }) }
     return _subject.compactMap({ $0 }).sink { result in
       Task {
@@ -83,7 +83,7 @@ public class AnyGraphQLQueryPager<Model> {
   }
 
   public func subscribe(completion: @MainActor @escaping (Output) -> Void) {
-    subscribe(completion: completion).store(in: &cancellables)
+    sink(completion: completion).store(in: &cancellables)
   }
 
   public func loadNext(
