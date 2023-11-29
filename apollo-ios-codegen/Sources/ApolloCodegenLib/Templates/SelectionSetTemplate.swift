@@ -5,16 +5,6 @@ import GraphQLCompiler
 import TemplateString
 import Utilities
 
-#warning("""
-TODO: Addition to PR Description
-- Changes the generated model format for using referenced fragments (precursor to hoisted types).
-  - Though we haven't implemented intelligent hoisted types yet, there are times when a field accessor for a merged field points to another generated `SelectionSet`, rather than generating its own child selection set with the same exact shape.
-  - The determination of whether a selection set can use a referenced fragment depends on the merged selections, but we no longer want to compute these and retain them during the ...
-
-Can we instead collect the computed selections as needed from FieldAccessorsTemplate and InlineFragmentAccessorsTemplate and then pass them into ChildTypeCaseSelectionSets?
-Then we might not need to change the rendering to use the reference typealiases?
-""")
-
 struct SelectionSetTemplate {
 
   let definition: IR.Definition
@@ -41,16 +31,15 @@ struct SelectionSetTemplate {
   }
 
   func renderBody() -> TemplateString {
-    let computedRootSelectionSet = ComputedSelectionSet.Builder(
+    let computedRootSelectionSet = IR.ComputedSelectionSet.Builder(
       definition.rootField.selectionSet,
       entityStorage: definition.entityStorage
     ).build()
     return BodyTemplate(computedRootSelectionSet)
   }
 
-  // MARK: - Field
-  #warning("TODO: Rename this")
-  func render(field selectionSet: IR.ComputedSelectionSet) -> String {
+  // MARK: - Child Entity  
+  func render(childEntity selectionSet: IR.ComputedSelectionSet) -> String {
     let fieldSelectionSetName = nameCache.selectionSetName(for: selectionSet.typeInfo)
 
     if let referencedSelectionSetName = selectionSet.nameForReferencedSelectionSet(config: config) {
@@ -637,7 +626,7 @@ struct SelectionSetTemplate {
         field.selectionSet,
         entityStorage: definition.entityStorage
       ).build()
-      return render(field: computedSelectionSet)
+      return render(childEntity: computedSelectionSet)
     }, separator: "\n\n")
     """
   }

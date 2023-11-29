@@ -286,7 +286,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       operation[field: "query"]?[field: "animal"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: animal.selectionSet.computed)
+    let actual = subject.render(childEntity: animal.selectionSet.computed)
 
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
@@ -414,7 +414,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
     let animal = try XCTUnwrap(
       operation[field: "query"]?[field: "animal"] as? IRTestWrapper<IR.EntityField>
     )
-    let actual = subject.render(field: animal.selectionSet.computed)
+    let actual = subject.render(childEntity: animal.selectionSet.computed)
 
     expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }

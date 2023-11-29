@@ -92,7 +92,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(String(actual.reversed())).to(equalLineByLine("}", ignoringExtraLines: true))
@@ -131,7 +131,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -167,7 +167,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -207,7 +207,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -247,7 +247,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -288,7 +288,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -340,7 +340,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "nested"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: asDog_Nested.selectionSet.computed)
+    let actual = subject.render(childEntity: asDog_Nested.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -387,7 +387,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -499,7 +499,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -538,7 +538,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -605,7 +605,7 @@ class SelectionSetTemplateTests: XCTestCase {
         operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
       )
 
-      let actual = subject.render(field: allAnimals.selectionSet.computed)
+      let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
       // then
       expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -676,7 +676,7 @@ class SelectionSetTemplateTests: XCTestCase {
         operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
       )
 
-      let actual = subject.render(field: allAnimals.selectionSet.computed)
+      let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
       // then
       expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -716,7 +716,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -755,7 +755,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -806,7 +806,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1006,7 +1006,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1053,7 +1053,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1175,7 +1175,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1216,7 +1216,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1255,7 +1255,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1294,7 +1294,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1375,7 +1375,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1430,7 +1430,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1482,7 +1482,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1526,7 +1526,7 @@ class SelectionSetTemplateTests: XCTestCase {
       allAnimals[as: "Animal", deferred: .init(label: "root")]
     )
 
-    let rendered_allAnimals = subject.render(field: allAnimals.selectionSet.computed)
+    let rendered_allAnimals = subject.render(childEntity: allAnimals.selectionSet.computed)
     let rendered_allAnimals_deferredAsRoot = subject.render(
       inlineFragment: allAnimals_deferredAsRoot.computed
     )
@@ -1590,7 +1590,7 @@ class SelectionSetTemplateTests: XCTestCase {
       allAnimals[as: "Animal", deferred: .init(label: "root")]
     )
 
-    let rendered_allAnimals = subject.render(field: allAnimals.selectionSet.computed)
+    let rendered_allAnimals = subject.render(childEntity: allAnimals.selectionSet.computed)
     let rendered_allAnimals_deferredAsRoot = subject.render(
       inlineFragment: allAnimals_deferredAsRoot.computed
     )
@@ -1660,7 +1660,7 @@ class SelectionSetTemplateTests: XCTestCase {
       allAnimals_asDog[as: "Dog", deferred: .init(label: "root")]
     )
 
-    let rendered_allAnimals = subject.render(field: allAnimals.selectionSet.computed)
+    let rendered_allAnimals = subject.render(childEntity: allAnimals.selectionSet.computed)
     let rendered_allAnimals_asDog = subject.render(inlineFragment: allAnimals_asDog.computed)
     let rendered_allAnimals_asDog_deferredAsRoot = subject.render(
       inlineFragment: allAnimals_asDog_deferredAsRoot.computed
@@ -1740,7 +1740,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1779,7 +1779,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1818,7 +1818,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1860,7 +1860,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1918,7 +1918,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1967,7 +1967,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -2012,7 +2012,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -2101,7 +2101,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -2183,7 +2183,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]
     )
 
-    let actual = subject.render(field: queryRoot.selectionSet.computed)
+    let actual = subject.render(childEntity: queryRoot.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -2494,7 +2494,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 35, ignoringExtraLines: true))
@@ -2558,7 +2558,7 @@ class SelectionSetTemplateTests: XCTestCase {
         operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
       )
 
-      let actual = subject.render(field: allAnimals.selectionSet.computed)
+      let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
       // then
       expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
@@ -2626,7 +2626,7 @@ class SelectionSetTemplateTests: XCTestCase {
         operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
       )
 
-      let actual = subject.render(field: allAnimals.selectionSet.computed)
+      let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
       // then
       expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -2665,7 +2665,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "AllAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -2701,7 +2701,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "AllAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -2739,7 +2739,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -2819,7 +2819,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "AllAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -2855,7 +2855,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "AllAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -3050,7 +3050,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(
@@ -3098,7 +3098,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(
@@ -3211,7 +3211,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(
@@ -3265,7 +3265,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
@@ -3304,7 +3304,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -3343,7 +3343,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -3382,7 +3382,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -3429,7 +3429,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
@@ -3474,7 +3474,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -3528,7 +3528,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals_predator.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals_predator.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -3585,7 +3585,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Pet"]?[field: "predator"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals_asPet_predator.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals_asPet_predator.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
@@ -3650,7 +3650,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let allAnimals_predator_asPet = try XCTUnwrap(allAnimals_predator[as: "Pet"])
 
-    let allAnimals_predator_actual = subject.render(field: allAnimals_predator.selectionSet.computed)
+    let allAnimals_predator_actual = subject.render(childEntity: allAnimals_predator.selectionSet.computed)
     let allAnimals_predator_asPet_actual = subject.render(
       inlineFragment: allAnimals_predator_asPet.computed
     )
@@ -3721,7 +3721,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let allAnimals_predator_asPet = try XCTUnwrap(allAnimals_predator[as: "Pet"])
 
-    let allAnimals_predator_actual = subject.render(field: allAnimals_predator.selectionSet.computed)
+    let allAnimals_predator_actual = subject.render(childEntity: allAnimals_predator.selectionSet.computed)
     let allAnimals_predator_asPet_actual = subject.render(
       inlineFragment: allAnimals_predator_asPet.computed
     )
@@ -3785,7 +3785,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let predator_actual = subject.render(field: predator.selectionSet.computed)
+    let predator_actual = subject.render(childEntity: predator.selectionSet.computed)
 
     // then
     expect(predator_actual)
@@ -3845,7 +3845,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let predator_actual = subject.render(field: predator.selectionSet.computed)
+    let predator_actual = subject.render(childEntity: predator.selectionSet.computed)
 
     // then
     expect(predator_actual)
@@ -4167,7 +4167,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals_asDog_predator.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals_asDog_predator.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4234,7 +4234,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals_asDog_predator.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals_asDog_predator.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4272,7 +4272,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4308,7 +4308,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4434,7 +4434,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4484,7 +4484,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[field: "child"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals_child.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals_child.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4535,7 +4535,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[if: "a"]?[field: "child"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals_child.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals_child.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
@@ -4750,7 +4750,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
@@ -4810,7 +4810,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals_asDog_predator.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals_asDog_predator.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -4854,7 +4854,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4896,7 +4896,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4938,7 +4938,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4980,7 +4980,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5021,7 +5021,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5071,7 +5071,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
@@ -5125,7 +5125,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
@@ -5237,7 +5237,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
@@ -5283,7 +5283,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5329,7 +5329,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -5416,7 +5416,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let rendered = subject.render(field: allAnimals.selectionSet.computed)
+    let rendered = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     expect(rendered).to(equalLineByLine(
       """
@@ -5468,7 +5468,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let rendered = subject.render(field: allAnimals.selectionSet.computed)
+    let rendered = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     expect(rendered).to(equalLineByLine(
       """
@@ -5588,7 +5588,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5630,7 +5630,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5672,7 +5672,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5717,7 +5717,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5793,7 +5793,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]
     )
 
-    let actual = subject.render(field: query.selectionSet.computed)
+    let actual = subject.render(childEntity: query.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5869,7 +5869,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]
     )
 
-    let actual = subject.render(field: query.selectionSet.computed)
+    let actual = subject.render(childEntity: query.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5953,7 +5953,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals_asDog_predator.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals_asDog_predator.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -6004,7 +6004,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -6055,7 +6055,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -6146,9 +6146,9 @@ class SelectionSetTemplateTests: XCTestCase {
       allAnimals_predator[as: "WarmBlooded"]
     )
 
-    let allAnimals_actual = subject.render(field: allAnimals.selectionSet.computed)
+    let allAnimals_actual = subject.render(childEntity: allAnimals.selectionSet.computed)
     let allAnimals_predator_actual = subject.render(
-      field: allAnimals_predator.selectionSet!.computed
+      childEntity: allAnimals_predator.selectionSet!.computed
     )
     let allAnimals_predator_asWarmBlooded_actual = subject
       .render(inlineFragment: allAnimals_predator_asWarmBlooded.computed)
@@ -6211,7 +6211,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
@@ -6274,7 +6274,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals_asDog_predator.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals_asDog_predator.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -6319,7 +6319,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -6361,7 +6361,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 21, ignoringExtraLines: true))
@@ -6422,7 +6422,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let predator_actual = subject.render(field: predator.selectionSet.computed)
+    let predator_actual = subject.render(childEntity: predator.selectionSet.computed)
 
     // then
     expect(predator_actual)
@@ -6483,7 +6483,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let predator_actual = subject.render(field: predator.selectionSet.computed)
+    let predator_actual = subject.render(childEntity: predator.selectionSet.computed)
 
     // then
     expect(predator_actual)
@@ -6528,7 +6528,7 @@ class SelectionSetTemplateTests: XCTestCase {
         operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
       )
 
-      let predator_actual = subject.render(field: allAnimals.selectionSet.computed)
+      let predator_actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
       // then
       expect(predator_actual)
@@ -7106,7 +7106,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -7148,7 +7148,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -7188,7 +7188,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -7227,7 +7227,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -7271,7 +7271,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -7307,7 +7307,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: allAnimals.selectionSet.computed)
+    let actual = subject.render(childEntity: allAnimals.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -7355,7 +7355,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "animal"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: animal.selectionSet.computed)
+    let actual = subject.render(childEntity: animal.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -7402,7 +7402,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "animal"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: animal.selectionSet.computed)
+    let actual = subject.render(childEntity: animal.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -7454,7 +7454,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "animal"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: animal.selectionSet.computed)
+    let actual = subject.render(childEntity: animal.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -7502,7 +7502,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "animal"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: animal.selectionSet.computed)
+    let actual = subject.render(childEntity: animal.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -7551,7 +7551,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "getUser"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: user.selectionSet.computed)
+    let actual = subject.render(childEntity: user.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expectedOne, atLine: 9, ignoringExtraLines: true))
@@ -7604,7 +7604,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "getUser"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: user.selectionSet.computed)
+    let actual = subject.render(childEntity: user.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expectedOne, atLine: 9, ignoringExtraLines: true))
@@ -7649,7 +7649,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "getUser"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: user.selectionSet.computed)
+    let actual = subject.render(childEntity: user.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expectedOne, atLine: 9, ignoringExtraLines: true))
@@ -7690,7 +7690,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "getUser"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: user.selectionSet.computed)
+    let actual = subject.render(childEntity: user.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -7740,7 +7740,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "getUser"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: user.selectionSet.computed)
+    let actual = subject.render(childEntity: user.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -7777,7 +7777,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "getType"] as? IRTestWrapper<IR.EntityField>
     )
 
-    let actual = subject.render(field: user.selectionSet.computed)
+    let actual = subject.render(childEntity: user.selectionSet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
