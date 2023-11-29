@@ -111,11 +111,15 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     completion: (@MainActor (Error?) -> Void)? = nil
   ) {
     Task<_, Never> {
-      do {
-        try await pager.loadPrevious(cachePolicy: cachePolicy)
-        await completion?(nil)
-      } catch {
-        await completion?(error)
+      await withTaskCancellationHandler {
+        do {
+          try await pager.loadPrevious(cachePolicy: cachePolicy)
+          await completion?(nil)
+        } catch {
+          await completion?(error)
+        }
+      } onCancel: {
+        Task { await completion?(PaginationError.taskCancelled) }
       }
     }
   }
@@ -125,22 +129,30 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     completion: (@MainActor (Error?) -> Void)? = nil
   ) {
     Task<_, Never> {
-      do {
-        try await pager.loadNext(cachePolicy: cachePolicy)
-        await completion?(nil)
-      } catch {
-        await completion?(error)
+      await withTaskCancellationHandler {
+        do {
+          try await pager.loadNext(cachePolicy: cachePolicy)
+          await completion?(nil)
+        } catch {
+          await completion?(error)
+        }
+      } onCancel: {
+        Task { await completion?(PaginationError.taskCancelled) }
       }
     }
   }
 
   public func loadAll(reload: Bool = true, completion: (@MainActor (Error?) -> Void)? = nil) {
     Task<_, Never> {
-      do {
-        try await pager.loadAll(reload: reload)
-        await completion?(nil)
-      } catch {
-        await completion?(error)
+      await withTaskCancellationHandler {
+        do {
+          try await pager.loadAll(reload: reload)
+          await completion?(nil)
+        } catch {
+          await completion?(error)
+        }
+      } onCancel: {
+        Task { await completion?(PaginationError.taskCancelled) }
       }
     }
   }
@@ -185,7 +197,8 @@ extension GraphQLQueryPager {
 
     @Published var currentValue: Result<Output, Error>?
     private var queuedValue: Result<Output, Error>?
-    private var subscribers: [AnyCancellable] = []
+    private var paginationSubscriber: AnyCancellable?
+    private var initialFetchSubscriber: AnyCancellable?
 
     @Published var initialPageResult: InitialQuery.Data?
     var latest: ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data])? {
@@ -318,7 +331,8 @@ extension GraphQLQueryPager {
       activeTask = nil
       initialFetchTask?.cancel()
       initialFetchTask = nil
-      subscribers.removeAll()
+      paginationSubscriber = nil
+      initialFetchSubscriber = nil
     }
 
     /// Whether or not we can load more information based on the current page.
@@ -333,35 +347,45 @@ extension GraphQLQueryPager {
     // MARK: - Private
 
     private func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) async {
-      guard initialFetchTask == nil, activeContinuation == nil else {
+      guard initialFetchTask == nil, initialContinuation == nil else {
         await initialFetchTask?.value
         return
       }
       let task = Task {
         let publisher = CurrentValueSubject<Void, Never>(())
-        await withCheckedContinuation { continuation in
-          initialContinuation = continuation
-          if firstPageWatcher == nil {
-            firstPageWatcher = GraphQLQueryWatcher(
-              client: client,
-              query: initialQuery,
-              resultHandler: { [weak self] result in
-                guard let self else { return continuation.resume() }
-                Task {
-                  await self.onInitialFetch(cachePolicy: cachePolicy, result: result, publisher: publisher)
+        await withTaskCancellationHandler {
+          await withCheckedContinuation { continuation in
+            initialContinuation = continuation
+            if firstPageWatcher == nil {
+              firstPageWatcher = GraphQLQueryWatcher(
+                client: client,
+                query: initialQuery,
+                resultHandler: { [weak self] result in
+                  guard let self else { return continuation.resume() }
+                  Task {
+                    await self.onInitialFetch(
+                      cachePolicy: cachePolicy,
+                      result: result,
+                      publisher: publisher
+                    )
+                  }
                 }
-              }
-            )
-          }
-          publisher.sink(receiveCompletion: { [weak self] _ in
-            guard let self else { return continuation.resume() }
-            Task {
-              await self.initialContinuationResumption()
-              await self.onTaskCancellation()
+              )
             }
-          }, receiveValue: { })
-          .store(in: &subscribers)
-          firstPageWatcher?.refetch(cachePolicy: cachePolicy)
+            initialFetchSubscriber = publisher.sink(receiveCompletion: { [weak self] _ in
+              guard let self else { return continuation.resume() }
+              Task {
+                await self.initialContinuationResumption()
+                await self.onInitialTaskCancellation()
+              }
+            }, receiveValue: { })
+            firstPageWatcher?.refetch(cachePolicy: cachePolicy)
+          }
+        } onCancel: {
+          Task { [weak self] in
+            await self?.initialContinuationResumption()
+            await self?.onInitialTaskCancellation()
+          }
         }
       }
       initialFetchTask = task
@@ -372,6 +396,16 @@ extension GraphQLQueryPager {
       direction: PaginationDirection,
       cachePolicy: CachePolicy
     ) async throws {
+      if initialContinuation != nil || initialFetchTask != nil {
+        // If we are here, it means we are attempting to load the next (or previous) page on the basis of
+        // cached data. That can lead to inconsistent pagination state. We will pause execution here until
+        // the initial fetch completes.
+        PaginationLogger.log(
+          "We have entered a pagination fetch while an initial fetch task is still active",
+          logLevel: .debug
+        )
+        await initialFetchTask?.value
+      }
       let pageQuery: PaginatedQuery?
       switch direction {
       case .previous:
@@ -390,30 +424,36 @@ extension GraphQLQueryPager {
 
       let task = Task {
         let publisher = CurrentValueSubject<Void, Never>(())
-        await withCheckedContinuation { continuation in
-          activeContinuation = continuation
-          let watcher = GraphQLQueryWatcher(client: client, query: pageQuery) { [weak self] result in
-            guard let self else { return continuation.resume() }
-            Task {
-              await self.onPaginationFetch(
-                direction: direction,
-                cachePolicy: cachePolicy,
-                result: result,
-                publisher: publisher,
-                query: pageQuery
-              )
+        await withTaskCancellationHandler {
+          await withCheckedContinuation { continuation in
+            activeContinuation = continuation
+            let watcher = GraphQLQueryWatcher(client: client, query: pageQuery) { [weak self] result in
+              guard let self else { return continuation.resume() }
+              Task {
+                await self.onPaginationFetch(
+                  direction: direction,
+                  cachePolicy: cachePolicy,
+                  result: result,
+                  publisher: publisher,
+                  query: pageQuery
+                )
+              }
             }
+            nextPageWatchers.append(watcher)
+            paginationSubscriber = publisher.sink(receiveCompletion: { [weak self] _ in
+              guard let self else { return continuation.resume() }
+              Task {
+                await self.continuationResumption()
+                await self.onTaskCancellation()
+              }
+            }, receiveValue: { })
+            watcher.refetch(cachePolicy: cachePolicy)
           }
-          nextPageWatchers.append(watcher)
-          publisher.sink(receiveCompletion: { [weak self] _ in
-            guard let self else { return continuation.resume() }
-            Task {
-              await self.continuationResumption()
-              await self.onTaskCancellation()
-            }
-          }, receiveValue: { })
-          .store(in: &subscribers)
-          watcher.refetch(cachePolicy: cachePolicy)
+        } onCancel: {
+          Task { [weak self] in
+            await self?.continuationResumption()
+            await self?.onTaskCancellation()
+          }
         }
       }
       activeTask = task
@@ -519,9 +559,14 @@ extension GraphQLQueryPager {
     private func onTaskCancellation() async {
       activeTask?.cancel()
       activeTask = nil
+      paginationSubscriber = nil
+      await onInitialTaskCancellation()
+    }
+
+    private func onInitialTaskCancellation() async {
       initialFetchTask?.cancel()
       initialFetchTask = nil
-      subscribers.removeAll()
+      initialFetchSubscriber = nil
     }
 
     private func nextPageTransformation() -> PaginationInfo? {
