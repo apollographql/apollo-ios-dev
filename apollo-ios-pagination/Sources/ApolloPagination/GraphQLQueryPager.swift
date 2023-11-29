@@ -137,7 +137,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   public func loadAll(reload: Bool = true, completion: (@MainActor (Error?) -> Void)? = nil) {
     Task<_, Never> {
       do {
-        try await pager.loadAll()
+        try await pager.loadAll(reload: reload)
         await completion?(nil)
       } catch {
         await completion?(error)
