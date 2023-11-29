@@ -986,7 +986,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   ///  - experimentalFeatures: Allows users to enable experimental features.
   public init(
     schemaNamespace: String,
-    additionalImportedModuleNamespaces: [String] = [],
+    additionalImportedModuleNames: [String] = [],
     input: FileInput,
     output: FileOutput,
     options: OutputOptions = Default.options,
@@ -995,7 +995,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     operationManifest: OperationManifestConfiguration? = Default.operationManifest
   ) {
     self.schemaNamespace = schemaNamespace
-    self.additionalImportedModuleNamespaces = additionalImportedModuleNamespaces
+    self.additionalImportedModuleNames = additionalImportedModuleNames
     self.input = input
     self.output = output
     self.options = options
