@@ -1,5 +1,5 @@
-import os
 import Foundation
+import os
 
 /// Helper to get logs printing to stdout so they can be read from the command line.
 enum PaginationLogger {
