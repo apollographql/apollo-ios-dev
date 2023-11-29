@@ -311,10 +311,4 @@ fileprivate extension ApolloCodegenConfiguration {
     case .swiftPackageManager, .other: return schemaNamespace.firstUppercased
     }
   }
-  var additionalImportedModulesNames: [String] {
-    switch output.schemaTypes.moduleType {
-    case .embeddedInTarget: return []
-    case .swiftPackageManager, .other: return additionalImportedModuleNamespaces.map { $0.firstUppercased }
-    }
-  }
 }
