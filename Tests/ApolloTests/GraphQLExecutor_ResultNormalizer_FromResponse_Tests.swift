@@ -20,6 +20,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     return try GraphQLExecutor_ResultNormalizer_FromResponse_Tests.executor.execute(
       selectionSet: selectionSet,
       on: object,
+      expecting: .labels([]),
       withRootCacheReference: CacheReference.RootQuery,
       variables: variables,
       accumulator: ResultNormalizerFactory.networkResponseDataNormalizer()

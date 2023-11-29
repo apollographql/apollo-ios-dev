@@ -17,11 +17,13 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
   private func readValues<T: RootSelectionSet>(
     _ selectionSet: T.Type,
     from object: JSONObject,
-    variables: GraphQLOperation.Variables? = nil
+    variables: GraphQLOperation.Variables? = nil,
+    fulfilledFragments: FulfilledFragments = .labels([])
   ) throws -> T {
     return try GraphQLExecutor_SelectionSetMapper_FromResponse_Tests.executor.execute(
       selectionSet: selectionSet,
-      on: object,      
+      on: object,
+      expecting: fulfilledFragments,
       variables: variables,
       accumulator: GraphQLSelectionSetMapper<T>()
     )
@@ -1768,7 +1770,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     }
   }
 
-  // MARK: Fulfilled Fragment Tests
+  // MARK: - Fulfilled Fragment Tests
 
   func test__nestedEntity_andTypeCaseWithAdditionalMergedNestedEntityFields_givenChildEntityCanConvertToTypeCase_fulfilledFragmentsContainsTypeCase() throws {
     struct Types {
@@ -1840,5 +1842,833 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let data = try Character(data: jsonObject)
     expect(data.friend.__data.fragmentIsFulfilled(Character.Friend.self)).to(beTrue())
     expect(data.friend.__data.fragmentIsFulfilled(Character.AsHero.Friend.self)).to(beTrue())
+  }
+
+  // MARK: - Deferred Fragments
+
+  func test__deferredFragment__givenFieldSelection_withUnfulfilledResponse_doesNotCollectDeferredField() throws {
+    // given
+    struct Types {
+      static let Animal = Interface(name: "Animal")
+    }
+
+    class AllAnimal: AbstractMockSelectionSet<AllAnimal.Fragments, MockSchemaMetadata> {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .deferred(Root.self, label: "root"),
+      ]}
+
+      struct Fragments: FragmentContainer {
+        let __data: DataDict
+        init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred var root: Root?
+      }
+
+      class Root: MockTypeCase {
+        override class var __parentType: ParentType { Types.Animal }
+        override class var __selections: [Selection] {[
+          .field("species", String.self),
+        ]}
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Animal",
+      "id": "animal-cat",
+      "species": "Domestic Cat",
+    ]
+
+    // when
+    let data = try readValues(AllAnimal.self, from: object, fulfilledFragments: .labels([]))
+
+    // then
+    expect(data.__typename).to(equal("Animal"))
+    expect(data.id).to(equal("animal-cat"))
+
+    expect(data.fragments.root).to(beNil())
+  }
+
+  func test__deferredFragment__givenFieldSelection_withFulfilledResponse_doesCollectDeferredField() throws {
+    // given
+    struct Types {
+      static let Animal = Interface(name: "Animal")
+    }
+
+    class AllAnimal: AbstractMockSelectionSet<AllAnimal.Fragments, MockSchemaMetadata> {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .deferred(Root.self, label: "root"),
+      ]}
+
+      struct Fragments: FragmentContainer {
+        let __data: DataDict
+        init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred var root: Root?
+      }
+
+      class Root: MockTypeCase {
+        override class var __parentType: ParentType { Types.Animal }
+        override class var __selections: [Selection] {[
+          .field("species", String.self),
+        ]}
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Animal",
+      "id": "animal-cat",
+      "species": "Domestic Cat",
+    ]
+
+    // when
+    let data = try readValues(AllAnimal.self, from: object, fulfilledFragments: .labels(["root"]))
+
+    // then
+    expect(data.__typename).to(equal("Animal"))
+    expect(data.id).to(equal("animal-cat"))
+
+    expect(data.fragments.root?.id).to(equal("animal-cat"))
+    expect(data.fragments.root?.species).to(equal("Domestic Cat"))
+  }
+
+  func test__deferredFragment__givenFieldSelection_withFulfilledResponseAndConditionEvaluatingTrue_doesCollectDeferredField() throws {
+    // given
+    struct Types {
+      static let Animal = Interface(name: "Animal")
+    }
+
+    class AllAnimal: AbstractMockSelectionSet<AllAnimal.Fragments, MockSchemaMetadata> {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .deferred(if: "a", Root.self, label: "root"),
+      ]}
+
+      struct Fragments: FragmentContainer {
+        let __data: DataDict
+        init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred var root: Root?
+      }
+
+      class Root: MockTypeCase {
+        override class var __parentType: ParentType { Types.Animal }
+        override class var __selections: [Selection] {[
+          .field("species", String.self),
+        ]}
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Animal",
+      "id": "animal-cat",
+      "species": "Domestic Cat",
+    ]
+
+    // when
+    let data = try readValues(
+      AllAnimal.self,
+      from: object,
+      variables: ["a": true],
+      fulfilledFragments: .labels(["root"])
+    )
+
+    // then
+    expect(data.__typename).to(equal("Animal"))
+    expect(data.id).to(equal("animal-cat"))
+
+    expect(data.fragments.root?.id).to(equal("animal-cat"))
+    expect(data.fragments.root?.species).to(equal("Domestic Cat"))
+  }
+
+  func test__deferredFragment__givenFieldSelection_withUnfulfilledResponseAndConditionEvaluatingFalse_doesNotCollectDeferredField() throws {
+    // given
+    struct Types {
+      static let Animal = Interface(name: "Animal")
+    }
+
+    class AllAnimal: AbstractMockSelectionSet<AllAnimal.Fragments, MockSchemaMetadata> {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .deferred(if: "a", Root.self, label: "root"),
+      ]}
+
+      struct Fragments: FragmentContainer {
+        let __data: DataDict
+        init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred var root: Root?
+      }
+
+      class Root: MockTypeCase {
+        override class var __parentType: ParentType { Types.Animal }
+        override class var __selections: [Selection] {[
+          .field("id", String.self),
+          .field("species", String.self),
+        ]}
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Animal",
+      "id": "animal-cat",
+      "species": "Domestic Cat",
+    ]
+
+    // when
+    let data = try readValues(
+      AllAnimal.self,
+      from: object,
+      variables: ["a": false],
+      fulfilledFragments: .labels([])
+    )
+
+    // then
+    expect(data.__typename).to(equal("Animal"))
+    expect(data.id).to(equal("animal-cat"))
+
+    expect(data.fragments.root).to(beNil())
+  }
+
+  func test__deferredFragment__givenFieldSelection_withFulfilledResponseButMissingField_throwsError() throws {
+    // given
+    struct Types {
+      static let Animal = Interface(name: "Animal")
+    }
+
+    class AllAnimal: AbstractMockSelectionSet<AllAnimal.Fragments, MockSchemaMetadata> {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .deferred(Root.self, label: "root"),
+      ]}
+
+      struct Fragments: FragmentContainer {
+        let __data: DataDict
+        init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred var root: Root?
+      }
+
+      class Root: MockTypeCase {
+        override class var __parentType: ParentType { Types.Animal }
+        override class var __selections: [Selection] {[
+          .field("species", String.self),
+        ]}
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Animal",
+      "id": "animal-cat",
+      // missing deferred field
+    ]
+
+    // when
+    expect { try self.readValues(AllAnimal.self, from: object, fulfilledFragments: .labels(["root"])) }.to(
+      throwError { (error: GraphQLExecutionError) in
+        expect(error.path).to(equal(["species"]))
+        expect(error.underlying).to(matchError(JSONDecodingError.missingValue))
+      }
+    )
+  }
+
+  func test__deferredFragment__givenInlineFragmentSelectionWithTypeCase_withFulfilledResponseOnMatchingType_doesCollectDeferredInlineFragment() throws {
+    // given
+    struct Types {
+      static let Animal = Interface(name: "Animal")
+      static let Dog = Object(typename: "Dog", implementedInterfaces: [Animal])
+    }
+
+    MockSchemaMetadata.stub_objectTypeForTypeName =  { _ in Types.Dog }
+
+    class AllAnimal: AbstractMockSelectionSet<AllAnimal.Fragments, MockSchemaMetadata> {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .deferred(Root.self, label: "root"),
+      ]}
+
+      struct Fragments: FragmentContainer {
+        let __data: DataDict
+        init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred var root: Root?
+      }
+
+      class Root: MockTypeCase {
+        override class var __parentType: ParentType { Types.Animal }
+        override class var __selections: [Selection] {[
+          .field("species", String.self),
+          .inlineFragment(AsDog.self),
+        ]}
+
+        var asDog: AsDog? { _asInlineFragment() }
+
+        class AsDog: MockTypeCase {
+          override class var __parentType: ParentType { Types.Dog }
+          override class var __selections: [Selection] {[
+            .field("genus", String.self),
+          ]}
+        }
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Dog",
+      "id": "animal-dog",
+      "species": "Domestic Dog",
+      "genus": "Canis familiaris",
+    ]
+
+    // when
+    let data = try readValues(AllAnimal.self, from: object, fulfilledFragments: .labels(["root"]))
+
+    // then
+    expect(data.__typename).to(equal("Dog"))
+    expect(data.id).to(equal("animal-dog"))
+
+    expect(data.fragments.root?.id).to(equal("animal-dog"))
+    expect(data.fragments.root?.species).to(equal("Domestic Dog"))
+
+    expect(data.fragments.root?.asDog?.genus).to(equal("Canis familiaris"))
+  }
+
+  func test__deferredFragment__givenInlineFragmentSelectionWithTypeCase_withFulfilledResponseOnNonMatchingType_doesNotCollectDeferredInlineFragment() throws {
+    // given
+    struct Types {
+      static let Animal = Interface(name: "Animal")
+      static let Dog = Object(typename: "Dog", implementedInterfaces: [Animal])
+      static let Cat = Object(typename: "Cat", implementedInterfaces: [Animal])
+    }
+
+    MockSchemaMetadata.stub_objectTypeForTypeName =  { typeName in
+      switch typeName {
+      case "Dog": return Types.Dog
+      case "Cat": return Types.Cat
+      default: fail()
+      }
+
+      return nil
+    }
+
+    class AllAnimal: AbstractMockSelectionSet<AllAnimal.Fragments, MockSchemaMetadata> {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .deferred(Root.self, label: "root"),
+      ]}
+
+      struct Fragments: FragmentContainer {
+        let __data: DataDict
+        init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred var root: Root?
+      }
+
+      class Root: MockTypeCase {
+        override class var __parentType: ParentType { Types.Animal }
+        override class var __selections: [Selection] {[
+          .field("species", String.self),
+          .inlineFragment(AsDog.self),
+        ]}
+
+        var asDog: AsDog? { _asInlineFragment() }
+
+        class AsDog: MockTypeCase {
+          override class var __parentType: ParentType { Types.Dog }
+          override class var __selections: [Selection] {[
+            .field("genus", String.self),
+          ]}
+        }
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Cat",
+      "id": "animal-cat",
+      "species": "Domestic Cat",
+      "genus": "Felis catus",
+    ]
+
+    // when
+    let data = try readValues(AllAnimal.self, from: object, fulfilledFragments: .labels(["root"]))
+
+    // then
+    expect(data.__typename).to(equal("Cat"))
+    expect(data.id).to(equal("animal-cat"))
+
+    expect(data.fragments.root?.id).to(equal("animal-cat"))
+    expect(data.fragments.root?.species).to(equal("Domestic Cat"))
+
+    expect(data.fragments.root?.asDog).to(beNil())
+  }
+
+  func test__deferredFragment__givenNamedFragmentSelectionWithTypeCase_withFulfilledResponseOnMatchingType_doesCollectDeferredNamedFragment() throws {
+    // given
+    struct Types {
+      static let Animal = Interface(name: "Animal")
+      static let Dog = Object(typename: "Dog", implementedInterfaces: [Animal])
+    }
+
+    MockSchemaMetadata.stub_objectTypeForTypeName =  { _ in Types.Dog }
+
+    class AllAnimal: AbstractMockSelectionSet<AllAnimal.Fragments, MockSchemaMetadata> {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .deferred(Root.self, label: "root"),
+      ]}
+
+      struct Fragments: FragmentContainer {
+        let __data: DataDict
+        init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred var root: Root?
+      }
+
+      class Root: AbstractMockSelectionSet<Root.Fragments, MockSchemaMetadata>, InlineFragment, Deferrable {
+        typealias RootEntityType = AllAnimal
+
+        override class var __parentType: ParentType { Types.Animal }
+        override class var __selections: [Selection] {[
+          .field("species", String.self),
+          .fragment(GenusFragment.self),
+        ]}
+
+        struct Fragments: FragmentContainer {
+          let __data: DataDict
+          init(_dataDict: DataDict) { __data = _dataDict }
+
+          var genusFragment: GenusFragment { _toFragment() }
+        }
+      }
+    }
+
+    class GenusFragment: MockFragment {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .inlineFragment(AsDog.self),
+      ]}
+
+      var asDog: AsDog? { _asInlineFragment() }
+
+      class AsDog: MockTypeCase {
+        override class var __parentType: ParentType { Types.Dog }
+        override class var __selections: [Selection] {[
+          .field("genus", String.self),
+        ]}
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Dog",
+      "id": "animal-dog",
+      "species": "Domestic dog",
+      "genus": "Canis familiaris",
+    ]
+
+    // when
+    let data = try readValues(AllAnimal.self, from: object, fulfilledFragments: .labels(["root"]))
+
+    // then
+    expect(data.__typename).to(equal("Dog"))
+    expect(data.id).to(equal("animal-dog"))
+
+    expect(data.fragments.root?.id).to(equal("animal-dog"))
+    expect(data.fragments.root?.species).to(equal("Domestic dog"))
+
+    expect(data.fragments.root?.fragments.genusFragment.__typename).to(equal("Dog"))
+    expect(data.fragments.root?.fragments.genusFragment.asDog?.genus).to(equal("Canis familiaris"))
+  }
+
+  func test__deferredFragment__givenNamedFragmentSelectionWithTypeCase_withFulfilledResponseOnNonMatchingType_doesNotCollectDeferredNamedFragment() throws {
+    // given
+    struct Types {
+      static let Animal = Interface(name: "Animal")
+      static let Dog = Object(typename: "Dog", implementedInterfaces: [Animal])
+      static let Cat = Object(typename: "Cat", implementedInterfaces: [Animal])
+    }
+
+    MockSchemaMetadata.stub_objectTypeForTypeName =  { typeName in
+      switch typeName {
+      case "Dog": return Types.Dog
+      case "Cat": return Types.Cat
+      default: fail()
+      }
+
+      return nil
+    }
+
+    class AllAnimal: AbstractMockSelectionSet<AllAnimal.Fragments, MockSchemaMetadata> {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .deferred(Root.self, label: "root"),
+      ]}
+
+      struct Fragments: FragmentContainer {
+        let __data: DataDict
+        init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred var root: Root?
+      }
+
+      class Root: AbstractMockSelectionSet<Root.Fragments, MockSchemaMetadata>, InlineFragment, Deferrable {
+        typealias RootEntityType = AllAnimal
+
+        override class var __parentType: ParentType { Types.Animal }
+        override class var __selections: [Selection] {[
+          .field("species", String.self),
+          .fragment(GenusFragment.self),
+        ]}
+
+        struct Fragments: FragmentContainer {
+          let __data: DataDict
+          init(_dataDict: DataDict) { __data = _dataDict }
+
+          var genusFragment: GenusFragment { _toFragment() }
+        }
+      }
+    }
+
+    class GenusFragment: MockFragment {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .inlineFragment(AsDog.self),
+      ]}
+
+      var asDog: AsDog? { _asInlineFragment() }
+
+      class AsDog: MockTypeCase {
+        override class var __parentType: ParentType { Types.Dog }
+        override class var __selections: [Selection] {[
+          .field("genus", String.self),
+        ]}
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Cat",
+      "id": "animal-cat",
+      "species": "Domestic cat",
+      "genus": "Felis catus",
+    ]
+
+    // when
+    let data = try readValues(AllAnimal.self, from: object, fulfilledFragments: .labels(["root"]))
+
+    // then
+    expect(data.__typename).to(equal("Cat"))
+    expect(data.id).to(equal("animal-cat"))
+
+    expect(data.fragments.root?.id).to(equal("animal-cat"))
+    expect(data.fragments.root?.species).to(equal("Domestic cat"))
+
+    expect(data.fragments.root?.fragments.genusFragment.__typename).to(equal("Cat"))
+    expect(data.fragments.root?.fragments.genusFragment.asDog).to(beNil())
+  }
+
+  func test__deferredFragment__givenConditionalFieldSelection_withFulfilledResponseAndConditionEvaluatingTrue_doesCollectConditionalField() throws {
+    // given
+    struct Types {
+      static let Animal = Interface(name: "Animal")
+    }
+
+    class AllAnimal: AbstractMockSelectionSet<AllAnimal.Fragments, MockSchemaMetadata> {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .deferred(Root.self, label: "root"),
+      ]}
+
+      struct Fragments: FragmentContainer {
+        let __data: DataDict
+        init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred var root: Root?
+      }
+
+      class Root: MockTypeCase {
+        override class var __parentType: ParentType { Types.Animal }
+        override class var __selections: [Selection] {[
+          .include(if: "variable", .field("species", String.self)),
+        ]}
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Animal",
+      "id": "animal-cat",
+      "species": "Domestic Cat",
+    ]
+
+    // when
+    let data = try readValues(
+      AllAnimal.self,
+      from: object,
+      variables: ["variable": true],
+      fulfilledFragments: .labels(["root"])
+    )
+
+    // then
+    expect(data.__typename).to(equal("Animal"))
+    expect(data.id).to(equal("animal-cat"))
+
+    expect(data.fragments.root?.id).to(equal("animal-cat"))
+    expect(data.fragments.root?.species).to(equal("Domestic Cat"))
+  }
+
+  func test__deferredFragment__givenConditionalFieldSelection_withFulfilledResponseAndConditionEvaluatingFalse_doesNotCollectConditionalField() throws {
+    // given
+    struct Types {
+      static let Animal = Interface(name: "Animal")
+    }
+
+    class AllAnimal: AbstractMockSelectionSet<AllAnimal.Fragments, MockSchemaMetadata> {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .deferred(Root.self, label: "root"),
+      ]}
+
+      struct Fragments: FragmentContainer {
+        let __data: DataDict
+        init(_dataDict: DataDict) {
+          __data = _dataDict
+          _root = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred var root: Root?
+      }
+
+      class Root: MockTypeCase {
+        override class var __parentType: ParentType { Types.Animal }
+        override class var __selections: [Selection] {[
+          .include(if: "variable", .field("species", String.self)),
+        ]}
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Animal",
+      "id": "animal-cat",
+      "species": "Domestic Cat",
+    ]
+
+    // when
+    let data = try readValues(
+      AllAnimal.self,
+      from: object,
+      variables: ["variable": false],
+      fulfilledFragments: .labels(["root"])
+    )
+
+    // then
+    expect(data.__typename).to(equal("Animal"))
+    expect(data.id).to(equal("animal-cat"))
+
+    expect(data.fragments.root?.id).to(equal("animal-cat"))
+    expect(data.fragments.root?.species).to(beNil())
+  }
+
+  func test__deferredFragment__givenDeferredSelection_withUnfulfilledResponse_doesNotCollectDeferredField() throws {
+    // given
+    struct Types {
+      static let Animal = Interface(name: "Animal")
+    }
+
+    class AllAnimal: AbstractMockSelectionSet<AllAnimal.Fragments, MockSchemaMetadata> {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .deferred(Outer.self, label: "outer"),
+      ]}
+
+      struct Fragments: FragmentContainer {
+        let __data: DataDict
+        init(_dataDict: DataDict) {
+          __data = _dataDict
+          _outer = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred var outer: Outer?
+      }
+
+      class Outer: AbstractMockSelectionSet<Outer.Fragments, MockSchemaMetadata>, InlineFragment, Deferrable {
+        typealias RootEntityType = AllAnimal
+
+        override class var __parentType: ParentType { Types.Animal }
+        override class var __selections: [Selection] {[
+          .field("species", String.self),
+          .deferred(Inner.self, label: "inner"),
+        ]}
+
+        struct Fragments: FragmentContainer {
+          let __data: DataDict
+          init(_dataDict: DataDict) {
+            __data = _dataDict
+            _inner = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred var inner: Inner?
+        }
+
+        class Inner: MockTypeCase {
+          override class var __parentType: ParentType { Types.Animal }
+          override class var __selections: [Selection] {[
+            .field("genus", String.self),
+          ]}
+        }
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Animal",
+      "id": "animal-cat",
+      "species": "Domestic Cat",
+      "genus": "Felis catus",
+    ]
+
+    // when
+    let data = try readValues(
+      AllAnimal.self,
+      from: object,
+      fulfilledFragments: .labels(["outer"])
+    )
+
+    // then
+    expect(data.__typename).to(equal("Animal"))
+    expect(data.id).to(equal("animal-cat"))
+
+    expect(data.fragments.outer?.id).to(equal("animal-cat"))
+    expect(data.fragments.outer?.species).to(equal("Domestic Cat"))
+
+    expect(data.fragments.outer?.fragments.inner).to(beNil())
+  }
+
+  func test__deferredFragment__givenDeferredSelection_withFulfilledResponse_doesCollectDeferredField() throws {
+    // given
+    struct Types {
+      static let Animal = Interface(name: "Animal")
+    }
+
+    class AllAnimal: AbstractMockSelectionSet<AllAnimal.Fragments, MockSchemaMetadata> {
+      override class var __parentType: ParentType { Types.Animal }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .deferred(Outer.self, label: "outer"),
+      ]}
+
+      struct Fragments: FragmentContainer {
+        let __data: DataDict
+        init(_dataDict: DataDict) {
+          __data = _dataDict
+          _outer = Deferred(_dataDict: _dataDict)
+        }
+
+        @Deferred var outer: Outer?
+      }
+
+      class Outer: AbstractMockSelectionSet<Outer.Fragments, MockSchemaMetadata>, InlineFragment, Deferrable {
+        typealias RootEntityType = AllAnimal
+
+        override class var __parentType: ParentType { Types.Animal }
+        override class var __selections: [Selection] {[
+          .field("species", String.self),
+          .deferred(Inner.self, label: "inner"),
+        ]}
+
+        struct Fragments: FragmentContainer {
+          let __data: DataDict
+          init(_dataDict: DataDict) {
+            __data = _dataDict
+            _inner = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred var inner: Inner?
+        }
+
+        class Inner: MockTypeCase {
+          override class var __parentType: ParentType { Types.Animal }
+          override class var __selections: [Selection] {[
+            .field("genus", String.self),
+          ]}
+        }
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "Animal",
+      "id": "animal-cat",
+      "species": "Domestic Cat",
+      "genus": "Felis catus",
+    ]
+
+    // when
+    let data = try readValues(
+      AllAnimal.self,
+      from: object,
+      fulfilledFragments: .labels(["outer", "inner"])
+    )
+
+    // then
+    expect(data.__typename).to(equal("Animal"))
+    expect(data.id).to(equal("animal-cat"))
+
+    expect(data.fragments.outer?.id).to(equal("animal-cat"))
+    expect(data.fragments.outer?.species).to(equal("Domestic Cat"))
+
+    expect(data.fragments.outer?.fragments.inner?.genus).to(equal("Felis catus"))
   }
 }
