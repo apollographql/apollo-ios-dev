@@ -57,7 +57,8 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   }
 
   private let pager: Actor
-  private var cancellables: [AnyCancellable] = []
+  private var publishSubscriber: AnyCancellable?
+  private var subscriptions: [AnyCancellable] = []
   private var canLoadNextSubject: CurrentValueSubject<Bool, Never> = .init(false)
   private var canLoadPreviousSubject: CurrentValueSubject<Bool, Never> = .init(false)
 
@@ -88,7 +89,8 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     Task { [weak self] in
       guard let self else { return }
       let (previousPageVarMapPublisher, initialPublisher, nextPageVarMapPublisher) = await pager.publishers
-      previousPageVarMapPublisher.combineLatest(initialPublisher, nextPageVarMapPublisher).sink { _ in
+      // It's important that we don't store this in the `subscriptions` variable: The thread sanitizer points out, correctly, that we're creating an access race.
+      self.publishSubscriber = previousPageVarMapPublisher.combineLatest(initialPublisher, nextPageVarMapPublisher).sink { _ in
         guard !Task.isCancelled else { return }
         Task { [weak self] in
           guard let self else { return }
@@ -96,7 +98,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
           self.canLoadNextSubject.send(canLoadNext)
           self.canLoadPreviousSubject.send(canLoadPrevious)
         }
-      }.store(in: &self.cancellables)
+      }
     }
   }
 
@@ -110,7 +112,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     Task { [weak self] in
       guard let self else { return }
       await self.pager.subscribe(onUpdate: onUpdate)
-        .store(in: &self.cancellables)
+        .store(in: &self.subscriptions)
     }
   }
 
