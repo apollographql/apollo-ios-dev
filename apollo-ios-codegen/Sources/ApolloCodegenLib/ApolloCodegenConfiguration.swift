@@ -458,6 +458,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
 
   // MARK: - Other Types
   public struct OutputOptions: Codable, Equatable {
+      
+    public struct PatternMatchedOutputOptions: Codable, Equatable {
+      let additionallyImportedModuleNames: [String]
+    }
+    public let patternMatchedOutputOptions: [String: PatternMatchedOutputOptions]
     /// Any non-default rules for pluralization or singularization you wish to include.
     public let additionalInflectionRules: [InflectionRule]
     /// How deprecated enum cases from the schema should be handled.
@@ -519,6 +524,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       public static let conversionStrategies: ConversionStrategies = .init()
       public static let pruneGeneratedFiles: Bool = true
       public static let markOperationDefinitionsAsFinal: Bool = false
+        public static let patternMatchedOutputOptions: [String: PatternMatchedOutputOptions] = [:]
     }
 
     /// Designated initializer.
@@ -550,7 +556,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       warningsOnDeprecatedUsage: Composition = Default.warningsOnDeprecatedUsage,
       conversionStrategies: ConversionStrategies = Default.conversionStrategies,
       pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-      markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
+      markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
+      patternMatchedOutputOptions: [String: PatternMatchedOutputOptions] = [:]
     ) {
       self.additionalInflectionRules = additionalInflectionRules
       self.deprecatedEnumCases = deprecatedEnumCases
@@ -562,6 +569,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       self.conversionStrategies = conversionStrategies
       self.pruneGeneratedFiles = pruneGeneratedFiles
       self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
+      self.patternMatchedOutputOptions = patternMatchedOutputOptions
     }
 
     // MARK: Codable
@@ -579,6 +587,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case conversionStrategies
       case pruneGeneratedFiles
       case markOperationDefinitionsAsFinal
+      case patternMatchedOutputOptions
     }
 
     public init(from decoder: Decoder) throws {
@@ -639,6 +648,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         Bool.self,
         forKey: .markOperationDefinitionsAsFinal
       ) ?? Default.markOperationDefinitionsAsFinal
+        
+      patternMatchedOutputOptions = try values.decodeIfPresent(
+        [String: PatternMatchedOutputOptions].self,
+        forKey: .patternMatchedOutputOptions
+      ) ?? Default.patternMatchedOutputOptions
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -945,8 +959,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
 
   /// Name used to scope the generated schema type files.
   public let schemaNamespace: String
-  /// Names used to add additional scopes to the generated schema type files.
-  public let additionalImportedModulesNames: [String]
   /// The input files required for code generation.
   public let input: FileInput
   /// The paths and files output by code generation.
@@ -986,7 +998,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   ///  - experimentalFeatures: Allows users to enable experimental features.
   public init(
     schemaNamespace: String,
-    additionalImportedModulesNames: [String] = [],
     input: FileInput,
     output: FileOutput,
     options: OutputOptions = Default.options,
@@ -995,7 +1006,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     operationManifest: OperationManifestConfiguration? = Default.operationManifest
   ) {
     self.schemaNamespace = schemaNamespace
-    self.additionalImportedModulesNames = additionalImportedModulesNames
     self.input = input
     self.output = output
     self.options = options
@@ -1360,7 +1370,8 @@ extension ApolloCodegenConfiguration.OutputOptions {
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
+    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
+    patternMatchedOutputOptions: [String: PatternMatchedOutputOptions] = [:]
   ) {
     self.additionalInflectionRules = additionalInflectionRules
     self.deprecatedEnumCases = deprecatedEnumCases
@@ -1372,6 +1383,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.conversionStrategies = conversionStrategies
     self.pruneGeneratedFiles = pruneGeneratedFiles
     self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
+    self.patternMatchedOutputOptions = patternMatchedOutputOptions
   }
   
   /// Deprecated initializer.
@@ -1409,7 +1421,8 @@ extension ApolloCodegenConfiguration.OutputOptions {
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
+    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
+    patternMatchedOutputOptions: [String: PatternMatchedOutputOptions] = [:]
   ) {
     self.additionalInflectionRules = additionalInflectionRules
     self.deprecatedEnumCases = deprecatedEnumCases
@@ -1421,6 +1434,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.conversionStrategies = conversionStrategies
     self.pruneGeneratedFiles = pruneGeneratedFiles
     self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
+    self.patternMatchedOutputOptions = patternMatchedOutputOptions
   }
 
   /// Whether the generated operations should use Automatic Persisted Queries.
