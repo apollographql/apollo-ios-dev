@@ -275,15 +275,12 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     )
     let lastPageExpectation = Mocks.Hero.FriendsQuery.failingExpectation(server: server)
 
-    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
-    await pager
-      .subscribe(onUpdate: { results.append($0) })
-      .store(in: &cancellables)
+    let cancellable = await pager.subscribe { result in
+      try? XCTAssertThrowsError(result.get())
+    }
     await pager.fetch()
     await fulfillment(of: [lastPageExpectation])
-    XCTAssertFalse(results.isEmpty)
-    let result = try XCTUnwrap(results.first)
-    await XCTAssertThrowsError(try result.get())
+    cancellable.cancel()
   }
 
   private func createPager() -> GraphQLQueryPager<Query, Query>.Actor {
