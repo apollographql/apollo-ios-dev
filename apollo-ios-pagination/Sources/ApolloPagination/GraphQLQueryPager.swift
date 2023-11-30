@@ -32,21 +32,21 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 
     /// An array of previous  pages, in pagination order
     /// Earlier pages come first in the array.
-    public let previousPages: [PaginatedQuery.Data]
+    public let previousPages: OrderedSet<PaginatedQuery.Data>
 
     /// The initial page that we fetched.
     public let initialPage: InitialQuery.Data
 
     /// An array of pages after the initial page.
-    public let nextPages: [PaginatedQuery.Data]
+    public let nextPages: OrderedSet<PaginatedQuery.Data>
 
     /// The source of the most recent `Output`: either from the cache or server.
     public let updateSource: UpdateSource
 
     public init(
-      previousPages: [PaginatedQuery.Data],
+      previousPages: OrderedSet<PaginatedQuery.Data>,
       initialPage: InitialQuery.Data,
-      nextPages: [PaginatedQuery.Data],
+      nextPages: OrderedSet<PaginatedQuery.Data>,
       updateSource: UpdateSource
     ) {
       self.previousPages = previousPages
@@ -328,7 +328,22 @@ extension GraphQLQueryPager {
     }
 
     public func subscribe(onUpdate: @MainActor @escaping (Result<Output, Error>) -> Void) -> AnyCancellable {
-      $currentValue.compactMap({ $0 }).sink { [weak self] result in
+      $currentValue.compactMap({ $0 })
+        .removeDuplicates(by: { previous, current in
+          switch (previous, current) {
+          case (.success(let lhs), .success(let rhs)):
+            return lhs == rhs
+          case (.failure(let lhs), .failure(let rhs)):
+            if let lhs = lhs as? PaginationError, let rhs = rhs as? PaginationError {
+              return lhs == rhs
+            } else {
+              return lhs.localizedDescription == rhs.localizedDescription
+            }
+          case (.failure, .success), (.success, .failure):
+            return false
+          }
+        })
+        .sink { [weak self] result in
         guard let self else { return }
         Task {
           let isLoadingAll = await self.isLoadingAll
@@ -514,12 +529,12 @@ extension GraphQLQueryPager {
           shouldUpdate = true
         }
         if let latest {
-          let (previousPages, _, nextPage) = latest
+          let (previousPages, _, nextPages) = latest
           let value: Result<Output, Error> = .success(
             Output(
-              previousPages: previousPages,
+              previousPages: .init(previousPages),
               initialPage: firstPageData,
-              nextPages: nextPage,
+              nextPages: .init(nextPages),
               updateSource: data.source == .cache ? .cache : .fetch
             )
           )
@@ -533,7 +548,11 @@ extension GraphQLQueryPager {
           publisher.send(completion: .finished)
         }
       case .failure(let error):
-        currentValue = .failure(error)
+        if isLoadingAll {
+          queuedValue = .failure(error)
+        } else {
+          currentValue = .failure(error)
+        }
         publisher.send(completion: .finished)
       }
     }
@@ -558,7 +577,7 @@ extension GraphQLQueryPager {
         } else {
           shouldUpdate = true
         }
-        let variables = query.__variables?.values.compactMap { $0._jsonEncodableValue?._jsonValue } ?? []
+        let variables = query.__variables?.underlyingJson ?? []
         switch direction {
         case .next:
           nextPageVarMap[variables] = pageData
@@ -567,12 +586,12 @@ extension GraphQLQueryPager {
         }
 
         if let latest {
-          let (previousPages, firstPage, nextPage) = latest
+          let (previousPages, firstPage, nextPages) = latest
           let value: Result<Output, Error> = .success(
             Output(
-              previousPages: previousPages,
+              previousPages: .init(previousPages),
               initialPage: firstPage,
-              nextPages: nextPage,
+              nextPages: .init(nextPages),
               updateSource: data.source == .cache ? .cache : .fetch
             )
           )
@@ -586,7 +605,11 @@ extension GraphQLQueryPager {
           publisher.send(completion: .finished)
         }
       case .failure(let error):
-        currentValue = .failure(error)
+        if isLoadingAll {
+          queuedValue = .failure(error)
+        } else {
+          currentValue = .failure(error)
+        }
         publisher.send(completion: .finished)
       }
     }
@@ -627,5 +650,11 @@ extension GraphQLQueryPager {
       initialContinuation?.resume(with: .success(()))
       initialContinuation = nil
     }
+  }
+}
+
+private extension GraphQLOperation.Variables {
+  var underlyingJson: [JSONValue] {
+    values.compactMap { $0._jsonEncodableValue?._jsonValue }
   }
 }
