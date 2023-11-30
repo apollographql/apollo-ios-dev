@@ -78,9 +78,7 @@ public class AnyGraphQLQueryPager<Model> {
   /// - Returns: an `AnyCancellable` value that has not been stored internal to the `AnyGraphQLPager`.
   public func sink(completion: @MainActor @escaping (Output) -> Void) -> AnyCancellable {
     return _subject.compactMap({ $0 }).sink { result in
-      Task {
-        await completion(result)
-      }
+      Task { await completion(result) }
     }
   }
 
@@ -114,13 +112,13 @@ public class AnyGraphQLQueryPager<Model> {
 
   /// Loads all pages.
   /// - Parameters:
-  ///   - reload: Whether or not to begin loading from the initial query. Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
+  ///   - fetchFromInitialPage: Pass true to begin loading from the initial page; otherwise pass false.  Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadAll(
-    reload: Bool = true,
+    fetchFromInitialPage: Bool = true,
     completion: (@MainActor (Error?) -> Void)? = nil
   ) {
-    pager.loadAll(reload: reload, completion: completion)
+    pager.loadAll(fetchFromInitialPage: fetchFromInitialPage, completion: completion)
   }
 
   /// Discards pagination state and fetches the first page from scratch.

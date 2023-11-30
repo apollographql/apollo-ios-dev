@@ -19,7 +19,7 @@ public protocol PagerType {
     cachePolicy: CachePolicy,
     completion: (@MainActor (Error?) -> Void)?
   )
-  func loadAll(reload: Bool, completion: (@MainActor (Error?) -> Void)?)
+  func loadAll(fetchFromInitialPage: Bool, completion: (@MainActor (Error?) -> Void)?)
   func refetch(cachePolicy: CachePolicy)
   func fetch()
 }
@@ -145,11 +145,11 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
-  public func loadAll(reload: Bool = true, completion: (@MainActor (Error?) -> Void)? = nil) {
+  public func loadAll(fetchFromInitialPage: Bool = true, completion: (@MainActor (Error?) -> Void)? = nil) {
     Task<_, Never> {
       await withTaskCancellationHandler {
         do {
-          try await pager.loadAll(reload: reload)
+          try await pager.loadAll(fetchFromInitialPage: fetchFromInitialPage)
           await completion?(nil)
         } catch {
           await completion?(error)
@@ -257,9 +257,9 @@ extension GraphQLQueryPager {
 
     // MARK: - Public API
 
-    public func loadAll(reload: Bool = true) async throws {
+    public func loadAll(fetchFromInitialPage: Bool = true) async throws {
       isLoadingAll = true
-      if reload {
+      if fetchFromInitialPage {
         cancel()
         // As we are loading all data from all pages before notifying the caller, we don't care about cached responses
         await fetch(cachePolicy: .fetchIgnoringCacheData)
