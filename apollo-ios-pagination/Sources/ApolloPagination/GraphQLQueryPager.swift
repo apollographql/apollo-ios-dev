@@ -26,10 +26,21 @@ public protocol PagerType {
 
 /// Handles pagination in the queue by managing multiple query watchers.
 public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: PagerType {
+
+  /// A struct which contains the outputs of pagination
   public struct Output: Hashable {
+
+    /// An array of previous  pages, in pagination order
+    /// Earlier pages come first in the array.
     public let previousPages: [PaginatedQuery.Data]
+
+    /// The initial page that we fetched.
     public let initialPage: InitialQuery.Data
+
+    /// An array of pages after the initial page.
     public let nextPages: [PaginatedQuery.Data]
+
+    /// The source of the most recent `Output`: either from the cache or server.
     public let updateSource: UpdateSource
 
     public init(
@@ -56,6 +67,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     case paginated(PaginatedQuery.Data)
   }
 
+  /// An enumeration that can determine whether we are paginating forward or backwards.
   public enum PaginationDirection: Hashable {
     case next
     case previous
@@ -92,6 +104,8 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     self.pager = pager
   }
 
+  /// Allows the caller to subscribe to new pagination results.
+  /// - Parameter onUpdate: A closure which provides the most recent pagination result. This closure is guaruanteed to be dispatched to the `MainActor`
   public func subscribe(onUpdate: @MainActor @escaping (Result<Output, Error>) -> Void) {
     Task { [weak self] in
       guard let self else { return }
@@ -103,12 +117,17 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   public var canLoadNext: Bool { canLoadNextSubject.value }
   public var canLoadPrevious: Bool { canLoadPreviousSubject.value }
 
+  /// Reset all pagination state and cancel all in-flight requests.
   public func cancel() {
     Task {
       await pager.cancel()
     }
   }
 
+  /// Loads the previous page, if we can.
+  /// - Parameters:
+  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `fetchIgnoringCacheData`.
+  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
     completion: (@MainActor (Error?) -> Void)? = nil
@@ -127,6 +146,10 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
+  /// Loads the next page, if we can.
+  /// - Parameters:
+  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `fetchIgnoringCacheData`.
+  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
     completion: (@MainActor (Error?) -> Void)? = nil
@@ -145,6 +168,10 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
+  /// Loads all pages.
+  /// - Parameters:
+  ///   - fetchFromInitialPage: Pass true to begin loading from the initial page; otherwise pass false.  Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
+  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadAll(fetchFromInitialPage: Bool = true, completion: (@MainActor (Error?) -> Void)? = nil) {
     Task<_, Never> {
       await withTaskCancellationHandler {
@@ -160,12 +187,15 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
+  /// Discards pagination state and fetches the first page from scratch.
+  /// - Parameter cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `fetchIgnoringCacheData`.
   public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
     Task {
       await pager.refetch(cachePolicy: cachePolicy)
     }
   }
 
+  /// Fetches the first page.
   public func fetch() {
     Task {
       await pager.fetch()
