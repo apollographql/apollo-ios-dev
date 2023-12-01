@@ -58,8 +58,7 @@ public struct JSONResponseParsingInterceptor: ApolloInterceptor {
 
       let graphQLResponse = GraphQLResponse(
         operation: request.operation,
-        body: body,
-        fulfilledFragments: createdResponse.fulfilledFragments
+        body: body
       )
       createdResponse.legacyResponse = graphQLResponse
 

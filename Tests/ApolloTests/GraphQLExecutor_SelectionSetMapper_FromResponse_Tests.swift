@@ -17,13 +17,11 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
   private func readValues<T: RootSelectionSet>(
     _ selectionSet: T.Type,
     from object: JSONObject,
-    variables: GraphQLOperation.Variables? = nil,
-    fulfilledFragments: FulfilledFragments = .labels([])
+    variables: GraphQLOperation.Variables? = nil
   ) throws -> T {
     return try GraphQLExecutor_SelectionSetMapper_FromResponse_Tests.executor.execute(
       selectionSet: selectionSet,
       on: object,
-      expecting: fulfilledFragments,
       variables: variables,
       accumulator: GraphQLSelectionSetMapper<T>()
     )

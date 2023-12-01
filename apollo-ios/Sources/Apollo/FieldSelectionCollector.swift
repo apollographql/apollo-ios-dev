@@ -52,7 +52,6 @@ protocol FieldSelectionCollector<ObjectData> {
     from selections: [Selection],
     into groupedFields: inout FieldSelectionGrouping,
     for object: ObjectData,
-    expecting fulfilledFragments: FulfilledFragments,
     info: ObjectExecutionInfo
   ) throws
 
@@ -63,7 +62,6 @@ struct DefaultFieldSelectionCollector: FieldSelectionCollector {
     from selections: [Selection],
     into groupedFields: inout FieldSelectionGrouping,
     for object: JSONObject,
-    expecting fulfilledFragments: FulfilledFragments,
     info: ObjectExecutionInfo
   ) throws {
     for selection in selections {
@@ -77,37 +75,20 @@ struct DefaultFieldSelectionCollector: FieldSelectionCollector {
             from: conditionalSelections,
             into: &groupedFields,
             for: object,
-            expecting: fulfilledFragments,
             info: info
           )
         }
 
       case let .deferred(condition, typeCase, label):
-        switch fulfilledFragments {
-        case .all:
-          preconditionFailure(".all hasn't been implemented yet!")
-          if condition?.evaluate(with: info.variables) ?? true {
-            groupedFields.addFulfilledFragment(typeCase)
-            try collectFields(
-              from: typeCase.__selections,
-              into: &groupedFields,
-              for: object,
-              expecting: fulfilledFragments,
-              info: info
-            )
-          }
-
-        case let .labels(fulfilled):
-          if fulfilled.contains(label) {
-            groupedFields.addFulfilledFragment(typeCase)
-            try collectFields(
-              from: typeCase.__selections,
-              into: &groupedFields,
-              for: object,
-              expecting: fulfilledFragments,
-              info: info
-            )
-          }
+        preconditionFailure()
+        if condition?.evaluate(with: info.variables) ?? true {
+          groupedFields.addFulfilledFragment(typeCase)
+          try collectFields(
+            from: typeCase.__selections,
+            into: &groupedFields,
+            for: object,
+            info: info
+          )
         }
 
       case let .fragment(fragment):
@@ -116,7 +97,6 @@ struct DefaultFieldSelectionCollector: FieldSelectionCollector {
           from: fragment.__selections,
           into: &groupedFields,
           for: object,
-          expecting: fulfilledFragments,
           info: info
         )
 
@@ -129,7 +109,6 @@ struct DefaultFieldSelectionCollector: FieldSelectionCollector {
             from: typeCase.__selections,
             into: &groupedFields,
             for: object,
-            expecting: fulfilledFragments,
             info: info
           )
         }
@@ -150,7 +129,6 @@ struct CustomCacheDataWritingFieldSelectionCollector: FieldSelectionCollector {
     from selections: [Selection],
     into groupedFields: inout FieldSelectionGrouping,
     for object: DataDict,
-    expecting fulfilledFragments: FulfilledFragments,
     info: ObjectExecutionInfo
   ) throws {
     groupedFields.fulfilledFragments = object._fulfilledFragments

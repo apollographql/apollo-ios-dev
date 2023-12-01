@@ -192,7 +192,6 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
   >(
     selectionSet: SelectionSet.Type,
     on data: Source.RawObjectData,
-    expecting fulfilledFragments: FulfilledFragments,
     withRootCacheReference root: CacheReference? = nil,
     variables: GraphQLOperation.Variables? = nil,
     accumulator: Accumulator
@@ -207,7 +206,6 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
     let rootValue = execute(
       selections: selectionSet.__selections,
       on: data,
-      expecting: fulfilledFragments,
       info: info,
       accumulator: accumulator
     )
@@ -218,7 +216,6 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
   private func execute<Accumulator: GraphQLResultAccumulator>(
     selections: [Selection],
     on object: Source.RawObjectData,
-    expecting fulfilledFragments: FulfilledFragments,
     info: ObjectExecutionInfo,
     accumulator: Accumulator
   ) -> PossiblyDeferred<Accumulator.ObjectResult> {
@@ -226,7 +223,6 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
       let groupedFields = try groupFields(
         selections,
         on: object,
-        expecting: fulfilledFragments,
         info: info
       )
       info.fulfilledFragments = groupedFields.fulfilledFragments
@@ -259,7 +255,6 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
   private func groupFields(
     _ selections: [Selection],
     on object: Source.RawObjectData,
-    expecting fulfilledFragments: FulfilledFragments,
     info: ObjectExecutionInfo
   ) throws -> FieldSelectionGrouping {
     var grouping = FieldSelectionGrouping(info: info)
@@ -268,7 +263,6 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
       from: selections,
       into: &grouping,
       for: object,
-      expecting: fulfilledFragments,
       info: info
     )
     return grouping
@@ -415,7 +409,6 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
     return execute(
       selections: selections,
       on: object,
-      expecting: .labels([]),
       info: childExecutionInfo,
       accumulator: accumulator
     )

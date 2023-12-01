@@ -131,7 +131,6 @@ public extension RootSelectionSet {
     return try! executor.execute(
       selectionSet: Self.self,
       on: mock._selectionSetMockData,
-      expecting: .labels([]),
       variables: variables,
       accumulator: accumulator
     )
