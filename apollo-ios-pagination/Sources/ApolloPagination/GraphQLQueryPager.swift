@@ -97,7 +97,6 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   }
 
   /// Loads the previous page, if we can.
-  /// Returns a `PaginationError.taskCancelled` error in the completion block if this task is cancelled mid-flight.
   /// - Parameters:
   ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `fetchIgnoringCacheData`.
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
@@ -106,21 +105,16 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     completion: (@MainActor (Error?) -> Void)? = nil
   ) {
     Task<_, Never> {
-      await withTaskCancellationHandler {
-        do {
-          try await pager.loadPrevious(cachePolicy: cachePolicy)
-          await completion?(nil)
-        } catch {
-          await completion?(error)
-        }
-      } onCancel: {
-        Task { await completion?(PaginationError.taskCancelled) }
+      do {
+        try await pager.loadPrevious(cachePolicy: cachePolicy)
+        await completion?(nil)
+      } catch {
+        await completion?(error)
       }
     }
   }
 
   /// Loads the next page, if we can.
-  /// /// Returns a `PaginationError.taskCancelled` error in the completion block if this task is cancelled mid-flight.
   /// - Parameters:
   ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `fetchIgnoringCacheData`.
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
@@ -129,35 +123,26 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     completion: (@MainActor (Error?) -> Void)? = nil
   ) {
     Task<_, Never> {
-      await withTaskCancellationHandler {
-        do {
-          try await pager.loadNext(cachePolicy: cachePolicy)
-          await completion?(nil)
-        } catch {
-          await completion?(error)
-        }
-      } onCancel: {
-        Task { await completion?(PaginationError.taskCancelled) }
+      do {
+        try await pager.loadNext(cachePolicy: cachePolicy)
+        await completion?(nil)
+      } catch {
+        await completion?(error)
       }
     }
   }
 
   /// Loads all pages.
-  /// Returns a `PaginationError.taskCancelled` error in the completion block if this task is cancelled mid-flight.
   /// - Parameters:
   ///   - fetchFromInitialPage: Pass true to begin loading from the initial page; otherwise pass false.  Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadAll(fetchFromInitialPage: Bool = true, completion: (@MainActor (Error?) -> Void)? = nil) {
     Task<_, Never> {
-      await withTaskCancellationHandler {
-        do {
-          try await pager.loadAll(fetchFromInitialPage: fetchFromInitialPage)
-          await completion?(nil)
-        } catch {
-          await completion?(error)
-        }
-      } onCancel: {
-        Task { await completion?(PaginationError.taskCancelled) }
+      do {
+        try await pager.loadAll(fetchFromInitialPage: fetchFromInitialPage)
+        await completion?(nil)
+      } catch {
+        await completion?(error)
       }
     }
   }
