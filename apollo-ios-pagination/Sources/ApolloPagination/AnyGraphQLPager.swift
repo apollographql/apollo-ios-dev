@@ -29,7 +29,7 @@ public class AnyGraphQLQueryPager<Model> {
       switch result {
       case let .success(output):
         do {
-          let transformedModels = try transform(output.previousPages.elements, output.initialPage, output.nextPages.elements)
+          let transformedModels = try transform(output.previousPages, output.initialPage, output.nextPages)
           returnValue = .success((transformedModels, output.updateSource))
         } catch {
           returnValue = .failure(error)
