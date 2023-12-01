@@ -91,7 +91,7 @@ final class ConcurrencyTests: XCTestCase {
   ) async throws {
     try await withThrowingTaskGroup(of: Void.self) { group in
       let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
-      group.addTask(priority: .userInitiated) { try await pager.loadNext() }
+      group.addTask { try await pager.loadNext() }
       group.addTask { try await pager.loadNext() }
       group.addTask { try await pager.loadNext() }
       group.addTask { try await pager.loadNext() }
