@@ -8,13 +8,14 @@ import OrderedCollections
 struct OperationDefinitionTemplate: OperationTemplateRenderer {
   /// IR representation of source [GraphQL Operation](https://spec.graphql.org/draft/#sec-Language.Operations).
   let operation: IR.Operation
-
   /// The persisted query identifier for the ``operation``.
   let operationIdentifier: String?
+  /// The pattern matched options for this particular operation source file.
+  let patternMatchedOutputOptions: ApolloCodegenConfiguration.OutputOptions.PatternMatchedOutputOptions?
 
   let config: ApolloCodegen.ConfigurationContext
 
-  var target: TemplateTarget { .operationFile(name: operation.definition.filePath) }
+  var target: TemplateTarget { .operationFile(patternMatchedOutputOptions: patternMatchedOutputOptions) }
 
   var template: TemplateString {
     let definition = IR.Definition.operation(operation)

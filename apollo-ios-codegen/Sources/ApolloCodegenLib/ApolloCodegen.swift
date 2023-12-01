@@ -343,6 +343,18 @@ public class ApolloCodegen {
     ir: IRBuilder,
     fileManager: ApolloFileManager
   ) async throws {
+
+    let matchedOutputOptionsTask = Task {
+      var dict = [String: ApolloCodegenConfiguration.OutputOptions.PatternMatchedOutputOptions]()
+      for (pattern, options) in self.config.options.patternMatchedOutputOptions {
+        let matches = try Glob([pattern], relativeTo: self.config.rootURL).match()
+        for match in matches {
+          dict[match] = options
+        }
+      }
+      return dict
+    }
+
     try await withThrowingTaskGroup(of: Void.self) { group in
       for fragment in fragments {
         group.addTask {
@@ -351,8 +363,13 @@ public class ApolloCodegen {
             for: irFragment.rootField.selectionSet,
             in: irFragment.definition.name
           )
-          try await FragmentFileGenerator(irFragment: irFragment, config: self.config)
-            .generate(forConfig: self.config, fileManager: fileManager)
+
+          let matchedOutputOptions = try await matchedOutputOptionsTask.value
+          try await FragmentFileGenerator(
+            irFragment: irFragment,
+            patternMatchedOutputOptions: matchedOutputOptions[fragment.filePath],
+            config: self.config
+          ).generate(forConfig: self.config, fileManager: fileManager)
         }
       }
 
@@ -366,9 +383,11 @@ public class ApolloCodegen {
             in: irOperation.definition.name
           )
 
+          let matchedOutputOptions = try await matchedOutputOptionsTask.value
           try await OperationFileGenerator(
             irOperation: irOperation,
             operationIdentifier: await identifier,
+            patternMatchedOutputOptions: matchedOutputOptions[operation.filePath],
             config: self.config
           ).generate(forConfig: self.config, fileManager: fileManager)
         }

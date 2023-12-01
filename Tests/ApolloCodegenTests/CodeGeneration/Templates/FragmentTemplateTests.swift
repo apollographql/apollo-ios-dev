@@ -53,6 +53,7 @@ class FragmentTemplateTests: XCTestCase {
     fragment = await ir.build(fragment: fragmentDefinition)
     subject = FragmentTemplate(
       fragment: fragment,
+      patternMatchedOutputOptions: nil,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }

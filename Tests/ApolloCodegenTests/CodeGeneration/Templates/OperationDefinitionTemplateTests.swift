@@ -56,6 +56,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     subject = OperationDefinitionTemplate(
       operation: operation,
       operationIdentifier: nil,
+      patternMatchedOutputOptions: nil,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
