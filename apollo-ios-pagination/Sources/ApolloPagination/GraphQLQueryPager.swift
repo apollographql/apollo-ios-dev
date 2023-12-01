@@ -86,7 +86,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 
   /// Whether or not we can load the next page. Initializes with a `false` value that is updated after the initial fetch.
   public var canLoadNext: Bool = false
-  /// Whether or not we can load the next page. Initializes with a `false` value that is updated after the initial fetch.
+  /// Whether or not we can load the previous page. Initializes with a `false` value that is updated after the initial fetch.
   public var canLoadPrevious: Bool = false
 
   /// Reset all pagination state and cancel all in-flight requests.
