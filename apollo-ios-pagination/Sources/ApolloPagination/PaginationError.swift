@@ -3,5 +3,4 @@ public enum PaginationError: Error {
   case pageHasNoMoreContent
   case loadInProgress
   case noQuery
-  case taskCancelled
 }

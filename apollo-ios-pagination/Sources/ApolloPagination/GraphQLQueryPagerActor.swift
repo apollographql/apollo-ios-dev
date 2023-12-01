@@ -199,19 +199,22 @@ extension GraphQLQueryPager {
       await withCheckedContinuation { continuation in
         Task {
           await fetchContainer.setValues(subscriber: subscriber, continuation: continuation)
-          if firstPageWatcher == nil {
-            firstPageWatcher = GraphQLQueryWatcher(client: client, query: initialQuery) { result in
-              Task { [weak self] in
-                await self?.onFetch(
-                  fetchType: .initial,
-                  cachePolicy: cachePolicy,
-                  result: result,
-                  publisher: publisher
-                )
+          try await execute(with: fetchContainer) {
+            try Task.checkCancellation()
+            if firstPageWatcher == nil {
+              firstPageWatcher = GraphQLQueryWatcher(client: client, query: initialQuery) { result in
+                Task { [weak self] in
+                  await self?.onFetch(
+                    fetchType: .initial,
+                    cachePolicy: cachePolicy,
+                    result: result,
+                    publisher: publisher
+                  )
+                }
               }
             }
+            firstPageWatcher?.refetch(cachePolicy: cachePolicy)
           }
-          firstPageWatcher?.refetch(cachePolicy: cachePolicy)
         }
       }
     }
@@ -250,18 +253,21 @@ extension GraphQLQueryPager {
       await withCheckedContinuation { continuation in
         Task {
           await fetchContainer.setValues(subscriber: subscriber, continuation: continuation)
-          let watcher = GraphQLQueryWatcher(client: client, query: pageQuery) { result in
-            Task { [weak self] in
-              await self?.onFetch(
-                fetchType: .paginated(direction, pageQuery),
-                cachePolicy: cachePolicy,
-                result: result,
-                publisher: publisher
-              )
+          try await execute(with: fetchContainer) {
+            try Task.checkCancellation()
+            let watcher = GraphQLQueryWatcher(client: client, query: pageQuery) { result in
+              Task { [weak self] in
+                await self?.onFetch(
+                  fetchType: .paginated(direction, pageQuery),
+                  cachePolicy: cachePolicy,
+                  result: result,
+                  publisher: publisher
+                )
+              }
             }
+            nextPageWatchers.append(watcher)
+            watcher.refetch(cachePolicy: cachePolicy)
           }
-          nextPageWatchers.append(watcher)
-          watcher.refetch(cachePolicy: cachePolicy)
         }
       }
     }
@@ -355,12 +361,15 @@ extension GraphQLQueryPager {
       }
       return extractPageInfo(.paginated(first))
     }
-  }
-}
 
-private extension GraphQLOperation.Variables {
-  var underlyingJson: [JSONValue] {
-    values.compactMap { $0._jsonEncodableValue?._jsonValue }
+    private func execute(with fetchContainer: FetchContainer, operation: () async throws -> Void) async throws {
+      try await withTaskCancellationHandler {
+        try Task.checkCancellation()
+        try await operation()
+      } onCancel: {
+        Task { await fetchContainer.cancel() }
+      }
+    }
   }
 }
 
@@ -381,13 +390,13 @@ private extension GraphQLQueryPager {
       self.continuation = continuation
     }
 
+    deinit {
+      continuation?.resume()
+    }
+
     func cancel() {
       subscriber = nil
       continuation = nil
-    }
-
-    deinit {
-      continuation?.resume()
     }
 
     func setValues(
@@ -404,5 +413,11 @@ private extension GraphQLQueryPager {
   enum FetchType {
     case initial
     case paginated(PaginationDirection, PaginatedQuery)
+  }
+}
+
+private extension GraphQLOperation.Variables {
+  var underlyingJson: [JSONValue] {
+    values.compactMap { $0._jsonEncodableValue?._jsonValue }
   }
 }
