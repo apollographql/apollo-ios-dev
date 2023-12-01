@@ -290,24 +290,47 @@ extension GraphQLQueryPager {
     // MARK: - Public API
 
     public func loadAll(fetchFromInitialPage: Bool = true) async throws {
-      isLoadingAll = true
-      if fetchFromInitialPage {
-        cancel()
-        // As we are loading all data from all pages before notifying the caller, we don't care about cached responses
-        await fetch(cachePolicy: .fetchIgnoringCacheData)
-      }
+      return try await withThrowingTaskGroup(of: Void.self) { group in
+        isLoadingAll = true // TODO: This should be task-local.
 
-      while nextPageInfo?.canLoadNext ?? false {
-        try await loadNext()
+        if fetchFromInitialPage {
+          cancel()
+          // As we are loading all data from all pages before notifying the caller, we don't care about cached responses
+          group.addTask { [weak self] in
+            await self?.fetch(cachePolicy: .fetchIgnoringCacheData)
+          }
+        } else if initialPageResult == nil {
+          throw PaginationError.missingInitialPage
+        } else {
+          if nextPageInfo?.canLoadNext ?? false {
+            group.addTask { [weak self] in
+              try await self?.loadNext()
+            }
+          } else if previousPageInfo?.canLoadPrevious ?? false {
+            group.addTask { [weak self] in
+              try await self?.loadPrevious()
+            }
+          }
+        }
+
+        while let _ = try await group.next() {
+          if nextPageInfo?.canLoadNext ?? false {
+            group.addTask { [weak self] in
+              try await self?.loadNext()
+            }
+          } else if previousPageInfo?.canLoadPrevious ?? false {
+            group.addTask { [weak self] in
+              try await self?.loadPrevious()
+            }
+          }
+        }
+
+        isLoadingAll = false
+        if let queuedValue {
+          currentValue = queuedValue
+        }
+        queuedValue = nil
       }
-      while previousPageInfo?.canLoadPrevious ?? false {
-        try await loadPrevious()
-      }
-      isLoadingAll = false
-      if let queuedValue {
-        currentValue = queuedValue
-      }
-      queuedValue = nil
     }
 
     public func loadPrevious(
@@ -344,13 +367,13 @@ extension GraphQLQueryPager {
           }
         })
         .sink { [weak self] result in
-        guard let self else { return }
-        Task {
-          let isLoadingAll = await self.isLoadingAll
-          guard !isLoadingAll else { return }
-          await onUpdate(result)
+          guard let self else { return }
+          Task {
+            let isLoadingAll = await self.isLoadingAll
+            guard !isLoadingAll else { return }
+            await onUpdate(result)
+          }
         }
-      }
     }
 
     /// Reloads all data, starting at the first query, resetting pagination state.
