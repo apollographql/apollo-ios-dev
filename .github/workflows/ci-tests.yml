@@ -207,6 +207,31 @@ jobs:
       shell: bash
       run: |
         ./scripts/run-test-codegen-configurations.sh -t
+  
+  verify-frontend-bundle-latest:
+    runs-on: macos-13
+    needs: [changes]
+    if: ${{ needs.changes.outputs.codegen  == 'true' }}
+    timeout-minutes: 5
+    name: Verify Frontend Bundle Latest - macOS
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Install Node packages
+      shell: bash
+      working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript
+      run: |
+        npm install
+    - name: Rollup Bundle
+      shell: bash
+      working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript
+      run: |
+        npm install --global rollup
+        sh ./auto_rollup.sh
+    - name: Verify Latest
+      shell: bash
+      run: |
+        git diff --exit-code
 
   run-cocoapods-integration-tests:
     runs-on: macos-13
