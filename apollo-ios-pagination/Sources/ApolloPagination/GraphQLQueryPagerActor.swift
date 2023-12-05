@@ -233,13 +233,6 @@ extension GraphQLQueryPager {
       }
       guard let pageQuery else { throw PaginationError.noQuery }
 
-      // Setup our publisher
-      let publisher = CurrentValueSubject<Void, Never>(())
-      let fetchContainer = FetchContainer()
-      let subscriber = publisher.sink(receiveCompletion: { _ in
-        Task { await fetchContainer.cancel() }
-      }, receiveValue: { })
-
       await execute { [weak self] publisher in
         guard let self else { return }
         let watcher = GraphQLQueryWatcher(client: self.client, query: pageQuery) { result in
