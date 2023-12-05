@@ -190,32 +190,22 @@ extension GraphQLQueryPager {
     // MARK: - Private
 
     private func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) async {
-      let publisher = CurrentValueSubject<Void, Never>(())
-      let fetchContainer = FetchContainer()
-      let subscriber = publisher.sink(receiveCompletion: { _ in
-        Task { await fetchContainer.cancel() }
-      }, receiveValue: { })
-
-      await withCheckedContinuation { continuation in
-        Task {
-          await fetchContainer.setValues(subscriber: subscriber, continuation: continuation)
-          try await execute(with: fetchContainer) {
-            try Task.checkCancellation()
-            if firstPageWatcher == nil {
-              firstPageWatcher = GraphQLQueryWatcher(client: client, query: initialQuery) { result in
-                Task { [weak self] in
-                  await self?.onFetch(
-                    fetchType: .initial,
-                    cachePolicy: cachePolicy,
-                    result: result,
-                    publisher: publisher
-                  )
-                }
-              }
+      await execute { [weak self] publisher in
+        guard let self else { return }
+        if await self.firstPageWatcher == nil {
+          let watcher = GraphQLQueryWatcher(client: client, query: initialQuery) { result in
+            Task { [weak self] in
+              await self?.onFetch(
+                fetchType: .initial,
+                cachePolicy: cachePolicy,
+                result: result,
+                publisher: publisher
+              )
             }
-            firstPageWatcher?.refetch(cachePolicy: cachePolicy)
           }
+          await self.setFirstPageWatcher(watcher: watcher)
         }
+        await self.firstPageWatcher?.refetch(cachePolicy: cachePolicy)
       }
     }
 
@@ -225,7 +215,7 @@ extension GraphQLQueryPager {
     ) async throws {
       // Access to `isFetching` is mutually exclusive, so these checks and modifications will prevent
       // other attempts to call this function in rapid succession.
-      guard !isFetching else { throw PaginationError.loadInProgress }
+      if isFetching { throw PaginationError.loadInProgress }
       isFetching = true
       defer { isFetching = false }
 
@@ -250,25 +240,20 @@ extension GraphQLQueryPager {
         Task { await fetchContainer.cancel() }
       }, receiveValue: { })
 
-      await withCheckedContinuation { continuation in
-        Task {
-          await fetchContainer.setValues(subscriber: subscriber, continuation: continuation)
-          try await execute(with: fetchContainer) {
-            try Task.checkCancellation()
-            let watcher = GraphQLQueryWatcher(client: client, query: pageQuery) { result in
-              Task { [weak self] in
-                await self?.onFetch(
-                  fetchType: .paginated(direction, pageQuery),
-                  cachePolicy: cachePolicy,
-                  result: result,
-                  publisher: publisher
-                )
-              }
-            }
-            nextPageWatchers.append(watcher)
-            watcher.refetch(cachePolicy: cachePolicy)
+      await execute { [weak self] publisher in
+        guard let self else { return }
+        let watcher = GraphQLQueryWatcher(client: self.client, query: pageQuery) { result in
+          Task { [weak self] in
+            await self?.onFetch(
+              fetchType: .paginated(direction, pageQuery),
+              cachePolicy: cachePolicy,
+              result: result,
+              publisher: publisher
+            )
           }
         }
+        await self.appendPaginationWatcher(watcher: watcher)
+        watcher.refetch(cachePolicy: cachePolicy)
       }
     }
 
@@ -305,7 +290,7 @@ extension GraphQLQueryPager {
         case .initial:
           guard let pageData = pageData as? InitialQuery.Data else { return }
           initialPageResult = pageData
-          latest.flatMap { latest in
+          if let latest {
             output = (latest.previous, pageData, latest.next)
           }
         case .paginated(let direction, let query):
@@ -319,20 +304,18 @@ extension GraphQLQueryPager {
             previousPageVarMap[variables] = pageData
           }
 
-          latest.flatMap { latest in
+          if let latest {
             output = latest
           }
         }
 
-        output.flatMap { output in
-          value = .success(
-            Output(
-              previousPages: output.0,
-              initialPage: output.1,
-              nextPages: output.2,
-              updateSource: data.source == .cache ? .cache : .fetch
-            )
-          )
+        value = output.flatMap { output in
+          Result.success(Output(
+            previousPages: output.0,
+            initialPage: output.1,
+            nextPages: output.2,
+            updateSource: data.source == .cache ? .cache : .fetch
+          ))
         }
 
         if let value {
@@ -362,13 +345,31 @@ extension GraphQLQueryPager {
       return extractPageInfo(.paginated(first))
     }
 
-    private func execute(with fetchContainer: FetchContainer, operation: () async throws -> Void) async throws {
-      try await withTaskCancellationHandler {
-        try Task.checkCancellation()
-        try await operation()
-      } onCancel: {
+    private func execute(operation: @escaping (CurrentValueSubject<Void, Never>) async throws -> Void) async {
+      let fetchContainer = FetchContainer()
+      let publisher = CurrentValueSubject<Void, Never>(())
+      let subscriber = publisher.sink(receiveCompletion: { _ in
         Task { await fetchContainer.cancel() }
+      }, receiveValue: { })
+      await withCheckedContinuation { continuation in
+        Task {
+          await fetchContainer.setValues(subscriber: subscriber, continuation: continuation)
+          try await withTaskCancellationHandler {
+            try Task.checkCancellation()
+            try await operation(publisher)
+          } onCancel: {
+            Task { await fetchContainer.cancel() }
+          }
+        }
       }
+    }
+
+    private func appendPaginationWatcher(watcher: GraphQLQueryWatcher<PaginatedQuery>) {
+      nextPageWatchers.append(watcher)
+    }
+
+    private func setFirstPageWatcher(watcher: GraphQLQueryWatcher<InitialQuery>) {
+      firstPageWatcher = watcher
     }
   }
 }
