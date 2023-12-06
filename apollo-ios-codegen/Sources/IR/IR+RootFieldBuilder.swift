@@ -3,20 +3,6 @@ import OrderedCollections
 import GraphQLCompiler
 import Utilities
 
-#warning("TODO: List")
-/// Remove merged selections from SelectionSet.Selections
-/// Add function to EntityStorage to compute merged selections (WIP)
-///   - Make new MergedSelections a simple struct (class? run perf tests)
-///   - Turn existing MergedSelections into MergedSelectionsBuilder
-///   - Give MergedSelectionsBuilder reference to entity storage
-///   - We may not need the computeMergedSelections on EntityStorage
-///     opting for a MergedSelectionsBuilder.build(with: entityStorage)?
-/// Pass entity storage through to SelectionSetTemplate
-/// Get merged selections in template
-/// (Fix field validation)
-/// (Clean up SelectionSet initializers and properties)
-
-
 class RootFieldBuilder {
   struct Result {
     let rootField: EntityField
