@@ -6682,6 +6682,88 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
+  func test__deferredFragments__givenDeferredNamedFragmentWithMatchingDeferredTypeCase_buildsInlineFragmentWithMergedFragmentSelection() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String
+        species: String
+      }
+
+      type Pet implements Animal {
+        id: String
+        species: String
+      }
+      """
+
+    document = """
+      query TestOperation($a: Boolean) {
+        allAnimals {
+          __typename
+          ...AnimalFragment @defer(label: "root")
+          ... on Pet {
+            id
+          }
+        }
+      }
+
+      fragment AnimalFragment on Animal {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectRootField()
+
+    // then
+    let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
+    let Fragment_AnimalFragment = try XCTUnwrap(ir.compilationResult[fragment: "AnimalFragment"])
+    let Object_Pet = try XCTUnwrap(schema[object: "Pet"])
+
+    let allAnimals = self.subject[field: "allAnimals"]
+    let animalFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "AnimalFragment").xctUnwrapped()
+    let allAnimals_asPet = allAnimals?[as: "Pet"]
+
+    expect(allAnimals?.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .inlineFragment(parentType: Object_Pet),
+          .deferred(Fragment_AnimalFragment, label: "root"),
+        ]
+      )
+    ))
+
+    expect(animalFragment.rootField.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("species", type: .string()),
+        ]
+      )
+    ))
+
+    expect(allAnimals_asPet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Pet,
+        directSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSelections: [
+          .deferred(Fragment_AnimalFragment, label: "root"),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+    ))
+  }
+
   // MARK: Deferred Fragments - Named Fragments (with @include/@skip)
 
   func test__deferredFragments__givenBothDeferAndIncludeDirectives_onSameNamedFragment_buildsNestedDeferredNamedFragment() async throws {
