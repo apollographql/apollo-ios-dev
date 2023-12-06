@@ -14,7 +14,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
   var document: String!
   var ir: IRBuilderTestWrapper!
   var operation: CompilationResult.OperationDefinition!
-  var subject: IRTestWrapper<IR.EntityField>!
+  var subject: IRTestWrapper<IR.Field>!
 
   var schema: IR.Schema { ir.schema }
 
@@ -36,16 +36,7 @@ class IRSelectionSet_IncludeSkip_Tests: XCTestCase {
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     operation = try XCTUnwrap(ir.compilationResult.operations.first)
 
-    let result = await IR.RootFieldBuilder.buildRootEntityField(
-      forRootField: .mock(
-        "query",
-        type: .nonNull(.entity(operation.rootType)),
-        selectionSet: operation.selectionSet
-      ),
-      onRootEntity: IR.Entity(source: .operation(operation)),
-      inIR: ir.irBuilder
-    )
-    subject = IRTestWrapper(irObject: result.rootField, entityStorage: result.entityStorage)
+    subject = await ir.build(operation: operation).rootField
   }
 
   // MARK: - Scalar Fields

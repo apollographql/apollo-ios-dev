@@ -15,14 +15,9 @@ class IRRootFieldBuilderTests: XCTestCase {
   var document: String!
   var ir: IRBuilderTestWrapper!
   var operation: CompilationResult.OperationDefinition!
-  var result: IR.RootFieldBuilder.Result!
+  var result: IRTestWrapper<IR.Operation>!
+  var subject: IRTestWrapper<IR.Field>!
 
-  var subject: IRTestWrapper<IR.EntityField>! {
-    IRTestWrapper(
-      irObject: result.rootField,
-      entityStorage: result.entityStorage
-    )
-  }
   var computedReferencedFragments: IR.RootFieldBuilder.ReferencedFragments! {
     result.referencedFragments
   }
@@ -37,25 +32,24 @@ class IRRootFieldBuilderTests: XCTestCase {
     schemaSDL = nil
     document = nil
     operation = nil
+    subject = nil
     result = nil
     super.tearDown()
   }
 
   // MARK: - Helpers
 
-  func buildSubjectRootField() async throws {
+  func buildSubjectRootField(operationName: String? = nil) async throws {
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
-    operation = try XCTUnwrap(ir.compilationResult.operations.first)
-
-    result = await IR.RootFieldBuilder.buildRootEntityField(
-      forRootField: .mock(
-        "query",
-        type: .nonNull(.entity(operation.rootType)),
-        selectionSet: operation.selectionSet
-      ),
-      onRootEntity: IR.Entity(source: .operation(operation)),
-      inIR: ir.irBuilder
-    )
+    if let operationName {
+      operation = try XCTUnwrap(ir.compilationResult.operations.first(
+        where: { $0.name == operationName }
+      ))
+    } else {
+      operation = try XCTUnwrap(ir.compilationResult.operations.first)
+    }
+    result = await ir.build(operation: operation)
+    subject = result.rootField
   }
 
   // MARK: - Children Computation
@@ -5767,19 +5761,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
 
     for operationName in operations {
-      operation = try XCTUnwrap(ir.compilationResult.operations.first(
-        where: { $0.name == operationName }
-      ))
-
-      result = await IR.RootFieldBuilder.buildRootEntityField(
-        forRootField: .mock(
-          "query",
-          type: .nonNull(.entity(operation.rootType)),
-          selectionSet: operation.selectionSet
-        ),
-        onRootEntity: IR.Entity(source: .operation(operation)),
-        inIR: ir.irBuilder
-      )
+      try await buildSubjectRootField(operationName: operationName)
 
       // then
       let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
@@ -6021,20 +6003,8 @@ class IRRootFieldBuilderTests: XCTestCase {
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
 
     for operationName in operations {
-      operation = try XCTUnwrap(ir.compilationResult.operations.first(
-        where: { $0.name == operationName }
-      ))
-
-      result = await IR.RootFieldBuilder.buildRootEntityField(
-        forRootField: .mock(
-          "query",
-          type: .nonNull(.entity(operation.rootType)),
-          selectionSet: operation.selectionSet
-        ),
-        onRootEntity: IR.Entity(source: .operation(operation)),
-        inIR: ir.irBuilder
-      )
-
+      try await buildSubjectRootField(operationName: operationName)
+      
       // then
       let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 

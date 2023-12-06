@@ -7202,8 +7202,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[fragment: "Details"]
     )
     let detailsFragment_predators_predators_asPet = try XCTUnwrap(
-      detailsFragment.rootField
-        .selectionSet[field: "predators"]?[field: "predators"]?[as: "Pet"]
+      detailsFragment.rootField[field: "predators"]?[field: "predators"]?[as: "Pet"]
     )
 
     let fragmentTemplate = SelectionSetTemplate(

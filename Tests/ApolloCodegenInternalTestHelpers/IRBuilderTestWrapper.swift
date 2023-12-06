@@ -24,14 +24,20 @@ public class IRBuilderTestWrapper {
     operation operationDefinition: CompilationResult.OperationDefinition
   ) async -> IRTestWrapper<IR.Operation> {
     let operation = await irBuilder.build(operation: operationDefinition)
-    return IRTestWrapper(irObject: operation, entityStorage: operation.entityStorage)
+    return IRTestWrapper(
+      irObject: operation,
+      computedSelectionSetCache: .init(entityStorage: operation.entityStorage)
+    )
   }
 
   public func build(
     fragment fragmentDefinition: CompilationResult.FragmentDefinition
   ) async -> IRTestWrapper<IR.NamedFragment> {
     let fragment = await irBuilder.build(fragment: fragmentDefinition)
-    return IRTestWrapper(irObject: fragment, entityStorage: fragment.entityStorage)
+    return IRTestWrapper(
+      irObject: fragment,
+      computedSelectionSetCache: .init(entityStorage: fragment.entityStorage)
+    )
   }
 
   public subscript<T>(dynamicMember keyPath: KeyPath<IRBuilder, T>) -> T {
@@ -52,7 +58,7 @@ public class IRBuilderTestWrapper {
 
       return IRTestWrapper(
         irObject: fragment,
-        entityStorage: fragment.entityStorage
+        computedSelectionSetCache: .init(entityStorage: fragment.entityStorage)
       )
     }
   }

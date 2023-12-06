@@ -2,11 +2,11 @@
 @testable import IR
 import GraphQLCompiler
 
-public protocol ScopedChildSelectionSetAccessible: CustomDebugStringConvertible {
+protocol ScopedChildSelectionSetAccessible: CustomDebugStringConvertible {
 
   func childSelectionSet(
     with conditions: IR.ScopeCondition,
-    entityStorage: DefinitionEntityStorage
+    computedSelectionSetCache: ComputedSelectionSetCache
   ) -> SelectionSetTestWrapper?
 
 }
@@ -14,11 +14,14 @@ public protocol ScopedChildSelectionSetAccessible: CustomDebugStringConvertible 
 // MARK: - Conformance Extensions
 
 extension IR.Field: ScopedChildSelectionSetAccessible {
-  public func childSelectionSet(
+  func childSelectionSet(
     with conditions: IR.ScopeCondition,
-    entityStorage: IR.DefinitionEntityStorage
+    computedSelectionSetCache: ComputedSelectionSetCache
   ) -> SelectionSetTestWrapper? {
-    selectionSet?.childSelectionSet(with: conditions, entityStorage: entityStorage)
+    selectionSet?.childSelectionSet(
+      with: conditions,
+      computedSelectionSetCache: computedSelectionSetCache
+    )
   }
 
   var selectionSet: IR.SelectionSet? {
@@ -29,14 +32,13 @@ extension IR.Field: ScopedChildSelectionSetAccessible {
 
 extension IR.SelectionSet: ScopedChildSelectionSetAccessible {
 
-  public func childSelectionSet(
+  func childSelectionSet(
     with conditions: IR.ScopeCondition,
-    entityStorage: IR.DefinitionEntityStorage
+    computedSelectionSetCache: ComputedSelectionSetCache
   ) -> SelectionSetTestWrapper? {
-#warning("TODO: this re-creates every time. Bad perf")
     let wrapper = SelectionSetTestWrapper(
       irObject: self,
-      entityStorage: entityStorage
+      computedSelectionSetCache: computedSelectionSetCache
     )
     return wrapper.childSelectionSet(with: conditions)
   }
@@ -44,44 +46,52 @@ extension IR.SelectionSet: ScopedChildSelectionSetAccessible {
 }
 
 extension ComputedSelectionSet: ScopedChildSelectionSetAccessible {
-  public func childSelectionSet(
+  func childSelectionSet(
     with conditions: IR.ScopeCondition,
-    entityStorage: IR.DefinitionEntityStorage
+    computedSelectionSetCache: ComputedSelectionSetCache
   ) -> SelectionSetTestWrapper? {
     let selectionSet = direct?.inlineFragments[conditions]?.selectionSet ??
     merged.inlineFragments[conditions]?.selectionSet
 
-  #warning("TODO: this re-creates every time. Bad perf")
     return SelectionSetTestWrapper(
       irObject: selectionSet,
-      entityStorage: entityStorage
+      computedSelectionSetCache: computedSelectionSetCache
     )
   }
 }
 
 extension IR.Operation: ScopedChildSelectionSetAccessible {
-  public func childSelectionSet(
+  func childSelectionSet(
     with conditions: IR.ScopeCondition,
-    entityStorage: IR.DefinitionEntityStorage
+    computedSelectionSetCache: ComputedSelectionSetCache
   ) -> SelectionSetTestWrapper? {
-    rootField.childSelectionSet(with: conditions, entityStorage: entityStorage)
+    rootField.childSelectionSet(
+      with: conditions,
+      computedSelectionSetCache: computedSelectionSetCache
+    )
   }
 }
 
 extension IR.NamedFragment: ScopedChildSelectionSetAccessible {
-  public func childSelectionSet(
+  func childSelectionSet(
     with conditions: IR.ScopeCondition,
-    entityStorage: IR.DefinitionEntityStorage
+    computedSelectionSetCache: ComputedSelectionSetCache
   ) -> SelectionSetTestWrapper? {
-    return rootField.childSelectionSet(with: conditions, entityStorage: entityStorage)
+    return rootField.childSelectionSet(
+      with: conditions,
+      computedSelectionSetCache: computedSelectionSetCache
+    )
   }
 }
 
 extension IR.NamedFragmentSpread: ScopedChildSelectionSetAccessible {
-  public func childSelectionSet(
+  func childSelectionSet(
     with conditions: IR.ScopeCondition,
-    entityStorage: IR.DefinitionEntityStorage
+    computedSelectionSetCache: ComputedSelectionSetCache
   ) -> SelectionSetTestWrapper? {
-    return fragment.rootField.childSelectionSet(with: conditions, entityStorage: entityStorage)
+    return fragment.rootField.childSelectionSet(
+      with: conditions,
+      computedSelectionSetCache: computedSelectionSetCache
+    )
   }
 }

@@ -5,24 +5,27 @@ import GraphQLCompiler
 #warning("TODO: clean up and rename file, remove commented out code, document")
 // MARK: - IR Test Wrapper
 @dynamicMemberLookup
-public class IRTestWrapper<T: ScopedChildSelectionSetAccessible>: CustomDebugStringConvertible {
+public class IRTestWrapper<T: CustomDebugStringConvertible>: CustomDebugStringConvertible {
   public let irObject: T
-  public let entityStorage: DefinitionEntityStorage
+  let computedSelectionSetCache: ComputedSelectionSetCache
 
-  public init(
+  init(
     irObject: T,
-    entityStorage: DefinitionEntityStorage
+    computedSelectionSetCache: ComputedSelectionSetCache
   ) {
     self.irObject = irObject
-    self.entityStorage = entityStorage
+    self.computedSelectionSetCache = computedSelectionSetCache
   }
 
-  public convenience init?(
+  convenience init?(
     irObject: T?,
-    entityStorage: DefinitionEntityStorage
+    computedSelectionSetCache: ComputedSelectionSetCache
   ) {
     guard let irObject else { return nil }
-    self.init(irObject: irObject, entityStorage: entityStorage)
+    self.init(
+      irObject: irObject,
+      computedSelectionSetCache: computedSelectionSetCache
+    )
   }
 
   public subscript<V>(dynamicMember keyPath: KeyPath<T, V>) -> V {
@@ -32,7 +35,14 @@ public class IRTestWrapper<T: ScopedChildSelectionSetAccessible>: CustomDebugStr
   fileprivate func childSelectionSet(
     with conditions: IR.ScopeCondition
   ) -> SelectionSetTestWrapper? {
-    irObject.childSelectionSet(with: conditions, entityStorage: entityStorage)
+    guard let irObject = irObject as? ScopedChildSelectionSetAccessible else {
+      return nil
+    }
+
+    return irObject.childSelectionSet(
+      with: conditions,
+      computedSelectionSetCache: computedSelectionSetCache
+    )
   }
 
   public var debugDescription: String { irObject.debugDescription }
@@ -45,21 +55,23 @@ public class SelectionSetTestWrapper: IRTestWrapper<IR.SelectionSet> {
 
   override init(
     irObject selectionSet: SelectionSet,
-    entityStorage: DefinitionEntityStorage
+    computedSelectionSetCache: ComputedSelectionSetCache
   ) {
-    self.computed = ComputedSelectionSet.Builder(
-      directSelections: selectionSet.selections?.readOnlyView,
-      typeInfo: selectionSet.typeInfo,
-      entityStorage: entityStorage
-    ).build()
+    self.computed = computedSelectionSetCache.computed(for: selectionSet)
 
-    super.init(irObject: selectionSet, entityStorage: entityStorage)
+    super.init(
+      irObject: selectionSet,
+      computedSelectionSetCache: computedSelectionSetCache
+    )
   }
 
   override func childSelectionSet(
     with conditions: ScopeCondition
   ) -> SelectionSetTestWrapper? {
-    self.computed.childSelectionSet(with: conditions, entityStorage: entityStorage)
+    self.computed.childSelectionSet(
+      with: conditions,
+      computedSelectionSetCache: computedSelectionSetCache
+    )
   }
 
   public override var debugDescription: String { computed.debugDescription }
@@ -160,28 +172,9 @@ extension IRTestWrapper<IR.Field> {
 
   public var selectionSet: SelectionSetTestWrapper? {
     guard let entityField = self.irObject as? IR.EntityField else { return nil }
-    #warning("TODO: this re-creates every time. Bad perf")
     return SelectionSetTestWrapper(
       irObject: entityField.selectionSet,
-      entityStorage: entityStorage
-    )
-  }
-}
-
-extension IRTestWrapper<IR.EntityField> {
-  public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
-    self.selectionSet[field: field]
-  }
-
-  public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
-    self.selectionSet[fragment: fragment]
-  }
-
-  public var selectionSet: SelectionSetTestWrapper {
-    #warning("TODO: this re-creates every time. Bad perf")
-    return SelectionSetTestWrapper(
-      irObject: irObject.selectionSet,
-      entityStorage: entityStorage
+      computedSelectionSetCache: computedSelectionSetCache
     )
   }
 }
@@ -195,17 +188,17 @@ extension IRTestWrapper<IR.NamedFragmentSpread> {
     rootField[fragment: fragment]
   }
 
-  public var rootField: IRTestWrapper<IR.EntityField> {
-    return IRTestWrapper<IR.EntityField>(
+  public var rootField: IRTestWrapper<IR.Field> {
+    return IRTestWrapper<IR.Field>(
       irObject:  irObject.fragment.rootField,
-      entityStorage: irObject.fragment.entityStorage
+      computedSelectionSetCache: .init(entityStorage: irObject.fragment.entityStorage)
     )
   }
   
 }
 
 extension IRTestWrapper<IR.Operation> {
-  public subscript(field field: String) -> IRTestWrapper<IR.EntityField>? {
+  public subscript(field field: String) -> IRTestWrapper<IR.Field>? {
     guard irObject.rootField.underlyingField.name == field else { return nil }
 
     return rootField
@@ -215,10 +208,10 @@ extension IRTestWrapper<IR.Operation> {
     rootField[fragment: fragment]
   }
 
-  public var rootField: IRTestWrapper<IR.EntityField> {
-    return IRTestWrapper<IR.EntityField>(
+  public var rootField: IRTestWrapper<IR.Field> {
+    return IRTestWrapper<IR.Field>(
       irObject: irObject.rootField,
-      entityStorage: entityStorage
+      computedSelectionSetCache: computedSelectionSetCache
     )
   }
 }
@@ -237,7 +230,7 @@ extension IRTestWrapper<IR.NamedFragment> {
   public var rootField: IRTestWrapper<IR.Field> {
     return IRTestWrapper<IR.Field>(
       irObject: irObject.rootField,
-      entityStorage: entityStorage
+      computedSelectionSetCache: computedSelectionSetCache
     )
   }
 }
@@ -247,7 +240,7 @@ extension SelectionSetTestWrapper {
     IRTestWrapper<IR.Field>(
       irObject: 
         computed.direct?.fields[field] ?? computed.merged.fields[field],
-      entityStorage: entityStorage
+      computedSelectionSetCache: computedSelectionSetCache
     )
   }
 
@@ -255,9 +248,35 @@ extension SelectionSetTestWrapper {
     IRTestWrapper<IR.NamedFragmentSpread>(
       irObject: 
         computed.direct?.namedFragments[fragment] ?? computed.merged.namedFragments[fragment],
-      entityStorage: entityStorage
+      computedSelectionSetCache: computedSelectionSetCache
     )
   }  
+}
+
+// MARK: - ComputedSelectionSetCache
+
+class ComputedSelectionSetCache {
+  private var selectionSets: [SelectionSet.TypeInfo: ComputedSelectionSet] = [:]
+  public let entityStorage: DefinitionEntityStorage
+
+  init(entityStorage: DefinitionEntityStorage) {
+    self.entityStorage = entityStorage
+  }
+
+  func computed(for selectionSet: SelectionSet) -> ComputedSelectionSet{
+    if let selectionSet = selectionSets[selectionSet.typeInfo] {
+      return selectionSet
+    }
+
+    let selectionSet = ComputedSelectionSet.Builder(
+      directSelections: selectionSet.selections?.readOnlyView,
+      typeInfo: selectionSet.typeInfo,
+      entityStorage: entityStorage
+    ).build()
+
+    selectionSets[selectionSet.typeInfo] = selectionSet
+    return selectionSet
+  }
 }
 
 // MARK: - Other Subscript Accessors
