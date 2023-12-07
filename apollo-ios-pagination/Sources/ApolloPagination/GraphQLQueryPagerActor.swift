@@ -339,13 +339,13 @@ extension GraphQLQueryPager {
     }
 
     private func execute(operation: @escaping (CurrentValueSubject<Void, Never>) async throws -> Void) async {
-      let fetchContainer = FetchContainer()
-      let publisher = CurrentValueSubject<Void, Never>(())
-      let subscriber = publisher.sink(receiveCompletion: { _ in
-        Task { await fetchContainer.cancel() }
-      }, receiveValue: { })
       await withCheckedContinuation { continuation in
         Task {
+          let fetchContainer = FetchContainer()
+          let publisher = CurrentValueSubject<Void, Never>(())
+          let subscriber = publisher.sink(receiveCompletion: { _ in
+            Task { await fetchContainer.cancel() }
+          }, receiveValue: { })
           await fetchContainer.setValues(subscriber: subscriber, continuation: continuation)
           try await withTaskCancellationHandler {
             try Task.checkCancellation()
