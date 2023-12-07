@@ -226,7 +226,6 @@ jobs:
       shell: bash
       working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript
       run: |
-        npm install --global rollup
         sh ./auto_rollup.sh
     - name: Verify Latest
       shell: bash
