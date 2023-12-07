@@ -190,7 +190,7 @@ extension GraphQLQueryPager {
     // MARK: - Private
 
     private func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) async {
-      await execute { [weak self] in
+      await execute { [weak self] publisher in
         guard let self else { return }
         if await self.firstPageWatcher == nil {
           let watcher = GraphQLQueryWatcher(client: client, query: initialQuery) { [weak self] result in
@@ -198,7 +198,8 @@ extension GraphQLQueryPager {
               await self?.onFetch(
                 fetchType: .initial,
                 cachePolicy: cachePolicy,
-                result: result
+                result: result,
+                publisher: publisher
               )
             }
           }
@@ -232,14 +233,15 @@ extension GraphQLQueryPager {
       }
       guard let pageQuery else { throw PaginationError.noQuery }
 
-      await execute { [weak self] in
+      await execute { [weak self] publisher in
         guard let self else { return }
         let watcher = GraphQLQueryWatcher(client: self.client, query: pageQuery) { [weak self] result in
           Task { [weak self] in
             await self?.onFetch(
               fetchType: .paginated(direction, pageQuery),
               cachePolicy: cachePolicy,
-              result: result
+              result: result,
+              publisher: publisher
             )
           }
         }
@@ -251,7 +253,8 @@ extension GraphQLQueryPager {
     private func onFetch<DataType: RootSelectionSet>(
       fetchType: FetchType,
       cachePolicy: CachePolicy,
-      result: Result<GraphQLResult<DataType>, Error>
+      result: Result<GraphQLResult<DataType>, Error>,
+      publisher: CurrentValueSubject<Void, Never>
     ) {
       switch result {
       case .failure(let error):
@@ -260,10 +263,20 @@ extension GraphQLQueryPager {
         } else {
           currentValue = .failure(error)
         }
+        publisher.send(completion: .finished)
       case .success(let data):
         guard let pageData = data.data else {
+          publisher.send(completion: .finished)
           return
         }
+
+        let shouldUpdate: Bool
+        if cachePolicy == .returnCacheDataAndFetch && data.source == .cache {
+          shouldUpdate = false
+        } else {
+          shouldUpdate = true
+        }
+
         var value: Result<Output, Error>?
         var output: ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data])?
         switch fetchType {
@@ -305,6 +318,9 @@ extension GraphQLQueryPager {
             currentValue = value
           }
         }
+        if shouldUpdate {
+          publisher.send(completion: .finished)
+        }
       }
     }
 
@@ -322,15 +338,18 @@ extension GraphQLQueryPager {
       return extractPageInfo(.paginated(first))
     }
 
-    private func execute(operation: @escaping () async throws -> Void) async {
+    private func execute(operation: @escaping (CurrentValueSubject<Void, Never>) async throws -> Void) async {
       let fetchContainer = FetchContainer()
+      let publisher = CurrentValueSubject<Void, Never>(())
+      let subscriber = publisher.sink(receiveCompletion: { _ in
+        Task { await fetchContainer.cancel() }
+      }, receiveValue: { })
       await withCheckedContinuation { continuation in
         Task {
-          await fetchContainer.setValues(continuation: continuation)
+          await fetchContainer.setValues(subscriber: subscriber, continuation: continuation)
           try await withTaskCancellationHandler {
             try Task.checkCancellation()
-            try await operation()
-            await fetchContainer.cancel()
+            try await operation(publisher)
           } onCancel: {
             Task { await fetchContainer.cancel() }
           }
@@ -350,11 +369,18 @@ extension GraphQLQueryPager {
 
 private extension GraphQLQueryPager {
   private actor FetchContainer {
+    var subscriber: AnyCancellable? {
+      willSet { subscriber?.cancel() }
+    }
     var continuation: CheckedContinuation<Void, Never>? {
       willSet { continuation?.resume() }
     }
 
-    init(continuation: CheckedContinuation<Void, Never>? = nil) {
+    init(
+      subscriber: AnyCancellable? = nil,
+      continuation: CheckedContinuation<Void, Never>? = nil
+    ) {
+      self.subscriber = subscriber
       self.continuation = continuation
     }
 
@@ -363,10 +389,15 @@ private extension GraphQLQueryPager {
     }
 
     func cancel() {
+      subscriber = nil
       continuation = nil
     }
 
-    func setValues(continuation: CheckedContinuation<Void, Never>?) {
+    func setValues(
+      subscriber: AnyCancellable?,
+      continuation: CheckedContinuation<Void, Never>?
+    ) {
+      self.subscriber = subscriber
       self.continuation = continuation
     }
   }
