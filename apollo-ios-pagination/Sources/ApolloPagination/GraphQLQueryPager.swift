@@ -25,12 +25,16 @@ public protocol PagerType {
 /// Handles pagination in the queue by managing multiple query watchers.
 public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: PagerType {
 
-  // The `Actor` performs all of the behaviors of the `GraphQLQueryPager`. The `Actor` is isolated to its own thread, and thus the
-  // `GraphQLQueryPager` delegates all of its actions to the `Actor`. The `GraphQLQueryPager` is effectively a synchronous API-wrapper around
-  // the otherwise asynchronous `Actor`.
+  private actor Subscriptions {
+    var subscriptions: Set<AnyCancellable> = []
+
+    func store(subscription: AnyCancellable) {
+      subscriptions.insert(subscription)
+    }
+  }
+
   private let pager: Actor
-  private var publishSubscriber: AnyCancellable?
-  private var subscriptions: [AnyCancellable] = []
+  private var subscriptions = Subscriptions()
 
   public init<P: PaginationInfo>(
     client: ApolloClientProtocol,
@@ -56,7 +60,10 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     Task { [weak self] in
       guard let self else { return }
       let (previousPageVarMapPublisher, initialPublisher, nextPageVarMapPublisher) = await pager.publishers
-      self.publishSubscriber = previousPageVarMapPublisher.combineLatest(initialPublisher, nextPageVarMapPublisher).sink { _ in
+      let publishSubscriber = previousPageVarMapPublisher.combineLatest(
+        initialPublisher,
+        nextPageVarMapPublisher
+      ).sink { [weak self] _ in
         guard !Task.isCancelled else { return }
         Task { [weak self] in
           guard let self else { return }
@@ -65,6 +72,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
           self.canLoadPrevious = canLoadPrevious
         }
       }
+      await subscriptions.store(subscription: publishSubscriber)
     }
   }
 
@@ -79,8 +87,8 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   public func subscribe(onUpdate: @MainActor @escaping (Result<Output, Error>) -> Void) {
     Task { [weak self] in
       guard let self else { return }
-      await self.pager.subscribe(onUpdate: onUpdate)
-        .store(in: &self.subscriptions)
+      let subscription = await self.pager.subscribe(onUpdate: onUpdate)
+      await subscriptions.store(subscription: subscription)
     }
   }
 
