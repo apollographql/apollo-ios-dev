@@ -217,16 +217,10 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Install Node packages
+    - name: Build JS Bundle
       shell: bash
       working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript
-      run: |
-        npm install
-    - name: Rollup Bundle
-      shell: bash
-      working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript
-      run: |
-        sh ./auto_rollup.sh
+      run: npm install && ./auto_rollup.sh
     - name: Verify Latest
       shell: bash
       run: |
