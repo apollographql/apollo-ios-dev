@@ -92,7 +92,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
 
   @available(iOS 16.0, macOS 13.0, *)
   func test_actor_canCancelMidflight() async throws {
-    server.customDelay = .milliseconds(500)
+    server.customDelay = .milliseconds(250)
     let pager = createForwardPager()
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
@@ -135,6 +135,25 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
       await fulfillment(of: [cancellationExpectation])
       let isFetching = await pager.isFetching
       XCTAssertFalse(isFetching)
+  }
+
+  @available(iOS 16.0, macOS 13.0, *)
+  func test_pager_cancellation_calls_callback() throws {
+    server.customDelay = .milliseconds(1)
+    let pager = GraphQLQueryPager(pager: createForwardPager())
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+
+    pager.fetch()
+    wait(for: [serverExpectation], timeout: 1)
+    server.customDelay = .milliseconds(250)
+    let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
+    let callbackExpectation = expectation(description: "Callback")
+    pager.loadNext(completion: { result in
+      callbackExpectation.fulfill()
+    })
+    pager.cancel()
+
+    wait(for: [callbackExpectation, secondPageExpectation], timeout: 1)
   }
 
   private func createReversePager() -> GraphQLQueryPager<ReverseQuery, ReverseQuery>.Actor {
