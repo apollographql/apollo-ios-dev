@@ -43,8 +43,8 @@ struct SelectionSetTemplate {
     let fieldSelectionSetName = nameCache.selectionSetName(for: selectionSet.typeInfo)
 
     if let referencedSelectionSetName = selectionSet.nameForReferencedSelectionSet(config: config) {
-      #warning("TODO: Test and implement `renderAccessControl()`")
-      return "public typealias \(fieldSelectionSetName) = \(referencedSelectionSetName)"
+      guard referencedSelectionSetName != fieldSelectionSetName else { return "" }
+      return "\(renderAccessControl())typealias \(fieldSelectionSetName) = \(referencedSelectionSetName)"
     }
 
     return TemplateString(
