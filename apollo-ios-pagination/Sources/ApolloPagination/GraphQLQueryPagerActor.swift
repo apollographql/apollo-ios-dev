@@ -302,11 +302,11 @@ extension GraphQLQueryPager {
           }
         }
 
-        value = output.flatMap { output in
+        value = output.flatMap { previousPages, initialPage, nextPages in
           Result.success(Output(
-            previousPages: output.0,
-            initialPage: output.1,
-            nextPages: output.2,
+            previousPages: previousPages,
+            initialPage: initialPage,
+            nextPages: nextPages,
             updateSource: data.source == .cache ? .cache : .fetch
           ))
         }
