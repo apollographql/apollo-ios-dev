@@ -153,7 +153,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     })
     pager.cancel()
 
-    wait(for: [callbackExpectation, secondPageExpectation], timeout: 1)
+    wait(for: [callbackExpectation, secondPageExpectation])
   }
 
   private func createReversePager() -> GraphQLQueryPager<ReverseQuery, ReverseQuery>.Actor {
