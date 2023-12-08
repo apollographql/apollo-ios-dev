@@ -11,7 +11,7 @@ extension GraphQLQueryPager {
     private var nextPageWatchers: [GraphQLQueryWatcher<PaginatedQuery>] = []
     private let initialQuery: InitialQuery
     private var isLoadingAll: Bool = false
-    private var isFetching: Bool = false
+    var isFetching: Bool = false
     let nextPageResolver: (PaginationInfo) -> PaginatedQuery?
     let previousPageResolver: (PaginationInfo) -> PaginatedQuery?
     let extractPageInfo: (PageExtractionData) -> PaginationInfo
