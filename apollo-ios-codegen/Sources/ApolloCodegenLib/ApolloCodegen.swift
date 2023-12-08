@@ -3,6 +3,7 @@ import IR
 import GraphQLCompiler
 import OrderedCollections
 import Utilities
+import TemplateString
 
 // Only available on macOS
 #if os(macOS)
@@ -25,6 +26,7 @@ public class ApolloCodegen {
     case invalidSchemaName(_ name: String, message: String)
     case targetNameConflict(name: String)
     case typeNameConflict(name: String, conflictingName: String, containingObject: String)
+    case multipleErrors([Error])
 
     public var errorDescription: String? {
       switch self {
@@ -63,10 +65,14 @@ public class ApolloCodegen {
       case let .typeNameConflict(name, conflictingName, containingObject):
         return """
         TypeNameConflict - \
-        Field '\(conflictingName)' conflicts with field '\(name)' in operation/fragment `\(containingObject)`. \
+        Field '\(conflictingName)' conflicts with field '\(name)' in GraphQL definition `\(containingObject)`. \
         Recommend using a field alias for one of these fields to resolve this conflict. \
         For more info see: https://www.apollographql.com/docs/ios/troubleshooting/codegen-troubleshooting#typenameconflict
         """
+      case let .multipleErrors(errors):
+        return TemplateString("""
+        \(errors.compactMap(\.errorDescription), separator: "\n------\n")
+        """).description
       }
     }
   }
@@ -143,6 +149,7 @@ public class ApolloCodegen {
   class ConfigurationContext {
     let config: ApolloCodegenConfiguration
     let pluralizer: Pluralizer
+    let errorRecorder: ValidationErrorRecorder
     let rootURL: URL?
 
     init(
@@ -151,6 +158,7 @@ public class ApolloCodegen {
     ) {
       self.config = config
       self.pluralizer = Pluralizer(rules: config.options.additionalInflectionRules)
+      self.errorRecorder = ValidationErrorRecorder()
       self.rootURL = rootURL?.standardizedFileURL
     }
 
