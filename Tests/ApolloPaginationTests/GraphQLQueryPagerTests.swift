@@ -92,7 +92,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
 
   @available(iOS 16.0, macOS 13.0, *)
   func test_actor_canCancelMidflight() async throws {
-    server.customDelay = .milliseconds(250)
+    server.customDelay = .milliseconds(500)
     let pager = createForwardPager()
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
@@ -145,7 +145,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
 
     pager.fetch()
     wait(for: [serverExpectation], timeout: 1)
-    server.customDelay = .milliseconds(250)
+    server.customDelay = .milliseconds(500)
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let callbackExpectation = expectation(description: "Callback")
     pager.loadNext(completion: { result in
