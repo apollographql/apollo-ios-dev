@@ -87,7 +87,7 @@ jobs:
 
   build-and-unit-test:
     runs-on: macos-13
-    needs: [tuist-generation, changes]
+    needs: [tuist-generation, changes, verify-frontend-bundle-latest]
     timeout-minutes: 20
     strategy:
       fail-fast: false
