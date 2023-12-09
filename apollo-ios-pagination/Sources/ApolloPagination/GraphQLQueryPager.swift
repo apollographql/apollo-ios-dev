@@ -11,15 +11,15 @@ public protocol PagerType {
   func cancel()
   func loadPrevious(
     cachePolicy: CachePolicy,
-    completion: (@MainActor (Error?) throws -> Void)?
+    completion: (@MainActor (Error?) -> Void)?
   )
   func loadNext(
     cachePolicy: CachePolicy,
-    completion: (@MainActor (Error?) throws -> Void)?
+    completion: (@MainActor (Error?) -> Void)?
   )
   func loadAll(
     fetchFromInitialPage: Bool,
-    completion: (@MainActor (Error?) throws -> Void)?
+    completion: (@MainActor (Error?) -> Void)?
   )
   func refetch(cachePolicy: CachePolicy)
   func fetch()
@@ -37,14 +37,14 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   }
 
   private actor CompletionManager {
-    var completion: (@MainActor (Error?) throws -> Void)?
+    var completion: (@MainActor (Error?) -> Void)?
 
-    func set(completion: (@MainActor (Error?) throws -> Void)?) async {
+    func set(completion: (@MainActor (Error?) -> Void)?) async {
       self.completion = completion
     }
 
     func execute(error: Error?) async {
-      try? await completion?(error)
+      await completion?(error)
       completion = nil
     }
   }
@@ -123,12 +123,12 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-    completion: (@MainActor (Error?) throws -> Void)? = nil
+    completion: (@MainActor (Error?) -> Void)? = nil
   ) {
     execute { [weak self] in
       try await self?.pager.loadPrevious(cachePolicy: cachePolicy)
     } completion: { error in
-      try completion?(error)
+      completion?(error)
     }
   }
 
@@ -138,12 +138,12 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-    completion: (@MainActor (Error?) throws -> Void)? = nil
+    completion: (@MainActor (Error?) -> Void)? = nil
   ) {
     execute { [weak self] in
       try await self?.pager.loadNext(cachePolicy: cachePolicy)
     } completion: { error in
-      try completion?(error)
+      completion?(error)
     }
   }
 
@@ -151,11 +151,11 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// - Parameters:
   ///   - fetchFromInitialPage: Pass true to begin loading from the initial page; otherwise pass false.  Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
-  public func loadAll(fetchFromInitialPage: Bool = true, completion: (@MainActor (Error?) throws -> Void)? = nil) {
+  public func loadAll(fetchFromInitialPage: Bool = true, completion: (@MainActor (Error?) -> Void)? = nil) {
     execute { [weak self] in
       try await self?.pager.loadAll(fetchFromInitialPage: fetchFromInitialPage)
     } completion: { error in
-      try completion?(error)
+      completion?(error)
     }
   }
 
@@ -174,7 +174,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
-  private func execute(operation: @escaping () async throws -> Void, completion: (@MainActor (Error?) throws -> Void)?) {
+  private func execute(operation: @escaping () async throws -> Void, completion: (@MainActor (Error?) -> Void)?) {
     Task<_, Never> { [weak self] in
       guard let self else { return }
       let completionManager = CompletionManager()
