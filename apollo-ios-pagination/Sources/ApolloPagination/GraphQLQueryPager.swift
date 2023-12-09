@@ -65,15 +65,6 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
       extractPageInfo: extractPageInfo,
       pageResolver: pageResolver
     )
-    // We have to be careful with `Task`s in this class, especially when we reference properties on `self`.
-    // Reading properties on `self` is fine, but writing properties to `self` can be tricky.
-    // Generally, in `Combine`, we want to call `store(in:)` to store the resulting `AnyCancellable` that represents
-    // a subscriber. However, that API specifically takes an `inout` collection. That means that this can lead to
-    // an access race if we are making calls to `store(in:)` on the same variable in multiple locations.
-    // Generally speaking, that means that within the bounds of this class, which is a wrapper around the isolated
-    // `Actor` class, that we must make sure that any property we are writing to is only being written to in one
-    // place. We can do so either through use of mutexes, `@Atomic` properties (MAYBE), or by just using separate
-    // `AnyCancellable` storage variables per Combine publisher.
     Task { [weak self] in
       guard let self else { return }
       let (previousPageVarMapPublisher, initialPublisher, nextPageVarMapPublisher) = await pager.publishers
