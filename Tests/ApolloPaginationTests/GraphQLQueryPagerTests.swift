@@ -148,12 +148,50 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     server.customDelay = .milliseconds(500)
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let callbackExpectation = expectation(description: "Callback")
-    pager.loadNext(completion: { result in
+    pager.loadNext(completion: { _ in
       callbackExpectation.fulfill()
     })
-    pager.cancel()
+    Task {
+      try? await Task.sleep(for: .milliseconds(25))
+      pager.cancel()
+    }
 
     wait(for: [callbackExpectation, secondPageExpectation])
+  }
+
+  @available(iOS 16.0, macOS 13.0, *)
+  func test_pager_cancellation_calls_callback_manyQueuedRequests() throws {
+    server.customDelay = .milliseconds(1)
+    let pager = GraphQLQueryPager(pager: createForwardPager())
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    var results: [Result<GraphQLQueryPager<ForwardQuery, ForwardQuery>.Output, Error>] = []
+    var errors: [PaginationError] = []
+
+    pager.fetch()
+    wait(for: [serverExpectation], timeout: 1)
+    server.customDelay = .milliseconds(500)
+    pager.subscribe { result in
+      results.append(result)
+    }
+    let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
+    pager.loadNext(completion: { error in
+      let error = try XCTUnwrap(error as? PaginationError)
+      errors.append(error)
+    })
+    pager.loadNext(completion: { error in
+      let error = try XCTUnwrap(error as? PaginationError)
+      errors.append(error)
+    })
+    Task {
+      try? await Task.sleep(for: .milliseconds(25))
+      pager.cancel()
+    }
+
+    wait(for: [secondPageExpectation])
+    XCTAssertEqual(results.count, 1) // once for original fetch
+    XCTAssertEqual(errors.count, 2)
+    XCTAssertTrue(errors.contains(where: { $0 == .cancellation }))
+    XCTAssertTrue(errors.contains(where: { $0 == .loadInProgress }))
   }
 
   private func createReversePager() -> GraphQLQueryPager<ReverseQuery, ReverseQuery>.Actor {

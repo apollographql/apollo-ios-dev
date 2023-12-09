@@ -11,13 +11,16 @@ public protocol PagerType {
   func cancel()
   func loadPrevious(
     cachePolicy: CachePolicy,
-    completion: (@MainActor (Error?) -> Void)?
+    completion: (@MainActor (Error?) throws -> Void)?
   )
   func loadNext(
     cachePolicy: CachePolicy,
-    completion: (@MainActor (Error?) -> Void)?
+    completion: (@MainActor (Error?) throws -> Void)?
   )
-  func loadAll(fetchFromInitialPage: Bool, completion: (@MainActor (Error?) -> Void)?)
+  func loadAll(
+    fetchFromInitialPage: Bool,
+    completion: (@MainActor (Error?) throws -> Void)?
+  )
   func refetch(cachePolicy: CachePolicy)
   func fetch()
 }
@@ -34,22 +37,21 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   }
 
   private actor CompletionManager {
-    var completion: (@MainActor (Error?) -> Void)?
+    var completion: (@MainActor (Error?) throws -> Void)?
 
-    func set(completion: (@MainActor (Error?) -> Void)?) async {
-      await execute(error: nil)
+    func set(completion: (@MainActor (Error?) throws -> Void)?) async {
       self.completion = completion
     }
 
     func execute(error: Error?) async {
-      await completion?(error)
+      try? await completion?(error)
       completion = nil
     }
   }
 
   private let pager: Actor
   private var subscriptions = Subscriptions()
-  private let completionManager = CompletionManager()
+  private var completions: [CompletionManager] = []
 
   public init<P: PaginationInfo>(
     client: ApolloClientProtocol,
@@ -115,8 +117,12 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// Reset all pagination state and cancel all in-flight requests.
   public func cancel() {
     Task { [weak self] in
-      await self?.completionManager.execute(error: nil)
-      await self?.pager.cancel()
+      guard let self else { return }
+      for completion in self.completions {
+        await completion.execute(error: PaginationError.cancellation)
+      }
+      self.completions = []
+      await self.pager.cancel()
     }
   }
 
@@ -126,12 +132,12 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-    completion: (@MainActor (Error?) -> Void)? = nil
+    completion: (@MainActor (Error?) throws -> Void)? = nil
   ) {
     execute { [weak self] in
       try await self?.pager.loadPrevious(cachePolicy: cachePolicy)
     } completion: { error in
-      completion?(error)
+      try completion?(error)
     }
   }
 
@@ -141,12 +147,12 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-    completion: (@MainActor (Error?) -> Void)? = nil
+    completion: (@MainActor (Error?) throws -> Void)? = nil
   ) {
     execute { [weak self] in
       try await self?.pager.loadNext(cachePolicy: cachePolicy)
     } completion: { error in
-      completion?(error)
+      try completion?(error)
     }
   }
 
@@ -154,11 +160,11 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// - Parameters:
   ///   - fetchFromInitialPage: Pass true to begin loading from the initial page; otherwise pass false.  Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
-  public func loadAll(fetchFromInitialPage: Bool = true, completion: (@MainActor (Error?) -> Void)? = nil) {
+  public func loadAll(fetchFromInitialPage: Bool = true, completion: (@MainActor (Error?) throws -> Void)? = nil) {
     execute { [weak self] in
       try await self?.pager.loadAll(fetchFromInitialPage: fetchFromInitialPage)
     } completion: { error in
-      completion?(error)
+      try completion?(error)
     }
   }
 
@@ -177,14 +183,17 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
-  private func execute(operation: @escaping () async throws -> Void, completion: (@MainActor (Error?) -> Void)?) {
+  private func execute(operation: @escaping () async throws -> Void, completion: (@MainActor (Error?) throws -> Void)?) {
     Task<_, Never> { [weak self] in
-      await self?.completionManager.set(completion: completion)
+      guard let self else { return }
+      let completionManager = CompletionManager()
+      await completionManager.set(completion: completion)
+      self.completions.append(completionManager)
       do {
         try await operation()
-        await self?.completionManager.execute(error: nil)
+        await completionManager.execute(error: nil)
       } catch {
-        await self?.completionManager.execute(error: error)
+        await completionManager.execute(error: error)
       }
     }
   }
