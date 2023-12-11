@@ -138,15 +138,15 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
   }
 
   @available(iOS 16.0, macOS 13.0, *)
-  func test_pager_cancellation_calls_callback_manyQueuedRequests() throws {
+  func test_pager_cancellation_calls_callback_deinit() async throws {
     server.customDelay = .milliseconds(1)
-    let pager = GraphQLQueryPager(pager: createForwardPager())
+    var pager = GraphQLQueryPager(pager: createForwardPager())
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     var results: [Result<GraphQLQueryPager<ForwardQuery, ForwardQuery>.Output, Error>] = []
     var errors: [PaginationError?] = []
 
     pager.fetch()
-    wait(for: [serverExpectation], timeout: 1)
+    await fulfillment(of: [serverExpectation], timeout: 1)
     server.customDelay = .milliseconds(150)
     pager.subscribe { result in
       results.append(result)
@@ -156,15 +156,12 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
       let error = try? XCTUnwrap(error as? PaginationError)
       errors.append(error)
     })
-    pager.loadNext(completion: { error in
-      let error = try? XCTUnwrap(error as? PaginationError)
-      errors.append(error)
-    })
-    pager.cancel()
+    try await Task.sleep(for: .milliseconds(50))
+    pager = GraphQLQueryPager(pager: self.createForwardPager())
 
-    wait(for: [secondPageExpectation], timeout: 2)
+    await fulfillment(of: [secondPageExpectation], timeout: 2)
     XCTAssertEqual(results.count, 1) // once for original fetch
-    XCTAssertEqual(errors.count, 2)
+    XCTAssertEqual(errors.count, 1)
     XCTAssertTrue(errors.contains(where: { $0 == .cancellation }))
   }
 
