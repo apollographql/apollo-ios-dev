@@ -2291,7 +2291,6 @@ class ApolloCodegenTests: XCTestCase {
   }
 
   func test__validation__selectionSet_typeConflicts_shouldThrowError() async throws {
-    throw XCTSkip("Will fix validation in next PR.")
     let schemaDefData: Data = {
       """
       type Query {
@@ -2366,8 +2365,74 @@ class ApolloCodegenTests: XCTestCase {
     })
   }
 
+  func test__validation__selectionSet_typeWithConflictingNameOnParentEntity_shouldNotThrowError() async throws {
+    let schemaDefData: Data = {
+      """
+      type Query {
+        user: User
+      }
+
+      type User {
+        value: Value
+        containers: [Container]
+      }
+
+      type Container {
+        value: Value
+        values: [Value]
+      }
+
+      type Value {
+        propertyA: String!
+        propertyB: String!
+        propertyC: String!
+        propertyD: String!
+      }
+      """
+    }().data(using: .utf8)!
+
+    let operationData: Data =
+      """
+      query ConflictingQuery {
+          user {
+              value {
+                  propertyA
+                  propertyB
+                  propertyC
+                  propertyD
+              }
+              containers {
+                  values {
+                      propertyA
+                      propertyC
+                  }
+              }
+          }
+      }
+      """.data(using: .utf8)!
+
+    try createFile(containing: schemaDefData, named: "schema.graphqls")
+    try createFile(containing: operationData, named: "operation.graphql")
+
+    let config = ApolloCodegenConfiguration.mock(
+      input: .init(
+        schemaSearchPaths: ["schema*.graphqls"],
+        operationSearchPaths: ["*.graphql"]
+      ),
+      output: .init(
+        schemaTypes: .init(path: "SchemaModule",
+                           moduleType: .swiftPackageManager),
+        operations: .inSchemaModule
+      )
+    )
+
+    await expect {
+      try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
+    }
+    .toNot(throwError())
+  }
+
   func test__validation__selectionSet_typeConflicts_withDirectInlineFragment_shouldThrowError() async throws {
-    throw XCTSkip("Will fix validation in next PR.")
     let schemaDefData: Data = {
       """
       type Query {
@@ -2444,7 +2509,6 @@ class ApolloCodegenTests: XCTestCase {
   }
 
   func test__validation__selectionSet_typeConflicts_withMergedInlineFragment_shouldThrowError() async throws {
-    throw XCTSkip("Will fix validation in next PR.")
     let schemaDefData: Data = {
       """
       type Query {
@@ -2528,7 +2592,6 @@ class ApolloCodegenTests: XCTestCase {
   }
 
   func test__validation__selectionSet_typeConflicts_withDirectNamedFragment_shouldThrowError() async throws {
-    throw XCTSkip("Will fix validation in next PR.")
     let schemaDefData: Data = {
       """
       type Query {
@@ -2605,7 +2668,6 @@ class ApolloCodegenTests: XCTestCase {
   }
 
   func test__validation__selectionSet_typeConflicts_withNamedFragment_shouldThrowError() async throws {
-    throw XCTSkip("Will fix validation in next PR.")
     let schemaDefData: Data = {
       """
       type Query {
@@ -2674,7 +2736,6 @@ class ApolloCodegenTests: XCTestCase {
   }
 
   func test__validation__selectionSet_typeConflicts_withNamedFragmentFieldCollisionWithinInlineFragment_shouldThrowError() async throws {
-    throw XCTSkip("Will fix validation in next PR.")
     let schemaDefData: Data = {
       """
       type Query {
@@ -2760,7 +2821,6 @@ class ApolloCodegenTests: XCTestCase {
   }
 
   func test__validation__selectionSet_typeConflicts_withNamedFragmentWithinInlineFragmentTypeCollision_shouldThrowError() async throws {
-    throw XCTSkip("Will fix validation in next PR.")
     let schemaDefData: Data = {
       """
       type Query {
@@ -2851,7 +2911,6 @@ class ApolloCodegenTests: XCTestCase {
   }
 
   func test__validation__selectionSet_typeConflicts_withFieldUsingNamedFragmentCollision_shouldThrowError() async throws {
-    throw XCTSkip("Will fix validation in next PR.")
     let schemaDefData: Data = {
       """
       type Query {
