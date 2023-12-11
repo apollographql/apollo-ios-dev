@@ -27,53 +27,9 @@ public protocol PagerType {
 
 /// Handles pagination in the queue by managing multiple query watchers.
 public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: PagerType {
-
-  private actor Subscriptions {
-    var subscriptions: Set<AnyCancellable> = []
-
-    func store(subscription: AnyCancellable) {
-      subscriptions.insert(subscription)
-    }
-  }
-
-  private class Completion {
-    var completion: ((Error?) -> Void)?
-
-    init(completion: ((Error?) -> Void)?) {
-      self.completion = completion
-    }
-
-    func execute(error: Error?) async {
-      await MainActor.run { [weak self] in
-        self?.completion?(error)
-        self?.completion = nil
-      }
-    }
-  }
-
-  private actor CompletionManager {
-    var completions: [Completion] = []
-
-    func append(completion: Completion) {
-      completions.append(completion)
-    }
-
-    func reset() {
-      completions.removeAll()
-    }
-
-    func execute(completion: Completion, with error: Error?) async {
-      await completion.execute(error: error)
-    }
-
-    deinit {
-      completions.forEach { $0.completion?(PaginationError.cancellation) }
-    }
-  }
-
   private let pager: Actor
   private var subscriptions = Subscriptions()
-  private var completions = CompletionManager()
+  private var completionManager = CompletionManager()
 
   public init<P: PaginationInfo>(
     client: ApolloClientProtocol,
@@ -131,10 +87,10 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   public func cancel() {
     Task { [weak self] in
       guard let self else { return }
-      for completion in await self.completions.completions {
+      for completion in await self.completionManager.completions {
         await completion.execute(error: PaginationError.cancellation)
       }
-      await self.completions.reset()
+      await self.completionManager.reset()
       await self.pager.cancel()
     }
   }
@@ -179,7 +135,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// - Parameter cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `fetchIgnoringCacheData`.
   public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
     Task {
-      for completion in await self.completions.completions {
+      for completion in await self.completionManager.completions {
         await completion.execute(error: PaginationError.cancellation)
       }
       await pager.refetch(cachePolicy: cachePolicy)
@@ -196,13 +152,56 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   private func execute(completion: ((Error?) -> Void)?, operation: @escaping () async throws -> Void) {
     Task<_, Never> { [weak self] in
       let completionHandler = Completion(completion: completion)
-      await self?.completions.append(completion: completionHandler)
+      await self?.completionManager.append(completion: completionHandler)
       do {
         try await operation()
-        await self?.completions.execute(completion: completionHandler, with: nil)
+        await self?.completionManager.execute(completion: completionHandler, with: nil)
       } catch {
-        await self?.completions.execute(completion: completionHandler, with: error)
+        await self?.completionManager.execute(completion: completionHandler, with: error)
       }
     }
+  }
+}
+
+private actor Subscriptions {
+  var subscriptions: Set<AnyCancellable> = []
+
+  func store(subscription: AnyCancellable) {
+    subscriptions.insert(subscription)
+  }
+}
+
+private class Completion {
+  var completion: ((Error?) -> Void)?
+
+  init(completion: ((Error?) -> Void)?) {
+    self.completion = completion
+  }
+
+  func execute(error: Error?) async {
+    await MainActor.run { [weak self] in
+      self?.completion?(error)
+      self?.completion = nil
+    }
+  }
+}
+
+private actor CompletionManager {
+  var completions: [Completion] = []
+
+  func append(completion: Completion) {
+    completions.append(completion)
+  }
+
+  func reset() {
+    completions.removeAll()
+  }
+
+  func execute(completion: Completion, with error: Error?) async {
+    await completion.execute(error: error)
+  }
+
+  deinit {
+    completions.forEach { $0.completion?(PaginationError.cancellation) }
   }
 }
