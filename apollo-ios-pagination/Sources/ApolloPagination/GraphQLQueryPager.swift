@@ -11,15 +11,15 @@ public protocol PagerType {
   func cancel()
   func loadPrevious(
     cachePolicy: CachePolicy,
-    completion: (@MainActor (Error?) -> Void)?
+    completion: ((Error?) -> Void)?
   )
   func loadNext(
     cachePolicy: CachePolicy,
-    completion: (@MainActor (Error?) -> Void)?
+    completion: ((Error?) -> Void)?
   )
   func loadAll(
     fetchFromInitialPage: Bool,
-    completion: (@MainActor (Error?) -> Void)?
+    completion: ((Error?) -> Void)?
   )
   func refetch(cachePolicy: CachePolicy)
   func fetch()
@@ -36,22 +36,44 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
-  private actor CompletionManager {
-    var completion: (@MainActor (Error?) -> Void)?
+  private class Completion {
+    var completion: ((Error?) -> Void)?
 
-    func set(completion: (@MainActor (Error?) -> Void)?) async {
+    init(completion: ((Error?) -> Void)?) {
       self.completion = completion
     }
 
     func execute(error: Error?) async {
-      await completion?(error)
-      completion = nil
+      await MainActor.run { [weak self] in
+        self?.completion?(error)
+        self?.completion = nil
+      }
+    }
+  }
+
+  private actor CompletionManager {
+    var completions: [Completion] = []
+
+    func append(completion: Completion) {
+      completions.append(completion)
+    }
+
+    func reset() {
+      completions.removeAll()
+    }
+
+    func execute(completion: Completion, with error: Error?) async {
+      await completion.execute(error: error)
+    }
+
+    deinit {
+      completions.forEach { $0.completion?(PaginationError.cancellation) }
     }
   }
 
   private let pager: Actor
   private var subscriptions = Subscriptions()
-  private var completions: [CompletionManager] = []
+  private var completions = CompletionManager()
 
   public init<P: PaginationInfo>(
     client: ApolloClientProtocol,
@@ -109,10 +131,10 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   public func cancel() {
     Task { [weak self] in
       guard let self else { return }
-      for completion in self.completions {
+      for completion in await self.completions.completions {
         await completion.execute(error: PaginationError.cancellation)
       }
-      self.completions = []
+      await self.completions.reset()
       await self.pager.cancel()
     }
   }
@@ -123,12 +145,10 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-    completion: (@MainActor (Error?) -> Void)? = nil
+    completion: ((Error?) -> Void)? = nil
   ) {
-    execute { [weak self] in
+    execute(completion: completion) { [weak self] in
       try await self?.pager.loadPrevious(cachePolicy: cachePolicy)
-    } completion: { error in
-      completion?(error)
     }
   }
 
@@ -138,12 +158,10 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-    completion: (@MainActor (Error?) -> Void)? = nil
+    completion: ((Error?) -> Void)? = nil
   ) {
-    execute { [weak self] in
+    execute(completion: completion) { [weak self] in
       try await self?.pager.loadNext(cachePolicy: cachePolicy)
-    } completion: { error in
-      completion?(error)
     }
   }
 
@@ -151,11 +169,9 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// - Parameters:
   ///   - fetchFromInitialPage: Pass true to begin loading from the initial page; otherwise pass false.  Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
-  public func loadAll(fetchFromInitialPage: Bool = true, completion: (@MainActor (Error?) -> Void)? = nil) {
-    execute { [weak self] in
+  public func loadAll(fetchFromInitialPage: Bool = true, completion: ((Error?) -> Void)? = nil) {
+    execute(completion: completion) { [weak self] in
       try await self?.pager.loadAll(fetchFromInitialPage: fetchFromInitialPage)
-    } completion: { error in
-      completion?(error)
     }
   }
 
@@ -163,6 +179,9 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// - Parameter cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `fetchIgnoringCacheData`.
   public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
     Task {
+      for completion in await self.completions.completions {
+        await completion.execute(error: PaginationError.cancellation)
+      }
       await pager.refetch(cachePolicy: cachePolicy)
     }
   }
@@ -174,17 +193,15 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
-  private func execute(operation: @escaping () async throws -> Void, completion: (@MainActor (Error?) -> Void)?) {
+  private func execute(completion: ((Error?) -> Void)?, operation: @escaping () async throws -> Void) {
     Task<_, Never> { [weak self] in
-      guard let self else { return }
-      let completionManager = CompletionManager()
-      await completionManager.set(completion: completion)
-      self.completions.append(completionManager)
+      let completionHandler = Completion(completion: completion)
+      await self?.completions.append(completion: completionHandler)
       do {
         try await operation()
-        await completionManager.execute(error: nil)
+        await self?.completions.execute(completion: completionHandler, with: nil)
       } catch {
-        await completionManager.execute(error: error)
+        await self?.completions.execute(completion: completionHandler, with: error)
       }
     }
   }

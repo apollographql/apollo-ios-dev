@@ -32,6 +32,8 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
       }
     }
 
+    let fetchExpectation = expectation(description: "Initial Fetch")
+    fetchExpectation.assertForOverFulfill = false
     let subscriptionExpectation = expectation(description: "Subscription")
     subscriptionExpectation.expectedFulfillmentCount = 2
     var expectedViewModels: [ViewModel]?
@@ -39,6 +41,7 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
       switch result {
       case .success((let viewModels, _)):
         expectedViewModels = viewModels
+        fetchExpectation.fulfill()
         subscriptionExpectation.fulfill()
       default:
         XCTFail("Failed to get view models from pager.")
@@ -46,6 +49,7 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
     }
 
     fetchFirstPage(pager: anyPager)
+    wait(for: [fetchExpectation], timeout: 1)
     try fetchSecondPage(pager: anyPager)
 
     wait(for: [subscriptionExpectation], timeout: 1.0)
@@ -98,9 +102,7 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
     pager.subscribe { _ in
       loadAllExpectation.fulfill()
     }
-    pager.loadAll { error in
-      XCTAssertNil(error)
-    }
+    pager.loadAll(completion: ignoringCancellations(error:))
     wait(for: [firstPageExpectation, lastPageExpectation, loadAllExpectation], timeout: 5)
   }
 
@@ -134,6 +136,15 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
     )
   }
 
+  // This is due to a timing issue in unit tests only wherein we deinit immediately after waiting for expectations
+  private func ignoringCancellations(error: Error?) {
+    if (error as? PaginationError) == PaginationError.cancellation {
+      return
+    } else {
+      XCTAssertNil(error)
+    }
+  }
+
   private func fetchFirstPage<T>(pager: AnyGraphQLQueryPager<T>) {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     pager.fetch()
@@ -142,7 +153,7 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
 
   private func fetchSecondPage<T>(pager: AnyGraphQLQueryPager<T>) throws {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
-    pager.loadNext { error in XCTAssertNil(error) }
+    pager.loadNext(completion: ignoringCancellations(error:))
     wait(for: [serverExpectation], timeout: 1.0)
   }
 }

@@ -91,51 +91,30 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
   }
 
   @available(iOS 16.0, macOS 13.0, *)
-  func test_actor_canCancelMidflight() async throws {
-    server.customDelay = .milliseconds(500)
-    let pager = createForwardPager()
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-
-    await pager.subscribe(onUpdate: { _ in
-      XCTFail("We should never get results back")
-    }).store(in: &cancellables)
-
-    Task {
-      try await pager.loadAll()
-    }
-
-    Task {
-      try? await Task.sleep(for: .milliseconds(50))
-      await pager.cancel()
-    }
-
-    await fulfillment(of: [serverExpectation], timeout: 1.0)
-  }
-
-  @available(iOS 16.0, macOS 13.0, *)
   func test_actor_cancellationState_midflight() async throws {
-    server.customDelay = .milliseconds(1)
-    let pager = createForwardPager()
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+      server.customDelay = .milliseconds(1)
+      let pager = createForwardPager()
+      let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
-    await pager.fetch()
-    await fulfillment(of: [serverExpectation], timeout: 1.0)
+      await pager.fetch()
+      await fulfillment(of: [serverExpectation], timeout: 1.0)
 
-    server.customDelay = .seconds(3)
-    Task {
-      try? await pager.loadNext()
-    }
-    let cancellationExpectation = expectation(description: "finished cancellation")
-    Task {
-      try? await Task.sleep(for: .milliseconds(50))
-      await pager.cancel()
-      cancellationExpectation.fulfill()
-    }
+      server.customDelay = .seconds(3)
+      Task {
+          try? await pager.loadNext()
+      }
+      let cancellationExpectation = expectation(description: "finished cancellation")
+      Task {
+          try? await Task.sleep(for: .milliseconds(50))
+          await pager.cancel()
+          cancellationExpectation.fulfill()
+      }
 
-    await fulfillment(of: [cancellationExpectation])
-    let isFetching = await pager.isFetching
-    XCTAssertFalse(isFetching)
+      await fulfillment(of: [cancellationExpectation])
+      let isFetching = await pager.isFetching
+      XCTAssertFalse(isFetching)
   }
+
 
   @available(iOS 16.0, macOS 13.0, *)
   func test_pager_cancellation_calls_callback() throws {
@@ -145,18 +124,17 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
 
     pager.fetch()
     wait(for: [serverExpectation], timeout: 1)
-    server.customDelay = .milliseconds(500)
+    server.customDelay = .milliseconds(200)
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let callbackExpectation = expectation(description: "Callback")
     pager.loadNext(completion: { _ in
       callbackExpectation.fulfill()
     })
-    Task {
-      try? await Task.sleep(for: .milliseconds(25))
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(10)) {
       pager.cancel()
     }
 
-    wait(for: [callbackExpectation, secondPageExpectation])
+    wait(for: [callbackExpectation, secondPageExpectation], timeout: 2)
   }
 
   @available(iOS 16.0, macOS 13.0, *)
@@ -169,7 +147,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
 
     pager.fetch()
     wait(for: [serverExpectation], timeout: 1)
-    server.customDelay = .milliseconds(500)
+    server.customDelay = .milliseconds(150)
     pager.subscribe { result in
       results.append(result)
     }
@@ -182,16 +160,68 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
       let error = try? XCTUnwrap(error as? PaginationError)
       errors.append(error)
     })
-    Task {
-      try? await Task.sleep(for: .milliseconds(25))
-      pager.cancel()
+    pager.cancel()
+
+    wait(for: [secondPageExpectation], timeout: 2)
+    XCTAssertEqual(results.count, 1) // once for original fetch
+    XCTAssertEqual(errors.count, 2)
+    XCTAssertTrue(errors.contains(where: { $0 == .cancellation }))
+  }
+
+  @available(iOS 16.0, macOS 13.0, *)
+  func test_pager_cancellation_calls_callback_deinit() throws {
+    server.customDelay = .milliseconds(1)
+    var pager = GraphQLQueryPager(pager: createForwardPager())
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    var results: [Result<GraphQLQueryPager<ForwardQuery, ForwardQuery>.Output, Error>] = []
+    var errors: [PaginationError?] = []
+
+    pager.fetch()
+    wait(for: [serverExpectation], timeout: 1)
+    server.customDelay = .milliseconds(150)
+    pager.subscribe { result in
+      results.append(result)
+    }
+    let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
+    pager.loadNext(completion: { error in
+      let error = try? XCTUnwrap(error as? PaginationError)
+      errors.append(error)
+    })
+    pager.loadNext(completion: { error in
+      let error = try? XCTUnwrap(error as? PaginationError)
+      errors.append(error)
+    })
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(10)) {
+      pager = GraphQLQueryPager(pager: self.createForwardPager())
     }
 
-    wait(for: [secondPageExpectation])
+    wait(for: [secondPageExpectation], timeout: 2)
     XCTAssertEqual(results.count, 1) // once for original fetch
     XCTAssertEqual(errors.count, 2)
     XCTAssertTrue(errors.contains(where: { $0 == .cancellation }))
     XCTAssertTrue(errors.contains(where: { $0 == .loadInProgress }))
+  }
+
+  @available(iOS 16.0, macOS 13.0, *)
+  func test_actor_canCancelMidflight() async throws {
+    server.customDelay = .milliseconds(150)
+    let pager = createForwardPager()
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+
+    await pager.subscribe(onUpdate: { _ in
+      XCTFail("We should never get results back")
+    }).store(in: &cancellables)
+
+    Task {
+      try await pager.loadAll()
+    }
+
+    Task {
+      try? await Task.sleep(for: .milliseconds(10))
+      await pager.cancel()
+    }
+
+    await fulfillment(of: [serverExpectation], timeout: 1.0)
   }
 
   private func createReversePager() -> GraphQLQueryPager<ReverseQuery, ReverseQuery>.Actor {

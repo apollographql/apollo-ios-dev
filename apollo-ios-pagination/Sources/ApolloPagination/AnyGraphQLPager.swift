@@ -94,7 +94,7 @@ public class AnyGraphQLQueryPager<Model> {
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
-    completion: (@MainActor (Error?) -> Void)? = nil
+    completion: ((Error?) -> Void)? = nil
   ) {
     pager.loadNext(cachePolicy: cachePolicy, completion: completion)
   }
@@ -105,7 +105,7 @@ public class AnyGraphQLQueryPager<Model> {
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
-    completion: (@MainActor (Error?) -> Void)? = nil
+    completion: ((Error?) -> Void)? = nil
   ) {
     pager.loadPrevious(cachePolicy: cachePolicy, completion: completion)
   }
@@ -116,7 +116,7 @@ public class AnyGraphQLQueryPager<Model> {
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadAll(
     fetchFromInitialPage: Bool = true,
-    completion: (@MainActor (Error?) -> Void)? = nil
+    completion: ((Error?) -> Void)? = nil
   ) {
     pager.loadAll(fetchFromInitialPage: fetchFromInitialPage, completion: completion)
   }
