@@ -5,7 +5,7 @@ import ApolloInternalTestHelpers
 import StarWarsAPI
 
 final class GraphQLResultTests: XCTestCase {
-  
+
   override func setUpWithError() throws {
     try super.setUpWithError()
   }
@@ -14,6 +14,8 @@ final class GraphQLResultTests: XCTestCase {
     try super.tearDownWithError()
   }
   
+  // MARK: JSON conversion tests
+
   func test__result__givenResponseWithData_convertsToJSON() throws {
     let jsonObj: [String: AnyHashable] = [
       "hero": [
@@ -111,5 +113,9 @@ final class GraphQLResultTests: XCTestCase {
     let convertedJSON = result.asJSONDictionary()
     XCTAssertEqual(convertedJSON, expectedJSON)
   }
+
+  // MARK: Incremental merging tests
+
+  #warning("Need incremental merging tests here!")
 
 }
