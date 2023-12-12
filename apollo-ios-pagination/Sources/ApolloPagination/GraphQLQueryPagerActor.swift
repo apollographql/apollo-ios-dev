@@ -46,6 +46,8 @@ extension GraphQLQueryPager {
     /// Maps each query variable set to latest results from internal watchers.
     @Published var nextPageVarMap: OrderedDictionary<AnyHashable, PaginatedQuery.Data> = [:]
     @Published var previousPageVarMap: OrderedDictionary<AnyHashable, PaginatedQuery.Data> = [:]
+    private var tasks: Set<Task<Void, Error>> = []
+    private var taskGroup: ThrowingTaskGroup<Void, Error>?
 
     /// Designated Initializer
     /// - Parameters:
@@ -82,6 +84,7 @@ extension GraphQLQueryPager {
 
     public func loadAll(fetchFromInitialPage: Bool = true) async throws {
       return try await withThrowingTaskGroup(of: Void.self) { group in
+        taskGroup = group
         func appendJobs() {
           if nextPageInfo?.canLoadNext ?? false {
             group.addTask { [weak self] in
@@ -93,12 +96,12 @@ extension GraphQLQueryPager {
             }
           }
         }
-        isLoadingAll = true
 
         // We begin by setting the initial state. The group needs some job to perform or it will perform nothing.
         if fetchFromInitialPage {
           // If we are fetching from an initial page, then we will want to reset state and then add a task for the initial load.
           cancel()
+          isLoadingAll = true
           group.addTask { [weak self] in
             await self?.fetch(cachePolicy: .fetchIgnoringCacheData)
           }
@@ -106,6 +109,7 @@ extension GraphQLQueryPager {
           // Otherwise, we have to make sure that we have an `initialPageResult`
           throw PaginationError.missingInitialPage
         } else {
+          isLoadingAll = true
           appendJobs()
         }
 
@@ -122,6 +126,7 @@ extension GraphQLQueryPager {
           currentValue = queuedValue
         }
         queuedValue = nil
+        taskGroup = nil
       }
     }
 
@@ -176,6 +181,13 @@ extension GraphQLQueryPager {
       previousPageVarMap = [:]
       nextPageVarMap = [:]
       initialPageResult = nil
+
+      // Ensure any active networking operations are halted.
+      taskGroup?.cancelAll()
+      tasks.forEach { $0.cancel() }
+      tasks.removeAll()
+      isFetching = false
+      isLoadingAll = false
     }
 
     /// Whether or not we can load more information based on the current page.
@@ -339,8 +351,9 @@ extension GraphQLQueryPager {
     }
 
     private func execute(operation: @escaping (CurrentValueSubject<Void, Never>) async throws -> Void) async {
+      let tasksCopy = tasks
       await withCheckedContinuation { continuation in
-        Task {
+        let task = Task {
           let fetchContainer = FetchContainer()
           let publisher = CurrentValueSubject<Void, Never>(())
           let subscriber = publisher.sink(receiveCompletion: { _ in
@@ -351,9 +364,16 @@ extension GraphQLQueryPager {
             try Task.checkCancellation()
             try await operation(publisher)
           } onCancel: {
-            Task { await fetchContainer.cancel() }
+            Task {
+              await fetchContainer.cancel()
+            }
           }
         }
+        tasks.insert(task)
+      }
+      let remainder = tasks.subtracting(tasksCopy)
+      remainder.forEach { task in
+        tasks.remove(task)
       }
     }
 
