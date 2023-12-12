@@ -62,7 +62,7 @@ public extension ApolloCodegen {
   /// Errors that may occur during code generation that are not fatal. If these errors are present,
   /// the generated files will likely not compile correctly. Code generation execution can continue,
   /// but these errors should be surfaced to the user.
-  enum NonFatalError: Swift.Error, LocalizedError {
+  enum NonFatalError {
     case typeNameConflict(name: String, conflictingName: String, containingObject: String)
 
     public var errorDescription: String? {

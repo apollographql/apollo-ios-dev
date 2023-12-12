@@ -4,32 +4,14 @@ import IR
 struct SelectionSetValidationContext {
   private var referencedTypeNames: [String: String] = [:]
   private let config: ApolloCodegen.ConfigurationContext
-  let errorRecorder = ErrorRecorder()
 
   init(config: ApolloCodegen.ConfigurationContext) {
     self.config = config
   }
 
-  class ErrorRecorder {
-    var recordedErrors: [ApolloCodegen.Error] = []
-
-    func record(error: ApolloCodegen.Error) {
-      recordedErrors.append(error)
-    }
-
-    func checkForErrors() throws {
-      guard !recordedErrors.isEmpty else { return }
-
-      if recordedErrors.count == 1 {
-        throw recordedErrors.first.unsafelyUnwrapped
-      }
-
-      throw ApolloCodegen.Error.multipleErrors(recordedErrors)
-    }
-  }
-
   mutating func runTypeValidationFor(
-    _ selections: IR.ComputedSelectionSet
+    _ selections: IR.ComputedSelectionSet,
+    recordingErrorsTo errorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) {
     var locationName: String {
       SelectionSetNameGenerator.generatedSelectionSetName(
@@ -52,7 +34,7 @@ struct SelectionSetValidationContext {
         let formattedTypeName = field.formattedSelectionSetName(with: config.pluralizer)
         if let existingFieldName = typeNamesForEntityFields[formattedTypeName] {
           errorRecorder.record(error:
-            ApolloCodegen.Error.typeNameConflict(
+            ApolloCodegen.NonFatalError.typeNameConflict(
               name: existingFieldName,
               conflictingName: field.name,
               containingObject: locationName
@@ -69,7 +51,7 @@ struct SelectionSetValidationContext {
     IteratorSequence(selections.makeNamedFragmentIterator()).forEach { fragmentSpread in
       if let existingTypeName = referencedTypeNames[fragmentSpread.fragment.generatedDefinitionName] {
         errorRecorder.record(error:
-          ApolloCodegen.Error.typeNameConflict(
+          ApolloCodegen.NonFatalError.typeNameConflict(
             name: existingTypeName,
             conflictingName: fragmentSpread.fragment.name,
             containingObject: locationName

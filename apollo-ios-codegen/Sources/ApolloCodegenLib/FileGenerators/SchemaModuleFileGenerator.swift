@@ -9,7 +9,7 @@ struct SchemaModuleFileGenerator {
   static func generate(
     _ config: ApolloCodegen.ConfigurationContext,
     fileManager: ApolloFileManager = .default
-  ) async throws {
+  ) async throws -> [ApolloCodegen.NonFatalError] {
 
     let pathURL: URL = URL(
       fileURLWithPath: config.output.schemaTypes.path,
@@ -17,11 +17,12 @@ struct SchemaModuleFileGenerator {
     )
     let filePath: String
     let rendered: String
+    let errors: [ApolloCodegen.NonFatalError]
 
     switch config.output.schemaTypes.moduleType {
     case .swiftPackageManager:
       filePath = pathURL.appendingPathComponent("Package.swift").path
-      rendered = SwiftPackageManagerModuleTemplate(
+      (rendered, errors) = SwiftPackageManagerModuleTemplate(
         testMockConfig: config.output.testMocks,
         config: config
       ).render()
@@ -29,18 +30,20 @@ struct SchemaModuleFileGenerator {
     case .embeddedInTarget:
       filePath = pathURL
         .appendingPathComponent("\(config.schemaNamespace.firstUppercased).graphql.swift").path
-      rendered = SchemaModuleNamespaceTemplate(
+      (rendered, errors) = SchemaModuleNamespaceTemplate(
         config: config
         ).render()
 
     case .other:
       // no-op - the implementation is import statements in the generated operation files
-      return
+      return []
     }
 
     try await fileManager.createFile(
       atPath: filePath,
       data: rendered.data(using: .utf8)
     )
+    return errors
   }
+
 }

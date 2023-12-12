@@ -10,6 +10,7 @@ struct SelectionSetTemplate {
   let definition: IR.Definition
   let generateInitializers: Bool
   let config: ApolloCodegen.ConfigurationContext
+  let nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   let renderAccessControl: () -> String
 
   private let nameCache: SelectionSetNameCache
@@ -20,11 +21,13 @@ struct SelectionSetTemplate {
     definition: IR.Definition,
     generateInitializers: Bool,
     config: ApolloCodegen.ConfigurationContext,
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder,
     renderAccessControl: @autoclosure @escaping () -> String
   ) {
     self.definition = definition
     self.generateInitializers = generateInitializers
     self.config = config
+    self.nonFatalErrorRecorder = nonFatalErrorRecorder
     self.renderAccessControl = renderAccessControl
 
     self.nameCache = SelectionSetNameCache(config: config)
@@ -35,10 +38,6 @@ struct SelectionSetTemplate {
   struct SelectionSetContext {
     let selectionSet: IR.ComputedSelectionSet
     let validationContext: SelectionSetValidationContext
-
-    var errorRecorder: SelectionSetValidationContext.ErrorRecorder {
-      validationContext.errorRecorder
-    }
   }
 
   private func createSelectionSetContext(
@@ -50,7 +49,10 @@ struct SelectionSetTemplate {
       entityStorage: definition.entityStorage
     ).build()
     var validationContext = context.validationContext
-    validationContext.runTypeValidationFor(computedSelectionSet)
+    validationContext.runTypeValidationFor(
+      computedSelectionSet,
+      recordingErrorsTo: nonFatalErrorRecorder
+    )
     return SelectionSetContext(
       selectionSet: computedSelectionSet,
       validationContext: validationContext
@@ -59,7 +61,16 @@ struct SelectionSetTemplate {
 
   /// MARK: - Render Body
 
-  func renderBody() throws -> TemplateString {
+  /// Renders the body of the SelectionSet template for the entire `definition` including all
+  /// nested child selection sets.
+  ///
+  /// Errors that occur during rendering will be recorded to the `nonFatalErrorRecorder`
+  /// If any `NonFatalErrors` are recorded, the generated file will likely
+  /// not compile correctly. Code generation execution can continue, but these errors should be
+  /// surfaced to the user.
+  ///
+  /// - Returns: The `TemplateString` for the body of the `SelectionSetTemplate`.
+  func renderBody() -> TemplateString {
     let computedRootSelectionSet = IR.ComputedSelectionSet.Builder(
       definition.rootField.selectionSet,
       entityStorage: definition.entityStorage
@@ -72,9 +83,6 @@ struct SelectionSetTemplate {
 
     let body = BodyTemplate(selectionSetContext)
 
-    if let error = selectionSetContext.errorRecorder.recordedErrors.first {
-      throw error
-    }
     return body
   }
 

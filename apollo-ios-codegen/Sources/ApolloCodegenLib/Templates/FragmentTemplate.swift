@@ -29,8 +29,9 @@ struct FragmentTemplate: TemplateRenderer {
         definition: fragment,
         generateInitializers: config.options.shouldGenerateSelectionSetInitializers(for: fragment),
         config: config,
+        nonFatalErrorRecorder: nonFatalErrorRecorder,
         renderAccessControl: { accessControlModifier(for: .member) }()
-      ).renderBody(nonFatalErrorRecorder: nonFatalErrorRecorder))
+      ).renderBody())
     }
 
     """)
