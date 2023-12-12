@@ -9,8 +9,8 @@ extension GraphQLQueryPager {
     private let client: any ApolloClientProtocol
     private var firstPageWatcher: GraphQLQueryWatcher<InitialQuery>?
     private var nextPageWatchers: [GraphQLQueryWatcher<PaginatedQuery>] = []
-    private let initialQuery: InitialQuery
-    private var isLoadingAll: Bool = false
+    let initialQuery: InitialQuery
+    var isLoadingAll: Bool = false
     var isFetching: Bool = false
     let nextPageResolver: (PaginationInfo) -> PaginatedQuery?
     let previousPageResolver: (PaginationInfo) -> PaginatedQuery?

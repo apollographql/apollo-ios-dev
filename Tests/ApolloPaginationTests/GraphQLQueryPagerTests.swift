@@ -219,6 +219,32 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [serverExpectation], timeout: 1.0)
   }
 
+  @available(iOS 16.0, macOS 13.0, *)
+  func test_actor_cancellation_loadingState() async throws {
+    server.customDelay = .milliseconds(150)
+    let pager = createForwardPager()
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+
+    await pager.subscribe(onUpdate: { _ in
+      XCTFail("We should never get results back")
+    }).store(in: &cancellables)
+
+    Task {
+      try await pager.loadAll()
+    }
+
+    Task {
+      try? await Task.sleep(for: .milliseconds(10))
+      await pager.cancel()
+    }
+
+    await fulfillment(of: [serverExpectation], timeout: 1.0)
+    async let isLoadingAll = pager.isLoadingAll
+    async let isFetching = pager.isFetching
+    let loadingStates = await [isFetching, isLoadingAll]
+    loadingStates.forEach { XCTAssertFalse($0) }
+  }
+
   private func createReversePager() -> GraphQLQueryPager<ReverseQuery, ReverseQuery>.Actor {
     let initialQuery = ReverseQuery()
     initialQuery.__variables = ["id": "2001", "first": 2, "before": "Y3Vyc29yMw=="]
