@@ -12,7 +12,9 @@ struct FragmentTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .operationFile
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     return TemplateString(
     """
     \(accessControlModifier(for: .parent))\
@@ -28,7 +30,7 @@ struct FragmentTemplate: TemplateRenderer {
         generateInitializers: config.options.shouldGenerateSelectionSetInitializers(for: fragment),
         config: config,
         renderAccessControl: { accessControlModifier(for: .member) }()
-      ).renderBody())
+      ).renderBody(nonFatalErrorRecorder: nonFatalErrorRecorder))
     }
 
     """)

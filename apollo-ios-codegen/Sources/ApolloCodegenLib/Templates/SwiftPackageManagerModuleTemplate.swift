@@ -13,7 +13,9 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
 
   let config: ApolloCodegen.ConfigurationContext
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     let casedSchemaNamespace = config.schemaNamespace.firstUppercased
 
     return TemplateString("""

@@ -3,7 +3,6 @@ import IR
 import GraphQLCompiler
 import OrderedCollections
 import Utilities
-import TemplateString
 
 // Only available on macOS
 #if os(macOS)
@@ -11,72 +10,8 @@ import TemplateString
 /// A class to facilitate running code generation
 public class ApolloCodegen {
 
-  // MARK: Public
+  // MARK: - Public
 
-  /// Errors that can occur during code generation.
-  public enum Error: Swift.Error, LocalizedError {
-    /// An error occured during validation of the GraphQL schema or operations.
-    case graphQLSourceValidationFailure(atLines: [String])
-    case testMocksInvalidSwiftPackageConfiguration
-    case inputSearchPathInvalid(path: String)
-    case schemaNameConflict(name: String)
-    case cannotLoadSchema
-    case cannotLoadOperations
-    case invalidConfiguration(message: String)
-    case invalidSchemaName(_ name: String, message: String)
-    case targetNameConflict(name: String)
-    case typeNameConflict(name: String, conflictingName: String, containingObject: String)
-    case multipleErrors([Error])
-
-    public var errorDescription: String? {
-      switch self {
-      case let .graphQLSourceValidationFailure(lines):
-        return """
-          An error occured during validation of the GraphQL schema or operations! Check \(lines)
-          """
-      case .testMocksInvalidSwiftPackageConfiguration:
-        return """
-          Schema Types must be generated with module type 'swiftPackageManager' to generate a \
-          swift package for test mocks.
-          """
-      case let .inputSearchPathInvalid(path):
-        return """
-          Input search path '\(path)' is invalid. Input search paths must include a file \
-          extension component. (eg. '.graphql')
-          """
-      case let .schemaNameConflict(name):
-        return """
-          Schema namespace '\(name)' conflicts with name of a type in the generated code. Please \
-          choose a different schema name. Suggestions: \(name)Schema, \(name)GraphQL, \(name)API.
-          """
-      case .cannotLoadSchema:
-        return "A GraphQL schema could not be found. Please verify the schema search paths."
-      case .cannotLoadOperations:
-        return "No GraphQL operations could be found. Please verify the operation search paths."
-      case let .invalidConfiguration(message):
-        return "The codegen configuration has conflicting values: \(message)"
-      case let .invalidSchemaName(name, message):
-        return "The schema namespace `\(name)` is invalid: \(message)"
-      case let .targetNameConflict(name):
-        return """
-        Target name '\(name)' conflicts with a reserved library name. Please choose a different \
-        target name.
-        """
-      case let .typeNameConflict(name, conflictingName, containingObject):
-        return """
-        TypeNameConflict - \
-        Field '\(conflictingName)' conflicts with field '\(name)' in GraphQL definition `\(containingObject)`. \
-        Recommend using a field alias for one of these fields to resolve this conflict. \
-        For more info see: https://www.apollographql.com/docs/ios/troubleshooting/codegen-troubleshooting#typenameconflict
-        """
-      case let .multipleErrors(errors):
-        return TemplateString("""
-        \(errors.compactMap(\.errorDescription), separator: "\n------\n")
-        """).description
-      }
-    }
-  }
-  
   /// OptionSet used to configure what items should be generated during code generation.
   public struct ItemsToGenerate: OptionSet {
     public var rawValue: Int
@@ -149,7 +84,6 @@ public class ApolloCodegen {
   class ConfigurationContext {
     let config: ApolloCodegenConfiguration
     let pluralizer: Pluralizer
-    let errorRecorder: ValidationErrorRecorder
     let rootURL: URL?
 
     init(
@@ -158,7 +92,6 @@ public class ApolloCodegen {
     ) {
       self.config = config
       self.pluralizer = Pluralizer(rules: config.options.additionalInflectionRules)
-      self.errorRecorder = ValidationErrorRecorder()
       self.rootURL = rootURL?.standardizedFileURL
     }
 
@@ -355,10 +288,7 @@ public class ApolloCodegen {
       for fragment in fragments {
         group.addTask {
           let irFragment = await ir.build(fragment: fragment)
-          try self.config.validateTypeConflicts(
-            for: irFragment.rootField.selectionSet,
-            in: irFragment.definition.name
-          )
+
           try await FragmentFileGenerator(irFragment: irFragment, config: self.config)
             .generate(forConfig: self.config, fileManager: fileManager)
         }
@@ -369,10 +299,6 @@ public class ApolloCodegen {
           async let identifier = self.operationIdentifierFactory.identifier(for: operation)
 
           let irOperation = await ir.build(operation: operation)
-          try self.config.validateTypeConflicts(
-            for: irOperation.rootField.selectionSet,
-            in: irOperation.definition.name
-          )
 
           try await OperationFileGenerator(
             irOperation: irOperation,

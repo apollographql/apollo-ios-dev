@@ -2355,7 +2355,7 @@ class ApolloCodegenTests: XCTestCase {
       try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
     }
     .to(throwError { error in
-      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+      guard case let ApolloCodegen.NonFatalError.typeNameConflict(name, conflictingName, containingObject) = error else {
         fail("Expected .typeNameConflict, got .\(error)")
         return
       }
@@ -2498,7 +2498,7 @@ class ApolloCodegenTests: XCTestCase {
       try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
     }
     .to(throwError { error in
-      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+      guard case let ApolloCodegen.NonFatalError.typeNameConflict(name, conflictingName, containingObject) = error else {
         fail("Expected .typeNameConflict, got .\(error)")
         return
       }
@@ -2581,7 +2581,7 @@ class ApolloCodegenTests: XCTestCase {
       try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
     }
     .to(throwError { error in
-      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+      guard case let ApolloCodegen.NonFatalError.typeNameConflict(name, conflictingName, containingObject) = error else {
         fail("Expected .typeNameConflict, got .\(error)")
         return
       }
@@ -2657,7 +2657,7 @@ class ApolloCodegenTests: XCTestCase {
       try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
     }
     .to(throwError { error in
-      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+      guard case let ApolloCodegen.NonFatalError.typeNameConflict(name, conflictingName, containingObject) = error else {
         fail("Expected .typeNameConflict, got .\(error)")
         return
       }
@@ -2725,7 +2725,7 @@ class ApolloCodegenTests: XCTestCase {
       try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
     }
     .to(throwError { error in
-      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+      guard case let ApolloCodegen.NonFatalError.typeNameConflict(name, conflictingName, containingObject) = error else {
         fail("Expected .typeNameConflict, got .\(error)")
         return
       }
@@ -2810,7 +2810,7 @@ class ApolloCodegenTests: XCTestCase {
       try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
     }
     .to(throwError { error in
-      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+      guard case let ApolloCodegen.NonFatalError.typeNameConflict(name, conflictingName, containingObject) = error else {
         fail("Expected .typeNameConflict, got .\(error)")
         return
       }
@@ -2900,7 +2900,7 @@ class ApolloCodegenTests: XCTestCase {
       try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
     }
     .to(throwError { error in
-      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+      guard case let ApolloCodegen.NonFatalError.typeNameConflict(name, conflictingName, containingObject) = error else {
         fail("Expected .typeNameConflict, got .\(error)")
         return
       }
@@ -2972,7 +2972,7 @@ class ApolloCodegenTests: XCTestCase {
       try await ApolloCodegen.build(with: config, withRootURL: self.directoryURL)
     }
     .to(throwError { error in
-      guard case let ApolloCodegen.Error.typeNameConflict(name, conflictingName, containingObject) = error else {
+      guard case let ApolloCodegen.NonFatalError.typeNameConflict(name, conflictingName, containingObject) = error else {
         fail("Expected .typeNameConflict, got .\(error)")
         return
       }
