@@ -50,6 +50,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       definition: self.operation.irObject,
       generateInitializers: true,
       config: ApolloCodegen.ConfigurationContext(config: config),
+      nonFatalErrorRecorder: .init(),
       renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
     )
   }
@@ -77,6 +78,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       definition: fragment.irObject,
       generateInitializers: true,
       config: ApolloCodegen.ConfigurationContext(config: config),
+      nonFatalErrorRecorder: .init(),
       renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
     )
     return fragment

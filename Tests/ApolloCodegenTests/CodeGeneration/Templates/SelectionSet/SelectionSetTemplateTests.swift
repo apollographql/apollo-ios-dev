@@ -59,6 +59,7 @@ class SelectionSetTemplateTests: XCTestCase {
       definition: self.operation.irObject,
       generateInitializers: false,
       config: config,
+      nonFatalErrorRecorder: .init(),
       renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
     )
   }
@@ -7264,6 +7265,7 @@ class SelectionSetTemplateTests: XCTestCase {
       definition: detailsFragment.fragment,
       generateInitializers: false,
       config: self.subject.config,
+      nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()
     )
 

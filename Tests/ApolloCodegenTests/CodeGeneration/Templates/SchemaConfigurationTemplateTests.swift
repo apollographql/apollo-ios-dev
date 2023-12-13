@@ -24,11 +24,11 @@ class SchemaConfigurationTemplateTests: XCTestCase {
   }
 
   private func renderTemplate() -> String {
-    subject.template.description
+    subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
   private func renderDetachedTemplate() -> String? {
-    subject.detachedTemplate?.description
+    subject.renderDetachedTemplate(nonFatalErrorRecorder: .init())?.description
   }
 
   // MARK: Header Tests
@@ -48,7 +48,7 @@ class SchemaConfigurationTemplateTests: XCTestCase {
     buildSubject()
     // when
 
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
@@ -71,7 +71,7 @@ class SchemaConfigurationTemplateTests: XCTestCase {
     buildSubject()
     // when
 
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 10, ignoringExtraLines: false))
@@ -94,7 +94,7 @@ class SchemaConfigurationTemplateTests: XCTestCase {
     buildSubject(config: .mock(.embeddedInTarget(name: "TestTarget", accessModifier: .public)))
     // when
 
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 10, ignoringExtraLines: false))
@@ -115,7 +115,7 @@ class SchemaConfigurationTemplateTests: XCTestCase {
     buildSubject(config: .mock(.embeddedInTarget(name: "TestTarget", accessModifier: .internal)))
     // when
 
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 10, ignoringExtraLines: false))
@@ -136,7 +136,7 @@ class SchemaConfigurationTemplateTests: XCTestCase {
     buildSubject(config: .mock(options: .init(cocoapodsCompatibleImportStatements: true)))
     // when
 
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 10, ignoringExtraLines: false))

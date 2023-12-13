@@ -274,6 +274,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       definition: operation.irObject,
       generateInitializers: true,
       config: config,
+      nonFatalErrorRecorder: .init(),
       renderAccessControl: { "does not matter" }()
     )
 
@@ -325,7 +326,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       """#
 
     // then
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     expect(actual).to(equalLineByLine(expected, atLine: 23, ignoringExtraLines: true))
   }
@@ -368,7 +369,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       """#
 
     // then
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
@@ -403,6 +404,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       definition: operation.irObject,
       generateInitializers: true,
       config: config,
+      nonFatalErrorRecorder: .init(),
       renderAccessControl: { "does not matter" }()
     )
 
