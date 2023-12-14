@@ -10,7 +10,7 @@ struct SchemaConfigurationTemplate: TemplateRenderer {
 
   func renderHeaderTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
-  ) -> TemplateString {
+  ) -> TemplateString? {
     HeaderCommentTemplate.editableFileHeader(
       fileCanBeEditedTo: """
       provide custom configuration for a generated GraphQL schema.
