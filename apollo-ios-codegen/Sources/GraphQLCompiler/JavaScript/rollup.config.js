@@ -22,7 +22,7 @@ const options = {
     }),
     replace({
       preventAssignment: true,
-      "process.env.NODE_ENV": JSON.stringify("production"),
+      "globalThis.process.env.NODE_ENV": JSON.stringify("production"),
     }),
     terser({
       keep_classnames: true,

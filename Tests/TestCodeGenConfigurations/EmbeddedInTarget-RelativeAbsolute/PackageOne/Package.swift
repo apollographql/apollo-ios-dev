@@ -45,9 +45,6 @@ let package = Package(
         "graphql/PetDetails.graphql",
         "graphql/AllAnimalsIncludeSkipQuery.graphql",
         "graphql/PetAdoptionMutation.graphql"
-      ],
-      swiftSettings: [
-        .unsafeFlags(["-warnings-as-errors"])
       ]),
     .testTarget(
       name: "PackageOneTests",
