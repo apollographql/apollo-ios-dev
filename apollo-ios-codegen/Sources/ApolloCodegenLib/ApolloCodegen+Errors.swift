@@ -1,11 +1,10 @@
 import Foundation
 import TemplateString
+import OrderedCollections
 
-public extension ApolloCodegen {
-  /// Errors that can occur during code generation. These are fatal errors that prevent the code
+extension ApolloCodegen { /// Errors that can occur during code generation. These are fatal errors that prevent the code
   /// generation from continuing execution.
-  enum Error: Swift.Error, LocalizedError {
-    /// An error occured during validation of the GraphQL schema or operations.
+  public enum Error: Swift.Error, LocalizedError { /// An error occured during validation of the GraphQL schema or operations.
     case graphQLSourceValidationFailure(atLines: [String])
     case testMocksInvalidSwiftPackageConfiguration
     case inputSearchPathInvalid(path: String)
@@ -15,7 +14,6 @@ public extension ApolloCodegen {
     case invalidConfiguration(message: String)
     case invalidSchemaName(_ name: String, message: String)
     case targetNameConflict(name: String)
-//    case multipleErrors([ApolloCodegen.Error])
 
     public var errorDescription: String? {
       switch self {
@@ -48,13 +46,9 @@ public extension ApolloCodegen {
         return "The schema namespace `\(name)` is invalid: \(message)"
       case let .targetNameConflict(name):
         return """
-        Target name '\(name)' conflicts with a reserved library name. Please choose a different \
-        target name.
-        """
-//      case let .multipleErrors(errors):
-//        return TemplateString("""
-//        \(errors.compactMap(\.errorDescription), separator: "\n------\n")
-//        """).description
+          Target name '\(name)' conflicts with a reserved library name. Please choose a different \
+          target name.
+          """
       }
     }
   }
@@ -62,37 +56,65 @@ public extension ApolloCodegen {
   /// Errors that may occur during code generation that are not fatal. If these errors are present,
   /// the generated files will likely not compile correctly. Code generation execution can continue,
   /// but these errors should be surfaced to the user.
-  enum NonFatalError {
+  public enum NonFatalError {
     case typeNameConflict(name: String, conflictingName: String, containingObject: String)
 
-    public var errorDescription: String? {
+    var errorTypeName: String {
+      switch self {
+      case .typeNameConflict(_, _, _):
+        return "TypeNameConflict"
+      }
+    }
+
+    public var failureReason: String {
       switch self {
       case let .typeNameConflict(name, conflictingName, containingObject):
-        return """
-        TypeNameConflict - \
-        Field '\(conflictingName)' conflicts with field '\(name)' in GraphQL definition `\(containingObject)`. \
-        Recommend using a field alias for one of these fields to resolve this conflict. \
-        For more info see: https://www.apollographql.com/docs/ios/troubleshooting/codegen-troubleshooting#typenameconflict
-        """
+        return "Field '\(conflictingName)' conflicts with field '\(name)' in GraphQL definition `\(containingObject)`."
       }
+    }
+
+    public var recoverySuggestion: String {
+      switch self {
+      case .typeNameConflict(_, _, _):
+        return """
+          It is recommended to use a field alias for one of these fields to resolve this conflict.
+          For more info see: https://www.apollographql.com/docs/ios/troubleshooting/codegen-troubleshooting#typenameconflict
+          """
+      }
+    }
+
+    public var errorDescription: String? {
+      return "\(errorTypeName): \(failureReason)"
     }
 
     class Recorder {
       var recordedErrors: [NonFatalError] = []
 
-      func record(error: NonFatalError) {
-        recordedErrors.append(error)
-      }
+      func record(error: NonFatalError) { recordedErrors.append(error) }
+    }
+  }
 
-  //    func checkForErrors() throws {
-  //      guard !recordedErrors.isEmpty else { return }
-  //
-  //      if recordedErrors.count == 1 {
-  //        throw recordedErrors.first.unsafelyUnwrapped
-  //      }
-  //
-  //      throw ApolloCodegen.NonFatalError.multipleErrors(recordedErrors)
-  //    }
+  public struct NonFatalErrors: Swift.Error, LocalizedError {
+    public typealias DefinitionName = String
+
+    public let errorsByDefinition: OrderedDictionary<DefinitionName, [NonFatalError]>
+
+    public var errorDescription: String? {
+      var recoverySuggestionsByErrorType: OrderedDictionary<String, String> = [:]
+
+      return TemplateString(
+        """
+        \(errorsByDefinition.map {
+          """
+          - \($0.key):
+            - \($0.value.compactMap {
+                recoverySuggestionsByErrorType[$0.errorTypeName] = $0.recoverySuggestion
+                return $0.errorDescription
+            })
+          """
+        }, separator: "\n")
+        """
+      ).description
     }
   }
 }
