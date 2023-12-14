@@ -5,10 +5,9 @@ import Combine
 /// Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.
 public class AnyGraphQLQueryPager<Model> {
   public typealias Output = Result<(Model, UpdateSource), Error>
-
-  private var _subject: CurrentValueSubject<Output?, Never> = .init(nil)
-  private var cancellables = [AnyCancellable]()
-  private var pager: any PagerType
+  public let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
+  public var cancellables = [AnyCancellable]()
+  public let pager: any PagerType
 
   public var canLoadNext: Bool { pager.canLoadNext }
   public var canLoadPrevious: Bool { pager.canLoadPrevious }
