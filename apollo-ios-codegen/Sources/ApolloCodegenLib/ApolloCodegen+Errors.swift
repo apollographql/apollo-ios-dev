@@ -56,7 +56,7 @@ extension ApolloCodegen { /// Errors that can occur during code generation. Thes
   /// Errors that may occur during code generation that are not fatal. If these errors are present,
   /// the generated files will likely not compile correctly. Code generation execution can continue,
   /// but these errors should be surfaced to the user.
-  public enum NonFatalError {
+  public enum NonFatalError: Equatable {
     case typeNameConflict(name: String, conflictingName: String, containingObject: String)
 
     var errorTypeName: String {
@@ -91,7 +91,7 @@ extension ApolloCodegen { /// Errors that can occur during code generation. Thes
       var recordedErrors: [NonFatalError] = []
 
       func record(error: NonFatalError) { recordedErrors.append(error) }
-    }
+    }    
   }
 
   public struct NonFatalErrors: Swift.Error, LocalizedError {

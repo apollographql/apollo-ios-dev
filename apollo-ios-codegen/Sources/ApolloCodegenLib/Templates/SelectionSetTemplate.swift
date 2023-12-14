@@ -76,9 +76,11 @@ struct SelectionSetTemplate {
       entityStorage: definition.entityStorage
     ).build()
 
+    var validationContext = SelectionSetValidationContext(config: config)
+    validationContext.runTypeValidationFor(computedRootSelectionSet, recordingErrorsTo: nonFatalErrorRecorder)
     let selectionSetContext = SelectionSetContext(
       selectionSet: computedRootSelectionSet,
-      validationContext: SelectionSetValidationContext(config: config)
+      validationContext: validationContext
     )
 
     let body = BodyTemplate(selectionSetContext)
