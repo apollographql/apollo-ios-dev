@@ -91,7 +91,6 @@ public enum ApolloTarget {
   public var destinations: Destinations {
     switch self {
     case .animalKingdomAPI,
-        .apolloCodegenInternalTestHelpers,
         .apolloCodegenLibWrapper,
         .apolloCodegenTests,
         .apolloInternalTestHelpers,
@@ -106,28 +105,32 @@ public enum ApolloTarget {
         .subscriptionAPI,
         .uploadAPI:
       return Destinations([.mac])
+    case .apolloCodegenInternalTestHelpers:
+      return Destinations([.mac, .iPhone, .iPad])
     }
   }
     
     public var deploymentTargets: DeploymentTargets {
         switch self {
         case .animalKingdomAPI,
-             .apolloCodegenLibWrapper,
              .apolloWrapper,
              .gitHubAPI,
              .starWarsAPI,
              .subscriptionAPI,
              .uploadAPI:
             return DeploymentTargets(macOS: "10.15")
-        case .apolloCodegenInternalTestHelpers,
-             .apolloCodegenTests,
-             .apolloInternalTestHelpers,
+        case .apolloInternalTestHelpers,
              .apolloPerformanceTests,
              .apolloServerIntegrationTests,
              .apolloTests,
-             .apolloPaginationTests,
-             .codegenCLITests:
+             .apolloPaginationTests:
             return DeploymentTargets(macOS: "10.25")
+        case .apolloCodegenLibWrapper,
+             .apolloCodegenTests,
+             .codegenCLITests:
+          return DeploymentTargets(macOS: "12.0")
+        case .apolloCodegenInternalTestHelpers:
+          return DeploymentTargets(iOS: "13.0", macOS: "12.0")
         }
     }
 }
