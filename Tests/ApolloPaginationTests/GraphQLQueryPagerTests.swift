@@ -125,11 +125,9 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     }
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     pager.loadNext(completion: { error in
-      let error = try? XCTUnwrap(error as? PaginationError)
       errors.append(error)
     })
     pager.loadNext(completion: { error in
-      let error = try? XCTUnwrap(error as? PaginationError)
       errors.append(error)
     })
     DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(10)) {
@@ -158,7 +156,6 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     }
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     pager.loadNext(completion: { error in
-      let error = try? XCTUnwrap(error as? PaginationError)
       errors.append(error)
     })
     try await Task.sleep(for: .milliseconds(50))
