@@ -123,7 +123,7 @@ public enum ApolloTarget {
              .apolloServerIntegrationTests,
              .apolloTests,
              .apolloPaginationTests:
-            return DeploymentTargets(macOS: "10.25")
+            return DeploymentTargets(macOS: "12.0")
         case .apolloCodegenInternalTestHelpers,
              .apolloCodegenLibWrapper,
              .apolloCodegenTests,
