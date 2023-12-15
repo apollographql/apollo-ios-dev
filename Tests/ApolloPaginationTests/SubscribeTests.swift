@@ -45,8 +45,8 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     let initialFetchExpectation = expectation(description: "Results")
     initialFetchExpectation.assertForOverFulfill = false
 
-    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
-    var otherResults: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
+    var results: [Result<PaginationOutput<Query, Query>, Error>] = []
+    var otherResults: [Result<PaginationOutput<Query, Query>, Error>] = []
     await pager.$currentValue.compactMap({ $0 }).sink { result in
       results.append(result)
       initialFetchExpectation.fulfill()
@@ -71,10 +71,10 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     }
   }
 
-  private func createPager() -> GraphQLQueryPager<Query, Query>.Actor {
+  private func createPager() -> AsyncGraphQLQueryPager<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return GraphQLQueryPager<Query, Query>.Actor(
+    return AsyncGraphQLQueryPager<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in

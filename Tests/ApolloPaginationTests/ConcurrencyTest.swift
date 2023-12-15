@@ -26,7 +26,7 @@ final class ConcurrencyTests: XCTestCase {
   // MARK: - Test helpers
 
   private func loadDataFromManyThreads(
-    pager: GraphQLQueryPager<Query, Query>.Actor,
+    pager: AsyncGraphQLQueryPager<Query, Query>,
     expectation: XCTestExpectation
   ) async {
     await withTaskGroup(of: Void.self) { group in
@@ -43,7 +43,7 @@ final class ConcurrencyTests: XCTestCase {
   }
 
   private func loadDataFromManyThreadsThrowing(
-    pager: GraphQLQueryPager<Query, Query>.Actor
+    pager: AsyncGraphQLQueryPager<Query, Query>
   ) async throws {
     try await withThrowingTaskGroup(of: Void.self) { group in
       let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
@@ -69,10 +69,10 @@ final class ConcurrencyTests: XCTestCase {
     wait(for: [serverExpectation], timeout: 1.0)
   }
 
-  private func createPager() -> GraphQLQueryPager<Query, Query>.Actor {
+  private func createPager() -> AsyncGraphQLQueryPager<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return GraphQLQueryPager<Query, Query>.Actor(
+    return AsyncGraphQLQueryPager<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in
@@ -125,7 +125,7 @@ final class ConcurrencyTests: XCTestCase {
     )
   }
 
-  private func fetchFirstPage(pager: GraphQLQueryPager<Query, Query>.Actor) async {
+  private func fetchFirstPage(pager: AsyncGraphQLQueryPager<Query, Query>) async {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     await pager.fetch()
     await fulfillment(of: [serverExpectation], timeout: 1.0)
@@ -135,7 +135,7 @@ final class ConcurrencyTests: XCTestCase {
 
   func test_concurrentFetches() async throws {
     let pager = createPager()
-    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
+    var results: [Result<PaginationOutput<Query, Query>, Error>] = []
     let resultsExpectation = expectation(description: "Results arrival")
     resultsExpectation.expectedFulfillmentCount = 2
     await pager.subscribe { result in
@@ -158,7 +158,7 @@ final class ConcurrencyTests: XCTestCase {
 
   func test_concurrentFetches_nonisolated() throws {
     let pager = createNonisolatedPager()
-    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
+    var results: [Result<PaginationOutput<Query, Query>, Error>] = []
     let initialExpectation = expectation(description: "Initial")
     initialExpectation.assertForOverFulfill = false
     let nextExpectation = expectation(description: "Next")

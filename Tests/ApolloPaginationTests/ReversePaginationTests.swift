@@ -47,7 +47,7 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
 
     let serverExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForLastItem(server: server)
 
-    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
+    var results: [Result<Output<Query, Query>, Error>] = []
     let firstPageExpectation = expectation(description: "First page")
     var subscription = await pager.subscribe(onUpdate: { _ in
       firstPageExpectation.fulfill()
@@ -109,10 +109,10 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [firstPageExpectation, lastPageExpectation, loadAllExpectation], timeout: 5)
   }
 
-  private func createPager() -> GraphQLQueryPager<Query, Query>.Actor {
+  private func createPager() -> AsyncGraphQLQueryPager<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "before": "Y3Vyc29yMw=="]
-    return GraphQLQueryPager<Query, Query>.Actor(
+    return AsyncGraphQLQueryPager<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in

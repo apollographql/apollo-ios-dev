@@ -114,7 +114,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     server.customDelay = .milliseconds(1)
     let pager = GraphQLQueryPager(pager: createForwardPager())
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-    var results: [Result<GraphQLQueryPager<ForwardQuery, ForwardQuery>.Output, Error>] = []
+    var results: [Result<PaginationOutput<ForwardQuery, ForwardQuery>, Error>] = []
     var errors: [PaginationError?] = []
 
     pager.fetch()
@@ -145,7 +145,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     server.customDelay = .milliseconds(1)
     var pager = GraphQLQueryPager(pager: createForwardPager())
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-    var results: [Result<GraphQLQueryPager<ForwardQuery, ForwardQuery>.Output, Error>] = []
+    var results: [Result<PaginationOutput<ForwardQuery, ForwardQuery>, Error>] = []
     var errors: [PaginationError?] = []
 
     pager.fetch()
@@ -240,10 +240,10 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     XCTAssertFalse(isFetching)
   }
 
-  private func createReversePager() -> GraphQLQueryPager<ReverseQuery, ReverseQuery>.Actor {
+  private func createReversePager() -> AsyncGraphQLQueryPager<ReverseQuery, ReverseQuery> {
     let initialQuery = ReverseQuery()
     initialQuery.__variables = ["id": "2001", "first": 2, "before": "Y3Vyc29yMw=="]
-    return GraphQLQueryPager<ReverseQuery, ReverseQuery>.Actor(
+    return AsyncGraphQLQueryPager<ReverseQuery, ReverseQuery>(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in
@@ -268,10 +268,10 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     )
   }
 
-  private func createForwardPager() -> GraphQLQueryPager<ForwardQuery, ForwardQuery>.Actor {
+  private func createForwardPager() -> AsyncGraphQLQueryPager<ForwardQuery, ForwardQuery> {
     let initialQuery = ForwardQuery()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return GraphQLQueryPager<ForwardQuery, ForwardQuery>.Actor(
+    return AsyncGraphQLQueryPager<ForwardQuery, ForwardQuery>(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in

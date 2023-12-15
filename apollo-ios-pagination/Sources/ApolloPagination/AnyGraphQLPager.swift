@@ -138,7 +138,7 @@ public class AnyGraphQLQueryPager<Model> {
   }
 }
 
-extension GraphQLQueryPager.Actor {
+extension AsyncGraphQLQueryPager {
   nonisolated func eraseToAnyPager<T>(
     transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> T
   ) -> AnyGraphQLQueryPager<T> {

@@ -45,7 +45,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     let pager = createPager()
     let serverExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(server: server)
 
-    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
+    var results: [Result<PaginationOutput<Query, Query>, Error>] = []
     let firstPageExpectation = expectation(description: "First page")
     var subscription = await pager.subscribe(onUpdate: { _ in
       firstPageExpectation.fulfill()
@@ -153,10 +153,10 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     XCTAssertEqual(Set(friends).count, 3)
   }
 
-  private func createPager() -> GraphQLQueryPager<Query, Query>.Actor {
+  private func createPager() -> AsyncGraphQLQueryPager<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 1, "after": "Y3Vyc29yMw==", "before": GraphQLNullable<String>.null]
-    return GraphQLQueryPager<Query, Query>.Actor(
+    return AsyncGraphQLQueryPager<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in

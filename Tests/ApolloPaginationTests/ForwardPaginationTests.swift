@@ -47,7 +47,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
 
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
-    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
+    var results: [Result<PaginationOutput<Query, Query>, Error>] = []
     let firstPageExpectation = expectation(description: "First page")
     var subscription = await pager.subscribe(onUpdate: { _ in
       firstPageExpectation.fulfill()
@@ -250,7 +250,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
   func test_failingFetch_finishes() async throws {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "flirst": 2, "after": GraphQLNullable<String>.none]
-    let pager = GraphQLQueryPager<Query, Query>.Actor(
+    let pager = AsyncGraphQLQueryPager<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in
@@ -283,10 +283,10 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     cancellable.cancel()
   }
 
-  private func createPager() -> GraphQLQueryPager<Query, Query>.Actor {
+  private func createPager() -> AsyncGraphQLQueryPager<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return GraphQLQueryPager<Query, Query>.Actor(
+    return AsyncGraphQLQueryPager<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in

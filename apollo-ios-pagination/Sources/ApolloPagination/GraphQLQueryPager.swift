@@ -27,14 +27,14 @@ public protocol PagerType {
 
 /// Handles pagination in the queue by managing multiple query watchers.
 public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: PagerType {
-  private let pager: Actor
+  private let pager: AsyncGraphQLQueryPager<InitialQuery, PaginatedQuery>
   private var subscriptions = Subscriptions()
   private var completionManager = CompletionManager()
 
   public init<P: PaginationInfo>(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
-    extractPageInfo: @escaping (PageExtractionData) -> P,
+    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
   ) {
     pager = .init(
@@ -64,13 +64,13 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 
   /// Convenience initializer, internal only.
   /// - Parameter pager: An `Actor`.
-  init(pager: Actor) {
+  init(pager: AsyncGraphQLQueryPager<InitialQuery, PaginatedQuery>) {
     self.pager = pager
   }
 
   /// Allows the caller to subscribe to new pagination results.
   /// - Parameter onUpdate: A closure which provides the most recent pagination result. This closure is guaruanteed to be dispatched to the `MainActor`
-  public func subscribe(onUpdate: @MainActor @escaping (Result<Output, Error>) -> Void) {
+  public func subscribe(onUpdate: @MainActor @escaping (Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>) -> Void) {
     Task { [weak self] in
       guard let self else { return }
       let subscription = await self.pager.subscribe(onUpdate: onUpdate)
