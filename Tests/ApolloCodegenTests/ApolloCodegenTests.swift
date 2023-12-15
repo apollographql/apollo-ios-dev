@@ -2359,9 +2359,9 @@ class ApolloCodegenTests: XCTestCase {
         fail("Expected NonFatalErrors, got .\(error)")
         return
       }
-      expect(error.errorsByDefinition.count).to(equal(1))
+      expect(error.errorsByFile.count).to(equal(1))
 
-      guard let conflictingQueryErrors = error.errorsByDefinition["ConflictingQuery"],
+      guard let conflictingQueryErrors = error.errorsByFile["ConflictingQuery"],
             case let .typeNameConflict(name, conflictingName, containingObject) = conflictingQueryErrors.first else {
         fail("Expected .typeNameConflict, got .\(error)")
         return

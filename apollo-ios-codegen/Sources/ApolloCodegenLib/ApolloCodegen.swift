@@ -15,24 +15,24 @@ public class ApolloCodegen {
   /// OptionSet used to configure what items should be generated during code generation.
   public struct ItemsToGenerate: OptionSet {
     public var rawValue: Int
-    
+
     /// Only generate your code (Operations, Fragments, Enums, etc), this option maintains the codegen functionality
     /// from before this option set was created.
     public static let code = ItemsToGenerate(rawValue: 1 << 0)
-    
+
     /// Only generate the operation manifest used for persisted queries and automatic persisted queries.
     public static let operationManifest = ItemsToGenerate(rawValue: 1 << 1)
-    
+
     /// Generate all available items during code generation.
     public static let all: ItemsToGenerate = [
       .code,
       .operationManifest
     ]
-    
+
     public init(rawValue: Int) {
       self.rawValue = rawValue
     }
-    
+
   }
 
   /// Executes the code generation engine with a specified configuration.
@@ -116,13 +116,13 @@ public class ApolloCodegen {
 
   internal func build(fileManager: ApolloFileManager = .default) async throws {
     try config.validateConfigValues()
-    
+
     let compilationResult = try await compileGraphQLResult()
 
     try config.validate(compilationResult)
-    
+
     let ir = IRBuilder(compilationResult: compilationResult)
-    
+
     try await withThrowingTaskGroup(of: Void.self) { group in
       if itemsToGenerate.contains(.operationManifest) {
         group.addTask {
@@ -132,7 +132,7 @@ public class ApolloCodegen {
           )
         }
       }
-      
+
       if itemsToGenerate.contains(.code) {
         group.addTask { [self] in
           let existingGeneratedFilePaths = config.options.pruneGeneratedFiles ?
@@ -258,7 +258,9 @@ public class ApolloCodegen {
       )
     )
 
-    try await generateSchemaFiles(ir: ir, fileManager: fileManager)
+    nonFatalErrors.merge(
+      try await generateSchemaFiles(ir: ir, fileManager: fileManager)
+    )
 
     guard nonFatalErrors.isEmpty else {
       throw nonFatalErrors
@@ -324,136 +326,163 @@ public class ApolloCodegen {
   private func generateSchemaFiles(
     ir: IRBuilder,
     fileManager: ApolloFileManager
-  ) async throws {
+  ) async throws -> NonFatalErrors {
     let config = config
 
-    try await withThrowingTaskGroup(of: Void.self) { group in
-      for graphQLObject in ir.schema.referencedTypes.objects {
-        group.addTask {
-          try await ObjectFileGenerator(
-            graphqlObject: graphQLObject,
-            config: config
-          ).generate(
-            forConfig: config,
+    var nonFatalErrors = NonFatalErrors()
+
+    nonFatalErrors.merge(
+      try await nonFatalErrorCollectingTaskGroup() { group in
+        for graphQLObject in ir.schema.referencedTypes.objects {
+          addFileGenerationTask(
+            for: ObjectFileGenerator(
+              graphqlObject: graphQLObject,
+              config: config
+            ),
+            to: &group,
             fileManager: fileManager
           )
 
           if config.output.testMocks != .none {
             let fields = await ir.fieldCollector.collectedFields(for: graphQLObject)
-            try await MockObjectFileGenerator(
-              graphqlObject: graphQLObject,
-              fields: fields,
-              ir: ir,
-              config: config
-            ).generate(
-              forConfig: config,
+            addFileGenerationTask(
+              for: MockObjectFileGenerator(
+                graphqlObject: graphQLObject,
+                fields: fields,
+                ir: ir,
+                config: config
+              ),
+              to: &group,
               fileManager: fileManager
             )
           }
         }
       }
+    )
 
-      try await group.waitForAll()
-    }
-
-    try await withThrowingTaskGroup(of: Void.self) { group in
-      for graphQLEnum in ir.schema.referencedTypes.enums {
-        group.addTask {
-          try await EnumFileGenerator(graphqlEnum: graphQLEnum, config: config)
-            .generate(forConfig: config, fileManager: fileManager)
-        }
-      }
-      try await group.waitForAll()
-    }
-
-    try await withThrowingTaskGroup(of: Void.self) { group in
-      for graphQLInterface in ir.schema.referencedTypes.interfaces {
-        group.addTask {
-          try await InterfaceFileGenerator(graphqlInterface: graphQLInterface, config: config)
-            .generate(forConfig: config, fileManager: fileManager)
-        }
-      }
-      try await group.waitForAll()
-    }
-
-    try await withThrowingTaskGroup(of: Void.self) { group in
-      for graphQLUnion in ir.schema.referencedTypes.unions {
-        group.addTask {
-          try await UnionFileGenerator(
-            graphqlUnion: graphQLUnion,
-            config: config
-          ).generate(
-            forConfig: config,
+    nonFatalErrors.merge(
+      try await nonFatalErrorCollectingTaskGroup() { group in
+        for graphQLEnum in ir.schema.referencedTypes.enums {
+          addFileGenerationTask(
+            for: EnumFileGenerator(
+              graphqlEnum: graphQLEnum,
+              config: config
+            ),
+            to: &group,
             fileManager: fileManager
           )
         }
       }
-      try await group.waitForAll()
-    }
+    )
 
-    try await withThrowingTaskGroup(of: Void.self) { group in
-      for graphQLInputObject in ir.schema.referencedTypes.inputObjects {
-        group.addTask {
-          try await InputObjectFileGenerator(
-            graphqlInputObject: graphQLInputObject,
-            config: config
-          ).generate(
-            forConfig: config,
+
+    nonFatalErrors.merge(
+      try await nonFatalErrorCollectingTaskGroup() { group in
+        for graphQLInterface in ir.schema.referencedTypes.interfaces {
+          addFileGenerationTask(
+            for: InterfaceFileGenerator(
+              graphqlInterface: graphQLInterface,
+              config: config
+            ),
+            to: &group,
             fileManager: fileManager
           )
         }
       }
-      try await group.waitForAll()
-    }
+    )
 
-    try await withThrowingTaskGroup(of: Void.self) { group in
-      for graphQLScalar in ir.schema.referencedTypes.customScalars {
-        group.addTask {
-          try await CustomScalarFileGenerator(graphqlScalar: graphQLScalar, config: config)
-            .generate(forConfig: config, fileManager: fileManager)
-        }
-      }
-      try await group.waitForAll()
-    }
-
-    try await withThrowingTaskGroup(of: Void.self) { group in
-      if config.output.testMocks != .none {
-        group.addTask {
-          try await MockUnionsFileGenerator(
-            ir: ir,
-            config: config
-          )?.generate(
-            forConfig: config,
-            fileManager: fileManager
-          )
-        }
-
-        group.addTask {
-          try await MockInterfacesFileGenerator(
-            ir: ir,
-            config: config
-          )?.generate(
-            forConfig: config,
+    nonFatalErrors.merge(
+      try await nonFatalErrorCollectingTaskGroup() { group in
+        for graphQLUnion in ir.schema.referencedTypes.unions {
+          addFileGenerationTask(
+            for: UnionFileGenerator(
+              graphqlUnion: graphQLUnion,
+              config: config
+            ),
+            to: &group,
             fileManager: fileManager
           )
         }
       }
+    )
 
-      group.addTask {
-        try await SchemaMetadataFileGenerator(schema: ir.schema, config: config)
-          .generate(forConfig: config, fileManager: fileManager)
+    nonFatalErrors.merge(
+      try await nonFatalErrorCollectingTaskGroup() { group in
+        for graphQLInputObject in ir.schema.referencedTypes.inputObjects {
+          addFileGenerationTask(
+            for: InputObjectFileGenerator(
+              graphqlInputObject: graphQLInputObject,
+              config: config
+            ),
+            to: &group,
+            fileManager: fileManager
+          )
+        }
       }
-      group.addTask {
-        try await SchemaConfigurationFileGenerator(config: config)
-          .generate(forConfig: config, fileManager: fileManager)
-      }
+    )
 
-      group.addTask {
-        try await SchemaModuleFileGenerator.generate(config, fileManager: fileManager)
+    nonFatalErrors.merge(
+      try await nonFatalErrorCollectingTaskGroup() { group in
+        for graphQLScalar in ir.schema.referencedTypes.customScalars {
+          addFileGenerationTask(
+            for: CustomScalarFileGenerator(
+              graphqlScalar: graphQLScalar,
+              config: config
+            ),
+            to: &group, fileManager: fileManager
+          )
+        }
       }
+    )
 
-      try await group.waitForAll()
-    }
+    nonFatalErrors.merge(
+      try await nonFatalErrorCollectingTaskGroup() { group in
+        if config.output.testMocks != .none {
+
+          if let mockUnionsFileGenerator = MockUnionsFileGenerator(ir: ir,config: config) {
+            addFileGenerationTask(
+              for: mockUnionsFileGenerator,
+              to: &group,
+              fileManager: fileManager
+            )
+          }
+
+          if let mockInterfacesFileGenerator = MockInterfacesFileGenerator(ir: ir, config: config) {
+            addFileGenerationTask(
+              for: mockInterfacesFileGenerator,
+              to: &group,
+              fileManager: fileManager
+            )
+          }
+        }
+
+        addFileGenerationTask(
+          for: SchemaMetadataFileGenerator(
+            schema: ir.schema,
+            config: config
+          ),
+          to: &group,
+          fileManager: fileManager
+        )
+
+        addFileGenerationTask(
+          for: SchemaConfigurationFileGenerator(config: config),
+          to: &group,
+          fileManager: fileManager
+        )
+
+        group.addTask {
+          let errors = try await SchemaModuleFileGenerator.generate(
+            config,
+            fileManager: fileManager
+          )
+          return ("SchemaModule", errors)
+        }
+
+      }
+    )
+
+    return nonFatalErrors
   }
 
   /// MARK: - Generated File Pruning
@@ -518,9 +547,12 @@ public class ApolloCodegen {
     }
   }
 
-  // MARK: - Task Group Helpers
+}
 
-  private func nonFatalErrorCollectingTaskGroup(
+// MARK: - Task Group Helpers
+
+extension ApolloCodegen {
+  fileprivate func nonFatalErrorCollectingTaskGroup(
     _ block: (inout ThrowingTaskGroup<NonFatalErrors.DefinitionEntry, Swift.Error>) async throws -> Void
   ) async throws -> NonFatalErrors {
     return try await withThrowingTaskGroup(
@@ -528,16 +560,32 @@ public class ApolloCodegen {
     ) { group in
       try await block(&group)
 
-      var results = OrderedDictionary<NonFatalErrors.DefinitionName, [NonFatalError]>()
+      var results = OrderedDictionary<NonFatalErrors.FileName, [NonFatalError]>()
       for try await (definition, errors) in group {
         guard !errors.isEmpty else { continue }
         results[definition] = errors
       }
 
-      return NonFatalErrors(errorsByDefinition: results)
+      return NonFatalErrors(errorsByFile: results)
     }
   }
-  
+
+  fileprivate func addFileGenerationTask(
+    for fileGenerator: FileGenerator,
+    to group: inout ThrowingTaskGroup<ApolloCodegen.NonFatalErrors.DefinitionEntry, Swift.Error>,
+    fileManager: ApolloFileManager
+  ) {
+    let config = config
+
+    group.addTask {
+      let errors = try await fileGenerator.generate(
+        forConfig: config,
+        fileManager: fileManager
+      )
+
+      return (fileGenerator.fileName, errors)
+    }
+  }
 }
 
 #endif

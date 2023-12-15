@@ -96,30 +96,30 @@ extension ApolloCodegen { /// Errors that can occur during code generation. Thes
   }
 
   public struct NonFatalErrors: Swift.Error, LocalizedError {
-    public typealias DefinitionName = String
-    public typealias ErrorsByDefinition = OrderedDictionary<DefinitionName, [NonFatalError]>
-    public typealias DefinitionEntry = (DefinitionName, [NonFatalError])
+    public typealias FileName = String
+    public typealias ErrorsByFile = OrderedDictionary<FileName, [NonFatalError]>
+    public typealias DefinitionEntry = (FileName, [NonFatalError])
 
-    public internal(set) var errorsByDefinition: ErrorsByDefinition
+    public internal(set) var errorsByFile: ErrorsByFile
 
     init(
-      errorsByDefinition: ErrorsByDefinition = [:]
+      errorsByFile: ErrorsByFile = [:]
     ) {
-      self.errorsByDefinition = errorsByDefinition
+      self.errorsByFile = errorsByFile
     }
 
     mutating func merge(_ other: NonFatalErrors) {
-      errorsByDefinition.merge(other.errorsByDefinition) { _, new in new }
+      errorsByFile.merge(other.errorsByFile) { _, new in new }
     }
 
-    public var isEmpty: Bool { errorsByDefinition.isEmpty }
+    public var isEmpty: Bool { errorsByFile.isEmpty }
 
     public var errorDescription: String? {
       var recoverySuggestionsByErrorType: OrderedDictionary<String, String> = [:]
 
       return TemplateString(
         """
-        \(errorsByDefinition.map {
+        \(errorsByFile.map {
           """
           - \($0.key):
             - \($0.value.compactMap {
