@@ -31,7 +31,7 @@ public typealias GraphQLResultHandler<Data: RootSelectionSet> = (Result<GraphQLR
 public class ApolloClient {
 
   let networkTransport: NetworkTransport
-
+// Sample change to trigger ci jobs to check tuist update
   public let store: ApolloStore
 
   public enum ApolloClientError: Error, LocalizedError, Hashable {
