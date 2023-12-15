@@ -132,7 +132,9 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
       let error = try? XCTUnwrap(error as? PaginationError)
       errors.append(error)
     })
-    pager.cancel()
+    DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(10)) {
+        pager.cancel()
+    }
 
     wait(for: [secondPageExpectation], timeout: 2)
     XCTAssertEqual(results.count, 1) // once for original fetch
