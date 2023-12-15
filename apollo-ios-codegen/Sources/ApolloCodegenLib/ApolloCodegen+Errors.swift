@@ -1,6 +1,7 @@
 import Foundation
 import TemplateString
 import OrderedCollections
+import IR
 
 extension ApolloCodegen { /// Errors that can occur during code generation. These are fatal errors that prevent the code
   /// generation from continuing execution.
@@ -96,8 +97,22 @@ extension ApolloCodegen { /// Errors that can occur during code generation. Thes
 
   public struct NonFatalErrors: Swift.Error, LocalizedError {
     public typealias DefinitionName = String
+    public typealias ErrorsByDefinition = OrderedDictionary<DefinitionName, [NonFatalError]>
+    public typealias DefinitionEntry = (DefinitionName, [NonFatalError])
 
-    public let errorsByDefinition: OrderedDictionary<DefinitionName, [NonFatalError]>
+    public internal(set) var errorsByDefinition: ErrorsByDefinition
+
+    init(
+      errorsByDefinition: ErrorsByDefinition = [:]
+    ) {
+      self.errorsByDefinition = errorsByDefinition
+    }
+
+    mutating func merge(_ other: NonFatalErrors) {
+      errorsByDefinition.merge(other.errorsByDefinition) { _, new in new }
+    }
+
+    public var isEmpty: Bool { errorsByDefinition.isEmpty }
 
     public var errorDescription: String? {
       var recoverySuggestionsByErrorType: OrderedDictionary<String, String> = [:]

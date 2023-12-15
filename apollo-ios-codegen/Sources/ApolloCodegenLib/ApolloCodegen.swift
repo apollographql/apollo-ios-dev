@@ -247,14 +247,22 @@ public class ApolloCodegen {
     ir: IRBuilder,
     fileManager: ApolloFileManager
   ) async throws {
-    try await generateGraphQLDefinitionFiles(
-      fragments: compilationResult.fragments,
-      operations: compilationResult.operations,
-      ir: ir,
-      fileManager: fileManager
+    var nonFatalErrors = NonFatalErrors()
+
+    nonFatalErrors.merge(
+      try await generateGraphQLDefinitionFiles(
+        fragments: compilationResult.fragments,
+        operations: compilationResult.operations,
+        ir: ir,
+        fileManager: fileManager
+      )
     )
 
     try await generateSchemaFiles(ir: ir, fileManager: fileManager)
+
+    guard nonFatalErrors.isEmpty else {
+      throw nonFatalErrors
+    }
   }
 
   private func generateOperationManifest(
@@ -283,14 +291,15 @@ public class ApolloCodegen {
     operations: [CompilationResult.OperationDefinition],
     ir: IRBuilder,
     fileManager: ApolloFileManager
-  ) async throws {
-    try await withThrowingTaskGroup(of: Void.self) { group in
+  ) async throws -> NonFatalErrors {
+    return try await nonFatalErrorCollectingTaskGroup() { group in
       for fragment in fragments {
         group.addTask {
           let irFragment = await ir.build(fragment: fragment)
 
-          try await FragmentFileGenerator(irFragment: irFragment, config: self.config)
+          let errors = try await FragmentFileGenerator(irFragment: irFragment, config: self.config)
             .generate(forConfig: self.config, fileManager: fileManager)
+          return (irFragment.name, errors)
         }
       }
 
@@ -300,15 +309,14 @@ public class ApolloCodegen {
 
           let irOperation = await ir.build(operation: operation)
 
-          try await OperationFileGenerator(
+          let errors = try await OperationFileGenerator(
             irOperation: irOperation,
             operationIdentifier: await identifier,
             config: self.config
           ).generate(forConfig: self.config, fileManager: fileManager)
+          return (irOperation.name, errors)
         }
       }
-      
-      try await group.waitForAll()
     }
   }
 
@@ -510,6 +518,26 @@ public class ApolloCodegen {
     }
   }
 
+  // MARK: - Task Group Helpers
+
+  private func nonFatalErrorCollectingTaskGroup(
+    _ block: (inout ThrowingTaskGroup<NonFatalErrors.DefinitionEntry, Swift.Error>) async throws -> Void
+  ) async throws -> NonFatalErrors {
+    return try await withThrowingTaskGroup(
+      of: (NonFatalErrors.DefinitionEntry).self
+    ) { group in
+      try await block(&group)
+
+      var results = OrderedDictionary<NonFatalErrors.DefinitionName, [NonFatalError]>()
+      for try await (definition, errors) in group {
+        guard !errors.isEmpty else { continue }
+        results[definition] = errors
+      }
+
+      return NonFatalErrors(errorsByDefinition: results)
+    }
+  }
+  
 }
 
 #endif
