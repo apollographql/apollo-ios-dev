@@ -4,7 +4,7 @@ import Foundation
 extension GraphQLQueryPager {
   /// A struct which contains the outputs of pagination
   public struct Output: Hashable {
-    /// An array of previous  pages, in pagination order
+    /// An array of previous pages, in pagination order
     /// Earlier pages come first in the array.
     public let previousPages: [PaginatedQuery.Data]
 
