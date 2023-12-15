@@ -37,7 +37,7 @@ This is especially useful when we consider that we want to ensure that there are
 That does mean that we need to use a continuation of some sort in order to await the completion of the `GraphQLQueryWatcher` callback. This is where the `withCheckedContinuation` API comes in handy. We can use this API to `await` the result of the `GraphQLQueryWatcher` callback, and then resume execution once the callback has been called. This was a source of frustration early on, for the following reasons:
 
 - A `Continuation` must be resumed exactly once. Failing to resume a `Continuation` will result in a thread that is forever blocked. Resuming it too many times will result in a runtime error.
-- The `GraphQLQueryWatcher` callback is called many times: it's called twice for fetch requests with a `returnCacheDataAndFetch` policy, and once more for every cache update. This means we need to determine the "canonical load" of a `GraphQLQueryWatcher` callback, and only resume the `Continuation` once that canonical load has been called.
+- The `GraphQLQueryWatcher` callback is called many times: it's called twice for fetch requests with a `returnCacheDataAndFetch` policy, and once more for every cache update. This means we must determine which response of the `GraphQLQueryWatcher` the `Continuation` can be resumed on. Generally speaking, that response is the "canonical load": it is the response that is most in-keeping with up-to-date information based on the `CachePolicy` that is passed in. For example, passing in `fetchIgnoringCacheData` means that we can resume the continuation on the first response. However, if we were to pass in `returnCacheDataAndFetch`, we can either resume the `Continuation` on the first or second response from the `GraphQLQueryWatcher`. In that instance, we resume the Continuation on the first response to come from the network. If we did not have cache data previously, then it is the first response. If we did have cache data previously, it is the second response.
 
 > [!NOTE]
 > **What is a Continuation?**
@@ -131,11 +131,64 @@ We use `Combine` across these classes for various reasons.
 
 #### Within `GraphQLQueryPager`
 
-1. We use `Combine` in the initializer to listen to changes on the `GraphQLQueryWatcher`'s `publishers` property, which allows us to respond to changes on the `GraphQLQueryWatcher`'s internal variables. Note that we don't care about the values emitted by the `GraphQLQueryWatcher`'s `publishers` property, only that it has changed. This is due to the fact that these properties only change as a result of a fetch from the network or cache change, which may impact whether or not we can load more data. We listen to these properties for the sole purpose of setting the `canLoadNext` and `canLoadPrevious` properties, which are computed properties of the `Actor`.
+We use `Combine` in the initializer to listen to changes on the `GraphQLQueryWatcher`'s `publishers` property, which allows us to respond to changes on the `GraphQLQueryWatcher`'s internal variables. Note that we don't care about the values emitted by the `GraphQLQueryWatcher`'s `publishers` property, only that it has changed. This is due to the fact that these properties only change as a result of a fetch from the network or cache change, which may impact whether or not we can load more data. We listen to these properties for the sole purpose of setting the `canLoadNext` and `canLoadPrevious` properties, which are computed properties of the `Actor`.
+
+
+Let's examine the initializer function in more detail:
+
+```swift
+public init<P: PaginationInfo>(
+  client: ApolloClientProtocol,
+  initialQuery: InitialQuery,
+  extractPageInfo: @escaping (PageExtractionData) -> P,
+  pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
+) {
+  pager = .init(
+    client: client,
+    initialQuery: initialQuery,
+    extractPageInfo: extractPageInfo,
+    pageResolver: pageResolver
+  )
+  // 1
+  Task { [weak self] in
+    guard let self else { return }
+    // 2
+    let (previousPageVarMapPublisher, initialPublisher, nextPageVarMapPublisher) = await pager.publishers
+    // 3
+    let publishSubscriber = previousPageVarMapPublisher.combineLatest(
+      initialPublisher,
+      nextPageVarMapPublisher
+    ).sink { [weak self] _ in
+      // 4
+      guard !Task.isCancelled else { return }
+      // 5
+      Task { [weak self] in
+        guard let self else { return }
+        // 6
+        let (canLoadNext, canLoadPrevious) = await self.pager.canLoadPages
+        self.canLoadNext = canLoadNext
+        self.canLoadPrevious = canLoadPrevious
+      }
+    }
+    // 7
+    await subscriptions.store(subscription: publishSubscriber)
+  }
+}
+```
+
+This function:
+
+1. Creates a new `Task` that will run asynchronously. The `init` of this class must be synchronous, as it is intended to be used in a synchronous context. We will require an asynchronous context in order to await the `publishers` property of the `GraphQLQueryPager.Actor` -- or any property of the `GraphQLQueryPager.Actor`, for that matter.
+2. Awaits the `publishers` property of the `GraphQLQueryPager`. This is a tuple of `Combine` publishers that emit the `previousPageVarMap`, `initial`, and `nextPageVarMap` properties of the `GraphQLQueryPager.Actor`. We don't care about the values emitted by these publishers, only that they have changed. This is due to the fact that these properties only change as a result of a fetch from the network or cache change, which may impact whether or not we can load more data. We listen to these properties for the sole purpose of setting the `canLoadNext` and `canLoadPrevious` properties, which are computed properties of the `Actor`.
+3. Combines the three publishers into a single publisher that emits whenever any of the three publishers emit. This allows us to listen to changes on all three publishers with a single subscriber. Note that we will get our first value from this newly combined publisher only after all three publishers have emitted at least once. Two of the three publishers (`previousPageVarMapPublisher` and `nextPageVarMapPublisher`) will emit immediately, as they have a default value. The third publisher (`initialPublisher`) will emit after the initial query has been resolved, as its initial value is `nil`.
+4. Checks to see if the `Task` has been cancelled. If it has, we return early.
+5. Creates a new `Task` so that we can re-enter an asynchronous context. This is necessary, as the `sink` function is synchronous.
+6. Awaits the `canLoadPages` property of the `GraphQLQueryPager.Actor`. This is a tuple of `Bool`s that indicate whether or not we can load the next and previous pages. We then set the `canLoadNext` and `canLoadPrevious` properties of the `GraphQLQueryPager` to these values.
+7. Stores the `publishSubscriber` in the `subscriptions` property of the `GraphQLQueryPager`. This is necessary, as we need to keep a strong reference to the subscriber in order to keep it alive. Additionally, subscriptons are being managed by an `actor` in order to ensure thread safety – otherwise, we may have multiple threads attempting to access an array of subscriptions at the same time.
 
 #### Within `AnyGraphQLQueryPager`
 
-1. We declare a `_subject` property that allows us to apply a model transform across the outputs of the `GraphQLQueryPager`. This is necessary, as we may use multiple queries that resolve to the same model, and so we need to be able to erase the type of the `GraphQLQueryPager` and apply a transform to the output. This `_subject` emits the values being subscribed to by the `AnyGraphQLQueryPager`'s subscribers.
+We declare a `_subject` property that allows us to apply a model transform across the outputs of the `GraphQLQueryPager`. This is necessary, as we may use multiple queries that resolve to the same model, and so we need to be able to erase the type of the `GraphQLQueryPager` and apply a transform to the output. This `_subject` emits the values being subscribed to by the `AnyGraphQLQueryPager`'s subscribers.
 
 ## Consequences
 
