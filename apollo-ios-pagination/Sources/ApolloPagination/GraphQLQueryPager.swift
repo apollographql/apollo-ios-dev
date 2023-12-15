@@ -11,15 +11,15 @@ public protocol PagerType {
   func cancel()
   func loadPrevious(
     cachePolicy: CachePolicy,
-    completion: ((Error?) -> Void)?
+    completion: ((PaginationError?) -> Void)?
   )
   func loadNext(
     cachePolicy: CachePolicy,
-    completion: ((Error?) -> Void)?
+    completion: ((PaginationError?) -> Void)?
   )
   func loadAll(
     fetchFromInitialPage: Bool,
-    completion: ((Error?) -> Void)?
+    completion: ((PaginationError?) -> Void)?
   )
   func refetch(cachePolicy: CachePolicy)
   func fetch()
@@ -101,7 +101,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-    completion: ((Error?) -> Void)? = nil
+    completion: ((PaginationError?) -> Void)? = nil
   ) {
     execute(completion: completion) { [weak self] in
       try await self?.pager.loadPrevious(cachePolicy: cachePolicy)
@@ -114,7 +114,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-    completion: ((Error?) -> Void)? = nil
+    completion: ((PaginationError?) -> Void)? = nil
   ) {
     execute(completion: completion) { [weak self] in
       try await self?.pager.loadNext(cachePolicy: cachePolicy)
@@ -125,7 +125,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// - Parameters:
   ///   - fetchFromInitialPage: Pass true to begin loading from the initial page; otherwise pass false.  Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
   ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
-  public func loadAll(fetchFromInitialPage: Bool = true, completion: ((Error?) -> Void)? = nil) {
+  public func loadAll(fetchFromInitialPage: Bool = true, completion: ((PaginationError?) -> Void)? = nil) {
     execute(completion: completion) { [weak self] in
       try await self?.pager.loadAll(fetchFromInitialPage: fetchFromInitialPage)
     }
@@ -149,7 +149,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
-  private func execute(completion: ((Error?) -> Void)?, operation: @escaping () async throws -> Void) {
+  private func execute(completion: ((PaginationError?) -> Void)?, operation: @escaping () async throws -> Void) {
     Task<_, Never> { [weak self] in
       let completionHandler = Completion(completion: completion)
       await self?.completionManager.append(completion: completionHandler)
@@ -157,7 +157,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
         try await operation()
         await self?.completionManager.execute(completion: completionHandler, with: nil)
       } catch {
-        await self?.completionManager.execute(completion: completionHandler, with: error)
+        await self?.completionManager.execute(completion: completionHandler, with: error as? PaginationError)
       }
     }
   }
@@ -172,13 +172,13 @@ private actor Subscriptions {
 }
 
 private class Completion {
-  var completion: ((Error?) -> Void)?
+  var completion: ((PaginationError?) -> Void)?
 
-  init(completion: ((Error?) -> Void)?) {
+  init(completion: ((PaginationError?) -> Void)?) {
     self.completion = completion
   }
 
-  func execute(error: Error?) async {
+  func execute(error: PaginationError?) async {
     await MainActor.run { [weak self] in
       self?.completion?(error)
       self?.completion = nil
@@ -197,7 +197,7 @@ private actor CompletionManager {
     completions.removeAll()
   }
 
-  func execute(completion: Completion, with error: Error?) async {
+  func execute(completion: Completion, with error: PaginationError?) async {
     await completion.execute(error: error)
   }
 
