@@ -63,7 +63,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   }
 
   /// Convenience initializer, internal only.
-  /// - Parameter pager: An `Actor`.
+  /// - Parameter pager: An `AsyncGraphQLQueryPager`.
   init(pager: AsyncGraphQLQueryPager<InitialQuery, PaginatedQuery>) {
     self.pager = pager
   }
