@@ -44,12 +44,12 @@
     "node-sass": "7.0.3",
     "sass-loader": "10.4.1",
     "vue": "2.7.15",
-    "vue-router": "3.6.5",
+    "vue-router": "4.2.5",
     "vue-template-compiler": "2.7.15"
   },
   "peerDependencies": {
     "vue": "2.7.15",
-    "vue-router": "^3.4.9"
+    "vue-router": "^3.4.9 || ^4.0.0"
   },
   "engines": {
     "node": "14.21.3",
