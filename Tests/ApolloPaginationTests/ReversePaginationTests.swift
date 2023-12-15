@@ -47,7 +47,7 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
 
     let serverExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForLastItem(server: server)
 
-    var results: [Result<Output<Query, Query>, Error>] = []
+    var results: [Result<PaginationOutput<Query, Query>, Error>] = []
     let firstPageExpectation = expectation(description: "First page")
     var subscription = await pager.subscribe(onUpdate: { _ in
       firstPageExpectation.fulfill()
