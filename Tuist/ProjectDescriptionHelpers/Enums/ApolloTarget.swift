@@ -92,6 +92,7 @@ public enum ApolloTarget {
     switch self {
     case .animalKingdomAPI,
         .apolloCodegenLibWrapper,
+        .apolloCodegenInternalTestHelpers,
         .apolloCodegenTests,
         .apolloInternalTestHelpers,
         .apolloPaginationTests,
@@ -105,8 +106,6 @@ public enum ApolloTarget {
         .subscriptionAPI,
         .uploadAPI:
       return Destinations([.mac])
-    case .apolloCodegenInternalTestHelpers:
-      return Destinations([.mac, .iPhone, .iPad])
     }
   }
     
@@ -125,12 +124,11 @@ public enum ApolloTarget {
              .apolloTests,
              .apolloPaginationTests:
             return DeploymentTargets(macOS: "10.25")
-        case .apolloCodegenLibWrapper,
+        case .apolloCodegenInternalTestHelpers,
+             .apolloCodegenLibWrapper,
              .apolloCodegenTests,
              .codegenCLITests:
           return DeploymentTargets(macOS: "12.0")
-        case .apolloCodegenInternalTestHelpers:
-          return DeploymentTargets(iOS: "13.0", macOS: "12.0")
         }
     }
 }
