@@ -1,6 +1,7 @@
 import Apollo
 import ApolloAPI
 import Combine
+import Foundation
 
 public protocol PagerType {
   associatedtype InitialQuery: GraphQLQuery
@@ -34,12 +35,14 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   public init<P: PaginationInfo>(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
+    watcherDispatchQueue: DispatchQueue = .global(qos: .background),
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
   ) {
     pager = .init(
       client: client,
       initialQuery: initialQuery,
+      watcherDispatchQueue: watcherDispatchQueue,
       extractPageInfo: extractPageInfo,
       pageResolver: pageResolver
     )
@@ -62,9 +65,9 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
-  /// Convenience initializer, internal only.
+  /// Convenience initializer
   /// - Parameter pager: An `AsyncGraphQLQueryPager`.
-  init(pager: AsyncGraphQLQueryPager<InitialQuery, PaginatedQuery>) {
+  public init(pager: AsyncGraphQLQueryPager<InitialQuery, PaginatedQuery>) {
     self.pager = pager
   }
 
