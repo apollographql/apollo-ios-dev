@@ -1,6 +1,12 @@
 import IR
 
-#warning("TODO: document")
+/// A struct that validates that there are no type name conflicts while generating SelectionSet
+/// objects.
+///
+/// This holds onto the names of current referenced types and ensures that no conflicting names
+/// will be generated.
+///
+/// A context is copied and then has new types added to it for each individual child selection set.
 struct SelectionSetValidationContext {
   private var referencedTypeNames: [String: String] = [:]
   private let config: ApolloCodegen.ConfigurationContext
