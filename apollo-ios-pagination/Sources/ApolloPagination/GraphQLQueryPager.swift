@@ -28,9 +28,13 @@ public protocol PagerType {
 
 /// Handles pagination in the queue by managing multiple query watchers.
 public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: PagerType {
-  private let pager: AsyncGraphQLQueryPager<InitialQuery, PaginatedQuery>
+  let pager: AsyncGraphQLQueryPager<InitialQuery, PaginatedQuery>
   private var subscriptions = Subscriptions()
   private var completionManager = CompletionManager()
+
+  public var publisher: AnyPublisher<Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>, Never> {
+    get async { await pager.$currentValue.compactMap { $0 }.eraseToAnyPublisher() }
+  }
 
   public init<P: PaginationInfo>(
     client: ApolloClientProtocol,

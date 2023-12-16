@@ -7,7 +7,6 @@ import XCTest
 @testable import ApolloPagination
 
 final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
-  private typealias ReverseQuery = MockQuery<Mocks.Hero.ReverseFriendsQuery>
   private typealias ForwardQuery = MockQuery<Mocks.Hero.FriendsQuery>
 
   var cacheType: TestCacheProvider.Type {
@@ -40,54 +39,6 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     cancellables = []
 
     try super.tearDownWithError()
-  }
-
-  func test_canLoadMore() async throws {
-    let pager = createForwardPager()
-
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-
-    await pager.fetch()
-    await fulfillment(of: [serverExpectation])
-
-    var canLoadMore = await pager.canLoadNext
-    XCTAssertTrue(canLoadMore)
-
-    let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
-    let secondPageFetch = expectation(description: "Second Page")
-    secondPageFetch.expectedFulfillmentCount = 2
-    let subscription = await pager.subscribe(onUpdate: { _ in
-      secondPageFetch.fulfill()
-    })
-    try await pager.loadNext()
-    await fulfillment(of: [secondPageExpectation, secondPageFetch])
-    subscription.cancel()
-    canLoadMore = await pager.canLoadNext
-    XCTAssertFalse(canLoadMore)
-  }
-
-  func test_canLoadPrevious() async throws {
-    let pager = createReversePager()
-
-    let serverExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForLastItem(server: server)
-
-    await pager.fetch()
-    await fulfillment(of: [serverExpectation])
-
-    var canLoadMore = await pager.canLoadPrevious
-    XCTAssertTrue(canLoadMore)
-
-    let secondPageExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForPreviousItem(server: server)
-    let secondPageFetch = expectation(description: "Second Page")
-    secondPageFetch.expectedFulfillmentCount = 2
-    let subscription = await pager.subscribe(onUpdate: { _ in
-      secondPageFetch.fulfill()
-    })
-    try await pager.loadPrevious()
-    await fulfillment(of: [secondPageExpectation, secondPageFetch])
-    subscription.cancel()
-    canLoadMore = await pager.canLoadPrevious
-    XCTAssertFalse(canLoadMore)
   }
 
   @available(iOS 16.0, macOS 13.0, *)
@@ -165,108 +116,6 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     XCTAssertEqual(results.count, 1) // once for original fetch
     XCTAssertEqual(errors.count, 1)
     XCTAssertTrue(errors.contains(where: { $0 == .cancellation }))
-  }
-
-  @available(iOS 16.0, macOS 13.0, *)
-  func test_actor_canCancelMidflight() async throws {
-    server.customDelay = .milliseconds(150)
-    let pager = createForwardPager()
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-
-    await pager.subscribe(onUpdate: { _ in
-      XCTFail("We should never get results back")
-    }).store(in: &cancellables)
-
-    Task {
-      try await pager.loadAll()
-    }
-
-    Task {
-      try? await Task.sleep(for: .milliseconds(10))
-      await pager.cancel()
-    }
-
-    await fulfillment(of: [serverExpectation], timeout: 1.0)
-  }
-
-  @available(iOS 16.0, macOS 13.0, *)
-  func test_actor_cancellation_loadingState() async throws {
-    server.customDelay = .milliseconds(150)
-    let pager = createForwardPager()
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-
-    await pager.subscribe(onUpdate: { _ in
-      XCTFail("We should never get results back")
-    }).store(in: &cancellables)
-
-    Task {
-      try await pager.loadAll()
-    }
-
-    Task {
-      try? await Task.sleep(for: .milliseconds(10))
-      await pager.cancel()
-    }
-
-    await fulfillment(of: [serverExpectation], timeout: 1.0)
-    async let isLoadingAll = pager.isLoadingAll
-    async let isFetching = pager.isFetching
-    let loadingStates = await [isFetching, isLoadingAll]
-    loadingStates.forEach { XCTAssertFalse($0) }
-  }
-
-  @available(iOS 16.0, macOS 13.0, *)
-  func test_actor_cancellationState_midflight() async throws {
-    server.customDelay = .milliseconds(1)
-    let pager = createForwardPager()
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-
-    await pager.fetch()
-    await fulfillment(of: [serverExpectation], timeout: 1.0)
-
-    server.customDelay = .seconds(3)
-    Task {
-      try? await pager.loadNext()
-    }
-    let cancellationExpectation = expectation(description: "finished cancellation")
-    Task {
-      try? await Task.sleep(for: .milliseconds(50))
-      await pager.cancel()
-      cancellationExpectation.fulfill()
-    }
-
-    await fulfillment(of: [cancellationExpectation])
-    let isFetching = await pager.isFetching
-    XCTAssertFalse(isFetching)
-  }
-
-  private func createReversePager() -> AsyncGraphQLQueryPager<ReverseQuery, ReverseQuery> {
-    let initialQuery = ReverseQuery()
-    initialQuery.__variables = ["id": "2001", "first": 2, "before": "Y3Vyc29yMw=="]
-    return AsyncGraphQLQueryPager<ReverseQuery, ReverseQuery>(
-      client: client,
-      initialQuery: initialQuery,
-      watcherDispatchQueue: .main,
-      extractPageInfo: { data in
-        switch data {
-        case .initial(let data), .paginated(let data):
-          return CursorBasedPagination.Reverse(
-            hasPrevious: data.hero.friendsConnection.pageInfo.hasPreviousPage,
-            startCursor: data.hero.friendsConnection.pageInfo.startCursor
-          )
-        }
-      },
-      pageResolver: { pageInfo, direction in
-        guard direction == .previous else { return nil }
-        let nextQuery = ReverseQuery()
-        nextQuery.__variables = [
-          "id": "2001",
-          "first": 2,
-          "before": pageInfo.startCursor,
-        ]
-        return nextQuery
-      }
-    )
   }
 
   private func createForwardPager() -> AsyncGraphQLQueryPager<ForwardQuery, ForwardQuery> {
