@@ -60,6 +60,7 @@ public actor AsyncGraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: 
   @Published var previousPageVarMap: OrderedDictionary<AnyHashable, PaginatedQuery.Data> = [:]
   private var tasks: Set<Task<Void, Error>> = []
   private var taskGroup: ThrowingTaskGroup<Void, Error>?
+  private var watcherCallbackQueue: DispatchQueue
 
   /// Designated Initializer
   /// - Parameters:
@@ -71,12 +72,14 @@ public actor AsyncGraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: 
   public init<P: PaginationInfo>(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
+    watcherDispatchQueue: DispatchQueue = .global(qos: .background),
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
   ) {
     self.client = client
     self.initialQuery = initialQuery
     self.extractPageInfo = extractPageInfo
+    self.watcherCallbackQueue = watcherDispatchQueue
     self.nextPageResolver = { page in
       guard let page = page as? P else { return nil }
       return pageResolver?(page, .next)
@@ -222,7 +225,7 @@ public actor AsyncGraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: 
     await execute { [weak self] publisher in
       guard let self else { return }
       if await self.firstPageWatcher == nil {
-        let watcher = GraphQLQueryWatcher(client: client, query: initialQuery, callbackQueue: .global(qos: .background)) { [weak self] result in
+        let watcher = GraphQLQueryWatcher(client: client, query: initialQuery, callbackQueue: await watcherCallbackQueue) { [weak self] result in
           Task { [weak self] in
             await self?.onFetch(
               fetchType: .initial,
@@ -264,7 +267,7 @@ public actor AsyncGraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: 
 
     await execute { [weak self] publisher in
       guard let self else { return }
-      let watcher = GraphQLQueryWatcher(client: self.client, query: pageQuery, callbackQueue: .global(qos: .background)) { [weak self] result in
+      let watcher = GraphQLQueryWatcher(client: self.client, query: pageQuery, callbackQueue: await watcherCallbackQueue) { [weak self] result in
         Task { [weak self] in
           await self?.onFetch(
             fetchType: .paginated(direction, pageQuery),
