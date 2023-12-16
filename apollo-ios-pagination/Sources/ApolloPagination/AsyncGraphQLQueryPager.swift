@@ -4,7 +4,20 @@ import Combine
 import Foundation
 import OrderedCollections
 
-public actor AsyncGraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery> {
+public protocol AsyncPagerType {
+  associatedtype InitialQuery: GraphQLQuery
+  associatedtype PaginatedQuery: GraphQLQuery
+  var canLoadNext: Bool { get async }
+  var canLoadPrevious: Bool { get async }
+  func cancel() async
+  func loadPrevious(cachePolicy: CachePolicy) async throws
+  func loadNext(cachePolicy: CachePolicy) async throws
+  func loadAll(fetchFromInitialPage: Bool) async throws
+  func refetch(cachePolicy: CachePolicy) async
+  func fetch() async
+}
+
+public actor AsyncGraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: AsyncPagerType {
   private let client: any ApolloClientProtocol
   private var firstPageWatcher: GraphQLQueryWatcher<InitialQuery>?
   private var nextPageWatchers: [GraphQLQueryWatcher<PaginatedQuery>] = []
