@@ -159,6 +159,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     return AsyncGraphQLQueryPager<Query, Query>(
       client: client,
       initialQuery: initialQuery,
+      watcherDispatchQueue: .main,
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):

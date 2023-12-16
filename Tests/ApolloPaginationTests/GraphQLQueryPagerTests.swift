@@ -246,6 +246,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     return AsyncGraphQLQueryPager<ReverseQuery, ReverseQuery>(
       client: client,
       initialQuery: initialQuery,
+      watcherDispatchQueue: .main,
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):
@@ -274,6 +275,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     return AsyncGraphQLQueryPager<ForwardQuery, ForwardQuery>(
       client: client,
       initialQuery: initialQuery,
+      watcherDispatchQueue: .main,
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):
