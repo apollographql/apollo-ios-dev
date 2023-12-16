@@ -93,6 +93,30 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
     XCTAssertEqual(expectedViewModel, "Leia Organa")
   }
 
+  @available(iOS 16.0, macOS 13.0, *)
+  func test_pager_cancellation_calls_callback() async throws {
+    server.customDelay = .milliseconds(1)
+    let pager = createPager().eraseToAnyPager { _, initial, next in
+      if let latestPage = next.last {
+        return latestPage.hero.friendsConnection.friends.last?.name
+      }
+      return initial.hero.friendsConnection.friends.last?.name
+    }
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+
+    pager.fetch()
+    await fulfillment(of: [serverExpectation], timeout: 1)
+    server.customDelay = .milliseconds(200)
+    let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
+    let callbackExpectation = expectation(description: "Callback")
+    pager.loadNext(completion: { _ in
+      callbackExpectation.fulfill()
+    })
+    try await Task.sleep(for: .milliseconds(50))
+    pager.cancel()
+    await fulfillment(of: [callbackExpectation, secondPageExpectation], timeout: 1)
+  }
+
   // MARK: - Test helpers
 
   private func createPager() -> GraphQLQueryPager<Query, Query> {
