@@ -222,7 +222,7 @@ public actor AsyncGraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: 
     await execute { [weak self] publisher in
       guard let self else { return }
       if await self.firstPageWatcher == nil {
-        let watcher = GraphQLQueryWatcher(client: client, query: initialQuery) { [weak self] result in
+        let watcher = GraphQLQueryWatcher(client: client, query: initialQuery, callbackQueue: .global(qos: .background)) { [weak self] result in
           Task { [weak self] in
             await self?.onFetch(
               fetchType: .initial,
@@ -264,7 +264,7 @@ public actor AsyncGraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: 
 
     await execute { [weak self] publisher in
       guard let self else { return }
-      let watcher = GraphQLQueryWatcher(client: self.client, query: pageQuery) { [weak self] result in
+      let watcher = GraphQLQueryWatcher(client: self.client, query: pageQuery, callbackQueue: .global(qos: .background)) { [weak self] result in
         Task { [weak self] in
           await self?.onFetch(
             fetchType: .paginated(direction, pageQuery),
