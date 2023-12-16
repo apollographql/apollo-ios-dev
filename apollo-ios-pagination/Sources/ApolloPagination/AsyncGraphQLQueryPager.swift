@@ -90,6 +90,9 @@ public actor AsyncGraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: 
   deinit {
     nextPageWatchers.forEach { $0.cancel() }
     firstPageWatcher?.cancel()
+    taskGroup?.cancelAll()
+    tasks.forEach { $0.cancel() }
+    tasks.removeAll()
   }
 
   // MARK: - Public API
