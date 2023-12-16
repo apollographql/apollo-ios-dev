@@ -16,11 +16,9 @@ extension Target {
             ],
             dependencies: [
                 .target(name: ApolloTarget.apolloInternalTestHelpers.name),
-                .target(name: ApolloTarget.starWarsAPI.name),
                 .package(product: "Apollo"),
                 .package(product: "ApolloAPI"),
                 .package(product: "ApolloTestSupport"),
-                .package(product: "Nimble"),
                 .package(product: "ApolloPagination")
             ],
             settings: .forTarget(target)
