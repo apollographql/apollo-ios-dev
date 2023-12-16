@@ -162,14 +162,16 @@ public actor AsyncGraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: 
     try await paginationFetch(direction: .next, cachePolicy: cachePolicy)
   }
 
-  public func subscribe(onUpdate: @MainActor @escaping (Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>) -> Void) -> AnyCancellable {
+  public func subscribe(
+    onUpdate: @escaping (Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>) -> Void
+  ) -> AnyCancellable {
     $currentValue.compactMap({ $0 })
       .sink { [weak self] result in
         Task { [weak self] in
           guard let self else { return }
           let isLoadingAll = await self.isLoadingAll
           guard !isLoadingAll else { return }
-          await onUpdate(result)
+          onUpdate(result)
         }
       }
   }

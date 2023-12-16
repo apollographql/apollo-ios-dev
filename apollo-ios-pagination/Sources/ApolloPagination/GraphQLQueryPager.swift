@@ -69,8 +69,8 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   }
 
   /// Allows the caller to subscribe to new pagination results.
-  /// - Parameter onUpdate: A closure which provides the most recent pagination result. This closure is guaruanteed to be dispatched to the `MainActor`
-  public func subscribe(onUpdate: @MainActor @escaping (Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>) -> Void) {
+  /// - Parameter onUpdate: A closure which provides the most recent pagination result. Execution may be on any thread.
+  public func subscribe(onUpdate: @escaping (Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>) -> Void) {
     Task { [weak self] in
       guard let self else { return }
       let subscription = await self.pager.subscribe(onUpdate: onUpdate)
@@ -179,10 +179,8 @@ private class Completion {
   }
 
   func execute(error: PaginationError?) async {
-    await MainActor.run { [weak self] in
-      self?.completion?(error)
-      self?.completion = nil
-    }
+    completion?(error)
+    completion = nil
   }
 }
 

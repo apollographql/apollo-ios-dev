@@ -6,7 +6,7 @@ import Combine
 public class AnyGraphQLQueryPager<Model> {
   public typealias Output = Result<(Model, UpdateSource), Error>
   private let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
-  public var publisher: AnyPublisher<Output?, Never> { _subject.eraseToAnyPublisher() }
+  public var publisher: AnyPublisher<Output, Never> { _subject.compactMap { $0 }.eraseToAnyPublisher() }
   public var cancellables = [AnyCancellable]()
   public let pager: any PagerType
 
@@ -73,19 +73,12 @@ public class AnyGraphQLQueryPager<Model> {
     pager.cancel()
   }
 
-  /// Subscribe to the results of the pager, returning an `AnyCancellable` for the caller to manage.
-  /// - Parameter completion: The closure to trigger when new values come in.
-  /// - Returns: an `AnyCancellable` value that has not been stored internal to the `AnyGraphQLPager`.
-  public func sink(completion: @MainActor @escaping (Output) -> Void) -> AnyCancellable {
-    return _subject.compactMap({ $0 }).sink { result in
-      Task { await completion(result) }
-    }
-  }
-
   /// Subscribe to the results of the pager, with the management of the subscriber being stored internally to the `AnyGraphQLQueryPager`.
-  /// - Parameter completion: The closure to trigger when new values come in.
-  public func subscribe(completion: @MainActor @escaping (Output) -> Void) {
-    sink(completion: completion).store(in: &cancellables)
+  /// - Parameter completion: The closure to trigger when new values come in. Guaranteed to run on the main thread.
+  public func subscribe(completion: @escaping @MainActor (Output) -> Void) {
+    publisher.sink { result in
+      Task { await completion(result) }
+    }.store(in: &cancellables)
   }
 
   /// Load the next page, if available.
