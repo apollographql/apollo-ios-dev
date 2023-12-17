@@ -303,6 +303,39 @@ class URLSessionClientTests: XCTestCase {
       
     client2.invalidate()
   }
+    
+  func testTaskDescription() {
+    let url = URL(string: "http://www.test.com/taskDesciption")!
+    
+    let request = request(for: url,
+                          responseData: nil,
+                          statusCode: -1)
+
+    let expectation = self.expectation(description: "Described task completed")
+    expectation.isInverted = true
+    
+    let task = self.client.sendRequest(request) { result in
+      // This shouldn't get hit since we cancel the task immediately
+      expectation.fulfill()
+    }
+    self.client.cancel(task: task)
+    
+    // Should be nil by default.
+    XCTAssertNil(task.taskDescription)
+    
+    let expected = "test task description"
+    let describedTask = self.client.sendRequest(request,
+                                                taskDescription: expected) { result in
+      // This shouldn't get hit since we cancel the task immediately
+      expectation.fulfill()
+    }
+    self.client.cancel(task: describedTask)
+    
+    // The returned task should have the provided taskDescription.
+    XCTAssertEqual(expected, describedTask.taskDescription)
+
+    self.wait(for: [expectation], timeout: 5)
+  }
 }
 
 extension URLSessionClientTests: MockRequestProvider {
