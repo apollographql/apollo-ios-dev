@@ -61,12 +61,17 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
   /// - Parameters:
   ///   - sessionConfiguration: The `URLSessionConfiguration` to use to set up the URL session.
   ///   - callbackQueue: [optional] The `OperationQueue` to tell the URL session to call back to this class on, which will in turn call back to your class. Defaults to `.main`.
+  ///   - sessionDescription: [optional] A human-readable string that you can use for debugging purposes.
   public init(sessionConfiguration: URLSessionConfiguration = .default,
-              callbackQueue: OperationQueue? = .main) {
+              callbackQueue: OperationQueue? = .main,
+              sessionDescription: String? = nil) {
     super.init()
-    self.session = URLSession(configuration: sessionConfiguration,
-                              delegate: self,
-                              delegateQueue: callbackQueue)
+      
+    let session = URLSession(configuration: sessionConfiguration, 
+                             delegate: self,
+                             delegateQueue: callbackQueue)
+    session.sessionDescription = sessionDescription
+    self.session = session
   }
   
   /// Cleans up and invalidates everything related to this session client.

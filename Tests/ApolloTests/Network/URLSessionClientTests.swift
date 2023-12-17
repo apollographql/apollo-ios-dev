@@ -291,6 +291,18 @@ class URLSessionClientTests: XCTestCase {
     self.wait(for: [expectation], timeout: 5)
   }
   
+  func testSessionDescription() {
+    // Should be nil by default.
+    XCTAssertNil(client.session.sessionDescription)
+            
+    // Should set the sessionDescription of the URLSession.
+    let expected = "test description"
+    let client2 = URLSessionClient(sessionConfiguration: sessionConfiguration,
+                                   sessionDescription: expected)
+    XCTAssertEqual(expected, client2.session.sessionDescription)
+      
+    client2.invalidate()
+  }
 }
 
 extension URLSessionClientTests: MockRequestProvider {
