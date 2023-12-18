@@ -55,6 +55,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     operation = await ir.build(operation: operationDefinition)
     subject = LocalCacheMutationDefinitionTemplate(
       operation: operation,
+      patternMatchedOutputOptions: nil,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }

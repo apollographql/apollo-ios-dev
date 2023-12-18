@@ -7,6 +7,8 @@ struct OperationFileGenerator: FileGenerator {
   let irOperation: IR.Operation
   /// The persisted query identifier for the ``operation``.
   let operationIdentifier: String?
+  /// The pattern matched options for this particular operation source file.
+  let patternMatchedOutputOptions: ApolloCodegenConfiguration.OutputOptions.PatternMatchedOutputOptions?
   /// Shared codegen configuration
   let config: ApolloCodegen.ConfigurationContext
   
@@ -14,11 +16,13 @@ struct OperationFileGenerator: FileGenerator {
     irOperation.definition.isLocalCacheMutation ?
     LocalCacheMutationDefinitionTemplate(
       operation: irOperation,
+      patternMatchedOutputOptions: patternMatchedOutputOptions,
       config: config
     ) :
     OperationDefinitionTemplate(
       operation: irOperation,
       operationIdentifier: operationIdentifier,
+      patternMatchedOutputOptions: patternMatchedOutputOptions,
       config: config
     )
   }

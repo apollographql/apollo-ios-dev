@@ -7,7 +7,7 @@ enum TemplateTarget: Equatable {
   /// Used in schema types files; enum, input object, union, etc.
   case schemaFile(type: SchemaFileType)
   /// Used in operation files; query, mutation, fragment, etc.
-  case operationFile
+  case operationFile(patternMatchedOutputOptions: ApolloCodegenConfiguration.OutputOptions.PatternMatchedOutputOptions?)
   /// Used in files that define a module; Swift Package Manager, etc.
   case moduleFile
   /// Used in test mock files; schema object `Mockable` extensions
@@ -74,7 +74,7 @@ extension TemplateRenderer {
   func render() -> String {
     switch target {
     case let .schemaFile(type): return renderSchemaFile(type)
-    case .operationFile: return renderOperationFile()
+    case let .operationFile(patternMatchedOutputOptions): return renderOperationFile(patternMatchedOutputOptions)
     case .moduleFile: return renderModuleFile()
     case .testMockFile: return renderTestMockFile()
     }
@@ -110,11 +110,11 @@ extension TemplateRenderer {
     ).description
   }
 
-  private func renderOperationFile() -> String {
+  private func renderOperationFile(_ patternMatchedOutputOptions: ApolloCodegenConfiguration.OutputOptions.PatternMatchedOutputOptions?) -> String {
     TemplateString(
     """
     \(ifLet: headerTemplate, { "\($0)\n" })
-    \(ImportStatementTemplate.Operation.template(for: config))
+    \(ImportStatementTemplate.Operation.template(for: config, additionallyImportedModuleNames: patternMatchedOutputOptions?.additionallyImportedModuleNames))
 
     \(if: config.output.operations.isInModule && !config.output.schemaTypes.isInModule,
       template.wrappedInNamespace(
@@ -281,12 +281,16 @@ struct ImportStatementTemplate {
 
   enum Operation {
     static func template(
-      for config: ApolloCodegen.ConfigurationContext
+      for config: ApolloCodegen.ConfigurationContext,
+      additionallyImportedModuleNames: [String]?
     ) -> TemplateString {
       let apolloAPITargetName = config.ApolloAPITargetName
       return """
       @_exported import \(apolloAPITargetName)
       \(if: config.output.operations != .inSchemaModule, "import \(config.schemaModuleName)")
+      \(ifLet: additionallyImportedModuleNames, { moduleNames in
+        return "\(moduleNames.map { "import \($0)" }.joined(separator: "\n"))"
+      })
       """
     }
   }

@@ -7,10 +7,12 @@ import TemplateString
 struct FragmentTemplate: TemplateRenderer {
   /// IR representation of source [GraphQL Fragment](https://spec.graphql.org/draft/#sec-Language.Fragments).
   let fragment: IR.NamedFragment
+  /// The pattern matched options for this particular [GraphQL Fragment](https://spec.graphql.org/draft/#sec-Language.Fragments) source file
+  let patternMatchedOutputOptions: ApolloCodegenConfiguration.OutputOptions.PatternMatchedOutputOptions?
 
   let config: ApolloCodegen.ConfigurationContext
 
-  let target: TemplateTarget = .operationFile
+  var target: TemplateTarget { .operationFile(patternMatchedOutputOptions: patternMatchedOutputOptions) }
 
   var template: TemplateString {
     let definition = IR.Definition.namedFragment(fragment)

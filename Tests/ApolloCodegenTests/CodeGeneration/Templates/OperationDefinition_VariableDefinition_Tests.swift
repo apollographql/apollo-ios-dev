@@ -22,6 +22,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     template = OperationDefinitionTemplate(
       operation: .mock(),
       operationIdentifier: nil,
+      patternMatchedOutputOptions: nil,
       config: .init(config: .mock(output: configOutput, options: options))
     )
   }

@@ -50,6 +50,7 @@ class FragmentFileGeneratorTests: XCTestCase {
     
     subject = FragmentFileGenerator(
       irFragment: irFragment,
+      patternMatchedOutputOptions: nil,
       config: ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock())
     )
   }

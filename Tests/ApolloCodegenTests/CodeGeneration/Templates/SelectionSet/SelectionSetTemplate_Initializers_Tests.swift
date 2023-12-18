@@ -42,7 +42,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       options: .init()
     )
     let mockTemplateRenderer = MockTemplateRenderer(
-      target: .operationFile,
+      target: .operationFile(patternMatchedOutputOptions: nil),
       template: "",
       config: .init(config: config)
     )
@@ -69,7 +69,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       options: .init()
     )
     let mockTemplateRenderer = MockTemplateRenderer(
-      target: .operationFile,
+      target: .operationFile(patternMatchedOutputOptions: nil),
       template: "",
       config: .init(config: config)
     )
