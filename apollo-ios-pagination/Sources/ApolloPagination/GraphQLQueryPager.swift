@@ -105,7 +105,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// Loads the previous page, if we can.
   /// - Parameters:
   ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `fetchIgnoringCacheData`.
-  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
+  ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
     completion: ((PaginationError?) -> Void)? = nil
@@ -118,7 +118,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// Loads the next page, if we can.
   /// - Parameters:
   ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `fetchIgnoringCacheData`.
-  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
+  ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
     completion: ((PaginationError?) -> Void)? = nil
@@ -131,7 +131,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// Loads all pages.
   /// - Parameters:
   ///   - fetchFromInitialPage: Pass true to begin loading from the initial page; otherwise pass false.  Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
-  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
+  ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadAll(fetchFromInitialPage: Bool = true, completion: ((PaginationError?) -> Void)? = nil) {
     execute(completion: completion) { [weak self] in
       try await self?.pager.loadAll(fetchFromInitialPage: fetchFromInitialPage)
@@ -164,7 +164,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
         try await operation()
         await self?.completionManager.execute(completion: completionHandler, with: nil)
       } catch {
-        await self?.completionManager.execute(completion: completionHandler, with: error as? PaginationError)
+        await self?.completionManager.execute(completion: completionHandler, with: error as? PaginationError ?? .unknown(error))
       }
     }
   }

@@ -153,7 +153,7 @@ final class ConcurrencyTests: XCTestCase {
     let pager = createPager()
     await fetchFirstPage(pager: pager)
     await XCTAssertThrowsError(try await loadDataFromManyThreadsThrowing(pager: pager)) { error in
-      XCTAssertEqual(error as? PaginationError, PaginationError.loadInProgress)
+      XCTAssertTrue(PaginationError.isLoadInProgress(error: error as? PaginationError))
     }
   }
 

@@ -80,7 +80,6 @@ public class AnyAsyncGraphQLQueryPager<Model> {
   /// Load the next page, if available.
   /// - Parameters:
   ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
-  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch
   ) async throws {
@@ -90,7 +89,6 @@ public class AnyAsyncGraphQLQueryPager<Model> {
   /// Load the previous page, if available.
   /// - Parameters:
   ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
-  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch
   ) async throws {
@@ -100,7 +98,6 @@ public class AnyAsyncGraphQLQueryPager<Model> {
   /// Loads all pages.
   /// - Parameters:
   ///   - fetchFromInitialPage: Pass true to begin loading from the initial page; otherwise pass false.  Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
-  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
   public func loadAll(
     fetchFromInitialPage: Bool = true
   ) async throws {

@@ -88,7 +88,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     wait(for: [secondPageExpectation], timeout: 2)
     XCTAssertEqual(results.count, 1) // once for original fetch
     XCTAssertEqual(errors.count, 2)
-    XCTAssertTrue(errors.contains(where: { $0 == .cancellation }))
+    XCTAssertTrue(errors.contains(where: { PaginationError.isCancellation(error: $0) }))
   }
 
   @available(iOS 16.0, macOS 13.0, *)
@@ -115,7 +115,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [secondPageExpectation], timeout: 2)
     XCTAssertEqual(results.count, 1) // once for original fetch
     XCTAssertEqual(errors.count, 1)
-    XCTAssertTrue(errors.contains(where: { $0 == .cancellation }))
+    XCTAssertTrue(errors.contains(where: { PaginationError.isCancellation(error: $0) }))
   }
 
   private func createForwardPager() -> AsyncGraphQLQueryPager<ForwardQuery, ForwardQuery> {

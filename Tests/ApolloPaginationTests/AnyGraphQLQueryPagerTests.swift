@@ -83,7 +83,7 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
 
   // This is due to a timing issue in unit tests only wherein we deinit immediately after waiting for expectations
   private func ignoringCancellations(error: Error?) {
-    if (error as? PaginationError) == PaginationError.cancellation {
+    if PaginationError.isCancellation(error: error as? PaginationError) {
       return
     } else {
       XCTAssertNil(error)

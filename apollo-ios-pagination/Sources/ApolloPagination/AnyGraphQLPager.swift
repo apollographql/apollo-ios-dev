@@ -84,7 +84,7 @@ public class AnyGraphQLQueryPager<Model> {
   /// Load the next page, if available.
   /// - Parameters:
   ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
-  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
+  ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
     completion: ((Error?) -> Void)? = nil
@@ -95,7 +95,7 @@ public class AnyGraphQLQueryPager<Model> {
   /// Load the previous page, if available.
   /// - Parameters:
   ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
-  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
+  ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
     completion: ((Error?) -> Void)? = nil
@@ -106,7 +106,7 @@ public class AnyGraphQLQueryPager<Model> {
   /// Loads all pages.
   /// - Parameters:
   ///   - fetchFromInitialPage: Pass true to begin loading from the initial page; otherwise pass false.  Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
-  ///   - completion: An optional error closure that triggers in the event of an error. Defaults to `nil`.
+  ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadAll(
     fetchFromInitialPage: Bool = true,
     completion: ((Error?) -> Void)? = nil
