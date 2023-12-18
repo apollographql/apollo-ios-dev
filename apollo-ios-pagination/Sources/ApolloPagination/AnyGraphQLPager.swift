@@ -6,6 +6,8 @@ import Combine
 public class AnyGraphQLQueryPager<Model> {
   public typealias Output = Result<(Model, UpdateSource), Error>
   private let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
+
+  /// The `publisher` is the intended access point for using the pager as a `Combine` stream.
   public var publisher: AnyPublisher<Output, Never> { _subject.compactMap { $0 }.eraseToAnyPublisher() }
   public var cancellables = [AnyCancellable]()
   public let pager: any PagerType
@@ -87,7 +89,7 @@ public class AnyGraphQLQueryPager<Model> {
   ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
-    completion: ((Error?) -> Void)? = nil
+    completion: ((PaginationError?) -> Void)? = nil
   ) {
     pager.loadNext(cachePolicy: cachePolicy, completion: completion)
   }
@@ -98,7 +100,7 @@ public class AnyGraphQLQueryPager<Model> {
   ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
-    completion: ((Error?) -> Void)? = nil
+    completion: ((PaginationError?) -> Void)? = nil
   ) {
     pager.loadPrevious(cachePolicy: cachePolicy, completion: completion)
   }
@@ -109,7 +111,7 @@ public class AnyGraphQLQueryPager<Model> {
   ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadAll(
     fetchFromInitialPage: Bool = true,
-    completion: ((Error?) -> Void)? = nil
+    completion: ((PaginationError?) -> Void)? = nil
   ) {
     pager.loadAll(fetchFromInitialPage: fetchFromInitialPage, completion: completion)
   }
