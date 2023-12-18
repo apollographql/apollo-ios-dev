@@ -30,6 +30,7 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
     return GraphQLQueryPager<Query, Query>(
       client: client,
       initialQuery: initialQuery,
+      watcherDispatchQueue: .main,
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):
@@ -58,6 +59,7 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
     return GraphQLQueryPager<ReverseQuery, ReverseQuery>(
       client: client,
       initialQuery: initialQuery,
+      watcherDispatchQueue: .main,
       extractPageInfo: { data in
         switch data {
         case .initial(let data), .paginated(let data):
