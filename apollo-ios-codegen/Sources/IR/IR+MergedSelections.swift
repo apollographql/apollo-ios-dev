@@ -1,19 +1,18 @@
 import Foundation
 import OrderedCollections
 
-#warning("TODO: Update this documentation")
-/// The selections that are available to be accessed by a selection set.
+/// Represents the selections that merged into a selection set from other selection sets.
+/// This includes all selections from other related `SelectionSet`s on the same entity that match
+/// the selection set's type scope.
 ///
-/// Includes the direct `selections`, along with all selections from other related
-/// `SelectionSet`s on the same entity that match the selection set's type scope.
+/// Combining the `MergedSelections` with the `DirectSelections` for a `SelectionSet` provides all
+/// selections that are available to be accessed by the selection set.
+///
+/// To get the `MergedSelections` for a `SelectionSet` use a `ComputedSelectionSet`.
 ///
 /// Selections in the `mergedSelections` are guaranteed to be selected if this `SelectionSet`'s
 /// `selections` are selected. This means they can be merged into the generated object
 /// representing this `SelectionSet` as field accessors.
-///
-/// - Precondition: The `directSelections` for all `SelectionSet`s in the operation must be
-/// completed prior to first access of `mergedSelections`. Otherwise, the merged selections
-/// will be incomplete.
 public struct MergedSelections: Equatable {
   public let mergedSources: OrderedSet<MergedSource>
   public let fields: OrderedDictionary<String, Field>
