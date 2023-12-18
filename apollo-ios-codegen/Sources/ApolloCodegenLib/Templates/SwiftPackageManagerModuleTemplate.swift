@@ -9,9 +9,13 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .moduleFile
 
-  let headerTemplate: TemplateString? = nil
-
   let config: ApolloCodegen.ConfigurationContext
+
+  func renderHeaderTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString? {
+    nil
+  }
 
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
