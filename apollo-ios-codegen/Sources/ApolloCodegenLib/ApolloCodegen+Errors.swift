@@ -3,7 +3,8 @@ import TemplateString
 import OrderedCollections
 import IR
 
-extension ApolloCodegen { /// Errors that can occur during code generation. These are fatal errors that prevent the code
+extension ApolloCodegen {
+  /// Errors that can occur during code generation. These are fatal errors that prevent the code
   /// generation from continuing execution.
   public enum Error: Swift.Error, LocalizedError { /// An error occured during validation of the GraphQL schema or operations.
     case graphQLSourceValidationFailure(atLines: [String])
