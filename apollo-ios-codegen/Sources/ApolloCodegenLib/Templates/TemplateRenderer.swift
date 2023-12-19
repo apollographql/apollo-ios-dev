@@ -86,7 +86,7 @@ extension TemplateRenderer {
   }
 
   /// A tuple of the `String` for the `body` of a rendered template and an array of
-  /// non-fatal `errors` that occured rendering.
+  /// non-fatal `errors` that occured during rendering.
   ///
   /// If there are no non-fatal errors during rendering, the `errors` array will be empty.
   /// Any fatal errors should be thrown during rendering.
