@@ -17,13 +17,20 @@ We found that achieving these design goals was not easy, and required a number o
 1. By making use of semaphores, operation queues, mutexes, locks, and related APIs.
 2. By making use of Swift Concurrency APIs and Swift `actor`s.
 
-We decided that we would use Swift Concurrency and `actor`, as it prevented us from having to manually manage locks, semaphores, and other concurrency primitives. The `actor` API has the added benefit of being able to protect properties from concurrent access, as well as serialize calls to the `actor`'s message queue. This meant that we could ensure that calls to the `GraphQLQueryPager` would be serialized, and that we would not have to worry about concurrent access to the `GraphQLQueryPager`'s properties. Using an `actor` forces the usage of Swift concurrency, as calls to an `actor` must be made from within an asynchronous context. This means that we would have to use `Task`s to interface with the `GraphQLQueryPager`. We decided to namespace the `actor` as `GraphQLQueryPager.Actor`, and expose a `GraphQLQueryPager` class that would be responsible for interfacing with the `Actor`.
+We decided that we would use Swift Concurrency and `actor`, as it prevented us from having to manually manage locks, semaphores, and other concurrency primitives. The `actor` API has the added benefit of being able to protect properties from concurrent access, as well as serialize calls to the `actor`'s message queue. This meant that we could ensure that calls to the `GraphQLQueryPager` would be serialized, and that we would not have to worry about concurrent access to the `GraphQLQueryPager`'s properties. Using an `actor` forces the usage of Swift concurrency, as calls to an `actor` must be made from within an asynchronous context. This means that we would have to use `Task`s to interface with the `GraphQLQueryPager`. We decided to namespace the `actor` as `AsyncGraphQLQueryPager`, and expose a `GraphQLQueryPager` class that would be responsible for interfacing with the `AsyncGraphQLQueryPager`.
 
 Using Swift Concurrency, it allowed us to think about the behavior of a fetch operation. We decided that the `GraphQLQueryPager` would have to suspend execution during a `fetch`, whether we are fetching the next page, the previous page, or the initial page. Concretely, we must leave the caller "waiting" for a response from the `GraphQLQueryPager` when a `fetch` is in progress. Additionally, the `GraphQLQueryPager` may not start another `fetch` until the previous `fetch` has completed. Under the hood, since the `GraphQLQueryPager` is using a `GraphQLQueryWatcher` to fetch pages, we would need to bridge the gap between the `GraphQLQueryPager` and the `GraphQLQueryWatcher` callback. That proved challenging, but we ultimately found that we could use the `withCheckedContinuation` API to bridge the gap between the `GraphQLQueryPager` and the `GraphQLQueryWatcher` callback with some additional logic.
 
 ## Details
 
-As the `GraphQLQueryPager.Actor` is an `actor`, that means two things:
+There are several classes that make up the pagination API:
+
+1. `AsyncGraphQLQueryPager`: The `actor` that is responsible for handling the logic of fetching pages, and exposing APIs that allow the caller to interact with the pager.
+2. `GraphQLQueryPager`: The class that is responsible for interfacing with the `AsyncGraphQLQueryPager`, and exposing a synchronous API that can be used by the caller.
+3. `AnyGraphQLQueryPager`: A type-erased wrapper around the `GraphQLQueryPager` that allows us to store a `GraphQLQueryPager` in a property without exposing the `GraphQLQueryPager`'s API.
+4. `AnyAsyncGraphQLQueryPager`: A type-erased wrapper around the `AsyncGraphQLQueryPager` that allows us to store a `AsyncGraphQLQueryPager` in a property without exposing the `AsyncGraphQLQueryPager`'s API.
+
+As the `AsyncGraphQLQueryPager` is an `actor`, that means two things:
 
 1. It operates its own message queue, meaning that calls to the pager are serialized and executed in order.
 2. It protects its properties from concurrent access.
@@ -87,7 +94,7 @@ This function is used within the `fetch` and `paginationFetch` functions, and is
 
 ### Bridging to synchronous APIs
 
-The `GraphQLQueryPager.Actor` is an `actor`, and so all calls to the pager must be made from within an asynchronous context. However, our existing application is by and large synchronous. This means that we need to bridge the gap between the synchronous and asynchronous worlds. To that end, we have made the `GraphQLQueryPager` a class that is responsible for that bridging. It does so by wrapping the asynchronous calls in `Task<_, Never>`. In order to respond to thrown errors, we allow for a callback that exposes an optional `Error`, if there is one. Allowing for this callback also allows us to execute code after the asynchronous call has completed.
+The `AsyncGraphQLQueryPager` is an `actor`, and so all calls to the pager must be made from within an asynchronous context. However, our existing application is by and large synchronous. This means that we need to bridge the gap between the synchronous and asynchronous worlds. To that end, we have made the `GraphQLQueryPager` a class that is responsible for that bridging. It does so by wrapping the asynchronous calls in `Task<_, Never>`. In order to respond to thrown errors, we allow for a callback that exposes an optional `Error`, if there is one. Allowing for this callback also allows us to execute code after the asynchronous call has completed.
 
 > [!NOTE]
 >
@@ -123,15 +130,15 @@ The `GraphQLQueryPager` is a generic type, and so we need to be able to erase it
 
 We use `Combine` across these classes for various reasons.
 
-#### Within `GraphQLQueryPager.Actor`
+#### Within `AsyncGraphQLQueryPager`
 
 1. We use `Combine` in the `subscribe` function, which allows callers to subscribe to the `GraphQLQueryPager`'s output. This is necessary, as we need to be able to support multiple subscribers on the same `GraphQLQueryPager` output. This is not possible with the existing Swift concurrency APIs, as they do not allow for multiple subscribers on the same `AsyncStream` or `AsyncSequence`.
 2. We use `Combine` within the `execute` function in order to suspend the `Continuation` until the `GraphQLQueryWatcher` callback has been called for the canonical load. This is due to the fact that the `GraphQLQueryWatcher`'s callback can be triggered many times, but we only care to suspend continuation during a fetch from the network.
-3. We annotate several properties of the `GraphQLQueryPager.Actor` with `@Published`. This allows us to subscribe to changes on these properties and respond to them, without having to initiate a new asynchronous context to access these properties.
+3. We annotate several properties of the `AsyncGraphQLQueryPager` with `@Published`. This allows us to subscribe to changes on these properties and respond to them, without having to initiate a new asynchronous context to access these properties.
 
 #### Within `GraphQLQueryPager`
 
-We use `Combine` in the initializer to listen to changes on the `GraphQLQueryWatcher`'s `publishers` property, which allows us to respond to changes on the `GraphQLQueryWatcher`'s internal variables. Note that we don't care about the values emitted by the `GraphQLQueryWatcher`'s `publishers` property, only that it has changed. This is due to the fact that these properties only change as a result of a fetch from the network or cache change, which may impact whether or not we can load more data. We listen to these properties for the sole purpose of setting the `canLoadNext` and `canLoadPrevious` properties, which are computed properties of the `Actor`.
+We use `Combine` in the initializer to listen to changes on the `GraphQLQueryWatcher`'s `publishers` property, which allows us to respond to changes on the `GraphQLQueryWatcher`'s internal variables. Note that we don't care about the values emitted by the `GraphQLQueryWatcher`'s `publishers` property, only that it has changed. This is due to the fact that these properties only change as a result of a fetch from the network or cache change, which may impact whether or not we can load more data. We listen to these properties for the sole purpose of setting the `canLoadNext` and `canLoadPrevious` properties, which are computed properties of the `AsyncGraphQLQueryPager`.
 
 
 Let's examine the initializer function in more detail:
@@ -178,12 +185,12 @@ public init<P: PaginationInfo>(
 
 This function:
 
-1. Creates a new `Task` that will run asynchronously. The `init` of this class must be synchronous, as it is intended to be used in a synchronous context. We will require an asynchronous context in order to await the `publishers` property of the `GraphQLQueryPager.Actor` -- or any property of the `GraphQLQueryPager.Actor`, for that matter.
-2. Awaits the `publishers` property of the `GraphQLQueryPager`. This is a tuple of `Combine` publishers that emit the `previousPageVarMap`, `initial`, and `nextPageVarMap` properties of the `GraphQLQueryPager.Actor`. We don't care about the values emitted by these publishers, only that they have changed. This is due to the fact that these properties only change as a result of a fetch from the network or cache change, which may impact whether or not we can load more data. We listen to these properties for the sole purpose of setting the `canLoadNext` and `canLoadPrevious` properties, which are computed properties of the `Actor`.
+1. Creates a new `Task` that will run asynchronously. The `init` of this class must be synchronous, as it is intended to be used in a synchronous context. We will require an asynchronous context in order to await the `publishers` property of the `AsyncGraphQLQueryPager` -- or any property of the `AsyncGraphQLQueryPager`, for that matter.
+2. Awaits the `publishers` property of the `GraphQLQueryPager`. This is a tuple of `Combine` publishers that emit the `previousPageVarMap`, `initial`, and `nextPageVarMap` properties of the `AsyncGraphQLQueryPager`. We don't care about the values emitted by these publishers, only that they have changed. This is due to the fact that these properties only change as a result of a fetch from the network or cache change, which may impact whether or not we can load more data. We listen to these properties for the sole purpose of setting the `canLoadNext` and `canLoadPrevious` properties, which are computed properties of the `AsyncGraphQLQueryPager`.
 3. Combines the three publishers into a single publisher that emits whenever any of the three publishers emit. This allows us to listen to changes on all three publishers with a single subscriber. Note that we will get our first value from this newly combined publisher only after all three publishers have emitted at least once. Two of the three publishers (`previousPageVarMapPublisher` and `nextPageVarMapPublisher`) will emit immediately, as they have a default value. The third publisher (`initialPublisher`) will emit after the initial query has been resolved, as its initial value is `nil`.
 4. Checks to see if the `Task` has been cancelled. If it has, we return early.
 5. Creates a new `Task` so that we can re-enter an asynchronous context. This is necessary, as the `sink` function is synchronous.
-6. Awaits the `canLoadPages` property of the `GraphQLQueryPager.Actor`. This is a tuple of `Bool`s that indicate whether or not we can load the next and previous pages. We then set the `canLoadNext` and `canLoadPrevious` properties of the `GraphQLQueryPager` to these values.
+6. Awaits the `canLoadPages` property of the `AsyncGraphQLQueryPager`. This is a tuple of `Bool`s that indicate whether or not we can load the next and previous pages. We then set the `canLoadNext` and `canLoadPrevious` properties of the `GraphQLQueryPager` to these values.
 7. Stores the `publishSubscriber` in the `subscriptions` property of the `GraphQLQueryPager`. This is necessary, as we need to keep a strong reference to the subscriber in order to keep it alive. Additionally, subscriptons are being managed by an `actor` in order to ensure thread safety – otherwise, we may have multiple threads attempting to access an array of subscriptions at the same time.
 
 #### Within `AnyGraphQLQueryPager`
@@ -196,7 +203,7 @@ The `GraphQLQueryPager` is a powerful tool that allows us to paginate through a 
 
 Using an `actor` is not without its added complexity. Because the `actor` operates in an isolated context, any `Task` outside of that context cannot access or modify the `actor`'s properties. If we are to use a `Task` outside of the `actor`'s context, we must ensure that the `actor` makes the modification or that the the modification is made from within the `actor`'s context. The compiler will prevent us from doing otherwise, but we must be aware of this limitation. This leads to declaring specific functions which set or modify the values of an `actor`'s properties.
 
-A further consequence is that the team must learn about Swift Concurrency concepts in order to understand how the `GraphQLQueryPager.Actor` works. By and large, we've avoided having to do so as our application doesn't make use of Swift's concurrency model or APIs. However, as Apple further takes the platform and language in the direction of Swift concurrency, we will need to learn about these concepts as time marches on. Perhaps this may be the start of that journey, and the point where we begin using small `actor` types to solve problems that we may not have been able to easily solve otherwise.
+A further consequence is that the team must learn about Swift Concurrency concepts in order to understand how the `AsyncGraphQLQueryPager` works. By and large, we've avoided having to do so as our application doesn't make use of Swift's concurrency model or APIs. However, as Apple further takes the platform and language in the direction of Swift concurrency, we will need to learn about these concepts as time marches on. Perhaps this may be the start of that journey, and the point where we begin using small `actor` types to solve problems that we may not have been able to easily solve otherwise.
 
 ## Alternatives Considered
 
