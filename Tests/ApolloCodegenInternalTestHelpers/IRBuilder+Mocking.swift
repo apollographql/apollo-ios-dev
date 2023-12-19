@@ -100,11 +100,12 @@ extension IR.Operation {
     containsDeferredFragment: Bool = false
   ) -> IR.Operation {
     let definition = definition ?? .mock()
+    let entity = IR.Entity(
+      location: .init(source: .operation(definition), fieldPath: nil),
+      rootTypePath: [.mock()]
+    )
     let typeInfo = SelectionSet.TypeInfo(
-      entity: .init(
-        location: .init(source: .operation(definition), fieldPath: nil),
-        rootTypePath: [.mock()]
-      ),
+      entity: entity,
       scopePath: [.descriptor(
         forType: .mock(),
         inclusionConditions: nil,
@@ -123,7 +124,7 @@ extension IR.Operation {
       definition: definition,
       rootField: rootField,
       referencedFragments: referencedFragments,
-      entityStorage: .init(rootEntity: rootField.entity),
+      entityStorage: .init(rootEntity: entity),
       containsDeferredFragment: containsDeferredFragment
     )
   }

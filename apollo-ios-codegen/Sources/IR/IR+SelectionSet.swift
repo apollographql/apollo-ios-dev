@@ -8,7 +8,7 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
     /// The entity that the `selections` are being selected on.
     ///
     /// Multiple `SelectionSet`s may reference the same `Entity`
-    public let entity: Entity
+    public unowned let entity: Entity
 
     /// A list of the scopes for the `SelectionSet` and its enclosing entities.
     ///
