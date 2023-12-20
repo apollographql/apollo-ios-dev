@@ -7,7 +7,7 @@ extension SelectionSetTemplate {
   ///
   /// This is used to test rendering of templates without requiring the entire operation.
   /// Validation performed by the `SelectionSetValidationContext` will not be exhaustive.
-  func test_render(childEntity: IR.ComputedSelectionSet) -> String {
+  func test_render(childEntity: IR.ComputedSelectionSet) -> String? {
     let context = SelectionSetContext(
       selectionSet: childEntity,
       validationContext: .init(config: self.config)

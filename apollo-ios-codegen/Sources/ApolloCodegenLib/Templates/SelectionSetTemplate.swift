@@ -92,12 +92,12 @@ struct SelectionSetTemplate {
   }
 
   // MARK: - Child Entity
-  func render(childEntity context: SelectionSetContext) -> String {
+  func render(childEntity context: SelectionSetContext) -> String? {
     let selectionSet = context.selectionSet
     let fieldSelectionSetName = nameCache.selectionSetName(for: selectionSet.typeInfo)
 
     if let referencedSelectionSetName = selectionSet.nameForReferencedSelectionSet(config: config) {
-      guard referencedSelectionSetName != fieldSelectionSetName else { return "" }
+      guard referencedSelectionSetName != fieldSelectionSetName else { return nil }
       return
         "\(renderAccessControl())typealias \(fieldSelectionSetName) = \(referencedSelectionSetName)"
     }
@@ -691,7 +691,7 @@ struct SelectionSetTemplate {
     }
 
     return """
-      \(IteratorSequence(allFields).map { field in
+      \(IteratorSequence(allFields).compactMap { field in
         let field = unsafeDowncast(field, to: IR.EntityField.self)
         let childContext = createSelectionSetContext(for: field.selectionSet, inParent: context)
         return render(childEntity: childContext)
