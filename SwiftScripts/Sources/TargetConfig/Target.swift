@@ -1,5 +1,5 @@
-import Foundation
 import ApolloCodegenLib
+import Foundation
 
 public enum Target: CaseIterable {
   case starWars
@@ -30,7 +30,8 @@ public enum Target: CaseIterable {
   }
 
   public func targetRootURL(fromSourceRoot sourceRootURL: Foundation.URL) -> Foundation.URL {
-    return sourceRootURL
+    return
+      sourceRootURL
       .childFolderURL(folderName: "Sources")
       .childFolderURL(folderName: moduleName)
   }
@@ -41,23 +42,10 @@ public enum Target: CaseIterable {
     let targetRootURL = self.targetRootURL(fromSourceRoot: sourceRootURL)
     let graphQLFolder = graphQLFolder(fromTargetRoot: targetRootURL)
 
-    switch self {
-    case .animalKingdom:
-      return ApolloCodegenConfiguration.FileInput(
-        schemaPath: graphQLFolder.appendingPathComponent("AnimalSchema.graphqls").path,
-        // There is a subdirectory that contains CCN enabled operations in the same `graphQLFolder`
-        // as the .animalKingdom target. We want to include those operations when we generate for
-        // .animalKingdom.
-        operationSearchPaths: [graphQLFolder.appendingPathComponent("**/*.graphql").path]
-      )
-
-
-    default:
-      return ApolloCodegenConfiguration.FileInput(
-        schemaPath: schemaURL(fromTargetRoot: targetRootURL).path,
-        operationSearchPaths: [graphQLFolder.appendingPathComponent("**/*.graphql").path]
-      )
-    }
+    return ApolloCodegenConfiguration.FileInput(
+      schemaPath: schemaURL(fromTargetRoot: targetRootURL).path,
+      operationSearchPaths: [graphQLFolder.appendingPathComponent("**/*.graphql").path]
+    )
   }
 
   private func graphQLFolder(fromTargetRoot targetRootURL: Foundation.URL) -> URL {
@@ -117,23 +105,24 @@ public enum Target: CaseIterable {
 
   public func options() -> ApolloCodegenConfiguration.OutputOptions {
     switch self {
-    case .starWars: return .init(
-      schemaDocumentation: .include,
-      selectionSetInitializers: .all,
-      operationDocumentFormat: [.definition, .operationId]
-    )
-    case .animalKingdom: return .init(
-      schemaDocumentation: .include,
-      selectionSetInitializers: .all
-    )
+    case .starWars:
+      return .init(
+        schemaDocumentation: .include,
+        selectionSetInitializers: .all,
+        operationDocumentFormat: [.definition, .operationId]
+      )
+    case .animalKingdom:
+      return .init(
+        schemaDocumentation: .include,
+        selectionSetInitializers: .all
+      )
     default: return .init()
     }
   }
 
   public func experimentalFeatures() -> ApolloCodegenConfiguration.ExperimentalFeatures {
     switch self {
-    case .starWars, .gitHub: return .init(legacySafelistingCompatibleOperations: true)
-    case .animalKingdom: return .init(clientControlledNullability: true)
+    case .starWars, .gitHub: return .init(legacySafelistingCompatibleOperations: true)  
     default: return .init()
     }
   }
