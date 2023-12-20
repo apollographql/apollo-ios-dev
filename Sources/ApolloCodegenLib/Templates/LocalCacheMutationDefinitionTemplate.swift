@@ -10,8 +10,9 @@ struct LocalCacheMutationDefinitionTemplate: OperationTemplateRenderer {
 
   let target: TemplateTarget = .operationFile
 
-  var template: TemplateString {
-    let definition = IR.Definition.operation(operation)
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     let memberAccessControl = accessControlModifier(for: .member)
 
     return TemplateString(
@@ -26,11 +27,12 @@ struct LocalCacheMutationDefinitionTemplate: OperationTemplateRenderer {
 
       \(section: VariableAccessors(operation.definition.variables, graphQLOperation: false))
 
-      \(memberAccessControl)struct Data: \(definition.renderedSelectionSetType(config)) {
+      \(memberAccessControl)struct Data: \(operation.renderedSelectionSetType(config)) {
         \(SelectionSetTemplate(
-            definition: definition,            
+            definition: operation,
             generateInitializers: config.options.shouldGenerateSelectionSetInitializers(for: operation),
             config: config,
+            nonFatalErrorRecorder: nonFatalErrorRecorder,
             renderAccessControl: { accessControlModifier(for: .member) }()
         ).renderBody())
       }

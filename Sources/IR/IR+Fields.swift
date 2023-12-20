@@ -22,7 +22,8 @@ public class Field: Equatable, CustomDebugStringConvertible {
   }
 
   public static func ==(lhs: Field, rhs: Field) -> Bool {
-    lhs.underlyingField == rhs.underlyingField
+    lhs.underlyingField == rhs.underlyingField &&
+    lhs.inclusionConditions == rhs.inclusionConditions
   }
 
   public var debugDescription: String {
@@ -58,6 +59,7 @@ public final class EntityField: Field {
 
   public static func ==(lhs: EntityField, rhs: EntityField) -> Bool {
     lhs.underlyingField == rhs.underlyingField &&
+    lhs.inclusionConditions == rhs.inclusionConditions &&
     lhs.selectionSet == rhs.selectionSet
   }
 }

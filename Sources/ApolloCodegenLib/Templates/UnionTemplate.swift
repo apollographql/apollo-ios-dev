@@ -12,7 +12,9 @@ struct UnionTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .schemaFile(type: .union)
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     TemplateString(
     """
     \(documentation: graphqlUnion.documentation, config: config)

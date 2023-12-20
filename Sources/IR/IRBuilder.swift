@@ -45,6 +45,7 @@ public class IRBuilder {
       definition: operationDefinition,
       rootField: result.rootField,
       referencedFragments: result.referencedFragments,
+      entityStorage: result.entityStorage,
       containsDeferredFragment: result.containsDeferredFragment
     )
   }
@@ -84,7 +85,9 @@ public class IRBuilder {
     }
   }
 
-  public func build(fragment fragmentDefinition: CompilationResult.FragmentDefinition) async -> NamedFragment {
+  public func build(
+    fragment fragmentDefinition: CompilationResult.FragmentDefinition
+  ) async -> NamedFragment {
     await builtFragmentStorage.getFragment(named: fragmentDefinition.name) {
       let rootField = CompilationResult.Field(
         name: fragmentDefinition.name,
@@ -106,8 +109,8 @@ public class IRBuilder {
         definition: fragmentDefinition,
         rootField: result.rootField,
         referencedFragments: result.referencedFragments,
-        containsDeferredFragment: result.containsDeferredFragment,
-        entities: result.entities
+        entityStorage: result.entityStorage,
+        containsDeferredFragment: result.containsDeferredFragment
       )
     }
   }

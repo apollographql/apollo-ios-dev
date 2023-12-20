@@ -9,11 +9,17 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .moduleFile
 
-  let headerTemplate: TemplateString? = nil
-
   let config: ApolloCodegen.ConfigurationContext
 
-  var template: TemplateString {
+  func renderHeaderTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString? {
+    nil
+  }
+
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     let casedSchemaNamespace = config.schemaNamespace.firstUppercased
 
     return TemplateString("""
