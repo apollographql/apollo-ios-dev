@@ -89,9 +89,11 @@ public class AnyGraphQLQueryPager<Model> {
   ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
-    completion: ((PaginationError?) -> Void)? = nil
+    completion: (@MainActor (PaginationError?) -> Void)? = nil
   ) {
-    pager.loadNext(cachePolicy: cachePolicy, completion: completion)
+    pager.loadNext(cachePolicy: cachePolicy) { error in
+      Task { await completion?(error) }
+    }
   }
 
   /// Load the previous page, if available.
@@ -100,9 +102,11 @@ public class AnyGraphQLQueryPager<Model> {
   ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
-    completion: ((PaginationError?) -> Void)? = nil
+    completion: (@MainActor (PaginationError?) -> Void)? = nil
   ) {
-    pager.loadPrevious(cachePolicy: cachePolicy, completion: completion)
+    pager.loadPrevious(cachePolicy: cachePolicy) { error in
+      Task { await completion?(error) }
+    }
   }
 
   /// Loads all pages.
@@ -111,9 +115,11 @@ public class AnyGraphQLQueryPager<Model> {
   ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadAll(
     fetchFromInitialPage: Bool = true,
-    completion: ((PaginationError?) -> Void)? = nil
+    completion: (@MainActor (PaginationError?) -> Void)? = nil
   ) {
-    pager.loadAll(fetchFromInitialPage: fetchFromInitialPage, completion: completion)
+    pager.loadAll(fetchFromInitialPage: fetchFromInitialPage) { error in
+      Task { await completion?(error) }
+    }
   }
 
   /// Discards pagination state and fetches the first page from scratch.
