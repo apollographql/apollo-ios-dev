@@ -16,9 +16,9 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
 
   let target: TemplateTarget = .operationFile
 
-  var template: TemplateString {
-    let definition = IR.Definition.operation(operation)
-
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     return TemplateString(
     """
     \(OperationDeclaration())
@@ -32,11 +32,12 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
 
       \(section: VariableAccessors(operation.definition.variables))
 
-      \(accessControlModifier(for: .member))struct Data: \(definition.renderedSelectionSetType(config)) {
+      \(accessControlModifier(for: .member))struct Data: \(operation.renderedSelectionSetType(config)) {
         \(SelectionSetTemplate(
-            definition: definition,
+            definition: operation,
             generateInitializers: config.options.shouldGenerateSelectionSetInitializers(for: operation),
             config: config,
+            nonFatalErrorRecorder: nonFatalErrorRecorder,
             renderAccessControl: { accessControlModifier(for: .member) }()
         ).renderBody())
       }

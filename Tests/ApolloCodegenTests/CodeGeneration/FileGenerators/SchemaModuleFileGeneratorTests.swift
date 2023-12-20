@@ -42,7 +42,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
+    _ = try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
     expect(self.mockFileManager.allClosuresCalled).to(beTrue())
@@ -66,7 +66,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
+    _ = try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
     expect(self.mockFileManager.allClosuresCalled).to(beTrue())
@@ -90,7 +90,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
+    _ = try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
     expect(self.mockFileManager.allClosuresCalled).to(beTrue())
@@ -114,7 +114,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
+    _ = try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
     expect(self.mockFileManager.allClosuresCalled).to(beTrue())
@@ -140,7 +140,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
+    _ = try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
     expect(self.mockFileManager.allClosuresCalled).to(beFalse())

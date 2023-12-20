@@ -19,7 +19,7 @@ public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   ] }
 
   public var bodyTemperature: Int { __data["bodyTemperature"] }
-  public var height: HeightInMeters.Height { __data["height"] }
+  public var height: Height { __data["height"] }
 
   public struct Fragments: FragmentContainer {
     public let __data: DataDict
@@ -31,7 +31,7 @@ public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   public init(
     __typename: String,
     bodyTemperature: Int,
-    height: HeightInMeters.Height
+    height: Height
   ) {
     self.init(_dataDict: DataDict(
       data: [
@@ -45,4 +45,6 @@ public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
       ]
     ))
   }
+
+  public typealias Height = HeightInMeters.Height
 }

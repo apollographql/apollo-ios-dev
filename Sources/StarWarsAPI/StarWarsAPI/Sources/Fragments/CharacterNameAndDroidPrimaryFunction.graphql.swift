@@ -59,10 +59,10 @@ public struct CharacterNameAndDroidPrimaryFunction: StarWarsAPI.SelectionSet, Fr
       .fragment(DroidPrimaryFunction.self),
     ] }
 
-    /// The name of the character
-    public var name: String { __data["name"] }
     /// This droid's primary function
     public var primaryFunction: String? { __data["primaryFunction"] }
+    /// The name of the character
+    public var name: String { __data["name"] }
 
     public struct Fragments: FragmentContainer {
       public let __data: DataDict
@@ -73,20 +73,20 @@ public struct CharacterNameAndDroidPrimaryFunction: StarWarsAPI.SelectionSet, Fr
     }
 
     public init(
-      name: String,
-      primaryFunction: String? = nil
+      primaryFunction: String? = nil,
+      name: String
     ) {
       self.init(_dataDict: DataDict(
         data: [
           "__typename": StarWarsAPI.Objects.Droid.typename,
-          "name": name,
           "primaryFunction": primaryFunction,
+          "name": name,
         ],
         fulfilledFragments: [
           ObjectIdentifier(CharacterNameAndDroidPrimaryFunction.self),
           ObjectIdentifier(CharacterNameAndDroidPrimaryFunction.AsDroid.self),
-          ObjectIdentifier(CharacterName.self),
-          ObjectIdentifier(DroidPrimaryFunction.self)
+          ObjectIdentifier(DroidPrimaryFunction.self),
+          ObjectIdentifier(CharacterName.self)
         ]
       ))
     }

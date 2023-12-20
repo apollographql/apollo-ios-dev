@@ -8,7 +8,7 @@ public class AllAnimalsQuery: GraphQLQuery {
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
       #"query AllAnimalsQuery { allAnimals { __typename height { __typename feet inches } ...HeightInMeters ...WarmBloodedDetails species skinCovering ... on Pet { ...PetDetails ...WarmBloodedDetails ... on Animal { height { __typename relativeSize centimeters } } } ... on Cat { isJellicle } ... on ClassroomPet { ... on Bird { wingspan } } ... on Dog { favoriteToy birthdate } predators { __typename species ... on WarmBlooded { predators { __typename species } ...WarmBloodedDetails laysEggs } } } }"#,
-      fragments: [HeightInMeters.self, WarmBloodedDetails.self, PetDetails.self]
+      fragments: [HeightInMeters.self, PetDetails.self, WarmBloodedDetails.self]
     ))
 
   public init() {}
@@ -189,7 +189,7 @@ public class AllAnimalsQuery: GraphQLQuery {
           public var laysEggs: Bool { __data["laysEggs"] }
           public var species: String { __data["species"] }
           public var bodyTemperature: Int { __data["bodyTemperature"] }
-          public var height: HeightInMeters.Height { __data["height"] }
+          public var height: Height { __data["height"] }
 
           public struct Fragments: FragmentContainer {
             public let __data: DataDict
@@ -205,7 +205,7 @@ public class AllAnimalsQuery: GraphQLQuery {
             laysEggs: Bool,
             species: String,
             bodyTemperature: Int,
-            height: HeightInMeters.Height
+            height: Height
           ) {
             self.init(_dataDict: DataDict(
               data: [
@@ -255,6 +255,8 @@ public class AllAnimalsQuery: GraphQLQuery {
               ))
             }
           }
+
+          public typealias Height = HeightInMeters.Height
         }
       }
 
@@ -305,8 +307,8 @@ public class AllAnimalsQuery: GraphQLQuery {
             fulfilledFragments: [
               ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.self),
               ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsWarmBlooded.self),
-              ObjectIdentifier(HeightInMeters.self),
-              ObjectIdentifier(WarmBloodedDetails.self)
+              ObjectIdentifier(WarmBloodedDetails.self),
+              ObjectIdentifier(HeightInMeters.self)
             ]
           ))
         }
@@ -367,7 +369,7 @@ public class AllAnimalsQuery: GraphQLQuery {
         public var predators: [Predator] { __data["predators"] }
         public var humanName: String? { __data["humanName"] }
         public var favoriteToy: String { __data["favoriteToy"] }
-        public var owner: PetDetails.Owner? { __data["owner"] }
+        public var owner: Owner? { __data["owner"] }
 
         public var asWarmBlooded: AsWarmBlooded? { _asInlineFragment() }
 
@@ -387,7 +389,7 @@ public class AllAnimalsQuery: GraphQLQuery {
           predators: [Predator],
           humanName: String? = nil,
           favoriteToy: String,
-          owner: PetDetails.Owner? = nil
+          owner: Owner? = nil
         ) {
           self.init(_dataDict: DataDict(
             data: [
@@ -453,6 +455,8 @@ public class AllAnimalsQuery: GraphQLQuery {
           }
         }
 
+        public typealias Owner = PetDetails.Owner
+
         /// AllAnimal.AsPet.AsWarmBlooded
         ///
         /// Parent Type: `WarmBlooded`
@@ -473,7 +477,7 @@ public class AllAnimalsQuery: GraphQLQuery {
           public var bodyTemperature: Int { __data["bodyTemperature"] }
           public var humanName: String? { __data["humanName"] }
           public var favoriteToy: String { __data["favoriteToy"] }
-          public var owner: PetDetails.Owner? { __data["owner"] }
+          public var owner: Owner? { __data["owner"] }
 
           public struct Fragments: FragmentContainer {
             public let __data: DataDict
@@ -493,7 +497,7 @@ public class AllAnimalsQuery: GraphQLQuery {
             bodyTemperature: Int,
             humanName: String? = nil,
             favoriteToy: String,
-            owner: PetDetails.Owner? = nil
+            owner: Owner? = nil
           ) {
             self.init(_dataDict: DataDict(
               data: [
@@ -511,8 +515,8 @@ public class AllAnimalsQuery: GraphQLQuery {
                 ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.self),
                 ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.self),
                 ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
-                ObjectIdentifier(HeightInMeters.self),
                 ObjectIdentifier(WarmBloodedDetails.self),
+                ObjectIdentifier(HeightInMeters.self),
                 ObjectIdentifier(PetDetails.self)
               ]
             ))
@@ -558,6 +562,8 @@ public class AllAnimalsQuery: GraphQLQuery {
               ))
             }
           }
+
+          public typealias Owner = PetDetails.Owner
         }
       }
 
@@ -582,7 +588,7 @@ public class AllAnimalsQuery: GraphQLQuery {
         public var bodyTemperature: Int { __data["bodyTemperature"] }
         public var humanName: String? { __data["humanName"] }
         public var favoriteToy: String { __data["favoriteToy"] }
-        public var owner: PetDetails.Owner? { __data["owner"] }
+        public var owner: Owner? { __data["owner"] }
 
         public struct Fragments: FragmentContainer {
           public let __data: DataDict
@@ -602,7 +608,7 @@ public class AllAnimalsQuery: GraphQLQuery {
           bodyTemperature: Int,
           humanName: String? = nil,
           favoriteToy: String,
-          owner: PetDetails.Owner? = nil
+          owner: Owner? = nil
         ) {
           self.init(_dataDict: DataDict(
             data: [
@@ -620,12 +626,12 @@ public class AllAnimalsQuery: GraphQLQuery {
             fulfilledFragments: [
               ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.self),
               ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsCat.self),
-              ObjectIdentifier(HeightInMeters.self),
-              ObjectIdentifier(WarmBloodedDetails.self),
               ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsWarmBlooded.self),
-              ObjectIdentifier(PetDetails.self),
+              ObjectIdentifier(WarmBloodedDetails.self),
+              ObjectIdentifier(HeightInMeters.self),
               ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.self),
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self)
+              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
+              ObjectIdentifier(PetDetails.self)
             ]
           ))
         }
@@ -670,6 +676,8 @@ public class AllAnimalsQuery: GraphQLQuery {
             ))
           }
         }
+
+        public typealias Owner = PetDetails.Owner
       }
 
       /// AllAnimal.AsClassroomPet
@@ -777,7 +785,7 @@ public class AllAnimalsQuery: GraphQLQuery {
           public var bodyTemperature: Int { __data["bodyTemperature"] }
           public var humanName: String? { __data["humanName"] }
           public var favoriteToy: String { __data["favoriteToy"] }
-          public var owner: PetDetails.Owner? { __data["owner"] }
+          public var owner: Owner? { __data["owner"] }
 
           public struct Fragments: FragmentContainer {
             public let __data: DataDict
@@ -797,7 +805,7 @@ public class AllAnimalsQuery: GraphQLQuery {
             bodyTemperature: Int,
             humanName: String? = nil,
             favoriteToy: String,
-            owner: PetDetails.Owner? = nil
+            owner: Owner? = nil
           ) {
             self.init(_dataDict: DataDict(
               data: [
@@ -816,12 +824,12 @@ public class AllAnimalsQuery: GraphQLQuery {
                 ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.self),
                 ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsClassroomPet.self),
                 ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsClassroomPet.AsBird.self),
-                ObjectIdentifier(HeightInMeters.self),
-                ObjectIdentifier(WarmBloodedDetails.self),
                 ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsWarmBlooded.self),
-                ObjectIdentifier(PetDetails.self),
+                ObjectIdentifier(WarmBloodedDetails.self),
+                ObjectIdentifier(HeightInMeters.self),
                 ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self)
+                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
+                ObjectIdentifier(PetDetails.self)
               ]
             ))
           }
@@ -866,6 +874,8 @@ public class AllAnimalsQuery: GraphQLQuery {
               ))
             }
           }
+
+          public typealias Owner = PetDetails.Owner
         }
       }
 
@@ -891,7 +901,7 @@ public class AllAnimalsQuery: GraphQLQuery {
         public var predators: [Predator] { __data["predators"] }
         public var bodyTemperature: Int { __data["bodyTemperature"] }
         public var humanName: String? { __data["humanName"] }
-        public var owner: PetDetails.Owner? { __data["owner"] }
+        public var owner: Owner? { __data["owner"] }
 
         public struct Fragments: FragmentContainer {
           public let __data: DataDict
@@ -911,7 +921,7 @@ public class AllAnimalsQuery: GraphQLQuery {
           predators: [Predator],
           bodyTemperature: Int,
           humanName: String? = nil,
-          owner: PetDetails.Owner? = nil
+          owner: Owner? = nil
         ) {
           self.init(_dataDict: DataDict(
             data: [
@@ -929,12 +939,12 @@ public class AllAnimalsQuery: GraphQLQuery {
             fulfilledFragments: [
               ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.self),
               ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsDog.self),
-              ObjectIdentifier(HeightInMeters.self),
-              ObjectIdentifier(WarmBloodedDetails.self),
               ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsWarmBlooded.self),
-              ObjectIdentifier(PetDetails.self),
+              ObjectIdentifier(WarmBloodedDetails.self),
+              ObjectIdentifier(HeightInMeters.self),
               ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.self),
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self)
+              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
+              ObjectIdentifier(PetDetails.self)
             ]
           ))
         }
@@ -979,6 +989,8 @@ public class AllAnimalsQuery: GraphQLQuery {
             ))
           }
         }
+
+        public typealias Owner = PetDetails.Owner
       }
     }
   }
