@@ -72,7 +72,7 @@ public actor AsyncGraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: 
   public init<P: PaginationInfo>(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
-    watcherDispatchQueue: DispatchQueue = .global(),
+    watcherDispatchQueue: DispatchQueue = .main,
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
   ) {
