@@ -109,7 +109,7 @@ public class AnyGraphQLQueryPager<Model> {
     callbackQueue: DispatchQueue = .main,
     completion: ((PaginationError?) -> Void)? = nil
   ) {
-    pager.loadNext(cachePolicy: cachePolicy, callbackQueue: callbackQueue, completion: { error in
+    pager.loadPrevious(cachePolicy: cachePolicy, callbackQueue: callbackQueue, completion: { error in
       callbackQueue.async { completion?(error) }
     })
   }
