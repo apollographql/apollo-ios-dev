@@ -274,6 +274,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       definition: operation.irObject,
       generateInitializers: true,
       config: config,
+      nonFatalErrorRecorder: .init(),
       renderAccessControl: { "does not matter" }()
     )
 
@@ -286,7 +287,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       operation[field: "query"]?[field: "animal"]?.selectionSet
     )
 
-    let actual = subject.render(childEntity: animal.computed)
+    let actual = subject.test_render(childEntity: animal.computed)
 
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
@@ -325,7 +326,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       """#
 
     // then
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     expect(actual).to(equalLineByLine(expected, atLine: 23, ignoringExtraLines: true))
   }
@@ -368,7 +369,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       """#
 
     // then
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
@@ -403,6 +404,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       definition: operation.irObject,
       generateInitializers: true,
       config: config,
+      nonFatalErrorRecorder: .init(),
       renderAccessControl: { "does not matter" }()
     )
 
@@ -414,7 +416,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
     let animal = try XCTUnwrap(
       operation[field: "query"]?[field: "animal"]?.selectionSet
     )
-    let actual = subject.render(childEntity: animal.computed)
+    let actual = subject.test_render(childEntity: animal.computed)
 
     expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }

@@ -24,7 +24,9 @@ struct MockObjectTemplate: TemplateRenderer {
     deprecationReason: String?
   )
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     let objectName = graphqlObject.formattedName
     let fields: [TemplateField] = fields
       .sorted { $0.0 < $1.0 }
