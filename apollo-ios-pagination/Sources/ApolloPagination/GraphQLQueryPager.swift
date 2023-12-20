@@ -12,14 +12,17 @@ public protocol PagerType {
   func cancel()
   func loadPrevious(
     cachePolicy: CachePolicy,
+    callbackQueue: DispatchQueue,
     completion: ((PaginationError?) -> Void)?
   )
   func loadNext(
     cachePolicy: CachePolicy,
+    callbackQueue: DispatchQueue,
     completion: ((PaginationError?) -> Void)?
   )
   func loadAll(
     fetchFromInitialPage: Bool,
+    callbackQueue: DispatchQueue,
     completion: ((PaginationError?) -> Void)?
   )
   func refetch(cachePolicy: CachePolicy)
@@ -105,9 +108,11 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// Loads the previous page, if we can.
   /// - Parameters:
   ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `fetchIgnoringCacheData`.
+  ///   - callbackQueue: The `DispatchQueue` that the `completion` fires on. Defaults to `main`.
   ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
+    callbackQueue: DispatchQueue = .main,
     completion: ((PaginationError?) -> Void)? = nil
   ) {
     execute(completion: completion) { [weak self] in
@@ -118,9 +123,11 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// Loads the next page, if we can.
   /// - Parameters:
   ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `fetchIgnoringCacheData`.
+  ///   - callbackQueue: The `DispatchQueue` that the `completion` fires on. Defaults to `main`.
   ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData,
+    callbackQueue: DispatchQueue = .main,
     completion: ((PaginationError?) -> Void)? = nil
   ) {
     execute(completion: completion) { [weak self] in
@@ -131,8 +138,13 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// Loads all pages.
   /// - Parameters:
   ///   - fetchFromInitialPage: Pass true to begin loading from the initial page; otherwise pass false.  Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
+  ///   - callbackQueue: The `DispatchQueue` that the `completion` fires on. Defaults to `main`.
   ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
-  public func loadAll(fetchFromInitialPage: Bool = true, completion: ((PaginationError?) -> Void)? = nil) {
+  public func loadAll(
+    fetchFromInitialPage: Bool = true,
+    callbackQueue: DispatchQueue = .main,
+    completion: ((PaginationError?) -> Void)? = nil
+  ) {
     execute(completion: completion) { [weak self] in
       try await self?.pager.loadAll(fetchFromInitialPage: fetchFromInitialPage)
     }

@@ -1,6 +1,7 @@
 import Apollo
 import ApolloAPI
 import Combine
+import Dispatch
 
 /// Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.
 public class AnyGraphQLQueryPager<Model> {
@@ -86,40 +87,46 @@ public class AnyGraphQLQueryPager<Model> {
   /// Load the next page, if available.
   /// - Parameters:
   ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
+  ///   - callbackQueue: The `DispatchQueue` that the `completion` fires on. Defaults to `main`.
   ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadNext(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
-    completion: (@MainActor (PaginationError?) -> Void)? = nil
+    callbackQueue: DispatchQueue = .main,
+    completion: ((PaginationError?) -> Void)? = nil
   ) {
-    pager.loadNext(cachePolicy: cachePolicy) { error in
-      Task { await completion?(error) }
-    }
+    pager.loadNext(cachePolicy: cachePolicy, callbackQueue: callbackQueue, completion: { error in
+      callbackQueue.async { completion?(error) }
+    })
   }
 
   /// Load the previous page, if available.
   /// - Parameters:
   ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
+  ///   - callbackQueue: The `DispatchQueue` that the `completion` fires on. Defaults to `main`.
   ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadPrevious(
     cachePolicy: CachePolicy = .returnCacheDataAndFetch,
-    completion: (@MainActor (PaginationError?) -> Void)? = nil
+    callbackQueue: DispatchQueue = .main,
+    completion: ((PaginationError?) -> Void)? = nil
   ) {
-    pager.loadPrevious(cachePolicy: cachePolicy) { error in
-      Task { await completion?(error) }
-    }
+    pager.loadNext(cachePolicy: cachePolicy, callbackQueue: callbackQueue, completion: { error in
+      callbackQueue.async { completion?(error) }
+    })
   }
 
   /// Loads all pages.
   /// - Parameters:
   ///   - fetchFromInitialPage: Pass true to begin loading from the initial page; otherwise pass false.  Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
+  ///   - callbackQueue: The `DispatchQueue` that the `completion` fires on. Defaults to `main`.
   ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadAll(
     fetchFromInitialPage: Bool = true,
-    completion: (@MainActor (PaginationError?) -> Void)? = nil
+    callbackQueue: DispatchQueue = .main,
+    completion: ((PaginationError?) -> Void)? = nil
   ) {
-    pager.loadAll(fetchFromInitialPage: fetchFromInitialPage) { error in
-      Task { await completion?(error) }
-    }
+    pager.loadAll(fetchFromInitialPage: fetchFromInitialPage, callbackQueue: callbackQueue, completion: { error in
+      callbackQueue.async { completion?(error) }
+    })
   }
 
   /// Discards pagination state and fetches the first page from scratch.
