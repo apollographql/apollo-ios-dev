@@ -7,10 +7,10 @@ extension Target {
         
         return Target(
             name: target.name,
-            platform: .macOS,
+            destinations: target.destinations,
             product: .framework,
             bundleId: "com.apollographql.\(target.name.lowercased())",
-            deploymentTarget: target.deploymentTarget,
+            deploymentTargets: target.deploymentTargets,
             infoPlist: .file(path: "Tests/\(target.name)/Info.plist"),
             dependencies: [
                 .package(product: "ApolloCodegenLib")

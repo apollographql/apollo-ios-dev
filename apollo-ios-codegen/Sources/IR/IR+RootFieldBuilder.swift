@@ -3,72 +3,11 @@ import OrderedCollections
 import GraphQLCompiler
 import Utilities
 
-class RootFieldEntityStorage {
-  private(set) var entitiesForFields: [Entity.Location: Entity] = [:]
-
-  init(rootEntity: Entity) {
-    entitiesForFields[rootEntity.location] = rootEntity
-  }
-
-  func entity(
-    for field: CompilationResult.Field,
-    on enclosingEntity: Entity
-  ) -> Entity {
-    let location = enclosingEntity
-      .location
-      .appending(.init(name: field.responseKey, type: field.type))
-
-    var rootTypePath: LinkedList<GraphQLCompositeType> {
-      guard let fieldType = field.selectionSet?.parentType else {
-        fatalError("Entity cannot be created for non-entity type field \(field).")
-      }
-      return enclosingEntity.rootTypePath.appending(fieldType)
-    }
-
-    return entitiesForFields[location] ??
-    createEntity(location: location, rootTypePath: rootTypePath)
-  }
-
-  func entity(
-    for entityInFragment: Entity,
-    inFragmentSpreadAtTypePath fragmentSpreadTypeInfo: SelectionSet.TypeInfo
-  ) -> Entity {
-    var location = fragmentSpreadTypeInfo.entity.location
-    if let pathInFragment = entityInFragment.location.fieldPath {
-      location = location.appending(pathInFragment)
-    }
-
-    var rootTypePath: LinkedList<GraphQLCompositeType> {
-      let otherRootTypePath = entityInFragment.rootTypePath.dropFirst()
-      return fragmentSpreadTypeInfo.entity.rootTypePath.appending(otherRootTypePath)
-    }
-
-    return entitiesForFields[location] ??
-    createEntity(location: location, rootTypePath: rootTypePath)
-  }
-
-  private func createEntity(
-    location: Entity.Location,
-    rootTypePath: LinkedList<GraphQLCompositeType>
-  ) -> Entity {
-    let entity = Entity(location: location, rootTypePath: rootTypePath)
-    entitiesForFields[location] = entity
-    return entity
-  }
-
-  fileprivate func mergeAllSelectionsIntoEntitySelectionTrees(from fragmentSpread: NamedFragmentSpread) {
-    for (_, fragmentEntity) in fragmentSpread.fragment.entities {
-      let entity = entity(for: fragmentEntity, inFragmentSpreadAtTypePath: fragmentSpread.typeInfo)
-      entity.selectionTree.mergeIn(fragmentEntity.selectionTree, from: fragmentSpread, using: self)
-    }
-  }
-}
-
 class RootFieldBuilder {
   struct Result {
     let rootField: EntityField
     let referencedFragments: ReferencedFragments
-    let entities: [Entity.Location: Entity]
+    let entityStorage: DefinitionEntityStorage
     let containsDeferredFragment: Bool
   }
 
@@ -85,7 +24,7 @@ class RootFieldBuilder {
 
   private let ir: IRBuilder
   private let rootEntity: Entity
-  private let entityStorage: RootFieldEntityStorage
+  private let entityStorage: DefinitionEntityStorage
   private var referencedFragments: ReferencedFragments = []
   @IsEverTrue private var containsDeferredFragment: Bool
 
@@ -94,7 +33,7 @@ class RootFieldBuilder {
   private init(ir: IRBuilder, rootEntity: Entity) {
     self.ir = ir
     self.rootEntity = rootEntity
-    self.entityStorage = RootFieldEntityStorage(rootEntity: rootEntity)
+    self.entityStorage = DefinitionEntityStorage(rootEntity: rootEntity)
   }
 
   private func build(
@@ -110,26 +49,49 @@ class RootFieldBuilder {
       givenAllTypesInSchema: schema.referencedTypes
     )
 
-    let rootIrSelectionSet = SelectionSet(
+    let rootIrSelectionSet = await buildSelectionSet(
+      fromCompiledSelectionSet: rootSelectionSet,
       entity: rootEntity,
       scopePath: LinkedList(rootTypePath)
-    )
-
-    await buildDirectSelections(
-      into: rootIrSelectionSet.selections.direct.unsafelyUnwrapped,
-      atTypePath: rootIrSelectionSet.typeInfo,
-      from: rootSelectionSet
     )
 
     referencedFragments.sort(by: {
       $0.name < $1.name
     })
-    
+
     return Result(
       rootField: EntityField(rootField, selectionSet: rootIrSelectionSet),
       referencedFragments: referencedFragments,
-      entities: entityStorage.entitiesForFields,
+      entityStorage: entityStorage,
       containsDeferredFragment: containsDeferredFragment
+    )
+  }
+
+  private func buildSelectionSet(
+    fromCompiledSelectionSet compiledSelectionSet: CompilationResult.SelectionSet?,
+    entity: Entity,
+    scopePath: LinkedList<ScopeDescriptor>
+  ) async -> SelectionSet {
+    let typeInfo = SelectionSet.TypeInfo(
+      entity: entity,
+      scopePath: scopePath
+    )
+
+    var directSelections: DirectSelections? = nil
+
+    if let compiledSelectionSet {
+      directSelections = DirectSelections()
+
+      await buildDirectSelections(
+        into: directSelections.unsafelyUnwrapped,
+        atTypePath: typeInfo,
+        from: compiledSelectionSet
+      )
+    }
+
+    return SelectionSet(
+      typeInfo: typeInfo,
+      selections: directSelections
     )
   }
 
@@ -216,7 +178,7 @@ class RootFieldBuilder {
       }
 
       let irTypeCase = await buildInlineFragmentSpread(
-        from: inlineSelectionSet,
+        fromCompiledSelectionSet: inlineSelectionSet,
         with: scope,
         inParentTypePath: typeInfo,
         deferCondition: deferCondition
@@ -279,7 +241,7 @@ class RootFieldBuilder {
 
     case (false, nil):
       let irTypeCaseEnclosingFragment = await buildInlineFragmentSpread(
-        from: CompilationResult.SelectionSet(
+        fromCompiledSelectionSet: CompilationResult.SelectionSet(
           parentType: fragmentSpread.parentType,
           selections: [selection]
         ),
@@ -296,7 +258,10 @@ class RootFieldBuilder {
 
       if matchesType {
         typeInfo.entity.selectionTree.mergeIn(
-          selections: irTypeCaseEnclosingFragment.selectionSet.selections.direct.unsafelyUnwrapped.readOnlyView,
+          selections: irTypeCaseEnclosingFragment.selectionSet
+            .selections
+            .unsafelyUnwrapped
+            .readOnlyView,
           with: typeInfo
         )
       }
@@ -313,14 +278,7 @@ class RootFieldBuilder {
       return nil
     }
 
-    let type = (
-      // We must specify the type whenever there is a defer condition because even when the type
-      // case matches that of the parent it must be evaluted as an entirely separate scope because
-      // deferred fragments are treated as isolated selections and must not be merged into any
-      // other selection.
-      parentTypePath.parentType == conditionalSelectionSet.parentType
-      && !isDeferred
-    )
+    let type = (parentTypePath.parentType == conditionalSelectionSet.parentType)
     ? nil
     : conditionalSelectionSet.parentType
 
@@ -384,20 +342,15 @@ class RootFieldBuilder {
     )
     let typePath = enclosingTypeInfo.scopePath.appending(typeScope)
 
-    let irSelectionSet = SelectionSet(
+    return await buildSelectionSet(
+      fromCompiledSelectionSet: fieldSelectionSet,
       entity: entity,
       scopePath: typePath
     )
-    await buildDirectSelections(
-      into: irSelectionSet.selections.direct.unsafelyUnwrapped,
-      atTypePath: irSelectionSet.typeInfo,
-      from: fieldSelectionSet
-    )
-    return irSelectionSet
   }
 
   private func buildInlineFragmentSpread(
-    from selectionSet: CompilationResult.SelectionSet?,
+    fromCompiledSelectionSet compiledSelectionSet: CompilationResult.SelectionSet?,
     with scopeCondition: ScopeCondition,
     inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo,
     deferCondition: CompilationResult.DeferCondition? = nil
@@ -413,19 +366,11 @@ class RootFieldBuilder {
     let typePath = enclosingTypeInfo.scopePath.mutatingLast {
       $0.appending(scope)
     }
-
-    let irSelectionSet = SelectionSet(
+    let irSelectionSet = await buildSelectionSet(
+      fromCompiledSelectionSet: compiledSelectionSet,
       entity: enclosingTypeInfo.entity,
       scopePath: typePath
-    )
-
-    if let selectionSet = selectionSet {
-      await buildDirectSelections(
-        into: irSelectionSet.selections.direct.unsafelyUnwrapped,
-        atTypePath: irSelectionSet.typeInfo,
-        from: selectionSet
-      )
-    }
+    )    
 
     return InlineFragmentSpread(selectionSet: irSelectionSet)
   }
@@ -439,15 +384,13 @@ class RootFieldBuilder {
       $0.appending(scopeCondition)
     }
 
-    let irSelectionSet = SelectionSet(
+    let irSelectionSet = await buildSelectionSet(
+      fromCompiledSelectionSet: .init(
+        parentType: enclosingTypeInfo.parentType,
+        selections: [selection]
+      ),
       entity: enclosingTypeInfo.entity,
       scopePath: typePath
-    )
-
-    await add(
-      selection,
-      to: irSelectionSet.selections.direct.unsafelyUnwrapped,
-      atTypePath: irSelectionSet.typeInfo
     )
 
     return InlineFragmentSpread(selectionSet: irSelectionSet)
@@ -487,10 +430,20 @@ class RootFieldBuilder {
     )
 
     if fragmentSpread.typeInfo.deferCondition == nil {
-      entityStorage.mergeAllSelectionsIntoEntitySelectionTrees(from: fragmentSpread)
+      mergeAllSelectionsIntoEntitySelectionTrees(from: fragmentSpread)
     }
 
     return fragmentSpread
+  }
+
+  private func mergeAllSelectionsIntoEntitySelectionTrees(from fragmentSpread: NamedFragmentSpread) {
+    for (_, fragmentEntity) in fragmentSpread.fragment.entityStorage.entitiesForFields {
+      let entity = entityStorage.entity(
+        for: fragmentEntity,
+        inFragmentSpreadAtTypePath: fragmentSpread.typeInfo
+      )
+      entity.selectionTree.mergeIn(fragmentEntity.selectionTree, from: fragmentSpread)
+    }
   }
 
 }

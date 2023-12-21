@@ -23,7 +23,8 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
   }
 
   private func renderSubject() -> String {
-    subject.template.description
+    let (rendered, _ ) = subject.render()
+    return rendered
   }
 
   // MARK: Boilerplate Tests

@@ -7,10 +7,10 @@ extension Target {
 
         return Target(
             name: target.name,
-            platform: .macOS,
+            destinations: target.destinations,
             product: .unitTests,
             bundleId: "com.apollographql.\(target.name.lowercased())",
-            deploymentTarget: target.deploymentTarget,
+            deploymentTargets: target.deploymentTargets,
             sources: [
                 "Tests/\(target.name)/**",
             ],

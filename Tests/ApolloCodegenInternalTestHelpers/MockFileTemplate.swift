@@ -1,28 +1,33 @@
 import Foundation
-@testable import ApolloCodegenLib
 import TemplateString
+
+@testable import ApolloCodegenLib
 
 public struct MockFileTemplate: TemplateRenderer {
   public var target: TemplateTarget
   public var config: ApolloCodegen.ConfigurationContext
 
-  public var template: TemplateString {
+  public func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     TemplateString(
-    """
-    root {
-      nested
-    }
-    """
+      """
+      root {
+        nested
+      }
+      """
     )
   }
 
-  public var detachedTemplate: TemplateString? {
+  public func renderDetachedTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString? {
     TemplateString(
-    """
-    detached {
-      nested
-    }
-    """
+      """
+      detached {
+        nested
+      }
+      """
     )
   }
 

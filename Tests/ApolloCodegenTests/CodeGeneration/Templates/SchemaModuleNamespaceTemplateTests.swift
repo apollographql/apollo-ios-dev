@@ -18,7 +18,7 @@ class SchemaModuleNamespaceTemplateTests: XCTestCase {
     let subject = SchemaModuleNamespaceTemplate(
       config: .init(config: .mock(schemaNamespace: "schema"))
     )
-    let actual = subject.template.description
+    let actual = subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
 
     // then
     expect(actual).to(equalLineByLine(expected))
@@ -35,7 +35,7 @@ class SchemaModuleNamespaceTemplateTests: XCTestCase {
     let subject = SchemaModuleNamespaceTemplate(
       config: .init(config: .mock(schemaNamespace: "SCHEMA"))
     )
-    let actual = subject.template.description
+    let actual = subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
 
     // then
     expect(actual).to(equalLineByLine(expected))
@@ -52,7 +52,7 @@ class SchemaModuleNamespaceTemplateTests: XCTestCase {
     let subject = SchemaModuleNamespaceTemplate(
       config: .init(config: .mock(schemaNamespace: "MySchema"))
     )
-    let actual = subject.template.description
+    let actual = subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
 
     // then
     expect(actual).to(equalLineByLine(expected))
@@ -74,7 +74,7 @@ class SchemaModuleNamespaceTemplateTests: XCTestCase {
         output: .mock(moduleType: .embeddedInTarget(name: "TestTarget", accessModifier: .internal))
       ))
     )
-    let actual = subject.template.description
+    let actual = subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
 
     // then
     expect(actual).to(equalLineByLine(expected))
@@ -94,7 +94,7 @@ class SchemaModuleNamespaceTemplateTests: XCTestCase {
         output: .mock(moduleType: .embeddedInTarget(name: "TestTarget", accessModifier: .public))
       ))
     )
-    let actual = subject.template.description
+    let actual = subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
 
     // then
     expect(actual).to(equalLineByLine(expected))

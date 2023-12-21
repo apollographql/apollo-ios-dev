@@ -61,7 +61,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       let subject = buildSubject(config: config)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
@@ -122,7 +122,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       let subject = buildSubject(config: config)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(expected, atLine: 4, ignoringExtraLines: true))
@@ -187,7 +187,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       let subject = buildSubject(config: config)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(expected, atLine: 4, ignoringExtraLines: true))
@@ -315,7 +315,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       let subject = buildSubject(config: config, targetFileType: .schemaMetadata)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: test.atLine))
@@ -391,7 +391,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       let subject = buildSubject(config: config, targetFileType: .schemaConfiguration)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(expected, atLine: test.atLine))
@@ -519,7 +519,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       let subject = buildSubject(config: config, targetFileType: .enum)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: test.atLine))
@@ -647,7 +647,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       let subject = buildSubject(config: config, targetFileType: .inputObject)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: test.atLine))
@@ -775,7 +775,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       let subject = buildSubject(config: config, targetFileType: .customScalar)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: test.atLine))
@@ -905,7 +905,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       let subject = buildSubject(config: config, targetFileType: .object)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: test.atLine))
@@ -1035,7 +1035,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       let subject = buildSubject(config: config, targetFileType: .interface)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: test.atLine))
@@ -1165,7 +1165,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       let subject = buildSubject(config: config, targetFileType: .union)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: test.atLine))
@@ -1184,7 +1184,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
     let subject = buildSubject(config: config, targetFileType: .union)
 
     // when
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     let expected = """
@@ -1204,7 +1204,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
     let subject = buildSubject(config: config, targetFileType: .union)
 
     // when
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     let expected = """
@@ -1224,7 +1224,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
     let subject = buildSubject(config: config, targetFileType: .union)
 
     // when
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     let expected = """
@@ -1244,7 +1244,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
     let subject = buildSubject(config: config, targetFileType: .customScalar)
 
     // when
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     let expected = """
@@ -1264,7 +1264,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
     let subject = buildSubject(config: config, targetFileType: .customScalar)
 
     // when
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     let expected = """
@@ -1284,7 +1284,7 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
     let subject = buildSubject(config: config, targetFileType: .customScalar)
 
     // when
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     let expected = """
