@@ -393,7 +393,7 @@ struct SelectionSetTemplate {
   }
 
   private func FragmentSelectionTemplate(_ fragment: IR.NamedFragmentSpread) -> TemplateString {
-    if let deferCondition = fragment.deferCondition {
+    if let deferCondition = fragment.typeInfo.deferCondition {
       return DeferredNamedFragmentSelectionTemplate(
         deferCondition: deferCondition,
         fragment: fragment
@@ -540,7 +540,7 @@ struct SelectionSetTemplate {
           return ""
         })
         \(forEachIn: directSelections.namedFragments.values, {
-          if let _ = $0.deferCondition {
+          if let _ = $0.typeInfo.deferCondition {
             return DeferredPropertyInitializationStatement($0.definition.name.firstLowercased)
           }
 
@@ -568,7 +568,7 @@ struct SelectionSetTemplate {
     let isOptional =
       fragment.inclusionConditions != nil
       && !scope.matches(fragment.inclusionConditions.unsafelyUnwrapped)
-    let isDeferred = fragment.deferCondition != nil
+    let isDeferred = fragment.typeInfo.deferCondition != nil
 
     return """
       \(if: isDeferred,
@@ -1187,6 +1187,6 @@ extension OrderedDictionary<ScopeCondition, InlineFragmentSpread> {
 
 extension OrderedDictionary<String, NamedFragmentSpread> {
   fileprivate var containsDeferredFragment: Bool {
-    values.contains(where: { $0.deferCondition != nil })
+    values.contains(where: { $0.typeInfo.deferCondition != nil })
   }
 }

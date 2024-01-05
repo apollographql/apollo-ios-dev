@@ -18,7 +18,7 @@ public class NamedFragmentSpread: Hashable, CustomDebugStringConvertible {
   /// Indicates the location where the fragment has been "spread into" its enclosing
   /// operation/fragment. It's `scopePath` and `entity` reference are scoped to the operation it
   /// belongs to.
-  let typeInfo: SelectionSet.TypeInfo
+  public let typeInfo: SelectionSet.TypeInfo
 
   public internal(set) var inclusionConditions: AnyOf<InclusionConditions>?
 
@@ -58,7 +58,4 @@ public class NamedFragmentSpread: Hashable, CustomDebugStringConvertible {
     return description
   }
 
-  public var deferCondition: CompilationResult.DeferCondition? {
-    typeInfo.scope.scopePath.last.value.deferCondition
-  }
 }
