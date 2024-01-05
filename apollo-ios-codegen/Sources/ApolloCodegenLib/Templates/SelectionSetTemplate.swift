@@ -584,7 +584,6 @@ struct SelectionSetTemplate {
       )
       \(if: isMutable,
       """
-
         get { _toFragment() }
         _modify { var f = \(propertyName); yield &f; \(
           if: isOptional,
