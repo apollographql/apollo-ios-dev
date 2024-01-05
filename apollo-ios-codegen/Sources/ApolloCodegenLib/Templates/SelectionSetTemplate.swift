@@ -122,7 +122,6 @@ struct SelectionSetTemplate {
       \(renderAccessControl())\
       struct \(inlineFragment.renderedTypeName): \(SelectionSetType(asInlineFragment: true))\
       \(if: inlineFragment.isCompositeSelectionSet, ", \(config.ApolloAPITargetName).CompositeInlineFragment")\
-      \(if: inlineFragment.isDeferred, ", \(config.ApolloAPITargetName).Deferrable")\
        {
         \(BodyTemplate(context))
       }

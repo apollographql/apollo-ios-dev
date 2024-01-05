@@ -5,8 +5,6 @@ open class MockOperation<SelectionSet: RootSelectionSet>: GraphQLOperation {
 
   open class var operationType: GraphQLOperationType { .query }
 
-  open class var hasDeferredFragments: Bool { false }
-
   open class var operationName: String { "MockOperationName" }
 
   open class var operationDocument: OperationDocument {

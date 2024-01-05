@@ -24,7 +24,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
           content-type: test/custom
 
           {
-            "data" : {Ï
+            "data" : {
               "key" : "value"
             }
           }
