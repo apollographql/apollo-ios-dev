@@ -116,6 +116,6 @@ final class GraphQLResultTests: XCTestCase {
 
   // MARK: Incremental merging tests
 
-  #warning("Need incremental merging tests here!")
+  // TODO: Need more incremental merging tests here
 
 }
