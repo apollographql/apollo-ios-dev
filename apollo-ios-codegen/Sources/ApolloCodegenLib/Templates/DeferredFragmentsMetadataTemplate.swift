@@ -1,3 +1,4 @@
+import GraphQLCompiler
 import IR
 import TemplateString
 
@@ -23,7 +24,7 @@ struct DeferredFragmentsMetadataTemplate {
   ///
   /// - Returns: The `TemplateString` for the deferred fragments metadata definitions.
   func render() -> TemplateString {
-    let deferredFragmentPathTypeInfo = collectDeferredFragmentPathTypeInfo(
+    let deferredFragmentPathTypeInfo = DeferredFragmentsPathTypeInfo(
       from: operation.rootField.selectionSet.selections
     )
     guard !deferredFragmentPathTypeInfo.isEmpty else { return "" }
@@ -46,12 +47,8 @@ struct DeferredFragmentsMetadataTemplate {
     """
     enum DeferredFragmentIdentifiers {
     \(deferredFragmentPathTypeInfo.map {
-      guard let label = $0.typeInfo.deferCondition?.label else {
-        fatalError("Defer condition missing for metadata generation!")
-      }
-
       return """
-        static let \(label) = DeferredFragmentIdentifier(label: \"\(label)\", path: [\
+        static let \($0.deferCondition.label) = DeferredFragmentIdentifier(label: \"\($0.deferCondition.label)\", path: [\
       \($0.path.map { "\"\($0)\"" }, separator: ", ")\
       ])
       """
@@ -66,18 +63,8 @@ struct DeferredFragmentsMetadataTemplate {
     """
     static var deferredFragments: [DeferredFragmentIdentifier: any \(config.ApolloAPITargetName).SelectionSet.Type]? {[
     \(deferredFragmentPathTypeInfo.map {
-      guard let label = $0.typeInfo.deferCondition?.label else {
-        fatalError("Defer condition missing for metadata generation!")
-      }
-
-      let typeName = SelectionSetNameGenerator.generatedSelectionSetName(
-        for: $0.typeInfo,
-        format: .omittingRoot,
-        pluralizer: config.pluralizer
-      )
-
       return """
-        DeferredFragmentIdentifiers.\(label): Data.\(typeName).self,
+        DeferredFragmentIdentifiers.\($0.deferCondition.label): \($0.typeName).self,
       """
     }, separator: "\n")
     ]}
@@ -88,10 +75,11 @@ struct DeferredFragmentsMetadataTemplate {
 
   fileprivate struct DeferredPathTypeInfo {
     let path: [String]
-    let typeInfo: SelectionSet.TypeInfo
+    let deferCondition: CompilationResult.DeferCondition
+    let typeName: String
   }
 
-  fileprivate func collectDeferredFragmentPathTypeInfo(
+  fileprivate func DeferredFragmentsPathTypeInfo(
     from directSelections: DirectSelections?,
     path: [String] = []
   ) -> [DeferredPathTypeInfo] {
@@ -103,24 +91,42 @@ struct DeferredFragmentsMetadataTemplate {
       if let field = field as? EntityField {
         let fieldPath = path + [(field.alias ?? field.name)]
         deferredPathTypeInfo.append(contentsOf:
-          collectDeferredFragmentPathTypeInfo(from: field.selectionSet.selections, path: fieldPath)
+          DeferredFragmentsPathTypeInfo(from: field.selectionSet.selections, path: fieldPath)
         )
       }
     }
 
     for fragment in directSelections.inlineFragments.values {
-      if fragment.typeInfo.isDeferred {
-        deferredPathTypeInfo.append(DeferredPathTypeInfo(path: path, typeInfo: fragment.typeInfo))
+      if let deferCondition = fragment.typeInfo.deferCondition {
+        let selectionSetName = SelectionSetNameGenerator.generatedSelectionSetName(
+          for: fragment.typeInfo,
+          format: .omittingRoot,
+          pluralizer: config.pluralizer
+        )
+
+        deferredPathTypeInfo.append(DeferredPathTypeInfo(
+          path: path,
+          deferCondition: deferCondition,
+          typeName: "Data.\(selectionSetName)"
+        ))
       }
 
       deferredPathTypeInfo.append(contentsOf:
-        collectDeferredFragmentPathTypeInfo(from: fragment.selectionSet.selections, path: path)
+        DeferredFragmentsPathTypeInfo(from: fragment.selectionSet.selections, path: path)
       )
     }
 
     for fragment in directSelections.namedFragments.values {
+      if let deferCondition = fragment.typeInfo.deferCondition {
+        deferredPathTypeInfo.append(DeferredPathTypeInfo(
+          path: path,
+          deferCondition: deferCondition,
+          typeName: fragment.definition.name.asFragmentName
+        ))
+      }
+
       deferredPathTypeInfo.append(contentsOf:
-        collectDeferredFragmentPathTypeInfo(
+        DeferredFragmentsPathTypeInfo(
           from: fragment.fragment.rootField.selectionSet.selections,
           path: path
         )
