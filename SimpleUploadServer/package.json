@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "apollo-server": "^2.16.1",
+    "apollo-server": "^3.0.0",
     "graphql": "^14.7.0",
     "lowdb": "^1.0.0",
     "mkdirp": "^0.5.5",
