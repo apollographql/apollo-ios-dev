@@ -57,4 +57,8 @@ public class NamedFragmentSpread: Hashable, CustomDebugStringConvertible {
 
     return description
   }
+
+  public var deferCondition: CompilationResult.DeferCondition? {
+    typeInfo.scope.scopePath.last.value.deferCondition
+  }
 }
