@@ -205,3 +205,17 @@ public extension CompilationResult.Directive {
     )    
   }
 }
+
+public extension CompilationResult.Argument {
+  static func mock(
+    _ name: String,
+    value: GraphQLValue
+  ) -> Self {
+    Self(
+      name: name,
+      type: .nonNull(.string()),
+      value: value,
+      deprecationReason: nil
+    )
+  }
+}
