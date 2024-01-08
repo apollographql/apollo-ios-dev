@@ -5,7 +5,7 @@ import ApolloInternalTestHelpers
 import ApolloCodegenInternalTestHelpers
 @testable import ApolloCodegenLib
 
-class CompilationCustomDirectiveTests: XCTestCase {
+class CompilationApolloSpecificDirectiveTests: XCTestCase {
 
   var schemaSDL: String!
   var schemaJSON: String!
