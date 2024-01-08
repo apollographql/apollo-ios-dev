@@ -98,7 +98,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     Task { [weak self] in
       guard let self else { return }
       for completion in await self.completionManager.completions {
-        await completion.execute(error: PaginationError.cancellation)
+        completion.execute(error: PaginationError.cancellation)
       }
       await self.completionManager.reset()
       await self.pager.cancel()
@@ -115,7 +115,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     callbackQueue: DispatchQueue = .main,
     completion: ((PaginationError?) -> Void)? = nil
   ) {
-    execute(completion: completion) { [weak self] in
+    execute(callbackQueue: callbackQueue, completion: completion) { [weak self] in
       try await self?.pager.loadPrevious(cachePolicy: cachePolicy)
     }
   }
@@ -130,7 +130,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     callbackQueue: DispatchQueue = .main,
     completion: ((PaginationError?) -> Void)? = nil
   ) {
-    execute(completion: completion) { [weak self] in
+    execute(callbackQueue: callbackQueue, completion: completion) { [weak self] in
       try await self?.pager.loadNext(cachePolicy: cachePolicy)
     }
   }
@@ -145,7 +145,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     callbackQueue: DispatchQueue = .main,
     completion: ((PaginationError?) -> Void)? = nil
   ) {
-    execute(completion: completion) { [weak self] in
+    execute(callbackQueue: callbackQueue, completion: completion) { [weak self] in
       try await self?.pager.loadAll(fetchFromInitialPage: fetchFromInitialPage)
     }
   }
@@ -155,7 +155,7 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
     Task {
       for completion in await self.completionManager.completions {
-        await completion.execute(error: PaginationError.cancellation)
+        completion.execute(error: PaginationError.cancellation)
       }
       await pager.refetch(cachePolicy: cachePolicy)
     }
@@ -168,9 +168,9 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     }
   }
 
-  private func execute(completion: ((PaginationError?) -> Void)?, operation: @escaping () async throws -> Void) {
+  private func execute(callbackQueue: DispatchQueue, completion: ((PaginationError?) -> Void)?, operation: @escaping () async throws -> Void) {
     Task<_, Never> { [weak self] in
-      let completionHandler = Completion(completion: completion)
+      let completionHandler = Completion(callbackQueue: callbackQueue, completion: completion)
       await self?.completionManager.append(completion: completionHandler)
       do {
         try await operation()
@@ -192,14 +192,18 @@ private actor Subscriptions {
 
 private class Completion {
   var completion: ((PaginationError?) -> Void)?
+  var callbackQueue: DispatchQueue
 
-  init(completion: ((PaginationError?) -> Void)?) {
+  init(callbackQueue: DispatchQueue, completion: ((PaginationError?) -> Void)?) {
     self.completion = completion
+    self.callbackQueue = callbackQueue
   }
 
-  func execute(error: PaginationError?) async {
-    completion?(error)
-    completion = nil
+  func execute(error: PaginationError?) {
+    callbackQueue.async { [weak self] in
+      self?.completion?(error)
+      self?.completion = nil
+    }
   }
 }
 
@@ -214,8 +218,8 @@ private actor CompletionManager {
     completions.removeAll()
   }
 
-  func execute(completion: Completion, with error: PaginationError?) async {
-    await completion.execute(error: error)
+  func execute(completion: Completion, with error: PaginationError?) {
+    completion.execute(error: error)
   }
 
   deinit {
