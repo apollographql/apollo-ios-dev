@@ -18,10 +18,11 @@ import {
   GraphQLError,
   DocumentNode,
   DirectiveNode,
+  DirectiveDefinitionNode
 } from "graphql";
 import { isNode } from "graphql/language/ast";
 import { validateSDL } from "graphql/validation/validate";
-import { directive_apollo_client_ios_localCacheMutation } from "./apolloCodegenSchemaExtension";
+import { directive_apollo_client_ios_localCacheMutation, directive_import_statement } from "./apolloCodegenSchemaExtension";
 import { addTypeNameFieldForLegacySafelisting } from "./legacySafelistingTransform";
 
 export class GraphQLSchemaValidationError extends Error {
@@ -87,7 +88,7 @@ export function transformToNetworkRequestSourceDefinition(
     },
     Directive: {
       enter(node: DirectiveNode) {
-        return stripLocalCacheMutationCustomClientDirective(node)
+        return stripApolloClientSpecificDirectives(node)
       }
     }
   });
@@ -120,8 +121,19 @@ function transformTypenameFieldIfNeeded(node: FieldNode): FieldNode {
   }
 }
 
-function stripApolloClientDirectives(node: DirectiveNode): DirectiveNode | null {
-  return (node.name.value == directive_apollo_client_ios_localCacheMutation.name.value) ? null : node;
+function stripApolloClientSpecificDirectives(node: DirectiveNode): DirectiveNode | null {
+  const apolloClientSpecificDirectives: DirectiveDefinitionNode[] = [
+    directive_apollo_client_ios_localCacheMutation,
+    directive_import_statement
+  ]
+
+  for (const directive of apolloClientSpecificDirectives) {
+    if (node.name.value == directive.name.value) {
+      return null
+    }
+  }
+
+  return node
 }
 
 // Utility functions extracted from graphql-js

@@ -115,6 +115,36 @@ class CompilationApolloSpecificDirectiveTests: XCTestCase {
     expect(operation.directives).to(equal(expectedDirectives))
   }
 
+  func test__compile__givenQueryWithLocalCacheMutationDirective_stripsDirectiveFromSource() async throws {
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        species: String!
+      }
+      """
+
+    document = """
+      query Test @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+    let expectedDirectives: [CompilationResult.Directive] = [
+      .mock("import", arguments: [.mock("module", value: .string("MyModuleName"))])
+    ]
+
+    let compilationResult = try await compileFrontend()
+
+
+    let operation = try XCTUnwrap(compilationResult.operations.first)
+    expect(operation.source).toNot(contain("@apollo_client_ios_localCacheMutation"))
+  }
+
   // MARK: @import Tests
 
   /// Tests that we automatically add the import directive to the schema
@@ -173,6 +203,36 @@ class CompilationApolloSpecificDirectiveTests: XCTestCase {
 
     let operation = try XCTUnwrap(compilationResult.operations.first)
     expect(operation.directives).to(equal(expectedDirectives))
+  }
+
+  func test__compile__givenQueryWithImportDirective_stripsDirectiveFromSource() async throws {
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        species: String!
+      }
+      """
+
+    document = """
+      query Test @import(module: "MyModuleName") {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+    let expectedDirectives: [CompilationResult.Directive] = [
+      .mock("import", arguments: [.mock("module", value: .string("MyModuleName"))])
+    ]
+
+    let compilationResult = try await compileFrontend()
+
+
+    let operation = try XCTUnwrap(compilationResult.operations.first)
+    expect(operation.source).toNot(contain("@import"))
   }
 
 }
