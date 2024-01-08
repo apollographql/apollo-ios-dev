@@ -1,4 +1,4 @@
-import { DefinitionNode, GraphQLArgument, GraphQLDirective, GraphQLNamedType, InputValueDefinitionNode, Kind, NameNode, StringValueNode, TypeNode, getNamedType } from "graphql";
+import { DefinitionNode, GraphQLArgument, GraphQLDirective, GraphQLNamedType, InputValueDefinitionNode, Kind, NameNode, StringValueNode, TypeNode, NamedTypeNode, ListTypeNode, getNamedType } from "graphql";
 
 export function nameNode(name :string): NameNode {
   return {
@@ -34,9 +34,16 @@ export function definitionNode(definition: GraphQLDirective): DefinitionNode {
   }
 }
 
-function typeNode(type: GraphQLNamedType): TypeNode {
+export function typeNode(type: GraphQLNamedType): NamedTypeNode {
   return {
     kind: Kind.NAMED_TYPE,
     name: nameNode(type.name)
+  }
+}
+
+export function nonNullNode(node: NamedTypeNode | ListTypeNode): TypeNode {
+  return {
+    kind: Kind.NON_NULL_TYPE,
+    type: node
   }
 }
