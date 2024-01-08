@@ -72,12 +72,12 @@ export function transformToNetworkRequestSourceDefinition(
   }
 
   return visit(ast, {
-    SelectionSet: {           
-      leave(node: SelectionSetNode, _, parent) { 
+    SelectionSet: {
+      leave(node: SelectionSetNode, _, parent) {
         if (isNode(parent) && ![Kind.FIELD, Kind.FRAGMENT_DEFINITION].includes(parent.kind)) {
-          return node 
+          return node
         }
-        return addTypenameFieldToSelectionSetIfNeeded(node) 
+        return addTypenameFieldToSelectionSetIfNeeded(node)
       }
     },
     Field: {
@@ -93,17 +93,17 @@ export function transformToNetworkRequestSourceDefinition(
   });
 }
 
-function addTypenameFieldToSelectionSetIfNeeded(node: SelectionSetNode): SelectionSetNode {    
-  const hasTypenameField = node.selections.find((selection) => 
+function addTypenameFieldToSelectionSetIfNeeded(node: SelectionSetNode): SelectionSetNode {
+  const hasTypenameField = node.selections.find((selection) =>
     selection.kind == typenameField.kind && selection.name.value == typenameField.name.value
   );
 
-  if (hasTypenameField) { 
+  if (hasTypenameField) {
     return node
   } else {
     return {
-      ...node,        
-      selections: [typenameField, ...node.selections],      
+      ...node,
+      selections: [typenameField, ...node.selections],
     };
   }
 }
@@ -113,14 +113,14 @@ function transformTypenameFieldIfNeeded(node: FieldNode): FieldNode {
     return {
       ...node,
       alias: undefined,
-      directives: undefined      
+      directives: undefined
     }
   } else {
     return node;
   }
 }
 
-function stripLocalCacheMutationCustomClientDirective(node: DirectiveNode): DirectiveNode | null {
+function stripApolloClientDirectives(node: DirectiveNode): DirectiveNode | null {
   return (node.name.value == directive_apollo_client_ios_localCacheMutation.name.value) ? null : node;
 }
 
