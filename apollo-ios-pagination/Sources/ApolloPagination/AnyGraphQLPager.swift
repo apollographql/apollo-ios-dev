@@ -94,9 +94,7 @@ public class AnyGraphQLQueryPager<Model> {
     callbackQueue: DispatchQueue = .main,
     completion: ((PaginationError?) -> Void)? = nil
   ) {
-    pager.loadNext(cachePolicy: cachePolicy, callbackQueue: callbackQueue, completion: { error in
-      callbackQueue.async { completion?(error) }
-    })
+    pager.loadNext(cachePolicy: cachePolicy, callbackQueue: callbackQueue, completion: completion)
   }
 
   /// Load the previous page, if available.
@@ -109,9 +107,7 @@ public class AnyGraphQLQueryPager<Model> {
     callbackQueue: DispatchQueue = .main,
     completion: ((PaginationError?) -> Void)? = nil
   ) {
-    pager.loadPrevious(cachePolicy: cachePolicy, callbackQueue: callbackQueue, completion: { error in
-      callbackQueue.async { completion?(error) }
-    })
+    pager.loadPrevious(cachePolicy: cachePolicy, callbackQueue: callbackQueue, completion: completion)
   }
 
   /// Loads all pages.
@@ -124,9 +120,7 @@ public class AnyGraphQLQueryPager<Model> {
     callbackQueue: DispatchQueue = .main,
     completion: ((PaginationError?) -> Void)? = nil
   ) {
-    pager.loadAll(fetchFromInitialPage: fetchFromInitialPage, callbackQueue: callbackQueue, completion: { error in
-      callbackQueue.async { completion?(error) }
-    })
+    pager.loadAll(fetchFromInitialPage: fetchFromInitialPage, callbackQueue: callbackQueue, completion: completion)
   }
 
   /// Discards pagination state and fetches the first page from scratch.
