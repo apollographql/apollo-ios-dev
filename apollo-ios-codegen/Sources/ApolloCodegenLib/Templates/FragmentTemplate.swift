@@ -10,7 +10,11 @@ struct FragmentTemplate: TemplateRenderer {
 
   let config: ApolloCodegen.ConfigurationContext
 
-  let target: TemplateTarget = .operationFile
+  var target: TemplateTarget {
+    .operationFile(importModules: fragment.definition.importDirectives.map {
+      $0.moduleName
+    })
+  }
 
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
