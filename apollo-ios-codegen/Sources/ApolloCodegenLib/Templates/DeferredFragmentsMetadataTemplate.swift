@@ -48,7 +48,7 @@ struct DeferredFragmentsMetadataTemplate {
     enum DeferredFragmentIdentifiers {
     \(deferredFragmentPathTypeInfo.map {
       return """
-        static let \($0.deferCondition.label) = DeferredFragmentIdentifier(label: \"\($0.deferCondition.label)\", path: [\
+        static let \($0.deferCondition.label) = DeferredFragmentIdentifier(label: \"\($0.deferCondition.label)\", fieldPath: [\
       \($0.path.map { "\"\($0)\"" }, separator: ", ")\
       ])
       """
