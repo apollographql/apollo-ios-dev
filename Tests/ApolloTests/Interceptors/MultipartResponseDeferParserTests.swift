@@ -78,40 +78,6 @@ final class MultipartResponseDeferParserTests: XCTestCase {
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
-  func test__error__givenChunk_withMissingPayload_shouldReturnError() throws {
-    let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
-
-    let expectation = expectation(description: "Received callback")
-
-    subject.intercept(
-      request: .mock(operation: MockQuery.mock()),
-      response: .mock(
-        headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
-        data: """
-          --graphql
-          content-type: application/json
-
-          {
-            "key": "value"
-          }
-          --graphql
-          """.crlfFormattedData()
-      )
-    ) { result in
-      defer {
-        expectation.fulfill()
-      }
-
-      expect(result).to(beFailure { error in
-        expect(error).to(
-          matchError(MultipartResponseDeferParser.ParsingError.cannotParsePayloadData)
-        )
-      })
-    }
-
-    wait(for: [expectation], timeout: defaultTimeout)
-  }
-
   // MARK: Parsing tests
 
   #warning("Need parsing tests - to be done after #3147")

@@ -64,25 +64,11 @@ struct MultipartResponseDeferParser: MultipartResponseSpecificationParser {
         }
 
       case let .json(object):
-        if let _ = object.incremental {
-          guard
-            let serialized: Data = try? JSONSerializationFormat.serialize(value: object)
-          else {
-            return .failure(ParsingError.cannotParsePayloadData)
-          }
-
-          return .success(serialized)
-
-        } else {
-          guard
-            let _ = object.data,
-            let serialized: Data = try? JSONSerializationFormat.serialize(value: object)
-          else {
-            return .failure(ParsingError.cannotParsePayloadData)
-          }
-
-          return .success(serialized)
+        guard let serialized: Data = try? JSONSerializationFormat.serialize(value: object) else {
+          return .failure(ParsingError.cannotParsePayloadData)
         }
+
+        return .success(serialized)
 
       case .unknown:
         return .failure(ParsingError.cannotParseChunkData)
@@ -90,27 +76,5 @@ struct MultipartResponseDeferParser: MultipartResponseSpecificationParser {
     }
 
     return .success(nil)
-  }
-}
-
-fileprivate extension JSONObject {
-  var label: String? {
-    self["label"] as? String
-  }
-
-  var path: [String]? {
-    self["path"] as? [String]
-  }
-
-  var hasNext: Bool? {
-    self["hasNext"] as? Bool
-  }
-
-  var data: JSONObject? {
-    self["data"] as? JSONObject
-  }
-
-  var incremental: [JSONObject]? {
-    self["incremental"] as? [JSONObject]
   }
 }
