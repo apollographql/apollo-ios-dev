@@ -7,6 +7,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
   /// String constants used to match JavaScriptObject instances.
   fileprivate enum Constants {
     enum DirectiveNames {
+      static let Import = "import"
       static let LocalCacheMutation = "apollo_client_ios_localCacheMutation"
       static let Defer = "defer"
     }
@@ -108,6 +109,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     public let filePath: String
 
     public let isLocalCacheMutation: Bool
+      
+    public let importDirectives: [ImportDirective]
 
     static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
       self.init(
@@ -145,6 +148,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.filePath = filePath
       self.isLocalCacheMutation = directives?
         .contains { $0.name == Constants.DirectiveNames.LocalCacheMutation } ?? false
+      self.importDirectives = directives?
+        .compactMap { ImportDirective(directive: $0) } ?? []
     }
 
     public var debugDescription: String {
@@ -213,6 +218,10 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
     public var isLocalCacheMutation: Bool {
       directives?.contains { $0.name == Constants.DirectiveNames.LocalCacheMutation } ?? false
+    }
+      
+    public var importDirectives: [ImportDirective] {
+      directives?.compactMap { ImportDirective(directive: $0) } ?? []
     }
 
     init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
@@ -527,7 +536,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     }
   }
   
-  public struct Argument: 
+  public struct Argument:
     JavaScriptObjectDecodable, Sendable, Hashable {
     public let name: String
 
@@ -650,7 +659,33 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       return string
     }
   }
-
+    
+    public struct ImportDirective: Hashable, CustomDebugStringConvertible, Sendable {
+      /// String constants used to match JavaScriptObject instances.
+      fileprivate enum Constants {
+          enum ArgumentNames {
+            static let Module = "module"
+          }
+      }
+        
+      public var debugDescription: String {
+        return "Import \"\(moduleName)\""
+      }
+      public let moduleName: String
+        
+      init?(directive: Directive) {
+        guard directive.name == CompilationResult.Constants.DirectiveNames.Import else {
+          return nil
+        }
+        guard let moduleArgument = directive.arguments?.first(
+            where: { $0.name == Constants.ArgumentNames.Module }),
+          case let .string(moduleValue) = moduleArgument.value
+        else {
+          return nil
+        }
+        moduleName = moduleValue
+      }
+    }
 }
 
 fileprivate protocol Deferrable { }
