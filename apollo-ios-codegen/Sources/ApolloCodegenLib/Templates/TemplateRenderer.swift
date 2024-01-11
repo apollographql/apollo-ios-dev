@@ -7,7 +7,7 @@ enum TemplateTarget: Equatable {
   /// Used in schema types files; enum, input object, union, etc.
   case schemaFile(type: SchemaFileType)
   /// Used in operation files; query, mutation, fragment, etc.
-  case operationFile(importModules: [String])
+  case operationFile(importModules: [String]?)
   /// Used in files that define a module; Swift Package Manager, etc.
   case moduleFile
   /// Used in test mock files; schema object `Mockable` extensions
@@ -153,14 +153,14 @@ extension TemplateRenderer {
   }
 
   private func renderOperationFile(
-    _ importModules: [String],
+    _ importModules: [String]?,
     _ errorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> String {
     TemplateString(
     """
     \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
     \(ImportStatementTemplate.Operation.template(for: config))
-    \(AdditionalImportStatementTemplate.template(importModules: importModules))
+    \(ifLet: AdditionalImportStatementTemplate.template(importModules: importModules), { "\($0)" })
 
     \(if: config.output.operations.isInModule && !config.output.schemaTypes.isInModule,
       renderBodyTemplate(nonFatalErrorRecorder: errorRecorder)
@@ -356,8 +356,9 @@ struct ImportStatementTemplate {
 struct AdditionalImportStatementTemplate {
 
   static func template(
-    importModules: [String]
-  ) -> TemplateString {
+    importModules: [String]?
+  ) -> TemplateString? {
+    guard let importModules else  { return nil }
     return """
     \(forEachIn: importModules, {
       return """
