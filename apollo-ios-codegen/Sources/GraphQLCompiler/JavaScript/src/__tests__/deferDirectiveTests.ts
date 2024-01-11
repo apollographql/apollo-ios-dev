@@ -14,6 +14,8 @@ import { emptyValidationOptions } from "../__testUtils__/validationHelpers";
 
 describe("given schema", () => {
   const schemaSDL: string = `
+  directive @defer(label: String, if: Boolean! = true) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
   type Query {
     allAnimals: [Animal!]
   }
@@ -30,6 +32,28 @@ describe("given schema", () => {
   `;
 
   const schema: GraphQLSchema = loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
+
+  // Directive Definition Tests
+
+  describe("does not add a duplicate directive", () => {
+    const documentString: string = `
+    query Test {
+      allAnimals {
+        species
+      }
+    }
+    `;
+
+    const document: DocumentNode = parseOperationDocument(
+      new Source(documentString, "Test Query", { line: 1, column: 1 })
+    );
+
+    it("should pass validation", () => {
+      const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
+
+      expect(validationErrors).toHaveLength(0)
+    });
+  })
 
   // Disabling Tests
 
