@@ -110,7 +110,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
     public let isLocalCacheMutation: Bool
       
-    public let importDirectives: [ImportDirective]
+    public let moduleImports: [String]
 
     static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
       self.init(
@@ -148,8 +148,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.filePath = filePath
       self.isLocalCacheMutation = directives?
         .contains { $0.name == Constants.DirectiveNames.LocalCacheMutation } ?? false
-      self.importDirectives = directives?
-        .compactMap { ImportDirective(directive: $0) } ?? []
+      self.moduleImports = directives?
+        .compactMap { ImportDirective(directive: $0)?.moduleName } ?? []
     }
 
     public var debugDescription: String {
@@ -220,8 +220,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       directives?.contains { $0.name == Constants.DirectiveNames.LocalCacheMutation } ?? false
     }
       
-    public var importDirectives: [ImportDirective] {
-      directives?.compactMap { ImportDirective(directive: $0) } ?? []
+    public var moduleImports: [String] {
+      directives?.compactMap { ImportDirective(directive: $0)?.moduleName } ?? []
     }
 
     init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
@@ -660,18 +660,15 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     }
   }
     
-    public struct ImportDirective: Hashable, CustomDebugStringConvertible, Sendable {
+    fileprivate struct ImportDirective: Hashable, CustomDebugStringConvertible, Sendable, Equatable {
       /// String constants used to match JavaScriptObject instances.
-      fileprivate enum Constants {
+      enum Constants {
           enum ArgumentNames {
             static let Module = "module"
           }
       }
         
-      public var debugDescription: String {
-        return "Import \"\(moduleName)\""
-      }
-      public let moduleName: String
+      let moduleName: String
         
       init?(directive: Directive) {
         guard directive.name == CompilationResult.Constants.DirectiveNames.Import else {
@@ -684,6 +681,10 @@ public final class CompilationResult: JavaScriptObjectDecodable {
           return nil
         }
         moduleName = moduleValue
+      }
+    
+      var debugDescription: String {
+        return "Import \"\(moduleName)\""
       }
     }
 }
