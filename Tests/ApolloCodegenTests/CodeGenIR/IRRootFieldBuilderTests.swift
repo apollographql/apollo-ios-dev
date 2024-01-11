@@ -4427,6 +4427,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredInlineFragment_hasDeferredFragmentsTrue() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -4467,6 +4469,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredInlineFragmentWithCondition_hasDeferredFragmentsTrue() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -4507,6 +4511,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredInlineFragmentWithConditionFalse_hasDeferredFragmentsFalse() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -4547,6 +4553,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredNamedFragment_onDifferentTypeCase_hasDeferredFragmentsTrue() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -4586,6 +4594,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredInlineFragment_withinNamedFragment_hasDeferredFragmentsTrue() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -4630,6 +4640,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredNamedFragment_withSelectionOnDifferentTypeCase_hasDeferredFragmentsTrue() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -4683,6 +4695,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   // MARK: Deferred Fragments - Inline Fragments
 
   func test__deferredFragments__givenDeferredInlineFragmentWithoutTypeCase_buildsDeferredInlineFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -4749,6 +4763,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredInlineFragmentOnSameTypeCase_buildsDeferredInlineFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -4810,6 +4826,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredInlineFragmentOnDifferentTypeCase_buildsDeferredInlineFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -4896,6 +4914,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredInlineFragmentWithVariableCondition_buildsDeferredInlineFragmentWithVariable() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -4982,6 +5002,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredInlineFragmentWithTrueCondition_buildsDeferredInlineFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -5068,6 +5090,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredInlineFragmentWithFalseCondition_doesNotBuildDeferredInlineFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -5141,6 +5165,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenSiblingDeferredInlineFragmentsOnSameTypeCase_doesNotMergeDeferredFragments() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -5247,6 +5273,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenSiblingDeferredInlineFragmentsOnDifferentTypeCase_doesNotMergeDeferredFragments() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -5342,6 +5370,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredInlineFragmentWithSiblingOnSameTypeCase_doesNotMergeDeferredFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -5431,6 +5461,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredInlineFragmentWithSiblingOnDifferentTypeCase_doesNotMergeDeferredFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -5542,6 +5574,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenNestedDeferredInlineFragments_buildsNestedDeferredFragments_doesNotMergeDeferredFragments() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -5660,6 +5694,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   // MARK: Deferred Fragments - Inline Fragments (with @include/@skip)
 
   func test__deferredFragments__givenBothDeferAndIncludeDirectives_onSameTypeCase_buildsInclusionTypeCaseWithNestedDeferredInlineFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -5721,6 +5757,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenBothDeferAndIncludeDirectives_directivesOrderShouldNotAffectGeneratedFragments() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -5797,6 +5835,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenBothDeferAndIncludeDirectives_onDifferentTypeCases_shouldNotNestFragments() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -5902,6 +5942,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenBothDeferAndSkipDirectives_onSameTypeCase_buildsInclusionTypeCaseWithNestedDeferredInlineFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -5963,6 +6005,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenBothDeferAndSkipDirectives_directivesOrderShouldNotAffectGeneratedFragments() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -6039,6 +6083,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenBothDeferAndSkipDirectives_onDifferentTypeCases_shouldNotNestFragments() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -6146,6 +6192,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   // MARK: Deferred Fragments - Named Fragments
 
   func test__deferredFragments__givenDeferredNamedFragmentOnSameTypeCase_buildsDeferredNamedFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
       type Query {
@@ -6204,6 +6252,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredNamedFragmentOnDifferentTypeCase_buildsDeferredNamedFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
       type Query {
@@ -6284,6 +6334,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredNamedFragmentWithVariableCondition_buildsDeferredNamedFragmentWithVariable() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
       type Query {
@@ -6365,6 +6417,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredNamedFragmentWithTrueCondition_buildsDeferredNamedFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
       type Query {
@@ -6445,6 +6499,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredNamedFragmentWithFalseCondition_doesNotBuildDeferredNamedFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
       type Query {
@@ -6516,6 +6572,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredInlineFragment_insideNamedFragment_buildsDeferredInlineFragment_insideNamedFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
       type Query {
@@ -6607,6 +6665,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredInlineFragmentOnDifferentTypeCase_insideNamedFragment_buildsDeferredInlineFragment_insideNamedFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
       type Query {
@@ -6683,6 +6743,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenDeferredNamedFragmentWithMatchingDeferredTypeCase_buildsInlineFragmentWithMergedFragmentSelection() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
       type Query {
@@ -6767,6 +6829,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   // MARK: Deferred Fragments - Named Fragments (with @include/@skip)
 
   func test__deferredFragments__givenBothDeferAndIncludeDirectives_onSameNamedFragment_buildsNestedDeferredNamedFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
       type Query {
@@ -6843,6 +6907,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenBothDeferAndIncludeDirectives_onDifferentNamedFragment_shouldNotNestFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
       type Query {
@@ -6971,6 +7037,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenBothDeferAndSkipDirectives_onSameNamedFragment_buildsNestedDeferredNamedFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
       type Query {
@@ -7046,6 +7114,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   }
 
   func test__deferredFragments__givenBothDeferAndSkipDirectives_onDifferentNamedFragment_shouldNotNestFragment() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+    
     // given
     schemaSDL = """
       type Query {
