@@ -43,7 +43,7 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
       )
     )
     let mockTemplateRenderer = MockTemplateRenderer(
-      target: .operationFile(importModules: nil),
+      target: .operationFile(moduleImports: nil),
       template: "",
       config: config
     )
