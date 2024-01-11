@@ -11,9 +11,7 @@ struct FragmentTemplate: TemplateRenderer {
   let config: ApolloCodegen.ConfigurationContext
 
   var target: TemplateTarget {
-    .operationFile(importModules: fragment.definition.importDirectives.map {
-      $0.moduleName
-    })
+    .operationFile(moduleImports: fragment.definition.moduleImports)
   }
 
   func renderBodyTemplate(

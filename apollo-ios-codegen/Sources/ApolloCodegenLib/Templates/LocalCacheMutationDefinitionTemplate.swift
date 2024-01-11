@@ -9,9 +9,7 @@ struct LocalCacheMutationDefinitionTemplate: OperationTemplateRenderer {
   let config: ApolloCodegen.ConfigurationContext
 
   var target: TemplateTarget {
-    .operationFile(importModules: operation.definition.importDirectives.map {
-      $0.moduleName
-    })
+    .operationFile(moduleImports: operation.definition.moduleImports)
   }
 
   func renderBodyTemplate(
