@@ -6,7 +6,6 @@
 - [ ] Update the version constants using the `set-version.sh` script.
 - [ ] Update [`CHANGELOG.md`](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) with all relevant changes since the prior version. _Please include PR numbers and mention contributors for external PR submissions._
 - [ ] Run the Documentation Generator from the internal `SwiftScripts` folder using the command `swift run DocumentationGenerator` to re-generate the API reference documentation from source for all included libraries. _Make sure you are on HEAD of the parent branch otherwise the documentation generator will not catch all changes, rebase this PR if needed._
-- [ ] Run `make archive-cli-to-apollo-package` to attach cli to apollo-ios package
 
 #### Things to do as part of releasing
 - [ ] Add tag of format `major.minor.patch` to GitHub.
