@@ -1,3 +1,3 @@
 #!/bin/bash
 
-swift test
+swift test -Xswiftc -warnings-as-errors

@@ -7,11 +7,14 @@ extension Settings {
         let debugConfig = Configuration.debug(name: .debug, xcconfig: configPath)
         let releaseConfig = Configuration.release(name: .release, xcconfig: configPath)
         let performanceTestingConfig = Configuration.release(name: .performanceTesting, xcconfig: configPath)
-        let settings = Settings.settings(configurations: [
+        let settings = Settings.settings(
+        configurations: [
             debugConfig,
             releaseConfig,
             performanceTestingConfig
-        ])
+        ],
+        defaultSettings: .none
+        )
         return settings
     }
     

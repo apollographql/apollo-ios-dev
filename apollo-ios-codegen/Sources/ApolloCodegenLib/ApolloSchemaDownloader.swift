@@ -7,7 +7,7 @@ import GraphQLCompiler
 /// A wrapper to facilitate downloading a GraphQL schema.
 public struct ApolloSchemaDownloader {
   
-  public enum SchemaDownloadError: Error, LocalizedError {
+  public enum SchemaDownloadError: Swift.Error, LocalizedError {
     case downloadedRegistryJSONFileNotFound(underlying: Error)
     case downloadedIntrospectionJSONFileNotFound(underlying: Error)
     case couldNotParseRegistryJSON(underlying: Error)

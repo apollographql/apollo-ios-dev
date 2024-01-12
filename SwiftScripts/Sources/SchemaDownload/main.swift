@@ -28,7 +28,7 @@ for target in Target.allCases {
   )
 
   do {
-    try ApolloSchemaDownloader.fetch(configuration: configuration)
+    try await ApolloSchemaDownloader.fetch(configuration: configuration)
   } catch {
     print(error)
     continue

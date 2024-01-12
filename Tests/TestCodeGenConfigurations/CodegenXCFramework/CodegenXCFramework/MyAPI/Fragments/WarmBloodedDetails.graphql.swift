@@ -20,7 +20,7 @@ public extension MyAPI {
     ] }
 
     public var bodyTemperature: Int { __data["bodyTemperature"] }
-    public var height: HeightInMeters.Height { __data["height"] }
+    public var height: Height { __data["height"] }
 
     public struct Fragments: FragmentContainer {
       public let __data: DataDict
@@ -28,6 +28,8 @@ public extension MyAPI {
 
       public var heightInMeters: HeightInMeters { _toFragment() }
     }
+
+    public typealias Height = HeightInMeters.Height
   }
 
 }

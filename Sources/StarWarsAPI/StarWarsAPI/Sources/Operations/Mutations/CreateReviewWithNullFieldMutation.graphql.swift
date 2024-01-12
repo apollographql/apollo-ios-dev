@@ -6,9 +6,9 @@
 public class CreateReviewWithNullFieldMutation: GraphQLMutation {
   public static let operationName: String = "CreateReviewWithNullField"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
-    operationIdentifier: "e962313bc77c193dc516d097b5e41efea073de16c3a5f2e8c00f082853835d49",
+    operationIdentifier: "3857a03e0db1698622249dcc09b2de36dd56e0360fd053ffc1b9204b3b67f52c",
     definition: .init(
-      #"mutation CreateReviewWithNullField { createReview(episode: JEDI, review: {stars: 10, commentary: null}) { __typename stars commentary } }"#
+      #"mutation CreateReviewWithNullField { createReview(episode: JEDI, review: { stars: 10, commentary: null }) { __typename stars commentary } }"#
     ))
 
   public init() {}

@@ -28,11 +28,11 @@ class SchemaMetadataTemplateTests: XCTestCase {
   }
 
   private func renderTemplate() -> String {
-    subject.template.description
+    subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
   private func renderDetachedTemplate() -> String? {
-    subject.detachedTemplate?.description
+    subject.renderDetachedTemplate(nonFatalErrorRecorder: .init())?.description
   }
 
   // MARK: Typealias & Protocol Tests

@@ -23,9 +23,6 @@ let package = Package(
       dependencies: [
         .product(name: "Apollo", package: "apollo-ios"),
         .product(name: "AnimalKingdomAPI", package: "AnimalKingdomAPI")
-      ],
-      swiftSettings: [
-        .unsafeFlags(["-warnings-as-errors"])
       ]
     ),
     .testTarget(
