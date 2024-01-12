@@ -149,7 +149,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
         .contains { $0.name == Constants.DirectiveNames.LocalCacheMutation } ?? false
         
       let referencedImports: [Directive] = self.referencedFragments
-        .compactMap { $0.directives?.filter { ImportDirective(directive: $0) != nil } }
+        .compactMap { $0.directives?.filter { $0.name == Constants.DirectiveNames.Import } }
         .flatMap { $0 }
       self.directives = Array(Set(directives ?? [] + referencedImports))
 
@@ -239,7 +239,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
         
       let directives: [Directive]? = .fromJSValue(jsValue["directives"], bridge: bridge)
       let referencedImports: [Directive] = self.referencedFragments
-        .compactMap { $0.directives?.filter { ImportDirective(directive: $0) != nil } }
+        .compactMap { $0.directives?.filter { $0.name == Constants.DirectiveNames.Import } }
         .flatMap { $0 }
       self.directives = Array(Set(directives ?? [] + referencedImports))
     }
