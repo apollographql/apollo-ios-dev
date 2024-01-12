@@ -3064,6 +3064,15 @@
                 "type" : "property"
               },
               {
+                "title" : "Instance Methods",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/graphqlresult\/asjsondictionary()",
+                "title" : "func asJSONDictionary() -> [String : Any]",
+                "type" : "method"
+              },
+              {
                 "title" : "Enumerations",
                 "type" : "groupMarker"
               },
