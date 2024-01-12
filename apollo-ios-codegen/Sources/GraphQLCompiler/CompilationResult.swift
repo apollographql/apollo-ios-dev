@@ -142,13 +142,18 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.variables = variables
       self.rootType = rootType
       self.selectionSet = selectionSet
-      self.directives = directives
       self.referencedFragments = referencedFragments
       self.source = source
       self.filePath = filePath
       self.isLocalCacheMutation = directives?
         .contains { $0.name == Constants.DirectiveNames.LocalCacheMutation } ?? false
-      self.moduleImports = directives?
+        
+      let referencedImports: [Directive] = self.referencedFragments
+        .compactMap { $0.directives?.filter { ImportDirective(directive: $0) != nil } }
+        .flatMap { $0 }
+      self.directives = Array(Set(directives ?? [] + referencedImports))
+
+      self.moduleImports = self.directives?
         .compactMap { ImportDirective(directive: $0)?.moduleName } ?? []
     }
 
@@ -228,10 +233,15 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.name = jsValue["name"]
       self.type = .fromJSValue(jsValue["typeCondition"], bridge: bridge)
       self.selectionSet = .fromJSValue(jsValue["selectionSet"], bridge: bridge)
-      self.directives = .fromJSValue(jsValue["directives"], bridge: bridge)
       self.referencedFragments = .fromJSValue(jsValue["referencedFragments"], bridge: bridge)
       self.source = jsValue["source"]
       self.filePath = jsValue["filePath"]
+        
+      let directives: [Directive]? = .fromJSValue(jsValue["directives"], bridge: bridge)
+      let referencedImports: [Directive] = self.referencedFragments
+        .compactMap { $0.directives?.filter { ImportDirective(directive: $0) != nil } }
+        .flatMap { $0 }
+      self.directives = Array(Set(directives ?? [] + referencedImports))
     }
 
     /// Initializer to be used for creating mock objects in tests only.
