@@ -12,7 +12,7 @@ public protocol Fragment: SelectionSet, Deferrable {
 /// Extension providing default implementation for the ``Fragment`` protocol.
 extension Fragment {
   // Default implementation for the `fragmentDefinition` variable
-  static var fragmentDefinition: StaticString {
+  public static var fragmentDefinition: StaticString {
     return ""
   }
 }
