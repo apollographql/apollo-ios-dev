@@ -41,7 +41,7 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
       options: .init()
     )
     let mockTemplateRenderer = MockTemplateRenderer(
-      target: .operationFile(moduleImports: nil),
+      target: .operationFile,
       template: "",
       config: .init(config: config)
     )
@@ -64,7 +64,7 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
       options: .init()
     )
     let mockTemplateRenderer = MockTemplateRenderer(
-      target: .operationFile(moduleImports: nil),
+      target: .operationFile,
       template: "",
       config: .init(config: config)
     )

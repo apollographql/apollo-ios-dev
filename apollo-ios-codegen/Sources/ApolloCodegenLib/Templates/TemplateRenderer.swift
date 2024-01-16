@@ -1,4 +1,5 @@
 import TemplateString
+import OrderedCollections
 
 // MARK: TemplateRenderer
 
@@ -7,7 +8,7 @@ enum TemplateTarget: Equatable {
   /// Used in schema types files; enum, input object, union, etc.
   case schemaFile(type: SchemaFileType)
   /// Used in operation files; query, mutation, fragment, etc.
-  case operationFile(moduleImports: [String]?)
+  case operationFile(moduleImports: OrderedSet<String>? = nil)
   /// Used in files that define a module; Swift Package Manager, etc.
   case moduleFile
   /// Used in test mock files; schema object `Mockable` extensions
@@ -153,7 +154,7 @@ extension TemplateRenderer {
   }
 
   private func renderOperationFile(
-    _ moduleImports: [String]?,
+    _ moduleImports: OrderedSet<String>?,
     _ errorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> String {
     TemplateString(
@@ -356,7 +357,7 @@ struct ImportStatementTemplate {
 struct ModuleImportStatementTemplate {
 
   static func template(
-    moduleImports: [String]?
+    moduleImports: OrderedSet<String>?
   ) -> TemplateString? {
     guard let moduleImports else  { return nil }
     return """

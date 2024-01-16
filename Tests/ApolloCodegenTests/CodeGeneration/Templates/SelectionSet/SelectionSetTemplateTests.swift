@@ -51,7 +51,7 @@ class SelectionSetTemplateTests: XCTestCase {
       )
     ))
     let mockTemplateRenderer = MockTemplateRenderer(
-      target: .operationFile(moduleImports: nil),
+      target: .operationFile,
       template: "",
       config: config
     )
