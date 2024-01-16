@@ -1,13 +1,13 @@
 
-import { 
+import {
   compileDocument,
   parseOperationDocument,
   loadSchemaFromSources,
 } from "../index"
-import { 
+import {
   CompilationResult
 } from "../compiler/index"
-import { 
+import {
   Source,
   GraphQLSchema,
   DocumentNode
@@ -15,7 +15,7 @@ import {
 import { emptyValidationOptions } from "../__testUtils__/validationHelpers";
 
 describe("given schema", () => {
-  const schemaSDL: string = 
+  const schemaSDL: string =
 `type Query {
   allAnimals: [Animal!]
 }
@@ -32,9 +32,9 @@ interface Pet {
   const schema: GraphQLSchema = loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
 
   describe("given query not including __typename fields", () => {
-    const documentString: string = 
+    const documentString: string =
 `query Test {
-  allAnimals {        
+  allAnimals {
     species
     ... on Pet {
       name
@@ -51,8 +51,8 @@ interface Pet {
 
       it("operation definition should have source including __typename field.", () => {
         const operation = compilationResult.operations[0];
-  
-        const expected: string = 
+
+        const expected: string =
 `query Test {
   allAnimals {
     __typename
@@ -62,7 +62,7 @@ interface Pet {
     }
   }
 }`;
-              
+
         expect(operation.source).toEqual(expected);
       });
     });
@@ -72,8 +72,8 @@ interface Pet {
 
       it("operation definition should have source including __typename field in each selection set.", () => {
         const operation = compilationResult.operations[0];
-  
-        const expected: string = 
+
+        const expected: string =
 `query Test {
   allAnimals {
     __typename
@@ -84,17 +84,17 @@ interface Pet {
     }
   }
 }`;
-              
+
         expect(operation.source).toEqual(expected);
       });
     });
   });
-    
+
 
   describe("given query including __typename field with directive", () => {
-    const documentString: string = 
+    const documentString: string =
 `query Test {
-  allAnimals {        
+  allAnimals {
     __typename @include(if: true)
     species
     ... on Pet {
@@ -111,7 +111,7 @@ interface Pet {
       const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
       const operation = compilationResult.operations[0];
 
-      const expected: string = 
+      const expected: string =
 `query Test {
   allAnimals {
     __typename
@@ -121,15 +121,15 @@ interface Pet {
     }
   }
 }`;
-            
+
       expect(operation.source).toEqual(expected);
     });
   });
 
   describe("given query with local cache mutation directive", () => {
-    const documentString: string = 
+    const documentString: string =
 `query Test @apollo_client_ios_localCacheMutation {
-  allAnimals {        
+  allAnimals {
     species
     ... on Pet {
       name
@@ -145,7 +145,7 @@ interface Pet {
       const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
       const operation = compilationResult.operations[0];
 
-      const expected: string = 
+      const expected: string =
 `query Test {
   allAnimals {
     __typename
@@ -155,15 +155,49 @@ interface Pet {
     }
   }
 }`;
-            
+
+      expect(operation.source).toEqual(expected);
+    });
+  });
+
+  describe("given query with import directive", () => {
+    const documentString: string =
+`query Test @import(module: "MyModuleName") {
+  allAnimals {
+    species
+    ... on Pet {
+      name
+    }
+  }
+}`;
+
+    const document: DocumentNode = parseOperationDocument(
+      new Source(documentString, "Test Query", { line: 1, column: 1 })
+    );
+
+    it("operation definition should have source not including import directive.", () => {
+      const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
+      const operation = compilationResult.operations[0];
+
+      const expected: string =
+`query Test {
+  allAnimals {
+    __typename
+    species
+    ... on Pet {
+      name
+    }
+  }
+}`;
+
       expect(operation.source).toEqual(expected);
     });
   });
 
   describe("given fragment not including __typename field", () => {
-    const documentString: string = 
-`fragment Test on Animal {  
-  species  
+    const documentString: string =
+`fragment Test on Animal {
+  species
 }`;
 
     const document: DocumentNode = parseOperationDocument(
@@ -174,12 +208,12 @@ interface Pet {
       const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
       const fragment = compilationResult.fragments[0];
 
-      const expected: string = 
+      const expected: string =
 `fragment Test on Animal {
   __typename
   species
 }`;
-            
+
       expect(fragment.source).toEqual(expected);
     });
   });
