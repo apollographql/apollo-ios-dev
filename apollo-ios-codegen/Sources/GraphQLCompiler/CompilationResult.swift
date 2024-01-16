@@ -150,7 +150,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.isLocalCacheMutation = directives?
         .contains { $0.name == Constants.DirectiveNames.LocalCacheMutation } ?? false
    
-      self.moduleImports = OperationDefinition.getImportModuleNames(directives: directives, referencedFragments: referencedFragments)
+      self.moduleImports = OperationDefinition.getImportModuleNames(directives: directives, 
+                                                                    referencedFragments: referencedFragments)
     }
 
     public var debugDescription: String {
@@ -168,7 +169,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     private static func getImportModuleNames(directives: [Directive]?, 
                                              referencedFragments: [FragmentDefinition]) -> OrderedSet<String> {
       let referencedImports: [String] = referencedFragments
-            .compactMap { $0.directives?.compactMap { ImportDirective(directive: $0)?.moduleName } }
+            .map { $0.moduleImports }
             .flatMap { $0 }
       let directiveImports: [String] = directives?.compactMap { ImportDirective(directive: $0)?.moduleName } ?? []
       var ordered = OrderedSet(referencedImports + directiveImports)
@@ -242,7 +243,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.referencedFragments = .fromJSValue(jsValue["referencedFragments"], bridge: bridge)
       self.source = jsValue["source"]
       self.filePath = jsValue["filePath"]
-      self.moduleImports = FragmentDefinition.getImportModuleNames(directives: directives, referencedFragments: referencedFragments)
+      self.moduleImports = FragmentDefinition.getImportModuleNames(directives: directives, 
+                                                                   referencedFragments: referencedFragments)
     }
 
     /// Initializer to be used for creating mock objects in tests only.
@@ -262,7 +264,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.referencedFragments = referencedFragments
       self.source = source
       self.filePath = filePath
-      self.moduleImports = FragmentDefinition.getImportModuleNames(directives: directives, referencedFragments: referencedFragments)
+      self.moduleImports = FragmentDefinition.getImportModuleNames(directives: directives,
+                                                                   referencedFragments: referencedFragments)
     }
 
     public var debugDescription: String {
@@ -280,7 +283,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     private static func getImportModuleNames(directives: [Directive]?, 
                                              referencedFragments: [FragmentDefinition]) -> OrderedSet<String> {
       let referencedImports: [String] = referencedFragments
-            .compactMap { $0.directives?.compactMap { ImportDirective(directive: $0)?.moduleName } }
+            .map { $0.moduleImports }
             .flatMap { $0 }
       let directiveImports: [String] = directives?.compactMap { ImportDirective(directive: $0)?.moduleName } ?? []
             
