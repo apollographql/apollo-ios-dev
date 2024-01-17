@@ -172,9 +172,9 @@ public final class CompilationResult: JavaScriptObjectDecodable {
         .flatMap { $0.moduleImports }
       let directiveImports: [String] = directives?
         .compactMap { ImportDirective(directive: $0)?.moduleName } ?? []
-      var ordered = OrderedSet(referencedImports + directiveImports)
-      ordered.sort()
-      return ordered
+      var orderedImports = OrderedSet(referencedImports + directiveImports)
+      orderedImports.sort()
+      return orderedImports
     }
   }
   
@@ -287,9 +287,9 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       let directiveImports: [String] = directives?
         .compactMap { ImportDirective(directive: $0)?.moduleName } ?? []
             
-      var ordered = OrderedSet(referencedImports + directiveImports)
-      ordered.sort()
-      return ordered
+      var orderedImports = OrderedSet(referencedImports + directiveImports)
+      orderedImports.sort()
+      return orderedImports
     }
   }
   
