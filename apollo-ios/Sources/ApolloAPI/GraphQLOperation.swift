@@ -65,6 +65,8 @@ public struct DeferredFragmentIdentifier: Hashable {
   }
 }
 
+// MARK: - GraphQLOperation
+
 public protocol GraphQLOperation: AnyObject, Hashable {
   typealias Variables = [String: GraphQLOperationVariableValue]
 
@@ -79,11 +81,9 @@ public protocol GraphQLOperation: AnyObject, Hashable {
   associatedtype Data: RootSelectionSet
 }
 
-public extension GraphQLOperation {
-  var __variables: Variables? {
-    return nil
-  }
+// MARK: Static Extensions
 
+public extension GraphQLOperation {
   static var deferredFragments: [DeferredFragmentIdentifier: any SelectionSet.Type]? {
     return nil
   }
@@ -97,6 +97,10 @@ public extension GraphQLOperation {
     return deferredFragments?[DeferredFragmentIdentifier(label: label, fieldPath: fieldPath)]
   }
 
+  static var hasDeferredFragments: Bool {
+    return !(deferredFragments?.isEmpty ?? true)
+  }
+
   static var definition: OperationDefinition? {
     operationDocument.definition
   }
@@ -108,21 +112,35 @@ public extension GraphQLOperation {
   static func ==(lhs: Self, rhs: Self) -> Bool {
     lhs.__variables?._jsonEncodableValue?._jsonValue == rhs.__variables?._jsonEncodableValue?._jsonValue
   }
+}
+
+// MARK: Instance Extensions
+
+public extension GraphQLOperation {
+  var __variables: Variables? {
+    return nil
+  }
 
   func hash(into hasher: inout Hasher) {
     hasher.combine(__variables?._jsonEncodableValue?._jsonValue)
   }
 }
 
+// MARK: - GraphQLQuery
+
 public protocol GraphQLQuery: GraphQLOperation {}
 public extension GraphQLQuery {
   @inlinable static var operationType: GraphQLOperationType { return .query }
 }
 
+// MARK: - GraphQLMutation
+
 public protocol GraphQLMutation: GraphQLOperation {}
 public extension GraphQLMutation {
   @inlinable static var operationType: GraphQLOperationType { return .mutation }
 }
+
+// MARK: - GraphQLSbuscription
 
 public protocol GraphQLSubscription: GraphQLOperation {}
 public extension GraphQLSubscription {

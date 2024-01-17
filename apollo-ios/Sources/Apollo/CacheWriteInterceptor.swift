@@ -44,7 +44,7 @@ public struct CacheWriteInterceptor: ApolloInterceptor {
       return
     }
 
-    guard (Operation.deferredFragments?.isEmpty ?? true) else {
+    guard !Operation.hasDeferredFragments else {
       chain.proceedAsync(
         request: request,
         response: response,
