@@ -169,8 +169,9 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     private static func getImportModuleNames(directives: [Directive]?, 
                                              referencedFragments: [FragmentDefinition]) -> OrderedSet<String> {
       let referencedImports: [String] = referencedFragments
-            .flatMap { $0.moduleImports }
-      let directiveImports: [String] = directives?.compactMap { ImportDirective(directive: $0)?.moduleName } ?? []
+        .flatMap { $0.moduleImports }
+      let directiveImports: [String] = directives?
+        .compactMap { ImportDirective(directive: $0)?.moduleName } ?? []
       var ordered = OrderedSet(referencedImports + directiveImports)
       ordered.sort()
       return ordered
@@ -282,8 +283,9 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     private static func getImportModuleNames(directives: [Directive]?, 
                                              referencedFragments: [FragmentDefinition]) -> OrderedSet<String> {
       let referencedImports: [String] = referencedFragments
-            .flatMap { $0.moduleImports }
-      let directiveImports: [String] = directives?.compactMap { ImportDirective(directive: $0)?.moduleName } ?? []
+        .flatMap { $0.moduleImports }
+      let directiveImports: [String] = directives?
+        .compactMap { ImportDirective(directive: $0)?.moduleName } ?? []
             
       var ordered = OrderedSet(referencedImports + directiveImports)
       ordered.sort()
