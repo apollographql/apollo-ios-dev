@@ -26,10 +26,20 @@ struct FieldSelectionGrouping: Sequence {
   }
 
   mutating func addFulfilledFragment<T: SelectionSet>(_ type: T.Type) {
+    precondition(
+      !deferredFragments.contains(type: type),
+      "Cannot fulfill \(type.self) fragment, it's already deferred!"
+    )
+
     fulfilledFragments.insert(ObjectIdentifier(type))
   }
 
   mutating func addDeferredFragment<T: SelectionSet>(_ type: T.Type) {
+    precondition(
+      !fulfilledFragments.contains(type: type),
+      "Cannot defer \(type.self) fragment, it's already fulfilled!"
+    )
+
     deferredFragments.insert(ObjectIdentifier(type))
   }
 
