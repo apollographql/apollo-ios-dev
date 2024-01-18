@@ -200,8 +200,8 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
     return try execute(
       selectionSet: selectionSet,
       on: data,
-      variables: variables,
       withRootCacheReference: root,
+      variables: variables,
       schema: SelectionSet.Schema.self,
       accumulator: accumulator
     )
@@ -221,8 +221,8 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
     return try execute(
       selectionSet: selectionSet,
       on: data,
-      variables: variables,
       withRootCacheReference: root,
+      variables: variables,
       schema: Operation.Data.Schema.self,
       accumulator: accumulator
     )
@@ -233,8 +233,8 @@ final class GraphQLExecutor<Source: GraphQLExecutionSource> {
   >(
     selectionSet: any SelectionSet.Type,
     on data: Source.RawObjectData,
-    variables: GraphQLOperation.Variables? = nil,
     withRootCacheReference root: CacheReference? = nil,
+    variables: GraphQLOperation.Variables? = nil,
     schema: SchemaMetadata.Type,
     accumulator: Accumulator
   ) throws -> Accumulator.FinalResult {
