@@ -14,7 +14,7 @@ struct CustomScalarTemplate: TemplateRenderer {
 
   func renderHeaderTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
-  ) -> TemplateString {
+  ) -> TemplateString? {
     HeaderCommentTemplate.editableFileHeader(
       fileCanBeEditedTo: "implement advanced custom scalar functionality."
     )    
