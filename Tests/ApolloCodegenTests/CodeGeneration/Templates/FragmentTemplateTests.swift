@@ -109,6 +109,29 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     expect(String(actual.reversed())).to(equalLineByLine("\n}", ignoringExtraLines: true))
   }
+  
+  func test__render__givenFragment_generatesFragmentDeclarationWithoutDefinition() async throws {
+    // given
+    let expected =
+    """
+    struct TestFragment: TestSchema.SelectionSet, Fragment {
+      let __data: DataDict
+      init(_dataDict: DataDict) { __data = _dataDict }
+    """
+
+    // when
+    try await buildSubjectAndFragment(config: .mock(
+      options: .init(
+        operationDocumentFormat: .operationId
+      )
+    ))
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+    expect(String(actual.reversed())).to(equalLineByLine("\n}", ignoringExtraLines: true))
+  }
 
   func test__render__givenLowercaseFragment_generatesTitleCaseTypeName() async throws {
     // given

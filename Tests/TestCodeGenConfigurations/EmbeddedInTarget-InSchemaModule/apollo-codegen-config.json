@@ -13,7 +13,8 @@
     },
     "pruneGeneratedFiles" : true,
     "queryStringLiteralFormat" : "multiline",
-    "warningsOnDeprecatedUsage" : "include"
+    "warningsOnDeprecatedUsage" : "include",
+    "operationDocumentFormat" : ["operationId"]
   },
   "input" : {
     "operationSearchPaths" : [

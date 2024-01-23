@@ -309,6 +309,8 @@ class OperationDefinitionTemplateTests: XCTestCase {
   // MARK: - Defer Properties
 
   func test__generate__givenQueryWithDeferredInlineFragment_generatesDeferredPropertyTrue() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -347,6 +349,8 @@ class OperationDefinitionTemplateTests: XCTestCase {
   }
 
   func test__generate__givenQueryWithDeferredNamedFragment_generatesDeferredPropertyTrue() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+
     // given
     schemaSDL = """
     type Query {
@@ -387,6 +391,8 @@ class OperationDefinitionTemplateTests: XCTestCase {
   }
 
   func test__generate__givenQueryWithNamedFragment_withDeferredTypeCase_generatesDeferredPropertyTrue() async throws {
+    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
+    
     // given
     schemaSDL = """
     type Query {

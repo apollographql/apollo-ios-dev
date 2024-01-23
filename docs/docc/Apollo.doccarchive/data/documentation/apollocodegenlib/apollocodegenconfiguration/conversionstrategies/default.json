@@ -92,7 +92,8 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/Default\/enumCases",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/Default\/fieldAccessors"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/Default\/fieldAccessors",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/Default\/inputObjects"
       ],
       "title" : "Type Properties"
     }
@@ -359,6 +360,66 @@
   "title" : "fieldAccessors",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/conversionstrategies\/default\/fieldaccessors"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ConversionStrategies/Default/inputObjects": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "inputObjects"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:16ApolloCodegenLib0aB13ConfigurationV",
+      "text" : "ApolloCodegenConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:16ApolloCodegenLib0aB13ConfigurationV20ConversionStrategiesV",
+      "text" : "ConversionStrategies"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:16ApolloCodegenLib0aB13ConfigurationV20ConversionStrategiesV12InputObjectsO",
+      "text" : "InputObjects"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/Default\/inputObjects",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "inputObjects",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/conversionstrategies\/default\/inputobjects"
 }
 }
 }

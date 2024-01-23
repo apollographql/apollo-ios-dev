@@ -17,16 +17,20 @@ struct FragmentTemplate: TemplateRenderer {
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
+    let includeDefinition = config.options.operationDocumentFormat.contains(.definition)
+    
     return TemplateString(
     """
     \(accessControlModifier(for: .parent))\
     struct \(fragment.generatedDefinitionName.asFragmentName): \
     \(fragment.renderedSelectionSetType(config)), Fragment {
+    \(if: includeDefinition, """
       \(accessControlModifier(for: .member))\
     static var fragmentDefinition: StaticString {
         #"\(fragment.definition.source.convertedToSingleLine())"#
       }
-
+    
+    """)
       \(SelectionSetTemplate(
         definition: fragment,
         generateInitializers: config.options.shouldGenerateSelectionSetInitializers(for: fragment),
