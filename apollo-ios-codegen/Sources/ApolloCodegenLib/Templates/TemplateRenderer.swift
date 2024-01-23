@@ -103,10 +103,17 @@ extension TemplateRenderer {
 
     let body = {
       switch target {
-      case let .schemaFile(type): return renderSchemaFile(type, errorRecorder)
-      case let .operationFile(moduleImports): return renderOperationFile(moduleImports, errorRecorder)
-      case .moduleFile: return renderModuleFile(errorRecorder)
-      case .testMockFile: return renderTestMockFile(errorRecorder)
+      case let .schemaFile(type): 
+        return renderSchemaFile(type, errorRecorder)
+
+      case let .operationFile(moduleImports):
+        return renderOperationFile(moduleImports, errorRecorder)
+
+      case .moduleFile:
+        return renderModuleFile(errorRecorder)
+
+      case .testMockFile:
+        return renderTestMockFile(errorRecorder)
       }
     }()
 
@@ -161,7 +168,7 @@ extension TemplateRenderer {
     """
     \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
     \(ImportStatementTemplate.Operation.template(for: config))
-    \(ifLet: ModuleImportStatementTemplate.template(moduleImports: moduleImports), { "\($0)" })
+    \(ifLet: moduleImports, { "\(ModuleImportStatementTemplate.template(moduleImports: $0))" })
 
     \(if: config.output.operations.isInModule && !config.output.schemaTypes.isInModule,
       renderBodyTemplate(nonFatalErrorRecorder: errorRecorder)
@@ -357,9 +364,8 @@ struct ImportStatementTemplate {
 struct ModuleImportStatementTemplate {
 
   static func template(
-    moduleImports: OrderedSet<String>?
-  ) -> TemplateString? {
-    guard let moduleImports else  { return nil }
+    moduleImports: OrderedSet<String>
+  ) -> TemplateString {
     return """
     \(moduleImports.map { "import \($0)" }.joined(separator: "\n"))
     """
