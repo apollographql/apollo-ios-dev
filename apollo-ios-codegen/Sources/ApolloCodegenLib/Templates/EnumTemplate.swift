@@ -12,7 +12,9 @@ struct EnumTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .schemaFile(type: .enum)
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     TemplateString(
     """
     \(documentation: graphqlEnum.documentation, config: config)

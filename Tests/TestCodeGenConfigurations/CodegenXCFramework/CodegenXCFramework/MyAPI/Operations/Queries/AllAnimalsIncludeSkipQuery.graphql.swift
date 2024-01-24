@@ -144,7 +144,7 @@ public extension MyAPI {
             public var species: String { __data["species"] }
             public var laysEggs: Bool { __data["laysEggs"] }
             public var bodyTemperature: Int { __data["bodyTemperature"] }
-            public var height: HeightInMeters.Height { __data["height"] }
+            public var height: Height { __data["height"] }
 
             public struct Fragments: FragmentContainer {
               public let __data: DataDict
@@ -153,6 +153,8 @@ public extension MyAPI {
               public var warmBloodedDetails: WarmBloodedDetails { _toFragment() }
               public var heightInMeters: HeightInMeters { _toFragment() }
             }
+
+            public typealias Height = HeightInMeters.Height
           }
         }
 
@@ -194,6 +196,8 @@ public extension MyAPI {
             public var inches: Int? { __data["inches"] }
             public var meters: Int { __data["meters"] }
           }
+
+
         }
 
         /// AllAnimal.AsWarmBloodedIfGetWarmBlooded
@@ -236,6 +240,8 @@ public extension MyAPI {
             public var inches: Int? { __data["inches"] }
             public var meters: Int { __data["meters"] }
           }
+
+
         }
 
         /// AllAnimal.AsPet
@@ -259,7 +265,7 @@ public extension MyAPI {
           public var predators: [Predator] { __data["predators"] }
           public var humanName: String? { __data["humanName"] }
           public var favoriteToy: String { __data["favoriteToy"] }
-          public var owner: PetDetails.Owner? { __data["owner"] }
+          public var owner: Owner? { __data["owner"] }
 
           public var asWarmBlooded: AsWarmBlooded? { _asInlineFragment() }
 
@@ -293,6 +299,10 @@ public extension MyAPI {
             public var inches: Int? { __data["inches"] }
           }
 
+
+
+          public typealias Owner = PetDetails.Owner
+
           /// AllAnimal.AsPet.AsWarmBlooded
           ///
           /// Parent Type: `WarmBlooded`
@@ -310,10 +320,10 @@ public extension MyAPI {
             public var species: String? { __data["species"] }
             public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
             public var predators: [Predator] { __data["predators"] }
+            public var bodyTemperature: Int { __data["bodyTemperature"] }
             public var humanName: String? { __data["humanName"] }
             public var favoriteToy: String { __data["favoriteToy"] }
-            public var owner: PetDetails.Owner? { __data["owner"] }
-            public var bodyTemperature: Int { __data["bodyTemperature"] }
+            public var owner: Owner? { __data["owner"] }
 
             public struct Fragments: FragmentContainer {
               public let __data: DataDict
@@ -339,6 +349,10 @@ public extension MyAPI {
               public var centimeters: Double? { __data["centimeters"] }
               public var meters: Int { __data["meters"] }
             }
+
+
+
+            public typealias Owner = PetDetails.Owner
           }
         }
 
@@ -360,10 +374,10 @@ public extension MyAPI {
           public var species: String? { __data["species"] }
           public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
           public var predators: [Predator] { __data["predators"] }
+          public var bodyTemperature: Int { __data["bodyTemperature"] }
           public var humanName: String? { __data["humanName"] }
           public var favoriteToy: String { __data["favoriteToy"] }
-          public var owner: PetDetails.Owner? { __data["owner"] }
-          public var bodyTemperature: Int { __data["bodyTemperature"] }
+          public var owner: Owner? { __data["owner"] }
 
           public struct Fragments: FragmentContainer {
             public let __data: DataDict
@@ -389,6 +403,10 @@ public extension MyAPI {
             public var centimeters: Double? { __data["centimeters"] }
             public var meters: Int { __data["meters"] }
           }
+
+
+
+          public typealias Owner = PetDetails.Owner
         }
 
         /// AllAnimal.AsClassroomPet
@@ -436,10 +454,10 @@ public extension MyAPI {
             public var species: String? { __data["species"] }
             public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
             public var predators: [Predator] { __data["predators"] }
+            public var bodyTemperature: Int { __data["bodyTemperature"] }
             public var humanName: String? { __data["humanName"] }
             public var favoriteToy: String { __data["favoriteToy"] }
-            public var owner: PetDetails.Owner? { __data["owner"] }
-            public var bodyTemperature: Int { __data["bodyTemperature"] }
+            public var owner: Owner? { __data["owner"] }
 
             public struct Fragments: FragmentContainer {
               public let __data: DataDict
@@ -465,6 +483,10 @@ public extension MyAPI {
               public var centimeters: Double? { __data["centimeters"] }
               public var meters: Int { __data["meters"] }
             }
+
+
+
+            public typealias Owner = PetDetails.Owner
           }
         }
       }

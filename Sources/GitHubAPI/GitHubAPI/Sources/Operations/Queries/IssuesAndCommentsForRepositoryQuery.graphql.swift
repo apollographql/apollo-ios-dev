@@ -123,8 +123,8 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
               public typealias RootEntityType = IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Author
               public static var __parentType: ApolloAPI.ParentType { GitHubAPI.Objects.User }
               public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
-                AuthorDetails.self,
                 IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Author.self,
+                AuthorDetails.self,
                 AuthorDetails.AsUser.self
               ] }
 
@@ -213,8 +213,8 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
                   public typealias RootEntityType = IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Comments.Node.Author
                   public static var __parentType: ApolloAPI.ParentType { GitHubAPI.Objects.User }
                   public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
-                    AuthorDetails.self,
                     IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Comments.Node.Author.self,
+                    AuthorDetails.self,
                     AuthorDetails.AsUser.self
                   ] }
 

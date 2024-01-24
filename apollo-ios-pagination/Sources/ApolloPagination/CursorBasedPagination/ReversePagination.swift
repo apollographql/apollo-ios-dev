@@ -1,14 +1,15 @@
 extension CursorBasedPagination {
-    public struct ReversePagination: PaginationInfo, Hashable {
-        public let hasPrevious: Bool
-        public let startCursor: String?
+  /// A cursor-basd pagination strategy that can support fetching previous pages.
+  public struct Reverse: PaginationInfo, Hashable {
+    public let hasPrevious: Bool
+    public let startCursor: String?
 
-        public var canLoadMore: Bool { hasPrevious }
+    public var canLoadNext: Bool { false }
+    public var canLoadPrevious: Bool { hasPrevious }
 
-        public init(hasPrevious: Bool, startCursor: String?) {
-            self.hasPrevious = hasPrevious
-            self.startCursor = startCursor
-        }
+    public init(hasPrevious: Bool, startCursor: String?) {
+      self.hasPrevious = hasPrevious
+      self.startCursor = startCursor
     }
-
+  }
 }

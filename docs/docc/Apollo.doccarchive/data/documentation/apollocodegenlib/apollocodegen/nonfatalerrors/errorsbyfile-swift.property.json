@@ -4,21 +4,21 @@
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/NonFatalErrors"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error\/typeNameConflict(name:conflictingName:containingObject:)"
+    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/NonFatalErrors\/errorsByFile-swift.property"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloCodegenLib0aB0C5ErrorO16typeNameConflictyAESS_S2StcAEmF",
+    "externalID" : "s:16ApolloCodegenLib0aB0C14NonFatalErrorsV12errorsByFile18OrderedCollections0J10DictionaryVySSSayAC0dE5ErrorOGGvp",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "case"
+        "text" : "var"
       },
       {
         "kind" : "text",
@@ -26,15 +26,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "typeNameConflict"
-      },
-      {
-        "kind" : "text",
-        "text" : "("
-      },
-      {
-        "kind" : "externalParam",
-        "text" : "name"
+        "text" : "errorsByFile"
       },
       {
         "kind" : "text",
@@ -42,46 +34,26 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:SS",
-        "text" : "String"
+        "preciseIdentifier" : "s:16ApolloCodegenLib0aB0C",
+        "text" : "ApolloCodegen"
       },
       {
         "kind" : "text",
-        "text" : ", "
-      },
-      {
-        "kind" : "externalParam",
-        "text" : "conflictingName"
-      },
-      {
-        "kind" : "text",
-        "text" : ": "
+        "text" : "."
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:SS",
-        "text" : "String"
+        "preciseIdentifier" : "s:16ApolloCodegenLib0aB0C14NonFatalErrorsV",
+        "text" : "NonFatalErrors"
       },
       {
         "kind" : "text",
-        "text" : ", "
-      },
-      {
-        "kind" : "externalParam",
-        "text" : "containingObject"
-      },
-      {
-        "kind" : "text",
-        "text" : ": "
+        "text" : "."
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:SS",
-        "text" : "String"
-      },
-      {
-        "kind" : "text",
-        "text" : ")"
+        "preciseIdentifier" : "s:16ApolloCodegenLib0aB0C14NonFatalErrorsV0F6ByFilea",
+        "text" : "ErrorsByFile"
       }
     ],
     "modules" : [
@@ -90,9 +62,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Case",
-    "symbolKind" : "case",
-    "title" : "ApolloCodegen.Error.typeNameConflict(name:conflictingName:containingObject:)"
+    "roleHeading" : "Instance Property",
+    "symbolKind" : "property",
+    "title" : "errorsByFile"
   },
   "primaryContentSections" : [
     {
@@ -107,7 +79,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "case"
+              "text" : "var"
             },
             {
               "kind" : "text",
@@ -115,62 +87,41 @@
             },
             {
               "kind" : "identifier",
-              "text" : "typeNameConflict"
-            },
-            {
-              "kind" : "text",
-              "text" : "("
-            },
-            {
-              "kind" : "externalParam",
-              "text" : "name"
+              "text" : "errorsByFile"
             },
             {
               "kind" : "text",
               "text" : ": "
             },
             {
+              "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:SS",
-              "text" : "String"
+              "preciseIdentifier" : "s:16ApolloCodegenLib0aB0C",
+              "text" : "ApolloCodegen"
             },
             {
               "kind" : "text",
-              "text" : ", "
+              "text" : "."
             },
             {
-              "kind" : "externalParam",
-              "text" : "conflictingName"
-            },
-            {
-              "kind" : "text",
-              "text" : ": "
-            },
-            {
+              "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/NonFatalErrors",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:SS",
-              "text" : "String"
+              "preciseIdentifier" : "s:16ApolloCodegenLib0aB0C14NonFatalErrorsV",
+              "text" : "NonFatalErrors"
             },
             {
               "kind" : "text",
-              "text" : ", "
+              "text" : "."
             },
             {
-              "kind" : "externalParam",
-              "text" : "containingObject"
-            },
-            {
-              "kind" : "text",
-              "text" : ": "
-            },
-            {
+              "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/NonFatalErrors\/ErrorsByFile-swift.typealias",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:SS",
-              "text" : "String"
+              "preciseIdentifier" : "s:16ApolloCodegenLib0aB0C14NonFatalErrorsV0F6ByFilea",
+              "text" : "ErrorsByFile"
             },
             {
               "kind" : "text",
-              "text" : ")"
+              "text" : " { get }"
             }
           ]
         }
@@ -189,7 +140,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollocodegenlib\/apollocodegen\/error\/typenameconflict(name:conflictingname:containingobject:)"
+        "\/documentation\/apollocodegenlib\/apollocodegen\/nonfatalerrors\/errorsbyfile-swift.property"
       ],
       "traits" : [
         {
@@ -248,48 +199,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegen"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/Error": {
-  "abstract" : [
-    {
-      "text" : "Errors that can occur during code generation.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "enum"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "Error"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "Error"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "ApolloCodegen.Error",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/error"
-},
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/Error/typeNameConflict(name:conflictingName:containingObject:)": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/NonFatalErrors": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "case"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -297,70 +214,104 @@
     },
     {
       "kind" : "identifier",
-      "text" : "typeNameConflict"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "name"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "conflictingName"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "containingObject"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
+      "text" : "NonFatalErrors"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error\/typeNameConflict(name:conflictingName:containingObject:)",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/NonFatalErrors",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "NonFatalErrors"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloCodegen.NonFatalErrors",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/nonfatalerrors"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/NonFatalErrors/ErrorsByFile-swift.typealias": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ErrorsByFile"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/NonFatalErrors\/ErrorsByFile-swift.typealias",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ErrorsByFile"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloCodegen.NonFatalErrors.ErrorsByFile",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/nonfatalerrors\/errorsbyfile-swift.typealias"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/NonFatalErrors/errorsByFile-swift.property": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "errorsByFile"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:16ApolloCodegenLib0aB0C",
+      "text" : "ApolloCodegen"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:16ApolloCodegenLib0aB0C14NonFatalErrorsV",
+      "text" : "NonFatalErrors"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:16ApolloCodegenLib0aB0C14NonFatalErrorsV0F6ByFilea",
+      "text" : "ErrorsByFile"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/NonFatalErrors\/errorsByFile-swift.property",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "ApolloCodegen.Error.typeNameConflict(name:conflictingName:containingObject:)",
+  "title" : "errorsByFile",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/error\/typenameconflict(name:conflictingname:containingobject:)"
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/nonfatalerrors\/errorsbyfile-swift.property"
 }
 }
 }

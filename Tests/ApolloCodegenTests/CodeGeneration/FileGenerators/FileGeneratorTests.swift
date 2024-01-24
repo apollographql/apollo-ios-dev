@@ -66,7 +66,7 @@ class FileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try await subject.generate(forConfig: config, fileManager: fileManager)
+    _ = try await subject.generate(forConfig: config, fileManager: fileManager)
 
     // then
     expect(self.fileManager.allClosuresCalled).to(beTrue())
@@ -88,7 +88,7 @@ class FileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try await subject.generate(forConfig: config, fileManager: fileManager)
+    _ = try await subject.generate(forConfig: config, fileManager: fileManager)
 
     // then
     expect(self.fileManager.allClosuresCalled).to(beTrue())
@@ -110,7 +110,7 @@ class FileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try await subject.generate(forConfig: config, fileManager: fileManager)
+    _ = try await subject.generate(forConfig: config, fileManager: fileManager)
 
     // then
     expect(self.fileManager.allClosuresCalled).to(beTrue())
@@ -121,7 +121,8 @@ class FileGeneratorTests: XCTestCase {
     buildConfig()
     buildSubject()
 
-    let expectedData = template.render().data(using: .utf8)
+    let (actual, _) = template.render()
+    let expectedData = actual.data(using: .utf8)
 
     fileManager.mock(closure: .createFile({ path, data, attributes in
       // then
@@ -131,7 +132,7 @@ class FileGeneratorTests: XCTestCase {
     }))
 
     // when
-    try await subject.generate(forConfig: config, fileManager: fileManager)
+    _ = try await subject.generate(forConfig: config, fileManager: fileManager)
 
     // then
     expect(self.fileManager.allClosuresCalled).to(beTrue())

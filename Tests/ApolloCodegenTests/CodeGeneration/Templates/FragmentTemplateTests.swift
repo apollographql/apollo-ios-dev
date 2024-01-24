@@ -58,7 +58,7 @@ class FragmentTemplateTests: XCTestCase {
   }
 
   private func renderSubject() -> String {
-    subject.template.description
+    subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
   // MARK: Fragment Definition
@@ -78,6 +78,29 @@ class FragmentTemplateTests: XCTestCase {
 
     // when
     try await buildSubjectAndFragment()
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+    expect(String(actual.reversed())).to(equalLineByLine("\n}", ignoringExtraLines: true))
+  }
+  
+  func test__render__givenFragment_generatesFragmentDeclarationWithoutDefinition() async throws {
+    // given
+    let expected =
+    """
+    struct TestFragment: TestSchema.SelectionSet, Fragment {
+      let __data: DataDict
+      init(_dataDict: DataDict) { __data = _dataDict }
+    """
+
+    // when
+    try await buildSubjectAndFragment(config: .mock(
+      options: .init(
+        operationDocumentFormat: .operationId
+      )
+    ))
 
     let actual = renderSubject()
 

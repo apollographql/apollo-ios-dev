@@ -97,8 +97,8 @@ public class HeroDetailsWithFragmentQuery: GraphQLQuery {
         public typealias RootEntityType = HeroDetailsWithFragmentQuery.Data.Hero
         public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
         public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
-          HeroDetails.self,
           HeroDetailsWithFragmentQuery.Data.Hero.self,
+          HeroDetails.self,
           HeroDetails.AsHuman.self
         ] }
 
@@ -144,8 +144,8 @@ public class HeroDetailsWithFragmentQuery: GraphQLQuery {
         public typealias RootEntityType = HeroDetailsWithFragmentQuery.Data.Hero
         public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
         public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
-          HeroDetails.self,
           HeroDetailsWithFragmentQuery.Data.Hero.self,
+          HeroDetails.self,
           HeroDetails.AsDroid.self
         ] }
 

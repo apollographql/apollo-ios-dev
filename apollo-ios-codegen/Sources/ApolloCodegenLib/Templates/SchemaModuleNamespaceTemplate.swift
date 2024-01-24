@@ -9,7 +9,9 @@ struct SchemaModuleNamespaceTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .moduleFile
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     TemplateString("""
     \(accessControlModifier(for: .namespace))\
     enum \(config.schemaNamespace.firstUppercased) { }

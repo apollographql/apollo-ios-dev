@@ -14,6 +14,10 @@
   </a>
 </p>
 
+| ☑️  Apollo Clients User Survey |
+| :----- |
+| What do you like best about Apollo iOS? What needs to be improved? Please tell us by taking a [one-minute survey](https://docs.google.com/forms/d/e/1FAIpQLSczNDXfJne3ZUOXjk9Ursm9JYvhTh1_nFTDfdq3XBAFWCzplQ/viewform?usp=pp_url&entry.1170701325=Apollo+iOS&entry.204965213=Readme). Your responses will help us understand Apollo iOS usage and allow us to serve you better. |
+
 ### Apollo iOS Dev
 
 This repo contains the development environment for working on and contributing to the Apollo iOS ecosystem. This repo uses a git subtree setup to include the following repos for development:
@@ -55,7 +59,7 @@ After working and making changes in the `ApolloDev.xcworkspace` you can commit y
 
 ## Issues
 
-To report an issue, bug, or feature request ou can do so in the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repo.
+To report an issue, bug, or feature request, you can do so in the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repo.
 
 ## Roadmap
 

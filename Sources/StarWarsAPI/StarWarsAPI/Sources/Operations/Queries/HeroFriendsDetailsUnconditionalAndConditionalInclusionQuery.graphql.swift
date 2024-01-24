@@ -181,6 +181,7 @@ public class HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: GraphQ
             }
           }
         }
+
         /// Hero.Friend.AsDroid
         ///
         /// Parent Type: `Droid`

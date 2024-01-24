@@ -55,7 +55,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
       let subject = buildSubject(config: config)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
@@ -138,7 +138,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
       let subject = buildSubject(config: config)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: 4, ignoringExtraLines: true))
@@ -225,7 +225,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
       let subject = buildSubject(config: config)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: 4, ignoringExtraLines: true))
@@ -329,7 +329,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
       let subject = buildSubject(config: config)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: test.atLine))
@@ -353,7 +353,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
     """
 
     // when
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -374,7 +374,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
     """
 
     // when
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -395,7 +395,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
     """
 
     // when
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))

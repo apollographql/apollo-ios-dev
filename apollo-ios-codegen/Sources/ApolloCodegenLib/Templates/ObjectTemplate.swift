@@ -12,7 +12,9 @@ struct ObjectTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .schemaFile(type: .object)
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {    
     """
     \(documentation: graphqlObject.documentation, config: config)
     static let \(graphqlObject.formattedName) = \(config.ApolloAPITargetName).Object(

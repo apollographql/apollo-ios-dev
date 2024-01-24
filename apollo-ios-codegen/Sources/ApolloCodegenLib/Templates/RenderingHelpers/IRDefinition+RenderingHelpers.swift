@@ -8,23 +8,7 @@ extension IR.Definition {
     "\(config.schemaNamespace.firstUppercased).\(if: isMutable, "Mutable")SelectionSet"
   }
 
-  var isMutable: Bool {
-    switch self {
-    case  let .operation(operation):
-      return operation.definition.isLocalCacheMutation
-    case let .namedFragment(fragment):
-      return fragment.definition.isLocalCacheMutation
-    }
-  }
-
-  var generatedDefinitionName: String {
-    switch self {
-    case  let .operation(operation):
-      return operation.generatedDefinitionName
-    case let .namedFragment(fragment):
-      return fragment.generatedDefinitionName
-    }
-  }
+  var isMutable: Bool { self.isLocalCacheMutation }
 
 }
 

@@ -115,7 +115,7 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
     /// The name of the character
     public var name: String { __data["name"] }
     /// The friends of the character, or an empty list if they have none
-    public var friends: [FriendsNames.Friend?]? { __data["friends"] }
+    public var friends: [Friend?]? { __data["friends"] }
 
     public struct Fragments: FragmentContainer {
       public let __data: DataDict
@@ -127,7 +127,7 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
 
     public init(
       name: String,
-      friends: [FriendsNames.Friend?]? = nil
+      friends: [Friend?]? = nil
     ) {
       self.init(_dataDict: DataDict(
         data: [
@@ -143,5 +143,7 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
         ]
       ))
     }
+
+    public typealias Friend = FriendsNames.Friend
   }
 }

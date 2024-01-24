@@ -14,10 +14,10 @@ struct SchemaMetadataTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .schemaFile(type: .schemaMetadata)
 
-  var template: TemplateString { embeddableTemplate }
-
   /// Swift code that can be embedded within a namespace.
-  var embeddableTemplate: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     let parentAccessLevel = accessControlModifier(for: .parent)
 
     return TemplateString(
@@ -66,7 +66,9 @@ struct SchemaMetadataTemplate: TemplateRenderer {
     """
   }
   /// Swift code that must be rendered outside of any namespace.
-  var detachedTemplate: TemplateString? {
+  func renderDetachedTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString? {
     guard !config.output.schemaTypes.isInModule else { return nil }
 
     return protocolDefinition(prefix: "\(schemaNamespace)_", schemaNamespace: schemaNamespace)

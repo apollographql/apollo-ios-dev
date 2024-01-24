@@ -11,7 +11,9 @@ struct MockUnionsTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .testMockFile
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     TemplateString("""
     \(accessControlModifier(for: .parent))extension MockObject {
       \(graphQLUnions.map {

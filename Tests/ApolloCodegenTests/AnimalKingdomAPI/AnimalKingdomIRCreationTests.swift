@@ -55,10 +55,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
   var expected: (fields: [ShallowFieldMatcher],
                  typeCases: [ShallowInlineFragmentMatcher],
                  fragments: [ShallowFragmentSpreadMatcher])!
-
-  func compilationResult() async -> CompilationResult {
-    return await AnimalKingdomSchema.shared.compilationResult
-  }
+  var operation: IRTestWrapper<IR.Operation>!
 
   class override func tearDown() {
     super.tearDown()
@@ -74,15 +71,32 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   override func tearDown() {
     expected = nil
+    operation = nil
     super.tearDown()
   }
 
+  // MARK: - Helpers
+
+  var rootSelectionSet: SelectionSetTestWrapper! {
+    operation.rootField.selectionSet
+  }
+
+  func buildOperation(named name: String = "AllAnimalsQuery") async throws {
+    let compilationResult = await compilationResult()
+    let operation = compilationResult.operations.first { $0.name == name }
+    let ir = IRBuilderTestWrapper(IRBuilder.mock(compilationResult: compilationResult))
+    self.operation = await ir.build(operation: try XCTUnwrap(operation))
+  }
+
+  func compilationResult() async -> CompilationResult {
+    return await AnimalKingdomSchema.shared.compilationResult
+  }
+
+  // MARK: - Tests
+
   func test__directSelections_AllAnimalsQuery_RootQuery__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     expected = (
       fields: [
@@ -94,7 +108,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = rootSelectionSet.selections.direct
+    let actual = rootSelectionSet.computed.direct
 
     // then
     expect(actual).to(shallowlyMatch(self.expected))
@@ -102,13 +116,10 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_RootQuery__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     // when
-    let actual = rootSelectionSet.selections.merged
+    let actual = rootSelectionSet.computed.merged
 
     // then
     expect(actual).to(beEmpty())
@@ -116,12 +127,9 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AllAnimal__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
     let Interface_Animal = GraphQLInterfaceType.mock("Animal")
 
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(rootSelectionSet[field: "allAnimals"]?.selectionSet)
 
@@ -149,7 +157,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(Interface_Animal))
@@ -158,17 +166,14 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AllAnimal__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
     let Interface_Animal = GraphQLInterfaceType.mock("Animal")
 
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(rootSelectionSet[field: "allAnimals"]?.selectionSet)
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(Interface_Animal))
@@ -177,10 +182,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AllAnimal_Height__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "height"]?.selectionSet
@@ -198,7 +200,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -207,10 +209,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AllAnimal_Height__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "height"]?.selectionSet
@@ -226,7 +225,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
     
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -235,10 +234,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AllAnimal_Predator__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "predators"]?.selectionSet
@@ -256,7 +252,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("Animal")))
@@ -265,17 +261,14 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AllAnimal_Predator__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "predators"]?.selectionSet
     )
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("Animal")))
@@ -284,10 +277,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AllAnimal_Predator_AsWarmBlooded__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "predators"]?[as: "WarmBlooded"]
@@ -307,7 +297,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("WarmBlooded")))
@@ -316,10 +306,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AllAnimal_Predator_AsWarmBlooded__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[field: "predators"]?[as: "WarmBlooded"]
@@ -341,7 +328,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("WarmBlooded")))
@@ -350,10 +337,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AllAnimal_AsWarmBlooded__isCorrect() async throws  {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "WarmBlooded"]
@@ -368,7 +352,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("WarmBlooded")))
@@ -377,10 +361,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsWarmBlooded__isCorrect() async throws  {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "WarmBlooded"]
@@ -406,7 +387,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("WarmBlooded")))
@@ -415,17 +396,14 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AllAnimal_AsWarmBlooded_Height__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "WarmBlooded"]?[field: "height"]?.selectionSet
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -434,10 +412,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsWarmBlooded_Height__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "WarmBlooded"]?[field: "height"]?.selectionSet
@@ -457,7 +432,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -466,10 +441,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AllAnimal_AsPet__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]
@@ -489,7 +461,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("Pet")))
@@ -498,10 +470,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsPet__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]
@@ -530,7 +499,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("Pet")))
@@ -539,10 +508,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AllAnimal_AsPet_Height__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[field: "height"]?.selectionSet
@@ -560,7 +526,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -569,10 +535,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsPet_Height__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[field: "height"]?.selectionSet
@@ -592,7 +555,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -601,10 +564,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AsPet_AsWarmBlooded__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[as: "WarmBlooded"]
@@ -619,7 +579,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("WarmBlooded")))
@@ -628,10 +588,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AsPet_AsWarmBlooded__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[as: "WarmBlooded"]
@@ -664,7 +621,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("WarmBlooded")))
@@ -673,17 +630,14 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AllAnimal_AsPet_AsWarmBlooded_Height__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[as: "WarmBlooded"]?[field: "height"]?.selectionSet
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -692,10 +646,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsPet_AsWarmBlooded_Height__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Pet"]?[as: "WarmBlooded"]?[field: "height"]?.selectionSet
@@ -719,7 +670,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -728,10 +679,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AsCat__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Cat"]
@@ -747,7 +695,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Cat")))
@@ -756,10 +704,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AsCat__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Cat"]
@@ -793,7 +738,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Cat")))
@@ -802,17 +747,14 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AllAnimal_AsCat_Height__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Cat"]?[field: "height"]?.selectionSet
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -821,10 +763,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsCat_Height__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "Cat"]?[field: "height"]?.selectionSet
@@ -848,7 +787,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -857,10 +796,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AsClassroomPet__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]
@@ -875,7 +811,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLUnionType.mock("ClassroomPet")))
@@ -884,10 +820,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AsClassroomPet__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]
@@ -912,7 +845,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLUnionType.mock("ClassroomPet")))
@@ -921,10 +854,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AsClassroomPet_AsBird__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]?[as: "Bird"]
@@ -940,7 +870,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Bird")))
@@ -949,10 +879,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AsClassroomPet_AsBird__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]?[as: "Bird"]
@@ -986,7 +913,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Bird")))
@@ -995,17 +922,14 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__directSelections_AllAnimalsQuery_AllAnimal_AsClassroomPet_AsBird_Height__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]?[as: "Bird"]?[field: "height"]?.selectionSet
     )
 
     // when
-    let actual = selectionSet.selections.direct
+    let actual = selectionSet.computed.direct
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -1014,10 +938,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AllAnimal_AsClassroomPet_AsBird_Height__isCorrect() async throws {
     // given
-    let compilationResult = await compilationResult()
-    let operation = compilationResult.operations.first { $0.name == "AllAnimalsQuery" }
-    let ir = IRBuilder.mock(compilationResult: compilationResult)
-    let rootSelectionSet = await ir.build(operation: try XCTUnwrap(operation)).rootField.selectionSet!
+    try await buildOperation()
 
     let selectionSet = try XCTUnwrap(
       rootSelectionSet[field: "allAnimals"]?[as: "ClassroomPet"]?[as: "Bird"]?[field: "height"]?.selectionSet
@@ -1041,7 +962,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.selections.merged
+    let actual = selectionSet.computed.merged
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))

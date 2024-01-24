@@ -87,28 +87,48 @@ public enum ApolloTarget {
             return "Apollo-Target-UploadAPI"
         }
     }
+  
+  public var destinations: Destinations {
+    switch self {
+    case .animalKingdomAPI,
+        .apolloCodegenLibWrapper,
+        .apolloCodegenInternalTestHelpers,
+        .apolloCodegenTests,
+        .apolloInternalTestHelpers,
+        .apolloPaginationTests,
+        .apolloPerformanceTests,
+        .apolloServerIntegrationTests,
+        .apolloTests,
+        .apolloWrapper,
+        .codegenCLITests,
+        .gitHubAPI,
+        .starWarsAPI,
+        .subscriptionAPI,
+        .uploadAPI:
+      return Destinations([.mac])
+    }
+  }
     
-    public var deploymentTarget: DeploymentTarget {
-        var version = "10.15"
+    public var deploymentTargets: DeploymentTargets {
         switch self {
         case .animalKingdomAPI,
-             .apolloCodegenLibWrapper,
              .apolloWrapper,
              .gitHubAPI,
              .starWarsAPI,
              .subscriptionAPI,
              .uploadAPI:
-            version = "10.15"
-        case .apolloCodegenInternalTestHelpers,
-             .apolloCodegenTests,
-             .apolloInternalTestHelpers,
+            return DeploymentTargets(macOS: "10.15")
+        case .apolloInternalTestHelpers,
              .apolloPerformanceTests,
              .apolloServerIntegrationTests,
              .apolloTests,
-             .apolloPaginationTests,
+             .apolloPaginationTests:
+            return DeploymentTargets(macOS: "12.0")
+        case .apolloCodegenInternalTestHelpers,
+             .apolloCodegenLibWrapper,
+             .apolloCodegenTests,
              .codegenCLITests:
-            version = "12.5"
+          return DeploymentTargets(macOS: "12.0")
         }
-        return .macOS(targetVersion: version)
     }
 }
