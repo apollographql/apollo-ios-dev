@@ -1,180 +1,275 @@
 import Apollo
 import ApolloAPI
+import Foundation
 
-extension GraphQLQueryPager.Actor {
-  static func makeQueryPager<P: PaginationInfo>(
+public extension GraphQLQueryPager {
+  static func makeForwardCursorQueryPager(
     client: ApolloClientProtocol,
-    queryProvider: @escaping (P?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> P
-  ) -> GraphQLQueryPager.Actor where InitialQuery == PaginatedQuery {
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (CursorBasedPagination.Forward?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Forward
+  ) -> GraphQLQueryPager where InitialQuery == PaginatedQuery {
     .init(
       client: client,
       initialQuery: queryProvider(nil),
+      watcherDispatchQueue: watcherDispatchQueue,
       extractPageInfo: pageExtraction(transform: extractPageInfo),
-      nextPageResolver: queryProvider
+      pageResolver: { page, direction in
+        guard direction == .next else { return nil }
+        return queryProvider(page)
+      }
     )
   }
 
-  static func makeQueryPager<P: PaginationInfo>(
+  static func makeForwardCursorQueryPager(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
-    extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
-    extractNextPageInfo: @escaping (PaginatedQuery.Data) -> P,
-    nextPageResolver: @escaping (P) -> PaginatedQuery
-  ) -> GraphQLQueryPager.Actor {
+    watcherDispatchQueue: DispatchQueue = .main,
+    extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Forward,
+    extractNextPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.Forward,
+    nextPageResolver: @escaping (CursorBasedPagination.Forward) -> PaginatedQuery
+  ) -> GraphQLQueryPager {
     .init(
       client: client,
       initialQuery: initialQuery,
+      watcherDispatchQueue: watcherDispatchQueue,
       extractPageInfo: pageExtraction(
         initialTransfom: extractInitialPageInfo,
         paginatedTransform: extractNextPageInfo
       ),
-      nextPageResolver: nextPageResolver
-    )
-  }
-
-  static func makeForwardCursorQueryPager(
-    client: ApolloClientProtocol,
-    queryProvider: @escaping (CursorBasedPagination.ForwardPagination?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ForwardPagination
-  ) -> GraphQLQueryPager.Actor where InitialQuery == PaginatedQuery {
-    .makeQueryPager(
-      client: client,
-      queryProvider: queryProvider,
-      extractPageInfo: extractPageInfo
-    )
-  }
-
-  static func makeForwardCursorQueryPager(
-    client: ApolloClientProtocol,
-    initialQuery: InitialQuery,
-    extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ForwardPagination,
-    extractNextPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.ForwardPagination,
-    nextPageResolver: @escaping (CursorBasedPagination.ForwardPagination) -> PaginatedQuery
-  ) -> GraphQLQueryPager.Actor {
-    makeQueryPager(
-      client: client,
-      initialQuery: initialQuery,
-      extractInitialPageInfo: extractInitialPageInfo,
-      extractNextPageInfo: extractNextPageInfo,
-      nextPageResolver: nextPageResolver
+      pageResolver: { page, direction in
+        guard direction == .next else { return nil }
+        return nextPageResolver(page)
+      }
     )
   }
 
   static func makeReverseCursorQueryPager(
     client: ApolloClientProtocol,
-    queryProvider: @escaping (CursorBasedPagination.ReversePagination?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ReversePagination
-  ) -> GraphQLQueryPager.Actor where InitialQuery == PaginatedQuery {
-    .makeQueryPager(
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (CursorBasedPagination.Reverse?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Reverse
+  ) -> GraphQLQueryPager where InitialQuery == PaginatedQuery {
+    .init(
       client: client,
-      queryProvider: queryProvider,
-      extractPageInfo: extractPageInfo
+      initialQuery: queryProvider(nil),
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: pageExtraction(transform: extractPageInfo),
+      pageResolver: { page, direction in
+        guard direction == .previous else { return nil }
+        return queryProvider(page)
+      }
     )
   }
 
   static func makeReverseCursorQueryPager(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
-    extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ReversePagination,
-    extractNextPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.ReversePagination,
-    nextPageResolver: @escaping (CursorBasedPagination.ReversePagination) -> PaginatedQuery
-  ) -> GraphQLQueryPager.Actor {
-    makeQueryPager(
+    watcherDispatchQueue: DispatchQueue = .main,
+    extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Reverse,
+    extractPreviousPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.Reverse,
+    previousPageResolver: @escaping (CursorBasedPagination.Reverse) -> PaginatedQuery
+  ) -> GraphQLQueryPager {
+    .init(
       client: client,
       initialQuery: initialQuery,
-      extractInitialPageInfo: extractInitialPageInfo,
-      extractNextPageInfo: extractNextPageInfo,
-      nextPageResolver: nextPageResolver
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: pageExtraction(
+        initialTransfom: extractInitialPageInfo,
+        paginatedTransform: extractPreviousPageInfo
+      ),
+      pageResolver: { page, direction in
+        guard direction == .previous else { return nil }
+        return previousPageResolver(page)
+      }
+    )
+  }
+
+  static func makeBidirectionalCursorQueryPager(
+    client: ApolloClientProtocol,
+    initialQuery: InitialQuery,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (CursorBasedPagination.Bidirectional?) -> PaginatedQuery,
+    previousQueryProvider: @escaping (CursorBasedPagination.Bidirectional?) -> PaginatedQuery,
+    extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Bidirectional,
+    extractPaginatedPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.Bidirectional
+  ) -> GraphQLQueryPager {
+    .init(
+      client: client,
+      initialQuery: initialQuery,
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: pageExtraction(
+        initialTransfom: extractInitialPageInfo,
+        paginatedTransform: extractPaginatedPageInfo
+      ),
+      pageResolver: { page, direction in
+        switch direction {
+        case .next:
+          return queryProvider(page)
+        case .previous:
+          return previousQueryProvider(page)
+        }
+      }
+    )
+  }
+
+  static func makeBidirectionalCursorQueryPager(
+    client: ApolloClientProtocol,
+    start: CursorBasedPagination.Bidirectional?,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (CursorBasedPagination.Bidirectional?) -> InitialQuery,
+    previousQueryProvider: @escaping (CursorBasedPagination.Bidirectional?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Bidirectional
+  ) -> GraphQLQueryPager where InitialQuery == PaginatedQuery {
+    .init(
+      client: client,
+      initialQuery: queryProvider(start),
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: pageExtraction(transform: extractPageInfo),
+      pageResolver: { page, direction in
+        switch direction {
+        case .next:
+          return queryProvider(page)
+        case .previous:
+          return previousQueryProvider(page)
+        }
+      }
     )
   }
 }
 
-public extension GraphQLQueryPager {
-  static func makeQueryPager<P: PaginationInfo>(
+public extension AsyncGraphQLQueryPager {
+  static func makeForwardCursorQueryPager(
     client: ApolloClientProtocol,
-    queryProvider: @escaping (P?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> P
-  ) -> GraphQLQueryPager where InitialQuery == PaginatedQuery {
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (CursorBasedPagination.Forward?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Forward
+  ) -> AsyncGraphQLQueryPager where InitialQuery == PaginatedQuery {
     .init(
       client: client,
       initialQuery: queryProvider(nil),
+      watcherDispatchQueue: watcherDispatchQueue,
       extractPageInfo: pageExtraction(transform: extractPageInfo),
-      nextPageResolver: queryProvider
+      pageResolver: { page, direction in
+        guard direction == .next else { return nil }
+        return queryProvider(page)
+      }
     )
   }
 
-  static func makeQueryPager<P: PaginationInfo>(
+  static func makeForwardCursorQueryPager(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
-    extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
-    extractNextPageInfo: @escaping (PaginatedQuery.Data) -> P,
-    nextPageResolver: @escaping (P) -> PaginatedQuery
-  ) -> GraphQLQueryPager {
+    watcherDispatchQueue: DispatchQueue = .main,
+    extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Forward,
+    extractNextPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.Forward,
+    nextPageResolver: @escaping (CursorBasedPagination.Forward) -> PaginatedQuery
+  ) -> AsyncGraphQLQueryPager {
     .init(
       client: client,
       initialQuery: initialQuery,
+      watcherDispatchQueue: watcherDispatchQueue,
       extractPageInfo: pageExtraction(
         initialTransfom: extractInitialPageInfo,
         paginatedTransform: extractNextPageInfo
       ),
-      nextPageResolver: nextPageResolver
-    )
-  }
-
-  static func makeForwardCursorQueryPager(
-    client: ApolloClientProtocol,
-    queryProvider: @escaping (CursorBasedPagination.ForwardPagination?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ForwardPagination
-  ) -> GraphQLQueryPager where InitialQuery == PaginatedQuery {
-    .makeQueryPager(
-      client: client,
-      queryProvider: queryProvider,
-      extractPageInfo: extractPageInfo
-    )
-  }
-
-  static func makeForwardCursorQueryPager(
-    client: ApolloClientProtocol,
-    initialQuery: InitialQuery,
-    extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ForwardPagination,
-    extractNextPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.ForwardPagination,
-    nextPageResolver: @escaping (CursorBasedPagination.ForwardPagination) -> PaginatedQuery
-  ) -> GraphQLQueryPager {
-    makeQueryPager(
-      client: client,
-      initialQuery: initialQuery,
-      extractInitialPageInfo: extractInitialPageInfo,
-      extractNextPageInfo: extractNextPageInfo,
-      nextPageResolver: nextPageResolver
+      pageResolver: { page, direction in
+        guard direction == .next else { return nil }
+        return nextPageResolver(page)
+      }
     )
   }
 
   static func makeReverseCursorQueryPager(
     client: ApolloClientProtocol,
-    queryProvider: @escaping (CursorBasedPagination.ReversePagination?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ReversePagination
-  ) -> GraphQLQueryPager where InitialQuery == PaginatedQuery {
-    .makeQueryPager(
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (CursorBasedPagination.Reverse?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Reverse
+  ) -> AsyncGraphQLQueryPager where InitialQuery == PaginatedQuery {
+    .init(
       client: client,
-      queryProvider: queryProvider,
-      extractPageInfo: extractPageInfo
+      initialQuery: queryProvider(nil),
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: pageExtraction(transform: extractPageInfo),
+      pageResolver: { page, direction in
+        guard direction == .previous else { return nil }
+        return queryProvider(page)
+      }
     )
   }
 
   static func makeReverseCursorQueryPager(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
-    extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.ReversePagination,
-    extractNextPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.ReversePagination,
-    nextPageResolver: @escaping (CursorBasedPagination.ReversePagination) -> PaginatedQuery
-  ) -> GraphQLQueryPager {
-    makeQueryPager(
+    watcherDispatchQueue: DispatchQueue = .main,
+    extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Reverse,
+    extractPreviousPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.Reverse,
+    previousPageResolver: @escaping (CursorBasedPagination.Reverse) -> PaginatedQuery
+  ) -> AsyncGraphQLQueryPager {
+    .init(
       client: client,
       initialQuery: initialQuery,
-      extractInitialPageInfo: extractInitialPageInfo,
-      extractNextPageInfo: extractNextPageInfo,
-      nextPageResolver: nextPageResolver
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: pageExtraction(
+        initialTransfom: extractInitialPageInfo,
+        paginatedTransform: extractPreviousPageInfo
+      ),
+      pageResolver: { page, direction in
+        guard direction == .previous else { return nil }
+        return previousPageResolver(page)
+      }
+    )
+  }
+
+  static func makeBidirectionalCursorQueryPager(
+    client: ApolloClientProtocol,
+    initialQuery: InitialQuery,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (CursorBasedPagination.Bidirectional?) -> PaginatedQuery,
+    previousQueryProvider: @escaping (CursorBasedPagination.Bidirectional?) -> PaginatedQuery,
+    extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Bidirectional,
+    extractPaginatedPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.Bidirectional
+  ) -> AsyncGraphQLQueryPager {
+    .init(
+      client: client,
+      initialQuery: initialQuery,
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: pageExtraction(
+        initialTransfom: extractInitialPageInfo,
+        paginatedTransform: extractPaginatedPageInfo
+      ),
+      pageResolver: { page, direction in
+        switch direction {
+        case .next:
+          return queryProvider(page)
+        case .previous:
+          return previousQueryProvider(page)
+        }
+      }
+    )
+  }
+
+  static func makeBidirectionalCursorQueryPager(
+    client: ApolloClientProtocol,
+    start: CursorBasedPagination.Bidirectional?,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (CursorBasedPagination.Bidirectional?) -> InitialQuery,
+    previousQueryProvider: @escaping (CursorBasedPagination.Bidirectional?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Bidirectional
+  ) -> AsyncGraphQLQueryPager where InitialQuery == PaginatedQuery {
+    .init(
+      client: client,
+      initialQuery: queryProvider(start),
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: pageExtraction(transform: extractPageInfo),
+      pageResolver: { page, direction in
+        switch direction {
+        case .next:
+          return queryProvider(page)
+        case .previous:
+          return previousQueryProvider(page)
+        }
+      }
     )
   }
 }
@@ -182,7 +277,7 @@ public extension GraphQLQueryPager {
 private func pageExtraction<InitialQuery: GraphQLQuery, NextQuery: GraphQLQuery, P: PaginationInfo>(
   initialTransfom: @escaping (InitialQuery.Data) -> P,
   paginatedTransform: @escaping (NextQuery.Data) -> P
-) -> (GraphQLQueryPager<InitialQuery, NextQuery>.PageExtractionData) -> P {
+) -> (PageExtractionData<InitialQuery, NextQuery>) -> P {
   { extractionData in
     switch extractionData {
     case .initial(let value):
@@ -195,7 +290,7 @@ private func pageExtraction<InitialQuery: GraphQLQuery, NextQuery: GraphQLQuery,
 
 private func pageExtraction<InitialQuery: GraphQLQuery, P: PaginationInfo>(
   transform: @escaping (InitialQuery.Data) -> P
-) -> (GraphQLQueryPager<InitialQuery, InitialQuery>.PageExtractionData) -> P {
+) -> (PageExtractionData<InitialQuery, InitialQuery>) -> P {
   { extractionData in
     switch extractionData {
     case .initial(let value), .paginated(let value):
