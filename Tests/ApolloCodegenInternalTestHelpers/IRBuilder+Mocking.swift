@@ -42,10 +42,10 @@ extension IRBuilder {
     return .mock(compilationResult: compilationResult)
   }
 
-  public static func mock(    
+  public static func mock(
     compilationResult: CompilationResult
   ) -> IRBuilder {
-    return IRBuilder(compilationResult: compilationResult)
+    return IRBuilder(compilationResult: compilationResult)    
   }
 
 }
@@ -63,24 +63,31 @@ extension IR.NamedFragment {
       location: .init(source: .namedFragment(definition), fieldPath: nil),
       rootTypePath: LinkedList(type)
     )
+    let typeInfo = SelectionSet.TypeInfo(
+      entity: rootEntity,
+      scopePath: [
+        .descriptor(
+          forType: type,
+          inclusionConditions: nil,
+          givenAllTypesInSchema: .init([type], schemaRootTypes: .mock())
+        )
+      ]
+    )
     let rootEntityField = IR.EntityField.init(
       rootField,
       inclusionConditions: nil,
       selectionSet: .init(
-        entity: rootEntity,
-        scopePath: LinkedList(
-          .descriptor(
-            forType: type,
-            inclusionConditions: nil,
-            givenAllTypesInSchema: .init([type], schemaRootTypes: .mock())
-          ))))
+        typeInfo: typeInfo,
+        selections: DirectSelections()
+      )
+    )
 
     return IR.NamedFragment(
       definition: definition,
       rootField: rootEntityField,
       referencedFragments: [],
-      containsDeferredFragment: false,
-      entities: [rootEntity.location: rootEntity]
+      entityStorage: .init(rootEntity: rootEntity),
+      containsDeferredFragment: false
     )
   }
 }
@@ -93,23 +100,31 @@ extension IR.Operation {
     containsDeferredFragment: Bool = false
   ) -> IR.Operation {
     let definition = definition ?? .mock()
+    let entity = IR.Entity(
+      location: .init(source: .operation(definition), fieldPath: nil),
+      rootTypePath: [.mock()]
+    )
+    let typeInfo = SelectionSet.TypeInfo(
+      entity: entity,
+      scopePath: [.descriptor(
+        forType: .mock(),
+        inclusionConditions: nil,
+        givenAllTypesInSchema: .init([], schemaRootTypes: .mock()))
+      ]
+    )
+    let rootField = IR.EntityField(
+      .mock(),
+      inclusionConditions: nil,
+      selectionSet: .init(
+        typeInfo: typeInfo,
+        selections: DirectSelections()
+      )
+    )
     return IR.Operation.init(
       definition: definition,
-      rootField: .init(
-        .mock(),
-        inclusionConditions: nil,
-        selectionSet: .init(
-          entity: .init(
-            location: .init(source: .operation(definition), fieldPath: nil),
-            rootTypePath: [.mock()]
-          ),
-          scopePath: [.descriptor(
-            forType: .mock(),
-            inclusionConditions: nil,
-            givenAllTypesInSchema: .init([], schemaRootTypes: .mock()))
-          ])
-      ),
+      rootField: rootField,
       referencedFragments: referencedFragments,
+      entityStorage: .init(rootEntity: entity),
       containsDeferredFragment: containsDeferredFragment
     )
   }

@@ -12,23 +12,28 @@ struct FragmentTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .operationFile
 
-  var template: TemplateString {
-    let definition = IR.Definition.namedFragment(fragment)
-
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
+    let includeDefinition = config.options.operationDocumentFormat.contains(.definition)
+    
     return TemplateString(
     """
     \(accessControlModifier(for: .parent))\
     struct \(fragment.generatedDefinitionName.asFragmentName): \
-    \(definition.renderedSelectionSetType(config)), Fragment {
+    \(fragment.renderedSelectionSetType(config)), Fragment {
+    \(if: includeDefinition, """
       \(accessControlModifier(for: .member))\
     static var fragmentDefinition: StaticString {
         #"\(fragment.definition.source.convertedToSingleLine())"#
       }
-
+    
+    """)
       \(SelectionSetTemplate(
-        definition: definition,
+        definition: fragment,
         generateInitializers: config.options.shouldGenerateSelectionSetInitializers(for: fragment),
         config: config,
+        nonFatalErrorRecorder: nonFatalErrorRecorder,
         renderAccessControl: { accessControlModifier(for: .member) }()
       ).renderBody())
     }

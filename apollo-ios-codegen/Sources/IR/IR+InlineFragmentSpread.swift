@@ -1,6 +1,6 @@
 /// Represents an Inline Fragment that has been "spread into" another SelectionSet using the
 /// spread operator (`...`).
-public class InlineFragmentSpread: Hashable, CustomDebugStringConvertible {
+public struct InlineFragmentSpread: Hashable, CustomDebugStringConvertible {
   /// The `SelectionSet` representing the inline fragment that has been "spread into" its
   /// enclosing operation/fragment.
   public let selectionSet: SelectionSet

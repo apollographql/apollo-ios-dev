@@ -19,8 +19,7 @@ let package = Package(
             dependencies: [
               .product(name: "ApolloCodegenLib", package: "ApolloCodegen"),
             ]),
-    .target(name: "SwiftScriptHelpers"
-           ),
+    .target(name: "SwiftScriptHelpers"),
     .executableTarget(name: "Codegen",
             dependencies: [
               .product(name: "ApolloCodegenLib", package: "ApolloCodegen"),
@@ -32,7 +31,8 @@ let package = Package(
             dependencies: [
               .product(name: "ApolloCodegenLib", package: "ApolloCodegen"),
               .target(name: "TargetConfig"),
-            ]),    
+              .target(name: "SwiftScriptHelpers")
+            ]),
     .executableTarget(name: "DocumentationGenerator",
             dependencies: [
               .product(name: "ApolloCodegenLib", package: "ApolloCodegen"),

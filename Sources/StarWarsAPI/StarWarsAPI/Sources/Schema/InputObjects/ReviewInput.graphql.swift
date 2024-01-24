@@ -14,12 +14,12 @@ public struct ReviewInput: InputObject {
   public init(
     stars: Int,
     commentary: GraphQLNullable<String> = nil,
-    favorite_color: GraphQLNullable<ColorInput> = nil
+    favoriteColor: GraphQLNullable<ColorInput> = nil
   ) {
     __data = InputDict([
       "stars": stars,
       "commentary": commentary,
-      "favorite_color": favorite_color
+      "favorite_color": favoriteColor
     ])
   }
 
@@ -36,7 +36,7 @@ public struct ReviewInput: InputObject {
   }
 
   /// Favorite color, optional
-  public var favorite_color: GraphQLNullable<ColorInput> {
+  public var favoriteColor: GraphQLNullable<ColorInput> {
     get { __data["favorite_color"] }
     set { __data["favorite_color"] = newValue }
   }

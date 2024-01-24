@@ -58,8 +58,8 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
     var mergedField = existingField
 
     if existingField.inclusionConditions == newField.inclusionConditions {
-      mergedField.selectionSet.selections.direct!
-        .mergeIn(newField.selectionSet.selections.direct!)
+      mergedField.selectionSet.selections!
+        .mergeIn(newField.selectionSet.selections!)
 
     } else if existingField.inclusionConditions != nil {
       mergedField = createInclusionWrapperField(wrapping: existingField, mergingIn: newField)
@@ -83,13 +83,20 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
       )
     }
 
+    let typeInfo = SelectionSet.TypeInfo(
+      entity: existingField.entity,
+      scopePath: wrapperScope
+    )
+
+    let selectionSet = SelectionSet(
+      typeInfo: typeInfo,
+      selections: DirectSelections()
+    )
+
     let wrapperField = EntityField(
       existingField.underlyingField,
       inclusionConditions: (existingField.inclusionConditions || newField.inclusionConditions),
-      selectionSet: SelectionSet(
-        entity: existingField.entity,
-        scopePath: wrapperScope
-      )
+      selectionSet: selectionSet
     )
 
     merge(field: existingField, intoInclusionWrapperField: wrapperField)
@@ -100,20 +107,27 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
 
   private func merge(field newField: EntityField, intoInclusionWrapperField wrapperField: EntityField) {
     if let newFieldConditions = newField.selectionSet.inclusionConditions {
-      let newFieldSelectionSet = SelectionSet(
+      let typeInfo = SelectionSet.TypeInfo(
         entity: newField.entity,
         scopePath: wrapperField.selectionSet.scopePath.mutatingLast {
           $0.appending(newFieldConditions)
-        },
-        selections: newField.selectionSet.selections.direct.unsafelyUnwrapped
+        }
       )
+
+      let newFieldSelectionSet = SelectionSet(
+        typeInfo: typeInfo,
+        selections: newField.selectionSet.selections.unsafelyUnwrapped
+      )
+
       let newFieldInlineFragment = InlineFragmentSpread(
         selectionSet: newFieldSelectionSet
       )
-      wrapperField.selectionSet.selections.direct?.mergeIn(newFieldInlineFragment)
+      wrapperField.selectionSet.selections?.mergeIn(newFieldInlineFragment)
 
     } else {
-      wrapperField.selectionSet.selections.direct?.mergeIn(newField.selectionSet.selections.direct.unsafelyUnwrapped)
+      wrapperField.selectionSet.selections?.mergeIn(
+        newField.selectionSet.selections.unsafelyUnwrapped
+      )
     }
   }
 
@@ -121,8 +135,8 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
     let scopeCondition = fragment.selectionSet.scope.scopePath.last.value
 
     if let existingTypeCase = inlineFragments[scopeCondition]?.selectionSet {
-      existingTypeCase.selections.direct!
-        .mergeIn(fragment.selectionSet.selections.direct!)
+      existingTypeCase.selections!
+        .mergeIn(fragment.selectionSet.selections!)
 
     } else {
       inlineFragments[scopeCondition] = fragment
@@ -180,11 +194,12 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
     public var inlineFragments: OrderedDictionary<ScopeCondition, InlineFragmentSpread> { value.inlineFragments }
     public var namedFragments: OrderedDictionary<String, NamedFragmentSpread> { value.namedFragments }
     public var isEmpty: Bool { value.isEmpty }
+
+    public var groupedByInclusionCondition: GroupedByInclusionCondition {
+      GroupedByInclusionCondition(self)
+    }
   }
 
-  public var groupedByInclusionCondition: GroupedByInclusionCondition {
-    GroupedByInclusionCondition(self)
-  }
 
   public class GroupedByInclusionCondition: Equatable {
 
@@ -194,7 +209,7 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
     public private(set) var inclusionConditionGroups:
     OrderedDictionary<AnyOf<InclusionConditions>, DirectSelections.ReadOnly> = [:]
 
-    init(_ directSelections: DirectSelections) {
+    init(_ directSelections: DirectSelections.ReadOnly) {
       for selection in directSelections.fields {
         if let condition = selection.value.inclusionConditions {
           inclusionConditionGroups.updateValue(
@@ -244,143 +259,4 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
     }
   }
 
-}
-
-public class MergedSelections: Equatable, CustomDebugStringConvertible {
-
-  public struct MergedSource: Hashable {
-    public let typeInfo: SelectionSet.TypeInfo
-
-    /// The `NamedFragment` that the merged selections were contained in.
-    ///
-    /// - Note: If `fragment` is present, the `typeInfo` is relative to the fragment,
-    /// instead of the operation directly.
-    public unowned let fragment: NamedFragment?
-  }
-
-  public typealias MergedSources = OrderedSet<MergedSource>
-
-  private let directSelections: DirectSelections.ReadOnly?
-  let typeInfo: SelectionSet.TypeInfo
-
-  public fileprivate(set) var mergedSources: MergedSources = []
-  public fileprivate(set) var fields: OrderedDictionary<String, Field> = [:]
-  public fileprivate(set) var inlineFragments: OrderedDictionary<ScopeCondition, InlineFragmentSpread> = [:]
-  public fileprivate(set) var namedFragments: OrderedDictionary<String, NamedFragmentSpread> = [:]
-
-  init(
-    directSelections: DirectSelections.ReadOnly?,
-    typeInfo: SelectionSet.TypeInfo
-  ) {
-    self.directSelections = directSelections
-    self.typeInfo = typeInfo
-  }
-
-  func mergeIn(_ selections: EntityTreeScopeSelections, from source: MergedSource) {
-    @IsEverTrue var didMergeAnySelections: Bool
-
-    selections.fields.values.forEach { didMergeAnySelections = self.mergeIn($0) }
-    selections.namedFragments.values.forEach { didMergeAnySelections = self.mergeIn($0) }
-
-    if didMergeAnySelections {
-      mergedSources.append(source)
-    }
-  }
-
-  private func mergeIn(_ field: Field) -> Bool {
-    let keyInScope = field.hashForSelectionSetScope
-    if let directSelections = directSelections,
-       directSelections.fields.keys.contains(keyInScope) {
-      return false
-    }
-
-    let fieldToMerge: Field
-    if let entityField = field as? EntityField {
-      fieldToMerge = createShallowlyMergedNestedEntityField(from: entityField)
-
-    } else {
-      fieldToMerge = field
-    }
-
-    fields[keyInScope] = fieldToMerge
-    return true
-  }
-
-  private func createShallowlyMergedNestedEntityField(from field: EntityField) -> EntityField {
-    let newSelectionSet = SelectionSet(
-      entity: field.entity,
-      scopePath: self.typeInfo.scopePath.appending(field.selectionSet.typeInfo.scope),
-      mergedSelectionsOnly: true
-    )
-    return EntityField(
-      field.underlyingField,
-      inclusionConditions: field.inclusionConditions,
-      selectionSet: newSelectionSet
-    )
-  }
-
-  private func mergeIn(_ fragment: NamedFragmentSpread) -> Bool {
-    let keyInScope = fragment.hashForSelectionSetScope
-    if let directSelections = directSelections,
-       directSelections.namedFragments.keys.contains(keyInScope) {
-      return false
-    }
-
-    namedFragments[keyInScope] = fragment
-
-    return true
-  }
-
-  func addMergedInlineFragment(with condition: ScopeCondition) {
-    guard typeInfo.isEntityRoot else { return }
-
-    createShallowlyMergedInlineFragmentIfNeeded(with: condition)
-  }
-
-  private func createShallowlyMergedInlineFragmentIfNeeded(
-    with condition: ScopeCondition
-  ) {
-    if let directSelections = directSelections,
-       directSelections.inlineFragments.keys.contains(condition) {
-      return
-    }
-
-    guard !inlineFragments.keys.contains(condition) else { return }
-
-    let inlineFragment = InlineFragmentSpread(
-      selectionSet: .init(
-        entity: self.typeInfo.entity,
-        scopePath: self.typeInfo.scopePath.mutatingLast { $0.appending(condition) },
-        mergedSelectionsOnly: true
-      )
-    )
-    inlineFragments[condition] = inlineFragment
-  }
-
-  var isEmpty: Bool {
-    fields.isEmpty && inlineFragments.isEmpty && namedFragments.isEmpty
-  }
-
-  public static func == (lhs: MergedSelections, rhs: MergedSelections) -> Bool {
-    lhs.mergedSources == rhs.mergedSources &&
-    lhs.fields == rhs.fields &&
-    lhs.inlineFragments == rhs.inlineFragments &&
-    lhs.namedFragments == rhs.namedFragments
-  }
-
-  public var debugDescription: String {
-      """
-      Merged Sources: \(mergedSources)
-      Fields: \(fields.values.elements)
-      InlineFragments: \(inlineFragments.values.elements.map(\.debugDescription))
-      NamedFragments: \(namedFragments.values.elements.map(\.debugDescription))
-      """
-  }
-
-}
-
-extension MergedSelections.MergedSource: CustomDebugStringConvertible {
-  public var debugDescription: String {
-    typeInfo.debugDescription + ", fragment: \(fragment?.debugDescription ?? "nil")"
-  }
 }

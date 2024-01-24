@@ -12,7 +12,9 @@ struct InputObjectTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .schemaFile(type: .inputObject)
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     let (validFields, deprecatedFields) = filterFields(graphqlInputObject.fields)
     let memberAccessControl = accessControlModifier(for: .member)
 

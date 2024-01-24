@@ -1,6 +1,7 @@
 import Foundation
-@testable import ApolloCodegenLib
 import TemplateString
+
+@testable import ApolloCodegenLib
 
 public struct MockTemplateRenderer: TemplateRenderer {
   public var target: ApolloCodegenLib.TemplateTarget
@@ -16,4 +17,8 @@ public struct MockTemplateRenderer: TemplateRenderer {
     self.template = template
     self.config = config
   }
+
+  public func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString { template }
 }
