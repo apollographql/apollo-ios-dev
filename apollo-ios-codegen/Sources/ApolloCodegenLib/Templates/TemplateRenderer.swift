@@ -361,6 +361,7 @@ struct ImportStatementTemplate {
 }
 
 /// Provides the format to import additional Swift modules required by the template type.
+/// These are custom import statements defined using the `@import(module:)` directive.
 struct ModuleImportStatementTemplate {
 
   static func template(
