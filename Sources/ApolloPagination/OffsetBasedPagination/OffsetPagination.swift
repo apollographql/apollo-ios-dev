@@ -1,9 +1,10 @@
 public struct OffsetPagination: PaginationInfo, Hashable {
   public let offset: Int
-  public let canLoadMore: Bool
+  public let canLoadNext: Bool
+  public var canLoadPrevious: Bool { false }
 
-  public init(offset: Int, canLoadMore: Bool) {
+  public init(offset: Int, canLoadNext: Bool) {
     self.offset = offset
-    self.canLoadMore = canLoadMore
+    self.canLoadNext = canLoadNext
   }
 }
