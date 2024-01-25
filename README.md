@@ -59,7 +59,7 @@ After working and making changes in the `ApolloDev.xcworkspace` you can commit y
 
 ## Issues
 
-To report an issue, bug, or feature request ou can do so in the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repo.
+To report an issue, bug, or feature request, you can do so in the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repo.
 
 ## Roadmap
 
