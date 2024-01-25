@@ -8,6 +8,7 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
   public enum ResponseError: Error, LocalizedError {
     case missingPath
     case cannotParseIncrementalData
+    case missingDeferredSelectionSetType(String, String)
 
     public var errorDescription: String? {
       switch self {
@@ -16,6 +17,9 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
 
       case .cannotParseIncrementalData:
         return "Cannot parse the incremental data."
+
+      case let .missingDeferredSelectionSetType(label, path):
+        return "The operation does not have a deferred selection set for label '\(label)' at field path '\(path)'."
       }
     }
   }
@@ -39,12 +43,21 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
   func parseIncrementalResult() throws -> IncrementalGraphQLResult {
     guard 
       let label = base.body["label"] as? String,
-      let path = base.body["path"] as? [JSONValue],
-      let selectionSetType = Operation.deferredSelectionSetType(withLabel: label, atPath: path)
+      let jsonPath = base.body["path"] as? [JSONValue]
     else {
       throw ResponseError.cannotParseIncrementalData
     }
-    
+
+    let pathComponents: [PathComponent] = jsonPath.compactMap(PathComponent.init)
+    let fieldPath = pathComponents.fieldPath
+
+    guard let selectionSetType = Operation.deferredSelectionSetType(
+      withLabel: label,
+      atFieldPath: fieldPath
+    ) else {
+      throw ResponseError.missingDeferredSelectionSetType(label, fieldPath.joined(separator: "."))
+    }
+
     let accumulator = zip(
       DataDictMapper(),
       ResultNormalizerFactory.networkResponseDataNormalizer(),
@@ -66,7 +79,7 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
 
     return IncrementalGraphQLResult(
       label: label,
-      path: path.compactMap(PathComponent.init),
+      path: pathComponents,
       data: selectionSet,
       extensions: base.parseExtensions(),
       errors: base.parseErrors(),
@@ -86,5 +99,17 @@ fileprivate extension CacheReference {
     }
 
     return CacheReference(keys.joined(separator: "."))
+  }
+}
+
+extension [PathComponent] {
+  fileprivate var fieldPath: [String] {
+    return self.compactMap({ pathComponent in
+      if case let .field(name) = pathComponent {
+        return name
+      }
+
+      return nil
+    })
   }
 }

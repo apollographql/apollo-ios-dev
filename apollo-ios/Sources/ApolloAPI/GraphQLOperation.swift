@@ -90,10 +90,8 @@ public extension GraphQLOperation {
 
   static func deferredSelectionSetType(
     withLabel label: String,
-    atPath path: [JSONValue]
+    atFieldPath fieldPath: [String]
   ) -> (any SelectionSet.Type)? {
-    let fieldPath: [String] = path.compactMap({ $0 as? String })
-
     return deferredFragments?[DeferredFragmentIdentifier(label: label, fieldPath: fieldPath)]
   }
 
