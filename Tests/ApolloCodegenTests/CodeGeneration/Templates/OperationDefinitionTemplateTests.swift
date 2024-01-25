@@ -64,7 +64,31 @@ class OperationDefinitionTemplateTests: XCTestCase {
     subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
-  // MARK: - Operation Definition
+  // MARK: - Target Configuration Tests
+
+  func test__target__givenModuleImports_targetHasModuleImports() async throws {
+    // given
+    document = """
+    query TestOperation @import(module: "ModuleA") {
+      allAnimals {
+        species
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    guard case let .operationFile(actual) = subject.target else {
+      fail("expected operationFile target")
+      return
+    }
+
+    // then
+    expect(actual).to(equal(["ModuleA"]))
+  }
+
+  // MARK: - Operation Definition Tests
 
   func test__generate__givenQuery_generatesQueryOperation() async throws {
     // given
