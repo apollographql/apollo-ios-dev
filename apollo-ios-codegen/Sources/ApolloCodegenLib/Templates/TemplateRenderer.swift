@@ -1,4 +1,5 @@
 import TemplateString
+import OrderedCollections
 
 // MARK: TemplateRenderer
 
@@ -7,7 +8,7 @@ enum TemplateTarget: Equatable {
   /// Used in schema types files; enum, input object, union, etc.
   case schemaFile(type: SchemaFileType)
   /// Used in operation files; query, mutation, fragment, etc.
-  case operationFile
+  case operationFile(moduleImports: OrderedSet<String>? = nil)
   /// Used in files that define a module; Swift Package Manager, etc.
   case moduleFile
   /// Used in test mock files; schema object `Mockable` extensions
@@ -23,7 +24,7 @@ enum TemplateTarget: Equatable {
     case customScalar
     case inputObject
 
-    var namespaceComponent: String? {      
+    var namespaceComponent: String? {
       switch self {
       case .schemaMetadata, .enum, .customScalar, .inputObject, .schemaConfiguration:
         return nil
@@ -102,10 +103,17 @@ extension TemplateRenderer {
 
     let body = {
       switch target {
-      case let .schemaFile(type): return renderSchemaFile(type, errorRecorder)
-      case .operationFile: return renderOperationFile(errorRecorder)
-      case .moduleFile: return renderModuleFile(errorRecorder)
-      case .testMockFile: return renderTestMockFile(errorRecorder)
+      case let .schemaFile(type): 
+        return renderSchemaFile(type, errorRecorder)
+
+      case let .operationFile(moduleImports):
+        return renderOperationFile(moduleImports, errorRecorder)
+
+      case .moduleFile:
+        return renderModuleFile(errorRecorder)
+
+      case .testMockFile:
+        return renderTestMockFile(errorRecorder)
       }
     }()
 
@@ -153,12 +161,14 @@ extension TemplateRenderer {
   }
 
   private func renderOperationFile(
+    _ moduleImports: OrderedSet<String>?,
     _ errorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> String {
     TemplateString(
     """
     \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
     \(ImportStatementTemplate.Operation.template(for: config))
+    \(ifLet: moduleImports, { "\(ModuleImportStatementTemplate.template(moduleImports: $0))" })
 
     \(if: config.output.operations.isInModule && !config.output.schemaTypes.isInModule,
       renderBodyTemplate(nonFatalErrorRecorder: errorRecorder)
@@ -348,6 +358,20 @@ struct ImportStatementTemplate {
       """
     }
   }
+}
+
+/// Provides the format to import additional Swift modules required by the template type.
+/// These are custom import statements defined using the `@import(module:)` directive.
+struct ModuleImportStatementTemplate {
+
+  static func template(
+    moduleImports: OrderedSet<String>
+  ) -> TemplateString {
+    return """
+    \(moduleImports.map { "import \($0)" }.joined(separator: "\n"))
+    """
+  }
+    
 }
 
 fileprivate extension ApolloCodegenConfiguration {

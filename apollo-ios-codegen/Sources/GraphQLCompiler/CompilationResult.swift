@@ -1,5 +1,6 @@
 import JavaScriptCore
 import TemplateString
+import OrderedCollections
 
 /// The output of the frontend compiler.
 public final class CompilationResult: JavaScriptObjectDecodable {
@@ -7,6 +8,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
   /// String constants used to match JavaScriptObject instances.
   fileprivate enum Constants {
     enum DirectiveNames {
+      static let Import = "import"
       static let LocalCacheMutation = "apollo_client_ios_localCacheMutation"
       static let Defer = "defer"
     }
@@ -108,6 +110,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     public let filePath: String
 
     public let isLocalCacheMutation: Bool
+      
+    public let moduleImports: OrderedSet<String>
 
     static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
       self.init(
@@ -145,6 +149,9 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.filePath = filePath
       self.isLocalCacheMutation = directives?
         .contains { $0.name == Constants.DirectiveNames.LocalCacheMutation } ?? false
+   
+      self.moduleImports = OperationDefinition.getImportModuleNames(directives: directives, 
+                                                                    referencedFragments: referencedFragments)
     }
 
     public var debugDescription: String {
@@ -157,6 +164,17 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     
     public static func ==(lhs: OperationDefinition, rhs: OperationDefinition) -> Bool {
       return lhs.name == rhs.name
+    }
+      
+    private static func getImportModuleNames(directives: [Directive]?, 
+                                             referencedFragments: [FragmentDefinition]) -> OrderedSet<String> {
+      let referencedImports: [String] = referencedFragments
+        .flatMap { $0.moduleImports }
+      let directiveImports: [String] = directives?
+        .compactMap { ImportDirective(directive: $0)?.moduleName } ?? []
+      var orderedImports = OrderedSet(referencedImports + directiveImports)
+      orderedImports.sort()
+      return orderedImports
     }
   }
   
@@ -214,15 +232,19 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     public var isLocalCacheMutation: Bool {
       directives?.contains { $0.name == Constants.DirectiveNames.LocalCacheMutation } ?? false
     }
+      
+    public let moduleImports: OrderedSet<String>
 
     init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
       self.name = jsValue["name"]
+      self.directives = .fromJSValue(jsValue["directives"], bridge: bridge)
       self.type = .fromJSValue(jsValue["typeCondition"], bridge: bridge)
       self.selectionSet = .fromJSValue(jsValue["selectionSet"], bridge: bridge)
-      self.directives = .fromJSValue(jsValue["directives"], bridge: bridge)
       self.referencedFragments = .fromJSValue(jsValue["referencedFragments"], bridge: bridge)
       self.source = jsValue["source"]
       self.filePath = jsValue["filePath"]
+      self.moduleImports = FragmentDefinition.getImportModuleNames(directives: directives, 
+                                                                   referencedFragments: referencedFragments)
     }
 
     /// Initializer to be used for creating mock objects in tests only.
@@ -242,6 +264,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.referencedFragments = referencedFragments
       self.source = source
       self.filePath = filePath
+      self.moduleImports = FragmentDefinition.getImportModuleNames(directives: directives,
+                                                                   referencedFragments: referencedFragments)
     }
 
     public var debugDescription: String {
@@ -254,6 +278,18 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
     public static func ==(lhs: FragmentDefinition, rhs: FragmentDefinition) -> Bool {
       return lhs.name == rhs.name
+    }
+    
+    private static func getImportModuleNames(directives: [Directive]?, 
+                                             referencedFragments: [FragmentDefinition]) -> OrderedSet<String> {
+      let referencedImports: [String] = referencedFragments
+        .flatMap { $0.moduleImports }
+      let directiveImports: [String] = directives?
+        .compactMap { ImportDirective(directive: $0)?.moduleName } ?? []
+            
+      var orderedImports = OrderedSet(referencedImports + directiveImports)
+      orderedImports.sort()
+      return orderedImports
     }
   }
   
@@ -527,7 +563,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     }
   }
   
-  public struct Argument: 
+  public struct Argument:
     JavaScriptObjectDecodable, Sendable, Hashable {
     public let name: String
 
@@ -650,7 +686,34 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       return string
     }
   }
-
+    
+    fileprivate struct ImportDirective: Hashable, CustomDebugStringConvertible, Sendable, Equatable {
+      /// String constants used to match JavaScriptObject instances.
+      enum Constants {
+          enum ArgumentNames {
+            static let Module = "module"
+          }
+      }
+        
+      let moduleName: String
+        
+      init?(directive: Directive) {
+        guard directive.name == CompilationResult.Constants.DirectiveNames.Import else {
+          return nil
+        }
+        guard let moduleArgument = directive.arguments?.first(
+            where: { $0.name == Constants.ArgumentNames.Module }),
+          case let .string(moduleValue) = moduleArgument.value
+        else {
+          return nil
+        }
+        moduleName = moduleValue
+      }
+    
+      var debugDescription: String {
+        return "@import(module: \"\(moduleName)\")"
+      }
+    }
 }
 
 fileprivate protocol Deferrable { }
