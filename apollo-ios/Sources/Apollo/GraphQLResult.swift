@@ -136,11 +136,11 @@ fileprivate extension DataDict {
 
     public var errorDescription: String? {
       switch self {
-      case let .invalidPathDataType(got):
-        return "Invalid data type for merge - \(got)"
+      case let .invalidPathDataType(invalidType):
+        return "Invalid data type for incremental merge. Expected DataDict, got \(invalidType)."
 
       case let .cannotOverwriteData(current, new):
-        return "Incremental merging cannot overwrite existing data \(current) with \(new)"
+        return "Incremental merge cannot overwrite field data value '\(current)' with mismatched value '\(new)'."
       }
     }
   }
