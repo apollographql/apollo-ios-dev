@@ -14,7 +14,9 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
 
   let config: ApolloCodegen.ConfigurationContext
 
-  let target: TemplateTarget = .operationFile
+  var target: TemplateTarget {
+    .operationFile(moduleImports: operation.definition.moduleImports)
+  }
 
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
@@ -45,7 +47,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
 
     """)
   }
-
+    
   private func OperationDeclaration() -> TemplateString {
     return """
     \(accessControlModifier(for: .parent))\
