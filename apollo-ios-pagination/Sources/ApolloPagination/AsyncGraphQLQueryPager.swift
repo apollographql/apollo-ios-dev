@@ -3,10 +3,11 @@ import ApolloAPI
 import Combine
 
 /// Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.
-public class AsyncGraphQLQueryPager<Model> {
+public class AsyncGraphQLQueryPager<Model>: Publisher {
+  public typealias Failure = Never
   public typealias Output = Result<(Model, UpdateSource), Error>
-  private let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
-  public var publisher: AnyPublisher<Output, Never> { _subject.compactMap({ $0 }).eraseToAnyPublisher() }
+  let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
+  var publisher: AnyPublisher<Output, Never> { _subject.compactMap({ $0 }).eraseToAnyPublisher() }
   public var cancellables = [AnyCancellable]()
   public let pager: any AsyncPagerType
 
@@ -119,7 +120,35 @@ public class AsyncGraphQLQueryPager<Model> {
   public func cancel() async {
     await pager.cancel()
   }
+
+  public func receive<S>(
+    subscriber: S
+  ) where S : Subscriber, Never == S.Failure, Result<(Model, UpdateSource), Error> == S.Input {
+    let subscription = PagerSubscription(pager: self, subscriber: subscriber)
+    subscriber.receive(subscription: subscription)
+  }
 }
+
+private class PagerSubscription<SubscriberType: Subscriber, Pager: AsyncGraphQLQueryPager<Model>, Model>: Subscription where SubscriberType.Input == Pager.Output {
+  private var subscriber: SubscriberType?
+  private var pager: Pager
+  private var cancellable: AnyCancellable?
+
+  init(pager: Pager, subscriber: SubscriberType) {
+    self.subscriber = subscriber
+    self.pager = pager
+    cancellable = pager.publisher.sink(receiveValue: {
+      _ = subscriber.receive($0)
+    })
+  }
+
+  func request(_ demand: Subscribers.Demand) { }
+
+  func cancel() {
+    subscriber = nil
+  }
+}
+
 
 extension AsyncGraphQLQueryPagerCoordinator {
   nonisolated func eraseToAnyPager<T>(

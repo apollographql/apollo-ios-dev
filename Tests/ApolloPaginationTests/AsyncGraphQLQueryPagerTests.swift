@@ -42,6 +42,30 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     try super.tearDownWithError()
   }
 
+  func test_canLoadMore_sink() async throws {
+    let pager = await AsyncGraphQLQueryPager(pager: createForwardPager(), transform: { ($0, $1, $2) })
+
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+
+    await pager.fetch()
+    await fulfillment(of: [serverExpectation])
+
+    var canLoadMore = await pager.canLoadNext
+    XCTAssertTrue(canLoadMore)
+
+    let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
+    let secondPageFetch = expectation(description: "Second Page")
+    secondPageFetch.expectedFulfillmentCount = 2
+    let subscription = pager.sink { value in
+      secondPageFetch.fulfill()
+    }
+    try await pager.loadNext()
+    await fulfillment(of: [secondPageExpectation, secondPageFetch])
+    subscription.cancel()
+    canLoadMore = await pager.canLoadNext
+    XCTAssertFalse(canLoadMore)
+  }
+
   func test_canLoadMore() async throws {
     let pager = createForwardPager()
 
