@@ -200,6 +200,26 @@ final class GraphQLQueryPagerTests: XCTestCase {
     XCTAssertEqual(results.map(\.name), ["Luke Skywalker", "Han Solo", "Leia Organa"])
   }
 
+  func test_transformless_init() throws {
+    let pager = GraphQLQueryPager(pager: createPager())
+    let fetchExpectation = expectation(description: "Initial Fetch")
+    var expectedViewModels: [PaginationOutput<Query, Query>] = []
+    pager.sink { result in
+      switch result {
+      case .success((let value, _)):
+        expectedViewModels.append(value)
+        fetchExpectation.fulfill()
+      default:
+        XCTFail("Failed to get view models from pager")
+      }
+    }.store(in: &subscriptions)
+
+    fetchFirstPage(pager: pager)
+    wait(for: [fetchExpectation], timeout: 1)
+    XCTAssertFalse(expectedViewModels.isEmpty)
+    XCTAssertEqual(expectedViewModels.count, 1)
+  }
+
   func test_passesBackSeparateData() throws {
     let anyPager = createPager().eraseToAnyPager { _, initial, next in
       if let latestPage = next.last {

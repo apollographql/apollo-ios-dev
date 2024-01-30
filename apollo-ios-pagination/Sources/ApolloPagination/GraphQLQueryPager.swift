@@ -45,6 +45,28 @@ public class GraphQLQueryPager<Model>: Publisher {
     }
   }
 
+  /// Type-erases a given pager, transforming data to a model as pagination receives new results.
+  /// - Parameters:
+  ///   - pager: Pager to type-erase.
+  public init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, NextQuery>, InitialQuery, NextQuery>(
+    pager: Pager
+  ) where Model == PaginationOutput<InitialQuery, NextQuery> {
+    self.pager = pager
+    pager.subscribe { [weak self] result in
+      guard let self else { return }
+      let returnValue: Output
+
+      switch result {
+      case let .success(output):
+        returnValue = .success((output, output.updateSource))
+      case let .failure(error):
+        returnValue = .failure(error)
+      }
+
+      _subject.send(returnValue)
+    }
+  }
+
   /// Type-erases a given pager, transforming the initial page to an array of models, and the
   /// subsequent pagination to an additional array of models, concatenating the results of each into one array.
   /// - Parameters:
