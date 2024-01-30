@@ -15,10 +15,6 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
   public var canLoadNext: Bool { get async { await pager.canLoadNext } }
   public var canLoadPrevious: Bool { get async { await pager.canLoadPrevious } }
 
-  /// Type-erases a given pager, transforming data to a model as pagination receives new results.
-  /// - Parameters:
-  ///   - pager: Pager to type-erase.
-  ///   - transform: Transformation from an initial page and array of paginated pages to a given view model.
   init<Pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager,
     transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
@@ -44,9 +40,6 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     }.store(in: &cancellables)
   }
 
-  /// Type-erases a given pager, transforming data to a model as pagination receives new results.
-  /// - Parameters:
-  ///   - pager: Pager to type-erase.
   init<Pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager
   ) async where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
@@ -87,6 +80,15 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     )
   }
 
+  /// For most use-cases, it's recommended to use the static `make...` functions instead of this initializer.
+  /// - Parameters:
+  ///   - client: The Apollo client
+  ///   - initialQuery: The initial query to be performed.
+  ///   - watcherDispatchQueue: The queue that the internal `GraphQLQueryWatcher`s dispatch their results to. Defaults to `main`.
+  ///   - extractPageInfo: This transforming function extracts a `PaginationInfo` from either `InitialQuery.Data` or `PaginatedQuery.Data`, represented in the form of `PageExtractionData`.
+  ///   - pageResolver: This transforming function initializes a new `PaginatedQuery` given a `PagiantionInfo` and `PaginationDirection`.
+  ///   - initialTransform: Transforms the `InitialQuery.Data` to a `Model` type.
+  ///   - pageTransform: Transforms the `PaginatedQuery.Data` to a `Model` type.
   public convenience init<
     P: PaginationInfo,
     InitialQuery: GraphQLQuery,
