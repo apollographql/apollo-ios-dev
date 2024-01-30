@@ -7,6 +7,7 @@ import Foundation
 public extension GraphQLQueryPager {
 
   // MARK: Offset initializers
+
   static func makeForwardOffsetQueryPager<InitialQuery: GraphQLQuery>(
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
