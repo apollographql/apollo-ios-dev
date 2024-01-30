@@ -195,35 +195,3 @@ private class PagerSubscription<SubscriberType: Subscriber, Pager: AsyncGraphQLQ
     subscriber = nil
   }
 }
-
-extension AsyncGraphQLQueryPagerCoordinator {
-  nonisolated func eraseToAnyPager<T>(
-    transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> T
-  ) async -> AsyncGraphQLQueryPager<T> {
-    await AsyncGraphQLQueryPager(
-      pager: self,
-      transform: transform
-    )
-  }
-
-  nonisolated func eraseToAnyPager<T, S: RangeReplaceableCollection>(
-    initialTransform: @escaping (InitialQuery.Data) throws -> S,
-    pageTransform: @escaping (PaginatedQuery.Data) throws -> S
-  ) async -> AsyncGraphQLQueryPager<S> where T == S.Element {
-    await AsyncGraphQLQueryPager(
-      pager: self,
-      initialTransform: initialTransform,
-      pageTransform: pageTransform
-    )
-  }
-
-  nonisolated func eraseToAnyPager<T, S: RangeReplaceableCollection>(
-    transform: @escaping (InitialQuery.Data) throws -> S
-  ) async -> AsyncGraphQLQueryPager<S> where InitialQuery == PaginatedQuery, T == S.Element {
-    await AsyncGraphQLQueryPager(
-      pager: self,
-      initialTransform: transform,
-      pageTransform: transform
-    )
-  }
-}
