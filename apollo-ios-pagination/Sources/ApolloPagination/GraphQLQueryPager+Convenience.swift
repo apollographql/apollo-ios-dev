@@ -2,14 +2,21 @@ import Apollo
 import ApolloAPI
 import Foundation
 
-public extension GraphQLQueryPagerCoordinator {
-  static func makeForwardCursorQueryPager(
+public extension AsyncGraphQLQueryPager {
+  /// This convenience function creates an `AsyncGraphQLQueryPager` that paginates forward with only one query and has an output type of `Result<(PaginationOutput<InitialQuery, InitialQuery>, UpdateSource), Error>`.
+  /// - Parameters:
+  ///   - client: The Apollo client
+  ///   - watcherDispatchQueue: The preferred dispatch queue for the internal `GraphQLQueryWatcher`s to operate on. Defaults to `main`.
+  ///   - queryProvider: The transform from `CursorBasedPagination.Forward` to `InitialQuery`.
+  ///   - extractPageInfo: The transform from `InitialQuery.Data` to `CursorBasedPagination.Forward`
+  /// - Returns: `AsyncGraphQLQueryPager`
+  static func makeForwardCursorQueryPager<InitialQuery: GraphQLQuery>(
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
     queryProvider: @escaping (CursorBasedPagination.Forward?) -> InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Forward
-  ) -> GraphQLQueryPagerCoordinator where InitialQuery == PaginatedQuery {
-    .init(
+  ) async -> AsyncGraphQLQueryPager where Model == PaginationOutput<InitialQuery, InitialQuery> {
+    await AsyncGraphQLQueryPager(pager: AsyncGraphQLQueryPagerCoordinator(
       client: client,
       initialQuery: queryProvider(nil),
       watcherDispatchQueue: watcherDispatchQueue,
@@ -18,9 +25,142 @@ public extension GraphQLQueryPagerCoordinator {
         guard direction == .next else { return nil }
         return queryProvider(page)
       }
+    ))
+  }
+
+  /// This convenience function creates an `AsyncGraphQLQueryPager` that paginates forward with only one query and has a custom output model.
+  /// - Parameters:
+  ///   - client: The Apollo client
+  ///   - watcherDispatchQueue: The preferred dispatch queue for the internal `GraphQLQueryWatcher`s to operate on. Defaults to `main`.
+  ///   - queryProvider: The transform from `CursorBasedPagination.Forward` to `InitialQuery`.
+  ///   - extractPageInfo: The transform from `InitialQuery.Data` to `CursorBasedPagination.Forward`
+  ///   - transform: The transform from `([InitialQuery.Data], InitialQuery.Data, [InitialQuery.Data])` to a custom `Model` type.
+  /// - Returns: `AsyncGraphQLQueryPager`
+  static func makeForwardCursorQueryPager<InitialQuery: GraphQLQuery>(
+    client: ApolloClientProtocol,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (CursorBasedPagination.Forward?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Forward,
+    transform: @escaping ([InitialQuery.Data], InitialQuery.Data, [InitialQuery.Data]) throws -> Model
+  ) async -> AsyncGraphQLQueryPager {
+    await AsyncGraphQLQueryPager(
+      pager: AsyncGraphQLQueryPagerCoordinator(
+        client: client,
+        initialQuery: queryProvider(nil),
+        watcherDispatchQueue: watcherDispatchQueue,
+        extractPageInfo: pageExtraction(transform: extractPageInfo),
+        pageResolver: { page, direction in
+          guard direction == .next else { return nil }
+          return queryProvider(page)
+        }
+      ),
+      transform: transform
+    )
+  }
+  /// This convenience function creates an `AsyncGraphQLQueryPager` that paginates forward with only one query. The output type is represented as an array of a custom model.
+  /// - Parameters:
+  ///   - client: The Apollo client
+  ///   - watcherDispatchQueue: The preferred dispatch queue for the internal `GraphQLQueryWatcher`s to operate on. Defaults to `main`.
+  ///   - queryProvider: The transform from `CursorBasedPagination.Forward` to `InitialQuery`.
+  ///   - extractPageInfo: The transform from `InitialQuery.Data` to `CursorBasedPagination.Forward`
+  ///   - transform: The transform from `([InitialQuery.Data], InitialQuery.Data, [InitialQuery.Data])` to a custom `Model` type.
+  /// - Returns: `AsyncGraphQLQueryPager`
+  static func makeForwardCursorQueryPager<InitialQuery: GraphQLQuery, T>(
+    client: ApolloClientProtocol,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (CursorBasedPagination.Forward?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Forward,
+    transform: @escaping (InitialQuery.Data) throws -> Model
+  ) async -> AsyncGraphQLQueryPager where Model: RangeReplaceableCollection, T == Model.Element {
+    await AsyncGraphQLQueryPager(
+      pager: AsyncGraphQLQueryPagerCoordinator(
+        client: client,
+        initialQuery: queryProvider(nil),
+        watcherDispatchQueue: watcherDispatchQueue,
+        extractPageInfo: pageExtraction(transform: extractPageInfo),
+        pageResolver: { page, direction in
+          guard direction == .next else { return nil }
+          return queryProvider(page)
+        }
+      ),
+      initialTransform: transform,
+      pageTransform: transform
     )
   }
 
+  static func makeForwardCursorQueryPager<InitialQuery: GraphQLQuery, NextQuery: GraphQLQuery>(
+    client: ApolloClientProtocol,
+    initialQuery: InitialQuery,
+    watcherDispatchQueue: DispatchQueue = .main,
+    extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Forward,
+    extractNextPageInfo: @escaping (NextQuery.Data) -> CursorBasedPagination.Forward,
+    nextPageResolver: @escaping (CursorBasedPagination.Forward) -> NextQuery
+  ) async -> AsyncGraphQLQueryPager where Model == PaginationOutput<InitialQuery, NextQuery> {
+    await AsyncGraphQLQueryPager(
+      pager: .init(
+        client: client,
+        initialQuery: initialQuery,
+        watcherDispatchQueue: watcherDispatchQueue,
+        extractPageInfo: pageExtraction(
+          initialTransfom: extractInitialPageInfo,
+          paginatedTransform: extractNextPageInfo
+        ),
+        pageResolver: { page, direction in
+          guard direction == .next else { return nil }
+          return nextPageResolver(page)
+        }
+      )
+    )
+  }
+
+  static func makeForwardCursorQueryPager<InitialQuery: GraphQLQuery, NextQuery: GraphQLQuery>(
+    client: ApolloClientProtocol,
+    initialQuery: InitialQuery,
+    watcherDispatchQueue: DispatchQueue = .main,
+    extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Forward,
+    extractNextPageInfo: @escaping (NextQuery.Data) -> CursorBasedPagination.Forward,
+    nextPageResolver: @escaping (CursorBasedPagination.Forward) -> NextQuery,
+    transform: @escaping ([NextQuery.Data], InitialQuery.Data, [NextQuery.Data]) throws -> Model
+  ) async -> AsyncGraphQLQueryPager {
+    await AsyncGraphQLQueryPager(
+      pager: .makeForwardCursorQueryPager(
+        client: client,
+        initialQuery: initialQuery,
+        watcherDispatchQueue: watcherDispatchQueue,
+        extractInitialPageInfo: extractInitialPageInfo,
+        extractNextPageInfo: extractNextPageInfo,
+        nextPageResolver: nextPageResolver
+      ),
+      transform: transform
+    )
+  }
+
+  static func makeForwardCursorQueryPager<InitialQuery: GraphQLQuery, NextQuery: GraphQLQuery, T>(
+    client: ApolloClientProtocol,
+    initialQuery: InitialQuery,
+    watcherDispatchQueue: DispatchQueue = .main,
+    extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Forward,
+    extractNextPageInfo: @escaping (NextQuery.Data) -> CursorBasedPagination.Forward,
+    nextPageResolver: @escaping (CursorBasedPagination.Forward) -> NextQuery,
+    initialTransform: @escaping (InitialQuery.Data) throws -> Model,
+    pageTransform: @escaping (NextQuery.Data) throws -> Model
+  ) async -> AsyncGraphQLQueryPager where Model: RangeReplaceableCollection, T == Model.Element {
+    await AsyncGraphQLQueryPager(
+      pager: .makeForwardCursorQueryPager(
+        client: client,
+        initialQuery: initialQuery,
+        watcherDispatchQueue: watcherDispatchQueue,
+        extractInitialPageInfo: extractInitialPageInfo,
+        extractNextPageInfo: extractNextPageInfo,
+        nextPageResolver: nextPageResolver
+      ),
+      initialTransform: initialTransform,
+      pageTransform: pageTransform
+    )
+  }
+}
+
+private extension GraphQLQueryPagerCoordinator {
   static func makeForwardCursorQueryPager(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
@@ -40,24 +180,6 @@ public extension GraphQLQueryPagerCoordinator {
       pageResolver: { page, direction in
         guard direction == .next else { return nil }
         return nextPageResolver(page)
-      }
-    )
-  }
-
-  static func makeReverseCursorQueryPager(
-    client: ApolloClientProtocol,
-    watcherDispatchQueue: DispatchQueue = .main,
-    queryProvider: @escaping (CursorBasedPagination.Reverse?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Reverse
-  ) -> GraphQLQueryPagerCoordinator where InitialQuery == PaginatedQuery {
-    .init(
-      client: client,
-      initialQuery: queryProvider(nil),
-      watcherDispatchQueue: watcherDispatchQueue,
-      extractPageInfo: pageExtraction(transform: extractPageInfo),
-      pageResolver: { page, direction in
-        guard direction == .previous else { return nil }
-        return queryProvider(page)
       }
     )
   }
@@ -138,25 +260,7 @@ public extension GraphQLQueryPagerCoordinator {
   }
 }
 
-public extension AsyncGraphQLQueryPagerCoordinator {
-  static func makeForwardCursorQueryPager(
-    client: ApolloClientProtocol,
-    watcherDispatchQueue: DispatchQueue = .main,
-    queryProvider: @escaping (CursorBasedPagination.Forward?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Forward
-  ) -> AsyncGraphQLQueryPagerCoordinator where InitialQuery == PaginatedQuery {
-    .init(
-      client: client,
-      initialQuery: queryProvider(nil),
-      watcherDispatchQueue: watcherDispatchQueue,
-      extractPageInfo: pageExtraction(transform: extractPageInfo),
-      pageResolver: { page, direction in
-        guard direction == .next else { return nil }
-        return queryProvider(page)
-      }
-    )
-  }
-
+private extension AsyncGraphQLQueryPagerCoordinator {
   static func makeForwardCursorQueryPager(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
@@ -176,24 +280,6 @@ public extension AsyncGraphQLQueryPagerCoordinator {
       pageResolver: { page, direction in
         guard direction == .next else { return nil }
         return nextPageResolver(page)
-      }
-    )
-  }
-
-  static func makeReverseCursorQueryPager(
-    client: ApolloClientProtocol,
-    watcherDispatchQueue: DispatchQueue = .main,
-    queryProvider: @escaping (CursorBasedPagination.Reverse?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Reverse
-  ) -> AsyncGraphQLQueryPagerCoordinator where InitialQuery == PaginatedQuery {
-    .init(
-      client: client,
-      initialQuery: queryProvider(nil),
-      watcherDispatchQueue: watcherDispatchQueue,
-      extractPageInfo: pageExtraction(transform: extractPageInfo),
-      pageResolver: { page, direction in
-        guard direction == .previous else { return nil }
-        return queryProvider(page)
       }
     )
   }

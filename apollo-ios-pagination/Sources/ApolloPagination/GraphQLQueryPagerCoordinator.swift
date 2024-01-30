@@ -74,7 +74,7 @@ public class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQ
 
   /// Convenience initializer
   /// - Parameter pager: An `AsyncGraphQLQueryPager`.
-  public init(pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>) {
+  init(pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>) {
     self.pager = pager
   }
 

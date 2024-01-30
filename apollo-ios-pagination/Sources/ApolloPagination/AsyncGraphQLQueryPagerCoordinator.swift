@@ -17,7 +17,7 @@ public protocol AsyncPagerType {
   func fetch() async
 }
 
-public actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: AsyncPagerType {
+actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: AsyncPagerType {
   private let client: any ApolloClientProtocol
   private var firstPageWatcher: GraphQLQueryWatcher<InitialQuery>?
   private var nextPageWatchers: [GraphQLQueryWatcher<PaginatedQuery>] = []
