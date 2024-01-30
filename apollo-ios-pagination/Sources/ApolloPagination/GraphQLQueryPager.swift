@@ -1,7 +1,6 @@
 import Apollo
 import ApolloAPI
 import Combine
-import Dispatch
 import Foundation
 
 /// Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.
@@ -20,7 +19,7 @@ public class GraphQLQueryPager<Model>: Publisher {
   /// - Parameters:
   ///   - pager: Pager to type-erase.
   ///   - transform: Transformation from an initial page and array of paginated pages to a given view model.
-  public init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
+  init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager,
     transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
   ) {
@@ -48,7 +47,7 @@ public class GraphQLQueryPager<Model>: Publisher {
   /// Type-erases a given pager, transforming data to a model as pagination receives new results.
   /// - Parameters:
   ///   - pager: Pager to type-erase.
-  public init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
+  init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager
   ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
     self.pager = pager
@@ -67,13 +66,7 @@ public class GraphQLQueryPager<Model>: Publisher {
     }
   }
 
-  /// Type-erases a given pager, transforming the initial page to an array of models, and the
-  /// subsequent pagination to an additional array of models, concatenating the results of each into one array.
-  /// - Parameters:
-  ///   - pager: Pager to type-erase.
-  ///   - initialTransform: Initial transformation from the initial page to an array of models.
-  ///   - nextPageTransform: Transformation to execute on each subseqent page to an array of models.
-  public convenience init<
+  convenience init<
     Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>,
     InitialQuery,
     PaginatedQuery,
@@ -91,6 +84,34 @@ public class GraphQLQueryPager<Model>: Publisher {
         let next = try nextData.flatMap { try pageTransform($0) }
         return previous + initial + next
       }
+    )
+  }
+
+  public convenience init<
+    P: PaginationInfo,
+    InitialQuery: GraphQLQuery,
+    PaginatedQuery: GraphQLQuery,
+    Element
+  >(
+    client: ApolloClientProtocol,
+    initialQuery: InitialQuery,
+    watcherDispatchQueue: DispatchQueue = .main,
+    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery>) -> P,
+    pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
+    initialTransform: @escaping (InitialQuery.Data) throws -> Model,
+    pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
+  ) where Model: RangeReplaceableCollection, Model.Element == Element {
+    let pager = GraphQLQueryPagerCoordinator(
+      client: client,
+      initialQuery: initialQuery,
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: extractPageInfo,
+      pageResolver: pageResolver
+    )
+    self.init(
+      pager: pager,
+      initialTransform: initialTransform,
+      pageTransform: pageTransform
     )
   }
 
@@ -189,7 +210,7 @@ private class PagerSubscription<SubscriberType: Subscriber, Pager: GraphQLQueryP
   }
 }
 
-public extension GraphQLQueryPagerCoordinator {
+extension GraphQLQueryPagerCoordinator {
   func eraseToAnyPager<T>(
     transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> T
   ) -> GraphQLQueryPager<T> {

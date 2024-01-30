@@ -9,7 +9,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
   public typealias Output = Result<(Model, UpdateSource), Error>
   let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
   var publisher: AnyPublisher<Output, Never> { _subject.compactMap({ $0 }).eraseToAnyPublisher() }
-  public var cancellables = [AnyCancellable]()
+  public var cancellables: Set<AnyCancellable> = []
   public let pager: any AsyncPagerType
 
   public var canLoadNext: Bool { get async { await pager.canLoadNext } }
@@ -87,12 +87,6 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     )
   }
 
-  /// Type-erases a given pager, transforming the initial page to an array of models, and the
-  /// subsequent pagination to an additional array of models, concatenating the results of each into one array.
-  /// - Parameters:
-  ///   - pager: Pager to type-erase.
-  ///   - initialTransform: Initial transformation from the initial page to an array of models.
-  ///   - nextPageTransform: Transformation to execute on each subseqent page to an array of models.
   public convenience init<
     P: PaginationInfo,
     InitialQuery: GraphQLQuery,
@@ -199,7 +193,6 @@ private class PagerSubscription<SubscriberType: Subscriber, Pager: AsyncGraphQLQ
     subscriber = nil
   }
 }
-
 
 extension AsyncGraphQLQueryPagerCoordinator {
   nonisolated func eraseToAnyPager<T>(
