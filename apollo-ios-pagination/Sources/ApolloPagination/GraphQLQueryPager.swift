@@ -20,9 +20,9 @@ public class GraphQLQueryPager<Model>: Publisher {
   /// - Parameters:
   ///   - pager: Pager to type-erase.
   ///   - transform: Transformation from an initial page and array of paginated pages to a given view model.
-  public init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, NextQuery>, InitialQuery, NextQuery>(
+  public init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager,
-    transform: @escaping ([NextQuery.Data], InitialQuery.Data, [NextQuery.Data]) throws -> Model
+    transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
   ) {
     self.pager = pager
     pager.subscribe { [weak self] result in
@@ -48,9 +48,9 @@ public class GraphQLQueryPager<Model>: Publisher {
   /// Type-erases a given pager, transforming data to a model as pagination receives new results.
   /// - Parameters:
   ///   - pager: Pager to type-erase.
-  public init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, NextQuery>, InitialQuery, NextQuery>(
+  public init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager
-  ) where Model == PaginationOutput<InitialQuery, NextQuery> {
+  ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
     self.pager = pager
     pager.subscribe { [weak self] result in
       guard let self else { return }
@@ -74,14 +74,14 @@ public class GraphQLQueryPager<Model>: Publisher {
   ///   - initialTransform: Initial transformation from the initial page to an array of models.
   ///   - nextPageTransform: Transformation to execute on each subseqent page to an array of models.
   public convenience init<
-    Pager: GraphQLQueryPagerCoordinator<InitialQuery, NextQuery>,
+    Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>,
     InitialQuery,
-    NextQuery,
+    PaginatedQuery,
     Element
   >(
     pager: Pager,
     initialTransform: @escaping (InitialQuery.Data) throws -> Model,
-    pageTransform: @escaping (NextQuery.Data) throws -> Model
+    pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
   ) where Model: RangeReplaceableCollection, Model.Element == Element {
     self.init(
       pager: pager,

@@ -19,9 +19,9 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
   /// - Parameters:
   ///   - pager: Pager to type-erase.
   ///   - transform: Transformation from an initial page and array of paginated pages to a given view model.
-  init<Pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, NextQuery>, InitialQuery, NextQuery>(
+  init<Pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager,
-    transform: @escaping ([NextQuery.Data], InitialQuery.Data, [NextQuery.Data]) throws -> Model
+    transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
   ) async {
     self.pager = pager
     await pager.subscribe { [weak self] result in
@@ -47,9 +47,9 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
   /// Type-erases a given pager, transforming data to a model as pagination receives new results.
   /// - Parameters:
   ///   - pager: Pager to type-erase.
-  init<Pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, NextQuery>, InitialQuery, NextQuery>(
+  init<Pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager
-  ) async where Model == PaginationOutput<InitialQuery, NextQuery> {
+  ) async where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
     self.pager = pager
     await pager.subscribe { [weak self] result in
       guard let self else { return }
@@ -67,14 +67,14 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
   }
 
   convenience init<
-    Pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, NextQuery>,
+    Pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>,
     InitialQuery,
-    NextQuery,
+    PaginatedQuery,
     Element
   >(
     pager: Pager,
     initialTransform: @escaping (InitialQuery.Data) throws -> Model,
-    pageTransform: @escaping (NextQuery.Data) throws -> Model
+    pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
   ) async where Model: RangeReplaceableCollection, Model.Element == Element {
     await self.init(
       pager: pager,
@@ -96,16 +96,16 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
   public convenience init<
     P: PaginationInfo,
     InitialQuery: GraphQLQuery,
-    NextQuery: GraphQLQuery,
+    PaginatedQuery: GraphQLQuery,
     Element
   >(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
-    extractPageInfo: @escaping (PageExtractionData<InitialQuery, NextQuery>) -> P,
-    pageResolver: ((P, PaginationDirection) -> NextQuery?)?,
+    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery>) -> P,
+    pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
     initialTransform: @escaping (InitialQuery.Data) throws -> Model,
-    pageTransform: @escaping (NextQuery.Data) throws -> Model
+    pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
   ) async where Model: RangeReplaceableCollection, Model.Element == Element {
     let pager = AsyncGraphQLQueryPagerCoordinator(
       client: client,
