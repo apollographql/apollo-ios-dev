@@ -30,7 +30,7 @@ public protocol PagerType {
 }
 
 /// Handles pagination in the queue by managing multiple query watchers.
-public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: PagerType {
+public class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: PagerType {
   let pager: AsyncGraphQLQueryPager<InitialQuery, PaginatedQuery>
   private var subscriptions = Subscriptions()
   private var completionManager = CompletionManager()

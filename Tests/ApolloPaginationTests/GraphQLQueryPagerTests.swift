@@ -44,7 +44,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
   @available(iOS 16.0, macOS 13.0, *)
   func test_pager_cancellation_calls_callback() async throws {
     server.customDelay = .milliseconds(1)
-    let pager = GraphQLQueryPager(pager: createForwardPager())
+    let pager = GraphQLQueryPagerCoordinator(pager: createForwardPager())
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
     pager.fetch()
@@ -63,7 +63,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
   @available(iOS 16.0, macOS 13.0, *)
   func test_pager_cancellation_calls_callback_manyQueuedRequests() throws {
     server.customDelay = .milliseconds(1)
-    let pager = GraphQLQueryPager(pager: createForwardPager())
+    let pager = GraphQLQueryPagerCoordinator(pager: createForwardPager())
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     var results: [Result<PaginationOutput<ForwardQuery, ForwardQuery>, Error>] = []
     var errors: [PaginationError?] = []
@@ -94,7 +94,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
   @available(iOS 16.0, macOS 13.0, *)
   func test_pager_cancellation_calls_callback_deinit() async throws {
     server.customDelay = .milliseconds(1)
-    var pager = GraphQLQueryPager(pager: createForwardPager())
+    var pager = GraphQLQueryPagerCoordinator(pager: createForwardPager())
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     var results: [Result<PaginationOutput<ForwardQuery, ForwardQuery>, Error>] = []
     var errors: [PaginationError?] = []
@@ -110,7 +110,7 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
       errors.append(error)
     })
     try await Task.sleep(for: .milliseconds(50))
-    pager = GraphQLQueryPager(pager: self.createForwardPager())
+    pager = GraphQLQueryPagerCoordinator(pager: self.createForwardPager())
 
     await fulfillment(of: [secondPageExpectation], timeout: 2)
     XCTAssertEqual(results.count, 1) // once for original fetch

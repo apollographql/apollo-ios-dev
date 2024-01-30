@@ -24,10 +24,10 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
 
   // MARK: - Test helpers
 
-  private func createPager() -> GraphQLQueryPager<Query, Query> {
+  private func createPager() -> GraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return GraphQLQueryPager<Query, Query>(
+    return GraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,
@@ -53,10 +53,10 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
     )
   }
 
-  private func createReversePager() -> GraphQLQueryPager<ReverseQuery, ReverseQuery> {
+  private func createReversePager() -> GraphQLQueryPagerCoordinator<ReverseQuery, ReverseQuery> {
     let initialQuery = ReverseQuery()
     initialQuery.__variables = ["id": "2001", "first": 2, "before": "Y3Vyc29yMw=="]
-    return GraphQLQueryPager<ReverseQuery, ReverseQuery>(
+    return GraphQLQueryPagerCoordinator<ReverseQuery, ReverseQuery>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,

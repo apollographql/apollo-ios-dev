@@ -59,7 +59,7 @@ final class ConcurrencyTests: XCTestCase {
   }
 
   private func loadDataFromManyThreads(
-    pager: GraphQLQueryPager<Query, Query>
+    pager: GraphQLQueryPagerCoordinator<Query, Query>
   ) {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
 
@@ -98,10 +98,10 @@ final class ConcurrencyTests: XCTestCase {
     )
   }
 
-  private func createNonisolatedPager() -> GraphQLQueryPager<Query, Query> {
+  private func createNonisolatedPager() -> GraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return GraphQLQueryPager<Query, Query>(
+    return GraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,

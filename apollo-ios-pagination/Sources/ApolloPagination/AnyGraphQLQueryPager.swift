@@ -20,7 +20,7 @@ public class AnyGraphQLQueryPager<Model> {
   /// - Parameters:
   ///   - pager: Pager to type-erase.
   ///   - transform: Transformation from an initial page and array of paginated pages to a given view model.
-  public init<Pager: GraphQLQueryPager<InitialQuery, NextQuery>, InitialQuery, NextQuery>(
+  public init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, NextQuery>, InitialQuery, NextQuery>(
     pager: Pager,
     transform: @escaping ([NextQuery.Data], InitialQuery.Data, [NextQuery.Data]) throws -> Model
   ) {
@@ -52,7 +52,7 @@ public class AnyGraphQLQueryPager<Model> {
   ///   - initialTransform: Initial transformation from the initial page to an array of models.
   ///   - nextPageTransform: Transformation to execute on each subseqent page to an array of models.
   public convenience init<
-    Pager: GraphQLQueryPager<InitialQuery, NextQuery>,
+    Pager: GraphQLQueryPagerCoordinator<InitialQuery, NextQuery>,
     InitialQuery,
     NextQuery,
     Element
@@ -140,7 +140,7 @@ public class AnyGraphQLQueryPager<Model> {
   }
 }
 
-public extension GraphQLQueryPager {
+public extension GraphQLQueryPagerCoordinator {
   func eraseToAnyPager<T>(
     transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> T
   ) -> AnyGraphQLQueryPager<T> {

@@ -203,7 +203,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
   // MARK: - GraphQLQueryPager tests
 
   func test_fetchMultiplePages() async throws {
-    let pager = GraphQLQueryPager(pager: createPager())
+    let pager = GraphQLQueryPagerCoordinator(pager: createPager())
     let serverExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(server: server)
 
     var results: [Result<PaginationOutput<Query, Query>, Error>] = []
@@ -280,7 +280,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
   }
 
   func test_loadAll() async throws {
-    let pager = GraphQLQueryPager(pager: createPager())
+    let pager = GraphQLQueryPagerCoordinator(pager: createPager())
 
     let firstPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(server: server)
     let previousPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
