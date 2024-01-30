@@ -14,7 +14,7 @@ public struct PaginationOutput<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   public let nextPages: [PaginatedQuery.Data]
 
   /// The source of the most recent `Output`: either from the cache or server.
-  public let updateSource: UpdateSource
+  let updateSource: UpdateSource
 
   public init(
     previousPages: [PaginatedQuery.Data],
