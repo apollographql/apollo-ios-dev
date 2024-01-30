@@ -170,7 +170,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
 
   public func receive<S>(
     subscriber: S
-  ) where S : Subscriber, Never == S.Failure, Result<(Model, UpdateSource), Error> == S.Input {
+  ) where S: Subscriber, Never == S.Failure, Result<(Model, UpdateSource), Error> == S.Input {
     let subscription = PagerSubscription(pager: self, subscriber: subscriber)
     subscriber.receive(subscription: subscription)
   }
