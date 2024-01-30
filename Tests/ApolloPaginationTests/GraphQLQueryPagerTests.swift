@@ -118,10 +118,10 @@ final class GraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     XCTAssertTrue(errors.contains(where: { PaginationError.isCancellation(error: $0) }))
   }
 
-  private func createForwardPager() -> AsyncGraphQLQueryPager<ForwardQuery, ForwardQuery> {
+  private func createForwardPager() -> AsyncGraphQLQueryPagerCoordinator<ForwardQuery, ForwardQuery> {
     let initialQuery = ForwardQuery()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPager<ForwardQuery, ForwardQuery>(
+    return AsyncGraphQLQueryPagerCoordinator<ForwardQuery, ForwardQuery>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,

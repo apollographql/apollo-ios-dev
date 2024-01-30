@@ -109,10 +109,10 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [firstPageExpectation, lastPageExpectation, loadAllExpectation], timeout: 5)
   }
 
-  private func createPager() -> AsyncGraphQLQueryPager<Query, Query> {
+  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "before": "Y3Vyc29yMw=="]
-    return AsyncGraphQLQueryPager<Query, Query>(
+    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,

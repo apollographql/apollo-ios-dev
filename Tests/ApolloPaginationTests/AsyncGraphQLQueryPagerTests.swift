@@ -163,10 +163,10 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     XCTAssertFalse(isFetching)
   }
 
-  private func createReversePager() -> AsyncGraphQLQueryPager<ReverseQuery, ReverseQuery> {
+  private func createReversePager() -> AsyncGraphQLQueryPagerCoordinator<ReverseQuery, ReverseQuery> {
     let initialQuery = ReverseQuery()
     initialQuery.__variables = ["id": "2001", "first": 2, "before": "Y3Vyc29yMw=="]
-    return AsyncGraphQLQueryPager<ReverseQuery, ReverseQuery>(
+    return AsyncGraphQLQueryPagerCoordinator<ReverseQuery, ReverseQuery>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,
@@ -192,10 +192,10 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase, CacheDependentTesting {
     )
   }
 
-  private func createForwardPager() -> AsyncGraphQLQueryPager<ForwardQuery, ForwardQuery> {
+  private func createForwardPager() -> AsyncGraphQLQueryPagerCoordinator<ForwardQuery, ForwardQuery> {
     let initialQuery = ForwardQuery()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPager<ForwardQuery, ForwardQuery>(
+    return AsyncGraphQLQueryPagerCoordinator<ForwardQuery, ForwardQuery>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,

@@ -109,10 +109,10 @@ final class AnyAsyncGraphQLQueryPagerTests: XCTestCase {
 
   // MARK: - Test helpers
 
-  private func createPager() -> AsyncGraphQLQueryPager<Query, Query> {
+  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPager<Query, Query>(
+    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,
@@ -138,13 +138,13 @@ final class AnyAsyncGraphQLQueryPagerTests: XCTestCase {
     )
   }
 
-  private func fetchFirstPage<T>(pager: AnyAsyncGraphQLQueryPager<T>) async {
+  private func fetchFirstPage<T>(pager: AsyncGraphQLQueryPager<T>) async {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     await pager.fetch()
     await fulfillment(of: [serverExpectation], timeout: 1.0)
   }
 
-  private func fetchSecondPage<T>(pager: AnyAsyncGraphQLQueryPager<T>) async throws {
+  private func fetchSecondPage<T>(pager: AsyncGraphQLQueryPager<T>) async throws {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     try await pager.loadNext()
     await fulfillment(of: [serverExpectation], timeout: 1.0)

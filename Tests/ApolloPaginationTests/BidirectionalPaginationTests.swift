@@ -43,10 +43,10 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
 
   // MARK: - Test Helpers
 
-  private func createPager() -> AsyncGraphQLQueryPager<Query, Query> {
+  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 1, "after": "Y3Vyc29yMw==", "before": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPager<Query, Query>(
+    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,

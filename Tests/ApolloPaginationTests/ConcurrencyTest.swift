@@ -26,7 +26,7 @@ final class ConcurrencyTests: XCTestCase {
   // MARK: - Test helpers
 
   private func loadDataFromManyThreads(
-    pager: AsyncGraphQLQueryPager<Query, Query>,
+    pager: AsyncGraphQLQueryPagerCoordinator<Query, Query>,
     expectation: XCTestExpectation
   ) async {
     await withTaskGroup(of: Void.self) { group in
@@ -43,7 +43,7 @@ final class ConcurrencyTests: XCTestCase {
   }
 
   private func loadDataFromManyThreadsThrowing(
-    pager: AsyncGraphQLQueryPager<Query, Query>
+    pager: AsyncGraphQLQueryPagerCoordinator<Query, Query>
   ) async throws {
     try await withThrowingTaskGroup(of: Void.self) { group in
       let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
@@ -69,10 +69,10 @@ final class ConcurrencyTests: XCTestCase {
     wait(for: [serverExpectation], timeout: 1.0)
   }
 
-  private func createPager() -> AsyncGraphQLQueryPager<Query, Query> {
+  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPager<Query, Query>(
+    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,
@@ -127,7 +127,7 @@ final class ConcurrencyTests: XCTestCase {
     )
   }
 
-  private func fetchFirstPage(pager: AsyncGraphQLQueryPager<Query, Query>) async {
+  private func fetchFirstPage(pager: AsyncGraphQLQueryPagerCoordinator<Query, Query>) async {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     await pager.fetch()
     await fulfillment(of: [serverExpectation], timeout: 1.0)

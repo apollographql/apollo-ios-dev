@@ -92,25 +92,25 @@ final class AnyGraphQLQueryPagerTests: XCTestCase {
     }
   }
 
-  private func fetchFirstPage<T>(pager: AnyGraphQLQueryPager<T>) {
+  private func fetchFirstPage<T>(pager: GraphQLQueryPager<T>) {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     pager.fetch()
     wait(for: [serverExpectation], timeout: 1.0)
   }
 
-  private func fetchSecondPage<T>(pager: AnyGraphQLQueryPager<T>) throws {
+  private func fetchSecondPage<T>(pager: GraphQLQueryPager<T>) throws {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     pager.loadNext(completion: ignoringCancellations(error:))
     wait(for: [serverExpectation], timeout: 1.0)
   }
 
-  private func reverseFetchLastPage<T>(pager: AnyGraphQLQueryPager<T>) {
+  private func reverseFetchLastPage<T>(pager: GraphQLQueryPager<T>) {
     let serverExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForLastItem(server: server)
     pager.fetch()
     wait(for: [serverExpectation], timeout: 1.0)
   }
 
-  private func reverseFetchPreviousPage<T>(pager: AnyGraphQLQueryPager<T>) throws {
+  private func reverseFetchPreviousPage<T>(pager: GraphQLQueryPager<T>) throws {
     let serverExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForPreviousItem(server: server)
     pager.loadPrevious(completion: ignoringCancellations(error:))
     wait(for: [serverExpectation], timeout: 1.0)

@@ -250,7 +250,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
   func test_failingFetch_finishes() async throws {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "flirst": 2, "after": GraphQLNullable<String>.none]
-    let pager = AsyncGraphQLQueryPager<Query, Query>(
+    let pager = AsyncGraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in
@@ -283,10 +283,10 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     cancellable.cancel()
   }
 
-  private func createPager() -> AsyncGraphQLQueryPager<Query, Query> {
+  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPager<Query, Query>(
+    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,

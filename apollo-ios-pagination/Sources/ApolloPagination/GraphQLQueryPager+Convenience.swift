@@ -138,13 +138,13 @@ public extension GraphQLQueryPagerCoordinator {
   }
 }
 
-public extension AsyncGraphQLQueryPager {
+public extension AsyncGraphQLQueryPagerCoordinator {
   static func makeForwardCursorQueryPager(
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
     queryProvider: @escaping (CursorBasedPagination.Forward?) -> InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Forward
-  ) -> AsyncGraphQLQueryPager where InitialQuery == PaginatedQuery {
+  ) -> AsyncGraphQLQueryPagerCoordinator where InitialQuery == PaginatedQuery {
     .init(
       client: client,
       initialQuery: queryProvider(nil),
@@ -164,7 +164,7 @@ public extension AsyncGraphQLQueryPager {
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Forward,
     extractNextPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.Forward,
     nextPageResolver: @escaping (CursorBasedPagination.Forward) -> PaginatedQuery
-  ) -> AsyncGraphQLQueryPager {
+  ) -> AsyncGraphQLQueryPagerCoordinator {
     .init(
       client: client,
       initialQuery: initialQuery,
@@ -185,7 +185,7 @@ public extension AsyncGraphQLQueryPager {
     watcherDispatchQueue: DispatchQueue = .main,
     queryProvider: @escaping (CursorBasedPagination.Reverse?) -> InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Reverse
-  ) -> AsyncGraphQLQueryPager where InitialQuery == PaginatedQuery {
+  ) -> AsyncGraphQLQueryPagerCoordinator where InitialQuery == PaginatedQuery {
     .init(
       client: client,
       initialQuery: queryProvider(nil),
@@ -205,7 +205,7 @@ public extension AsyncGraphQLQueryPager {
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Reverse,
     extractPreviousPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.Reverse,
     previousPageResolver: @escaping (CursorBasedPagination.Reverse) -> PaginatedQuery
-  ) -> AsyncGraphQLQueryPager {
+  ) -> AsyncGraphQLQueryPagerCoordinator {
     .init(
       client: client,
       initialQuery: initialQuery,
@@ -229,7 +229,7 @@ public extension AsyncGraphQLQueryPager {
     previousQueryProvider: @escaping (CursorBasedPagination.Bidirectional?) -> PaginatedQuery,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Bidirectional,
     extractPaginatedPageInfo: @escaping (PaginatedQuery.Data) -> CursorBasedPagination.Bidirectional
-  ) -> AsyncGraphQLQueryPager {
+  ) -> AsyncGraphQLQueryPagerCoordinator {
     .init(
       client: client,
       initialQuery: initialQuery,
@@ -256,7 +256,7 @@ public extension AsyncGraphQLQueryPager {
     queryProvider: @escaping (CursorBasedPagination.Bidirectional?) -> InitialQuery,
     previousQueryProvider: @escaping (CursorBasedPagination.Bidirectional?) -> InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> CursorBasedPagination.Bidirectional
-  ) -> AsyncGraphQLQueryPager where InitialQuery == PaginatedQuery {
+  ) -> AsyncGraphQLQueryPagerCoordinator where InitialQuery == PaginatedQuery {
     .init(
       client: client,
       initialQuery: queryProvider(start),
