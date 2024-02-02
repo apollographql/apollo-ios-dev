@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  XCODE_VERSION: "15.0.1"
+  XCODE_VERSION: "15.2"
 
 jobs:
   changes:
@@ -14,6 +14,7 @@ jobs:
       ios: ${{ steps.filter.outputs.ios }}
       codegen: ${{ steps.filter.outputs.codegen }}
       pagination: ${{ steps.filter.outputs.pagination }}
+      tuist: ${{ steps.filter.outputs.tuist }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v2
@@ -36,11 +37,13 @@ jobs:
               - 'apollo-ios-pagination/**'
               - 'Tests/ApolloInternalTestHelpers/**'
               - 'apollo-ios/**'
+            tuist:
+              - '.tuist-version'
 
   tuist-generation:
-    runs-on: macos-13
+    runs-on: macos-14
     needs: [changes]
-    if: ${{ needs.changes.outputs.ios == 'true' || needs.changes.outputs.codegen  == 'true' || needs.changes.outputs.pagination  == 'true' }}
+    if: ${{ needs.changes.outputs.ios == 'true' || needs.changes.outputs.codegen  == 'true' || needs.changes.outputs.pagination  == 'true' || needs.changes.outputs.tuist == 'true' }}
     timeout-minutes: 8
     name: Run Tuist Generation
     steps:
@@ -50,10 +53,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Run Tuist Generation
-      uses: tuist/tuist-action@0.13.0
-      with:
-          command: 'generate'
-          arguments: ''
+      uses: ./.github/actions/run-tuist-generation
     - name: Cache Build Dependencies
       uses: actions/cache@v3
       with:
@@ -64,7 +64,7 @@ jobs:
         key: ${{ github.run_id }}-dependencies
 
   run-swift-builds:
-    runs-on: macos-13
+    runs-on: macos-14
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -86,7 +86,7 @@ jobs:
         cd ${{ matrix.package }} && swift build
 
   build-and-unit-test:
-    runs-on: macos-13
+    runs-on: macos-14
     needs: [tuist-generation, changes]
     timeout-minutes: 20
     strategy:
@@ -190,7 +190,7 @@ jobs:
           TestResults/ResultBundle.zip
 
   run-codegen-test-configurations:
-    runs-on: macos-13
+    runs-on: macos-14
     timeout-minutes: 20
     name: Codegen Test Configurations - macOS
     steps:
@@ -209,7 +209,7 @@ jobs:
         ./scripts/run-test-codegen-configurations.sh -t
   
   verify-frontend-bundle-latest:
-    runs-on: macos-13
+    runs-on: macos-14
     needs: [changes]
     if: ${{ needs.changes.outputs.codegen  == 'true' }}
     timeout-minutes: 5
@@ -227,7 +227,7 @@ jobs:
         git diff --exit-code
 
   run-cocoapods-integration-tests:
-    runs-on: macos-13
+    runs-on: macos-14
     timeout-minutes: 20
     name: Cocoapods Integration Tests - macOS
     steps:
@@ -247,7 +247,7 @@ jobs:
       uses: ./.github/actions/run-cocoapods-integration-tests
 
   run-integration-tests:
-    runs-on: macos-13
+    runs-on: macos-14
     needs: [tuist-generation, changes]
     if: ${{ needs.changes.outputs.ios  == 'true' }}
     timeout-minutes: 20
