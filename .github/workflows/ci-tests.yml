@@ -43,7 +43,6 @@ jobs:
   tuist-generation:
     runs-on: macos-13
     needs: [changes]
-    if: ${{ needs.changes.outputs.ios == 'true' || needs.changes.outputs.codegen  == 'true' || needs.changes.outputs.pagination  == 'true' || needs.changes.outputs.tuist == 'true' }}
     timeout-minutes: 8
     name: Run Tuist Generation
     steps:
