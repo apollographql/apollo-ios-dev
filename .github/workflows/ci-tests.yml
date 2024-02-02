@@ -258,19 +258,19 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Setup Node 12.22.10
+    - name: Setup Node v16
       uses: actions/setup-node@v3
       with:
-        node-version: 12.22.10
+        node-version: 16
     - name: Setup Upload Server
       shell: bash
       run: |
         sudo chmod -R +rwx SimpleUploadServer
         cd SimpleUploadServer && npm install && npm start &
-    - name: Setup Node 18.15.0
+    - name: Setup Node v18
       uses: actions/setup-node@v3
       with:
-        node-version: 18.15.0
+        node-version: 18
     - name: Setup Subscription Server
       shell: bash
       run: |
