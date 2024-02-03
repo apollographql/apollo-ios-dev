@@ -33,10 +33,10 @@ To get started contributing to Apollo iOS, the first step you need to take is to
 
 ### Tuist
 
-This project uses [Tuist](https://tuist.io/) to handle generation of the Xcode workspace for development. In order to use Tuist run the following command in terminal to ensure you have it installed:
+This project uses [Tuist](https://tuist.io/) to handle generation of the Xcode workspace for development. In order to use Tuist run the following local script in terminal to ensure you have it installed:
 
 ```
-curl -Ls https://install.tuist.io | bash
+./scripts/install-tuist.sh
 ```
 
 In order to generate the project/workspace you will need to run the [tuist generate](https://docs.tuist.io/commands/generate) command from the project root.
@@ -59,7 +59,7 @@ After working and making changes in the `ApolloDev.xcworkspace` you can commit y
 
 ## Issues
 
-To report an issue, bug, or feature request ou can do so in the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repo.
+To report an issue, bug, or feature request, you can do so in the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repo.
 
 ## Roadmap
 

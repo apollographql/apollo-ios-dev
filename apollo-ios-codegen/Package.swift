@@ -19,7 +19,7 @@ let package = Package(
       .upToNextMajor(from: "1.0.0")),
     .package(
       url: "https://github.com/apple/swift-collections",
-      .upToNextMajor(from: "1.0.0")),
+      .upToNextMajor(from: "1.0.6")),
     .package(
       url: "https://github.com/apple/swift-argument-parser.git", 
       .upToNextMajor(from: "1.2.0")),

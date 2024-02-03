@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  XCODE_VERSION: "15.0.1"
+  XCODE_VERSION: "15.2"
 
 jobs:
   changes:
@@ -14,6 +14,7 @@ jobs:
       ios: ${{ steps.filter.outputs.ios }}
       codegen: ${{ steps.filter.outputs.codegen }}
       pagination: ${{ steps.filter.outputs.pagination }}
+      tuist: ${{ steps.filter.outputs.tuist }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v2
@@ -36,11 +37,13 @@ jobs:
               - 'apollo-ios-pagination/**'
               - 'Tests/ApolloInternalTestHelpers/**'
               - 'apollo-ios/**'
+            tuist:
+              - '.tuist-version'
 
   tuist-generation:
     runs-on: macos-13
     needs: [changes]
-    if: ${{ needs.changes.outputs.ios == 'true' || needs.changes.outputs.codegen  == 'true' || needs.changes.outputs.pagination  == 'true' }}
+    if: ${{ needs.changes.outputs.ios == 'true' || needs.changes.outputs.codegen  == 'true' || needs.changes.outputs.pagination  == 'true' || needs.changes.outputs.tuist == 'true' }}
     timeout-minutes: 8
     name: Run Tuist Generation
     steps:
@@ -50,10 +53,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Run Tuist Generation
-      uses: tuist/tuist-action@0.13.0
-      with:
-          command: 'generate'
-          arguments: ''
+      uses: ./.github/actions/run-tuist-generation
     - name: Cache Build Dependencies
       uses: actions/cache@v3
       with:

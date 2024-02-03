@@ -63,6 +63,30 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
+  // MARK: - Target Configuration Tests
+
+  func test__target__givenModuleImports_targetHasModuleImports() async throws {
+    // given
+    document = """
+    query TestOperation @apollo_client_ios_localCacheMutation @import(module: "ModuleA") {
+      allAnimals {
+        species
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    guard case let .operationFile(actual) = subject.target else {
+      fail("expected operationFile target")
+      return
+    }
+
+    // then
+    expect(actual).to(equal(["ModuleA"]))
+  }
+
   // MARK: - Access Level Tests
 
   func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsInSchemaModule_generatesWithPublicAccess() async throws {

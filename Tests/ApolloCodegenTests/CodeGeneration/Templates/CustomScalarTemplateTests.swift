@@ -6,7 +6,8 @@ import ApolloAPI
 import GraphQLCompiler
 
 class CustomScalarTemplateTests: XCTestCase {
-  var subject: CustomScalarTemplate!
+  // Since the base protocol is actually used, Use TemplateRenderer. This can be confirmed that no unintended implementation is using.
+  var subject: TemplateRenderer!
 
   // MARK: Helpers
 
@@ -57,7 +58,21 @@ class CustomScalarTemplateTests: XCTestCase {
     // then
     expect(rendered).to(equalLineByLine(expected))
   }
+  
+  // MARK: Header Tests
+  
+  func test__contain_can_edited_header_description() throws {
+    // given
+    buildSubject()
+    
+    // when
+    let rendered = subject.renderHeaderTemplate(nonFatalErrorRecorder: .init())
 
+    // then
+    expect(rendered?.description).toNot(contain("should not be edited"))
+    expect(rendered?.description).to(contain("can be edited"))
+  }
+  
   // MARK: Typealias Definition Tests
 
   func test__render__givenCustomScalar_shouldGenerateStringTypealias() throws {
