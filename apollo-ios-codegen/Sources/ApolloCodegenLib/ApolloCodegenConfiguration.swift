@@ -468,6 +468,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public let selectionSetInitializers: SelectionSetInitializers
     /// How to generate the operation documents for your generated operations.
     public let operationDocumentFormat: OperationDocumentFormat
+    /// Customization options to be applie to the schema during code generation.
+    public let schemaCustomization: SchemaCustomization
     /// Generate import statements that are compatible with including `Apollo` via Cocoapods.
     ///
     /// Cocoapods bundles all files from subspecs into the main target for a pod. This means that
@@ -514,6 +516,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       public static let schemaDocumentation: Composition = .include
       public static let selectionSetInitializers: SelectionSetInitializers = [.localCacheMutations]
       public static let operationDocumentFormat: OperationDocumentFormat = .definition
+      public static let schemaCustomization: SchemaCustomization = .init()
       public static let cocoapodsCompatibleImportStatements: Bool = false
       public static let warningsOnDeprecatedUsage: Composition = .include
       public static let conversionStrategies: ConversionStrategies = .init()
@@ -546,6 +549,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       schemaDocumentation: Composition = Default.schemaDocumentation,
       selectionSetInitializers: SelectionSetInitializers = Default.selectionSetInitializers,
       operationDocumentFormat: OperationDocumentFormat = Default.operationDocumentFormat,
+      schemaCustomization: SchemaCustomization = Default.schemaCustomization,
       cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
       warningsOnDeprecatedUsage: Composition = Default.warningsOnDeprecatedUsage,
       conversionStrategies: ConversionStrategies = Default.conversionStrategies,
@@ -557,6 +561,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       self.schemaDocumentation = schemaDocumentation
       self.selectionSetInitializers = selectionSetInitializers
       self.operationDocumentFormat = operationDocumentFormat
+      self.schemaCustomization = schemaCustomization
       self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
       self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
       self.conversionStrategies = conversionStrategies
@@ -574,6 +579,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case selectionSetInitializers
       case apqs
       case operationDocumentFormat
+      case schemaCustomization
       case cocoapodsCompatibleImportStatements
       case warningsOnDeprecatedUsage
       case conversionStrategies
@@ -614,6 +620,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         forKey: .apqs
       )?.operationDocumentFormat ??
       Default.operationDocumentFormat
+      
+      schemaCustomization = try values.decodeIfPresent(
+        SchemaCustomization.self,
+        forKey: .schemaCustomization
+      ) ?? Default.schemaCustomization
 
       cocoapodsCompatibleImportStatements = try values.decodeIfPresent(
         Bool.self,
@@ -649,6 +660,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       try container.encode(self.schemaDocumentation, forKey: .schemaDocumentation)
       try container.encode(self.selectionSetInitializers, forKey: .selectionSetInitializers)
       try container.encode(self.operationDocumentFormat, forKey: .operationDocumentFormat)
+      try container.encode(self.schemaCustomization, forKey: .schemaCustomization)
       try container.encode(self.cocoapodsCompatibleImportStatements, forKey: .cocoapodsCompatibleImportStatements)
       try container.encode(self.warningsOnDeprecatedUsage, forKey: .warningsOnDeprecatedUsage)
       try container.encode(self.conversionStrategies, forKey: .conversionStrategies)
@@ -1368,6 +1380,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.conversionStrategies = conversionStrategies
     self.pruneGeneratedFiles = pruneGeneratedFiles
     self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
+    self.schemaCustomization = Default.schemaCustomization
   }
   
   /// Deprecated initializer.
@@ -1417,6 +1430,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.conversionStrategies = conversionStrategies
     self.pruneGeneratedFiles = pruneGeneratedFiles
     self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
+    self.schemaCustomization = Default.schemaCustomization
   }
 
   /// Whether the generated operations should use Automatic Persisted Queries.
