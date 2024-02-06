@@ -40,6 +40,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   // MARK: - Helpers
 
   func buildSubjectRootField(operationName: String? = nil) async throws {
+    addDeferDirective()
+
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     if let operationName {
       operation = try XCTUnwrap(ir.compilationResult.operations.first(
@@ -50,6 +52,16 @@ class IRRootFieldBuilderTests: XCTestCase {
     }
     result = await ir.build(operation: operation)
     subject = result.rootField
+  }
+
+  fileprivate func addDeferDirective() {
+    guard let schemaSDL = self.schemaSDL else { return }
+
+    self.schemaSDL = """
+    directive @defer(label: String, if: Boolean! = true) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+    \(schemaSDL)
+    """
   }
 
   // MARK: - Children Computation
