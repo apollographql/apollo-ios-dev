@@ -1,0 +1,39 @@
+{
+  "schemaNamespace" : "MySchema",
+  "schemaDownload": {
+    ...
+  },
+  "input" : {
+    ...
+  },
+  "output" : {
+    ...
+  },
+  "options" : {
+    ...
+    "schemaCustomization" : {
+      "customTypeNames" : {
+        "InterfaceName":  "CustomInterfaceName",
+        "ScalarName": "CustomScalarName",
+        "InputObjectName": {
+            "inputObject": {
+                "fields": {
+                    "fieldOne": "CustomFieldOne"
+                },
+                "name": "CustomInputObjectName"
+            }
+        },
+        "ObjectName": "CustomObjectName",
+        "UnionName": "CustomUnionName",
+        "EnumName": {
+            "enum": {
+                "name": "CustomEnumName",
+                "cases": {
+                    "enumCase": "CustomEnumCase"
+                }
+            }
+        }
+    }
+    }
+  }
+}
