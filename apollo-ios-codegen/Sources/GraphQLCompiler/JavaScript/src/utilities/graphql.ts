@@ -18,10 +18,11 @@ import {
   GraphQLError,
   DocumentNode,
   DirectiveNode,
+  DirectiveDefinitionNode
 } from "graphql";
 import { isNode } from "graphql/language/ast";
 import { validateSDL } from "graphql/validation/validate";
-import { directive_apollo_client_ios_localCacheMutation } from "./apolloCodegenSchemaExtension";
+import { directive_apollo_client_ios_localCacheMutation, directive_import_statement } from "./apolloCodegenSchemaExtension";
 import { addTypeNameFieldForLegacySafelisting } from "./legacySafelistingTransform";
 
 export class GraphQLSchemaValidationError extends Error {
@@ -72,12 +73,12 @@ export function transformToNetworkRequestSourceDefinition(
   }
 
   return visit(ast, {
-    SelectionSet: {           
-      leave(node: SelectionSetNode, _, parent) { 
+    SelectionSet: {
+      leave(node: SelectionSetNode, _, parent) {
         if (isNode(parent) && ![Kind.FIELD, Kind.FRAGMENT_DEFINITION].includes(parent.kind)) {
-          return node 
+          return node
         }
-        return addTypenameFieldToSelectionSetIfNeeded(node) 
+        return addTypenameFieldToSelectionSetIfNeeded(node)
       }
     },
     Field: {
@@ -87,23 +88,23 @@ export function transformToNetworkRequestSourceDefinition(
     },
     Directive: {
       enter(node: DirectiveNode) {
-        return stripLocalCacheMutationCustomClientDirective(node)
+        return stripApolloClientSpecificDirectives(node)
       }
     }
   });
 }
 
-function addTypenameFieldToSelectionSetIfNeeded(node: SelectionSetNode): SelectionSetNode {    
-  const hasTypenameField = node.selections.find((selection) => 
+function addTypenameFieldToSelectionSetIfNeeded(node: SelectionSetNode): SelectionSetNode {
+  const hasTypenameField = node.selections.find((selection) =>
     selection.kind == typenameField.kind && selection.name.value == typenameField.name.value
   );
 
-  if (hasTypenameField) { 
+  if (hasTypenameField) {
     return node
   } else {
     return {
-      ...node,        
-      selections: [typenameField, ...node.selections],      
+      ...node,
+      selections: [typenameField, ...node.selections],
     };
   }
 }
@@ -113,15 +114,26 @@ function transformTypenameFieldIfNeeded(node: FieldNode): FieldNode {
     return {
       ...node,
       alias: undefined,
-      directives: undefined      
+      directives: undefined
     }
   } else {
     return node;
   }
 }
 
-function stripLocalCacheMutationCustomClientDirective(node: DirectiveNode): DirectiveNode | null {
-  return (node.name.value == directive_apollo_client_ios_localCacheMutation.name.value) ? null : node;
+function stripApolloClientSpecificDirectives(node: DirectiveNode): DirectiveNode | null {
+  const apolloClientSpecificDirectives: DirectiveDefinitionNode[] = [
+    directive_apollo_client_ios_localCacheMutation,
+    directive_import_statement
+  ]
+
+  for (const directive of apolloClientSpecificDirectives) {
+    if (node.name.value == directive.name.value) {
+      return null
+    }
+  }
+
+  return node
 }
 
 // Utility functions extracted from graphql-js

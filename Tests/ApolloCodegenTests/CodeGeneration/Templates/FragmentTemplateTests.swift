@@ -61,6 +61,30 @@ class FragmentTemplateTests: XCTestCase {
     subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
+  // MARK: - Target Configuration Tests
+
+  func test__target__givenModuleImports_targetHasModuleImports() async throws {
+    // given
+    document = """
+    fragment TestFragment on Query @import(module: "ModuleA") {
+      allAnimals {
+        species
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndFragment()
+
+    guard case let .operationFile(actual) = subject.target else {
+      fail("expected operationFile target")
+      return
+    }
+
+    // then
+    expect(actual).to(equal(["ModuleA"]))
+  }
+
   // MARK: Fragment Definition
 
   func test__render__givenFragment_generatesFragmentDeclarationDefinitionAndBoilerplate() async throws {
@@ -78,6 +102,29 @@ class FragmentTemplateTests: XCTestCase {
 
     // when
     try await buildSubjectAndFragment()
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+    expect(String(actual.reversed())).to(equalLineByLine("\n}", ignoringExtraLines: true))
+  }
+  
+  func test__render__givenFragment_generatesFragmentDeclarationWithoutDefinition() async throws {
+    // given
+    let expected =
+    """
+    struct TestFragment: TestSchema.SelectionSet, Fragment {
+      let __data: DataDict
+      init(_dataDict: DataDict) { __data = _dataDict }
+    """
+
+    // when
+    try await buildSubjectAndFragment(config: .mock(
+      options: .init(
+        operationDocumentFormat: .operationId
+      )
+    ))
 
     let actual = renderSubject()
 

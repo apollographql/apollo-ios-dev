@@ -42,7 +42,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       options: .init()
     )
     let mockTemplateRenderer = MockTemplateRenderer(
-      target: .operationFile,
+      target: .operationFile(),
       template: "",
       config: .init(config: config)
     )
@@ -70,7 +70,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       options: .init()
     )
     let mockTemplateRenderer = MockTemplateRenderer(
-      target: .operationFile,
+      target: .operationFile(),
       template: "",
       config: .init(config: config)
     )
@@ -1757,7 +1757,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 24, ignoringExtraLines: true))
   }
 
-  // MARK: - Include/Skip Tests
+  // MARK: Include/Skip Tests
 
   func test__render_given_fieldWithInclusionCondition_rendersInitializerWithOptionalParameter() async throws {
     // given
@@ -2135,5 +2135,111 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       allAnimals_expected, atLine: 23, ignoringExtraLines: true))
     expect(allAnimals_ifA_actual).to(equalLineByLine(
       allAnimals_ifA_expected, atLine: 23, ignoringExtraLines: true))
+  }
+
+  // MARK: Parameter Name Tests
+
+  func test__render__givenReservedFieldName_shouldGenerateParameterNameWithAlias() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    type Animal {
+      name: String
+      self: String # <- reserved name
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        name
+        self
+      }
+    }
+    """
+
+    let expected =
+    """
+      public init(
+        name: String? = nil,
+        `self` _self: String? = nil
+      ) {
+        self.init(_dataDict: DataDict(
+          data: [
+            "__typename": TestSchema.Objects.Animal.typename,
+            "name": name,
+            "self": _self,
+          ],
+          fulfilledFragments: [
+            ObjectIdentifier(TestOperationQuery.Data.AllAnimal.self)
+          ]
+        ))
+      }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
+  }
+
+  func test__render__givenFieldName_generatesParameterNameWithoutAlias() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    type Animal {
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        name
+      }
+    }
+    """
+
+    let expected =
+    """
+      public init(
+        name: String? = nil
+      ) {
+        self.init(_dataDict: DataDict(
+          data: [
+            "__typename": TestSchema.Objects.Animal.typename,
+            "name": name,
+          ],
+          fulfilledFragments: [
+            ObjectIdentifier(TestOperationQuery.Data.AllAnimal.self)
+          ]
+        ))
+      }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 }

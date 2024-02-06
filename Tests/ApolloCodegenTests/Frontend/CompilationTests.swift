@@ -130,64 +130,6 @@ class CompilationTests: XCTestCase {
     expect(operation.directives).to(equal(expectedDirectives))
   }
 
-  /// Tests that we automatically add the local cache mutation directive to the schema
-  /// during codegen.
-  func test__compile__givenSchemaSDL_queryWithLocalCacheMutationDirective_notInSchema_hasDirective() async throws {
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      species: String!
-    }
-    """
-
-    document = """
-    query Test @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        species
-      }
-    }
-    """
-
-    let expectedDirectives: [CompilationResult.Directive] = [
-      .mock("apollo_client_ios_localCacheMutation")
-    ]
-
-    let compilationResult = try await compileFrontend()
-
-
-    let operation = try XCTUnwrap(compilationResult.operations.first)
-    expect(operation.directives).to(equal(expectedDirectives))
-  }
-
-  /// Tests that we automatically add the local cache mutation directive to the schema
-  /// during codegen.
-  func test__compile__givenSchemaJSON_queryWithLocalCacheMutationDirective_notInSchema_hasDirective() async throws {
-    try useStarWarsSchema()
-
-    document = """
-      query HeroAndFriendsNames($id: ID) @apollo_client_ios_localCacheMutation {
-        human(id: $id) {
-          name
-          mass
-          appearsIn
-        }
-      }
-      """
-
-    let expectedDirectives: [CompilationResult.Directive] = [
-      .mock("apollo_client_ios_localCacheMutation")
-    ]
-
-    let compilationResult = try await compileFrontend()
-
-
-    let operation = try XCTUnwrap(compilationResult.operations.first)
-    expect(operation.directives).to(equal(expectedDirectives))
-  }
-
   func test__compile__givenInputObject_withListFieldWithDefaultValueEmptyArray() async throws {
     // given
     schemaSDL = """
