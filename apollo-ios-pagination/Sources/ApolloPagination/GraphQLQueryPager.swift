@@ -25,10 +25,10 @@ public class GraphQLQueryPager<Model>: Publisher {
       let returnValue: Output
 
       switch result {
-      case let .success(output):
+      case let .success((output, source)):
         do {
           let transformedModels = try transform(output.previousPages, output.initialPage, output.nextPages)
-          returnValue = .success((transformedModels, output.updateSource))
+          returnValue = .success((transformedModels, source))
         } catch {
           returnValue = .failure(error)
         }
@@ -46,16 +46,7 @@ public class GraphQLQueryPager<Model>: Publisher {
     self.pager = pager
     pager.subscribe { [weak self] result in
       guard let self else { return }
-      let returnValue: Output
-
-      switch result {
-      case let .success(output):
-        returnValue = .success((output, output.updateSource))
-      case let .failure(error):
-        returnValue = .failure(error)
-      }
-
-      _subject.send(returnValue)
+      _subject.send(result)
     }
   }
 

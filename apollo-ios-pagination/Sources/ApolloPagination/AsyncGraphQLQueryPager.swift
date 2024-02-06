@@ -25,10 +25,10 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
       let returnValue: Output
 
       switch result {
-      case let .success(output):
+      case let .success((output, source)):
         do {
           let transformedModels = try transform(output.previousPages, output.initialPage, output.nextPages)
-          returnValue = .success((transformedModels, output.updateSource))
+          returnValue = .success((transformedModels, source))
         } catch {
           returnValue = .failure(error)
         }
@@ -49,8 +49,8 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
       let returnValue: Output
 
       switch result {
-      case let .success(output):
-        returnValue = .success((output, output.updateSource))
+      case let .success((output, source)):
+        returnValue = .success((output, source))
       case let .failure(error):
         returnValue = .failure(error)
       }

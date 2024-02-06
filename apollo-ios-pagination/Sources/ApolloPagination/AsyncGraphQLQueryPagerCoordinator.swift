@@ -42,8 +42,8 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
     return ($previousPageVarMap, $initialPageResult, $nextPageVarMap)
   }
 
-  @Published var currentValue: Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>?
-  private var queuedValue: Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>?
+  @Published var currentValue: Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>?
+  private var queuedValue: Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>?
 
   @Published var initialPageResult: InitialQuery.Data?
   var latest: (previous: [PaginatedQuery.Data], initial: InitialQuery.Data, next: [PaginatedQuery.Data])? {
@@ -166,7 +166,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   }
 
   public func subscribe(
-    onUpdate: @escaping (Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>) -> Void
+    onUpdate: @escaping (Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>) -> Void
   ) -> AnyCancellable {
     $currentValue.compactMap({ $0 })
       .sink { [weak self] result in
@@ -309,7 +309,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
         shouldUpdate = true
       }
 
-      var value: Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>?
+      var value: Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>?
       var output: ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data])?
       switch fetchType {
       case .initial:
@@ -335,11 +335,13 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
       }
 
       value = output.flatMap { previousPages, initialPage, nextPages in
-        Result.success(PaginationOutput(
-          previousPages: previousPages,
-          initialPage: initialPage,
-          nextPages: nextPages,
-          updateSource: data.source == .cache ? .cache : .fetch
+        Result.success((
+          PaginationOutput(
+            previousPages: previousPages,
+            initialPage: initialPage,
+            nextPages: nextPages
+          ),
+          data.source == .cache ? .cache : .fetch
         ))
       }
 

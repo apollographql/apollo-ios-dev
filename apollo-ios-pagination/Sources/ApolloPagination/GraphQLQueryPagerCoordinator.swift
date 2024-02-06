@@ -35,7 +35,7 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
   private var subscriptions = Subscriptions()
   private var completionManager = CompletionManager()
 
-  public var publisher: AnyPublisher<Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>, Never> {
+  public var publisher: AnyPublisher<Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>, Never> {
     get async { await pager.$currentValue.compactMap { $0 }.eraseToAnyPublisher() }
   }
 
@@ -80,7 +80,7 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
 
   /// Allows the caller to subscribe to new pagination results.
   /// - Parameter onUpdate: A closure which provides the most recent pagination result. Execution may be on any thread.
-  public func subscribe(onUpdate: @escaping (Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>) -> Void) {
+  public func subscribe(onUpdate: @escaping (Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>) -> Void) {
     Task { [weak self] in
       guard let self else { return }
       let subscription = await self.pager.subscribe(onUpdate: onUpdate)
