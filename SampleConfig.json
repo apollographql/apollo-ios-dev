@@ -13,16 +13,8 @@
     ...
     "schemaCustomization" : {
       "customTypeNames" : {
-        "InterfaceName": {
-            "interface": {
-                "name": "CustomInterfaceName"
-            }
-        },
-        "ScalarName": {
-            "customScalar": {
-                "name": "CustomScalarName"
-            }
-        },
+        "InterfaceName":  "CustomInterfaceName",
+        "ScalarName": "CustomScalarName",
         "InputObjectName": {
             "inputObject": {
                 "fields": {
@@ -31,16 +23,8 @@
                 "name": "CustomInputObjectName"
             }
         },
-        "ObjectName": {
-            "object": {
-                "name": "CustomObjectName"
-            }
-        },
-        "UnionName": {
-            "union": {
-                "name": "CustomUnionName"
-            }
-        },
+        "ObjectName": "CustomObjectName",
+        "UnionName": "CustomUnionName",
         "EnumName": {
             "enum": {
                 "name": "CustomEnumName",
