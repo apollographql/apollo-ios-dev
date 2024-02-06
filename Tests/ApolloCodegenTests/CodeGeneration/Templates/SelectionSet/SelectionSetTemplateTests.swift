@@ -1731,7 +1731,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.prefixedWithDeferDirective()
 
     document = """
       query TestOperation {
@@ -1786,7 +1786,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.prefixedWithDeferDirective()
 
     document = """
       query TestOperation {
@@ -5652,7 +5652,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.prefixedWithDeferDirective()
 
     document = """
       query TestOperation {
@@ -8420,4 +8420,14 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
 
+}
+
+extension String {
+  fileprivate func prefixedWithDeferDirective() -> String {
+    return """
+    directive @defer(label: String, if: Boolean! = true) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+    \(self)
+    """
+  }
 }
