@@ -1,0 +1,39 @@
+---
+title: Project Modularization
+description: Configuring Apollo iOS with single target vs multi-module projects
+---
+
+When determining how to configure your project to use Apollo iOS, the first question you'll need to answer is:
+
+**Will your project interact with Apollo in a single target or through multiple modules?**
+
+Depending on the size and complexity of your project, it might be built as a single monolithic application target _or_ be composed of multiple modules that interact with Apollo.
+
+Interactions with Apollo include setting up your `ApolloClient`; executing operations; using the generated models; interacting with the normalized cache; and any other functionality that uses the `Apollo` or `ApolloAPI` libraries.
+
+## Single target
+
+A single target project configuration means that all of your interaction with Apollo will be done from a single target in your project. This is usually the case if your project consists of a single monolithic application target.
+
+Alternatively you may use a single target configuration with a multi-module project when encapsulating your dependency on Apollo iOS behind a custom wrapper module. While it is common practice to encapsulate the setup of your `ApolloClient` and/or execution of operations, if you would like to use the generated operation response models in your other modules, you will need to use a multi-module project configuration.
+
+---
+
+For a single target project configuration, you can link your target to the `Apollo` library. You can also optionally link to [`ApolloSQLite`](#apollosqlite) and/or [`ApolloWebSocket`](#apollowebsocket) to enable their functionality.
+
+> For more information about the libraries that make up the Apollo iOS SDK, see the [Apollo iOS SDK](#apollo-ios-sdk-components).
+
+## Multi-module
+
+A multi-module project can interact with Apollo in a variety of ways from different modules.
+
+You may have some infrastructure modules that setup and manage the `ApolloClient` and `NormalizedCache`, others that need to execute operations, and others that consume response models without ever interacting with the `ApolloClient` directly.
+
+---
+
+To include the Apollo iOS SDK in a project with multiple modules:
+
+1. Link `Apollo` to the modules configuring or using the networking and caching APIs.
+    - Optionally, link `ApolloSQLite` and/or `ApolloWebSocket` to the module that sets up your `ApolloClient` to enable them.
+2. Link `ApolloAPI` to the modules that only include or consume the generated models.
+3. If you are using [test mocks](./../testing/test-mocks), link `ApolloTestSupport` to any unit test targets that need to create mocks of your generated models.
