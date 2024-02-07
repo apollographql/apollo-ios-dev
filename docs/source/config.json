@@ -59,7 +59,8 @@
         "ApolloAPI": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloAPI",
         "ApolloWebSocket": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloWebSocket",
         "ApolloSQLite": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloSQLite",
-        "ApolloCodegenLib": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloCodegenLib"
+        "ApolloCodegenLib": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloCodegenLib",
+        "Client Directives": "/client-directives"
       },
       true
     ],
