@@ -3,136 +3,147 @@ import ApolloAPI
 import Combine
 import Foundation
 
-public protocol PagerType {
-  associatedtype InitialQuery: GraphQLQuery
-  associatedtype PaginatedQuery: GraphQLQuery
+/// Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.
+public class GraphQLQueryPager<Model>: Publisher {
+  public typealias Failure = Never
+  public typealias Output = Result<(Model, UpdateSource), Error>
+  let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
+  var publisher: AnyPublisher<Output, Never> { _subject.compactMap { $0 }.eraseToAnyPublisher() }
+  public var cancellables: Set<AnyCancellable> = []
+  public let pager: any PagerType
 
-  var canLoadNext: Bool { get }
-  var canLoadPrevious: Bool { get }
-  func cancel()
-  func loadPrevious(
-    cachePolicy: CachePolicy,
-    callbackQueue: DispatchQueue,
-    completion: ((PaginationError?) -> Void)?
-  )
-  func loadNext(
-    cachePolicy: CachePolicy,
-    callbackQueue: DispatchQueue,
-    completion: ((PaginationError?) -> Void)?
-  )
-  func loadAll(
-    fetchFromInitialPage: Bool,
-    callbackQueue: DispatchQueue,
-    completion: ((PaginationError?) -> Void)?
-  )
-  func refetch(cachePolicy: CachePolicy)
-  func fetch()
-}
+  public var canLoadNext: Bool { pager.canLoadNext }
+  public var canLoadPrevious: Bool { pager.canLoadPrevious }
 
-/// Handles pagination in the queue by managing multiple query watchers.
-public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: PagerType {
-  let pager: AsyncGraphQLQueryPager<InitialQuery, PaginatedQuery>
-  private var subscriptions = Subscriptions()
-  private var completionManager = CompletionManager()
+  init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
+    pager: Pager,
+    transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
+  ) {
+    self.pager = pager
+    pager.subscribe { [weak self] result in
+      guard let self else { return }
+      let returnValue: Output
 
-  public var publisher: AnyPublisher<Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>, Never> {
-    get async { await pager.$currentValue.compactMap { $0 }.eraseToAnyPublisher() }
+      switch result {
+      case let .success((output, source)):
+        do {
+          let transformedModels = try transform(output.previousPages, output.initialPage, output.nextPages)
+          returnValue = .success((transformedModels, source))
+        } catch {
+          returnValue = .failure(error)
+        }
+      case let .failure(error):
+        returnValue = .failure(error)
+      }
+
+      _subject.send(returnValue)
+    }
   }
 
-  public init<P: PaginationInfo>(
+  init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
+    pager: Pager
+  ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
+    self.pager = pager
+    pager.subscribe { [weak self] result in
+      guard let self else { return }
+      _subject.send(result)
+    }
+  }
+
+  convenience init<
+    Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>,
+    InitialQuery,
+    PaginatedQuery,
+    Element
+  >(
+    pager: Pager,
+    initialTransform: @escaping (InitialQuery.Data) throws -> Model,
+    pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
+  ) where Model: RangeReplaceableCollection, Model.Element == Element {
+    self.init(
+      pager: pager,
+      transform: { previousData, initialData, nextData in
+        let previous = try previousData.flatMap { try pageTransform($0) }
+        let initial = try initialTransform(initialData)
+        let next = try nextData.flatMap { try pageTransform($0) }
+        return previous + initial + next
+      }
+    )
+  }
+
+  /// For most use-cases, it's recommended to use the static `make...` functions instead of this initializer.
+  /// - Parameters:
+  ///   - client: The Apollo client
+  ///   - initialQuery: The initial query to be performed.
+  ///   - watcherDispatchQueue: The queue that the internal `GraphQLQueryWatcher`s dispatch their results to. Defaults to `main`.
+  ///   - extractPageInfo: This transforming function extracts a `PaginationInfo` from either `InitialQuery.Data` or `PaginatedQuery.Data`, represented in the form of `PageExtractionData`.
+  ///   - pageResolver: This transforming function initializes a new `PaginatedQuery` given a `PagiantionInfo` and `PaginationDirection`.
+  ///   - initialTransform: Transforms the `InitialQuery.Data` to a `Model` type.
+  ///   - pageTransform: Transforms the `PaginatedQuery.Data` to a `Model` type.
+  public convenience init<
+    P: PaginationInfo,
+    InitialQuery: GraphQLQuery,
+    PaginatedQuery: GraphQLQuery,
+    Element
+  >(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery>) -> P,
-    pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
-  ) {
-    pager = .init(
+    pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
+    initialTransform: @escaping (InitialQuery.Data) throws -> Model,
+    pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
+  ) where Model: RangeReplaceableCollection, Model.Element == Element {
+    let pager = GraphQLQueryPagerCoordinator(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: watcherDispatchQueue,
       extractPageInfo: extractPageInfo,
       pageResolver: pageResolver
     )
-    Task { [weak self] in
-      guard let self else { return }
-      let (previousPageVarMapPublisher, initialPublisher, nextPageVarMapPublisher) = await pager.publishers
-      let publishSubscriber = previousPageVarMapPublisher.combineLatest(
-        initialPublisher,
-        nextPageVarMapPublisher
-      ).sink { [weak self] _ in
-        guard !Task.isCancelled else { return }
-        Task { [weak self] in
-          guard let self else { return }
-          let (canLoadNext, canLoadPrevious) = await self.pager.canLoadPages
-          self.canLoadNext = canLoadNext
-          self.canLoadPrevious = canLoadPrevious
-        }
-      }
-      await subscriptions.store(subscription: publishSubscriber)
-    }
+    self.init(
+      pager: pager,
+      initialTransform: initialTransform,
+      pageTransform: pageTransform
+    )
   }
 
-  /// Convenience initializer
-  /// - Parameter pager: An `AsyncGraphQLQueryPager`.
-  public init(pager: AsyncGraphQLQueryPager<InitialQuery, PaginatedQuery>) {
-    self.pager = pager
+  deinit {
+    pager.cancel()
   }
 
-  /// Allows the caller to subscribe to new pagination results.
-  /// - Parameter onUpdate: A closure which provides the most recent pagination result. Execution may be on any thread.
-  public func subscribe(onUpdate: @escaping (Result<PaginationOutput<InitialQuery, PaginatedQuery>, Error>) -> Void) {
-    Task { [weak self] in
-      guard let self else { return }
-      let subscription = await self.pager.subscribe(onUpdate: onUpdate)
-      await subscriptions.store(subscription: subscription)
-    }
+  /// Subscribe to the results of the pager, with the management of the subscriber being stored internally to the `AnyGraphQLQueryPager`.
+  /// - Parameter completion: The closure to trigger when new values come in. Guaranteed to run on the main thread.
+  public func subscribe(completion: @escaping @MainActor (Output) -> Void) {
+    publisher.sink { result in
+      Task { await completion(result) }
+    }.store(in: &cancellables)
   }
 
-  /// Whether or not we can load the next page. Initializes with a `false` value that is updated after the initial fetch.
-  public var canLoadNext: Bool = false
-  /// Whether or not we can load the previous page. Initializes with a `false` value that is updated after the initial fetch.
-  public var canLoadPrevious: Bool = false
-
-  /// Reset all pagination state and cancel all in-flight requests.
-  public func cancel() {
-    Task { [weak self] in
-      guard let self else { return }
-      for completion in await self.completionManager.completions {
-        completion.execute(error: PaginationError.cancellation)
-      }
-      await self.completionManager.reset()
-      await self.pager.cancel()
-    }
-  }
-
-  /// Loads the previous page, if we can.
+  /// Load the next page, if available.
   /// - Parameters:
-  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `fetchIgnoringCacheData`.
-  ///   - callbackQueue: The `DispatchQueue` that the `completion` fires on. Defaults to `main`.
-  ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
-  public func loadPrevious(
-    cachePolicy: CachePolicy = .fetchIgnoringCacheData,
-    callbackQueue: DispatchQueue = .main,
-    completion: ((PaginationError?) -> Void)? = nil
-  ) {
-    execute(callbackQueue: callbackQueue, completion: completion) { [weak self] in
-      try await self?.pager.loadPrevious(cachePolicy: cachePolicy)
-    }
-  }
-
-  /// Loads the next page, if we can.
-  /// - Parameters:
-  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `fetchIgnoringCacheData`.
+  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
   ///   - callbackQueue: The `DispatchQueue` that the `completion` fires on. Defaults to `main`.
   ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
   public func loadNext(
-    cachePolicy: CachePolicy = .fetchIgnoringCacheData,
+    cachePolicy: CachePolicy = .returnCacheDataAndFetch,
     callbackQueue: DispatchQueue = .main,
     completion: ((PaginationError?) -> Void)? = nil
   ) {
-    execute(callbackQueue: callbackQueue, completion: completion) { [weak self] in
-      try await self?.pager.loadNext(cachePolicy: cachePolicy)
-    }
+    pager.loadNext(cachePolicy: cachePolicy, callbackQueue: callbackQueue, completion: completion)
+  }
+
+  /// Load the previous page, if available.
+  /// - Parameters:
+  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
+  ///   - callbackQueue: The `DispatchQueue` that the `completion` fires on. Defaults to `main`.
+  ///   - completion: A completion block that will always trigger after the execution of this operation. Passes an optional error, of type `PaginationError`, if there was an internal error related to pagination. Does not surface network errors. Defaults to `nil`.
+  public func loadPrevious(
+    cachePolicy: CachePolicy = .returnCacheDataAndFetch,
+    callbackQueue: DispatchQueue = .main,
+    completion: ((PaginationError?) -> Void)? = nil
+  ) {
+    pager.loadPrevious(cachePolicy: cachePolicy, callbackQueue: callbackQueue, completion: completion)
   }
 
   /// Loads all pages.
@@ -145,84 +156,49 @@ public class GraphQLQueryPager<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     callbackQueue: DispatchQueue = .main,
     completion: ((PaginationError?) -> Void)? = nil
   ) {
-    execute(callbackQueue: callbackQueue, completion: completion) { [weak self] in
-      try await self?.pager.loadAll(fetchFromInitialPage: fetchFromInitialPage)
-    }
+    pager.loadAll(fetchFromInitialPage: fetchFromInitialPage, callbackQueue: callbackQueue, completion: completion)
   }
 
   /// Discards pagination state and fetches the first page from scratch.
   /// - Parameter cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `fetchIgnoringCacheData`.
   public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
-    Task {
-      for completion in await self.completionManager.completions {
-        completion.execute(error: PaginationError.cancellation)
-      }
-      await pager.refetch(cachePolicy: cachePolicy)
-    }
+    pager.refetch(cachePolicy: cachePolicy)
   }
 
   /// Fetches the first page.
   public func fetch() {
-    Task {
-      await pager.fetch()
-    }
+    pager.fetch()
   }
 
-  private func execute(callbackQueue: DispatchQueue, completion: ((PaginationError?) -> Void)?, operation: @escaping () async throws -> Void) {
-    Task<_, Never> { [weak self] in
-      let completionHandler = Completion(callbackQueue: callbackQueue, completion: completion)
-      await self?.completionManager.append(completion: completionHandler)
-      do {
-        try await operation()
-        await self?.completionManager.execute(completion: completionHandler, with: nil)
-      } catch {
-        await self?.completionManager.execute(completion: completionHandler, with: error as? PaginationError ?? .unknown(error))
-      }
-    }
+  /// Resets pagination state and cancels further updates from the pager.
+  public func cancel() {
+    pager.cancel()
+  }
+
+  public func receive<S>(
+    subscriber: S
+  ) where S: Subscriber, Never == S.Failure, Result<(Model, UpdateSource), Error> == S.Input {
+    let subscription = PagerSubscription(pager: self, subscriber: subscriber)
+    subscriber.receive(subscription: subscription)
   }
 }
 
-private actor Subscriptions {
-  var subscriptions: Set<AnyCancellable> = []
+private class PagerSubscription<SubscriberType: Subscriber, Pager: GraphQLQueryPager<Model>, Model>: Subscription where SubscriberType.Input == Pager.Output {
+  private var subscriber: SubscriberType?
+  private var pager: Pager
+  private var cancellable: AnyCancellable?
 
-  func store(subscription: AnyCancellable) {
-    subscriptions.insert(subscription)
-  }
-}
-
-private class Completion {
-  var completion: ((PaginationError?) -> Void)?
-  var callbackQueue: DispatchQueue
-
-  init(callbackQueue: DispatchQueue, completion: ((PaginationError?) -> Void)?) {
-    self.completion = completion
-    self.callbackQueue = callbackQueue
+  init(pager: Pager, subscriber: SubscriberType) {
+    self.subscriber = subscriber
+    self.pager = pager
+    cancellable = pager.publisher.sink(receiveValue: {
+      _ = subscriber.receive($0)
+    })
   }
 
-  func execute(error: PaginationError?) {
-    callbackQueue.async { [weak self] in
-      self?.completion?(error)
-      self?.completion = nil
-    }
-  }
-}
+  func request(_ demand: Subscribers.Demand) { }
 
-private actor CompletionManager {
-  var completions: [Completion] = []
-
-  func append(completion: Completion) {
-    completions.append(completion)
-  }
-
-  func reset() {
-    completions.removeAll()
-  }
-
-  func execute(completion: Completion, with error: PaginationError?) {
-    completion.execute(error: error)
-  }
-
-  deinit {
-    completions.forEach { $0.completion?(PaginationError.cancellation) }
+  func cancel() {
+    subscriber = nil
   }
 }
