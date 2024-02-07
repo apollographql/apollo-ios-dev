@@ -37,6 +37,14 @@ When including your operation models in a **multi-module project configuration**
 
 </Note>
 
+### Sharing fragments across modules
+
+When working in a **multi-module project configuration** with confined operation models, you may want to share fragment models across operations (or other fragments) in multiple modules in your project. This can be accomplished using the [`@import(module: String!)` client directive](./../client-directives#importmodule-string).
+
+This directive can be applied to any GraphQL definition in it's `.graphql` file, which adds an `import` statement for the given module name to the top of definition's generated Swift file.
+
+Using [`.relative(subpath:)`](./../code-generation/codegen-configuration#relative-operations-output) operations, you can place your shared fragment into a module that can be shared between the dependent definitions. Make sure the modules containing your dependent definitions are linked to the module containing your fragment. Then, you can use the [`@import(module: String!)` client directive](./../client-directives#importmodule-string) to import that module in your generated operation model file.
+
 ## Shared models
 
 You can also share your generated operation models across modules in your project. You can do this by including them within the shared schema types module or by manually including them in another shared module.
