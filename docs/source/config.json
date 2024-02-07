@@ -12,7 +12,8 @@
         "Introduction": "/project-configuration/intro",
         "1. Project Modularization": "/project-configuration/modularization",
         "2. Schema Types": "/project-configuration/schema-types",
-        "3. Operation Models": "/project-configuration/operation-models"
+        "3. Operation Models": "/project-configuration/operation-models",
+        "SDK components": "/project-configuration/sdk-components"
       },
       true
     ],
