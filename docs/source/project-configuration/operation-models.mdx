@@ -3,7 +3,7 @@ title: Operation Models Configuration
 description: Configuring operation models for your projects needs
 ---
 
-Operation models are generated for each of the GraphQL definitions defined in your project. These models are used to execute operations using the `ApolloClient` and include response models for accessing the data returned by these operation.
+Operation models are generated for each of the GraphQL definitions defined in your project. These models are used to execute operations using the `ApolloClient` and include response models for accessing the data returned by these operations.
 
 The way you want to structure your project to use these operation models is important in determining where they should be located in your project. You can configure this using the [`output.operations`](./../code-generation/codegen-configuration#operations) property in your codegen configuration.
 
@@ -33,7 +33,7 @@ With relative paths, you can:
 
 <Note>
 
-When including your operation models in a **multi-module project configuration**, ensure that any modules that include your operation models link to **both** your [schema types module](#schema-types-module) and the [`ApolloAPI` library](#apolloapi).
+When including your operation models in a **multi-module project configuration**, ensure that any modules that include your operation models link to **both** your [schema types module](./schema-types) and the [`ApolloAPI` library](./sdk-components/#apolloapi).
 
 </Note>
 
