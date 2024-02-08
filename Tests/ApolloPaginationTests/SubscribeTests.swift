@@ -45,8 +45,8 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     let initialFetchExpectation = expectation(description: "Results")
     initialFetchExpectation.assertForOverFulfill = false
 
-    var results: [Result<PaginationOutput<Query, Query>, Error>] = []
-    var otherResults: [Result<PaginationOutput<Query, Query>, Error>] = []
+    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), Error>] = []
+    var otherResults: [Result<(PaginationOutput<Query, Query>, UpdateSource), Error>] = []
     await pager.$currentValue.compactMap({ $0 }).sink { result in
       results.append(result)
       initialFetchExpectation.fulfill()
@@ -62,19 +62,19 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [serverExpectation, initialFetchExpectation], timeout: 1.0)
     XCTAssertFalse(results.isEmpty)
     let result = try XCTUnwrap(results.first)
-    XCTAssertSuccessResult(result) { output in
+    XCTAssertSuccessResult(result) { (output, source) in
       XCTAssertTrue(output.nextPages.isEmpty)
       XCTAssertEqual(output.initialPage.hero.friendsConnection.friends.count, 2)
       XCTAssertEqual(output.initialPage.hero.friendsConnection.totalCount, 3)
-      XCTAssertEqual(output.updateSource, .fetch)
+      XCTAssertEqual(source, .fetch)
       XCTAssertEqual(results.count, otherResults.count)
     }
   }
 
-  private func createPager() -> AsyncGraphQLQueryPager<Query, Query> {
+  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPager<Query, Query>(
+    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,
