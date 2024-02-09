@@ -123,13 +123,13 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       "after": "Y3Vyc29yMg==",
     ]
 
-    let expectedVariables = nextQuery.__variables?.values.compactMap { $0._jsonEncodableValue?._jsonValue } ?? []
-    let actualVariables = try await XCTUnwrapping(await pager.nextPageVarMap.keys.first as? [JSONValue])
+    let expectedVariables = Set(nextQuery.__variables?.values.compactMap { $0._jsonEncodableValue?._jsonValue } ?? [])
+    let actualVariables = try await XCTUnwrapping(await pager.nextPageVarMap.keys.first as? Set<JSONValue>)
 
     XCTAssertEqual(expectedVariables.count, actualVariables.count)
     XCTAssertEqual(expectedVariables.count, 3)
 
-    XCTAssertEqual(Set(expectedVariables), Set(actualVariables))
+    XCTAssertEqual(expectedVariables, actualVariables)
   }
 
   func test_paginationState() async throws {

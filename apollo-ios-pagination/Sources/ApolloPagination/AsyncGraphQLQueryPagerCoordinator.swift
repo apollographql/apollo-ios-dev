@@ -321,7 +321,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
       case .paginated(let direction, let query):
         guard let pageData = pageData as? PaginatedQuery.Data else { return }
 
-        let variables = query.__variables?.underlyingJson ?? []
+        let variables = Set(query.__variables?.underlyingJson ?? [])
         switch direction {
         case .next:
           nextPageVarMap[variables] = pageData
