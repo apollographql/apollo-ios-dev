@@ -1,0 +1,127 @@
+---
+title: Pagination
+---
+
+Apollo Pagination provides a convenient and easy way to interact with and watch paginated APIs. It provides a flexible and powerful way to interact with paginated data, and works with both cursor-based and offset-based pagination. Its key features include:
+
+- Watching paginated data
+- Forward, reverse, and bidirectional pagination support
+- Multi-query pagination support
+- Support for custom model types
+
+Apollo Pagination provides two classes to interact with paginated endpoints: `GraphQLQueryPager` and `AsyncGraphQLQueryPager`. They have very similar APIs, but the latter is designed for use in asynchronous contexts. 
+
+## Using a `GraphQLQueryPager`
+
+The `GraphQLQueryPager` class is intended to be a simple, flexible, and powerful way to interact with paginated data. While it has a standard initializer, it is recommended to use the convenience initializers, which simplify the process of creating a `GraphQLQueryPager` instance. The convenience initializers are defined as static methods on the `GraphQLQueryPager` class, prefixed with `make`.
+
+For example, in order to initialize a `GraphQLQueryPager` that paginates a single query in the forward direction with a cursor-based pagination, you can use the `makeForwardCursorQueryPager` method:
+
+```swift
+let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
+    client: apolloClient,
+    queryProvider: { page in
+        MyQuery(first: 10, after: page?.cursor ?? .none)
+    },
+    extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+            hasNext: data.values.pageInfo.hasNextPage ?? false,
+            endCursor: data.values.pageInfo.endCursor
+        )
+    }
+)
+```
+
+In this example, the `GraphQLQueryPager` instance is initialized with a closure that provides the query to be executed, and another closure that extracts the pagination information from the query result. The `GraphQLQueryPager` instance can then be used to fetch the paginated data, and to watch for changes to the paginated data. 
+
+## Subscribing to results
+
+The `GraphQLQueryPager` class can fetch data, but the caller must subscribe to the results in order to receive the data. A `subscribe` method is provided which takes a closure that is called whenever the pager fetches a new page of data. The `subscribe` method is a convenience method that ensures that the closure is called on the main thread.
+
+```swift
+// Guaranteed to run on the main thread
+pager.subscribe { result in
+    switch result {
+    case .success(let data):
+        // Handle the data
+    case .failure(let error):
+        // Handle the error
+    }
+}
+```
+
+The `GraphQLQueryPager` is also a Combine `Publisher`. As such, all `Publisher` methods are available, such as `sink`, `assign`, `map`, `filter`, and so on. 
+
+```swift
+// Can run on any thread
+pager.sink { result in
+    switch result {
+    case .success(let data):
+        // Handle the data
+    case .failure(let error):
+        // Handle the error
+    }
+}
+```
+
+## Custom response types
+
+The `GraphQLQueryPager` class is designed to work with any response type. By default, when initialized without a `transform`, the `GraphQLQueryPager` class will return a `Result` of `PaginationOutput`. This object contains three fields: `previousPages`, `initialPage`, and `nextPages`. 
+
+The `previousPages` field contains all the pages that have been fetched in the reverse direction, and exposes the paginated query's `Data` type. The `initialPage` field contains the first page of data that was fetched, and is an instance of the initial query's `Data` type. The `nextPages` field contains all the pages that have been fetched in the forward direction, and is a list of the paginated query's `Data` type.
+
+If you want to use a custom response type, you can provide a `transform` closure when initializing the `GraphQLQueryPager` instance. This closure is called whenever the pager fetches a new page of data, and is used to transform the raw response into the desired response type. 
+
+```swift
+struct Person {
+    let id: String
+    let name: String
+}
+
+let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
+    client: apolloClient,
+    queryProvider: { page in
+        MyQuery(first: 10, after: page?.cursor ?? .none)
+    },
+    extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+            hasNext: data.values.pageInfo.hasNextPage ?? false,
+            endCursor: data.values.pageInfo.endCursor
+        )
+    },
+    transform: { data in 
+        data.values.nodes.map { Person(id: $0.id, name: $0.name) }
+    }
+)
+```
+
+In this example, the `GraphQLQueryPager` instance is initialized with a `transform` closure that transforms the raw response into an array of `Person` objects. Alternatively, we can make use of the `GraphQLQueryPager`'s `map` method to achieve the same result:
+
+```swift
+pager.map { data in 
+    data.values.nodes.map { Person(id: $0.id, name: $0.name) }
+}.sink { result in
+    switch result {
+    case .success(let people):
+        // Handle the people
+    case .failure(let error):
+        // Handle the error
+    }
+}
+```
+
+## Fetching Data
+
+The `GraphQLQueryPager` class provides several methods to fetch paginated data: `fetch`, `refetch`, `loadNext`, `loadPrevious`, and `loadAll`. 
+
+The `fetch` method is used to fetch the first page of data and must be called before `loadNext` or `loadPrevious` can be called. The `refetch` method is used to refetch the first page of data, and additionally resets the pager to its initial state. The `loadNext` method is used to fetch the next page of data, and the `loadPrevious` method is used to fetch the previous page of data. The `loadAll` method is used to fetch all pages of data. 
+
+## Cancelling a Pager
+
+The `GraphQLQueryPager` class provides a `cancel` method, which can be used to cancel any ongoing fetch operations as well as cease any watcher subscriptions. Once cancelled, the pager's state is reset. Any subscriber that was subscribed to the pager will remain subscribed and will continue to receive updates. 
+
+## Error handling
+
+Network errors are exposed to the caller via the `Result` type. Usage errors are thrown as `Error` types or exposed as callbacks in each fetch method. 
+
+The `GraphQLQueryPager` will expose usage errors, of type `PaginationError`, as callbacks, whereas the `AsyncGraphQLQueryPager` will throw them directly.
