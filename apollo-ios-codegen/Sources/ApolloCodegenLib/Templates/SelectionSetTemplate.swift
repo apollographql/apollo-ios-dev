@@ -121,7 +121,7 @@ struct SelectionSetTemplate {
       \(SelectionSetNameDocumentation(inlineFragment))
       \(renderAccessControl())\
       struct \(inlineFragment.renderedTypeName): \(SelectionSetType(asInlineFragment: true))\
-      \(if: inlineFragment.isCompositeSelectionSet, ", \(config.ApolloAPITargetName).CompositeInlineFragment")\
+      \(if: inlineFragment.isCompositeInlineFragment, ", \(config.ApolloAPITargetName).CompositeInlineFragment")\
       \(if: inlineFragment.isDeferred, ", \(config.ApolloAPITargetName).Deferrable")\
        {
         \(BodyTemplate(context))
@@ -752,12 +752,8 @@ private class SelectionSetNameCache {
 
 extension IR.ComputedSelectionSet {
 
-  fileprivate var isCompositeSelectionSet: Bool {
-    return direct?.isEmpty ?? true
-  }
-
   fileprivate var isCompositeInlineFragment: Bool {
-    return !self.isEntityRoot && isCompositeSelectionSet
+    return !self.isEntityRoot && !self.isUserDefined && (direct?.isEmpty ?? true)
   }
 
   fileprivate var shouldBeRendered: Bool {
