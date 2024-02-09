@@ -211,6 +211,10 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
     public private(set) var inclusionConditionGroups:
     OrderedDictionary<AnyOf<InclusionConditions>, DirectSelections.ReadOnly> = [:]
 
+    public var isEmpty: Bool {
+      unconditionalSelections.isEmpty && inclusionConditionGroups.isEmpty
+    }
+
     init(_ directSelections: DirectSelections.ReadOnly) {
       for selection in directSelections.fields {
         if let condition = selection.value.inclusionConditions {

@@ -274,18 +274,25 @@ struct SelectionSetTemplate {
     var deprecatedArguments: [DeprecatedArgument]? =
       config.options.warningsOnDeprecatedUsage == .include ? [] : nil
 
-    let selectionsTemplate = TemplateString(
-      """
-      \(renderAccessControl())\
-      static var __selections: [\(config.ApolloAPITargetName).Selection] { [
-        \(if: shouldIncludeTypenameSelection(for: scope), ".field(\"__typename\", String.self),")
-        \(renderedSelections(groupedSelections.unconditionalSelections, &deprecatedArguments), terminator: ",")
-        \(groupedSelections.inclusionConditionGroups.map {
-        renderedConditionalSelectionGroup($0, $1, in: scope, &deprecatedArguments)
-      }, terminator: ",")
-      ] }
-      """
-    )
+    let shouldIncludeTypenameSelection = shouldIncludeTypenameSelection(for: scope)
+    let selectionsTemplate: TemplateString
+
+    if !groupedSelections.isEmpty || shouldIncludeTypenameSelection {
+      selectionsTemplate = TemplateString("""
+        \(renderAccessControl())\
+        static var __selections: [\(config.ApolloAPITargetName).Selection] { [
+          \(if: shouldIncludeTypenameSelection, ".field(\"__typename\", String.self),")
+          \(renderedSelections(groupedSelections.unconditionalSelections, &deprecatedArguments), terminator: ",")
+          \(groupedSelections.inclusionConditionGroups.map {
+          renderedConditionalSelectionGroup($0, $1, in: scope, &deprecatedArguments)
+        }, terminator: ",")
+        ] }
+        """
+      )
+    } else {
+      selectionsTemplate = ""
+    }
+
     return """
       \(if: deprecatedArguments != nil && !deprecatedArguments.unsafelyUnwrapped.isEmpty, """
       \(deprecatedArguments.unsafelyUnwrapped.map { """
