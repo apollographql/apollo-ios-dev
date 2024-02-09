@@ -7003,7 +7003,8 @@ class SelectionSetTemplateTests: XCTestCase {
       .to(equalLineByLine(predator_expected, atLine: 21, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSet__givenInlineFragmentWithOnlyReservedField_doesNotRenderCompositeInlineFragment() async throws {
+// Related to https://github.com/apollographql/apollo-ios/issues/3326
+  func test__render_nestedSelectionSet__givenInlineFragmentWithOnlyReservedField_doesNotRenderAsCompositeInlineFragment() async throws {
     // given
     schemaSDL = """
     type Query {
