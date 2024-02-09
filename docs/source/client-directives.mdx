@@ -1,0 +1,28 @@
+---
+title: Client Directives
+description: Custom GraphQL directives used by the Apollo iOS SDK
+---
+
+These are the custom directives used by the Apollo iOS SDK. These directives can be included in your `.graphql` definition files to enable their behaviors.
+
+All client directives listed here will be consumed only by Apollo iOS and will not be included in the definitions sent to your GraphQL endpoint via network transport.
+
+---
+
+### `@import(module: String!)`
+
+`directive @import(module: String!) repeatable on QUERY | MUTATION | SUBSCRIPTION | FRAGMENT_DEFINITION`
+
+Adds an import statement for the given `module` name to the top of a definition's generated Swift file.
+
+This directive can be used to enable sharing of fragment models across generated definitions in multiple modules of a project. See the documentation on [sharing fragments across modules](./project-configuration/operation-models#sharing-fragments-across-modules) for more information.
+
+---
+
+### `@apollo_client_ios_localCacheMutation`
+
+`directive @apollo_client_ios_localCacheMutation on QUERY | MUTATION | SUBSCRIPTION | FRAGMENT_DEFINITION`
+
+Defines a definition as a local cache mutation. This changes makes the generated operation model mutable.
+
+See the documentation on [defining local cache mutations](./caching/cache-transactions#defining-local-cache-mutations) for more information.
