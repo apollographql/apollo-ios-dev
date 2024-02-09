@@ -15,6 +15,10 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
     /// The selection set's `scope` is the last element in the list.
     public let scopePath: LinkedList<ScopeDescriptor>
 
+    public var isUserDefined: Bool
+
+    // MARK: - Computed Properties
+
     /// Describes all of the types and inclusion conditions the selection set matches.
     /// Derived from all the selection set's parents.
     public var scope: ScopeDescriptor { scopePath.last.value }
@@ -28,6 +32,7 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
     public var deferCondition: CompilationResult.DeferCondition? {
       scope.scopePath.last.value.deferCondition
     }
+
     public var isDeferred: Bool { deferCondition != nil }
 
     /// Indicates if the `SelectionSet` represents a root selection set.
@@ -38,10 +43,12 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
 
     init(
       entity: Entity,
-      scopePath: LinkedList<ScopeDescriptor>
+      scopePath: LinkedList<ScopeDescriptor>,
+      isUserDefined: Bool
     ) {
       self.entity = entity
       self.scopePath = scopePath
+      self.isUserDefined = isUserDefined
     }
 
     public static func == (lhs: TypeInfo, rhs: TypeInfo) -> Bool {
