@@ -15,6 +15,9 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
     /// The selection set's `scope` is the last element in the list.
     public let scopePath: LinkedList<ScopeDescriptor>
 
+    /// Indicates if the `SelectionSet` was created directly due to a selection set in the user defined `.graphql` definition file.
+    ///
+    /// If `false`, the selection set was artificially created by the IR. Currently, the only reason for this is a `CompositeInlineFragment` created during calculation of merged selections for field merging.
     public var isUserDefined: Bool
 
     // MARK: - Computed Properties
