@@ -35,9 +35,9 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   }
 
   var publishers: (
-    previousPageVarMap: Published<OrderedDictionary<AnyHashable, PaginatedQuery.Data>>.Publisher,
+    previousPageVarMap: Published<OrderedDictionary<Set<JSONValue>, PaginatedQuery.Data>>.Publisher,
     initialPageResult: Published<InitialQuery.Data?>.Publisher,
-    nextPageVarMap: Published<OrderedDictionary<AnyHashable, PaginatedQuery.Data>>.Publisher
+    nextPageVarMap: Published<OrderedDictionary<Set<JSONValue>, PaginatedQuery.Data>>.Publisher
   ) {
     return ($previousPageVarMap, $initialPageResult, $nextPageVarMap)
   }
@@ -56,8 +56,8 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   }
 
   /// Maps each query variable set to latest results from internal watchers.
-  @Published var nextPageVarMap: OrderedDictionary<AnyHashable, PaginatedQuery.Data> = [:]
-  @Published var previousPageVarMap: OrderedDictionary<AnyHashable, PaginatedQuery.Data> = [:]
+  @Published var nextPageVarMap: OrderedDictionary<Set<JSONValue>, PaginatedQuery.Data> = [:]
+  @Published var previousPageVarMap: OrderedDictionary<Set<JSONValue>, PaginatedQuery.Data> = [:]
   private var tasks: Set<Task<Void, Error>> = []
   private var taskGroup: ThrowingTaskGroup<Void, Error>?
   private var watcherCallbackQueue: DispatchQueue

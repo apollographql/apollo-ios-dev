@@ -124,7 +124,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     ]
 
     let expectedVariables = Set(nextQuery.__variables?.values.compactMap { $0._jsonEncodableValue?._jsonValue } ?? [])
-    let actualVariables = try await XCTUnwrapping(await pager.nextPageVarMap.keys.first as? Set<JSONValue>)
+    let actualVariables = try await XCTUnwrapping(await pager.nextPageVarMap.keys.first)
 
     XCTAssertEqual(expectedVariables.count, actualVariables.count)
     XCTAssertEqual(expectedVariables.count, 3)
