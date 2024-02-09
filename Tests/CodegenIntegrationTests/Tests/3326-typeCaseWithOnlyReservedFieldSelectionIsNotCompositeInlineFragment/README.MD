@@ -1,6 +1,6 @@
 # Overview
 
-When a type case selection consisted of only GraphQL reserved fields, such as `__typename` the selection was not being recognized and a composite inline fragment was generated. This resulted in empty `__selections` and `__mergedSources` lists. This is turn caused the `_asInlineFragment` accessor to behave incorrectly because it checks whether the definitions contained within `__mergedSources` are a match for the returned type. The empty list always matches and `_asInlineFragment` incorrectly matches the returned type.
+When a type case selection consisted of only GraphQL reserved fields, such as `__typename` the selection was not being recognized and a composite inline fragment was generated. This resulted in empty `__selections` and `__mergedSources` lists. This in turn caused the `_asInlineFragment` accessor to behave incorrectly because it checks whether the definitions contained within `__mergedSources` are a match for the returned type. The empty list always matches and `_asInlineFragment` incorrectly matches the returned type.
 
 We should not be generating the inline fragment with `CompositeInlineFragment` conformance, which will then not generate the empty `__mergedSources` list. Codegen will also no longer generate empty `__selections` lists and this integration test was created to ensure that the generated model still conforms to `SelectionSet` through the extensions default implementation of `__selections`.
 
