@@ -256,7 +256,7 @@ struct SelectionSetTemplate {
         )
 
         if selectionSetNameCache.contains(selectionSetName) {
-          print("\(mergedSources.count) mergedSources for \(definition): \(mergedSources.debugDescription)")
+          print("\(mergedSources.count) mergedSources for \(definition)\nSources: \(mergedSources.debugDescription)\nDuplicating generated selection set name \(selectionSetName)")
         } else {
           selectionSetNameCache.append(selectionSetName)
         }
