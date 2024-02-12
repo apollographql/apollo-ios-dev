@@ -19,7 +19,31 @@ struct AnyGraphQLResponse {
     self.variables = variables
   }
 
+  /// Call this function when you want to execute on an entire operation and its response data.
+  /// This function should also be called to execute on the partial (initial) response of an
+  /// operation with deferred selection sets.
+  func execute<
+    Accumulator: GraphQLResultAccumulator,
+    Data: RootSelectionSet
+  >(
+    selectionSet: Data.Type,
+    with accumulator: Accumulator
+  ) throws -> Accumulator.FinalResult? {
+    guard let dataEntry = body["data"] as? JSONObject else {
+      return nil
+    }
 
+    return try executor.execute(
+      selectionSet: Data.self,
+      on: dataEntry,
+      withRootCacheReference: rootKey,
+      variables: variables,
+      accumulator: accumulator
+    )
+  }
+
+  /// Call this function to execute on a specific selection set and its incremental response data.
+  /// This is typically used when executing on deferred selections.
   func execute<
     Accumulator: GraphQLResultAccumulator,
     Operation: GraphQLOperation
@@ -35,26 +59,6 @@ struct AnyGraphQLResponse {
     return try executor.execute(
       selectionSet: selectionSet,
       in: Operation.self,
-      on: dataEntry,
-      withRootCacheReference: rootKey,
-      variables: variables,
-      accumulator: accumulator
-    )
-  }
-
-  func execute<
-    Accumulator: GraphQLResultAccumulator,
-    Data: RootSelectionSet
-  >(
-    selectionSet: Data.Type,
-    with accumulator: Accumulator
-  ) throws -> Accumulator.FinalResult? {
-    guard let dataEntry = body["data"] as? JSONObject else {
-      return nil
-    }
-
-    return try executor.execute(
-      selectionSet: Data.self,
       on: dataEntry,
       withRootCacheReference: rootKey,
       variables: variables,
