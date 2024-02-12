@@ -244,6 +244,8 @@ struct SelectionSetTemplate {
   private func MergedSourcesTemplate(
     _ mergedSources: OrderedSet<IR.MergedSelections.MergedSource>
   ) -> TemplateString {
+    var selectionSetNameCache = [String]()
+
     return """
       public static var __mergedSources: [any \(config.ApolloAPITargetName).SelectionSet.Type] { [
         \(mergedSources.map {
@@ -252,6 +254,13 @@ struct SelectionSetTemplate {
           format: .fullyQualified,
           pluralizer: config.pluralizer
         )
+
+        if selectionSetNameCache.contains(selectionSetName) {
+          print("\(mergedSources.count) mergedSources for \(definition): \(mergedSources.debugDescription)")
+        } else {
+          selectionSetNameCache.append(selectionSetName)
+        }
+
         return "\(selectionSetName).self"
       })
       ] }
