@@ -114,7 +114,8 @@
     ],
     "Pagination": [
       {
-        "Introduction": "/pagination/introduction"
+        "Introduction": "/pagination/introduction",
+        "Using Custom Response Models": "/pagination/custom-types"
       },
       true
     ],

@@ -64,52 +64,6 @@ pager.sink { result in
 }
 ```
 
-## Custom response types
-
-The `GraphQLQueryPager` class is designed to work with any response type. By default, when initialized without a `transform`, the `GraphQLQueryPager` class will return a `Result` of `PaginationOutput`. This object contains three properties: `previousPages`, `initialPage`, and `nextPages`.
-
-The `previousPages` property contains all the pages that have been fetched in the reverse direction, and exposes the paginated query's `Data` type. The `initialPage` property contains the first page of data that was fetched, and is an instance of the initial query's `Data` type. The `nextPages` property contains all the pages that have been fetched in the forward direction, and is a list of the paginated query's `Data` type.
-
-If you want to use a custom response type, you can provide a `transform` closure when initializing the `GraphQLQueryPager` instance. This closure is called whenever the pager fetches a new page of data, and is used to transform the raw response into the desired response type.
-
-```swift
-struct Person {
-    let id: String
-    let name: String
-}
-
-let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
-    client: apolloClient,
-    queryProvider: { page in
-        MyQuery(first: 10, after: page?.cursor ?? .none)
-    },
-    extractPageInfo: { data in
-        CursorBasedPagination.Forward(
-            hasNext: data.values.pageInfo.hasNextPage ?? false,
-            endCursor: data.values.pageInfo.endCursor
-        )
-    },
-    transform: { data in
-        data.values.nodes.map { Person(id: $0.id, name: $0.name) }
-    }
-)
-```
-
-In this example, the `GraphQLQueryPager` instance is initialized with a `transform` closure that transforms the raw response into an array of `Person` objects. Alternatively, we can make use of the `GraphQLQueryPager`'s `map` method to achieve the same result:
-
-```swift
-pager.map { data in
-    data.values.nodes.map { Person(id: $0.id, name: $0.name) }
-}.sink { result in
-    switch result {
-    case .success(let people):
-        // Handle the people
-    case .failure(let error):
-        // Handle the error
-    }
-}
-```
-
 ## Fetching Data
 
 The `GraphQLQueryPager` class provides several methods to fetch paginated data: `fetch`, `refetch`, `loadNext`, `loadPrevious`, and `loadAll`.

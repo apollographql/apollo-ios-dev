@@ -1,0 +1,103 @@
+---
+title: Using custom response models
+---
+
+The `GraphQLQueryPager` supports not only returning collections of a query's `Data` type, but also custom response types. The custom response types can either be a collection or a single object. This is useful when you want to transform the raw response into custom models for consumption in your application.
+
+## Transforming existing responses types
+
+The `GraphQLQueryPager` class conforms to the `Publisher` protocol, and provides a `map` method that allows you to transform the raw response into a custom response type. When used this way, the `GraphQLQueryPager` will operate over generated `Data` types, but allow each `Data` type to betransformed into a custom response type. This is especially useful when you want to reuse a single pager in multiple places, transforming the raw data into view models.
+
+In this example, we take a `GraphQLQueryPager` that returns a `Result<PaginationOutput<MyQuery.Data, MyQuery.Data>>`, and transform the raw response into a custom response type of `Result<[Person], Error>`.
+
+```swift
+// This `GraphQLQueryPager` will return a `Result` of `PaginationOutput<MyQuery.Data, MyQuery.Data>`
+let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
+    client: apolloClient,
+    queryProvider: { page in
+        MyQuery(first: 10, after: page?.cursor ?? .none)
+    },
+    extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+            hasNext: data.values.pageInfo.hasNextPage ?? false,
+            endCursor: data.values.pageInfo.endCursor
+        )
+    }
+)
+
+// Elsewhere in the application
+let cancellable = pager.map { result in
+    switch result {
+    case .success((let paginationOutput, let source)):
+        // We may or may not care about the source, but we can use it to transform the response or pass it through as needed.
+        // In this example, we ignore the source and transform the response into a custom response type.
+        let pages = paginationOutput.previousPages + [paginationOutput.initialPage] + paginationOutput.nextPages
+        let people = pages.flatMap { page in
+            data.values.nodes.map { Person(id: $0.id, name: $0.name) }
+        }
+        return Result<[Person], Error>.success(people)
+    case .failure(let error):
+        return .failure(error)
+    }
+}.sink { result in
+    // NOTE: This is not guaranteed to run on the main thread. Dispatch to the main thread if necessary.
+    switch result {
+    case .success(let people):
+        // Handle the people
+    case .failure(let error):
+        // Handle the error
+    }
+}
+```
+
+## Creating `GraphQLQueryPager` that returns custom response types
+
+The `GraphQLQueryPager` class can also be initialized with a custom type in mind. When used this way, the `GraphQLQueryPager` will operate over the custom response type, and not the raw `Data` type. This is useful when you want to create a pager that returns a custom response type, and you don't want to transform the raw response into a custom response type.
+
+We provide a convenience method for transforming collection types in this manner. 
+
+In this example, we take a `GraphQLQueryPager` that returns a `Result<PaginationOutput<MyQuery.Data, MyQuery.Data>>`, and transform the raw response into a custom response type of `Result<([Person], UpdateSource), Error>`.
+
+```swift
+let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
+    client: apolloClient,
+    queryProvider: { page in
+        MyQuery(first: 10, after: page?.cursor ?? .none)
+    },
+    extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+            hasNext: data.values.pageInfo.hasNextPage ?? false,
+            endCursor: data.values.pageInfo.endCursor
+        )
+    },
+    transform: { data in
+        data.values.nodes.compactMap { node in
+            Person(id: node.id, name: node.name)
+        }
+    }
+)
+```
+
+This supports single object types as well, such as a `Result<(MyResponseModel, UpdateSource), Error>`:
+
+```swift
+let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
+    client: apolloClient,
+    queryProvider: { page in
+        MyQuery(first: 10, after: page?.cursor ?? .none)
+    },
+    extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+            hasNext: data.values.pageInfo.hasNextPage ?? false,
+            endCursor: data.values.pageInfo.endCursor
+        )
+    },
+    transform: { previousPages, initialPage, nextPages in
+        let allPages = previousPages + [initialPage] + nextPages
+        let people = allPages.flatMap { page in
+            data.values.nodes.map { Person(id: $0.id, name: $0.name) }
+        }
+        return MyResponseModel(people: people)
+    }
+)
+```
