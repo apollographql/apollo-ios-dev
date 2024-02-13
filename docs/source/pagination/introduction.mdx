@@ -32,7 +32,7 @@ let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
 )
 ```
 
-In this example, the `GraphQLQueryPager` instance is initialized with a closure that provides the query to be executed, and another closure that extracts the pagination information from the query result. The `GraphQLQueryPager` instance can then be used to fetch the paginated data, and to watch for changes to the paginated data. 
+In this example, the `GraphQLQueryPager` instance is initialized with a closure that provides the query to be executed, and another closure that extracts the pagination information from the query result. The `GraphQLQueryPager` instance can then be used to fetch the paginated data, and to watch for changes to the paginated data.
 
 ## Subscribing to results
 
@@ -50,7 +50,7 @@ pager.subscribe { result in
 }
 ```
 
-The `GraphQLQueryPager` is also a Combine `Publisher`. As such, all `Publisher` methods are available, such as `sink`, `assign`, `map`, `filter`, and so on. 
+The `GraphQLQueryPager` is also a Combine `Publisher`. As such, all `Publisher` methods are available, such as `sink`, `assign`, `map`, `filter`, and so on.
 
 ```swift
 // Can run on any thread
@@ -66,11 +66,11 @@ pager.sink { result in
 
 ## Custom response types
 
-The `GraphQLQueryPager` class is designed to work with any response type. By default, when initialized without a `transform`, the `GraphQLQueryPager` class will return a `Result` of `PaginationOutput`. This object contains three fields: `previousPages`, `initialPage`, and `nextPages`. 
+The `GraphQLQueryPager` class is designed to work with any response type. By default, when initialized without a `transform`, the `GraphQLQueryPager` class will return a `Result` of `PaginationOutput`. This object contains three fields: `previousPages`, `initialPage`, and `nextPages`.
 
 The `previousPages` field contains all the pages that have been fetched in the reverse direction, and exposes the paginated query's `Data` type. The `initialPage` field contains the first page of data that was fetched, and is an instance of the initial query's `Data` type. The `nextPages` field contains all the pages that have been fetched in the forward direction, and is a list of the paginated query's `Data` type.
 
-If you want to use a custom response type, you can provide a `transform` closure when initializing the `GraphQLQueryPager` instance. This closure is called whenever the pager fetches a new page of data, and is used to transform the raw response into the desired response type. 
+If you want to use a custom response type, you can provide a `transform` closure when initializing the `GraphQLQueryPager` instance. This closure is called whenever the pager fetches a new page of data, and is used to transform the raw response into the desired response type.
 
 ```swift
 struct Person {
@@ -89,7 +89,7 @@ let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
             endCursor: data.values.pageInfo.endCursor
         )
     },
-    transform: { data in 
+    transform: { data in
         data.values.nodes.map { Person(id: $0.id, name: $0.name) }
     }
 )
@@ -98,7 +98,7 @@ let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
 In this example, the `GraphQLQueryPager` instance is initialized with a `transform` closure that transforms the raw response into an array of `Person` objects. Alternatively, we can make use of the `GraphQLQueryPager`'s `map` method to achieve the same result:
 
 ```swift
-pager.map { data in 
+pager.map { data in
     data.values.nodes.map { Person(id: $0.id, name: $0.name) }
 }.sink { result in
     switch result {
@@ -112,16 +112,48 @@ pager.map { data in
 
 ## Fetching Data
 
-The `GraphQLQueryPager` class provides several methods to fetch paginated data: `fetch`, `refetch`, `loadNext`, `loadPrevious`, and `loadAll`. 
+The `GraphQLQueryPager` class provides several methods to fetch paginated data: `fetch`, `refetch`, `loadNext`, `loadPrevious`, and `loadAll`.
 
-The `fetch` method is used to fetch the first page of data and must be called before `loadNext` or `loadPrevious` can be called. The `refetch` method is used to refetch the first page of data, and additionally resets the pager to its initial state. The `loadNext` method is used to fetch the next page of data, and the `loadPrevious` method is used to fetch the previous page of data. The `loadAll` method is used to fetch all pages of data. 
+`fetch`: Fetches the first page of data. Must be called before `loadNext` or `loadPrevious` can be called.
+`refetch`: Cancels all ongoing fetch operations and resets the pager to its initial state. Fetches the first page of data.
+`loadNext`: Fetches the next page of data. Can only be called after `fetch` has been called.
+`loadPrevious`: Fetches the previous page of data. Can only be called after `fetch` has been called.
+`loadAll`: Fetches all pages of data. If no initial page is detected, it will first call `fetch` to fetch the first page of data. Will continue to fethc all pages until a `PageInfo` object indicates that there are no more pages to fetch. This function is compatible with forward, reverse, and bidirectional pagination.
 
-## Cancelling a Pager
+## Cancelling ongoing requests
 
-The `GraphQLQueryPager` class provides a `cancel` method, which can be used to cancel any ongoing fetch operations as well as cease any watcher subscriptions. Once cancelled, the pager's state is reset. Any subscriber that was subscribed to the pager will remain subscribed and will continue to receive updates. 
+The `GraphQLQueryPager` class provides a `cancel` method, which can be used to cancel any ongoing fetch operations as well as cease any watcher subscriptions. Once cancelled, the pager's state is reset. Any subscriber that was subscribed to the pager will remain subscribed and will continue to receive updates; the `cancel` function does not affect the pager's subscribers.
 
 ## Error handling
 
-Network errors are exposed to the caller via the `Result` type. Usage errors are thrown as `Error` types or exposed as callbacks in each fetch method. 
+There are two broad categories of errors that the `GraphQLQueryPager` class can throw: errors as a result of network operations, or errors as a result of usage. A network error is exposed to the user when the pager encounters a network error, such as a timeout or a connection error, via the `Result` that is passed to the subscriber. Usage errors, such as cancellations or attempting to begin a new fetch while a load is in progress, are thrown as `PaginationError` types (for `AsyncGraphQLQueryPager`) or exposed as callbacks in each fetch method (for `GraphQLQueryPager`). Note that `GraphQLQueryPager`'s callbacks are optional, and the user can choose to ignore them.
 
-The `GraphQLQueryPager` will expose usage errors, of type `PaginationError`, as callbacks, whereas the `AsyncGraphQLQueryPager` will throw them directly.
+### Usage errors in `GraphQLQueryPager`
+
+The `fetch`, `refetch`, `loadNext`, `loadPrevious`, and `loadAll` methods all have a completion handler that is called with a `Result` type. This `Result` type can contain either the paginated data or a `PaginationError` type. Common pagination errors are attempting to fetch while there is already a load in progress, or attempting to fetch a previous or next page without first calling `fetch`.
+
+```swift
+// Attempting to fetch a previous page without first calling `fetch`
+pager.loadNext { error in
+    if let error {
+        // Handle error
+    } else {
+        // We have no error, and are finished with our fetch operation
+    }
+}
+
+// Note that we can silently ignore the error
+pager.loadNext()
+```
+
+### Usage errors in `AsyncGraphQLQueryPager`
+
+The `AsyncGraphQLQueryPager` class can throw a `PaginationError` type directly, as opposed to exposing it via a completion handler. As an inherently asynchronous type, the `AsyncGraphQLQueryPager` can intercept an error thrown within a `Task` and forward it to the caller.
+
+```swift
+// Attempting to fetch a previous page without first calling `fetch`
+try await pager.loadNext()
+
+// Similarly, we can silently ignore the error
+try? await pager.loadNext()
+```
