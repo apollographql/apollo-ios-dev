@@ -37,43 +37,36 @@ public struct GraphQLResult<Data: RootSelectionSet> {
   }
 
   func merging(_ incrementalResult: IncrementalGraphQLResult) throws -> GraphQLResult<Data> {
-    var mergedData = self.data
-    if let incrementalDataDict = incrementalResult.data?.__data {
-      if let currentDataDict = mergedData?.__data {
-        mergedData = Data(
-          _dataDict: try currentDataDict.merging(incrementalDataDict, at: incrementalResult.path)
-        )
-
-      } else {
-        mergedData = Data(_dataDict: incrementalDataDict)
-      }
+    let mergedDataDict = try merge(
+      incrementalResult.data?.__data,
+      into: self.data?.__data
+    ) { currentDataDict, incrementalDataDict in
+      try currentDataDict.merging(incrementalDataDict, at: incrementalResult.path)
+    }
+    var mergedData: Data? = nil
+    if let mergedDataDict {
+      mergedData = Data(_dataDict: mergedDataDict)
     }
 
-    var mergedErrors = self.errors
-    if let incrementalErrors = incrementalResult.errors {
-      if let currentErrors = mergedErrors {
-        mergedErrors = currentErrors + incrementalErrors
-
-      } else {
-        mergedErrors = incrementalErrors
-      }
+    var mergedErrors = try merge(
+      incrementalResult.errors,
+      into: self.errors
+    ) { currentErrors, incrementalErrors in
+      currentErrors + incrementalErrors
     }
 
-    var mergedExtensions = self.extensions
-    if let incrementalExtensions = incrementalResult.extensions {
-      if let currentExtensions = mergedExtensions {
-        mergedExtensions = currentExtensions.merging(incrementalExtensions) { _, new in new }
-
-      } else {
-        mergedExtensions = incrementalExtensions
-      }
+    var mergedExtensions = try merge(
+      incrementalResult.extensions,
+      into: self.extensions
+    ) { currentExtensions, incrementalExtensions in
+      currentExtensions.merging(incrementalExtensions) { _, new in new }
     }
 
-    var mergedDependentKeys = self.dependentKeys
-    if let incrementalDependentKeys = incrementalResult.dependentKeys {
-      if let currentDependentKeys = mergedDependentKeys {
-        mergedDependentKeys = currentDependentKeys.union(incrementalDependentKeys)
-      }
+    var mergedDependentKeys = try merge(
+      incrementalResult.dependentKeys,
+      into: self.dependentKeys
+    ) { currentDependentKeys, incrementalDependentKeys in
+      currentDependentKeys.union(incrementalDependentKeys)
     }
 
     return GraphQLResult(
@@ -83,6 +76,23 @@ public struct GraphQLResult<Data: RootSelectionSet> {
       source: source,
       dependentKeys: mergedDependentKeys
     )
+  }
+
+  fileprivate func merge<T>(
+    _ newValue: T?,
+    into currentValue: T?,
+    onCurrent: (_ currentValue: T, _ newValue: T) throws -> T
+  ) throws -> T? {
+    switch (currentValue, newValue) {
+    case let (currentValue, nil):
+      return currentValue
+
+    case let (.some(currentValue), .some(newValue)):
+      return try onCurrent(currentValue, newValue)
+
+    case let (nil, newValue):
+      return newValue
+    }
   }
 }
 
