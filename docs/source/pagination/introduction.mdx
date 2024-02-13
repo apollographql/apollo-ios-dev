@@ -66,9 +66,9 @@ pager.sink { result in
 
 ## Custom response types
 
-The `GraphQLQueryPager` class is designed to work with any response type. By default, when initialized without a `transform`, the `GraphQLQueryPager` class will return a `Result` of `PaginationOutput`. This object contains three fields: `previousPages`, `initialPage`, and `nextPages`.
+The `GraphQLQueryPager` class is designed to work with any response type. By default, when initialized without a `transform`, the `GraphQLQueryPager` class will return a `Result` of `PaginationOutput`. This object contains three properties: `previousPages`, `initialPage`, and `nextPages`.
 
-The `previousPages` field contains all the pages that have been fetched in the reverse direction, and exposes the paginated query's `Data` type. The `initialPage` field contains the first page of data that was fetched, and is an instance of the initial query's `Data` type. The `nextPages` field contains all the pages that have been fetched in the forward direction, and is a list of the paginated query's `Data` type.
+The `previousPages` property contains all the pages that have been fetched in the reverse direction, and exposes the paginated query's `Data` type. The `initialPage` property contains the first page of data that was fetched, and is an instance of the initial query's `Data` type. The `nextPages` property contains all the pages that have been fetched in the forward direction, and is a list of the paginated query's `Data` type.
 
 If you want to use a custom response type, you can provide a `transform` closure when initializing the `GraphQLQueryPager` instance. This closure is called whenever the pager fetches a new page of data, and is used to transform the raw response into the desired response type.
 
