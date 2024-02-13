@@ -171,27 +171,6 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
   public func receive<S>(
     subscriber: S
   ) where S: Subscriber, Never == S.Failure, Result<(Model, UpdateSource), Error> == S.Input {
-    let subscription = PagerSubscription(pager: self, subscriber: subscriber)
-    subscriber.receive(subscription: subscription)
-  }
-}
-
-private class PagerSubscription<SubscriberType: Subscriber, Pager: AsyncGraphQLQueryPager<Model>, Model>: Subscription where SubscriberType.Input == Pager.Output {
-  private var subscriber: SubscriberType?
-  private var pager: Pager
-  private var cancellable: AnyCancellable?
-
-  init(pager: Pager, subscriber: SubscriberType) {
-    self.subscriber = subscriber
-    self.pager = pager
-    cancellable = pager.publisher.sink(receiveValue: {
-      _ = subscriber.receive($0)
-    })
-  }
-
-  func request(_ demand: Subscribers.Demand) { }
-
-  func cancel() {
-    subscriber = nil
+    publisher.subscribe(subscriber)
   }
 }
