@@ -101,3 +101,5 @@ let pager = GraphQLQueryPager(
     }
 )
 ```
+
+Similarly, if you need to create your own `PaginationInfo` type, you must either use the `init` method directly or create a new `make` function which utilizes your custom `PaginationInfo` type.
