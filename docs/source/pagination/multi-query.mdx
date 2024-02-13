@@ -1,0 +1,28 @@
+---
+title: Multi-Query Pagination
+---
+
+`GraphQLQueryPager` supports multi-query pagination. This means that you can use separate queries for fetching the initial page of data and for fetching subsequent pages of data. 
+
+In order to use multi-query pagination, you must configure the `GraphQLQueryPager` in order to support multiple queries. It is recommended to use an appropriate convenience `make` function to create the `GraphQLQueryPager` instance. In the following example, we will use the `makeForwardCursorQueryPager` function to create a `GraphQLQueryPager` that uses forward cursor-based pagination.
+
+```swift
+let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
+    client: client,
+    initialQuery: MyInitialQuery(),
+    extractInitialPageInfo: { data in
+        // Extract a `CursorBasedPagination.Forward` instance from the initial page of data
+    },
+    extractNextPageInfo: { data in
+        // Extract a `CursorBasedPagination.Forward` instance from the next page of data
+    },
+    nextPageResolver: { page in 
+        // Return a query that fetches the next page of data given a `CursorBasedPagination.Forward`
+        MyPaginatedQuery(cursor: page.endCursor)
+    }
+)
+```
+
+This example demonstrates how to create a `GraphQLQueryPager` that uses separate queries for fetching the initial page of data and for fetching subsequent pages of data. The `GraphQLQueryPager` is configured to use forward cursor-based pagination. The `extractInitialPageInfo` and `extractNextPageInfo` closures are used to extract pagination information from the initial page of data and from the next page of data, respectively. The `nextPageResolver` closure is used to resolve the next page query given a `CursorBasedPagination.Forward` instance.
+
+The `GraphQLQueryPager` instance can be used in the same way as a single-query pager. The `loadNextPage` method will automatically use the `nextPageResolver` closure to fetch the next page of data.
