@@ -34,6 +34,22 @@ let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
 
 In this example, the `GraphQLQueryPager` instance is initialized with a closure that provides the query to be executed, and another closure that extracts the pagination information from the query result. The `GraphQLQueryPager` instance can then be used to fetch the paginated data, and to watch for changes to the paginated data.
 
+Alternatively, we can create a forward-paginating offset-based `GraphQLQueryPager` instance using the `makeForwardOffsetQueryPager` method:
+
+```swift
+let pager = GraphQLQueryPager.makeForwardOffsetQueryPager(
+    client: apolloClient,
+    queryProvider: { page in
+        MyQuery(offset: page?.offset ?? 0)
+    },
+    extractPageInfo: { data in
+        // Configure to your own pagination model
+        // Your server may not return explicit `offset`, `limit`, or `canLoadNext` fields.
+        OffsetPagination(offset: data.values.offset, canLoadNext: data.values.canLoadNext)
+    }
+)
+```
+
 ## Subscribing to results
 
 The `GraphQLQueryPager` class can fetch data, but the caller must subscribe to the results in order to receive the data. A `subscribe` method is provided which takes a closure that is called whenever the pager fetches a new page of data. The `subscribe` method is a convenience method that ensures that the closure is called on the main thread.
