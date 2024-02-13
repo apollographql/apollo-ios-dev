@@ -116,7 +116,7 @@
       {
         "Introduction": "/pagination/introduction"
       },
-      false
+      true
     ],
     "Development & Testing": [
       {

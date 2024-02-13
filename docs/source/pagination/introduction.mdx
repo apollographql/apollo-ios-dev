@@ -9,11 +9,11 @@ Apollo Pagination provides a convenient and easy way to interact with and watch 
 - Multi-query pagination support
 - Support for custom model types
 
-Apollo Pagination provides two classes to interact with paginated endpoints: `GraphQLQueryPager` and `AsyncGraphQLQueryPager`. They have very similar APIs, but the latter is designed for use in asynchronous contexts. 
+Apollo Pagination provides two classes to interact with paginated endpoints: `GraphQLQueryPager` and `AsyncGraphQLQueryPager`. They have very similar APIs, but the latter supports `async`/`await` for use in asynchronous contexts.
 
 ## Using a `GraphQLQueryPager`
 
-The `GraphQLQueryPager` class is intended to be a simple, flexible, and powerful way to interact with paginated data. While it has a standard initializer, it is recommended to use the convenience initializers, which simplify the process of creating a `GraphQLQueryPager` instance. The convenience initializers are defined as static methods on the `GraphQLQueryPager` class, prefixed with `make`.
+The `GraphQLQueryPager` class is intended to be a simple, flexible, and powerful way to interact with paginated data. While it has a standard initializer, it is recommended to use the convenience initializers, which simplify the process of creating a `GraphQLQueryPager` instance. The convenience initializers are static methods on the `GraphQLQueryPager` class, prefixed with `make`.
 
 For example, in order to initialize a `GraphQLQueryPager` that paginates a single query in the forward direction with a cursor-based pagination, you can use the `makeForwardCursorQueryPager` method:
 
