@@ -1,0 +1,103 @@
+---
+title: Forward, Reverse, and Bi-directional Pagination
+---
+
+`GraphQLQueryPager` supports pagination in both the forward and reverse direction, as well as both at once. 
+
+## Forward Pagination
+
+Forward pagination is the most common form of pagination. It is used to fetch the next `n` items in a list. We can use the convenience `make` functions to create a configured `GraphQLQueryPager`. While we have many options depending on our requirements -- whether we use one query or two, whether we want to use a cursor or an offset, whether we want to transform the results, etc. -- we will examine using a cursor with a single query.
+
+```swift
+let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
+    client: client,
+    queryProvider: { page in
+        MyQuery(first: 10, after: page?.endCursor ?? .none)
+    },
+    extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+            hasNext: data.values.pageInfo.hasNextPage ?? false,
+            endCursor: data.values.pageInfo.endCursor
+        )
+    }
+)
+```
+
+## Reverse Pagination
+
+Reverse pagination is used to fetch the previous `n` items in a list. We can use the convenience `make` functions to create a configured `GraphQLQueryPager`. While we have many options depending on our requirements -- whether we use one query or two, whether we want to use a cursor or an offset, whether we want to transform the results, etc. -- we will examine using a cursor with a single query.
+
+```swift
+let pager = GraphQLQueryPager.makeReverseCursorQueryPager(
+    client: client,
+    queryProvider: { page in
+        MyQuery(last: 10, before: page?.startCursor ?? .none)
+    },
+    extractPageInfo: { data in
+        CursorBasedPagination.Reverse(
+            hasPrevious: data.values.pageInfo.hasPreviousPage ?? false,
+            startCursor: data.values.pageInfo.startCursor
+        )
+    }
+)
+```
+
+## Bi-directional Pagination
+
+Bi-directional pagination is used to fetch the next `n` items in a list, as well as the previous `n` items in a list. Given that we can fetch in both directions, the implication is that the initial query fetched is at neither the head nor tail of the list of results. We can use the convenience `make` functions to create a configured `GraphQLQueryPager`. For this example, we will examine using a cursor with a single query.
+
+```swift
+let pager = GraphQLQueryPager.makeBidirectionalCursorQueryPager(
+    client: client,
+    start: nil, // If you have pagination information already, you can supply it for the initial page here. Otherwise, it will use the `nil` case of the `queryProvider`
+    queryProvider: { page in
+        MyQuery(
+            first: 10, 
+            after: page?.endCursor ?? .none
+        )
+    },
+    previousQueryProvider: { page in 
+        MyQuery(
+            first: 10, 
+            before: page?.startCursor ?? .none
+        )
+    },
+    extractPageInfo: { data in
+        CursorBasedPagination.Bidirectional(
+            hasNext: data.values.pageInfo.hasNextPage ?? false,
+            endCursor: data.values.pageInfo.endCursor,
+            hasPrevious: data.values.pageInfo.hasPreviousPage ?? false,
+            startCursor: data.values.pageInfo.startCursor
+        )
+    }
+)
+```
+
+## Custom Configuration
+
+Generally, it's recommended to use a convenience `make` function to create a configured `GraphQLQueryPager`. However, if you need to customize the configuration, you can use the `init` method directly. 
+
+```swift
+let pager = GraphQLQueryPager(
+    client: client,
+    initialQuery: MyQuery(first: 10),
+    extractPageInfo: { pageExtractionData in 
+        switch pageExtractionData {
+            case .initial(let data):
+                // handle initial page fetches, returning a `PaginationInfo` of some type -- such as CursorBasedPagination.Forward. 
+            case .paginated(let data):
+                // handle paginated fetches, returning a `PaginationInfo` of some type -- such as CursorBasedPagination.Forward. 
+        }
+    },
+    pageResolver: { page, direction in
+        // Direction is either `.next` or `.previous`
+        // We must return a new query to fetch the next page in the given direction, or alternatively return `nil` if a given direction is invalid. 
+    },
+    initialTransform: { data in 
+        // Transform the initial page of result, or alternatively return `$0` if no transformation is needed.
+    },
+    pageTransform: { data in
+        // Transform a paginated result, or alternatively return `$0` if no transformation is needed.
+    }
+)
+```

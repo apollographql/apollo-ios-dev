@@ -115,7 +115,8 @@
     "Pagination": [
       {
         "Introduction": "/pagination/introduction",
-        "Using Custom Response Models": "/pagination/custom-types"
+        "Using Custom Response Models": "/pagination/custom-types",
+        "Forward, Reverse, and Bi-directional Pagination": "/pagination/directional-pagers"
       },
       true
     ],
