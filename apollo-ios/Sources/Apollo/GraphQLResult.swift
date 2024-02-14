@@ -48,21 +48,21 @@ public struct GraphQLResult<Data: RootSelectionSet> {
       mergedData = Data(_dataDict: mergedDataDict)
     }
 
-    var mergedErrors = try merge(
+    let mergedErrors = try merge(
       incrementalResult.errors,
       into: self.errors
     ) { currentErrors, incrementalErrors in
       currentErrors + incrementalErrors
     }
 
-    var mergedExtensions = try merge(
+    let mergedExtensions = try merge(
       incrementalResult.extensions,
       into: self.extensions
     ) { currentExtensions, incrementalExtensions in
       currentExtensions.merging(incrementalExtensions) { _, new in new }
     }
 
-    var mergedDependentKeys = try merge(
+    let mergedDependentKeys = try merge(
       incrementalResult.dependentKeys,
       into: self.dependentKeys
     ) { currentDependentKeys, incrementalDependentKeys in
