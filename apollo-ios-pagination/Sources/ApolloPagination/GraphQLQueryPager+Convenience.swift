@@ -11,8 +11,8 @@ public extension GraphQLQueryPager {
   static func makeForwardOffsetQueryPager<InitialQuery: GraphQLQuery>(
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
-    queryProvider: @escaping (OffsetPagination?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination
+    queryProvider: @escaping (OffsetPagination.Forward?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Forward
   ) -> GraphQLQueryPager where Model == PaginationOutput<InitialQuery, InitialQuery> {
     GraphQLQueryPager(pager: GraphQLQueryPagerCoordinator(
       client: client,
@@ -26,11 +26,33 @@ public extension GraphQLQueryPager {
     ))
   }
 
+  static func makeForwardOffsetQueryPager<InitialQuery: GraphQLQuery>(
+    client: ApolloClientProtocol,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (OffsetPagination.Forward?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Forward,
+    transform: @escaping ([InitialQuery.Data], InitialQuery.Data, [InitialQuery.Data]) throws -> Model
+  ) -> GraphQLQueryPager {
+    GraphQLQueryPager(
+      pager: GraphQLQueryPagerCoordinator(
+        client: client,
+        initialQuery: queryProvider(nil),
+        watcherDispatchQueue: watcherDispatchQueue,
+        extractPageInfo: pageExtraction(transform: extractPageInfo),
+        pageResolver: { page, direction in
+          guard direction == .next else { return nil }
+          return queryProvider(page)
+        }
+      ),
+      transform: transform
+    )
+  }
+
   static func makeForwardOffsetQueryPager<InitialQuery: GraphQLQuery, T>(
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
-    queryProvider: @escaping (OffsetPagination?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination,
+    queryProvider: @escaping (OffsetPagination.Forward?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Forward,
     transform: @escaping (InitialQuery.Data) throws -> Model
   ) -> GraphQLQueryPager where Model: RangeReplaceableCollection, T == Model.Element {
     GraphQLQueryPager(
@@ -52,8 +74,8 @@ public extension GraphQLQueryPager {
   static func makeReverseOffsetQueryPager<InitialQuery: GraphQLQuery>(
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
-    queryProvider: @escaping (OffsetPagination?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination
+    queryProvider: @escaping (OffsetPagination.Reverse?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Reverse
   ) -> GraphQLQueryPager where Model == PaginationOutput<InitialQuery, InitialQuery> {
     GraphQLQueryPager(pager: GraphQLQueryPagerCoordinator(
       client: client,
@@ -67,11 +89,33 @@ public extension GraphQLQueryPager {
     ))
   }
 
+  static func makeReverseOffsetQueryPager<InitialQuery: GraphQLQuery>(
+    client: ApolloClientProtocol,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (OffsetPagination.Reverse?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Reverse,
+    transform: @escaping ([InitialQuery.Data], InitialQuery.Data, [InitialQuery.Data]) throws -> Model
+  ) -> GraphQLQueryPager {
+    GraphQLQueryPager(
+      pager: GraphQLQueryPagerCoordinator(
+        client: client,
+        initialQuery: queryProvider(nil),
+        watcherDispatchQueue: watcherDispatchQueue,
+        extractPageInfo: pageExtraction(transform: extractPageInfo),
+        pageResolver: { page, direction in
+          guard direction == .previous else { return nil }
+          return queryProvider(page)
+        }
+      ),
+      transform: transform
+    )
+  }
+
   static func makeReverseOffsetQueryPager<InitialQuery: GraphQLQuery, T>(
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
-    queryProvider: @escaping (OffsetPagination?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination,
+    queryProvider: @escaping (OffsetPagination.Reverse?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Reverse,
     transform: @escaping (InitialQuery.Data) throws -> Model
   ) -> GraphQLQueryPager where Model: RangeReplaceableCollection, T == Model.Element {
     GraphQLQueryPager(
@@ -83,6 +127,87 @@ public extension GraphQLQueryPager {
         pageResolver: { page, direction in
           guard direction == .previous else { return nil }
           return queryProvider(page)
+        }
+      ),
+      initialTransform: transform,
+      pageTransform: transform
+    )
+  }
+
+  static func makeBidirectionalOffsetQueryPager<InitialQuery: GraphQLQuery>(
+    client: ApolloClientProtocol,
+    start: OffsetPagination.Bidirectional?,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (OffsetPagination.Bidirectional?) -> InitialQuery,
+    previousQueryProvider: @escaping (OffsetPagination.Bidirectional?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Bidirectional
+  ) -> GraphQLQueryPager where Model == PaginationOutput<InitialQuery, InitialQuery> {
+    GraphQLQueryPager(pager: GraphQLQueryPagerCoordinator(
+      client: client,
+      initialQuery: queryProvider(start),
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: pageExtraction(transform: extractPageInfo),
+      pageResolver: { page, direction in
+        switch direction {
+        case .next:
+          return queryProvider(page)
+        case .previous:
+          return previousQueryProvider(page)
+        }
+      }
+    ))
+  }
+
+  static func makeBidirectionalOffsetQueryPager<InitialQuery: GraphQLQuery>(
+    client: ApolloClientProtocol,
+    start: OffsetPagination.Bidirectional?,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (OffsetPagination.Bidirectional?) -> InitialQuery,
+    previousQueryProvider: @escaping (OffsetPagination.Bidirectional?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Bidirectional,
+    transform: @escaping ([InitialQuery.Data], InitialQuery.Data, [InitialQuery.Data]) throws -> Model
+  ) -> GraphQLQueryPager {
+    GraphQLQueryPager(
+      pager: GraphQLQueryPagerCoordinator(
+        client: client,
+        initialQuery: queryProvider(start),
+        watcherDispatchQueue: watcherDispatchQueue,
+        extractPageInfo: pageExtraction(transform: extractPageInfo),
+        pageResolver: { page, direction in
+          switch direction {
+          case .next:
+            return queryProvider(page)
+          case .previous:
+            return previousQueryProvider(page)
+          }
+        }
+      ),
+      transform: transform
+    )
+  }
+
+  static func makeBidirectionalOffsetQueryPager<InitialQuery: GraphQLQuery, T>(
+    client: ApolloClientProtocol,
+    start: OffsetPagination.Bidirectional?,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (OffsetPagination.Bidirectional?) -> InitialQuery,
+    previousQueryProvider: @escaping (OffsetPagination.Bidirectional?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Bidirectional,
+    transform: @escaping (InitialQuery.Data) throws -> Model
+  ) -> GraphQLQueryPager where Model: RangeReplaceableCollection, T == Model.Element {
+    GraphQLQueryPager(
+      pager: GraphQLQueryPagerCoordinator(
+        client: client,
+        initialQuery: queryProvider(start),
+        watcherDispatchQueue: watcherDispatchQueue,
+        extractPageInfo: pageExtraction(transform: extractPageInfo),
+        pageResolver: { page, direction in
+          switch direction {
+          case .next:
+            return queryProvider(page)
+          case .previous:
+            return previousQueryProvider(page)
+          }
         }
       ),
       initialTransform: transform,
@@ -522,8 +647,8 @@ public extension AsyncGraphQLQueryPager {
   static func makeForwardOffsetQueryPager<InitialQuery: GraphQLQuery>(
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
-    queryProvider: @escaping (OffsetPagination?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination
+    queryProvider: @escaping (OffsetPagination.Forward?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Forward
   ) async -> AsyncGraphQLQueryPager where Model == PaginationOutput<InitialQuery, InitialQuery> {
     await AsyncGraphQLQueryPager(pager: AsyncGraphQLQueryPagerCoordinator(
       client: client,
@@ -537,11 +662,33 @@ public extension AsyncGraphQLQueryPager {
     ))
   }
 
+  static func makeForwardOffsetQueryPager<InitialQuery: GraphQLQuery>(
+    client: ApolloClientProtocol,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (OffsetPagination.Forward?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Forward,
+    transform: @escaping ([InitialQuery.Data], InitialQuery.Data, [InitialQuery.Data]) throws -> Model
+  ) async -> AsyncGraphQLQueryPager {
+    await AsyncGraphQLQueryPager(
+      pager: AsyncGraphQLQueryPagerCoordinator(
+        client: client,
+        initialQuery: queryProvider(nil),
+        watcherDispatchQueue: watcherDispatchQueue,
+        extractPageInfo: pageExtraction(transform: extractPageInfo),
+        pageResolver: { page, direction in
+          guard direction == .next else { return nil }
+          return queryProvider(page)
+        }
+      ),
+      transform: transform
+    )
+  }
+
   static func makeForwardOffsetQueryPager<InitialQuery: GraphQLQuery, T>(
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
-    queryProvider: @escaping (OffsetPagination?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination,
+    queryProvider: @escaping (OffsetPagination.Forward?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Forward,
     transform: @escaping (InitialQuery.Data) throws -> Model
   ) async -> AsyncGraphQLQueryPager where Model: RangeReplaceableCollection, T == Model.Element {
     await AsyncGraphQLQueryPager(
@@ -563,8 +710,8 @@ public extension AsyncGraphQLQueryPager {
   static func makeReverseOffsetQueryPager<InitialQuery: GraphQLQuery>(
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
-    queryProvider: @escaping (OffsetPagination?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination
+    queryProvider: @escaping (OffsetPagination.Reverse?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Reverse
   ) async -> AsyncGraphQLQueryPager where Model == PaginationOutput<InitialQuery, InitialQuery> {
     await AsyncGraphQLQueryPager(pager: AsyncGraphQLQueryPagerCoordinator(
       client: client,
@@ -578,11 +725,33 @@ public extension AsyncGraphQLQueryPager {
     ))
   }
 
+  static func makeReverseOffsetQueryPager<InitialQuery: GraphQLQuery>(
+    client: ApolloClientProtocol,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (OffsetPagination.Reverse?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Reverse,
+    transform: @escaping ([InitialQuery.Data], InitialQuery.Data, [InitialQuery.Data]) throws -> Model
+  ) async -> AsyncGraphQLQueryPager {
+    await AsyncGraphQLQueryPager(
+      pager: AsyncGraphQLQueryPagerCoordinator(
+        client: client,
+        initialQuery: queryProvider(nil),
+        watcherDispatchQueue: watcherDispatchQueue,
+        extractPageInfo: pageExtraction(transform: extractPageInfo),
+        pageResolver: { page, direction in
+          guard direction == .previous else { return nil }
+          return queryProvider(page)
+        }
+      ),
+      transform: transform
+    )
+  }
+
   static func makeReverseOffsetQueryPager<InitialQuery: GraphQLQuery, T>(
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
-    queryProvider: @escaping (OffsetPagination?) -> InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination,
+    queryProvider: @escaping (OffsetPagination.Reverse?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Reverse,
     transform: @escaping (InitialQuery.Data) throws -> Model
   ) async -> AsyncGraphQLQueryPager where Model: RangeReplaceableCollection, T == Model.Element {
     await AsyncGraphQLQueryPager(
@@ -594,6 +763,87 @@ public extension AsyncGraphQLQueryPager {
         pageResolver: { page, direction in
           guard direction == .previous else { return nil }
           return queryProvider(page)
+        }
+      ),
+      initialTransform: transform,
+      pageTransform: transform
+    )
+  }
+
+  static func makeBidirectionalOffsetQueryPager<InitialQuery: GraphQLQuery>(
+    client: ApolloClientProtocol,
+    start: OffsetPagination.Bidirectional?,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (OffsetPagination.Bidirectional?) -> InitialQuery,
+    previousQueryProvider: @escaping (OffsetPagination.Bidirectional?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Bidirectional
+  ) async -> AsyncGraphQLQueryPager where Model == PaginationOutput<InitialQuery, InitialQuery> {
+    await AsyncGraphQLQueryPager(pager: AsyncGraphQLQueryPagerCoordinator(
+      client: client,
+      initialQuery: queryProvider(start),
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: pageExtraction(transform: extractPageInfo),
+      pageResolver: { page, direction in
+        switch direction {
+        case .next:
+          return queryProvider(page)
+        case .previous:
+          return previousQueryProvider(page)
+        }
+      }
+    ))
+  }
+
+  static func makeBidirectionalOffsetQueryPager<InitialQuery: GraphQLQuery>(
+    client: ApolloClientProtocol,
+    start: OffsetPagination.Bidirectional?,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (OffsetPagination.Bidirectional?) -> InitialQuery,
+    previousQueryProvider: @escaping (OffsetPagination.Bidirectional?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Bidirectional,
+    transform: @escaping ([InitialQuery.Data], InitialQuery.Data, [InitialQuery.Data]) throws -> Model
+  ) async -> AsyncGraphQLQueryPager {
+    await AsyncGraphQLQueryPager(
+      pager: AsyncGraphQLQueryPagerCoordinator(
+        client: client,
+        initialQuery: queryProvider(start),
+        watcherDispatchQueue: watcherDispatchQueue,
+        extractPageInfo: pageExtraction(transform: extractPageInfo),
+        pageResolver: { page, direction in
+          switch direction {
+          case .next:
+            return queryProvider(page)
+          case .previous:
+            return previousQueryProvider(page)
+          }
+        }
+      ),
+      transform: transform
+    )
+  }
+
+  static func makeBidirectionalOffsetQueryPager<InitialQuery: GraphQLQuery, T>(
+    client: ApolloClientProtocol,
+    start: OffsetPagination.Bidirectional?,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (OffsetPagination.Bidirectional?) -> InitialQuery,
+    previousQueryProvider: @escaping (OffsetPagination.Bidirectional?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Bidirectional,
+    transform: @escaping (InitialQuery.Data) throws -> Model
+  ) async -> AsyncGraphQLQueryPager where Model: RangeReplaceableCollection, T == Model.Element {
+    await AsyncGraphQLQueryPager(
+      pager: AsyncGraphQLQueryPagerCoordinator(
+        client: client,
+        initialQuery: queryProvider(start),
+        watcherDispatchQueue: watcherDispatchQueue,
+        extractPageInfo: pageExtraction(transform: extractPageInfo),
+        pageResolver: { page, direction in
+          switch direction {
+          case .next:
+            return queryProvider(page)
+          case .previous:
+            return previousQueryProvider(page)
+          }
         }
       ),
       initialTransform: transform,
