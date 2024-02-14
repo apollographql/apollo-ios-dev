@@ -1476,26 +1476,26 @@ private extension AsyncGraphQLQueryPagerCoordinator {
   }
 }
 
-private func pageExtraction<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery, P: PaginationInfo>(
+private func pageExtraction<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery, P: PaginationInfo, T>(
   initialTransfom: @escaping (InitialQuery.Data) -> P,
   paginatedTransform: @escaping (PaginatedQuery.Data) -> P
-) -> (PageExtractionData<InitialQuery, PaginatedQuery>) -> P {
+) -> (PageExtractionData<InitialQuery, PaginatedQuery, T>) -> P {
   { extractionData in
     switch extractionData {
-    case .initial(let value):
+    case .initial(let value, _):
       return initialTransfom(value)
-    case .paginated(let value):
+    case .paginated(let value, _):
       return paginatedTransform(value)
     }
   }
 }
 
-private func pageExtraction<InitialQuery: GraphQLQuery, P: PaginationInfo>(
+private func pageExtraction<InitialQuery: GraphQLQuery, P: PaginationInfo, T>(
   transform: @escaping (InitialQuery.Data) -> P
-) -> (PageExtractionData<InitialQuery, InitialQuery>) -> P {
+) -> (PageExtractionData<InitialQuery, InitialQuery, T>) -> P {
   { extractionData in
     switch extractionData {
-    case .initial(let value), .paginated(let value):
+    case .initial(let value, _), .paginated(let value, _):
       return transform(value)
     }
   }

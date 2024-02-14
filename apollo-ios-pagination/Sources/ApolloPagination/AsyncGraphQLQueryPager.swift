@@ -98,7 +98,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
-    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery>) -> P,
+    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
     initialTransform: @escaping (InitialQuery.Data) throws -> Model,
     pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
@@ -107,7 +107,14 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: watcherDispatchQueue,
-      extractPageInfo: extractPageInfo,
+      extractPageInfo: { data in
+        switch data {
+        case .initial(let data, let output):
+          return extractPageInfo(.initial(data, convertOutput(result: output)))
+        case .paginated(let data, let output):
+          return extractPageInfo(.paginated(data, convertOutput(result: output)))
+        }
+      },
       pageResolver: pageResolver
     )
     await self.init(
@@ -115,6 +122,18 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
       initialTransform: initialTransform,
       pageTransform: pageTransform
     )
+
+    func convertOutput(result: PaginationOutput<InitialQuery, PaginatedQuery>?) -> Model? {
+      guard let result else { return nil }
+
+      let transform: ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model = { previousData, initialData, nextData in
+        let previous = try previousData.flatMap { try pageTransform($0) }
+        let initial = try initialTransform(initialData)
+        let next = try nextData.flatMap { try pageTransform($0) }
+        return previous + initial + next
+      }
+      return try? transform(result.previousPages, result.initialPage, result.nextPages)
+    }
   }
 
   /// Subscribe to the results of the pager, with the management of the subscriber being stored internally to the `AnyGraphQLQueryPager`.
