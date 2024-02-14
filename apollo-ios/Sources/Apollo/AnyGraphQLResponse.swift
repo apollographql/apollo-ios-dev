@@ -48,7 +48,7 @@ struct AnyGraphQLResponse {
     Accumulator: GraphQLResultAccumulator,
     Operation: GraphQLOperation
   >(
-    selectionSet: any SelectionSet.Type,
+    selectionSet: any Deferrable.Type,
     in operation: Operation.Type,
     with accumulator: Accumulator
   ) throws -> Accumulator.FinalResult? {
