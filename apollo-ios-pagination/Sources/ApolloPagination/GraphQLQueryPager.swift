@@ -127,6 +127,43 @@ public class GraphQLQueryPager<Model>: Publisher {
     }
   }
 
+  public convenience init<
+    P: PaginationInfo,
+    InitialQuery: GraphQLQuery,
+    PaginatedQuery: GraphQLQuery
+  >(
+    client: ApolloClientProtocol,
+    initialQuery: InitialQuery,
+    watcherDispatchQueue: DispatchQueue = .main,
+    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
+    pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
+    transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
+  ) {
+    let pager = GraphQLQueryPagerCoordinator(
+      client: client,
+      initialQuery: initialQuery,
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: { data in
+        switch data {
+        case .initial(let data, let output):
+          return extractPageInfo(.initial(data, convertOutput(result: output)))
+        case .paginated(let data, let output):
+          return extractPageInfo(.paginated(data, convertOutput(result: output)))
+        }
+      },
+      pageResolver: pageResolver
+    )
+    self.init(
+      pager: pager,
+      transform: transform
+    )
+
+    func convertOutput(result: PaginationOutput<InitialQuery, PaginatedQuery>?) -> Model? {
+      guard let result else { return nil }
+      return try? transform(result.previousPages, result.initialPage, result.nextPages)
+    }
+  }
+
   deinit {
     pager.cancel()
   }
