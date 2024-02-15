@@ -80,15 +80,6 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     )
   }
 
-  /// For most use-cases, it's recommended to use the static `make...` functions instead of this initializer.
-  /// - Parameters:
-  ///   - client: The Apollo client
-  ///   - initialQuery: The initial query to be performed.
-  ///   - watcherDispatchQueue: The queue that the internal `GraphQLQueryWatcher`s dispatch their results to. Defaults to `main`.
-  ///   - extractPageInfo: This transforming function extracts a `PaginationInfo` from either `InitialQuery.Data` or `PaginatedQuery.Data`, represented in the form of `PageExtractionData`.
-  ///   - pageResolver: This transforming function initializes a new `PaginatedQuery` given a `PagiantionInfo` and `PaginationDirection`.
-  ///   - initialTransform: Transforms the `InitialQuery.Data` to a `Model` type.
-  ///   - pageTransform: Transforms the `PaginatedQuery.Data` to a `Model` type.
   public convenience init<
     P: PaginationInfo,
     InitialQuery: GraphQLQuery,
@@ -134,6 +125,29 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
       }
       return try? transform(result.previousPages, result.initialPage, result.nextPages)
     }
+  }
+
+  public convenience init<
+    P: PaginationInfo,
+    InitialQuery: GraphQLQuery,
+    PaginatedQuery: GraphQLQuery
+  >(
+    client: ApolloClientProtocol,
+    initialQuery: InitialQuery,
+    watcherDispatchQueue: DispatchQueue = .main,
+    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
+    pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
+  ) async where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
+    let pager = AsyncGraphQLQueryPagerCoordinator(
+      client: client,
+      initialQuery: initialQuery,
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: extractPageInfo,
+      pageResolver: pageResolver
+    )
+    await self.init(
+      pager: pager
+    )
   }
 
   public convenience init<
