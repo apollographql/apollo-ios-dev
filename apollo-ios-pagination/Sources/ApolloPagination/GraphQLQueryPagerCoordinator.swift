@@ -43,7 +43,7 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
-    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery>) -> P,
+    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, PaginationOutput<InitialQuery, PaginatedQuery>?>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
   ) {
     pager = .init(

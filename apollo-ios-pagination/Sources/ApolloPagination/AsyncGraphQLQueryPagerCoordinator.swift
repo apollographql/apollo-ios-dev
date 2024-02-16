@@ -26,7 +26,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   var isFetching: Bool = false
   let nextPageResolver: (PaginationInfo) -> PaginatedQuery?
   let previousPageResolver: (PaginationInfo) -> PaginatedQuery?
-  let extractPageInfo: (PageExtractionData<InitialQuery, PaginatedQuery>) -> PaginationInfo
+  let extractPageInfo: (PageExtractionData<InitialQuery, PaginatedQuery, PaginationOutput<InitialQuery, PaginatedQuery>?>) -> PaginationInfo
   var nextPageInfo: PaginationInfo? { nextPageTransformation() }
   var previousPageInfo: PaginationInfo? { previousPageTransformation() }
 
@@ -42,8 +42,10 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
     return ($previousPageVarMap, $initialPageResult, $nextPageVarMap)
   }
 
-  @Published var currentValue: Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>?
-  private var queuedValue: Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>?
+  typealias ResultType = Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>
+
+  @Published var currentValue: ResultType?
+  private var queuedValue: ResultType?
 
   @Published var initialPageResult: InitialQuery.Data?
   var latest: (previous: [PaginatedQuery.Data], initial: InitialQuery.Data, next: [PaginatedQuery.Data])? {
@@ -73,7 +75,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
-    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery>) -> P,
+    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, PaginationOutput<InitialQuery, PaginatedQuery>?>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
   ) {
     self.client = client
@@ -359,17 +361,19 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   }
 
   private func nextPageTransformation() -> PaginationInfo? {
+    let currentValue = try? currentValue?.get().0
     guard let last = nextPageVarMap.values.last else {
-      return initialPageResult.flatMap { extractPageInfo(.initial($0)) }
+      return initialPageResult.flatMap { extractPageInfo(.initial($0, currentValue)) }
     }
-    return extractPageInfo(.paginated(last))
+    return extractPageInfo(.paginated(last, currentValue))
   }
 
   private func previousPageTransformation() -> PaginationInfo? {
+    let currentValue = try? currentValue?.get().0
     guard let first = previousPageVarMap.values.last else {
-      return initialPageResult.flatMap { extractPageInfo(.initial($0)) }
+      return initialPageResult.flatMap { extractPageInfo(.initial($0, currentValue)) }
     }
-    return extractPageInfo(.paginated(first))
+    return extractPageInfo(.paginated(first, currentValue))
   }
 
   private func execute(operation: @escaping (CurrentValueSubject<Void, Never>) async throws -> Void) async {

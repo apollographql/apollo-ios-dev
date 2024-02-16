@@ -78,7 +78,7 @@ final class ConcurrencyTests: XCTestCase {
       watcherDispatchQueue: .main,
       extractPageInfo: { data in
         switch data {
-        case .initial(let data), .paginated(let data):
+        case .initial(let data, _), .paginated(let data, _):
           return CursorBasedPagination.Forward(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor
@@ -107,7 +107,7 @@ final class ConcurrencyTests: XCTestCase {
       watcherDispatchQueue: .main,
       extractPageInfo: { data in
         switch data {
-        case .initial(let data), .paginated(let data):
+        case .initial(let data, _), .paginated(let data, _):
           return CursorBasedPagination.Forward(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor
