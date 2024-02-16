@@ -71,15 +71,27 @@ public class GraphQLQueryPager<Model>: Publisher {
     )
   }
 
-  /// For most use-cases, it's recommended to use the static `make...` functions instead of this initializer.
-  /// - Parameters:
-  ///   - client: The Apollo client
-  ///   - initialQuery: The initial query to be performed.
-  ///   - watcherDispatchQueue: The queue that the internal `GraphQLQueryWatcher`s dispatch their results to. Defaults to `main`.
-  ///   - extractPageInfo: This transforming function extracts a `PaginationInfo` from either `InitialQuery.Data` or `PaginatedQuery.Data`, represented in the form of `PageExtractionData`.
-  ///   - pageResolver: This transforming function initializes a new `PaginatedQuery` given a `PagiantionInfo` and `PaginationDirection`.
-  ///   - initialTransform: Transforms the `InitialQuery.Data` to a `Model` type.
-  ///   - pageTransform: Transforms the `PaginatedQuery.Data` to a `Model` type.
+  public convenience init<
+    P: PaginationInfo,
+    InitialQuery: GraphQLQuery,
+    PaginatedQuery: GraphQLQuery
+  >(
+    client: ApolloClientProtocol,
+    initialQuery: InitialQuery,
+    watcherDispatchQueue: DispatchQueue = .main,
+    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
+    pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
+  ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
+    let pager = GraphQLQueryPagerCoordinator(
+      client: client,
+      initialQuery: initialQuery,
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: extractPageInfo,
+      pageResolver: pageResolver
+    )
+    self.init(pager: pager)
+  }
+
   public convenience init<
     P: PaginationInfo,
     InitialQuery: GraphQLQuery,
@@ -89,7 +101,7 @@ public class GraphQLQueryPager<Model>: Publisher {
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
-    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery>) -> P,
+    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
     initialTransform: @escaping (InitialQuery.Data) throws -> Model,
     pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
@@ -98,7 +110,14 @@ public class GraphQLQueryPager<Model>: Publisher {
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: watcherDispatchQueue,
-      extractPageInfo: extractPageInfo,
+      extractPageInfo: { data in
+        switch data {
+        case .initial(let data, let output):
+          return extractPageInfo(.initial(data, convertOutput(result: output)))
+        case .paginated(let data, let output):
+          return extractPageInfo(.paginated(data, convertOutput(result: output)))
+        }
+      },
       pageResolver: pageResolver
     )
     self.init(
@@ -106,6 +125,55 @@ public class GraphQLQueryPager<Model>: Publisher {
       initialTransform: initialTransform,
       pageTransform: pageTransform
     )
+
+    func convertOutput(result: PaginationOutput<InitialQuery, PaginatedQuery>?) -> Model? {
+      guard let result else { return nil }
+
+      let transform: ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model = { previousData, initialData, nextData in
+        let previous = try previousData.flatMap { try pageTransform($0) }
+        let initial = try initialTransform(initialData)
+        let next = try nextData.flatMap { try pageTransform($0) }
+        return previous + initial + next
+      }
+      return try? transform(result.previousPages, result.initialPage, result.nextPages)
+    }
+  }
+
+  public convenience init<
+    P: PaginationInfo,
+    InitialQuery: GraphQLQuery,
+    PaginatedQuery: GraphQLQuery
+  >(
+    client: ApolloClientProtocol,
+    initialQuery: InitialQuery,
+    watcherDispatchQueue: DispatchQueue = .main,
+    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
+    pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
+    transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
+  ) {
+    let pager = GraphQLQueryPagerCoordinator(
+      client: client,
+      initialQuery: initialQuery,
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: { data in
+        switch data {
+        case .initial(let data, let output):
+          return extractPageInfo(.initial(data, convertOutput(result: output)))
+        case .paginated(let data, let output):
+          return extractPageInfo(.paginated(data, convertOutput(result: output)))
+        }
+      },
+      pageResolver: pageResolver
+    )
+    self.init(
+      pager: pager,
+      transform: transform
+    )
+
+    func convertOutput(result: PaginationOutput<InitialQuery, PaginatedQuery>?) -> Model? {
+      guard let result else { return nil }
+      return try? transform(result.previousPages, result.initialPage, result.nextPages)
+    }
   }
 
   deinit {
