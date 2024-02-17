@@ -85,7 +85,8 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
 
     let typeInfo = SelectionSet.TypeInfo(
       entity: existingField.entity,
-      scopePath: wrapperScope
+      scopePath: wrapperScope,
+      isUserDefined: true
     )
 
     let selectionSet = SelectionSet(
@@ -111,7 +112,8 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
         entity: newField.entity,
         scopePath: wrapperField.selectionSet.scopePath.mutatingLast {
           $0.appending(newFieldConditions)
-        }
+        },
+        isUserDefined: true
       )
 
       let newFieldSelectionSet = SelectionSet(
@@ -208,6 +210,10 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
 
     public private(set) var inclusionConditionGroups:
     OrderedDictionary<AnyOf<InclusionConditions>, DirectSelections.ReadOnly> = [:]
+
+    public var isEmpty: Bool {
+      unconditionalSelections.isEmpty && inclusionConditionGroups.isEmpty
+    }
 
     init(_ directSelections: DirectSelections.ReadOnly) {
       for selection in directSelections.fields {

@@ -26,7 +26,7 @@ final class ConcurrencyTests: XCTestCase {
   // MARK: - Test helpers
 
   private func loadDataFromManyThreads(
-    pager: AsyncGraphQLQueryPager<Query, Query>,
+    pager: AsyncGraphQLQueryPagerCoordinator<Query, Query>,
     expectation: XCTestExpectation
   ) async {
     await withTaskGroup(of: Void.self) { group in
@@ -43,7 +43,7 @@ final class ConcurrencyTests: XCTestCase {
   }
 
   private func loadDataFromManyThreadsThrowing(
-    pager: AsyncGraphQLQueryPager<Query, Query>
+    pager: AsyncGraphQLQueryPagerCoordinator<Query, Query>
   ) async throws {
     try await withThrowingTaskGroup(of: Void.self) { group in
       let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
@@ -59,7 +59,7 @@ final class ConcurrencyTests: XCTestCase {
   }
 
   private func loadDataFromManyThreads(
-    pager: GraphQLQueryPager<Query, Query>
+    pager: GraphQLQueryPagerCoordinator<Query, Query>
   ) {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
 
@@ -69,16 +69,16 @@ final class ConcurrencyTests: XCTestCase {
     wait(for: [serverExpectation], timeout: 1.0)
   }
 
-  private func createPager() -> AsyncGraphQLQueryPager<Query, Query> {
+  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPager<Query, Query>(
+    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,
       extractPageInfo: { data in
         switch data {
-        case .initial(let data), .paginated(let data):
+        case .initial(let data, _), .paginated(let data, _):
           return CursorBasedPagination.Forward(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor
@@ -98,16 +98,16 @@ final class ConcurrencyTests: XCTestCase {
     )
   }
 
-  private func createNonisolatedPager() -> GraphQLQueryPager<Query, Query> {
+  private func createNonisolatedPager() -> GraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return GraphQLQueryPager<Query, Query>(
+    return GraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,
       extractPageInfo: { data in
         switch data {
-        case .initial(let data), .paginated(let data):
+        case .initial(let data, _), .paginated(let data, _):
           return CursorBasedPagination.Forward(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor
@@ -127,7 +127,7 @@ final class ConcurrencyTests: XCTestCase {
     )
   }
 
-  private func fetchFirstPage(pager: AsyncGraphQLQueryPager<Query, Query>) async {
+  private func fetchFirstPage(pager: AsyncGraphQLQueryPagerCoordinator<Query, Query>) async {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     await pager.fetch()
     await fulfillment(of: [serverExpectation], timeout: 1.0)
@@ -137,7 +137,7 @@ final class ConcurrencyTests: XCTestCase {
 
   func test_concurrentFetches() async throws {
     let pager = createPager()
-    var results: [Result<PaginationOutput<Query, Query>, Error>] = []
+    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), Error>] = []
     let resultsExpectation = expectation(description: "Results arrival")
     resultsExpectation.expectedFulfillmentCount = 2
     await pager.subscribe { result in
@@ -160,7 +160,7 @@ final class ConcurrencyTests: XCTestCase {
 
   func test_concurrentFetches_nonisolated() throws {
     let pager = createNonisolatedPager()
-    var results: [Result<PaginationOutput<Query, Query>, Error>] = []
+    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), Error>] = []
     let initialExpectation = expectation(description: "Initial")
     initialExpectation.assertForOverFulfill = false
     let nextExpectation = expectation(description: "Next")
