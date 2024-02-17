@@ -11,7 +11,9 @@ extension GraphQLNamedType {
     }
   }
 
-  @objc var formattedName: String { swiftName }
+  @objc var formattedName: String {
+    customName ?? swiftName
+  }
 }
 
 extension GraphQLScalarType {
@@ -29,6 +31,10 @@ extension GraphQLScalarType {
     if !isCustomScalar {
       return swiftName
     }
+    
+    if let customName = customName {
+      return customName
+    }
 
     let uppercasedName = swiftName.firstUppercased
     return SwiftKeywords.TypeNamesToSuffix.contains(uppercasedName) ?
@@ -40,6 +46,10 @@ extension GraphQLScalarType {
 extension GraphQLEnumType {
 
   override var formattedName: String {
+    if let customName = customName {
+      return customName
+    }
+    
     let uppercasedName = swiftName.firstUppercased
     return SwiftKeywords.TypeNamesToSuffix.contains(uppercasedName) ?
             "\(uppercasedName)_Enum" : uppercasedName
@@ -50,6 +60,10 @@ extension GraphQLEnumType {
 extension GraphQLInputObjectType {
 
   override var formattedName: String {
+    if let customName = customName {
+      return customName
+    }
+    
     let uppercasedName = swiftName.firstUppercased
     return SwiftKeywords.TypeNamesToSuffix.contains(uppercasedName) ?
             "\(uppercasedName)_InputObject" : uppercasedName
@@ -60,6 +74,10 @@ extension GraphQLInputObjectType {
 extension GraphQLObjectType {
 
   override var formattedName: String {
+    if let customName = customName {
+      return customName
+    }
+    
     let uppercasedName = swiftName.firstUppercased
     return SwiftKeywords.TypeNamesToSuffix.contains(uppercasedName) ?
             "\(uppercasedName)_Object" : uppercasedName
@@ -70,6 +88,10 @@ extension GraphQLObjectType {
 extension GraphQLInterfaceType {
 
   override var formattedName: String {
+    if let customName = customName {
+      return customName
+    }
+    
     let uppercasedName = swiftName.firstUppercased
     return SwiftKeywords.TypeNamesToSuffix.contains(uppercasedName) ?
             "\(uppercasedName)_Interface" : uppercasedName
@@ -80,6 +102,10 @@ extension GraphQLInterfaceType {
 extension GraphQLUnionType {
 
   override var formattedName: String {
+    if let customName = customName {
+      return customName
+    }
+    
     let uppercasedName = swiftName.firstUppercased
     return SwiftKeywords.TypeNamesToSuffix.contains(uppercasedName) ?
             "\(uppercasedName)_Union" : uppercasedName

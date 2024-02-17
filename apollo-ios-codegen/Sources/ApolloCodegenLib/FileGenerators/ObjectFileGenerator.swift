@@ -14,5 +14,5 @@ struct ObjectFileGenerator: FileGenerator {
   }
 
   var target: FileTarget { .object }
-  var fileName: String { graphqlObject.name }
+  var fileName: String { graphqlObject.customName ?? graphqlObject.name }
 }

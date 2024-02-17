@@ -119,6 +119,8 @@ public class ApolloCodegen {
 
     let compilationResult = try await compileGraphQLResult()
 
+    processSchemaCustomizations(compilationResult: compilationResult)
+    
     try config.validate(compilationResult)
 
     let ir = IRBuilder(compilationResult: compilationResult)
@@ -317,6 +319,83 @@ public class ApolloCodegen {
             config: self.config
           ).generate(forConfig: self.config, fileManager: fileManager)
           return (irOperation.name, errors)
+        }
+      }
+    }
+  }
+  
+  private func processSchemaCustomizations(compilationResult: CompilationResult) {
+    compilationResult.referencedTypes.forEach { type in
+      if type is GraphQLObjectType ||
+         type is GraphQLInterfaceType ||
+         type is GraphQLUnionType {
+        guard let typeCustomization = config.options.schemaCustomization.customTypeNames[type.name] else {
+          return
+        }
+        
+        switch typeCustomization {
+        case .type(let name):
+          type.customName = name
+        default:
+          break
+        }
+      } else if let scalarType = type as? GraphQLScalarType {
+        guard scalarType.isCustomScalar,
+              let typeCustomization = config.options.schemaCustomization.customTypeNames[scalarType.name] else {
+          return
+        }
+        
+        switch typeCustomization {
+        case .type(let name):
+          type.customName = name
+        default:
+          break
+        }
+      } else if let enumType = type as? GraphQLEnumType {
+        guard let typeCustomization = config.options.schemaCustomization.customTypeNames[enumType.name] else {
+          return
+        }
+        
+        switch typeCustomization {
+        case .type(let name):
+          enumType.customName = name
+          break
+        case .enum(let name, let cases):
+          enumType.customName = name
+          
+          if let cases = cases {
+            for value in enumType.values {
+              if let caseName = cases[value.name.value] {
+                value.customName = GraphQLEnumValue.Name(value: caseName)
+              }
+            }
+          }
+          break
+        default:
+          break
+        }
+      } else if let inputObjectType = type as? GraphQLInputObjectType {
+        guard let typeCustomization = config.options.schemaCustomization.customTypeNames[inputObjectType.name] else {
+          return
+        }
+        
+        switch typeCustomization {
+        case .type(let name):
+          inputObjectType.customName = name
+          break
+        case .inputObject(let name, let fields):
+          inputObjectType.customName = name
+          
+          if let fields = fields {
+            for (_, field) in inputObjectType.fields {
+              if let fieldName = fields[field.name] {
+                field.customName = fieldName
+              }
+            }
+          }
+          break
+        default:
+          break
         }
       }
     }
