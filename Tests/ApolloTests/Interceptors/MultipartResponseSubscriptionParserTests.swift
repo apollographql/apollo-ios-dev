@@ -151,4 +151,128 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
   }
 
   // MARK: Parsing tests
+
+  func test__parsing__givenSingleChunk_shouldReturnSuccess() throws {
+    let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
+
+    let expectation = expectation(description: "Received callback")
+
+    let expected: JSONObject = [
+      "data": [
+        "__typename": "Time",
+        "ticker": 1
+      ]
+    ]
+
+    subject.intercept(
+      request: .mock(operation: MockQuery.mock()),
+      response: .mock(
+        headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
+        data: """
+          --graphql
+          content-type: application/json
+
+          {
+            "payload": {
+              "data": {
+                "__typename": "Time",
+                "ticker": 1
+              }
+            }
+          }
+          --graphql
+          """.crlfFormattedData()
+      )
+    ) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      expect(result).to(beSuccess())
+
+      guard
+        let data = try! result.get(),
+        let deserialized = try! JSONSerialization.jsonObject(with: data) as? JSONObject
+      else {
+        return fail("data could not be deserialized!")
+      }
+
+      expect(deserialized).to(equal(expected))
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
+
+  func test__parsing__givenMultipleChunks_shouldReturnMultipleSuccess() throws {
+    let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
+
+    let expectation = expectation(description: "Received callback")
+    expectation.expectedFulfillmentCount = 2
+
+    var expected: [JSONObject] = [
+      [
+        "data": [
+          "__typename": "Time",
+          "ticker": 2
+        ]
+      ],
+      [
+        "data": [
+          "__typename": "Time",
+          "ticker": 3
+        ]
+      ]
+    ]
+
+    subject.intercept(
+      request: .mock(operation: MockQuery.mock()),
+      response: .mock(
+        headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
+        data: """
+          --graphql
+          content-type: application/json
+
+          {
+            "payload": {
+              "data": {
+                "__typename": "Time",
+                "ticker": 2
+              }
+            }
+          }
+          --graphql
+          content-type: application/json
+
+          {
+            "payload": {
+              "data": {
+                "__typename": "Time",
+                "ticker": 3
+              }
+            }
+          }
+          --graphql
+          """.crlfFormattedData()
+      )
+    ) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      expect(result).to(beSuccess())
+
+      guard
+        let data = try! result.get(),
+        let deserialized = try! JSONSerialization.jsonObject(with: data) as? JSONObject
+      else {
+        return fail("data could not be deserialized!")
+      }
+
+      expect(expected).to(contain(deserialized))
+      expected.removeAll(where: { $0 == deserialized })
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+    expect(expected).to(beEmpty())
+  }
 }
