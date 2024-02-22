@@ -9,10 +9,18 @@ title: Directional Pagination
 Forward pagination is the most common form of pagination. It is used to fetch the next `n` items in a list. We can use the convenience `make` functions to create a configured `GraphQLQueryPager`. While we have many options depending on our requirements -- whether we use one query or two, whether we want to use a cursor or an offset, whether we want to transform the results, etc. -- we will examine using a cursor with a single query.
 
 ```swift
-let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
+let initialQuery = MyQuery(first: 10, after: nil)
+let pager = GraphQLQueryPager.makeQueryPager(
     client: client,
-    queryProvider: { page in
-        MyQuery(first: 10, after: page?.endCursor ?? .none)
+    initialQuery: initialQuery,
+    pageResolver: { page, paginationDirection in
+        // As we only want to support forward pagination, we can return `nil` for reverse pagination
+        switch paginationDirection {
+        case .next:
+            return MyQuery(first: 10, after: page.endCursor ?? .none)
+        case .previous:
+            return nil
+        }
     },
     extractPageInfo: { data in
         CursorBasedPagination.Forward(
@@ -28,15 +36,23 @@ let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
 Reverse pagination is used to fetch the previous `n` items in a list. We can use the convenience `make` functions to create a configured `GraphQLQueryPager`. While we have many options depending on our requirements -- whether we use one query or two, whether we want to use a cursor or an offset, whether we want to transform the results, etc. -- we will examine using a cursor with a single query.
 
 ```swift
-let pager = GraphQLQueryPager.makeReverseCursorQueryPager(
+let initialQuery = MyQuery(first: 10, after: nil)
+let pager = GraphQLQueryPager.makeQueryPager(
     client: client,
-    queryProvider: { page in
-        MyQuery(last: 10, before: page?.startCursor ?? .none)
+    initialQuery: initialQuery,
+    pageResolver: { page, paginationDirection in
+        // As we only want to support reverse pagination, we can return `nil` for forward pagination
+        switch paginationDirection {
+        case .next:
+            return nil
+        case .previous:
+            return MyQuery(first: 10, before: page.startCursor ?? .none)
+        }
     },
     extractPageInfo: { data in
         CursorBasedPagination.Reverse(
-            hasPrevious: data.values.pageInfo.hasPreviousPage ?? false,
-            startCursor: data.values.pageInfo.startCursor
+            hasNext: data.values.pageInfo.hasPrevious ?? false,
+            endCursor: data.values.pageInfo.startCursor
         )
     }
 )
@@ -47,20 +63,16 @@ let pager = GraphQLQueryPager.makeReverseCursorQueryPager(
 Bi-directional pagination is used to fetch the next `n` items in a list, as well as the previous `n` items in a list. Given that we can fetch in both directions, the implication is that the initial query fetched is at neither the head nor tail of the list of results. We can use the convenience `make` functions to create a configured `GraphQLQueryPager`. For this example, we will examine using a cursor with a single query.
 
 ```swift
-let pager = GraphQLQueryPager.makeBidirectionalCursorQueryPager(
+let pager = GraphQLQueryPager.makeQueryPager(
     client: client,
-    start: nil, // If you have pagination information already, you can supply it for the initial page here. Otherwise, it will use the `nil` case of the `queryProvider`
-    queryProvider: { page in
-        MyQuery(
-            first: 10, 
-            after: page?.endCursor ?? .none
-        )
-    },
-    previousQueryProvider: { page in 
-        MyQuery(
-            first: 10, 
-            before: page?.startCursor ?? .none
-        )
+    initialQuery: MyQuery(first: 10, after: nil),
+    pageResolver: { page, direction in
+        switch direction {
+        case .next:
+            return MyQuery(first: 10, after: page?.endCursor ?? .none)
+        case .previous:
+            return MyQuery(first: 10, before: page?.startCursor ?? .none)
+        }
     },
     extractPageInfo: { data in
         CursorBasedPagination.Bidirectional(
