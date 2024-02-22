@@ -185,6 +185,41 @@ enum Mocks {
       }
     }
 
+    class OffsetFriendsQuery: MockSelectionSet {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero?.self, arguments: ["id": .variable("id")])
+      ]}
+
+      var hero: Hero { __data["hero"] }
+
+      class Hero: MockSelectionSet {
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .field("name", String.self),
+          .field("friends", [Character].self, arguments: [
+            "offset": .variable("offset"),
+            "limit": .variable("limit"),
+          ]),
+        ]}
+
+        var name: String { __data["name"] }
+        var id: String { __data["id"] }
+        var friends: [Character] { __data["friends"] }
+
+        class Character: MockSelectionSet {
+          override class var __selections: [Selection] {[
+            .field("__typename", String.self),
+            .field("name", String.self),
+            .field("id", String.self),
+          ]}
+
+          var name: String { __data["name"] }
+          var id: String { __data["id"] }
+        }
+      }
+    }
+
     struct NameCacheMutation: MockMutableRootSelectionSet {
       public var __data: DataDict = .empty()
       init(_dataDict: DataDict) { __data = _dataDict }

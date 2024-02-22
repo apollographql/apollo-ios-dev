@@ -1,0 +1,13 @@
+type Query {
+  allAnimals: [Animal]
+}
+
+union Animal = AnimalObject | AnimalError
+
+type AnimalObject {
+  species: String!
+}
+
+type AnimalError {
+  code: Int!
+}
