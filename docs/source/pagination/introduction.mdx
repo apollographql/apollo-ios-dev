@@ -15,13 +15,21 @@ Apollo Pagination provides two classes to interact with paginated endpoints: `Gr
 
 The `GraphQLQueryPager` class is intended to be a simple, flexible, and powerful way to interact with paginated data. While it has a standard initializer, it is recommended to use the convenience initializers, which simplify the process of creating a `GraphQLQueryPager` instance. The convenience initializers are static methods on the `GraphQLQueryPager` class, prefixed with `make`.
 
-For example, in order to initialize a `GraphQLQueryPager` that paginates a single query in the forward direction with a cursor-based pagination, you can use the `makeForwardCursorQueryPager` method:
+For example, in order to initialize a `GraphQLQueryPager` that paginates a single query in the forward direction with a cursor-based pagination, you can use the `makeQueryPager` method:
 
 ```swift
-let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
-    client: apolloClient,
-    queryProvider: { page in
-        MyQuery(first: 10, after: page?.cursor ?? .none)
+let initialQuery = MyQuery(first: 10, after: nil)
+let pager = GraphQLQueryPager.makeQueryPager(
+    client: client,
+    initialQuery: initialQuery,
+    pageResolver: { page, paginationDirection in
+        // As we only want to support forward pagination, we can return `nil` for reverse pagination
+        switch paginationDirection {
+        case .next:
+            return MyQuery(first: 10, after: page.endCursor ?? .none)
+        case .previous:
+            return nil
+        }
     },
     extractPageInfo: { data in
         CursorBasedPagination.Forward(

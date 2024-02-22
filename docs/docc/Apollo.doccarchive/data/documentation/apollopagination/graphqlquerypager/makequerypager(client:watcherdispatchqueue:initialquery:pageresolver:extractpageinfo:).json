@@ -20,7 +20,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "ApolloPagination",
-    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerC09makeQueryE06client20watcherDispatchQueue07initialG012pageResolver15extractPageInfoACyAA0B6OutputVyqd__qd__GG0A00A14ClientProtocol_p_So17OS_dispatch_queueCqd__qd__qd_0__AA0B9DirectionOtcqd_0_4DataQyd__ctALRsz0A3API0cD0Rd__AA0bQ0Rd_0_r0_lFZ",
+    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerC09makeQueryE06client20watcherDispatchQueue07initialG012pageResolver15extractPageInfoACyAA0B6OutputVyqd__qd__GG0A00A14ClientProtocol_p_So17OS_dispatch_queueCqd__qd__Sgqd_0__AA0B9DirectionOtcqd_0_4DataQyd__ctALRsz0A3API0cD0Rd__AA0bQ0Rd_0_r0_lFZ",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -143,7 +143,7 @@
       },
       {
         "kind" : "text",
-        "text" : ", "
+        "text" : "?, "
       },
       {
         "kind" : "externalParam",
@@ -346,7 +346,7 @@
             },
             {
               "kind" : "text",
-              "text" : ", "
+              "text" : "?, "
             },
             {
               "kind" : "externalParam",
@@ -681,7 +681,7 @@
     },
     {
       "kind" : "text",
-      "text" : ", "
+      "text" : "?, "
     },
     {
       "kind" : "externalParam",

@@ -20,7 +20,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "ApolloPagination",
-    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerC09makeQueryE06client07initialG020watcherDispatchQueue22extractInitialPageInfo0m4NextoP012pageResolverACyAA0B6OutputVyqd__qd_0_GG0A00A14ClientProtocol_p_qd__So17OS_dispatch_queueCqd_1_4DataQyd__cqd_1_ASQyd_0_cqd_0_qd_1__AA0B9DirectionOtctAMRsz0A3API0cD0Rd__AxYRd_0_AA0bP0Rd_1_r1_lFZ",
+    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerC09makeQueryE06client07initialG020watcherDispatchQueue22extractInitialPageInfo0m4NextoP012pageResolverACyAA0B6OutputVyqd__qd_0_GG0A00A14ClientProtocol_p_qd__So17OS_dispatch_queueCqd_1_4DataQyd__cqd_1_ASQyd_0_cqd_0_Sgqd_1__AA0B9DirectionOtctAMRsz0A3API0cD0Rd__AyZRd_0_AA0bP0Rd_1_r1_lFZ",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -215,7 +215,7 @@
       },
       {
         "kind" : "text",
-        "text" : ") -> "
+        "text" : "?) -> "
       },
       {
         "kind" : "typeIdentifier",
@@ -474,7 +474,7 @@
             },
             {
               "kind" : "text",
-              "text" : ") -> "
+              "text" : "?) -> "
             },
             {
               "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager",
@@ -858,7 +858,7 @@
     },
     {
       "kind" : "text",
-      "text" : ") -> "
+      "text" : "?) -> "
     },
     {
       "kind" : "typeIdentifier",
