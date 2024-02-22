@@ -12,10 +12,17 @@ In this example, we take a `GraphQLQueryPager` that returns a `Result<Pagination
 
 ```swift
 // This `GraphQLQueryPager` will return a `Result` of `PaginationOutput<MyQuery.Data, MyQuery.Data>`
-let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
-    client: apolloClient,
-    queryProvider: { page in
-        MyQuery(first: 10, after: page?.cursor ?? .none)
+let initialQuery = MyQuery(first: 10, after: nil)
+let pager = GraphQLQueryPager.makeQueryPager(
+    client: client,
+    initialQuery: initialQuery,
+    pageResolver: { page, paginationDirection in
+        switch paginationDirection {
+        case .next:
+            return MyQuery(first: 10, after: page.endCursor ?? .none)
+        case .previous:
+            return nil
+        }
     },
     extractPageInfo: { data in
         CursorBasedPagination.Forward(
@@ -59,10 +66,18 @@ We provide a convenience method for transforming collection types in this manner
 In this example, we take a `GraphQLQueryPager` that returns a `Result<PaginationOutput<MyQuery.Data, MyQuery.Data>>`, and transform the raw response into a custom response type of `Result<([Person], UpdateSource), Error>`.
 
 ```swift
-let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
-    client: apolloClient,
-    queryProvider: { page in
-        MyQuery(first: 10, after: page?.cursor ?? .none)
+let initialQuery = MyQuery(first: 10, after: nil)
+let pager = GraphQLQueryPager.makeQueryPager(
+    client: client,
+    initialQuery: initialQuery,
+    pageResolver: { page, paginationDirection in
+        // As we only want to support forward pagination, we can return `nil` for reverse pagination
+        switch paginationDirection {
+        case .next:
+            return MyQuery(first: 10, after: page.endCursor ?? .none)
+        case .previous:
+            return nil
+        }
     },
     extractPageInfo: { data in
         CursorBasedPagination.Forward(
@@ -81,10 +96,18 @@ let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
 This supports single object types as well, such as a `Result<(MyResponseModel, UpdateSource), Error>`:
 
 ```swift
-let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
-    client: apolloClient,
-    queryProvider: { page in
-        MyQuery(first: 10, after: page?.cursor ?? .none)
+let initialQuery = MyQuery(first: 10, after: nil)
+let pager = GraphQLQueryPager.makeQueryPager(
+    client: client,
+    initialQuery: initialQuery,
+    pageResolver: { page, paginationDirection in
+        // As we only want to support forward pagination, we can return `nil` for reverse pagination
+        switch paginationDirection {
+        case .next:
+            return MyQuery(first: 10, after: page.endCursor ?? .none)
+        case .previous:
+            return nil
+        }
     },
     extractPageInfo: { data in
         CursorBasedPagination.Forward(
@@ -100,4 +123,78 @@ let pager = GraphQLQueryPager.makeForwardCursorQueryPager(
         return MyResponseModel(people: people)
     }
 )
+```
+
+## Creating convenience initializers for `GraphQLQueryPager`
+
+If your application only uses a specific type of pagination, it is simple to declare a custom `GraphQLQueryPager` convenience initializer that can be used throughout your application. This allows you to easily instantiate a pager without worrying about cases that your application does not support.
+
+For example, if your pagination scheme only supports forward pagination and offsets, you can declare a custom `GraphQLQueryPager` convenience initializer that only supports forward pagination and offsets. In this example, we declare two initializers for forward offset pagination: one with a `transform`, and one without:
+
+```swift
+extension GraphQLQueryPager {
+  static func makeForwardOffsetQueryPager<InitialQuery: GraphQLQuery>(
+    client: ApolloClientProtocol,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (OffsetPagination.Forward?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Forward
+  ) -> GraphQLQueryPager where Model == PaginationOutput<InitialQuery, InitialQuery> {
+    GraphQLQueryPager.init(
+      client: client,
+      initialQuery: queryProvider(nil),
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: pageExtraction(transform: extractPageInfo),
+      pageResolver: { page, direction in
+        guard direction == .next else { return nil }
+        return queryProvider(page)
+      }
+    )
+  }
+
+  static func makeForwardOffsetQueryPager<InitialQuery: GraphQLQuery, T>(
+    client: ApolloClientProtocol,
+    watcherDispatchQueue: DispatchQueue = .main,
+    queryProvider: @escaping (OffsetPagination.Forward?) -> InitialQuery,
+    extractPageInfo: @escaping (InitialQuery.Data) -> OffsetPagination.Forward,
+    transform: @escaping (InitialQuery.Data) throws -> Model
+  ) -> GraphQLQueryPager where Model: RangeReplaceableCollection, T == Model.Element {
+    GraphQLQueryPager.init(
+      client: client,
+      initialQuery: queryProvider(nil),
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: pageExtraction(transform: extractPageInfo),
+      pageResolver: { page, direction in
+        guard direction == .next else { return nil }
+        return queryProvider(page)
+      },
+      initialTransform: transform,
+      pageTransform: transform
+    )
+  }
+}
+
+private func pageExtraction<InitialQuery: GraphQLQuery, P: PaginationInfo, T>(
+  transform: @escaping (InitialQuery.Data) -> P
+) -> (PageExtractionData<InitialQuery, InitialQuery, T>) -> P {
+  { extractionData in
+    switch extractionData {
+    case .initial(let value, _), .paginated(let value, _):
+      return transform(value)
+    }
+  }
+}
+
+private func pageExtraction<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery, P: PaginationInfo, T>(
+  initialTransfom: @escaping (InitialQuery.Data) -> P,
+  paginatedTransform: @escaping (PaginatedQuery.Data) -> P
+) -> (PageExtractionData<InitialQuery, PaginatedQuery, T>) -> P {
+  { extractionData in
+    switch extractionData {
+    case .initial(let value, _):
+      return initialTransfom(value)
+    case .paginated(let value, _):
+      return paginatedTransform(value)
+    }
+  }
+}
 ```
