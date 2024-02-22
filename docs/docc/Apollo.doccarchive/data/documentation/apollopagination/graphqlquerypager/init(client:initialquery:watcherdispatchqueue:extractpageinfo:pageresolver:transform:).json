@@ -9,11 +9,11 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:initialTransform:pageTransform:)"
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:transform:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerC6client12initialQuery20watcherDispatchQueue15extractPageInfo12pageResolver0G9Transform0oQ0ACyxG0A00A14ClientProtocol_p_qd_0_So17OS_dispatch_queueCqd__AA0M14ExtractionDataOyqd_0_qd_1_xSgGcqd_1_Sgqd___AA0B9DirectionOtcSgx0X0Qyd_0_KcxAXQyd_1_KctcSmRzAA0bN0Rd__0A3API0cD0Rd_0_A0_A1_Rd_1_7ElementQzRsd_2_r2_lufc",
+    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerC6client12initialQuery20watcherDispatchQueue15extractPageInfo12pageResolver9transformACyxG0A00A14ClientProtocol_p_qd_0_So17OS_dispatch_queueCqd__AA0M14ExtractionDataOyqd_0_qd_1_xSgGcqd_1_Sgqd___AA0B9DirectionOtcSgxSay0X0Qyd_1_G_AWQyd_0_AYtKctcAA0bN0Rd__0A3API0cD0Rd_0_A0_A1_Rd_1_r1_lufc",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -50,14 +50,6 @@
       {
         "kind" : "genericParameter",
         "text" : "PaginatedQuery"
-      },
-      {
-        "kind" : "text",
-        "text" : ", "
-      },
-      {
-        "kind" : "genericParameter",
-        "text" : "Element"
       },
       {
         "kind" : "text",
@@ -197,51 +189,11 @@
       },
       {
         "kind" : "externalParam",
-        "text" : "initialTransform"
+        "text" : "transform"
       },
       {
         "kind" : "text",
-        "text" : ": ("
-      },
-      {
-        "kind" : "typeIdentifier",
-        "text" : "InitialQuery"
-      },
-      {
-        "kind" : "text",
-        "text" : "."
-      },
-      {
-        "kind" : "typeIdentifier",
-        "text" : "Data"
-      },
-      {
-        "kind" : "text",
-        "text" : ") "
-      },
-      {
-        "kind" : "keyword",
-        "text" : "throws"
-      },
-      {
-        "kind" : "text",
-        "text" : " -> "
-      },
-      {
-        "kind" : "typeIdentifier",
-        "text" : "Model"
-      },
-      {
-        "kind" : "text",
-        "text" : ", "
-      },
-      {
-        "kind" : "externalParam",
-        "text" : "pageTransform"
-      },
-      {
-        "kind" : "text",
-        "text" : ": ("
+        "text" : ": (["
       },
       {
         "kind" : "typeIdentifier",
@@ -257,7 +209,39 @@
       },
       {
         "kind" : "text",
-        "text" : ") "
+        "text" : "], "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "text" : "InitialQuery"
+      },
+      {
+        "kind" : "text",
+        "text" : "."
+      },
+      {
+        "kind" : "typeIdentifier",
+        "text" : "Data"
+      },
+      {
+        "kind" : "text",
+        "text" : ", ["
+      },
+      {
+        "kind" : "typeIdentifier",
+        "text" : "PaginatedQuery"
+      },
+      {
+        "kind" : "text",
+        "text" : "."
+      },
+      {
+        "kind" : "typeIdentifier",
+        "text" : "Data"
+      },
+      {
+        "kind" : "text",
+        "text" : "]) "
       },
       {
         "kind" : "keyword",
@@ -284,7 +268,7 @@
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",
-    "title" : "init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:initialTransform:pageTransform:)"
+    "title" : "init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:transform:)"
   },
   "primaryContentSections" : [
     {
@@ -332,14 +316,6 @@
             {
               "kind" : "genericParameter",
               "text" : "PaginatedQuery"
-            },
-            {
-              "kind" : "text",
-              "text" : ", "
-            },
-            {
-              "kind" : "genericParameter",
-              "text" : "Element"
             },
             {
               "kind" : "text",
@@ -489,7 +465,7 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "initialTransform"
+              "text" : "transform"
             },
             {
               "kind" : "text",
@@ -501,55 +477,7 @@
             },
             {
               "kind" : "text",
-              "text" : " ("
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "InitialQuery"
-            },
-            {
-              "kind" : "text",
-              "text" : "."
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Data"
-            },
-            {
-              "kind" : "text",
-              "text" : ") "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "throws"
-            },
-            {
-              "kind" : "text",
-              "text" : " -> "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Model"
-            },
-            {
-              "kind" : "text",
-              "text" : ", "
-            },
-            {
-              "kind" : "externalParam",
-              "text" : "pageTransform"
-            },
-            {
-              "kind" : "text",
-              "text" : ": "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "@escaping"
-            },
-            {
-              "kind" : "text",
-              "text" : " ("
+              "text" : " (["
             },
             {
               "kind" : "typeIdentifier",
@@ -565,7 +493,39 @@
             },
             {
               "kind" : "text",
-              "text" : ") "
+              "text" : "], "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "InitialQuery"
+            },
+            {
+              "kind" : "text",
+              "text" : "."
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Data"
+            },
+            {
+              "kind" : "text",
+              "text" : ", ["
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "PaginatedQuery"
+            },
+            {
+              "kind" : "text",
+              "text" : "."
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Data"
+            },
+            {
+              "kind" : "text",
+              "text" : "]) "
             },
             {
               "kind" : "keyword",
@@ -590,23 +550,6 @@
             {
               "kind" : "text",
               "text" : " "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Model"
-            },
-            {
-              "kind" : "text",
-              "text" : " : "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:Sm",
-              "text" : "RangeReplaceableCollection"
-            },
-            {
-              "kind" : "text",
-              "text" : ", "
             },
             {
               "kind" : "typeIdentifier",
@@ -655,30 +598,6 @@
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI12GraphQLQueryP",
               "text" : "GraphQLQuery"
-            },
-            {
-              "kind" : "text",
-              "text" : ", "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Element"
-            },
-            {
-              "kind" : "text",
-              "text" : " == "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Model"
-            },
-            {
-              "kind" : "text",
-              "text" : "."
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Element"
             }
           ]
         }
@@ -697,7 +616,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollopagination\/graphqlquerypager\/init(client:initialquery:watcherdispatchqueue:extractpageinfo:pageresolver:initialtransform:pagetransform:)"
+        "\/documentation\/apollopagination\/graphqlquerypager\/init(client:initialquery:watcherdispatchqueue:extractpageinfo:pageresolver:transform:)"
       ],
       "traits" : [
         {
@@ -753,7 +672,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/graphqlquerypager"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:initialTransform:pageTransform:)": {
+"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:transform:)": {
   "abstract" : [
 
   ],
@@ -793,14 +712,6 @@
     {
       "kind" : "genericParameter",
       "text" : "PaginatedQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "genericParameter",
-      "text" : "Element"
     },
     {
       "kind" : "text",
@@ -940,51 +851,11 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "initialTransform"
+      "text" : "transform"
     },
     {
       "kind" : "text",
-      "text" : ": ("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "InitialQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ") "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "throws"
-    },
-    {
-      "kind" : "text",
-      "text" : " -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Model"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "pageTransform"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ("
+      "text" : ": (["
     },
     {
       "kind" : "typeIdentifier",
@@ -1000,7 +871,39 @@
     },
     {
       "kind" : "text",
-      "text" : ") "
+      "text" : "], "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "InitialQuery"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Data"
+    },
+    {
+      "kind" : "text",
+      "text" : ", ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "PaginatedQuery"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Data"
+    },
+    {
+      "kind" : "text",
+      "text" : "]) "
     },
     {
       "kind" : "keyword",
@@ -1019,12 +922,12 @@
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:initialTransform:pageTransform:)",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:transform:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:initialTransform:pageTransform:)",
+  "title" : "init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:transform:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/init(client:initialquery:watcherdispatchqueue:extractpageinfo:pageresolver:initialtransform:pagetransform:)"
+  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/init(client:initialquery:watcherdispatchqueue:extractpageinfo:pageresolver:transform:)"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/PageExtractionData": {
   "abstract" : [

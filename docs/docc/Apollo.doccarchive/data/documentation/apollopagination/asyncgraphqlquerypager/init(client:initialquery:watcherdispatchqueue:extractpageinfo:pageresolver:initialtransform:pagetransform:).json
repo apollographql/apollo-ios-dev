@@ -1,18 +1,4 @@
 {
-  "abstract" : [
-    {
-      "text" : "For most use-cases, it’s recommended to use the static ",
-      "type" : "text"
-    },
-    {
-      "code" : "make...",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " functions instead of this initializer.",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -27,7 +13,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination22AsyncGraphQLQueryPagerC6client12initialQuery20watcherDispatchQueue15extractPageInfo12pageResolver0H9Transform0pR0ACyxG0A00A14ClientProtocol_p_qd_0_So17OS_dispatch_queueCqd__AA0N14ExtractionDataOyqd_0_qd_1_Gcqd_1_Sgqd___AA0B9DirectionOtcSgx0Y0Qyd_0_KcxAWQyd_1_KctYacSmRzAA0bO0Rd__0A3API0dE0Rd_0_A_A0_Rd_1_7ElementQzRsd_2_r2_lufc",
+    "externalID" : "s:16ApolloPagination22AsyncGraphQLQueryPagerC6client12initialQuery20watcherDispatchQueue15extractPageInfo12pageResolver0H9Transform0pR0ACyxG0A00A14ClientProtocol_p_qd_0_So17OS_dispatch_queueCqd__AA0N14ExtractionDataOyqd_0_qd_1_xSgGcqd_1_Sgqd___AA0B9DirectionOtcSgx0Y0Qyd_0_KcxAXQyd_1_KctYacSmRzAA0bO0Rd__0A3API0dE0Rd_0_A0_A1_Rd_1_7ElementQzRsd_2_r2_lufc",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -158,7 +144,15 @@
       },
       {
         "kind" : "text",
-        "text" : ">) -> "
+        "text" : ", "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "text" : "Model"
+      },
+      {
+        "kind" : "text",
+        "text" : "?>) -> "
       },
       {
         "kind" : "typeIdentifier",
@@ -445,7 +439,15 @@
             },
             {
               "kind" : "text",
-              "text" : ">) -> "
+              "text" : ", "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Model"
+            },
+            {
+              "kind" : "text",
+              "text" : "?>) -> "
             },
             {
               "kind" : "typeIdentifier",
@@ -694,213 +696,6 @@
         }
       ],
       "kind" : "declarations"
-    },
-    {
-      "kind" : "parameters",
-      "parameters" : [
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The Apollo client",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "client"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The initial query to be performed.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "initialQuery"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The queue that the internal ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "GraphQLQueryWatcher",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : "s dispatch their results to. Defaults to ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "main",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : ".",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "watcherDispatchQueue"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "This transforming function extracts a ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "PaginationInfo",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : " from either ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "InitialQuery.Data",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : " or ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "PaginatedQuery.Data",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : ", represented in the form of ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "PageExtractionData",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : ".",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "extractPageInfo"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "This transforming function initializes a new ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "PaginatedQuery",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : " given a ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "PagiantionInfo",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : " and ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "PaginationDirection",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : ".",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "pageResolver"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "Transforms the ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "InitialQuery.Data",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : " to a ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "Model",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : " type.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "initialTransform"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "Transforms the ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "PaginatedQuery.Data",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : " to a ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "Model",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : " type.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "pageTransform"
-        }
-      ]
     }
   ],
   "schemaVersion" : {
@@ -972,18 +767,7 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager/init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:initialTransform:pageTransform:)": {
   "abstract" : [
-    {
-      "text" : "For most use-cases, it’s recommended to use the static ",
-      "type" : "text"
-    },
-    {
-      "code" : "make...",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " functions instead of this initializer.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
@@ -1115,7 +899,15 @@
     },
     {
       "kind" : "text",
-      "text" : ">) -> "
+      "text" : ", "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Model"
+    },
+    {
+      "kind" : "text",
+      "text" : "?>) -> "
     },
     {
       "kind" : "typeIdentifier",

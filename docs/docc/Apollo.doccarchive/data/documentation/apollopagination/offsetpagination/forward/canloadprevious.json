@@ -1,22 +1,38 @@
 {
+  "abstract" : [
+    {
+      "text" : "Inherited from ",
+      "type" : "text"
+    },
+    {
+      "code" : "PaginationInfo.canLoadPrevious",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Forward"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination"
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Forward\/canLoadPrevious"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination06OffsetB0O",
+    "externalID" : "s:16ApolloPagination06OffsetB0O7ForwardV15canLoadPreviousSbvp",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "enum"
+        "text" : "var"
       },
       {
         "kind" : "text",
@@ -24,7 +40,16 @@
       },
       {
         "kind" : "identifier",
-        "text" : "OffsetPagination"
+        "text" : "canLoadPrevious"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:Sb",
+        "text" : "Bool"
       }
     ],
     "modules" : [
@@ -32,16 +57,10 @@
         "name" : "ApolloPagination"
       }
     ],
-    "navigatorTitle" : [
-      {
-        "kind" : "identifier",
-        "text" : "OffsetPagination"
-      }
-    ],
     "role" : "symbol",
-    "roleHeading" : "Enumeration",
-    "symbolKind" : "enum",
-    "title" : "OffsetPagination"
+    "roleHeading" : "Instance Property",
+    "symbolKind" : "property",
+    "title" : "canLoadPrevious"
   },
   "primaryContentSections" : [
     {
@@ -56,7 +75,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "enum"
+              "text" : "var"
             },
             {
               "kind" : "text",
@@ -64,7 +83,28 @@
             },
             {
               "kind" : "identifier",
-              "text" : "OffsetPagination"
+              "text" : "canLoadPrevious"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:Sb",
+              "text" : "Bool"
+            },
+            {
+              "kind" : "text",
+              "text" : " { "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "get"
+            },
+            {
+              "kind" : "text",
+              "text" : " }"
             }
           ]
         }
@@ -80,20 +120,10 @@
   "sections" : [
 
   ],
-  "topicSections" : [
-    {
-      "identifiers" : [
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Bidirectional",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Forward",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Reverse"
-      ],
-      "title" : "Structures"
-    }
-  ],
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollopagination\/offsetpagination"
+        "\/documentation\/apollopagination\/offsetpagination\/forward\/canloadprevious"
       ],
       "traits" : [
         {
@@ -146,37 +176,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/offsetpagination"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/OffsetPagination/Bidirectional": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "struct"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "Bidirectional"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Bidirectional",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "Bidirectional"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "OffsetPagination.Bidirectional",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/offsetpagination\/bidirectional"
-},
 "doc://ApolloPagination/documentation/ApolloPagination/OffsetPagination/Forward": {
   "abstract" : [
 
@@ -208,14 +207,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/offsetpagination\/forward"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/OffsetPagination/Reverse": {
+"doc://ApolloPagination/documentation/ApolloPagination/OffsetPagination/Forward/canLoadPrevious": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "struct"
+      "text" : "var"
     },
     {
       "kind" : "text",
@@ -223,21 +222,24 @@
     },
     {
       "kind" : "identifier",
-      "text" : "Reverse"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Reverse",
-  "kind" : "symbol",
-  "navigatorTitle" : [
+      "text" : "canLoadPrevious"
+    },
     {
-      "kind" : "identifier",
-      "text" : "Reverse"
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
     }
   ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Forward\/canLoadPrevious",
+  "kind" : "symbol",
   "role" : "symbol",
-  "title" : "OffsetPagination.Reverse",
+  "title" : "canLoadPrevious",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/offsetpagination\/reverse"
+  "url" : "\/documentation\/apollopagination\/offsetpagination\/forward\/canloadprevious"
 }
 }
 }

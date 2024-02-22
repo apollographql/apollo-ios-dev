@@ -1,23 +1,38 @@
 {
+  "abstract" : [
+    {
+      "text" : "Convenience function for creating a multi-query pager that does not transform output responses.",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:initialTransform:pageTransform:)"
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/makeQueryPager(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerC6client12initialQuery20watcherDispatchQueue15extractPageInfo12pageResolver0G9Transform0oQ0ACyxG0A00A14ClientProtocol_p_qd_0_So17OS_dispatch_queueCqd__AA0M14ExtractionDataOyqd_0_qd_1_xSgGcqd_1_Sgqd___AA0B9DirectionOtcSgx0X0Qyd_0_KcxAXQyd_1_KctcSmRzAA0bN0Rd__0A3API0cD0Rd_0_A0_A1_Rd_1_7ElementQzRsd_2_r2_lufc",
+    "extendedModule" : "ApolloPagination",
+    "externalID" : "s:16ApolloPagination22AsyncGraphQLQueryPagerC09makeQueryF06client07initialH020watcherDispatchQueue22extractInitialPageInfo0n4NextpQ012pageResolverACyAA0B6OutputVyqd__qd_0_GG0A00A14ClientProtocol_p_qd__So17OS_dispatch_queueCqd_1_4DataQyd__cqd_1_ASQyd_0_cqd_0_Sgqd_1__AA0B9DirectionOtctYaAMRsz0A3API0dE0Rd__AyZRd_0_AA0bQ0Rd_1_r1_lFZ",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "convenience"
+        "text" : "static"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "func"
       },
       {
         "kind" : "text",
@@ -25,19 +40,11 @@
       },
       {
         "kind" : "identifier",
-        "text" : "init"
+        "text" : "makeQueryPager"
       },
       {
         "kind" : "text",
         "text" : "<"
-      },
-      {
-        "kind" : "genericParameter",
-        "text" : "P"
-      },
-      {
-        "kind" : "text",
-        "text" : ", "
       },
       {
         "kind" : "genericParameter",
@@ -57,7 +64,7 @@
       },
       {
         "kind" : "genericParameter",
-        "text" : "Element"
+        "text" : "P"
       },
       {
         "kind" : "text",
@@ -115,7 +122,7 @@
       },
       {
         "kind" : "externalParam",
-        "text" : "extractPageInfo"
+        "text" : "extractInitialPageInfo"
       },
       {
         "kind" : "text",
@@ -123,20 +130,35 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:16ApolloPagination18PageExtractionDataO",
-        "text" : "PageExtractionData"
-      },
-      {
-        "kind" : "text",
-        "text" : "<"
-      },
-      {
-        "kind" : "typeIdentifier",
         "text" : "InitialQuery"
       },
       {
         "kind" : "text",
+        "text" : "."
+      },
+      {
+        "kind" : "typeIdentifier",
+        "text" : "Data"
+      },
+      {
+        "kind" : "text",
+        "text" : ") -> "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "text" : "P"
+      },
+      {
+        "kind" : "text",
         "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "extractNextPageInfo"
+      },
+      {
+        "kind" : "text",
+        "text" : ": ("
       },
       {
         "kind" : "typeIdentifier",
@@ -144,15 +166,15 @@
       },
       {
         "kind" : "text",
-        "text" : ", "
+        "text" : "."
       },
       {
         "kind" : "typeIdentifier",
-        "text" : "Model"
+        "text" : "Data"
       },
       {
         "kind" : "text",
-        "text" : "?>) -> "
+        "text" : ") -> "
       },
       {
         "kind" : "typeIdentifier",
@@ -168,7 +190,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": (("
+        "text" : ": ("
       },
       {
         "kind" : "typeIdentifier",
@@ -193,35 +215,11 @@
       },
       {
         "kind" : "text",
-        "text" : "?)?, "
-      },
-      {
-        "kind" : "externalParam",
-        "text" : "initialTransform"
-      },
-      {
-        "kind" : "text",
-        "text" : ": ("
-      },
-      {
-        "kind" : "typeIdentifier",
-        "text" : "InitialQuery"
-      },
-      {
-        "kind" : "text",
-        "text" : "."
-      },
-      {
-        "kind" : "typeIdentifier",
-        "text" : "Data"
-      },
-      {
-        "kind" : "text",
-        "text" : ") "
+        "text" : "?) "
       },
       {
         "kind" : "keyword",
-        "text" : "throws"
+        "text" : "async"
       },
       {
         "kind" : "text",
@@ -229,43 +227,12 @@
       },
       {
         "kind" : "typeIdentifier",
-        "text" : "Model"
+        "preciseIdentifier" : "s:16ApolloPagination22AsyncGraphQLQueryPagerC",
+        "text" : "AsyncGraphQLQueryPager"
       },
       {
         "kind" : "text",
-        "text" : ", "
-      },
-      {
-        "kind" : "externalParam",
-        "text" : "pageTransform"
-      },
-      {
-        "kind" : "text",
-        "text" : ": ("
-      },
-      {
-        "kind" : "typeIdentifier",
-        "text" : "PaginatedQuery"
-      },
-      {
-        "kind" : "text",
-        "text" : "."
-      },
-      {
-        "kind" : "typeIdentifier",
-        "text" : "Data"
-      },
-      {
-        "kind" : "text",
-        "text" : ") "
-      },
-      {
-        "kind" : "keyword",
-        "text" : "throws"
-      },
-      {
-        "kind" : "text",
-        "text" : " -> "
+        "text" : "<"
       },
       {
         "kind" : "typeIdentifier",
@@ -273,7 +240,7 @@
       },
       {
         "kind" : "text",
-        "text" : ")"
+        "text" : ">"
       }
     ],
     "modules" : [
@@ -282,9 +249,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Initializer",
-    "symbolKind" : "init",
-    "title" : "init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:initialTransform:pageTransform:)"
+    "roleHeading" : "Type Method",
+    "symbolKind" : "method",
+    "title" : "makeQueryPager(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:)"
   },
   "primaryContentSections" : [
     {
@@ -299,7 +266,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "convenience"
+              "text" : "static"
             },
             {
               "kind" : "text",
@@ -307,19 +274,19 @@
             },
             {
               "kind" : "keyword",
-              "text" : "init"
+              "text" : "func"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "makeQueryPager"
             },
             {
               "kind" : "text",
               "text" : "<"
-            },
-            {
-              "kind" : "genericParameter",
-              "text" : "P"
-            },
-            {
-              "kind" : "text",
-              "text" : ", "
             },
             {
               "kind" : "genericParameter",
@@ -339,7 +306,7 @@
             },
             {
               "kind" : "genericParameter",
-              "text" : "Element"
+              "text" : "P"
             },
             {
               "kind" : "text",
@@ -397,7 +364,7 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "extractPageInfo"
+              "text" : "extractInitialPageInfo"
             },
             {
               "kind" : "text",
@@ -412,22 +379,44 @@
               "text" : " ("
             },
             {
-              "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PageExtractionData",
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:16ApolloPagination18PageExtractionDataO",
-              "text" : "PageExtractionData"
-            },
-            {
-              "kind" : "text",
-              "text" : "<"
-            },
-            {
               "kind" : "typeIdentifier",
               "text" : "InitialQuery"
             },
             {
               "kind" : "text",
+              "text" : "."
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Data"
+            },
+            {
+              "kind" : "text",
+              "text" : ") -> "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "P"
+            },
+            {
+              "kind" : "text",
               "text" : ", "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "extractNextPageInfo"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "@escaping"
+            },
+            {
+              "kind" : "text",
+              "text" : " ("
             },
             {
               "kind" : "typeIdentifier",
@@ -435,15 +424,15 @@
             },
             {
               "kind" : "text",
-              "text" : ", "
+              "text" : "."
             },
             {
               "kind" : "typeIdentifier",
-              "text" : "Model"
+              "text" : "Data"
             },
             {
               "kind" : "text",
-              "text" : "?>) -> "
+              "text" : ") -> "
             },
             {
               "kind" : "typeIdentifier",
@@ -459,7 +448,15 @@
             },
             {
               "kind" : "text",
-              "text" : ": (("
+              "text" : ": "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "@escaping"
+            },
+            {
+              "kind" : "text",
+              "text" : " ("
             },
             {
               "kind" : "typeIdentifier",
@@ -485,47 +482,25 @@
             },
             {
               "kind" : "text",
-              "text" : "?)?, "
-            },
-            {
-              "kind" : "externalParam",
-              "text" : "initialTransform"
-            },
-            {
-              "kind" : "text",
-              "text" : ": "
+              "text" : "?) "
             },
             {
               "kind" : "keyword",
-              "text" : "@escaping"
-            },
-            {
-              "kind" : "text",
-              "text" : " ("
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "InitialQuery"
-            },
-            {
-              "kind" : "text",
-              "text" : "."
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Data"
-            },
-            {
-              "kind" : "text",
-              "text" : ") "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "throws"
+              "text" : "async"
             },
             {
               "kind" : "text",
               "text" : " -> "
+            },
+            {
+              "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:16ApolloPagination22AsyncGraphQLQueryPagerC",
+              "text" : "AsyncGraphQLQueryPager"
+            },
+            {
+              "kind" : "text",
+              "text" : "<"
             },
             {
               "kind" : "typeIdentifier",
@@ -533,55 +508,7 @@
             },
             {
               "kind" : "text",
-              "text" : ", "
-            },
-            {
-              "kind" : "externalParam",
-              "text" : "pageTransform"
-            },
-            {
-              "kind" : "text",
-              "text" : ": "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "@escaping"
-            },
-            {
-              "kind" : "text",
-              "text" : " ("
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "PaginatedQuery"
-            },
-            {
-              "kind" : "text",
-              "text" : "."
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Data"
-            },
-            {
-              "kind" : "text",
-              "text" : ") "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "throws"
-            },
-            {
-              "kind" : "text",
-              "text" : " -> "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Model"
-            },
-            {
-              "kind" : "text",
-              "text" : ") "
+              "text" : "> "
             },
             {
               "kind" : "keyword",
@@ -597,12 +524,63 @@
             },
             {
               "kind" : "text",
+              "text" : " == "
+            },
+            {
+              "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:16ApolloPagination0B6OutputV",
+              "text" : "PaginationOutput"
+            },
+            {
+              "kind" : "text",
+              "text" : "<"
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "InitialQuery"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "PaginatedQuery"
+            },
+            {
+              "kind" : "text",
+              "text" : ">, "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "InitialQuery"
+            },
+            {
+              "kind" : "text",
               "text" : " : "
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:Sm",
-              "text" : "RangeReplaceableCollection"
+              "preciseIdentifier" : "s:9ApolloAPI12GraphQLQueryP",
+              "text" : "GraphQLQuery"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "PaginatedQuery"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI12GraphQLQueryP",
+              "text" : "GraphQLQuery"
             },
             {
               "kind" : "text",
@@ -621,64 +599,6 @@
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:16ApolloPagination0B4InfoP",
               "text" : "PaginationInfo"
-            },
-            {
-              "kind" : "text",
-              "text" : ", "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "InitialQuery"
-            },
-            {
-              "kind" : "text",
-              "text" : " : "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI12GraphQLQueryP",
-              "text" : "GraphQLQuery"
-            },
-            {
-              "kind" : "text",
-              "text" : ", "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "PaginatedQuery"
-            },
-            {
-              "kind" : "text",
-              "text" : " : "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI12GraphQLQueryP",
-              "text" : "GraphQLQuery"
-            },
-            {
-              "kind" : "text",
-              "text" : ", "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Element"
-            },
-            {
-              "kind" : "text",
-              "text" : " == "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Model"
-            },
-            {
-              "kind" : "text",
-              "text" : "."
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Element"
             }
           ]
         }
@@ -697,7 +617,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollopagination\/graphqlquerypager\/init(client:initialquery:watcherdispatchqueue:extractpageinfo:pageresolver:initialtransform:pagetransform:)"
+        "\/documentation\/apollopagination\/asyncgraphqlquerypager\/makequerypager(client:initialquery:watcherdispatchqueue:extractinitialpageinfo:extractnextpageinfo:pageresolver:)"
       ],
       "traits" : [
         {
@@ -719,7 +639,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager": {
+"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager": {
   "abstract" : [
     {
       "text" : "Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.",
@@ -737,30 +657,41 @@
     },
     {
       "kind" : "identifier",
-      "text" : "GraphQLQueryPager"
+      "text" : "AsyncGraphQLQueryPager"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "GraphQLQueryPager"
+      "text" : "AsyncGraphQLQueryPager"
     }
   ],
   "role" : "symbol",
-  "title" : "GraphQLQueryPager",
+  "title" : "AsyncGraphQLQueryPager",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager"
+  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:initialTransform:pageTransform:)": {
+"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager/makeQueryPager(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:)": {
   "abstract" : [
-
+    {
+      "text" : "Convenience function for creating a multi-query pager that does not transform output responses.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "convenience"
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "func"
     },
     {
       "kind" : "text",
@@ -768,19 +699,11 @@
     },
     {
       "kind" : "identifier",
-      "text" : "init"
+      "text" : "makeQueryPager"
     },
     {
       "kind" : "text",
       "text" : "<"
-    },
-    {
-      "kind" : "genericParameter",
-      "text" : "P"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
     },
     {
       "kind" : "genericParameter",
@@ -800,7 +723,7 @@
     },
     {
       "kind" : "genericParameter",
-      "text" : "Element"
+      "text" : "P"
     },
     {
       "kind" : "text",
@@ -858,7 +781,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "extractPageInfo"
+      "text" : "extractInitialPageInfo"
     },
     {
       "kind" : "text",
@@ -866,20 +789,35 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:16ApolloPagination18PageExtractionDataO",
-      "text" : "PageExtractionData"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
       "text" : "InitialQuery"
     },
     {
       "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Data"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "P"
+    },
+    {
+      "kind" : "text",
       "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "extractNextPageInfo"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ("
     },
     {
       "kind" : "typeIdentifier",
@@ -887,15 +825,15 @@
     },
     {
       "kind" : "text",
-      "text" : ", "
+      "text" : "."
     },
     {
       "kind" : "typeIdentifier",
-      "text" : "Model"
+      "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : "?>) -> "
+      "text" : ") -> "
     },
     {
       "kind" : "typeIdentifier",
@@ -911,7 +849,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": (("
+      "text" : ": ("
     },
     {
       "kind" : "typeIdentifier",
@@ -936,35 +874,11 @@
     },
     {
       "kind" : "text",
-      "text" : "?)?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "initialTransform"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "InitialQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ") "
+      "text" : "?) "
     },
     {
       "kind" : "keyword",
-      "text" : "throws"
+      "text" : "async"
     },
     {
       "kind" : "text",
@@ -972,43 +886,12 @@
     },
     {
       "kind" : "typeIdentifier",
-      "text" : "Model"
+      "preciseIdentifier" : "s:16ApolloPagination22AsyncGraphQLQueryPagerC",
+      "text" : "AsyncGraphQLQueryPager"
     },
     {
       "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "pageTransform"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "PaginatedQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ") "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "throws"
-    },
-    {
-      "kind" : "text",
-      "text" : " -> "
+      "text" : "<"
     },
     {
       "kind" : "typeIdentifier",
@@ -1016,57 +899,15 @@
     },
     {
       "kind" : "text",
-      "text" : ")"
+      "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:initialTransform:pageTransform:)",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/makeQueryPager(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(client:initialQuery:watcherDispatchQueue:extractPageInfo:pageResolver:initialTransform:pageTransform:)",
+  "title" : "makeQueryPager(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/init(client:initialquery:watcherdispatchqueue:extractpageinfo:pageresolver:initialtransform:pagetransform:)"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/PageExtractionData": {
-  "abstract" : [
-    {
-      "text" : "The result of either the initial query or the paginated query, for the purpose of extracting a ",
-      "type" : "text"
-    },
-    {
-      "code" : "PageInfo",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " from it.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "enum"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "PageExtractionData"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PageExtractionData",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "PageExtractionData"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "PageExtractionData",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/pageextractiondata"
+  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager\/makequerypager(client:initialquery:watcherdispatchqueue:extractinitialpageinfo:extractnextpageinfo:pageresolver:)"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/PaginationDirection": {
   "abstract" : [
@@ -1132,6 +973,40 @@
   "title" : "PaginationInfo",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/paginationinfo"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationOutput": {
+  "abstract" : [
+    {
+      "text" : "A struct which contains the outputs of pagination",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "PaginationOutput"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "PaginationOutput"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PaginationOutput",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationoutput"
 }
 }
 }
