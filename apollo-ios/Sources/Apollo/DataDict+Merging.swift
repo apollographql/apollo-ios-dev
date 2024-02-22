@@ -7,13 +7,13 @@ import ApolloAPI
 
 extension DataDict {
   enum MergeError: Error, LocalizedError {
-    case invalidPathDataType(String)
+    case pathDataTypeNotDataDict
     case cannotOverwriteData(AnyHashable, AnyHashable)
 
     public var errorDescription: String? {
       switch self {
-      case let .invalidPathDataType(invalidType):
-        return "Invalid data type for incremental merge. Expected DataDict, got \(invalidType)."
+      case .pathDataTypeNotDataDict:
+        return "Invalid data type for incremental merge, expected DataDict."
 
       case let .cannotOverwriteData(current, new):
         return "Incremental data merge cannot overwrite field data value '\(current)' with mismatched value '\(new)'."
@@ -31,7 +31,7 @@ extension DataDict {
   func merging(_ newDataDict: DataDict, at path: [PathComponent]) throws -> DataDict {
     let value = try value(at: path)
     guard let pathDataDict = value as? DataDict else {
-      throw MergeError.invalidPathDataType(String(describing: type(of: value)))
+      throw MergeError.pathDataTypeNotDataDict
     }
 
     let mergedData = try pathDataDict._data.merging(newDataDict._data) { current, new in
