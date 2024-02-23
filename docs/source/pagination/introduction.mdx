@@ -40,7 +40,9 @@ let pager = GraphQLQueryPager.makeQueryPager(
 )
 ```
 
-In this example, the `GraphQLQueryPager` instance is initialized with a closure that provides the pagination query to be executed, and another closure that extracts the pagination information from the query result. The `GraphQLQueryPager` instance can then be used to fetch the paginated data, and to watch for changes to the paginated data.
+In this example, the `GraphQLQueryPager` instance is initialized with a `pageResolver` closure that provides the pagination query to be executed, and an `extractPageInfo` closure that extracts the pagination information from the query result. The `GraphQLQueryPager` instance can then be used to fetch the paginated data, and to watch for changes to the paginated data.
+
+Whenever the pager needs to load a new page, it will call the `extractPageInfo` closure, passing in the data returned from the last page queried. Your implementation of `extractPageInfo` should return a `PaginationInfo` value that can be used to query the next page. Then the pager calls `pageResolver`, passing in the `PaginationInfo` that was provided by the `extractPageInfo` closure. Your implementation of `pageResolver` should then return a query for the next page using the given `PaginationInfo`.
 
 We could similarly support forward offset-based pagination by supplying `OffsetPagination.Forward` instead of `CursorBasedPagination.Forward` to the `extractPageInfo` closure.
 
