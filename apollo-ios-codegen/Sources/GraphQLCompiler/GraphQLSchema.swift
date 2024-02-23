@@ -22,8 +22,6 @@ protocol GraphQLSchemaType: JavaScriptReferencedObject {
 public class GraphQLNamedType: 
   JavaScriptReferencedObject, @unchecked Sendable, Hashable, CustomDebugStringConvertible {
   public let name: String
-  
-  public var customName: String?
 
   public let documentation: String?
 
@@ -120,7 +118,7 @@ public final class GraphQLEnumType: GraphQLNamedType {
   }
 }
 
-public final class GraphQLEnumValue: JavaScriptObjectDecodable {
+public struct GraphQLEnumValue: JavaScriptObjectDecodable {
 
   public struct Name {
     public let value: String
@@ -131,8 +129,6 @@ public final class GraphQLEnumValue: JavaScriptObjectDecodable {
   }
 
   public let name: Name
-  
-  public var customName: Name?
 
   public let documentation: String?
 
@@ -186,10 +182,8 @@ public final class GraphQLInputObjectType: GraphQLNamedType {
   }
 }
 
-public final class GraphQLInputField: JavaScriptObjectDecodable {
+public struct GraphQLInputField: JavaScriptObjectDecodable {
   public let name: String
-  
-  public var customName: String?
 
   public let type: GraphQLType
 

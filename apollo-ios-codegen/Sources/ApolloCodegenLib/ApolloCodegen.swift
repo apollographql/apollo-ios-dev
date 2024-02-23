@@ -118,23 +118,12 @@ public class ApolloCodegen {
     try config.validateConfigValues()
 
     let compilationResult = try await compileGraphQLResult()
-
-    processSchemaCustomizations(compilationResult: compilationResult)
     
     try config.validate(compilationResult)
 
     let ir = IRBuilder(compilationResult: compilationResult)
     
-    for refType in ir.schema.referencedTypes.allTypes {
-      if let customType = config.options.schemaCustomization.customTypeNames[refType.name.schemaName] {
-        switch customType {
-        case .type(let name):
-          refType.name.customName = name
-        default:
-          break
-        }
-      }
-    }
+    processSchemaCustomizations(compilationResult: compilationResult)
 
     try await withThrowingTaskGroup(of: Void.self) { group in
       if itemsToGenerate.contains(.operationManifest) {
@@ -335,49 +324,49 @@ public class ApolloCodegen {
     }
   }
   
-  private func processSchemaCustomizations(compilationResult: CompilationResult) {
-    compilationResult.referencedTypes.forEach { type in
-      if type is GraphQLObjectType ||
-         type is GraphQLInterfaceType ||
-         type is GraphQLUnionType {
-        guard let typeCustomization = config.options.schemaCustomization.customTypeNames[type.name] else {
+  private func processSchemaCustomizations(ir: IRBuilder) {
+    ir.referencedTypes.allTypes.forEach { type in
+      if type is IR.ObjectType ||
+          type is IR.InterfaceType ||
+          type is IR.UnionType {
+        guard let typeCustomization = config.options.schemaCustomization.customTypeNames[type.name.schemaName] else {
           return
         }
         
         switch typeCustomization {
         case .type(let name):
-          type.customName = name
+          type.name.customName = name
         default:
           break
         }
-      } else if let scalarType = type as? GraphQLScalarType {
+      } else if let scalarType = type as? IR.ScalarType {
         guard scalarType.isCustomScalar,
-              let typeCustomization = config.options.schemaCustomization.customTypeNames[scalarType.name] else {
+              let typeCustomization = config.options.schemaCustomization.customTypeNames[scalarType.name.schemaName] else {
           return
         }
         
         switch typeCustomization {
         case .type(let name):
-          type.customName = name
+          type.name.customName = name
         default:
           break
         }
-      } else if let enumType = type as? GraphQLEnumType {
-        guard let typeCustomization = config.options.schemaCustomization.customTypeNames[enumType.name] else {
+      } else if let enumType = type as? IR.EnumType {
+        guard let typeCustomization = config.options.schemaCustomization.customTypeNames[enumType.name.schemaName] else {
           return
         }
         
         switch typeCustomization {
         case .type(let name):
-          enumType.customName = name
+          enumType.name.customName = name
           break
         case .enum(let name, let cases):
-          enumType.customName = name
+          type.name.customName = name
           
           if let cases = cases {
             for value in enumType.values {
-              if let caseName = cases[value.name.value] {
-                value.customName = GraphQLEnumValue.Name(value: caseName)
+              if let caseName = cases[value.name.schemaName] {
+                value.name.customName = caseName
               }
             }
           }
@@ -385,22 +374,22 @@ public class ApolloCodegen {
         default:
           break
         }
-      } else if let inputObjectType = type as? GraphQLInputObjectType {
-        guard let typeCustomization = config.options.schemaCustomization.customTypeNames[inputObjectType.name] else {
+      } else if let inputObjectType = type as? IR.InputObjectType {
+        guard let typeCustomization = config.options.schemaCustomization.customTypeNames[inputObjectType.name.schemaName] else {
           return
         }
         
         switch typeCustomization {
         case .type(let name):
-          inputObjectType.customName = name
+          inputObjectType.name.customName = name
           break
         case .inputObject(let name, let fields):
-          inputObjectType.customName = name
+          inputObjectType.name.customName = name
           
           if let fields = fields {
             for (_, field) in inputObjectType.fields {
               if let fieldName = fields[field.name] {
-                field.customName = fieldName
+                field.name.customName = fieldName
               }
             }
           }
