@@ -13,11 +13,19 @@ let initialQuery = MyQuery(first: 10, after: nil)
 let pager = GraphQLQueryPager.makeQueryPager(
     client: client,
     initialQuery: initialQuery,
-    extractInitialPageInfo: { data in
+    extractInitialPageInfo: { initialQueryData in
         // Extract a `CursorBasedPagination.Forward` instance from the initial query's `Data`
+        CursorBasedPagination.Forward(
+             hasNext: initialQueryData.values.pageInfo.hasNextPage ?? false,
+             endCursor: initialQueryData.values.pageInfo.endCursor
+         )
     },
-    extractNextPageInfo: { data in
+    extractNextPageInfo: { paginatedQueryData in
         // Extract a `CursorBasedPagination.Forward` instance from the paginated query's `Data`
+        CursorBasedPagination.Forward(
+             hasNext: paginatedQueryData.values.pageInfo.hasNextPage ?? false,
+             endCursor: paginatedQueryData.values.pageInfo.endCursor
+         )
     },
     pageResolver: { page, paginationDirection in
         // As we only want to support forward pagination, we can return `nil` for reverse pagination
