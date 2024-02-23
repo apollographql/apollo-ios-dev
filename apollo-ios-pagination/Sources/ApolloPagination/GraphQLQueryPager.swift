@@ -241,6 +241,8 @@ public class GraphQLQueryPager<Model>: Publisher {
   /// Resets pagination state and cancels further updates from the pager.
   public func cancel() {
     pager.cancel()
+    _subject.send(completion: .finished)
+    cancellables.removeAll()
   }
 
   public func receive<S>(
