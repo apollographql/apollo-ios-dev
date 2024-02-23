@@ -10,7 +10,7 @@ public extension GraphQLQueryPager {
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
     initialQuery: InitialQuery,
-    pageResolver: @escaping (P, PaginationDirection) -> InitialQuery,
+    pageResolver: @escaping (P, PaginationDirection) -> InitialQuery?,
     extractPageInfo: @escaping (InitialQuery.Data) -> P
   ) -> GraphQLQueryPager where Model == PaginationOutput<InitialQuery, InitialQuery> {
     GraphQLQueryPager(pager: GraphQLQueryPagerCoordinator(
@@ -27,7 +27,7 @@ public extension GraphQLQueryPager {
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
     initialQuery: InitialQuery,
-    pageResolver: @escaping (P, PaginationDirection) -> InitialQuery,
+    pageResolver: @escaping (P, PaginationDirection) -> InitialQuery?,
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
     transform: @escaping ([InitialQuery.Data], InitialQuery.Data, [InitialQuery.Data]) throws -> Model
   ) -> GraphQLQueryPager {
@@ -48,7 +48,7 @@ public extension GraphQLQueryPager {
     client: ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
     initialQuery: InitialQuery,
-    pageResolver: @escaping (P, PaginationDirection) -> InitialQuery,
+    pageResolver: @escaping (P, PaginationDirection) -> InitialQuery?,
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
     transform: @escaping (InitialQuery.Data) throws -> Model
   ) -> GraphQLQueryPager where Model: RangeReplaceableCollection, T == Model.Element {
@@ -72,7 +72,7 @@ public extension GraphQLQueryPager {
     watcherDispatchQueue: DispatchQueue = .main,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
     extractNextPageInfo: @escaping (PaginatedQuery.Data) -> P,
-    pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery
+    pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery?
   ) -> GraphQLQueryPager where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
     GraphQLQueryPager(
       pager: .init(
@@ -95,7 +95,7 @@ public extension GraphQLQueryPager {
     watcherDispatchQueue: DispatchQueue = .main,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
     extractNextPageInfo: @escaping (PaginatedQuery.Data) -> P,
-    pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery,
+    pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery?,
     transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
   ) -> GraphQLQueryPager where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
     GraphQLQueryPager(
@@ -120,7 +120,7 @@ public extension GraphQLQueryPager {
     watcherDispatchQueue: DispatchQueue = .main,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
     extractNextPageInfo: @escaping (PaginatedQuery.Data) -> P,
-    pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery,
+    pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery?,
     initialTransform: @escaping (InitialQuery.Data) throws -> Model,
     pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
   ) -> GraphQLQueryPager where Model: RangeReplaceableCollection, T == Model.Element {
