@@ -6,16 +6,32 @@ import ApolloAPI
 // MARK: Internal
 
 extension DataDict {
-  enum MergeError: Error, LocalizedError {
-    case pathDataTypeNotDataDict
-    case cannotOverwriteData(AnyHashable, AnyHashable)
+  enum MergeError: Error, LocalizedError, Equatable {
+    case emptyMergePath
+    case dataTypeNotAccessibleByPathComponent(PathComponent)
+    case invalidPathComponentForDataType(PathComponent, String)
+    case cannotFindPathComponent(PathComponent)
+    case incrementalMergeNeedsDataDict
+    case cannotOverwriteFieldData(AnyHashable, AnyHashable)
 
     public var errorDescription: String? {
       switch self {
-      case .pathDataTypeNotDataDict:
+      case .emptyMergePath:
+        return "The merge path cannot be empty."
+
+      case let .dataTypeNotAccessibleByPathComponent(pathComponent):
+        return "The data type at \(pathComponent) is not accessible by path component."
+
+      case let .invalidPathComponentForDataType(pathComponent, dataType):
+        return "Invalid path component \(pathComponent) for data type \(dataType)."
+
+      case let .cannotFindPathComponent(pathComponent):
+        return "Path component \(pathComponent) is an invalid key or out-of-bounds index."
+
+      case .incrementalMergeNeedsDataDict:
         return "Invalid data type for incremental merge, expected DataDict."
 
-      case let .cannotOverwriteData(current, new):
+      case let .cannotOverwriteFieldData(current, new):
         return "Incremental data merge cannot overwrite field data value '\(current)' with mismatched value '\(new)'."
       }
     }
@@ -31,12 +47,12 @@ extension DataDict {
   func merging(_ newDataDict: DataDict, at path: [PathComponent]) throws -> DataDict {
     let value = try value(at: path)
     guard let pathDataDict = value as? DataDict else {
-      throw MergeError.pathDataTypeNotDataDict
+      throw MergeError.incrementalMergeNeedsDataDict
     }
 
     let mergedData = try pathDataDict._data.merging(newDataDict._data) { current, new in
       if current != new {
-        throw MergeError.cannotOverwriteData(current, new)
+        throw MergeError.cannotOverwriteFieldData(current, new)
       }
 
       return current
@@ -62,25 +78,6 @@ extension DataDict {
   }
 }
 
-enum PathComponentError: Error, LocalizedError {
-  case emptyMergePath
-  case unsupportedUnderlyingDataType
-  case invalidPathComponentForDataType(PathComponent, String)
-
-  public var errorDescription: String? {
-    switch self {
-    case .emptyMergePath:
-      return "The merge path cannot be empty."
-
-    case .unsupportedUnderlyingDataType:
-      return "The underlying data type is not accessible by path component."
-
-    case let .invalidPathComponentForDataType(pathComponent, dataType):
-      return "Invalid path component, cannot access \(dataType) with \(pathComponent)."
-    }
-  }
-}
-
 // MARK: - Private
 
 /// Functions that provide the ability to get and set a value when type-specific access to the
@@ -95,7 +92,7 @@ extension PathComponentAccessible {
   fileprivate func value(at path: [PathComponent]) throws -> AnyHashable? {
     switch path.headAndTail() {
     case nil:
-      throw PathComponentError.emptyMergePath
+      throw DataDict.MergeError.emptyMergePath
 
     case let (head, remaining)? where remaining.isEmpty:
       return try value(at: head)
@@ -109,7 +106,7 @@ extension PathComponentAccessible {
         return try array.value(at: remaining)
 
       default:
-        throw PathComponentError.unsupportedUnderlyingDataType
+        throw DataDict.MergeError.dataTypeNotAccessibleByPathComponent(head)
       }
     }
   }
@@ -117,7 +114,7 @@ extension PathComponentAccessible {
   fileprivate mutating func set(value newValue: AnyHashable?, at path: [PathComponent]) throws {
     switch path.headAndTail() {
     case nil:
-      throw PathComponentError.emptyMergePath
+      throw DataDict.MergeError.emptyMergePath
 
     case let (head, remaining)? where remaining.isEmpty:
       try set(value: newValue, at: head)
@@ -133,7 +130,7 @@ extension PathComponentAccessible {
         try set(value: array, at: head)
 
       default:
-        throw PathComponentError.unsupportedUnderlyingDataType
+        throw DataDict.MergeError.dataTypeNotAccessibleByPathComponent(head)
       }
     }
   }
@@ -141,37 +138,53 @@ extension PathComponentAccessible {
 
 extension DataDict: PathComponentAccessible {
   fileprivate func value(at path: PathComponent) throws -> AnyHashable? {
-    guard case let .field(field) = path else {
-      throw PathComponentError.invalidPathComponentForDataType(path, String(describing: self))
-    }
+    let key = try validatedKeyFromPath(path)
 
-    return self._data[field]
+    return self._data[key]
   }
 
   fileprivate mutating func set(value: AnyHashable?, at path: PathComponent) throws {
-    guard case let .field(field) = path else {
-      throw PathComponentError.invalidPathComponentForDataType(path, String(describing: self))
+    let key = try validatedKeyFromPath(path)
+
+    self._data[key] = value
+  }
+
+  private func validatedKeyFromPath(_ path: PathComponent) throws -> String {
+    guard case let .field(key) = path else {
+      throw DataDict.MergeError.invalidPathComponentForDataType(path, "DataDict")
     }
 
-    self._data[field] = value
+    guard _data.keys.contains(key) else {
+      throw DataDict.MergeError.cannotFindPathComponent(path)
+    }
+
+    return key
   }
 }
 
 extension Array: PathComponentAccessible where Element == AnyHashable? {
   fileprivate func value(at path: PathComponent) throws -> AnyHashable? {
-    guard case let .index(index) = path else {
-      throw PathComponentError.invalidPathComponentForDataType(path, String(describing: self))
-    }
+    let index = try validatedIndexFromPath(path)
 
     return self[index]
   }
 
   fileprivate mutating func set(value: AnyHashable?, at path: PathComponent) throws {
-    guard case let .index(index) = path else {
-      throw PathComponentError.invalidPathComponentForDataType(path, String(describing: self))
-    }
+    let index = try validatedIndexFromPath(path)
 
     self[index] = value
+  }
+
+  private func validatedIndexFromPath(_ path: PathComponent) throws -> Int {
+    guard case let .index(index) = path else {
+      throw DataDict.MergeError.invalidPathComponentForDataType(path, "Array")
+    }
+
+    guard index < endIndex else {
+      throw DataDict.MergeError.cannotFindPathComponent(path)
+    }
+
+    return index
   }
 }
 
