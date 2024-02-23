@@ -61,6 +61,7 @@
         "ApolloWebSocket": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloWebSocket",
         "ApolloSQLite": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloSQLite",
         "ApolloCodegenLib": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloCodegenLib",
+        "ApolloPagination": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloPagination",
         "Client Directives": "/client-directives"
       },
       true
@@ -108,6 +109,15 @@
     "Networking": [
       {
         "Creating a Client": "/networking/client-creation"
+      },
+      true
+    ],
+    "Pagination": [
+      {
+        "Introduction": "/pagination/introduction",
+        "Using Custom Response Models": "/pagination/custom-types",
+        "Directional Pagination": "/pagination/directional-pagers",
+        "Multi-query Pagination": "/pagination/multi-query"
       },
       true
     ],
