@@ -39,6 +39,6 @@ let pager = GraphQLQueryPager.makeQueryPager(
 )
 ```
 
-This example demonstrates how to create a `GraphQLQueryPager` that uses separate queries for fetching the initial page of data and for fetching subsequent pages of data. The `GraphQLQueryPager` is configured to use forward cursor-based pagination. The `extractInitialPageInfo` and `extractNextPageInfo` closures are used to extract pagination information from the initial page of data and from the next page of data, respectively. The `nextPageResolver` closure is used to resolve the next page query given a `CursorBasedPagination.Forward` instance.
+This example demonstrates how to create a `GraphQLQueryPager` that uses separate queries for fetching the initial page of data and for fetching subsequent pages of data. The `GraphQLQueryPager` is configured to use forward cursor-based pagination. The `extractInitialPageInfo` and `extractNextPageInfo` closures are used to extract pagination information from the initial page of data and from the next page of data, respectively. The `pageResolver` closure is used to resolve the next page query given a `CursorBasedPagination.Forward` instance.
 
-The `GraphQLQueryPager` instance can be used in the same way as a single-query pager. The `loadNextPage` method will automatically use the `nextPageResolver` closure to fetch the next page of data.
+The `GraphQLQueryPager` instance can be used in the same way as a single-query pager. The `loadNextPage` method will automatically use the `pageResolver` closure to fetch the next page of data.
