@@ -6,7 +6,7 @@ The `GraphQLQueryPager` supports not only returning collections of a query's `Da
 
 ## Transforming existing responses types
 
-The `GraphQLQueryPager` class conforms to the `Publisher` protocol, and provides a `map` method that allows you to transform the raw response into a custom response type. When used this way, the `GraphQLQueryPager` will operate over generated `Data` types, but allow each `Data` type to betransformed into a custom response type. This is especially useful when you want to reuse a single pager in multiple places, transforming the raw data into view models.
+The `GraphQLQueryPager` class conforms to the `Publisher` protocol, and provides a `map` method that allows you to transform the raw response into a custom response type. When used this way, the `GraphQLQueryPager` will operate over generated `Data` types, but allow each `Data` type to be transformed into a custom response type. This is especially useful when you want to reuse a single pager in multiple places, transforming the raw data into view models.
 
 In this example, we take a `GraphQLQueryPager` that returns a `Result<PaginationOutput<MyQuery.Data, MyQuery.Data>>`, and transform the raw response into a custom response type of `Result<[Person], Error>`.
 
