@@ -7,7 +7,10 @@ public final class UnionType: NamedType {
   
   public init(_ graphqlUnionType: GraphQLUnionType) {
     self.graphqlUnionType = graphqlUnionType
-    super.init(graphqlUnionType)
+    super.init(
+      graphqlUnionType,
+      typenameSuffix: "_Union"
+    )
   }
   
   // MARK: - Dyanmic Member Lookup

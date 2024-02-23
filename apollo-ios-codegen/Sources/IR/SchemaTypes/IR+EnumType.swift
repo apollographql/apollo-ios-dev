@@ -15,7 +15,10 @@ public final class EnumType: NamedType {
       self.values.append(EnumValue(graphqlEnumValue: val))
     }
     
-    super.init(graphqlEnumType)
+    super.init(
+      graphqlEnumType,
+      typenameSuffix: "_Enum"
+    )
   }
   
   // MARK: - Dyanmic Member Lookup
@@ -29,14 +32,17 @@ public final class EnumType: NamedType {
 // MARK: - Enum Case
 
 @dynamicMemberLookup
-public final class EnumValue {
+public final class EnumValue: NamedItem {
   public let graphqlEnumValue: GraphQLEnumValue
   
-  public let name: Name
+  private var _name: Name
+  public var name: Name {
+    _name
+  }
   
   public init(graphqlEnumValue: GraphQLEnumValue) {
     self.graphqlEnumValue = graphqlEnumValue
-    self.name = Name(schemaName: graphqlEnumValue.name.value)
+    self._name = Name(schemaName: graphqlEnumValue.name.value)
   }
   
   // MARK: - Dynamic Member Lookup

@@ -1,11 +1,11 @@
 import Foundation
 import OrderedCollections
-import GraphQLCompiler
+import IR
 import TemplateString
 
 struct MockUnionsTemplate: TemplateRenderer {
 
-  let graphQLUnions: OrderedSet<GraphQLUnionType>
+  let irUnions: OrderedSet<IR.UnionType>
 
   let config: ApolloCodegen.ConfigurationContext
 
@@ -16,8 +16,8 @@ struct MockUnionsTemplate: TemplateRenderer {
   ) -> TemplateString {
     TemplateString("""
     \(accessControlModifier(for: .parent))extension MockObject {
-      \(graphQLUnions.map {
-        "typealias \($0.formattedName) = Union"
+      \(irUnions.map {
+      "typealias \($0.render(as: .typename, config: config)) = Union"
       }, separator: "\n")
     }
     

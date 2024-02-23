@@ -1,12 +1,12 @@
 import Foundation
-import GraphQLCompiler
+import IR
 import TemplateString
 
 /// Provides the format to convert a [GraphQL Union](https://spec.graphql.org/draft/#sec-Unions)
 /// into Swift code.
 struct UnionTemplate: TemplateRenderer {
   /// IR representation of source [GraphQL Union](https://spec.graphql.org/draft/#sec-Unions).
-  let graphqlUnion: GraphQLUnionType
+  let irUnion: IR.UnionType
 
   let config: ApolloCodegen.ConfigurationContext
 
@@ -17,9 +17,9 @@ struct UnionTemplate: TemplateRenderer {
   ) -> TemplateString {
     TemplateString(
     """
-    \(documentation: graphqlUnion.documentation, config: config)
-    static let \(graphqlUnion.formattedName) = Union(
-      name: "\(graphqlUnion.name)",
+    \(documentation: irUnion.documentation, config: config)
+    static let \(irUnion.render(as: .typename, config: config)) = Union(
+      name: "\(irUnion.name.schemaName)",
       possibleTypes: \(PossibleTypesTemplate())
     )
     """
@@ -27,15 +27,15 @@ struct UnionTemplate: TemplateRenderer {
   }
 
   private func PossibleTypesTemplate() -> TemplateString {
-    "[\(list: graphqlUnion.types.map(PossibleTypeTemplate))]"
+    "[\(list: irUnion.types.map(PossibleTypeTemplate))]"
   }
 
   private func PossibleTypeTemplate(
-    _ type: GraphQLObjectType
+    _ type: IR.ObjectType
   ) -> TemplateString {
     """
     \(if: !config.output.schemaTypes.isInModule, "\(config.schemaNamespace.firstUppercased).")\
-    Objects.\(type.formattedName).self
+    Objects.\(type.render(as: .typename, config: config)).self
     """
   }
 

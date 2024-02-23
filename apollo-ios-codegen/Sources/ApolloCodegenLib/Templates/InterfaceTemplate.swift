@@ -1,12 +1,12 @@
 import Foundation
-import GraphQLCompiler
+import IR
 import TemplateString
 
 /// Provides the format to convert a [GraphQL Interface](https://spec.graphql.org/draft/#sec-Interfaces)
 /// into Swift code.
 struct InterfaceTemplate: TemplateRenderer {
   /// IR representation of source [GraphQL Interface](https://spec.graphql.org/draft/#sec-Interfaces).
-  let graphqlInterface: GraphQLInterfaceType
+  let irInterface: IR.InterfaceType
 
   let config: ApolloCodegen.ConfigurationContext
 
@@ -16,8 +16,8 @@ struct InterfaceTemplate: TemplateRenderer {
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
     """
-    \(documentation: graphqlInterface.documentation, config: config)
-    static let \(graphqlInterface.formattedName) = Interface(name: "\(graphqlInterface.name)")
+    \(documentation: irInterface.documentation, config: config)
+    static let \(irInterface.render(as: .typename, config: config)) = Interface(name: "\(irInterface.name.schemaName)")
     """
   }
 }

@@ -1,12 +1,12 @@
 import Foundation
-import GraphQLCompiler
+import IR
 import TemplateString
 
 /// Provides the format to convert a [GraphQL Input Object](https://spec.graphql.org/draft/#sec-Input-Objects)
 /// into Swift code.
 struct InputObjectTemplate: TemplateRenderer {
   /// IR representation of source [GraphQL Input Object](https://spec.graphql.org/draft/#sec-Input-Objects).
-  let graphqlInputObject: GraphQLInputObjectType
+  let irInputObject: IR.InputObjectType
 
   let config: ApolloCodegen.ConfigurationContext
 
@@ -15,14 +15,14 @@ struct InputObjectTemplate: TemplateRenderer {
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
-    let (validFields, deprecatedFields) = filterFields(graphqlInputObject.fields)
+    let (validFields, deprecatedFields) = filterFields(irInputObject.fields)
     let memberAccessControl = accessControlModifier(for: .member)
 
     return TemplateString(
     """
-    \(documentation: graphqlInputObject.documentation, config: config)
+    \(documentation: irInputObject.documentation, config: config)
     \(accessControlModifier(for: .parent))\
-    struct \(graphqlInputObject.formattedName): InputObject {
+    struct \(irInputObject.render(as: .typename, config: config)): InputObject {
       \(memberAccessControl)private(set) var __data: InputDict
     
       \(memberAccessControl)init(_ data: InputDict) {
@@ -44,14 +44,14 @@ struct InputObjectTemplate: TemplateRenderer {
       @available(*, deprecated, message: "\(deprecatedMessage(for: deprecatedFields))")
       """)
       \(memberAccessControl)init(
-        \(InitializerParametersTemplate(graphqlInputObject.fields))
+        \(InitializerParametersTemplate(irInputObject.fields))
       ) {
         __data = InputDict([
-          \(InputDictInitializerTemplate(graphqlInputObject.fields))
+          \(InputDictInitializerTemplate(irInputObject.fields))
         ])
       }
 
-      \(graphqlInputObject.fields.map({ "\(FieldPropertyTemplate($1))" }), separator: "\n\n")
+      \(irInputObject.fields.map({ "\(FieldPropertyTemplate($1))" }), separator: "\n\n")
     }
 
     """
@@ -63,10 +63,10 @@ struct InputObjectTemplate: TemplateRenderer {
   }
 
   private func filterFields(
-    _ fields: GraphQLInputFieldDictionary
-  ) -> (valid: GraphQLInputFieldDictionary, deprecated: GraphQLInputFieldDictionary) {
-    var valid: GraphQLInputFieldDictionary = [:]
-    var deprecated: GraphQLInputFieldDictionary = [:]
+    _ fields: IR.InputFieldDictionary
+  ) -> (valid: IR.InputFieldDictionary, deprecated: IR.InputFieldDictionary) {
+    var valid: IR.InputFieldDictionary = [:]
+    var deprecated: IR.InputFieldDictionary = [:]
 
     for (key, value) in fields {
       if let _ = value.deprecationReason {
@@ -79,7 +79,7 @@ struct InputObjectTemplate: TemplateRenderer {
     return (valid: valid, deprecated: deprecated)
   }
 
-  private func deprecatedMessage(for fields: GraphQLInputFieldDictionary) -> String {
+  private func deprecatedMessage(for fields: IR.InputFieldDictionary) -> String {
     guard !fields.isEmpty else { return "" }
 
     let names: String = fields.values.map({ $0.name }).joined(separator: ", ")
@@ -92,7 +92,7 @@ struct InputObjectTemplate: TemplateRenderer {
   }
 
   private func InitializerParametersTemplate(
-    _ fields: GraphQLInputFieldDictionary
+    _ fields: IR.InputFieldDictionary
   ) -> TemplateString {
     TemplateString("""
     \(fields.map({
@@ -102,14 +102,14 @@ struct InputObjectTemplate: TemplateRenderer {
   }
 
   private func InputDictInitializerTemplate(
-    _ fields: GraphQLInputFieldDictionary
+    _ fields: IR.InputFieldDictionary
   ) -> TemplateString {
     TemplateString("""
     \(fields.map({ "\"\($1.name)\": \($1.customName ?? $1.name.renderAsInputObjectName(config: config.config))" }), separator: ",\n")
     """)
   }
 
-  private func FieldPropertyTemplate(_ field: GraphQLInputField) -> TemplateString {
+  private func FieldPropertyTemplate(_ field: IR.InputField) -> TemplateString {
     """
     \(documentation: field.documentation, config: config)
     \(deprecationReason: field.deprecationReason, config: config)

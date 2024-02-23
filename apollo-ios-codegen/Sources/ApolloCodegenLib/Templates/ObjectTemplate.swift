@@ -1,12 +1,12 @@
 import Foundation
-import GraphQLCompiler
+import IR
 import TemplateString
 
 /// Provides the format to convert a [GraphQL Object](https://spec.graphql.org/draft/#sec-Objects)
 /// into Swift code.
 struct ObjectTemplate: TemplateRenderer {
   /// IR representation of source [GraphQL Object](https://spec.graphql.org/draft/#sec-Objects).
-  let graphqlObject: GraphQLObjectType
+  let irObject: IR.ObjectType
 
   let config: ApolloCodegen.ConfigurationContext
 
@@ -16,9 +16,9 @@ struct ObjectTemplate: TemplateRenderer {
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {    
     """
-    \(documentation: graphqlObject.documentation, config: config)
-    static let \(graphqlObject.formattedName) = \(config.ApolloAPITargetName).Object(
-      typename: "\(graphqlObject.name)\",
+    \(documentation: irObject.documentation, config: config)
+    static let \(irObject.render(as: .typename, config: config)) = \(config.ApolloAPITargetName).Object(
+      typename: "\(irObject.name.schemaName)\",
       implementedInterfaces: \(ImplementedInterfacesTemplate())
     )
     """
@@ -26,10 +26,10 @@ struct ObjectTemplate: TemplateRenderer {
 
   private func ImplementedInterfacesTemplate() -> TemplateString {
     return """
-    [\(list: graphqlObject.interfaces.map({ interface in
+    [\(list: irObject.interfaces.map({ interface in
           TemplateString("""
           \(if: !config.output.schemaTypes.isInModule, "\(config.schemaNamespace.firstUppercased).")\
-          Interfaces.\(interface.formattedName).self
+          Interfaces.\(interface.formattedme).self
           """)
       }))]
     """

@@ -7,7 +7,10 @@ public final class ScalarType: NamedType {
   
   public init(_ graphqlScalarType: GraphQLScalarType) {
     self.graphqlScalarType = graphqlScalarType
-    super.init(graphqlScalarType)
+    super.init(
+      graphqlScalarType,
+      typenameSuffix: "Scalar"
+    )
   }
   
   // MARK: - Dyanmic Member Lookup

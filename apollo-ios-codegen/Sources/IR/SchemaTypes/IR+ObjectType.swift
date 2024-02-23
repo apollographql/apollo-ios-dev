@@ -7,7 +7,10 @@ public final class ObjectType: NamedType {
   
   public init(_ graphqlObjectType: GraphQLObjectType) {
     self.graphqlObjectType = graphqlObjectType
-    super.init(graphqlObjectType)
+    super.init(
+      graphqlObjectType,
+      typenameSuffix: "_Object"
+    )
   }
   
   // MARK: - Dyanmic Member Lookup

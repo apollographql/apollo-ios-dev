@@ -1,11 +1,10 @@
 import Foundation
 import IR
-import GraphQLCompiler
 
 /// Generates a file providing the ability to mock a GraphQLObject for testing purposes.
 struct MockObjectFileGenerator: FileGenerator {
   /// Source GraphQL object.
-  let graphqlObject: GraphQLObjectType
+  let irObject: IR.ObjectType
 
   let fields: [(String, GraphQLType, deprecationReason: String?)]
 
@@ -15,7 +14,7 @@ struct MockObjectFileGenerator: FileGenerator {
 
   var template: TemplateRenderer {
     MockObjectTemplate(
-      graphqlObject: graphqlObject,
+      irObject: irObject,
       fields: fields,
       config: config,
       ir: ir
@@ -23,5 +22,5 @@ struct MockObjectFileGenerator: FileGenerator {
   }
 
   var target: FileTarget { .testMock }
-  var fileName: String { "\(graphqlObject.customName ?? graphqlObject.name)+Mock" }
+  var fileName: String { "\(irObject.render(as: .filename, config: config))+Mock" }
 }

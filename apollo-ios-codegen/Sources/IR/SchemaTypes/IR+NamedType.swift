@@ -2,14 +2,23 @@ import Foundation
 import GraphQLCompiler
 
 @dynamicMemberLookup
-public class NamedType: Hashable, CustomDebugStringConvertible, @unchecked Sendable {
+public class NamedType: Hashable, CustomDebugStringConvertible, @unchecked Sendable, NamedItem {
   public let graphqlNamedType: GraphQLNamedType
   
-  public let name: Name
+  private var _name: Name
+  public var name: Name {
+    _name
+  }
   
-  public init(_ graphqlNamedType: GraphQLNamedType) {
+  public init(
+    _ graphqlNamedType: GraphQLNamedType,
+    typenameSuffix: String = "GraphQL"
+  ) {
     self.graphqlNamedType = graphqlNamedType
-    self.name = Name(schemaName: graphqlNamedType.name)
+    self._name = Name(
+      schemaName: graphqlNamedType.name,
+      typenameSuffix: typenameSuffix
+    )
   }
   
   // MARK: - Hashable
@@ -33,4 +42,5 @@ public class NamedType: Hashable, CustomDebugStringConvertible, @unchecked Senda
   public var debugDescription: String {
     "Type - \(name.schemaName)"
   }
+  
 }

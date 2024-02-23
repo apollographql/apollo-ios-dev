@@ -18,7 +18,10 @@ public final class InputObjectType: NamedType {
       self.fields[key] = InputField(graphqlInputField: field)
     }
     
-    super.init(graphqlInputObjectType)
+    super.init(
+      graphqlInputObjectType,
+      typenameSuffix: "_InputObject"
+    )
   }
   
   // MARK: - Dyanmic Member Lookup
@@ -32,14 +35,17 @@ public final class InputObjectType: NamedType {
 // MARK: - Input Field
 
 @dynamicMemberLookup
-public final class InputField {
+public final class InputField: NamedItem {
   public let graphqlInputField: GraphQLInputField
   
-  public let name: Name
+  private var _name: Name
+  public var name: Name {
+    _name
+  }
   
   public init(graphqlInputField: GraphQLInputField) {
     self.graphqlInputField = graphqlInputField
-    self.name = Name(schemaName: graphqlInputField.name)
+    self._name = Name(schemaName: graphqlInputField.name)
   }
   
   // MARK: - Dynamic Member Lookup

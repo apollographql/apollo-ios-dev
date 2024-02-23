@@ -124,6 +124,17 @@ public class ApolloCodegen {
     try config.validate(compilationResult)
 
     let ir = IRBuilder(compilationResult: compilationResult)
+    
+    for refType in ir.schema.referencedTypes.allTypes {
+      if let customType = config.options.schemaCustomization.customTypeNames[refType.name.schemaName] {
+        switch customType {
+        case .type(let name):
+          refType.name.customName = name
+        default:
+          break
+        }
+      }
+    }
 
     try await withThrowingTaskGroup(of: Void.self) { group in
       if itemsToGenerate.contains(.operationManifest) {
@@ -415,7 +426,7 @@ public class ApolloCodegen {
         for graphQLObject in ir.schema.referencedTypes.objects {
           addFileGenerationTask(
             for: ObjectFileGenerator(
-              graphqlObject: graphQLObject,
+              irObject: graphQLObject,
               config: config
             ),
             to: &group,
@@ -426,7 +437,7 @@ public class ApolloCodegen {
             let fields = await ir.fieldCollector.collectedFields(for: graphQLObject)
             addFileGenerationTask(
               for: MockObjectFileGenerator(
-                graphqlObject: graphQLObject,
+                irObject: graphQLObject,
                 fields: fields,
                 ir: ir,
                 config: config

@@ -1,11 +1,11 @@
 import Foundation
 import OrderedCollections
-import GraphQLCompiler
+import IR
 import TemplateString
 
 struct MockInterfacesTemplate: TemplateRenderer {
 
-  let graphQLInterfaces: OrderedSet<GraphQLInterfaceType>
+  let irInterfaces: OrderedSet<IR.InterfaceType>
 
   let config: ApolloCodegen.ConfigurationContext
 
@@ -16,8 +16,8 @@ struct MockInterfacesTemplate: TemplateRenderer {
   ) -> TemplateString {
     TemplateString("""
     \(accessControlModifier(for: .parent))extension MockObject {
-      \(graphQLInterfaces.map {
-        "typealias \($0.formattedName) = Interface"
+      \(irInterfaces.map {
+      "typealias \($0.render(as: .typename, config: config)) = Interface"
       }, separator: "\n")
     }
 

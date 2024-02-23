@@ -1,12 +1,12 @@
 import Foundation
-import GraphQLCompiler
+import IR
 import TemplateString
 
 /// Provides the format to convert a [GraphQL Enum](https://spec.graphql.org/draft/#sec-Enums) into
 /// Swift code.
 struct EnumTemplate: TemplateRenderer {
   /// IR representation of source [GraphQL Enum](https://spec.graphql.org/draft/#sec-Enums).
-  let graphqlEnum: GraphQLEnumType
+  let irEnum: IR.EnumType
 
   let config: ApolloCodegen.ConfigurationContext
 
@@ -17,10 +17,10 @@ struct EnumTemplate: TemplateRenderer {
   ) -> TemplateString {
     TemplateString(
     """
-    \(documentation: graphqlEnum.documentation, config: config)
+    \(documentation: irEnum.documentation, config: config)
     \(accessControlModifier(for: .parent))\
-    enum \(graphqlEnum.formattedName): String, EnumType {
-      \(graphqlEnum.values.compactMap({
+    enum \(irEnum.render(as: .typename, config: config)): String, EnumType {
+      \(irEnum.values.compactMap({
         enumCase(for: $0)
       }), separator: "\n")
     }
@@ -29,29 +29,29 @@ struct EnumTemplate: TemplateRenderer {
     )
   }
 
-  private func enumCase(for graphqlEnumValue: GraphQLEnumValue) -> TemplateString? {
-    if config.options.deprecatedEnumCases == .exclude && graphqlEnumValue.isDeprecated {
+  private func enumCase(for irEnumValue: IR.EnumValue) -> TemplateString? {
+    if config.options.deprecatedEnumCases == .exclude && irEnumValue.isDeprecated {
       return nil
     }
 
-    let shouldRenderDocumentation = graphqlEnumValue.documentation != nil &&
+    let shouldRenderDocumentation = irEnumValue.documentation != nil &&
     config.options.schemaDocumentation == .include
 
     return """
-    \(if: shouldRenderDocumentation, "\(documentation: graphqlEnumValue.documentation)")
-    \(ifLet: graphqlEnumValue.deprecationReason, { """
+    \(if: shouldRenderDocumentation, "\(documentation: irEnumValue.documentation)")
+    \(ifLet: irEnumValue.deprecationReason, { """
       \(if: shouldRenderDocumentation, "///")
       \(documentation: "**Deprecated**: \($0.escapedSwiftStringSpecialCharacters())")
       """ })
-    \(caseDefinition(for: graphqlEnumValue))
+    \(caseDefinition(for: irEnumValue))
     """
   }
 
-  private func caseDefinition(for graphqlEnumValue: GraphQLEnumValue) -> TemplateString {
+  private func caseDefinition(for irEnumValue: IR.EnumValue) -> TemplateString {
     """
-    case \(graphqlEnumValue.customName?.value ?? graphqlEnumValue.name.rendered(as: .swiftEnumCase, config: config.config))\
+    case \(irEnumValue.render(as: .enumCase, config: config))\
     \(if: config.options.conversionStrategies.enumCases != .none, """
-       = "\(graphqlEnumValue.name.rendered(as: .rawValue, config: config.config))"
+       = "\(irEnumValue.render(as: .enumRawValue, config: config))"
       """)
     """
   }

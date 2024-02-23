@@ -7,7 +7,10 @@ public final class InterfaceType: NamedType {
   
   public init(_ graphqlInterfaceType: GraphQLInterfaceType) {
     self.graphqlInterfaceType = graphqlInterfaceType
-    super.init(graphqlInterfaceType)
+    super.init(
+      graphqlInterfaceType,
+      typenameSuffix: "_Interface"
+    )
   }
   
   // MARK: - Dyanmic Member Lookup
