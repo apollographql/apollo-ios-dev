@@ -63,7 +63,7 @@ The `GraphQLQueryPager` class can also be initialized with a custom type in mind
 
 We provide a convenience method for transforming collection types in this manner. 
 
-In this example, we take a `GraphQLQueryPager` that returns a `Result<PaginationOutput<MyQuery.Data, MyQuery.Data>>`, and transform the raw response into a custom response type of `Result<([Person], UpdateSource), Error>`.
+In this example, we create a `GraphQLQueryPager` that  transform the raw response into a custom response type of `Result<([Person], UpdateSource), Error>`. The `transform` closure will be called on the data from each paginated query and the resulting arrays will be concatenated together.
 
 ```swift
 let initialQuery = MyQuery(first: 10, after: nil)
