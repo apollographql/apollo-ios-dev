@@ -93,7 +93,7 @@ let pager = GraphQLQueryPager.makeQueryPager(
 )
 ```
 
-This supports single object types as well, such as a `Result<(MyResponseModel, UpdateSource), Error>`:
+Alternatively, you can also return a single model type, such as a `Result<(MyResponseModel, UpdateSource), Error>`. To do this, we use a `transform` closure with three parameters, `previousPages, initialPage, nextPages`:
 
 ```swift
 let initialQuery = MyQuery(first: 10, after: nil)
