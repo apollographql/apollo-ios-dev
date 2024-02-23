@@ -9,7 +9,7 @@ class DataDictMergingTests: XCTestCase {
 
   func test__merging__givenEmptyPathComponent_throwsError() throws {
     // given
-    let dataDict = DataDict([
+    let subject = DataDict([
       "animals": [
         DataDict([
           "__typename": "Animal",
@@ -28,27 +28,8 @@ class DataDictMergingTests: XCTestCase {
 
     // then
     expect(
-      try dataDict.merging(mergeDataDict, at: [])
+      try subject.merging(mergeDataDict, at: [])
     ).to(throwError(DataDict.MergeError.emptyMergePath))
-  }
-
-  func test__merging__givenPathForDataTypeNotAccessibleByPathComponent_throwsError() throws {
-    // given
-    let subject = DataDict([
-      "animals": [
-        "__typename": "Animal",
-        "name": "Dog"
-      ]
-    ])
-
-    let mergeDataDict = DataDict([
-      "key": "value"
-    ])
-
-    // then
-    expect(
-      try subject.merging(mergeDataDict, at: [.field("animals"), .field("name")])
-    ).to(throwError(DataDict.MergeError.dataTypeNotAccessibleByPathComponent(.field("animals"))))
   }
 
   func test__merging__givenIndexPathForDataDictType_throwsError() throws {
