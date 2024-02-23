@@ -80,11 +80,11 @@ pager.sink { result in
 
 The `GraphQLQueryPager` class provides several methods to fetch paginated data: `fetch`, `refetch`, `loadNext`, `loadPrevious`, and `loadAll`.
 
-`fetch`: Fetches the first page of data. Must be called before `loadNext` or `loadPrevious` can be called.
-`refetch`: Cancels all ongoing fetch operations and resets the pager to its initial state. Fetches the first page of data.
-`loadNext`: Fetches the next page of data. Can only be called after `fetch` has been called.
-`loadPrevious`: Fetches the previous page of data. Can only be called after `fetch` has been called.
-`loadAll`: Fetches all pages of data. If no initial page is detected, it will first call `fetch` to fetch the first page of data. Will continue to fethc all pages until a `PageInfo` object indicates that there are no more pages to fetch. This function is compatible with forward, reverse, and bidirectional pagination.
+- `fetch`: Fetches the first page of data. Must be called before `loadNext` or `loadPrevious` can be called.
+- `refetch`: Cancels all ongoing fetch operations and resets the pager to its initial state. Fetches the first page of data.
+- `loadNext`: Fetches the next page of data. Can only be called after `fetch` has been called.
+- `loadPrevious`: Fetches the previous page of data. Can only be called after `fetch` has been called.
+- `loadAll`: Fetches all pages of data. If no initial page is detected, it will first call `fetch` to fetch the first page of data. Will continue to fetch all pages until a `PageInfo` object indicates that there are no more pages to fetch. This function is compatible with forward, reverse, and bidirectional pagination.
 
 ## Cancelling ongoing requests
 
