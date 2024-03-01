@@ -1,7 +1,7 @@
 import Foundation
 import GraphQLCompiler
 
-@dynamicMemberLookup
+//@dynamicMemberLookup
 public class NamedType: Hashable, CustomDebugStringConvertible, @unchecked Sendable, NamedItem {
   public let graphqlNamedType: GraphQLNamedType
   
@@ -33,14 +33,23 @@ public class NamedType: Hashable, CustomDebugStringConvertible, @unchecked Senda
   
   // MARK: - Dynamic Member Lookup
   
-  public subscript<T>(dynamicMember keyPath: KeyPath<GraphQLNamedType, T>) -> T {
-    graphqlNamedType[keyPath: keyPath]
-  }
+//  public subscript<T>(dynamicMember keyPath: KeyPath<GraphQLNamedType, T>) -> T {
+//    graphqlNamedType[keyPath: keyPath]
+//  }
 
   // MARK: - CustomDebugStringConvertible
   
   public var debugDescription: String {
-    "Type - \(name.schemaName)"
+    name.schemaName
   }
   
+}
+
+public class CompositeType: NamedType {
+  public override var debugDescription: String {
+    "Type - \(name.schemaName)"
+  }
+}
+
+public class AbstractType: CompositeType {
 }

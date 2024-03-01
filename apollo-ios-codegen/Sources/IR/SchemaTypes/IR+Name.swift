@@ -4,7 +4,7 @@ public protocol NamedItem {
   var name: Name { get }
 }
 
-public struct Name: Hashable {
+public class Name: Hashable {
   public let schemaName: String
   
   public let typenameSuffix: String
@@ -25,6 +25,16 @@ public struct Name: Hashable {
   ) {
     self.schemaName = schemaName
     self.typenameSuffix = typenameSuffix
+  }
+  
+  // MARK: - Hashable
+  
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(schemaName)
+  }
+  
+  public static func == (lhs: Name, rhs: Name) -> Bool {
+    return lhs.schemaName == rhs.schemaName
   }
   
   // MARK: - Render Context

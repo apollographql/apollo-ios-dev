@@ -13,7 +13,7 @@ public class Entity {
       case operation(CompilationResult.OperationDefinition)
       case namedFragment(CompilationResult.FragmentDefinition)
 
-      var rootType: GraphQLCompositeType {
+      var rootType: CompositeType {
         switch self {
         case let .operation(definition): return definition.rootType
         case let .namedFragment(definition): return definition.type
@@ -77,9 +77,9 @@ public class Entity {
   /// located.
   public let location: Location
 
-  var rootTypePath: LinkedList<GraphQLCompositeType> { selectionTree.rootTypePath }
+  var rootTypePath: LinkedList<CompositeType> { selectionTree.rootTypePath }
 
-  var rootType: GraphQLCompositeType { rootTypePath.last.value }
+  var rootType: CompositeType { rootTypePath.last.value }
 
   init(source: Location.SourceDefinition) {
     self.location = .init(source: source, fieldPath: nil)
@@ -88,7 +88,7 @@ public class Entity {
 
   init(
     location: Location,
-    rootTypePath: LinkedList<GraphQLCompositeType>
+    rootTypePath: LinkedList<CompositeType>
   ) {
     self.location = location
     self.selectionTree = EntitySelectionTree(rootTypePath: rootTypePath)

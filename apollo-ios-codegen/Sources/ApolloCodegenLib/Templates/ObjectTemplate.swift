@@ -29,7 +29,7 @@ struct ObjectTemplate: TemplateRenderer {
     [\(list: irObject.interfaces.map({ interface in
           TemplateString("""
           \(if: !config.output.schemaTypes.isInModule, "\(config.schemaNamespace.firstUppercased).")\
-          Interfaces.\(interface.formattedme).self
+          Interfaces.\(interface.render(as: .typename, config: config)).self
           """)
       }))]
     """

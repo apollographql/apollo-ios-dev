@@ -2,8 +2,10 @@ import Foundation
 import GraphQLCompiler
 
 @dynamicMemberLookup
-public final class ObjectType: NamedType {
+public final class ObjectType: CompositeType, InterfaceImplementingType {
   public let graphqlObjectType: GraphQLObjectType
+  
+  public var interfaces: [InterfaceType]! = []
   
   public init(_ graphqlObjectType: GraphQLObjectType) {
     self.graphqlObjectType = graphqlObjectType
