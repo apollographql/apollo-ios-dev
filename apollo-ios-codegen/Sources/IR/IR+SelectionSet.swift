@@ -26,7 +26,7 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
     /// Derived from all the selection set's parents.
     public var scope: ScopeDescriptor { scopePath.last.value }
 
-    public var parentType: GraphQLCompositeType { scope.type }
+    public var parentType: CompositeType { scope.type }
 
     public var inclusionConditions: InclusionConditions? {
       scope.scopePath.last.value.conditions

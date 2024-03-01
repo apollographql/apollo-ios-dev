@@ -7,12 +7,12 @@ import Utilities
 // but different defer conditions don't  merge together.
 // To be done in issue #3141
 public struct ScopeCondition: Hashable, CustomDebugStringConvertible {
-  public let type: GraphQLCompositeType?
+  public let type: CompositeType?
   public let conditions: InclusionConditions?
   public let deferCondition: CompilationResult.DeferCondition?
 
   init(
-    type: GraphQLCompositeType? = nil,
+    type: CompositeType? = nil,
     conditions: InclusionConditions? = nil,
     deferCondition: CompilationResult.DeferCondition? = nil
   ) {
@@ -34,7 +34,7 @@ public struct ScopeCondition: Hashable, CustomDebugStringConvertible {
   public var isDeferred: Bool { deferCondition != nil }
 }
 
-public typealias TypeScope = OrderedSet<GraphQLCompositeType>
+public typealias TypeScope = OrderedSet<CompositeType>
 
 /// Defines the scope for an `IR.SelectionSet`. The "scope" indicates where in the entity the
 /// selection set is located, what types the `SelectionSet` implements, and what inclusion
@@ -44,7 +44,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
   /// The parentType of the `SelectionSet`.
   ///
   /// Should always be equivalent to the last "type" value of the `scopePath`.
-  public let type: GraphQLCompositeType
+  public let type: CompositeType
 
   /// A list of the parent types/conditions for the selection set and it's parents
   /// on the same entity.
@@ -79,7 +79,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
 
   private init(
     typePath: LinkedList<ScopeCondition>,
-    type: GraphQLCompositeType,
+    type: CompositeType,
     matchingTypes: TypeScope,
     matchingConditions: InclusionConditions?,
     allTypesInSchema: Schema.ReferencedTypes
@@ -103,7 +103,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
   ///   - givenAllTypesInSchema: The `ReferencedTypes` object that provides information on all of
   ///                            the types in the schema.
   static func descriptor(
-    forType type: GraphQLCompositeType,
+    forType type: CompositeType,
     inclusionConditions: InclusionConditions?,
     givenAllTypesInSchema allTypes: Schema.ReferencedTypes
   ) -> ScopeDescriptor {
@@ -121,7 +121,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
   }
 
   private static func typeScope(
-    addingType newType: GraphQLCompositeType,
+    addingType newType: CompositeType,
     to scope: TypeScope?,
     givenAllTypes allTypes: Schema.ReferencedTypes
   ) -> TypeScope {
@@ -130,11 +130,11 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
     var newScope = scope ?? []
     newScope.append(newType)
 
-    if let newType = newType as? GraphQLInterfaceImplementingType {
+    if let newType = newType as? InterfaceImplementingType {
       newScope.formUnion(newType.interfaces)
     }
 
-    if let newType = newType as? GraphQLObjectType {
+    if let newType = newType as? ObjectType {
       newScope.formUnion(allTypes.unions(including: newType))
     }
 
@@ -180,7 +180,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
   ///
   /// This should be used to create a `ScopeDescriptor` for a conditional `SelectionSet` inside
   /// of an entity, by appending the conditions to the parent `SelectionSet`'s `ScopeDescriptor`.
-  func appending(_ newType: GraphQLCompositeType) -> ScopeDescriptor {
+  func appending(_ newType: CompositeType) -> ScopeDescriptor {
     self.appending(.init(type: newType))
   }
 
@@ -200,7 +200,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
     otherScope.isSubset(of: self.matchingTypes)
   }
 
-  public func matches(_ otherType: GraphQLCompositeType) -> Bool {
+  public func matches(_ otherType: CompositeType) -> Bool {
     self.matchingTypes.contains(otherType)
   }
 

@@ -1,12 +1,12 @@
 import Foundation
-import GraphQLCompiler
+import IR
 import TemplateString
 
 /// Provides the format to convert a [GraphQL Custom Scalar](https://spec.graphql.org/draft/#sec-Scalars.Custom-Scalars)
 /// into Swift code.
 struct CustomScalarTemplate: TemplateRenderer {
   /// IR representation of source [GraphQL Custom Scalar](https://spec.graphql.org/draft/#sec-Scalars.Custom-Scalars).
-  let graphqlScalar: GraphQLScalarType
+  let irScalar: IR.ScalarType
 
   let config: ApolloCodegen.ConfigurationContext
 
@@ -27,15 +27,15 @@ struct CustomScalarTemplate: TemplateRenderer {
     """
     \(documentation: documentationTemplate, config: config)
     \(accessControlModifier(for: .parent))\
-    typealias \(graphqlScalar.formattedName) = String
+    typealias \(irScalar.render(as: .typename, config: config)) = String
     
     """
     )
   }
 
   private var documentationTemplate: String? {
-    var string = graphqlScalar.documentation
-    if let specifiedByURL = graphqlScalar.specifiedByURL {
+    var string = irScalar.documentation
+    if let specifiedByURL = irScalar.specifiedByURL {
       let specifiedByDocs = "Specified by: [](\(specifiedByURL))"
       string = string?.appending("\n\n\(specifiedByDocs)") ?? specifiedByDocs
     }

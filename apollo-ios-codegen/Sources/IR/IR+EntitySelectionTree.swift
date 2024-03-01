@@ -13,10 +13,10 @@ import Utilities
 /// to the `EntitySelectionTree`, the tree can be quickly traversed to collect the selections
 /// that will be selected for a given `SelectionSet`'s type scope.
 class EntitySelectionTree {
-  let rootTypePath: LinkedList<GraphQLCompositeType>
+  let rootTypePath: LinkedList<CompositeType>
   let rootNode: EntityNode
 
-  init(rootTypePath: LinkedList<GraphQLCompositeType>) {
+  init(rootTypePath: LinkedList<CompositeType>) {
     self.rootTypePath = rootTypePath
     self.rootNode = EntityNode(rootTypePath: rootTypePath)
   }
@@ -53,7 +53,7 @@ class EntitySelectionTree {
     atEnclosingEntityScope currentEntityScope: LinkedList<ScopeDescriptor>.Node,
     withEntityScopePath currentEntityConditionPath: LinkedList<ScopeCondition>.Node,
     from node: EntityNode,
-    withRootTypePath currentRootTypePathNode: LinkedList<GraphQLCompositeType>.Node
+    withRootTypePath currentRootTypePathNode: LinkedList<CompositeType>.Node
   ) -> EntityNode {
     guard let nextEntityTypePath = currentRootTypePathNode.next else {
       // Advance to field node in current entity & type case
@@ -129,18 +129,18 @@ class EntitySelectionTree {
       case selections(Selections)
     }
 
-    let rootTypePathNode: LinkedList<GraphQLCompositeType>.Node
-    let type: GraphQLCompositeType
+    let rootTypePathNode: LinkedList<CompositeType>.Node
+    let type: CompositeType
     let scope: ScopeCondition
     private(set) var child: Child?
     var scopeConditions: OrderedDictionary<ScopeCondition, EntityNode>?
     var mergedFragmentTrees: OrderedDictionary<NamedFragmentSpread, EntitySelectionTree> = [:]
 
-    fileprivate convenience init(rootTypePath: LinkedList<GraphQLCompositeType>) {
+    fileprivate convenience init(rootTypePath: LinkedList<CompositeType>) {
       self.init(typeNode: rootTypePath.head)
     }
 
-    private init(typeNode: LinkedList<GraphQLCompositeType>.Node) {
+    private init(typeNode: LinkedList<CompositeType>.Node) {
       self.scope = .init(type: typeNode.value)
       self.type = typeNode.value
       self.rootTypePathNode = typeNode
@@ -154,8 +154,8 @@ class EntitySelectionTree {
 
     private init(
       scope: ScopeCondition,
-      type: GraphQLCompositeType,
-      rootTypePathNode: LinkedList<GraphQLCompositeType>.Node
+      type: CompositeType,
+      rootTypePathNode: LinkedList<CompositeType>.Node
     ) {
       self.scope = scope
       self.type = type
