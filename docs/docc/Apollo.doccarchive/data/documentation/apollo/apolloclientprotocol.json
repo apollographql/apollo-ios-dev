@@ -119,7 +119,7 @@
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/clearCache(callbackQueue:completion:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/fetch(query:cachePolicy:contextIdentifier:context:queue:resultHandler:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/perform(mutation:publishResultToStore:context:queue:resultHandler:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/subscribe(subscription:context:queue:resultHandler:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/upload(operation:files:context:queue:resultHandler:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/watch(query:cachePolicy:context:callbackQueue:resultHandler:)"
@@ -512,7 +512,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclientprotocol\/fetch(query:cachepolicy:contextidentifier:context:queue:resulthandler:)"
 },
-"doc://Apollo/documentation/Apollo/ApolloClientProtocol/perform(mutation:publishResultToStore:context:queue:resultHandler:)": {
+"doc://Apollo/documentation/Apollo/ApolloClientProtocol/perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)": {
   "abstract" : [
     {
       "text" : "Performs a mutation by sending it to the server.",
@@ -576,6 +576,23 @@
     {
       "kind" : "text",
       "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "contextIdentifier"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation4UUIDV",
+      "text" : "UUID"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
     },
     {
       "kind" : "externalParam",
@@ -650,13 +667,13 @@
       "text" : "Cancellable"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/perform(mutation:publishResultToStore:context:queue:resultHandler:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
-  "title" : "perform(mutation:publishResultToStore:context:queue:resultHandler:)",
+  "title" : "perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclientprotocol\/perform(mutation:publishresulttostore:context:queue:resulthandler:)"
+  "url" : "\/documentation\/apollo\/apolloclientprotocol\/perform(mutation:publishresulttostore:contextidentifier:context:queue:resulthandler:)"
 },
 "doc://Apollo/documentation/Apollo/ApolloClientProtocol/store": {
   "abstract" : [
