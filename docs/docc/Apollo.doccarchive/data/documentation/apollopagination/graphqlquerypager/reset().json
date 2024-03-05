@@ -1,19 +1,25 @@
 {
+  "abstract" : [
+    {
+      "text" : "Resets pagination state and cancels in-flight updates from the pager.",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/cancel()"
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/reset()"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination14AsyncPagerTypeP6cancelyyYaF",
+    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerC5resetyyF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -25,15 +31,11 @@
       },
       {
         "kind" : "identifier",
-        "text" : "cancel"
+        "text" : "reset"
       },
       {
         "kind" : "text",
-        "text" : "() "
-      },
-      {
-        "kind" : "keyword",
-        "text" : "async"
+        "text" : "()"
       }
     ],
     "modules" : [
@@ -41,11 +43,10 @@
         "name" : "ApolloPagination"
       }
     ],
-    "required" : true,
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
-    "title" : "cancel()"
+    "title" : "reset()"
   },
   "primaryContentSections" : [
     {
@@ -68,15 +69,11 @@
             },
             {
               "kind" : "identifier",
-              "text" : "cancel"
+              "text" : "reset"
             },
             {
               "kind" : "text",
-              "text" : "() "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "async"
+              "text" : "()"
             }
           ]
         }
@@ -95,7 +92,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollopagination\/asyncpagertype\/cancel()"
+        "\/documentation\/apollopagination\/graphqlquerypager\/reset()"
       ],
       "traits" : [
         {
@@ -117,14 +114,17 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/AsyncPagerType": {
+"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager": {
   "abstract" : [
-
+    {
+      "text" : "Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "protocol"
+      "text" : "class"
     },
     {
       "kind" : "text",
@@ -132,25 +132,28 @@
     },
     {
       "kind" : "identifier",
-      "text" : "AsyncPagerType"
+      "text" : "GraphQLQueryPager"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "AsyncPagerType"
+      "text" : "GraphQLQueryPager"
     }
   ],
   "role" : "symbol",
-  "title" : "AsyncPagerType",
+  "title" : "GraphQLQueryPager",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/asyncpagertype"
+  "url" : "\/documentation\/apollopagination\/graphqlquerypager"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/AsyncPagerType/cancel()": {
+"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/reset()": {
   "abstract" : [
-
+    {
+      "text" : "Resets pagination state and cancels in-flight updates from the pager.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -163,24 +166,19 @@
     },
     {
       "kind" : "identifier",
-      "text" : "cancel"
+      "text" : "reset"
     },
     {
       "kind" : "text",
-      "text" : "() "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "async"
+      "text" : "()"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/cancel()",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/reset()",
   "kind" : "symbol",
-  "required" : true,
   "role" : "symbol",
-  "title" : "cancel()",
+  "title" : "reset()",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/asyncpagertype\/cancel()"
+  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/reset()"
 }
 }
 }
