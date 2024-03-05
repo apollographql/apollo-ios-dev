@@ -5,7 +5,7 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloClientProtocol.perform(mutation:publishResultToStore:context:queue:resultHandler:)",
+      "code" : "ApolloClientProtocol.perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)",
       "type" : "codeVoice"
     },
     {
@@ -24,12 +24,12 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:publishResultToStore:context:queue:resultHandler:)"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)"
   },
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "Apollo",
-    "externalID" : "s:6Apollo0A6ClientC7perform8mutation20publishResultToStore7context5queue13resultHandlerAA11Cancellable_px_SbAA14RequestContext_pSgSo012OS_dispatch_J0Cys0F0OyAA13GraphQLResultVy4DataQzGs5Error_pGcSgt0A3API0R10QLMutationRzlF",
+    "externalID" : "s:6Apollo0A6ClientC7perform8mutation20publishResultToStore17contextIdentifier0I05queue13resultHandlerAA11Cancellable_px_Sb10Foundation4UUIDVSgAA14RequestContext_pSgSo012OS_dispatch_K0Cys0F0OyAA13GraphQLResultVy4DataQzGs5Error_pGcSgt0A3API0U10QLMutationRzlF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -87,6 +87,23 @@
       {
         "kind" : "text",
         "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "contextIdentifier"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:10Foundation4UUIDV",
+        "text" : "UUID"
+      },
+      {
+        "kind" : "text",
+        "text" : "?, "
       },
       {
         "kind" : "externalParam",
@@ -169,7 +186,7 @@
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
-    "title" : "perform(mutation:publishResultToStore:context:queue:resultHandler:)"
+    "title" : "perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)"
   },
   "primaryContentSections" : [
     {
@@ -246,6 +263,23 @@
             {
               "kind" : "text",
               "text" : " = true, "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "contextIdentifier"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:10Foundation4UUIDV",
+              "text" : "UUID"
+            },
+            {
+              "kind" : "text",
+              "text" : "? = nil, "
             },
             {
               "kind" : "externalParam",
@@ -364,7 +398,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:context:queue:resulthandler:)"
+        "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:contextidentifier:context:queue:resulthandler:)"
       ],
       "traits" : [
         {
@@ -450,7 +484,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclient\/apolloclientprotocol-implementations"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient/perform(mutation:publishResultToStore:context:queue:resultHandler:)": {
+"doc://Apollo/documentation/Apollo/ApolloClient/perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)": {
   "abstract" : [
 
   ],
@@ -511,6 +545,23 @@
     {
       "kind" : "text",
       "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "contextIdentifier"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation4UUIDV",
+      "text" : "UUID"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
     },
     {
       "kind" : "externalParam",
@@ -585,12 +636,12 @@
       "text" : "Cancellable"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:publishResultToStore:context:queue:resultHandler:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "perform(mutation:publishResultToStore:context:queue:resultHandler:)",
+  "title" : "perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:context:queue:resulthandler:)"
+  "url" : "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:contextidentifier:context:queue:resulthandler:)"
 },
 "doc://Apollo/documentation/Apollo/Cancellable": {
   "abstract" : [

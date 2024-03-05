@@ -144,8 +144,8 @@
                     "type" : "method"
                   },
                   {
-                    "path" : "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:context:queue:resulthandler:)",
-                    "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, context: RequestContext?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> Cancellable",
+                    "path" : "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:contextidentifier:context:queue:resulthandler:)",
+                    "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, contextIdentifier: UUID?, context: RequestContext?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> Cancellable",
                     "type" : "method"
                   },
                   {
@@ -1835,8 +1835,8 @@
                 "type" : "method"
               },
               {
-                "path" : "\/documentation\/apollo\/apolloclientprotocol\/perform(mutation:publishresulttostore:context:queue:resulthandler:)",
-                "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, context: RequestContext?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> Cancellable",
+                "path" : "\/documentation\/apollo\/apolloclientprotocol\/perform(mutation:publishresulttostore:contextidentifier:context:queue:resulthandler:)",
+                "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, contextIdentifier: UUID?, context: RequestContext?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> Cancellable",
                 "type" : "method"
               },
               {

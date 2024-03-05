@@ -15,11 +15,11 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/perform(mutation:publishResultToStore:context:queue:resultHandler:)"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A14ClientProtocolP7perform8mutation20publishResultToStore7context5queue13resultHandlerAA11Cancellable_pqd___SbAA14RequestContext_pSgSo012OS_dispatch_K0Cys0G0OyAA13GraphQLResultVy4DataQyd__Gs5Error_pGcSgt0A3API0S10QLMutationRd__lF",
+    "externalID" : "s:6Apollo0A14ClientProtocolP7perform8mutation20publishResultToStore17contextIdentifier0J05queue13resultHandlerAA11Cancellable_pqd___Sb10Foundation4UUIDVSgAA14RequestContext_pSgSo012OS_dispatch_L0Cys0G0OyAA13GraphQLResultVy4DataQyd__Gs5Error_pGcSgt0A3API0V10QLMutationRd__lF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -77,6 +77,23 @@
       {
         "kind" : "text",
         "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "contextIdentifier"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:10Foundation4UUIDV",
+        "text" : "UUID"
+      },
+      {
+        "kind" : "text",
+        "text" : "?, "
       },
       {
         "kind" : "externalParam",
@@ -160,7 +177,7 @@
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
-    "title" : "perform(mutation:publishResultToStore:context:queue:resultHandler:)"
+    "title" : "perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)"
   },
   "primaryContentSections" : [
     {
@@ -229,6 +246,23 @@
             {
               "kind" : "text",
               "text" : ", "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "contextIdentifier"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:10Foundation4UUIDV",
+              "text" : "UUID"
+            },
+            {
+              "kind" : "text",
+              "text" : "?, "
             },
             {
               "kind" : "externalParam",
@@ -387,6 +421,28 @@
             {
               "inlineContent" : [
                 {
+                  "text" : "[optional] A unique identifier for this request, to help with deduping cache hits for watchers. Should default to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "nil",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "contextIdentifier"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
                   "text" : "[optional] A context that is being passed through the request chain. Should default to ",
                   "type" : "text"
                 },
@@ -466,7 +522,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/apolloclientprotocol\/perform(mutation:publishresulttostore:context:queue:resulthandler:)"
+        "\/documentation\/apollo\/apolloclientprotocol\/perform(mutation:publishresulttostore:contextidentifier:context:queue:resulthandler:)"
       ],
       "traits" : [
         {
@@ -533,7 +589,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclientprotocol"
 },
-"doc://Apollo/documentation/Apollo/ApolloClientProtocol/perform(mutation:publishResultToStore:context:queue:resultHandler:)": {
+"doc://Apollo/documentation/Apollo/ApolloClientProtocol/perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)": {
   "abstract" : [
     {
       "text" : "Performs a mutation by sending it to the server.",
@@ -597,6 +653,23 @@
     {
       "kind" : "text",
       "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "contextIdentifier"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation4UUIDV",
+      "text" : "UUID"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
     },
     {
       "kind" : "externalParam",
@@ -671,13 +744,13 @@
       "text" : "Cancellable"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/perform(mutation:publishResultToStore:context:queue:resultHandler:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
-  "title" : "perform(mutation:publishResultToStore:context:queue:resultHandler:)",
+  "title" : "perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclientprotocol\/perform(mutation:publishresulttostore:context:queue:resulthandler:)"
+  "url" : "\/documentation\/apollo\/apolloclientprotocol\/perform(mutation:publishresulttostore:contextidentifier:context:queue:resulthandler:)"
 },
 "doc://Apollo/documentation/Apollo/Cancellable": {
   "abstract" : [
