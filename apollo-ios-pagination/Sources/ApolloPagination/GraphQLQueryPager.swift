@@ -77,8 +77,8 @@ public class GraphQLQueryPager<Model>: Publisher {
     PaginatedQuery: GraphQLQuery
   >(
     client: ApolloClientProtocol,
-    initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
+    initialQuery: InitialQuery,
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
   ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
