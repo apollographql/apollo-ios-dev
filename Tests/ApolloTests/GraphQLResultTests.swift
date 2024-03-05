@@ -2,28 +2,40 @@ import XCTest
 import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
-import StarWarsAPI
 
 final class GraphQLResultTests: XCTestCase {
 
-  override func setUpWithError() throws {
-    try super.setUpWithError()
+  // given
+  class Data: MockSelectionSet {
+    override class var __selections: [Selection] { [
+      .field("hero", Hero?.self)
+    ]}
+
+    public var hero: Hero? { __data["hero"] }
+
+    class Hero: MockSelectionSet {
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("name", String.self)
+      ]}
+
+      var name: String { __data["name"] }
+    }
   }
 
-  override func tearDownWithError() throws {
-    try super.tearDownWithError()
-  }
-  
   // MARK: JSON conversion tests
 
   func test__result__givenResponseWithData_convertsToJSON() throws {
+    // given
     let jsonObj: [String: AnyHashable] = [
       "hero": [
         "name": "Luke Skywalker",
         "__typename": "Human"
       ]
     ]
-    let heroData = try StarWarsAPI.HeroNameQuery.Data(data: jsonObj)
+
+    // when
+    let heroData = try Data(data: jsonObj)
     let result = GraphQLResult(
       data: heroData,
       extensions: nil,
@@ -31,7 +43,7 @@ final class GraphQLResultTests: XCTestCase {
       source: .server,
       dependentKeys: nil
     )
-    
+
     let expectedJSON: [String: Any] = [
       "data": [
         "hero": [
@@ -40,16 +52,20 @@ final class GraphQLResultTests: XCTestCase {
         ]
       ]
     ]
-    
+
+    // then
     let convertedJSON = result.asJSONDictionary()
     XCTAssertEqual(convertedJSON, expectedJSON)
   }
   
   func test__result__givenResponseWithNullData_convertsToJSON() throws {
+    // given
     let jsonObj: [String: AnyHashable] = [
       "hero": NSNull()
     ]
-    let heroData = try StarWarsAPI.HeroNameQuery.Data(data: jsonObj)
+
+    // when
+    let heroData = try Data(data: jsonObj)
     let result = GraphQLResult(
       data: heroData,
       extensions: nil,
@@ -57,18 +73,20 @@ final class GraphQLResultTests: XCTestCase {
       source: .server,
       dependentKeys: nil
     )
-    
+
     let expectedJSON: [String: Any] = [
       "data": [
         "hero": NSNull()
       ]
     ]
-    
+
+    // then
     let convertedJSON = result.asJSONDictionary()
     XCTAssertEqual(convertedJSON, expectedJSON)
   }
   
   func test__result__givenResponseWithErrors_convertsToJSON() throws {
+    // given
     let jsonObj: [String: AnyHashable] = [
       "message": "Sample error message",
       "locations": [
@@ -82,16 +100,17 @@ final class GraphQLResultTests: XCTestCase {
         "test": "extension"
       ]
     ]
-    
+
+    // when
     let error = GraphQLError(jsonObj)
-    let result = GraphQLResult<HeroNameQuery.Data>(
+    let result = GraphQLResult<Data>(
       data: nil,
       extensions: nil,
       errors: [error],
       source: .server,
       dependentKeys: nil
     )
-    
+
     let expectedJSON: [String: Any] = [
       "errors": [
         [
@@ -109,13 +128,10 @@ final class GraphQLResultTests: XCTestCase {
         ]
       ]
     ]
-    
+
+    // then
     let convertedJSON = result.asJSONDictionary()
     XCTAssertEqual(convertedJSON, expectedJSON)
   }
-
-  // MARK: Incremental merging tests
-
-  #warning("Need incremental merging tests here!")
 
 }
