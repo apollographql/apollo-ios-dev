@@ -177,7 +177,7 @@ public class GraphQLQueryPager<Model>: Publisher {
   }
 
   deinit {
-    pager.cancel()
+    pager.reset()
   }
 
   /// Subscribe to the results of the pager, with the management of the subscriber being stored internally to the `AnyGraphQLQueryPager`.
@@ -238,11 +238,9 @@ public class GraphQLQueryPager<Model>: Publisher {
     pager.fetch()
   }
 
-  /// Resets pagination state and cancels further updates from the pager.
-  public func cancel() {
-    pager.cancel()
-    _subject.send(completion: .finished)
-    cancellables.removeAll()
+  /// Resets pagination state and cancels in-flight updates from the pager.
+  public func reset() {
+    pager.reset()
   }
 
   public func receive<S>(
