@@ -2,15 +2,15 @@
 title: Multi-Query Pagination
 ---
 
-`GraphQLQueryPager` supports multi-query pagination. This means that you can use separate queries for fetching the initial page of data and for fetching subsequent pages of data. 
+`GraphQLQueryPager` supports multi-query pagination. This means that you can use separate queries for fetching the initial page of data and for fetching subsequent pages of data.
 
-In order to use multi-query pagination, you must configure the `GraphQLQueryPager` in order to support multiple queries. It is recommended to use an appropriate convenience `make` function to create the `GraphQLQueryPager` instance. The convenience `make` functions that support multi-query pagination will have both an `extractInitialPageInfo` and `extractNextPageInfo` function.
+In order to use multi-query pagination, you must configure the `GraphQLQueryPager` in order to support multiple queries. It is recommended to use an appropriate convenience initializer to create the `GraphQLQueryPager` instance. The initalizers that support multi-query pagination will have both an `extractInitialPageInfo` and `extractNextPageInfo` function.
 
-In the following example, we will use the `makeQueryPager` function to create a `GraphQLQueryPager` that uses forward cursor-based pagination.
+In the following example, we will initialize a `GraphQLQueryPager` that uses forward cursor-based pagination.
 
 ```swift
 let initialQuery = MyQuery(first: 10, after: nil)
-let pager = GraphQLQueryPager.makeQueryPager(
+let pager = GraphQLQueryPager(
     client: client,
     initialQuery: initialQuery,
     extractInitialPageInfo: { initialQueryData in
