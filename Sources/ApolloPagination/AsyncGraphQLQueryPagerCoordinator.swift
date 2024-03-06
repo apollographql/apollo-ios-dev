@@ -9,7 +9,7 @@ public protocol AsyncPagerType {
   associatedtype PaginatedQuery: GraphQLQuery
   var canLoadNext: Bool { get async }
   var canLoadPrevious: Bool { get async }
-  func cancel() async
+  func reset() async
   func loadPrevious(cachePolicy: CachePolicy) async throws
   func loadNext(cachePolicy: CachePolicy) async throws
   func loadAll(fetchFromInitialPage: Bool) async throws
@@ -71,7 +71,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   ///   - extractPageInfo: The `PageInfo` derived from `PageExtractionData`
   ///   - nextPageResolver: The resolver that can derive the query for loading more. This can be a different query than the `initialQuery`.
   ///   - onError: The callback when there is an error.
-  public init<P: PaginationInfo>(
+  init<P: PaginationInfo>(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
@@ -102,7 +102,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
 
   // MARK: - Public API
 
-  public func loadAll(fetchFromInitialPage: Bool = true) async throws {
+  func loadAll(fetchFromInitialPage: Bool = true) async throws {
     return try await withThrowingTaskGroup(of: Void.self) { group in
       taskGroup = group
       func appendJobs() {
@@ -120,7 +120,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
       // We begin by setting the initial state. The group needs some job to perform or it will perform nothing.
       if fetchFromInitialPage {
         // If we are fetching from an initial page, then we will want to reset state and then add a task for the initial load.
-        cancel()
+        reset()
         isLoadingAll = true
         group.addTask { [weak self] in
           await self?.fetch(cachePolicy: .fetchIgnoringCacheData)
@@ -150,7 +150,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
     }
   }
 
-  public func loadPrevious(
+  func loadPrevious(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData
   ) async throws {
     try await paginationFetch(direction: .previous, cachePolicy: cachePolicy)
@@ -161,13 +161,13 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   /// **NOTE**: Requires having already called `fetch` or `refetch` prior to this call.
   /// - Parameters:
   ///   - cachePolicy: Preferred cache policy for fetching subsequent pages. Defaults to `fetchIgnoringCacheData`.
-  public func loadNext(
+  func loadNext(
     cachePolicy: CachePolicy = .fetchIgnoringCacheData
   ) async throws {
     try await paginationFetch(direction: .next, cachePolicy: cachePolicy)
   }
 
-  public func subscribe(
+  func subscribe(
     onUpdate: @escaping (Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>) -> Void
   ) -> AnyCancellable {
     $currentValue.compactMap({ $0 })
@@ -183,19 +183,19 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
 
   /// Reloads all data, starting at the first query, resetting pagination state.
   /// - Parameter cachePolicy: Preferred cache policy for first-page fetches. Defaults to `returnCacheDataAndFetch`
-  public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) async {
+  func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) async {
     assert(firstPageWatcher != nil, "To create consistent product behaviors, calling `fetch` before calling `refetch` will use cached data while still refreshing.")
-    cancel()
+    reset()
     await fetch(cachePolicy: cachePolicy)
   }
 
-  public func fetch() async {
-    cancel()
+  func fetch() async {
+    reset()
     await fetch(cachePolicy: .returnCacheDataAndFetch)
   }
 
-  /// Cancel any in progress fetching operations and unsubscribe from the store.
-  public func cancel() {
+  /// Cancels any in-flight fetching operations and unsubscribes from the store.
+  func reset() {
     nextPageWatchers.forEach { $0.cancel() }
     nextPageWatchers = []
     firstPageWatcher?.cancel()
@@ -213,11 +213,11 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   }
 
   /// Whether or not we can load more information based on the current page.
-  public var canLoadNext: Bool {
+  var canLoadNext: Bool {
     nextPageInfo?.canLoadNext ?? false
   }
 
-  public var canLoadPrevious: Bool {
+  var canLoadPrevious: Bool {
     previousPageInfo?.canLoadPrevious ?? false
   }
 
