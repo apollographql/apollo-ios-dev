@@ -13,9 +13,15 @@ In this example, we take a `GraphQLQueryPager` that returns a `Result<Pagination
 ```swift
 // This `GraphQLQueryPager` will return a `Result` of `PaginationOutput<MyQuery.Data, MyQuery.Data>`
 let initialQuery = MyQuery(first: 10, after: nil)
-let pager = GraphQLQueryPager.makeQueryPager(
+let pager = GraphQLQueryPager(
     client: client,
     initialQuery: initialQuery,
+    extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+            hasNext: data.values.pageInfo.hasNextPage ?? false,
+            endCursor: data.values.pageInfo.endCursor
+        )
+    },
     pageResolver: { page, paginationDirection in
         switch paginationDirection {
         case .next:
@@ -23,12 +29,6 @@ let pager = GraphQLQueryPager.makeQueryPager(
         case .previous:
             return nil
         }
-    },
-    extractPageInfo: { data in
-        CursorBasedPagination.Forward(
-            hasNext: data.values.pageInfo.hasNextPage ?? false,
-            endCursor: data.values.pageInfo.endCursor
-        )
     }
 )
 
@@ -61,15 +61,21 @@ let cancellable = pager.map { result in
 
 The `GraphQLQueryPager` class can also be initialized with a custom type in mind. When used this way, the `GraphQLQueryPager` will operate over the custom response type, and not the raw `Data` type. This is useful when you want to create a pager that returns a custom response type, and you don't want to transform the raw response into a custom response type.
 
-We provide a convenience method for transforming collection types in this manner. 
+We provide a convenience method for transforming collection types in this manner.
 
 In this example, we create a `GraphQLQueryPager` that  transform the raw response into a custom response type of `Result<([Person], UpdateSource), Error>`. The `transform` closure will be called on the data from each paginated query and the resulting arrays will be concatenated together.
 
 ```swift
 let initialQuery = MyQuery(first: 10, after: nil)
-let pager = GraphQLQueryPager.makeQueryPager(
+let pager = GraphQLQueryPager(
     client: client,
     initialQuery: initialQuery,
+    extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+            hasNext: data.values.pageInfo.hasNextPage ?? false,
+            endCursor: data.values.pageInfo.endCursor
+        )
+    },
     pageResolver: { page, paginationDirection in
         // As we only want to support forward pagination, we can return `nil` for reverse pagination
         switch paginationDirection {
@@ -78,12 +84,6 @@ let pager = GraphQLQueryPager.makeQueryPager(
         case .previous:
             return nil
         }
-    },
-    extractPageInfo: { data in
-        CursorBasedPagination.Forward(
-            hasNext: data.values.pageInfo.hasNextPage ?? false,
-            endCursor: data.values.pageInfo.endCursor
-        )
     },
     transform: { data in
         data.values.nodes.compactMap { node in
@@ -97,9 +97,15 @@ Alternatively, you can also return a single model type, such as a `Result<(MyRes
 
 ```swift
 let initialQuery = MyQuery(first: 10, after: nil)
-let pager = GraphQLQueryPager.makeQueryPager(
+let pager = GraphQLQueryPager(
     client: client,
     initialQuery: initialQuery,
+    extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+            hasNext: data.values.pageInfo.hasNextPage ?? false,
+            endCursor: data.values.pageInfo.endCursor
+        )
+    },
     pageResolver: { page, paginationDirection in
         // As we only want to support forward pagination, we can return `nil` for reverse pagination
         switch paginationDirection {
@@ -108,12 +114,6 @@ let pager = GraphQLQueryPager.makeQueryPager(
         case .previous:
             return nil
         }
-    },
-    extractPageInfo: { data in
-        CursorBasedPagination.Forward(
-            hasNext: data.values.pageInfo.hasNextPage ?? false,
-            endCursor: data.values.pageInfo.endCursor
-        )
     },
     transform: { previousPages, initialPage, nextPages in
         let allPages = previousPages + [initialPage] + nextPages

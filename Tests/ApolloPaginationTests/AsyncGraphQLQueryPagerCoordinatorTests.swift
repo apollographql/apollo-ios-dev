@@ -91,7 +91,7 @@ final class AsyncGraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTe
   }
 
   @available(iOS 16.0, macOS 13.0, *)
-  func test_actor_canCancelMidflight() async throws {
+  func test_actor_canResetMidflight() async throws {
     server.customDelay = .milliseconds(150)
     let pager = createForwardPager()
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
@@ -106,14 +106,14 @@ final class AsyncGraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTe
 
     Task {
       try? await Task.sleep(for: .milliseconds(10))
-      await pager.cancel()
+      await pager.reset()
     }
 
     await fulfillment(of: [serverExpectation], timeout: 1.0)
   }
 
   @available(iOS 16.0, macOS 13.0, *)
-  func test_actor_cancellation_loadingState() async throws {
+  func test__reset__loadingState() async throws {
     server.customDelay = .milliseconds(150)
     let pager = createForwardPager()
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
@@ -128,7 +128,7 @@ final class AsyncGraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTe
 
     Task {
       try? await Task.sleep(for: .milliseconds(10))
-      await pager.cancel()
+      await pager.reset()
     }
 
     await fulfillment(of: [serverExpectation], timeout: 1.0)
@@ -139,7 +139,7 @@ final class AsyncGraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTe
   }
 
   @available(iOS 16.0, macOS 13.0, *)
-  func test_actor_cancellationState_midflight() async throws {
+  func test__reset__midflight_isFetching_isFalse() async throws {
     server.customDelay = .milliseconds(1)
     let pager = createForwardPager()
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
@@ -154,7 +154,7 @@ final class AsyncGraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTe
     let cancellationExpectation = expectation(description: "finished cancellation")
     Task {
       try? await Task.sleep(for: .milliseconds(50))
-      await pager.cancel()
+      await pager.reset()
       cancellationExpectation.fulfill()
     }
 

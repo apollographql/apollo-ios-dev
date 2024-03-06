@@ -13,15 +13,21 @@ Apollo Pagination provides two classes to interact with paginated endpoints: `Gr
 
 ## Using a `GraphQLQueryPager`
 
-The `GraphQLQueryPager` class is intended to be a simple, flexible, and powerful way to interact with paginated data. While it has a standard initializer, it is recommended to use the convenience initializers, which simplify the process of creating a `GraphQLQueryPager` instance. The convenience initializers are static methods on the `GraphQLQueryPager` class, prefixed with `make`.
+The `GraphQLQueryPager` class is intended to be a simple, flexible, and powerful way to interact with paginated data. While it has a standard initializer, it is recommended to use the convenience initializers, which simplify the process of creating a `GraphQLQueryPager` instance.
 
-For example, in order to initialize a `GraphQLQueryPager` that paginates a single query in the forward direction with a cursor-based pagination, you can use the `makeQueryPager` method:
+In this example, a `GraphQLQueryPager` is initialized that paginates a single query in the forward direction with a cursor-based pagination:
 
 ```swift
 let initialQuery = MyQuery(first: 10, after: nil)
 let pager = GraphQLQueryPager.makeQueryPager(
     client: client,
     initialQuery: initialQuery,
+    extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+            hasNext: data.values.pageInfo.hasNextPage ?? false,
+            endCursor: data.values.pageInfo.endCursor
+        )
+    },
     pageResolver: { page, paginationDirection in
         // As we only want to support forward pagination, we can return `nil` for reverse pagination
         switch paginationDirection {
@@ -30,17 +36,11 @@ let pager = GraphQLQueryPager.makeQueryPager(
         case .previous:
             return nil
         }
-    },
-    extractPageInfo: { data in
-        CursorBasedPagination.Forward(
-            hasNext: data.values.pageInfo.hasNextPage ?? false,
-            endCursor: data.values.pageInfo.endCursor
-        )
     }
 )
 ```
 
-In this example, the `GraphQLQueryPager` instance is initialized with a `pageResolver` closure that provides the pagination query to be executed, and an `extractPageInfo` closure that extracts the pagination information from the query result. The `GraphQLQueryPager` instance can then be used to fetch the paginated data, and to watch for changes to the paginated data.
+In this example, the `GraphQLQueryPager` instance is initialized with an `extractPageInfo` closure which extracts the pagination information from the query result and an  `pageResolver` closure, which provides the next pagination query to be executed. The `GraphQLQueryPager` instance can then be used to fetch the paginated data, and to watch for changes to the paginated data.
 
 Whenever the pager needs to load a new page, it will call the `extractPageInfo` closure, passing in the data returned from the last page queried. Your implementation of `extractPageInfo` should return a `PaginationInfo` value that can be used to query the next page. Then the pager calls `pageResolver`, passing in the `PaginationInfo` that was provided by the `extractPageInfo` closure. Your implementation of `pageResolver` should then return a query for the next page using the given `PaginationInfo`.
 
@@ -81,14 +81,14 @@ pager.sink { result in
 The `GraphQLQueryPager` class provides several methods to fetch paginated data: `fetch`, `refetch`, `loadNext`, `loadPrevious`, and `loadAll`.
 
 - `fetch`: Fetches the first page of data. Must be called before `loadNext` or `loadPrevious` can be called.
-- `refetch`: Cancels all ongoing fetch operations and resets the pager to its initial state. Fetches the first page of data.
+- `refetch`: Cancels all in-flight fetch operations and resets the pager to its initial state. Fetches the first page of data.
 - `loadNext`: Fetches the next page of data. Can only be called after `fetch` has been called.
 - `loadPrevious`: Fetches the previous page of data. Can only be called after `fetch` has been called.
 - `loadAll`: Fetches all pages of data. If no initial page is detected, it will first call `fetch` to fetch the first page of data. Will continue to fetch all pages until a `PageInfo` object indicates that there are no more pages to fetch. This function is compatible with forward, reverse, and bidirectional pagination.
 
 ## Cancelling ongoing requests
 
-The `GraphQLQueryPager` class provides a `cancel` method, which can be used to cancel any ongoing fetch operations as well as cease all subscriptions. Once cancelled, the pager's state is reset. Any subscriber that was subscribed to the pager will receive a termination signal, and will no longer receive updates. In order to resume fetching data, a new `GraphQLQueryPager` instance must be created.
+The `GraphQLQueryPager` class provides a `reset` method, which can be used to cancel all in-flight fetch operations and stop watching for changes to cached data. This does not cancel subscriber's to the pager. Once the pager's state is reset, you can call `fetch` to being receiving updates again and existing subscribers will continue to receive updates.
 
 ## Error handling
 

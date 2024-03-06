@@ -2,17 +2,23 @@
 title: Directional Pagination
 ---
 
-`GraphQLQueryPager` supports pagination in both the forward and reverse direction, as well as both at once. 
+`GraphQLQueryPager` supports pagination in both the forward and reverse direction, as well as both at once.
 
 ## Forward Pagination
 
-Forward pagination is the most common form of pagination. It is used to fetch the next `n` items in a list. We can use the convenience `make` functions to create a configured `GraphQLQueryPager`. While we have many options depending on our requirements -- whether we use one query or two, whether we want to use a cursor or an offset, whether we want to transform the results, etc. -- we will examine using a cursor with a single query.
+Forward pagination is the most common form of pagination. It is used to fetch the next `n` items in a list. While we have many options depending on our requirements -- whether we use one query or two, whether we want to use a cursor or an offset, whether we want to transform the results, etc. -- we will examine using a cursor with a single query.
 
 ```swift
 let initialQuery = MyQuery(first: 10, after: nil)
-let pager = GraphQLQueryPager.makeQueryPager(
+let pager = GraphQLQueryPager(
     client: client,
     initialQuery: initialQuery,
+    extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+            hasNext: data.values.pageInfo.hasNextPage ?? false,
+            endCursor: data.values.pageInfo.endCursor
+        )
+    },
     pageResolver: { page, paginationDirection in
         // As we only want to support forward pagination, we can return `nil` for reverse pagination
         switch paginationDirection {
@@ -21,25 +27,25 @@ let pager = GraphQLQueryPager.makeQueryPager(
         case .previous:
             return nil
         }
-    },
-    extractPageInfo: { data in
-        CursorBasedPagination.Forward(
-            hasNext: data.values.pageInfo.hasNextPage ?? false,
-            endCursor: data.values.pageInfo.endCursor
-        )
     }
 )
 ```
 
 ## Reverse Pagination
 
-Reverse pagination is used to fetch the previous `n` items in a list. We can use the convenience `make` functions to create a configured `GraphQLQueryPager`. While we have many options depending on our requirements -- whether we use one query or two, whether we want to use a cursor or an offset, whether we want to transform the results, etc. -- we will examine using a cursor with a single query.
+Reverse pagination is used to fetch the previous `n` items in a list. While we have many options depending on our requirements -- whether we use one query or two, whether we want to use a cursor or an offset, whether we want to transform the results, etc. -- we will examine using a cursor with a single query.
 
 ```swift
 let initialQuery = MyQuery(first: 10, after: nil)
-let pager = GraphQLQueryPager.makeQueryPager(
+let pager = GraphQLQueryPager(
     client: client,
     initialQuery: initialQuery,
+    extractPageInfo: { data in
+        CursorBasedPagination.Reverse(
+            hasNext: data.values.pageInfo.hasPrevious ?? false,
+            endCursor: data.values.pageInfo.startCursor
+        )
+    },
     pageResolver: { page, paginationDirection in
         // As we only want to support reverse pagination, we can return `nil` for forward pagination
         switch paginationDirection {
@@ -48,32 +54,18 @@ let pager = GraphQLQueryPager.makeQueryPager(
         case .previous:
             return MyQuery(first: 10, before: page.startCursor ?? .none)
         }
-    },
-    extractPageInfo: { data in
-        CursorBasedPagination.Reverse(
-            hasNext: data.values.pageInfo.hasPrevious ?? false,
-            endCursor: data.values.pageInfo.startCursor
-        )
     }
 )
 ```
 
 ## Bi-directional Pagination
 
-Bi-directional pagination is used to fetch the next `n` items in a list, as well as the previous `n` items in a list. Given that we can fetch in both directions, the implication is that the initial query fetched is at neither the head nor tail of the list of results. We can use the convenience `make` functions to create a configured `GraphQLQueryPager`. For this example, we will examine using a cursor with a single query.
+Bi-directional pagination is used to fetch the next `n` items in a list, as well as the previous `n` items in a list. Given that we can fetch in both directions, the implication is that the initial query fetched is at neither the head nor tail of the list of results. For this example, we will examine using a cursor with a single query.
 
 ```swift
-let pager = GraphQLQueryPager.makeQueryPager(
+let pager = GraphQLQueryPager(
     client: client,
     initialQuery: MyQuery(first: 10, after: nil),
-    pageResolver: { page, direction in
-        switch direction {
-        case .next:
-            return MyQuery(first: 10, after: page?.endCursor ?? .none)
-        case .previous:
-            return MyQuery(first: 10, before: page?.startCursor ?? .none)
-        }
-    },
     extractPageInfo: { data in
         CursorBasedPagination.Bidirectional(
             hasNext: data.values.pageInfo.hasNextPage ?? false,
@@ -81,13 +73,21 @@ let pager = GraphQLQueryPager.makeQueryPager(
             hasPrevious: data.values.pageInfo.hasPreviousPage ?? false,
             startCursor: data.values.pageInfo.startCursor
         )
+    },
+    pageResolver: { page, direction in
+        switch direction {
+        case .next:
+            return MyQuery(first: 10, after: page?.endCursor ?? .none)
+        case .previous:
+            return MyQuery(first: 10, before: page?.startCursor ?? .none)
+        }
     }
 )
 ```
 
 ## Custom Configuration
 
-Generally, it's recommended to use a convenience `make` function to create a configured `GraphQLQueryPager`. However, if you need to customize the configuration, you can use the `init` method directly. If your application only uses a specific type of pagination, it is simple to declare a custom `GraphQLQueryPager` convenience initializer that can be used throughout your application. This allows you to easily instantiate a pager without worrying about cases that your application does not support. If your pagination scheme only supports forward pagination and offsets, you can declare a custom `GraphQLQueryPager` convenience initializer that only supports forward pagination and offsets. In this example, we declare two initializers for forward offset pagination: one with a `transform`, and one without:
+Generally, it's recommended to use a convenience initializer to create a configured `GraphQLQueryPager`. However, if you need to customize the configuration, you can use the `init` method directly. If your application only uses a specific type of pagination, it is simple to declare a custom `GraphQLQueryPager` convenience initializer that can be used throughout your application. This allows you to easily instantiate a pager without worrying about cases that your application does not support. If your pagination scheme only supports forward pagination and offsets, you can declare a custom `GraphQLQueryPager` convenience initializer that only supports forward pagination and offsets. In this example, we declare two initializers for forward offset pagination -- one with a `transform`, and one without:
 
 ```swift
 extension GraphQLQueryPager {

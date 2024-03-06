@@ -97,12 +97,12 @@
     },
     {
       "identifiers" : [
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/cancel()",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/fetch()",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/loadAll(fetchFromInitialPage:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/loadNext(cachePolicy:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/loadPrevious(cachePolicy:)",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/refetch(cachePolicy:)"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/refetch(cachePolicy:)",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/reset()"
       ],
       "title" : "Instance Methods"
     }
@@ -302,40 +302,6 @@
   "title" : "canLoadPrevious",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/asyncpagertype\/canloadprevious"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/AsyncPagerType/cancel()": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "cancel"
-    },
-    {
-      "kind" : "text",
-      "text" : "() "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "async"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/cancel()",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "cancel()",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/asyncpagertype\/cancel()"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/AsyncPagerType/fetch()": {
   "abstract" : [
@@ -598,6 +564,40 @@
   "title" : "refetch(cachePolicy:)",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/asyncpagertype\/refetch(cachepolicy:)"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/AsyncPagerType/reset()": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "reset"
+    },
+    {
+      "kind" : "text",
+      "text" : "() "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/reset()",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "reset()",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/asyncpagertype\/reset()"
 }
 }
 }

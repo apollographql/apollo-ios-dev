@@ -253,6 +253,46 @@
             }
           ],
           "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "inlineContent" : [
+                {
+                  "identifier" : "\/documentation\/apollopagination",
+                  "isActive" : true,
+                  "type" : "reference"
+                }
+              ],
+              "type" : "strong"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A library that provides support for fetching and watching paginated queries with ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "\/documentation\/apollo",
+              "isActive" : true,
+              "overridingTitleInlineContent" : [
+                {
+                  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo",
+                  "isActive" : true,
+                  "type" : "reference"
+                }
+              ],
+              "type" : "reference"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
         }
       ],
       "kind" : "content"
@@ -327,6 +367,18 @@
   ],
   "type" : "link",
   "url" : "\/documentation\/apollocodegenlib"
+},
+"/documentation/apollopagination": {
+  "identifier" : "\/documentation\/apollopagination",
+  "title" : "ApolloPagination",
+  "titleInlineContent" : [
+    {
+      "text" : "ApolloPagination",
+      "type" : "text"
+    }
+  ],
+  "type" : "link",
+  "url" : "\/documentation\/apollopagination"
 },
 "/documentation/apollosqlite": {
   "identifier" : "\/documentation\/apollosqlite",
