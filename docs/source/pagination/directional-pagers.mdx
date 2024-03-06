@@ -87,7 +87,7 @@ let pager = GraphQLQueryPager(
 
 ## Custom Configuration
 
-Generally, it's recommended to use a convenience initializers to create a configured `GraphQLQueryPager`. However, if you need to customize the configuration, you can use the `init` method directly. If your application only uses a specific type of pagination, it is simple to declare a custom `GraphQLQueryPager` convenience initializer that can be used throughout your application. This allows you to easily instantiate a pager without worrying about cases that your application does not support. If your pagination scheme only supports forward pagination and offsets, you can declare a custom `GraphQLQueryPager` convenience initializer that only supports forward pagination and offsets. In this example, we declare two initializers for forward offset pagination -- one with a `transform`, and one without:
+Generally, it's recommended to use a convenience initializer to create a configured `GraphQLQueryPager`. However, if you need to customize the configuration, you can use the `init` method directly. If your application only uses a specific type of pagination, it is simple to declare a custom `GraphQLQueryPager` convenience initializer that can be used throughout your application. This allows you to easily instantiate a pager without worrying about cases that your application does not support. If your pagination scheme only supports forward pagination and offsets, you can declare a custom `GraphQLQueryPager` convenience initializer that only supports forward pagination and offsets. In this example, we declare two initializers for forward offset pagination -- one with a `transform`, and one without:
 
 ```swift
 extension GraphQLQueryPager {
