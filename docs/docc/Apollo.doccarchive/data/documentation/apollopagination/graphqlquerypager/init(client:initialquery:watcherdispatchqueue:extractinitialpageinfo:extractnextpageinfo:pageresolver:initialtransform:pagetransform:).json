@@ -1,7 +1,15 @@
 {
   "abstract" : [
     {
-      "text" : "Convenience function for creating a multi-query pager that transforms output responses into collections",
+      "text" : "Convenience initializer for creating a multi-query pager that",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "transforms output responses into collections",
       "type" : "text"
     }
   ],
@@ -15,24 +23,16 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/makeQueryPager(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:initialTransform:pageTransform:)"
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/init(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:initialTransform:pageTransform:)"
   },
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "ApolloPagination",
-    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerC09makeQueryE06client07initialG020watcherDispatchQueue22extractInitialPageInfo0m4NextoP012pageResolver0I9Transform0rT0ACyxG0A00A14ClientProtocol_p_qd__So17OS_dispatch_queueCqd_2_4DataQyd__cqd_2_ARQyd_0_cqd_0_Sgqd_2__AA0B9DirectionOtcxASKcxATKctSmRz0A3API0cD0Rd__AxYRd_0_7ElementQzRsd_1_AA0bP0Rd_2_r2_lFZ",
+    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerC6client12initialQuery20watcherDispatchQueue22extractInitialPageInfo0l4NextnO012pageResolver0G9Transform0qS0ACyxG0A00A14ClientProtocol_p_qd__So17OS_dispatch_queueCqd_2_4DataQyd__cqd_2_AQQyd_0_cqd_0_Sgqd_2__AA0B9DirectionOtcxARKcxASKctcSmRz0A3API0cD0Rd__AwXRd_0_7ElementQzRsd_1_AA0bO0Rd_2_r2_lufc",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "static"
-      },
-      {
-        "kind" : "text",
-        "text" : " "
-      },
-      {
-        "kind" : "keyword",
-        "text" : "func"
+        "text" : "convenience"
       },
       {
         "kind" : "text",
@@ -40,7 +40,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "makeQueryPager"
+        "text" : "init"
       },
       {
         "kind" : "text",
@@ -303,24 +303,7 @@
       },
       {
         "kind" : "text",
-        "text" : ") -> "
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:16ApolloPagination17GraphQLQueryPagerC",
-        "text" : "GraphQLQueryPager"
-      },
-      {
-        "kind" : "text",
-        "text" : "<"
-      },
-      {
-        "kind" : "typeIdentifier",
-        "text" : "Model"
-      },
-      {
-        "kind" : "text",
-        "text" : ">"
+        "text" : ")"
       }
     ],
     "modules" : [
@@ -329,9 +312,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Type Method",
-    "symbolKind" : "method",
-    "title" : "makeQueryPager(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:initialTransform:pageTransform:)"
+    "roleHeading" : "Initializer",
+    "symbolKind" : "init",
+    "title" : "init(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:initialTransform:pageTransform:)"
   },
   "primaryContentSections" : [
     {
@@ -346,7 +329,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "static"
+              "text" : "convenience"
             },
             {
               "kind" : "text",
@@ -354,15 +337,7 @@
             },
             {
               "kind" : "keyword",
-              "text" : "func"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "identifier",
-              "text" : "makeQueryPager"
+              "text" : "init"
             },
             {
               "kind" : "text",
@@ -666,25 +641,7 @@
             },
             {
               "kind" : "text",
-              "text" : ") -> "
-            },
-            {
-              "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager",
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:16ApolloPagination17GraphQLQueryPagerC",
-              "text" : "GraphQLQueryPager"
-            },
-            {
-              "kind" : "text",
-              "text" : "<"
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Model"
-            },
-            {
-              "kind" : "text",
-              "text" : "> "
+              "text" : ") "
             },
             {
               "kind" : "keyword",
@@ -800,7 +757,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollopagination\/graphqlquerypager\/makequerypager(client:initialquery:watcherdispatchqueue:extractinitialpageinfo:extractnextpageinfo:pageresolver:initialtransform:pagetransform:)"
+        "\/documentation\/apollopagination\/graphqlquerypager\/init(client:initialquery:watcherdispatchqueue:extractinitialpageinfo:extractnextpageinfo:pageresolver:initialtransform:pagetransform:)"
       ],
       "traits" : [
         {
@@ -856,25 +813,25 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/graphqlquerypager"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/makeQueryPager(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:initialTransform:pageTransform:)": {
+"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/init(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:initialTransform:pageTransform:)": {
   "abstract" : [
     {
-      "text" : "Convenience function for creating a multi-query pager that transforms output responses into collections",
+      "text" : "Convenience initializer for creating a multi-query pager that",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "transforms output responses into collections",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "func"
+      "text" : "convenience"
     },
     {
       "kind" : "text",
@@ -882,7 +839,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "makeQueryPager"
+      "text" : "init"
     },
     {
       "kind" : "text",
@@ -1145,32 +1102,15 @@
     },
     {
       "kind" : "text",
-      "text" : ") -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:16ApolloPagination17GraphQLQueryPagerC",
-      "text" : "GraphQLQueryPager"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Model"
-    },
-    {
-      "kind" : "text",
-      "text" : ">"
+      "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/makeQueryPager(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:initialTransform:pageTransform:)",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/init(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:initialTransform:pageTransform:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "makeQueryPager(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:initialTransform:pageTransform:)",
+  "title" : "init(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:initialTransform:pageTransform:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/makequerypager(client:initialquery:watcherdispatchqueue:extractinitialpageinfo:extractnextpageinfo:pageresolver:initialtransform:pagetransform:)"
+  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/init(client:initialquery:watcherdispatchqueue:extractinitialpageinfo:extractnextpageinfo:pageresolver:initialtransform:pagetransform:)"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/PaginationDirection": {
   "abstract" : [

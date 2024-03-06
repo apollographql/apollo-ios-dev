@@ -1,25 +1,19 @@
 {
-  "abstract" : [
-    {
-      "text" : "Resets pagination state and cancels further updates from the pager.",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/cancel()"
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/reset()"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerC6cancelyyF",
+    "externalID" : "s:16ApolloPagination9PagerTypeP5resetyyF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -31,7 +25,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "cancel"
+        "text" : "reset"
       },
       {
         "kind" : "text",
@@ -43,10 +37,11 @@
         "name" : "ApolloPagination"
       }
     ],
+    "required" : true,
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
-    "title" : "cancel()"
+    "title" : "reset()"
   },
   "primaryContentSections" : [
     {
@@ -69,7 +64,7 @@
             },
             {
               "kind" : "identifier",
-              "text" : "cancel"
+              "text" : "reset"
             },
             {
               "kind" : "text",
@@ -92,7 +87,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollopagination\/graphqlquerypager\/cancel()"
+        "\/documentation\/apollopagination\/pagertype\/reset()"
       ],
       "traits" : [
         {
@@ -114,17 +109,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager": {
+"doc://ApolloPagination/documentation/ApolloPagination/PagerType": {
   "abstract" : [
-    {
-      "text" : "Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "protocol"
     },
     {
       "kind" : "text",
@@ -132,28 +124,25 @@
     },
     {
       "kind" : "identifier",
-      "text" : "GraphQLQueryPager"
+      "text" : "PagerType"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "GraphQLQueryPager"
+      "text" : "PagerType"
     }
   ],
   "role" : "symbol",
-  "title" : "GraphQLQueryPager",
+  "title" : "PagerType",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager"
+  "url" : "\/documentation\/apollopagination\/pagertype"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/cancel()": {
+"doc://ApolloPagination/documentation/ApolloPagination/PagerType/reset()": {
   "abstract" : [
-    {
-      "text" : "Resets pagination state and cancels further updates from the pager.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
@@ -166,19 +155,20 @@
     },
     {
       "kind" : "identifier",
-      "text" : "cancel"
+      "text" : "reset"
     },
     {
       "kind" : "text",
       "text" : "()"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/cancel()",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/reset()",
   "kind" : "symbol",
+  "required" : true,
   "role" : "symbol",
-  "title" : "cancel()",
+  "title" : "reset()",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/cancel()"
+  "url" : "\/documentation\/apollopagination\/pagertype\/reset()"
 }
 }
 }

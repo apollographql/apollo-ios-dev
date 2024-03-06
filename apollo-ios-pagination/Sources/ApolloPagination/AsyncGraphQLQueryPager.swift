@@ -234,11 +234,9 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     await pager.fetch()
   }
 
-  /// Resets pagination state and cancels further updates from the pager.
-  public func cancel() async {
-    await pager.cancel()
-    _subject.send(completion: .finished)
-    cancellables.removeAll()
+  /// Resets pagination state and cancels in-flight updates from the pager.
+  public func reset() async {
+    await pager.reset()    
   }
 
   public func receive<S>(
