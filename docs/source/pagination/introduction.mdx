@@ -88,7 +88,7 @@ The `GraphQLQueryPager` class provides several methods to fetch paginated data: 
 
 ## Cancelling ongoing requests
 
-The `GraphQLQueryPager` class provides a `reset` method, which can be used to cancel all in-flight fetch operations and stop watching for changes. Once the pager's state is reset, you can call `fetch` to being receiving updates again.
+The `GraphQLQueryPager` class provides a `reset` method, which can be used to cancel all in-flight fetch operations and stop watching for changes to cached data. This does not cancel subscriber's to the pager. Once the pager's state is reset, you can call `fetch` to being receiving updates again and existing subscribers will continue to receive updates.
 
 ## Error handling
 
