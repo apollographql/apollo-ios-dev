@@ -41,6 +41,10 @@ This repo provides an API way to handle paginated queries for Apollo iOS.
 - Forward, Reverse, and Bi-directional pagination
 - Cursor-based, offset-based, and custom pagination mechanisms  
 
+## Documentation
+
+Documentation can be found in [Pagination](https://www.apollographql.com/docs/ios/pagination/introduction/) on Apollo's documentation website.
+
 ## Issues
 
 To report an issue, bug, or feature request you can do so in the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repo.
