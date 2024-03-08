@@ -517,6 +517,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI14InlineFragmentP14RootEntityTypeQa",
       "text" : "RootEntityType"
     }
   ],

@@ -85,7 +85,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : ": (any "
       },
       {
         "kind" : "typeIdentifier",
@@ -94,7 +94,7 @@
       },
       {
         "kind" : "text",
-        "text" : "?) "
+        "text" : ")?) "
       },
       {
         "kind" : "keyword",
@@ -203,7 +203,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": "
+              "text" : ": (any "
             },
             {
               "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/NetworkSession",
@@ -213,7 +213,7 @@
             },
             {
               "kind" : "text",
-              "text" : "? = nil) "
+              "text" : ")? = nil) "
             },
             {
               "kind" : "keyword",
@@ -559,7 +559,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -568,7 +568,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?) "
+      "text" : ")?) "
     },
     {
       "kind" : "keyword",

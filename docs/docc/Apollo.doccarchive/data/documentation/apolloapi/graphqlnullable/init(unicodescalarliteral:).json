@@ -89,6 +89,7 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:s33ExpressibleByUnicodeScalarLiteralP0cdE4TypeQa",
         "text" : "UnicodeScalarLiteralType"
       },
       {
@@ -151,6 +152,7 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s33ExpressibleByUnicodeScalarLiteralP0cdE4TypeQa",
               "text" : "UnicodeScalarLiteralType"
             },
             {
@@ -361,6 +363,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s33ExpressibleByUnicodeScalarLiteralP0cdE4TypeQa",
       "text" : "UnicodeScalarLiteralType"
     },
     {

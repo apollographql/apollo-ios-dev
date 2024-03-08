@@ -89,6 +89,7 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:7Combine9SchedulerP0B7OptionsQa",
         "text" : "SchedulerOptions"
       },
       {
@@ -250,6 +251,7 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:7Combine9SchedulerP0B7OptionsQa",
               "text" : "SchedulerOptions"
             },
             {
@@ -458,6 +460,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:7Combine9SchedulerP0B7OptionsQa",
       "text" : "SchedulerOptions"
     },
     {

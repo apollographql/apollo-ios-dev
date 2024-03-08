@@ -179,7 +179,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : ": (any "
       },
       {
         "kind" : "typeIdentifier",
@@ -188,7 +188,7 @@
       },
       {
         "kind" : "text",
-        "text" : "?)"
+        "text" : ")?)"
       }
     ],
     "modules" : [
@@ -371,7 +371,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": "
+              "text" : ": (any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestContext",
@@ -381,7 +381,7 @@
             },
             {
               "kind" : "text",
-              "text" : "? = nil)"
+              "text" : ")? = nil)"
             }
           ]
         }
@@ -846,7 +846,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -855,7 +855,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?)"
+      "text" : ")?)"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest\/init(graphQLEndpoint:operation:contextIdentifier:contentType:clientName:clientVersion:additionalHeaders:cachePolicy:context:)",

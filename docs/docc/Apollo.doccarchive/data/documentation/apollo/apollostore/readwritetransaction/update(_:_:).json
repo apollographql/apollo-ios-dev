@@ -66,6 +66,7 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:9ApolloAPI18LocalCacheMutationP4DataQa",
         "text" : "Data"
       },
       {
@@ -197,6 +198,7 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI18LocalCacheMutationP4DataQa",
               "text" : "Data"
             },
             {
@@ -419,6 +421,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI18LocalCacheMutationP4DataQa",
       "text" : "Data"
     },
     {
