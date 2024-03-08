@@ -28,6 +28,7 @@ public final class MockURLSessionClient: URLSessionClient {
   }
 
   public override func sendRequest(_ request: URLRequest,
+                                   taskDescription: String? = nil,
                                    rawTaskCompletionHandler: URLSessionClient.RawCompletion? = nil,
                                    completion: @escaping URLSessionClient.Completion) -> URLSessionTask {
     self.$lastRequest.mutate { $0 = request }
