@@ -15,11 +15,11 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/sendRequest(_:rawTaskCompletionHandler:completion:)"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/sendRequest(_:taskDescription:rawTaskCompletionHandler:completion:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo16URLSessionClientC11sendRequest_24rawTaskCompletionHandler10completionSo012NSURLSessionG0C10Foundation10URLRequestV_yAI4DataVSg_So17NSHTTPURLResponseCSgs5Error_pSgtcSgys6ResultOyAM_APtsAR_pGctF",
+    "externalID" : "s:6Apollo16URLSessionClientC11sendRequest_15taskDescription24rawTaskCompletionHandler10completionSo012NSURLSessionI0C10Foundation10URLRequestV_SSSgyAJ4DataVSg_So17NSHTTPURLResponseCSgs5Error_pSgtcSgys6ResultOyAO_ARtsAT_pGctF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -45,6 +45,23 @@
       {
         "kind" : "text",
         "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "taskDescription"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
+      },
+      {
+        "kind" : "text",
+        "text" : "?, "
       },
       {
         "kind" : "externalParam",
@@ -112,7 +129,7 @@
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
-    "title" : "sendRequest(_:rawTaskCompletionHandler:completion:)"
+    "title" : "sendRequest(_:taskDescription:rawTaskCompletionHandler:completion:)"
   },
   "primaryContentSections" : [
     {
@@ -173,6 +190,23 @@
             {
               "kind" : "text",
               "text" : ", "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "taskDescription"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
+            },
+            {
+              "kind" : "text",
+              "text" : "? = nil, "
             },
             {
               "kind" : "externalParam",
@@ -270,6 +304,28 @@
             {
               "inlineContent" : [
                 {
+                  "text" : "[optional] A description to add to the ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "URLSessionTask",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " for debugging purposes.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "taskDescription"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
                   "text" : "[optional] A completion handler to call once the raw task is done, so if an Error requires access to the headers, the user can still access these.",
                   "type" : "text"
                 }
@@ -335,7 +391,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/urlsessionclient\/sendrequest(_:rawtaskcompletionhandler:completion:)"
+        "\/documentation\/apollo\/urlsessionclient\/sendrequest(_:taskdescription:rawtaskcompletionhandler:completion:)"
       ],
       "traits" : [
         {
@@ -502,7 +558,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/urlsessionclient\/rawcompletion"
 },
-"doc://Apollo/documentation/Apollo/URLSessionClient/sendRequest(_:rawTaskCompletionHandler:completion:)": {
+"doc://Apollo/documentation/Apollo/URLSessionClient/sendRequest(_:taskDescription:rawTaskCompletionHandler:completion:)": {
   "abstract" : [
     {
       "text" : "The main method to perform a request.",
@@ -534,6 +590,23 @@
     {
       "kind" : "text",
       "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "taskDescription"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
     },
     {
       "kind" : "externalParam",
@@ -593,12 +666,12 @@
       "text" : "URLSessionTask"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/sendRequest(_:rawTaskCompletionHandler:completion:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/sendRequest(_:taskDescription:rawTaskCompletionHandler:completion:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "sendRequest(_:rawTaskCompletionHandler:completion:)",
+  "title" : "sendRequest(_:taskDescription:rawTaskCompletionHandler:completion:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/urlsessionclient\/sendrequest(_:rawtaskcompletionhandler:completion:)"
+  "url" : "\/documentation\/apollo\/urlsessionclient\/sendrequest(_:taskdescription:rawtaskcompletionhandler:completion:)"
 }
 }
 }

@@ -15,11 +15,11 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/init(sessionConfiguration:callbackQueue:)"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/init(sessionConfiguration:callbackQueue:sessionDescription:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo16URLSessionClientC20sessionConfiguration13callbackQueueACSo012NSURLSessionE0C_So011NSOperationG0CSgtcfc",
+    "externalID" : "s:6Apollo16URLSessionClientC20sessionConfiguration13callbackQueue0D11DescriptionACSo012NSURLSessionE0C_So011NSOperationG0CSgSSSgtcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -61,6 +61,23 @@
       },
       {
         "kind" : "text",
+        "text" : "?, "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "sessionDescription"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
+      },
+      {
+        "kind" : "text",
         "text" : "?)"
       }
     ],
@@ -72,7 +89,7 @@
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",
-    "title" : "init(sessionConfiguration:callbackQueue:)"
+    "title" : "init(sessionConfiguration:callbackQueue:sessionDescription:)"
   },
   "primaryContentSections" : [
     {
@@ -125,7 +142,24 @@
             },
             {
               "kind" : "text",
-              "text" : "? = .main)"
+              "text" : "? = .main, "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "sessionDescription"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
+            },
+            {
+              "kind" : "text",
+              "text" : "? = nil)"
             }
           ]
         }
@@ -186,6 +220,20 @@
             }
           ],
           "name" : "callbackQueue"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "[optional] A human-readable string that you can use for debugging purposes.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "sessionDescription"
         }
       ]
     }
@@ -201,7 +249,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/urlsessionclient\/init(sessionconfiguration:callbackqueue:)"
+        "\/documentation\/apollo\/urlsessionclient\/init(sessionconfiguration:callbackqueue:sessiondescription:)"
       ],
       "traits" : [
         {
@@ -268,7 +316,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/urlsessionclient"
 },
-"doc://Apollo/documentation/Apollo/URLSessionClient/init(sessionConfiguration:callbackQueue:)": {
+"doc://Apollo/documentation/Apollo/URLSessionClient/init(sessionConfiguration:callbackQueue:sessionDescription:)": {
   "abstract" : [
     {
       "text" : "Designated initializer.",
@@ -316,15 +364,32 @@
     },
     {
       "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "sessionDescription"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
       "text" : "?)"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/init(sessionConfiguration:callbackQueue:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/init(sessionConfiguration:callbackQueue:sessionDescription:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(sessionConfiguration:callbackQueue:)",
+  "title" : "init(sessionConfiguration:callbackQueue:sessionDescription:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/urlsessionclient\/init(sessionconfiguration:callbackqueue:)"
+  "url" : "\/documentation\/apollo\/urlsessionclient\/init(sessionconfiguration:callbackqueue:sessiondescription:)"
 }
 }
 }

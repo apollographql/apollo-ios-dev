@@ -89,6 +89,7 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:s30ExpressibleByDictionaryLiteralP3KeyQa",
         "text" : "Key"
       },
       {
@@ -105,6 +106,7 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:s30ExpressibleByDictionaryLiteralP5ValueQa",
         "text" : "Value"
       },
       {
@@ -167,6 +169,7 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s30ExpressibleByDictionaryLiteralP3KeyQa",
               "text" : "Key"
             },
             {
@@ -183,6 +186,7 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s30ExpressibleByDictionaryLiteralP5ValueQa",
               "text" : "Value"
             },
             {
@@ -393,6 +397,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s30ExpressibleByDictionaryLiteralP3KeyQa",
       "text" : "Key"
     },
     {
@@ -409,6 +414,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s30ExpressibleByDictionaryLiteralP5ValueQa",
       "text" : "Value"
     },
     {

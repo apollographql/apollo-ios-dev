@@ -75,7 +75,7 @@
       },
       {
         "kind" : "text",
-        "text" : ") -> "
+        "text" : ") -> (any "
       },
       {
         "kind" : "typeIdentifier",
@@ -84,7 +84,7 @@
       },
       {
         "kind" : "text",
-        "text" : "?"
+        "text" : ")?"
       }
     ],
     "modules" : [
@@ -155,7 +155,7 @@
             },
             {
               "kind" : "text",
-              "text" : ") -> "
+              "text" : ") -> (any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloErrorInterceptor",
@@ -165,7 +165,7 @@
             },
             {
               "kind" : "text",
-              "text" : "? "
+              "text" : ")? "
             },
             {
               "kind" : "keyword",
@@ -372,7 +372,7 @@
     },
     {
       "kind" : "text",
-      "text" : ") -> "
+      "text" : ") -> (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -381,7 +381,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?"
+      "text" : ")?"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider\/additionalErrorInterceptor(for:)-4nida",
@@ -435,7 +435,7 @@
     },
     {
       "kind" : "text",
-      "text" : ") -> "
+      "text" : ") -> (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -444,7 +444,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?"
+      "text" : ")?"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider\/additionalErrorInterceptor(for:)-5p7fr",
