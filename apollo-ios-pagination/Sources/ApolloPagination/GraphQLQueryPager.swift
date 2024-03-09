@@ -229,13 +229,20 @@ public class GraphQLQueryPager<Model>: Publisher {
 
   /// Discards pagination state and fetches the first page from scratch.
   /// - Parameter cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `fetchIgnoringCacheData`.
-  public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
-    pager.refetch(cachePolicy: cachePolicy)
+  public func refetch(
+    cachePolicy: CachePolicy = .fetchIgnoringCacheData,
+    callbackQueue: DispatchQueue = .main,
+    completion: (() -> Void)? = nil
+  ) {
+    pager.refetch(cachePolicy: cachePolicy, callbackQueue: callbackQueue, completion: completion)
   }
 
   /// Fetches the first page.
-  public func fetch() {
-    pager.fetch()
+  public func fetch(
+    callbackQueue: DispatchQueue = .main,
+    completion: (() -> Void)? = nil
+  ) {
+    pager.fetch(callbackQueue: callbackQueue, completion: completion)
   }
 
   /// Resets pagination state and cancels in-flight updates from the pager.
