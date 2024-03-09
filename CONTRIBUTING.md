@@ -10,9 +10,9 @@ Oh, and if you haven't already, stop by our [Discord server](https://discord.gg/
 
 Apollo iOS is comprised of multiple repositories. To contribute to our projects, follow these guidelines:
 
-- Issues (bug reports, feature suggestions, etc.)
-  -  Create an issue in the [apollo-ios](https://github.com/apollographql/apollo-ios) repository.
-- Pull Requests
+- **Issues (bug reports, feature suggestions, etc.)**
+  - Create an issue in the [apollo-ios](https://github.com/apollographql/apollo-ios) repository.
+- **Pull Requests**
   - Write code and submit a pull request in the [apollo-ios-dev](https://github.com/apollographql/apollo-ios-dev) repository.
 
 Here are the different repositories associated with Apollo iOS along with what purpose they serve:
@@ -36,7 +36,7 @@ Here are the different repositories associated with Apollo iOS along with what p
 - [Apollo iOS Codegen](#apollo-ios-codegen)
 - [License](#license)
 
-# Apollo iOS Dev
+## Apollo iOS Dev
 
 The [apollo-ios-dev](https://github.com/apollographql/apollo-ios-dev) repository is where all development work and contributions for the Apollo iOS Ecosystem will happen. Any changes for the following repos will be automatically pushed out to their respective repos when PRs are merged in. This setup allows us to reduce the amount of files and dependencies included in the SPM packages for users.
 
@@ -45,9 +45,9 @@ The [apollo-ios-dev](https://github.com/apollographql/apollo-ios-dev) repository
 
 To get started contributing to Apollo iOS check out the [README](https://github.com/apollographql/apollo-ios-dev/tree/main/README.md) in the `apollo-ios-dev` repo for details on how to get setup for development.
 
-## Pull requests
+### Pull requests
 
-### Submitting
+#### Submitting
 
 For a small bug fix change (less than 20 lines of code changed), feel free to open a pull request. We’ll try to review and merge it as fast as possible. The only requirement is, make sure you also add a test that verifies the bug you are trying to fix.
 
@@ -55,7 +55,7 @@ For significant changes to a repository, it’s important to settle on a design 
 
 A good way to propose a design or implementation, and have discussion about it, is with a Request for Comments (RFC) pull request. This is a pull request in which you describe the changes to be made with enough technical detail that suggestions, comments and updates can be made. The approved pull request can then be merged as a technical document or closed for posterity and referenced in the actual code implementation.
 
-### Review
+#### Review
 
 It’s important that every piece of code in Apollo packages is reviewed by at least one core contributor familiar with that codebase. If you want to expedite the code being merged, try to review your own code first! Here are some things we look for:
 
@@ -72,7 +72,7 @@ Improving the documentation, examples, and other open source content can be the 
 
 ## Testing
 
-We do not aim for 100% test coverage but we do require that all new code be thoroughly tested. If you find code that is not being tested, or you want to improve the existing tests, please submit a pull request for it. Currently all tests are contained withing the [apollo-ios-dev](https://github.com/apollographql/apollo-ios-dev) repo.
+We do not aim for 100% test coverage but we do require that all new code be thoroughly tested. If you find code that is not being tested, or you want to improve the existing tests, please submit a pull request for it. Currently all tests are contained within the [apollo-ios-dev](https://github.com/apollographql/apollo-ios-dev) repo.
 
 Apollo iOS makes extensive use of [Xcode test plans](https://developer.apple.com/documentation/xcode/organizing-tests-to-improve-feedback?changes=_8). All targets have a related scheme and schemes execute one or more of the test plans.
 
@@ -124,4 +124,4 @@ By contributing to the Apollo iOS Ecosystem you agree that your contributions wi
 
 - [apollo-ios license](https://github.com/apollographql/apollo-ios/blob/main/LICENSE)
 - [apollo-ios-codegen license](https://github.com/apollographql/apollo-ios-codegen/blob/main/LICENSE)
-- [apollo-ios-dev license](https://github.com/apollographql/apollo-ios-dev/blob/main/LICENSE)
+
