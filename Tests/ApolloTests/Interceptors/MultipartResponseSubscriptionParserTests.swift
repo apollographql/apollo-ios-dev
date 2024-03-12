@@ -279,16 +279,42 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
       --graphql
       content-type: application/json
 
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
+          }
+        }
+      }
+      --graphql
+      content-type: application/json
+
       {}
+      --graphql
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 2
+          }
+        }
+      }
       --graphql
       """.crlfFormattedData()
     )
 
     let expectation = expectation(description: "Heartbeat ignored")
-    expectation.isInverted = true
+    expectation.expectedFulfillmentCount = 2
 
     _ = network.send(operation: MockSubscription<Time>()) { result in
-      expectation.fulfill()
+      defer {
+        expectation.fulfill()
+      }
+
+      expect(result).to(beSuccess())
     }
 
     wait(for: [expectation], timeout: defaultTimeout)
@@ -297,20 +323,34 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
   func test__parsing__givenNullPayload_shouldIgnore() throws {
     let network = buildNetworkTransport(responseData: """
       --graphql
-      content-type: application/json
+      Content-Type: application/json
 
       {
         "payload": null
+      }
+      --graphql
+      Content-Type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
+          }
+        }
       }
       --graphql
       """.crlfFormattedData()
     )
 
     let expectation = expectation(description: "Null payload ignored")
-    expectation.isInverted = true
 
     _ = network.send(operation: MockSubscription<Time>()) { result in
-      expectation.fulfill()
+      defer {
+        expectation.fulfill()
+      }
+
+      expect(result).to(beSuccess())
     }
 
     wait(for: [expectation], timeout: defaultTimeout)
@@ -325,14 +365,28 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
         "errors": null
       }
       --graphql
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
+          }
+        }
+      }
+      --graphql
       """.crlfFormattedData()
     )
 
     let expectation = expectation(description: "Null errors ignored")
-    expectation.isInverted = true
 
     _ = network.send(operation: MockSubscription<Time>()) { result in
-      expectation.fulfill()
+      defer {
+        expectation.fulfill()
+      }
+
+      expect(result).to(beSuccess())
     }
 
     wait(for: [expectation], timeout: defaultTimeout)

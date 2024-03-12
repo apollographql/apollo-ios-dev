@@ -46,7 +46,7 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
         return .heartbeat
       }
 
-      if dataLine.starts(with: contentTypeHeader.description) {
+      if dataLine.lowercased().starts(with: contentTypeHeader.description) {
         let contentType = (dataLine
           .components(separatedBy: ":").last ?? dataLine
         ).trimmingCharacters(in: .whitespaces)
