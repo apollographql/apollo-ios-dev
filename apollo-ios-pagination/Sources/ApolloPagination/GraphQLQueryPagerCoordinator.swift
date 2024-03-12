@@ -64,8 +64,8 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
         Task { [weak self] in
           guard let self else { return }
           let (canLoadNext, canLoadPrevious) = await self.pager.canLoadPages
-          self.canLoadNext = canLoadNext
-          self.canLoadPrevious = canLoadPrevious
+          self.$canLoadNext.mutate { $0 = canLoadNext }
+          self.$canLoadPrevious.mutate { $0 = canLoadPrevious }
         }
       }
       await subscriptions.store(subscription: publishSubscriber)
@@ -89,9 +89,9 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
   }
 
   /// Whether or not we can load the next page. Initializes with a `false` value that is updated after the initial fetch.
-  var canLoadNext: Bool = false
+  @Atomic var canLoadNext: Bool = false
   /// Whether or not we can load the previous page. Initializes with a `false` value that is updated after the initial fetch.
-  var canLoadPrevious: Bool = false
+  @Atomic var canLoadPrevious: Bool = false
 
   /// Reset all pagination state and cancel all in-flight operations.
   func reset() {
