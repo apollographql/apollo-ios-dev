@@ -10,7 +10,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
 
   // MARK: - Error tests
 
-  func test__error__givenChunk_withIncorrectContentType_shouldReturnError() throws {
+  func test__error__givenIncorrectContentType_shouldReturnError() throws {
     let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
 
     let expectation = expectation(description: "Received callback")
@@ -46,7 +46,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
-  func test__error__givenChunk_withTransportError_shouldReturnError() throws {
+  func test__error__givenTransportError_shouldReturnError() throws {
     let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
 
     let expectation = expectation(description: "Received callback")
@@ -84,7 +84,132 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
-  func test__error__givenUnrecognizableChunk_shouldReturnError() throws {
+  func test__error__givenTransportErrorWithNullPayload_shouldReturnError() throws {
+    let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
+
+    let expectation = expectation(description: "Received callback")
+
+    subject.intercept(
+      request: .mock(operation: MockSubscription.mock()),
+      response: .mock(
+        headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
+        data: """
+          --graphql
+          content-type: application/json
+
+          {
+            "payload": null,
+            "errors" : [
+              {
+                "message" : "forced test failure!"
+              }
+            ]
+          }
+          --graphql
+          """.crlfFormattedData()
+      )
+    ) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      expect(result).to(beFailure { error in
+        expect(error).to(
+          matchError(MultipartResponseSubscriptionParser.ParsingError.irrecoverableError(message: "forced test failure!"))
+        )
+      })
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
+
+  func test__error__givenTransportErrorWithValidPayload_errorShouldTakePrecendenceAndReturnError() throws {
+    let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
+
+    let expectation = expectation(description: "Received callback")
+
+    subject.intercept(
+      request: .mock(operation: MockSubscription.mock()),
+      response: .mock(
+        headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
+        data: """
+          --graphql
+          content-type: application/json
+
+          {
+            "payload": {
+              "data": {
+                "__typename": "Time",
+                "ticker": 1
+              }
+            },
+            "errors" : [
+              {
+                "message" : "forced test failure!"
+              }
+            ]
+          }
+          --graphql
+          """.crlfFormattedData()
+      )
+    ) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      expect(result).to(beFailure { error in
+        expect(error).to(
+          matchError(MultipartResponseSubscriptionParser.ParsingError.irrecoverableError(message: "forced test failure!"))
+        )
+      })
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
+
+  func test__error__givenTransportErrorIncludingUnknownKeys_shouldReturnErrorWithMessageOnly() throws {
+    let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
+
+    let expectation = expectation(description: "Received callback")
+
+    subject.intercept(
+      request: .mock(operation: MockSubscription.mock()),
+      response: .mock(
+        headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
+        data: """
+          --graphql
+          content-type: application/json
+
+          {
+            "errors" : [
+              {
+                "message" : "forced test failure!",
+                "path": [
+                  "hello"
+                ],
+                "foo": "bar"
+              }
+            ]
+          }
+          --graphql
+          """.crlfFormattedData()
+      )
+    ) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      expect(result).to(beFailure { error in
+        expect(error).to(
+          matchError(MultipartResponseSubscriptionParser.ParsingError.irrecoverableError(message: "forced test failure!"))
+        )
+      })
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
+
+  func test__error__givenMalformedJSON_shouldReturnError() throws {
     let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
 
     let expectation = expectation(description: "Received callback")
@@ -116,163 +241,410 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
-  func test__error__givenChunk_withMissingPayload_shouldReturnError() throws {
-    let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
-
-    let expectation = expectation(description: "Received callback")
-
-    subject.intercept(
-      request: .mock(operation: MockSubscription.mock()),
-      response: .mock(
-        headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
-        data: """
-          --graphql
-          content-type: application/json
-
-          {
-            "key": "value"
-          }
-          --graphql
-          """.crlfFormattedData()
-      )
-    ) { result in
-      defer {
-        expectation.fulfill()
-      }
-
-      expect(result).to(beFailure { error in
-        expect(error).to(
-          matchError(MultipartResponseSubscriptionParser.ParsingError.cannotParsePayloadData)
-        )
-      })
-    }
-
-    wait(for: [expectation], timeout: defaultTimeout)
-  }
-
   // MARK: Parsing tests
 
-  func test__parsing__givenSingleChunk_shouldReturnSuccess() throws {
-    let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
+  private class Time: MockSelectionSet {
+    typealias Schema = MockSchemaMetadata
 
-    let expectation = expectation(description: "Received callback")
+    override class var __selections: [Selection] {[
+      .field("__typename", String.self),
+      .field("ticker", Int.self)
+    ]}
 
-    let expected: JSONObject = [
-      "data": [
-        "__typename": "Time",
-        "ticker": 1
-      ]
-    ]
+    var ticker: Int { __data["ticker"] }
+  }
 
-    subject.intercept(
-      request: .mock(operation: MockQuery.mock()),
-      response: .mock(
-        headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
-        data: """
-          --graphql
-          content-type: application/json
+  private func buildNetworkTransport(
+    responseData: Data
+  ) -> RequestChainNetworkTransport {
+    let client = MockURLSessionClient(
+      response: .mock(headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]),
+      data: responseData
+    )
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 1
-              }
-            }
+    let provider = MockInterceptorProvider([
+      NetworkFetchInterceptor(client: client),
+      MultipartResponseParsingInterceptor(),
+      JSONResponseParsingInterceptor()
+    ])
+
+    return RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: TestURL.mockServer.url
+    )
+  }
+
+  func test__parsing__givenHeartbeat_shouldIgnore() throws {
+    let network = buildNetworkTransport(responseData: """
+      --graphql
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
           }
-          --graphql
-          """.crlfFormattedData()
-      )
-    ) { result in
+        }
+      }
+      --graphql
+      content-type: application/json
+
+      {}
+      --graphql
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 2
+          }
+        }
+      }
+      --graphql
+      """.crlfFormattedData()
+    )
+
+    let expectation = expectation(description: "Heartbeat ignored")
+    expectation.expectedFulfillmentCount = 2
+
+    _ = network.send(operation: MockSubscription<Time>()) { result in
       defer {
         expectation.fulfill()
       }
 
       expect(result).to(beSuccess())
-
-      guard
-        let data = try! result.get(),
-        let deserialized = try! JSONSerialization.jsonObject(with: data) as? JSONObject
-      else {
-        return fail("data could not be deserialized!")
-      }
-
-      expect(deserialized).to(equal(expected))
     }
 
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
-  func test__parsing__givenMultipleChunks_shouldReturnMultipleSuccess() throws {
-    let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
+  func test__parsing__givenNullPayload_shouldIgnore() throws {
+    let network = buildNetworkTransport(responseData: """
+      --graphql
+      Content-Type: application/json
 
-    let expectation = expectation(description: "Received callback")
-    expectation.expectedFulfillmentCount = 2
+      {
+        "payload": null
+      }
+      --graphql
+      Content-Type: application/json
 
-    var expected: [JSONObject] = [
-      [
-        "data": [
-          "__typename": "Time",
-          "ticker": 2
-        ]
-      ],
-      [
-        "data": [
-          "__typename": "Time",
-          "ticker": 3
-        ]
-      ]
-    ]
-
-    subject.intercept(
-      request: .mock(operation: MockQuery.mock()),
-      response: .mock(
-        headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
-        data: """
-          --graphql
-          content-type: application/json
-
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 2
-              }
-            }
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
           }
-          --graphql
-          content-type: application/json
+        }
+      }
+      --graphql
+      """.crlfFormattedData()
+    )
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 3
-              }
-            }
-          }
-          --graphql
-          """.crlfFormattedData()
-      )
-    ) { result in
+    let expectation = expectation(description: "Null payload ignored")
+
+    _ = network.send(operation: MockSubscription<Time>()) { result in
       defer {
         expectation.fulfill()
       }
 
       expect(result).to(beSuccess())
-
-      guard
-        let data = try! result.get(),
-        let deserialized = try! JSONSerialization.jsonObject(with: data) as? JSONObject
-      else {
-        return fail("data could not be deserialized!")
-      }
-
-      expect(expected).to(contain(deserialized))
-      expected.removeAll(where: { $0 == deserialized })
     }
 
     wait(for: [expectation], timeout: defaultTimeout)
-    expect(expected).to(beEmpty())
+  }
+
+  func test__parsing__givenNullErrors_shouldIgnore() throws {
+    let network = buildNetworkTransport(responseData: """
+      --graphql
+      content-type: application/json
+
+      {
+        "errors": null
+      }
+      --graphql
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
+          }
+        }
+      }
+      --graphql
+      """.crlfFormattedData()
+    )
+
+    let expectation = expectation(description: "Null errors ignored")
+
+    _ = network.send(operation: MockSubscription<Time>()) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      expect(result).to(beSuccess())
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
+
+  func test__parsing__givenSingleChunk_shouldReturnSuccess() throws {
+    let network = buildNetworkTransport(responseData: """
+      --graphql
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
+          }
+        }
+      }
+      --graphql
+      """.crlfFormattedData()
+    )
+
+    let expectedData = try Time(data: [
+      "__typename": "Time",
+      "ticker": 1
+    ], variables: nil)
+
+    let expectation = expectation(description: "Multipart data received")
+
+    _ = network.send(operation: MockSubscription<Time>()) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      switch (result) {
+      case let .success(data):
+        expect(data.data).to(equal(expectedData))
+      case let .failure(error):
+        fail("Unexpected failure result - \(error)")
+      }
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
+
+  func test__parsing__givenMultipleChunks_shouldReturnMultipleSuccesses() throws {
+    let network = buildNetworkTransport(responseData: """
+      --graphql
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 2
+          }
+        }
+      }
+      --graphql
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 3
+          }
+        }
+      }
+      --graphql
+      """.crlfFormattedData()
+    )
+
+    let expectation = expectation(description: "Multipart data received")
+    expectation.expectedFulfillmentCount = 2
+
+    _ = network.send(operation: MockSubscription<Time>()) { result in
+      switch (result) {
+      case let .success(data):
+        guard let time = data.data else {
+          fail("Unexpected missing data!")
+          return
+        }
+
+        expect(time.__typename).to(equal("Time"))
+        switch time.ticker {
+        case 2...3: expectation.fulfill()
+        default: fail("Unexpected data value!")
+        }
+
+      case let .failure(error):
+        fail("Unexpected failure result - \(error)")
+      }
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
+
+  func test__parsing__givenPayloadAndUnknownKeys_shouldReturnSuccessAndIgnoreUnknownKeys() throws {
+    let network = buildNetworkTransport(responseData: """
+      --graphql
+      content-type: application/json
+
+      {
+        "foo": "bar",
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
+          }
+        }
+      }
+      --graphql
+      """.crlfFormattedData()
+    )
+
+    let expectedData = try Time(data: [
+      "__typename": "Time",
+      "ticker": 1
+    ], variables: nil)
+
+    let expectation = expectation(description: "Multipart data received")
+
+    _ = network.send(operation: MockSubscription<Time>()) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      switch (result) {
+      case let .success(data):
+        expect(data.data).to(equal(expectedData))
+      case let .failure(error):
+        fail("Unexpected failure result - \(error)")
+      }
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
+
+  func test__parsing__givenPayloadWithDataAndGraphQLError_shouldReturnSuccessWithDataAndGraphQLError() throws {
+    let network = buildNetworkTransport(responseData: """
+      --graphql
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 4
+          },
+          "errors": [
+            {
+              "message": "test error"
+            }
+          ]
+        }
+      }
+      --graphql
+      """.crlfFormattedData()
+    )
+
+    let expectation = expectation(description: "Multipart data received")
+
+    _ = network.send(operation: MockSubscription<Time>()) { result in
+      switch (result) {
+      case let .success(data):
+        guard let time = data.data else {
+          fail("Unexpected missing data!")
+          return
+        }
+
+        expect(time.__typename).to(equal("Time"))
+        expect(time.ticker).to(equal(4))
+        expect(data.errors).to(equal([GraphQLError("test error")]))
+
+        expectation.fulfill()
+
+      case let .failure(error):
+        fail("Unexpected failure result - \(error)")
+      }
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
+
+  func test__parsing__givenPayloadWithNullDataAndGraphQLError_shouldReturnSuccessWithOnlyGraphQLError() throws {
+    let network = buildNetworkTransport(responseData: """
+      --graphql
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": null,
+          "errors": [
+            {
+              "message": "test error"
+            }
+          ]
+        }
+      }
+      --graphql
+      """.crlfFormattedData()
+    )
+
+    let expectation = expectation(description: "Multipart data received")
+
+    _ = network.send(operation: MockSubscription<Time>()) { result in
+      switch (result) {
+      case let .success(data):
+        expect(data.errors).to(equal([GraphQLError("test error")]))
+
+        expectation.fulfill()
+
+      case let .failure(error):
+        fail("Unexpected failure result - \(error)")
+      }
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
+
+  func test__parsing__givenEndOfStream_shouldReturnSuccess() throws {
+    let network = buildNetworkTransport(responseData: """
+      --graphql
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 5
+          }
+        }
+      }
+      --graphql--
+      """.crlfFormattedData()
+    )
+
+    let expectedData = try Time(data: [
+      "__typename": "Time",
+      "ticker": 5
+    ], variables: nil)
+
+    let expectation = expectation(description: "Multipart data received")
+
+    _ = network.send(operation: MockSubscription<Time>()) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      switch (result) {
+      case let .success(data):
+        expect(data.data).to(equal(expectedData))
+      case let .failure(error):
+        fail("Unexpected failure result - \(error)")
+      }
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
   }
 }
