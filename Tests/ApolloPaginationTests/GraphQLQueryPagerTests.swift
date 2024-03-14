@@ -324,4 +324,35 @@ final class GraphQLQueryPagerTests: XCTestCase {
     await fulfillment(of: [callbackExpectation, secondPageExpectation], timeout: 1)
   }
 
+  func test_equatable() {
+    let pagerA = GraphQLQueryPager(pager: createPager(), transform: { previous, initial, next in
+      let allPages = previous + [initial] + next
+      return allPages.flatMap { data in
+        data.hero.friendsConnection.friends.map { $0.name }
+      }
+    })
+
+    let pagerB = GraphQLQueryPager(pager: createPager(), transform: { previous, initial, next in
+      let allPages = previous + [initial] + next
+      return allPages.flatMap { data in
+        data.hero.friendsConnection.friends.map { $0.name }
+      }
+    })
+
+    XCTAssertEqual(pagerA, pagerB)
+
+    pagerA._subject.send(.success((["Al-Khwarizmi", "Al-Jaziri", "Charles Babbage", "Ada Lovelace"], .cache)))
+    XCTAssertNotEqual(pagerA, pagerB)
+
+    pagerB._subject.send(.success((["Al-Khwarizmi", "Al-Jaziri", "Charles Babbage", "Ada Lovelace"], .cache)))
+    XCTAssertEqual(pagerA, pagerB)
+
+    pagerA._subject.send(.success((["Al-Khwarizmi", "Al-Jaziri", "Charles Babbage", "Ada Lovelace"], .fetch)))
+    XCTAssertNotEqual(pagerA, pagerB)
+
+    pagerB._subject.send(.success((["Al-Khwarizmi", "Al-Jaziri", "Charles Babbage", "Ada Lovelace"], .fetch)))
+    pagerA.reset()
+    XCTAssertEqual(pagerA, pagerB)
+  }
+
 }
