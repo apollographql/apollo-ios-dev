@@ -245,3 +245,21 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     publisher.subscribe(subscriber)
   }
 }
+
+extension AsyncGraphQLQueryPager: Equatable where Model: Equatable {
+  public static func == (lhs: AsyncGraphQLQueryPager<Model>, rhs: AsyncGraphQLQueryPager<Model>) -> Bool {
+    let left = lhs._subject.value
+    let right = rhs._subject.value
+
+    switch (left, right) {
+    case (.success((let leftValue, let leftSource)), .success((let rightValue, let rightSource))):
+      return leftValue == rightValue && leftSource == rightSource
+    case (.failure(let leftError), .failure(let rightError)):
+      return leftError.localizedDescription == rightError.localizedDescription
+    case (.none, .none):
+      return true
+    default:
+      return false
+    }
+  }
+}
