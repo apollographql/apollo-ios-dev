@@ -5,9 +5,9 @@ import ApolloAPI
 
 /// Represents an incremental GraphQL response received from a server.
 final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
-  public enum ResponseError: Error, LocalizedError {
+  public enum ResponseError: Error, LocalizedError, Equatable {
     case missingPath
-    case cannotParseIncrementalData
+    case missingLabel
     case missingDeferredSelectionSetType(String, String)
 
     public var errorDescription: String? {
@@ -15,8 +15,8 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
       case .missingPath:
         return "Incremental responses must have a 'path' key."
 
-      case .cannotParseIncrementalData:
-        return "Cannot parse the incremental data."
+      case .missingLabel:
+        return "Incremental responses must have a 'label' key."
 
       case let .missingDeferredSelectionSetType(label, path):
         return "The operation does not have a deferred selection set for label '\(label)' at field path '\(path)'."
@@ -41,14 +41,10 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
   }
 
   func parseIncrementalResult() throws -> IncrementalGraphQLResult {
-    guard 
-      let label = base.body["label"] as? String,
-      let jsonPath = base.body["path"] as? [JSONValue]
-    else {
-      throw ResponseError.cannotParseIncrementalData
-    }
+    guard let path = base.body["path"] as? [JSONValue] else { throw ResponseError.missingPath }
+    guard let label = base.body["label"] as? String else { throw ResponseError.missingLabel }
 
-    let pathComponents: [PathComponent] = jsonPath.compactMap(PathComponent.init)
+    let pathComponents: [PathComponent] = path.compactMap(PathComponent.init)
     let fieldPath = pathComponents.fieldPath
 
     guard let selectionSetType = Operation.deferredSelectionSetType(
