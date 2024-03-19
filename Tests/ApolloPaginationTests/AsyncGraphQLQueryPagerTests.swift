@@ -28,7 +28,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       "first": 2,
       "after": GraphQLNullable<String>.null
     ]
-    let pager = await AsyncGraphQLQueryPager(
+    let pager = AsyncGraphQLQueryPager(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in
@@ -84,7 +84,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       "first": 2,
       "after": GraphQLNullable<String>.null
     ]
-    let pager = await AsyncGraphQLQueryPager(
+    let pager = AsyncGraphQLQueryPager(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in
@@ -146,7 +146,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       "first": 2,
       "after": GraphQLNullable<String>.null
     ]
-    let pager = await AsyncGraphQLQueryPager(
+    let pager = AsyncGraphQLQueryPager(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in
@@ -208,7 +208,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       "first": 2,
       "after": GraphQLNullable<String>.null
     ]
-    let pager = await AsyncGraphQLQueryPager(
+    let pager = AsyncGraphQLQueryPager(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in
@@ -273,7 +273,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       let name: String
     }
 
-    let anyPager = await createPager().eraseToAnyPager { data in
+    let anyPager = createPager().eraseToAnyPager { data in
       data.hero.friendsConnection.friends.map {
         ViewModel(name: $0.name)
       }
@@ -306,7 +306,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
   }
 
   func test_passesBackSeparateData() async throws {
-    let anyPager = await createPager().eraseToAnyPager { _, initial, next in
+    let anyPager = createPager().eraseToAnyPager { _, initial, next in
       if let latestPage = next.last {
         return latestPage.hero.friendsConnection.friends.last?.name
       }

@@ -58,7 +58,7 @@ final class OffsetTests: XCTestCase {
         return nextQuery
       }
     )
-    return await AsyncGraphQLQueryPager(pager: pager)
+    return AsyncGraphQLQueryPager(pager: pager)
   }
 
   // This is due to a timing issue in unit tests only wherein we deinit immediately after waiting for expectations

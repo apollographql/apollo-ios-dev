@@ -159,8 +159,8 @@ public extension AsyncGraphQLQueryPager {
     initialQuery: InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
     pageResolver: @escaping (P, PaginationDirection) -> InitialQuery?
-  ) async where Model == PaginationOutput<InitialQuery, InitialQuery> {
-    await self.init(
+  ) where Model == PaginationOutput<InitialQuery, InitialQuery> {
+    self.init(
       pager: AsyncGraphQLQueryPagerCoordinator(
         client: client,
         initialQuery: initialQuery,
@@ -179,8 +179,8 @@ public extension AsyncGraphQLQueryPager {
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
     pageResolver: @escaping (P, PaginationDirection) -> InitialQuery?,
     transform: @escaping ([InitialQuery.Data], InitialQuery.Data, [InitialQuery.Data]) throws -> Model
-  ) async {
-    await self.init(
+  ) {
+    self.init(
       pager: AsyncGraphQLQueryPagerCoordinator(
         client: client,
         initialQuery: initialQuery,
@@ -201,8 +201,8 @@ public extension AsyncGraphQLQueryPager {
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
     pageResolver: @escaping (P, PaginationDirection) -> InitialQuery?,
     transform: @escaping (InitialQuery.Data) throws -> Model
-  ) async where Model: RangeReplaceableCollection, T == Model.Element {
-    await self.init(
+  ) where Model: RangeReplaceableCollection, T == Model.Element {
+    self.init(
       pager: AsyncGraphQLQueryPagerCoordinator(
         client: client,
         initialQuery: initialQuery,
@@ -224,8 +224,8 @@ public extension AsyncGraphQLQueryPager {
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
     extractNextPageInfo: @escaping (PaginatedQuery.Data) -> P,
     pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery?
-  ) async where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
-    await self.init(
+  ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
+    self.init(
       pager: .init(
         client: client,
         initialQuery: initialQuery,
@@ -249,8 +249,8 @@ public extension AsyncGraphQLQueryPager {
     extractNextPageInfo: @escaping (PaginatedQuery.Data) -> P,
     pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery?,
     transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
-  ) async where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
-    await self.init(
+  ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
+    self.init(
       pager: .init(
         client: client,
         initialQuery: initialQuery,
@@ -276,8 +276,8 @@ public extension AsyncGraphQLQueryPager {
     pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery?,
     initialTransform: @escaping (InitialQuery.Data) throws -> Model,
     pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
-  ) async where Model: RangeReplaceableCollection, T == Model.Element {
-    await self.init(
+  ) where Model: RangeReplaceableCollection, T == Model.Element {
+    self.init(
       pager: .init(
         client: client,
         initialQuery: initialQuery,
