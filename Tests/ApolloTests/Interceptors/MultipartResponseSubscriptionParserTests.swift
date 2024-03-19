@@ -310,11 +310,23 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     expectation.expectedFulfillmentCount = 2
 
     _ = network.send(operation: MockSubscription<Time>()) { result in
-      defer {
-        expectation.fulfill()
-      }
+      switch (result) {
+      case let .success(data):
+        guard let time = data.data else {
+          fail("Unexpected missing data!")
+          return
+        }
 
-      expect(result).to(beSuccess())
+        expect(time.__typename).to(equal("Time"))
+
+        switch time.ticker {
+        case 1...2: expectation.fulfill()
+        default: fail("Unexpected data value!")
+        }
+
+      case let .failure(error):
+        fail("Unexpected failure result - \(error)")
+      }
     }
 
     wait(for: [expectation], timeout: defaultTimeout)
@@ -346,11 +358,21 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     let expectation = expectation(description: "Null payload ignored")
 
     _ = network.send(operation: MockSubscription<Time>()) { result in
-      defer {
-        expectation.fulfill()
-      }
+      switch (result) {
+      case let .success(data):
+        guard let time = data.data else {
+          fail("Unexpected missing data!")
+          return
+        }
 
-      expect(result).to(beSuccess())
+        expect(time.__typename).to(equal("Time"))
+        expect(time.ticker).to(equal(1))
+
+        expectation.fulfill()
+
+      case let .failure(error):
+        fail("Unexpected failure result - \(error)")
+      }
     }
 
     wait(for: [expectation], timeout: defaultTimeout)
@@ -382,11 +404,21 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     let expectation = expectation(description: "Null errors ignored")
 
     _ = network.send(operation: MockSubscription<Time>()) { result in
-      defer {
-        expectation.fulfill()
-      }
+      switch (result) {
+      case let .success(data):
+        guard let time = data.data else {
+          fail("Unexpected missing data!")
+          return
+        }
 
-      expect(result).to(beSuccess())
+        expect(time.__typename).to(equal("Time"))
+        expect(time.ticker).to(equal(1))
+
+        expectation.fulfill()
+
+      case let .failure(error):
+        fail("Unexpected failure result - \(error)")
+      }
     }
 
     wait(for: [expectation], timeout: defaultTimeout)

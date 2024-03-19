@@ -40,6 +40,8 @@ class IRRootFieldBuilderTests: XCTestCase {
   // MARK: - Helpers
 
   func buildSubjectRootField(operationName: String? = nil) async throws {
+    addDeferDirective()
+
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     if let operationName {
       operation = try XCTUnwrap(ir.compilationResult.operations.first(
@@ -50,6 +52,19 @@ class IRRootFieldBuilderTests: XCTestCase {
     }
     result = await ir.build(operation: operation)
     subject = result.rootField
+  }
+
+  // This function will only be needed until @defer is merged into the GraphQL spec and is
+  // considered a first-class directive in graphql-js. Right now it is a valid directive but must
+  // be 'enabled' through explicit declaration in the schema.
+  fileprivate func addDeferDirective() {
+    guard let schemaSDL = self.schemaSDL else { return }
+
+    self.schemaSDL = """
+    directive @defer(label: String, if: Boolean! = true) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+    \(schemaSDL)
+    """
   }
 
   // MARK: - Children Computation
@@ -4384,9 +4399,11 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(Array(self.computedReferencedFragments)).to(equal(expected))
   }
 
-  // MARK: - Deferred Fragments - hasDeferredFragments property
+  // MARK: - Deferred Fragments - containsDeferredFragment property
 
-  func test__deferredFragments__givenNoDeferredFragment_hasDeferredFragmentsFalse() async throws {
+  #warning("Need tests for deferredFragments property")
+
+  func test__deferredFragments__givenNoDeferredFragment_containsDeferredFragmentFalse() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4426,9 +4443,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.containsDeferredFragment).to(beFalse())
   }
 
-  func test__deferredFragments__givenDeferredInlineFragment_hasDeferredFragmentsTrue() async throws {
-    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
-
+  func test__deferredFragments__givenDeferredInlineFragment_containsDeferredFragmentTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4468,9 +4483,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentWithCondition_hasDeferredFragmentsTrue() async throws {
-    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
-
+  func test__deferredFragments__givenDeferredInlineFragmentWithCondition_containsDeferredFragmentTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4510,9 +4523,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentWithConditionFalse_hasDeferredFragmentsFalse() async throws {
-    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
-
+  func test__deferredFragments__givenDeferredInlineFragmentWithConditionFalse_containsDeferredFragmentFalse() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4552,9 +4563,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.containsDeferredFragment).to(beFalse())
   }
 
-  func test__deferredFragments__givenDeferredNamedFragment_onDifferentTypeCase_hasDeferredFragmentsTrue() async throws {
-    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
-
+  func test__deferredFragments__givenDeferredNamedFragment_onDifferentTypeCase_containsDeferredFragmentTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4593,9 +4602,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
-  func test__deferredFragments__givenDeferredInlineFragment_withinNamedFragment_hasDeferredFragmentsTrue() async throws {
-    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
-
+  func test__deferredFragments__givenDeferredInlineFragment_withinNamedFragment_containsDeferredFragmentTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4639,9 +4646,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
-  func test__deferredFragments__givenDeferredNamedFragment_withSelectionOnDifferentTypeCase_hasDeferredFragmentsTrue() async throws {
-    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
-
+  func test__deferredFragments__givenDeferredNamedFragment_withSelectionOnDifferentTypeCase_containsDeferredFragmentTrue() async throws {
     // given
     schemaSDL = """
     type Query {
