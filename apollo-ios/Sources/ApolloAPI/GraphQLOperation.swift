@@ -139,7 +139,7 @@ public extension GraphQLMutation {
   @inlinable static var operationType: GraphQLOperationType { return .mutation }
 }
 
-// MARK: - GraphQLSbuscription
+// MARK: - GraphQLSubscription
 
 public protocol GraphQLSubscription: GraphQLOperation {}
 public extension GraphQLSubscription {
