@@ -4,7 +4,7 @@ import ApolloAPI
 
 /// An abstract GraphQL response used for full and incremental responses.
 struct AnyGraphQLResponse {
-  public let body: JSONObject
+  let body: JSONObject
 
   private let rootKey: CacheReference
   private let variables: GraphQLOperation.Variables?
@@ -86,7 +86,7 @@ struct AnyGraphQLResponse {
 // MARK: - Equatable Conformance
 
 extension AnyGraphQLResponse: Equatable {
-  public static func == (lhs: AnyGraphQLResponse, rhs: AnyGraphQLResponse) -> Bool {
+  static func == (lhs: AnyGraphQLResponse, rhs: AnyGraphQLResponse) -> Bool {
     lhs.body == rhs.body &&
     lhs.rootKey == rhs.rootKey &&
     lhs.variables?._jsonEncodableObject._jsonValue == rhs.variables?._jsonEncodableObject._jsonValue
@@ -96,7 +96,7 @@ extension AnyGraphQLResponse: Equatable {
 // MARK: - Hashable Conformance
 
 extension AnyGraphQLResponse: Hashable {
-  public func hash(into hasher: inout Hasher) {
+  func hash(into hasher: inout Hasher) {
     hasher.combine(body)
     hasher.combine(rootKey)
     hasher.combine(variables?._jsonEncodableObject._jsonValue)
