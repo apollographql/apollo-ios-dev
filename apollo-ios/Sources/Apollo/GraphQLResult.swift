@@ -81,14 +81,14 @@ public struct GraphQLResult<Data: RootSelectionSet> {
   fileprivate func merge<T>(
     _ newValue: T?,
     into currentValue: T?,
-    onCurrent: (_ currentValue: T, _ newValue: T) throws -> T
+    onMerge: (_ currentValue: T, _ newValue: T) throws -> T
   ) throws -> T? {
     switch (currentValue, newValue) {
     case let (currentValue, nil):
       return currentValue
 
     case let (.some(currentValue), .some(newValue)):
-      return try onCurrent(currentValue, newValue)
+      return try onMerge(currentValue, newValue)
 
     case let (nil, newValue):
       return newValue
