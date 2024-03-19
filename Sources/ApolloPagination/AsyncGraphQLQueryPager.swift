@@ -9,7 +9,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
   public typealias Output = Result<(Model, UpdateSource), Error>
   let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
   var publisher: AnyPublisher<Output, Never> { _subject.compactMap({ $0 }).eraseToAnyPublisher() }
-  public var cancellables: Set<AnyCancellable> = []
+  @Atomic public var cancellables: Set<AnyCancellable> = []
   public let pager: any AsyncPagerType
 
   public var canLoadNext: Bool { get async { await pager.canLoadNext } }
@@ -18,45 +18,51 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
   init<Pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager,
     transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
-  ) async {
+  ) {
     self.pager = pager
-    await pager.subscribe { [weak self] result in
-      guard let self else { return }
-      let returnValue: Output
+    Task {
+      let cancellable = await pager.subscribe { [weak self] result in
+        guard let self else { return }
+        let returnValue: Output
 
-      switch result {
-      case let .success((output, source)):
-        do {
-          let transformedModels = try transform(output.previousPages, output.initialPage, output.nextPages)
-          returnValue = .success((transformedModels, source))
-        } catch {
+        switch result {
+        case let .success((output, source)):
+          do {
+            let transformedModels = try transform(output.previousPages, output.initialPage, output.nextPages)
+            returnValue = .success((transformedModels, source))
+          } catch {
+            returnValue = .failure(error)
+          }
+        case let .failure(error):
           returnValue = .failure(error)
         }
-      case let .failure(error):
-        returnValue = .failure(error)
-      }
 
-      _subject.send(returnValue)
-    }.store(in: &cancellables)
+        _subject.send(returnValue)
+      }
+      _ = $cancellables.mutate { $0.insert(cancellable) }
+    }
   }
 
   init<Pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager
-  ) async where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
+  ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
     self.pager = pager
-    await pager.subscribe { [weak self] result in
-      guard let self else { return }
-      let returnValue: Output
+    Task {
+      let cancellable = await pager.subscribe { [weak self] result in
+        guard let self else { return }
+        let returnValue: Output
 
-      switch result {
-      case let .success((output, source)):
-        returnValue = .success((output, source))
-      case let .failure(error):
-        returnValue = .failure(error)
+        switch result {
+        case let .success((output, source)):
+          returnValue = .success((output, source))
+        case let .failure(error):
+          returnValue = .failure(error)
+        }
+
+        _subject.send(returnValue)
       }
-
-      _subject.send(returnValue)
-    }.store(in: &cancellables)
+      _ = $cancellables.mutate { $0.insert(cancellable) }
+    }
   }
 
   convenience init<
@@ -68,8 +74,8 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     pager: Pager,
     initialTransform: @escaping (InitialQuery.Data) throws -> Model,
     pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
-  ) async where Model: RangeReplaceableCollection, Model.Element == Element {
-    await self.init(
+  ) where Model: RangeReplaceableCollection, Model.Element == Element {
+    self.init(
       pager: pager,
       transform: { previousData, initialData, nextData in
         let previous = try previousData.flatMap { try pageTransform($0) }
@@ -93,7 +99,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
     initialTransform: @escaping (InitialQuery.Data) throws -> Model,
     pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
-  ) async where Model: RangeReplaceableCollection, Model.Element == Element {
+  ) where Model: RangeReplaceableCollection, Model.Element == Element {
     let pager = AsyncGraphQLQueryPagerCoordinator(
       client: client,
       initialQuery: initialQuery,
@@ -108,7 +114,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
       },
       pageResolver: pageResolver
     )
-    await self.init(
+    self.init(
       pager: pager,
       initialTransform: initialTransform,
       pageTransform: pageTransform
@@ -137,7 +143,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     watcherDispatchQueue: DispatchQueue = .main,
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
-  ) async where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
+  ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
     let pager = AsyncGraphQLQueryPagerCoordinator(
       client: client,
       initialQuery: initialQuery,
@@ -145,7 +151,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
       extractPageInfo: extractPageInfo,
       pageResolver: pageResolver
     )
-    await self.init(
+    self.init(
       pager: pager
     )
   }
@@ -161,7 +167,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
     transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
-  ) async {
+  ) {
     let pager = AsyncGraphQLQueryPagerCoordinator(
       client: client,
       initialQuery: initialQuery,
@@ -176,7 +182,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
       },
       pageResolver: pageResolver
     )
-    await self.init(
+    self.init(
       pager: pager,
       transform: transform
     )
@@ -191,9 +197,10 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
   /// Subscribe to the results of the pager, with the management of the subscriber being stored internally to the `AnyGraphQLQueryPager`.
   /// - Parameter completion: The closure to trigger when new values come in.
   public func subscribe(completion: @MainActor @escaping (Output) -> Void) {
-    publisher.sink { result in
+    let cancellable = publisher.sink { result in
       Task { await completion(result) }
-    }.store(in: &cancellables)
+    }
+    _ = $cancellables.mutate { $0.insert(cancellable) }
   }
 
   /// Load the next page, if available.
