@@ -78,7 +78,7 @@
             },
             {
               "kind" : "text",
-              "text" : " : "
+              "text" : " : any "
             },
             {
               "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",

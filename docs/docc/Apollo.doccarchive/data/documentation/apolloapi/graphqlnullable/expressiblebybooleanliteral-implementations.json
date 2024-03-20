@@ -19,6 +19,7 @@
       }
     ],
     "role" : "collectionGroup",
+    "roleHeading" : "API Collection",
     "title" : "ExpressibleByBooleanLiteral Implementations"
   },
   "schemaVersion" : {
@@ -217,6 +218,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s27ExpressibleByBooleanLiteralP0cD4TypeQa",
       "text" : "BooleanLiteralType"
     },
     {

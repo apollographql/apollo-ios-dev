@@ -64,6 +64,10 @@ struct MultipartResponseDeferParser: MultipartResponseSpecificationParser {
         }
 
       case let .json(object):
+        guard object.isPartialResponse || object.isIncrementalResponse else {
+          return .failure(ParsingError.cannotParsePayloadData)
+        }
+
         guard let serialized: Data = try? JSONSerializationFormat.serialize(value: object) else {
           return .failure(ParsingError.cannotParsePayloadData)
         }
@@ -76,5 +80,15 @@ struct MultipartResponseDeferParser: MultipartResponseSpecificationParser {
     }
 
     return .success(nil)
+  }
+}
+
+fileprivate extension JSONObject {
+  var isPartialResponse: Bool {
+    self.keys.contains("data") && self.keys.contains("hasNext")
+  }
+
+  var isIncrementalResponse: Bool {
+    self.keys.contains("incremental") && self.keys.contains("hasNext")
   }
 }

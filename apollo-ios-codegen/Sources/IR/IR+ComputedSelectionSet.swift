@@ -104,7 +104,8 @@ extension ComputedSelectionSet {
     private func createShallowlyMergedNestedEntityField(from field: EntityField) -> EntityField {
       let typeInfo = SelectionSet.TypeInfo(
         entity: entityStorage.entity(for: field.underlyingField, on: typeInfo.entity),
-        scopePath: self.typeInfo.scopePath.appending(field.selectionSet.typeInfo.scope)
+        scopePath: self.typeInfo.scopePath.appending(field.selectionSet.typeInfo.scope),
+        isUserDefined: false
       )
 
       let newSelectionSet = SelectionSet(
@@ -149,7 +150,8 @@ extension ComputedSelectionSet {
 
       let typeInfo = SelectionSet.TypeInfo(
         entity: self.typeInfo.entity,
-        scopePath: self.typeInfo.scopePath.mutatingLast { $0.appending(condition) }
+        scopePath: self.typeInfo.scopePath.mutatingLast { $0.appending(condition) },
+        isUserDefined: false
       )
 
       let selectionSet = SelectionSet(

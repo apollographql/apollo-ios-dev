@@ -1,0 +1,500 @@
+{
+  "hierarchy" : {
+    "paths" : [
+      [
+
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "ApolloPagination",
+    "modules" : [
+      {
+        "name" : "ApolloPagination"
+      }
+    ],
+    "role" : "collection",
+    "roleHeading" : "Framework",
+    "symbolKind" : "module",
+    "title" : "ApolloPagination"
+  },
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "topicSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager"
+      ],
+      "title" : "Classes"
+    },
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationInfo"
+      ],
+      "title" : "Protocols"
+    },
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput"
+      ],
+      "title" : "Structures"
+    },
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PageExtractionData",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationDirection",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource"
+      ],
+      "title" : "Enumerations"
+    }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollopagination"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://ApolloPagination/documentation/ApolloPagination": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "ApolloPagination",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager": {
+  "abstract" : [
+    {
+      "text" : "Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "AsyncGraphQLQueryPager"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "AsyncGraphQLQueryPager"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "AsyncGraphQLQueryPager",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/AsyncPagerType": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "AsyncPagerType"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "AsyncPagerType"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "AsyncPagerType",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/asyncpagertype"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/CursorBasedPagination": {
+  "abstract" : [
+    {
+      "text" : "A namespace to handle cursor based pagination strategies.",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "For more information on cursor based pagination strategies, see: https:\/\/www.apollographql.com\/docs\/react\/pagination\/cursor-based\/",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "CursorBasedPagination"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "CursorBasedPagination"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "CursorBasedPagination",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/cursorbasedpagination"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager": {
+  "abstract" : [
+    {
+      "text" : "Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLQueryPager"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLQueryPager"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "GraphQLQueryPager",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/graphqlquerypager"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/OffsetPagination": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "OffsetPagination"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "OffsetPagination"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OffsetPagination",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/offsetpagination"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PageExtractionData": {
+  "abstract" : [
+    {
+      "text" : "The result of either the initial query or the paginated query, for the purpose of extracting a ",
+      "type" : "text"
+    },
+    {
+      "code" : "PageInfo",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " from it.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "PageExtractionData"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PageExtractionData",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "PageExtractionData"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PageExtractionData",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/pageextractiondata"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PagerType": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "PagerType"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "PagerType"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PagerType",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/pagertype"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationDirection": {
+  "abstract" : [
+    {
+      "text" : "An enumeration that can determine whether we are paginating forward or backwards.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "PaginationDirection"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationDirection",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "PaginationDirection"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PaginationDirection",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationdirection"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationError": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "PaginationError"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "PaginationError"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PaginationError",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationerror"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationInfo": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "PaginationInfo"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationInfo",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "PaginationInfo"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PaginationInfo",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationinfo"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationOutput": {
+  "abstract" : [
+    {
+      "text" : "A struct which contains the outputs of pagination",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "PaginationOutput"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "PaginationOutput"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PaginationOutput",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationoutput"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/UpdateSource": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "UpdateSource"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "UpdateSource"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "UpdateSource",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/updatesource"
+}
+}
+}

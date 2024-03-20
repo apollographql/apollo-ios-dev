@@ -11,6 +11,7 @@ let package = Package(
   dependencies: [
     .package(name: "Apollo", path: "../apollo-ios"),
     .package(name: "ApolloCodegen", path: "../apollo-ios-codegen"),
+    .package(name: "ApolloPagination", path: "../apollo-ios-pagination"),
     .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMajor(from: "1.2.0")),
     .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0")
   ],
@@ -40,6 +41,7 @@ let package = Package(
               .product(name: "ApolloAPI", package: "Apollo"),
               .product(name: "ApolloSQLite", package: "Apollo"),
               .product(name: "ApolloWebSocket", package: "Apollo"),
+              .product(name: "ApolloPagination", package: "ApolloPagination"),
               .target(name: "SwiftScriptHelpers")
             ]
            ),

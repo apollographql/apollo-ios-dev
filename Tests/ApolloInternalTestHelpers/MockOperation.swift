@@ -15,6 +15,8 @@ open class MockOperation<SelectionSet: RootSelectionSet>: GraphQLOperation {
 
   public init() {}
 
+  open class var deferredFragments: [DeferredFragmentIdentifier : any ApolloAPI.SelectionSet.Type]? { return nil }
+
 }
 
 open class MockQuery<SelectionSet: RootSelectionSet>: MockOperation<SelectionSet>, GraphQLQuery {

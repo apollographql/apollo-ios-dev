@@ -13,18 +13,13 @@ public struct PaginationOutput<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// An array of pages after the initial page.
   public let nextPages: [PaginatedQuery.Data]
 
-  /// The source of the most recent `Output`: either from the cache or server.
-  public let updateSource: UpdateSource
-
   public init(
     previousPages: [PaginatedQuery.Data],
     initialPage: InitialQuery.Data,
-    nextPages: [PaginatedQuery.Data],
-    updateSource: UpdateSource
+    nextPages: [PaginatedQuery.Data]
   ) {
     self.previousPages = previousPages
     self.initialPage = initialPage
     self.nextPages = nextPages
-    self.updateSource = updateSource
   }
 }

@@ -88,11 +88,12 @@ public extension GraphQLOperation {
     return nil
   }
 
-  static func deferredSelectionSetType(
+  static func deferredSelectionSetType<T: GraphQLOperation>(
+    for operation: T.Type,
     withLabel label: String,
     atFieldPath fieldPath: [String]
   ) -> (any SelectionSet.Type)? {
-    return deferredFragments?[DeferredFragmentIdentifier(label: label, fieldPath: fieldPath)]
+    return T.deferredFragments?[DeferredFragmentIdentifier(label: label, fieldPath: fieldPath)]
   }
 
   static var hasDeferredFragments: Bool {
@@ -138,7 +139,7 @@ public extension GraphQLMutation {
   @inlinable static var operationType: GraphQLOperationType { return .mutation }
 }
 
-// MARK: - GraphQLSbuscription
+// MARK: - GraphQLSubscription
 
 public protocol GraphQLSubscription: GraphQLOperation {}
 public extension GraphQLSubscription {

@@ -585,7 +585,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": any "
     },
     {
       "kind" : "typeIdentifier",
@@ -1443,7 +1443,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": any "
     },
     {
       "kind" : "typeIdentifier",
@@ -1560,7 +1560,7 @@
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/OutputOptions/pruneGeneratedFiles": {
   "abstract" : [
     {
-      "text" : "Whether unused generated files will be automatically deleted.",
+      "text" : "Whether unused previously generated files will be automatically deleted.",
       "type" : "text"
     }
   ],

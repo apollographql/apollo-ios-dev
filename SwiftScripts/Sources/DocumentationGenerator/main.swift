@@ -8,6 +8,7 @@ enum Target: String, CaseIterable {
   case ApolloSQLite
   case ApolloWebSocket
   case ApolloCodegenLib
+  case ApolloPagination
 
   var name: String {
     self.rawValue

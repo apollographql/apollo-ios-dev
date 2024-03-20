@@ -54,6 +54,9 @@ class IRRootFieldBuilderTests: XCTestCase {
     subject = result.rootField
   }
 
+  // This function will only be needed until @defer is merged into the GraphQL spec and is
+  // considered a first-class directive in graphql-js. Right now it is a valid directive but must
+  // be 'enabled' through explicit declaration in the schema.
   fileprivate func addDeferDirective() {
     guard let schemaSDL = self.schemaSDL else { return }
 
