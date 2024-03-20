@@ -1,0 +1,160 @@
+{
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/noQuery"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:16ApolloPagination0B5ErrorO7noQueryyA2CmF",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "case"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "noQuery"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "ApolloPagination"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Case",
+    "symbolKind" : "case",
+    "title" : "PaginationError.noQuery"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "case"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "noQuery"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollopagination\/paginationerror\/noquery"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://ApolloPagination/documentation/ApolloPagination": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "ApolloPagination",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationError": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "PaginationError"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "PaginationError"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PaginationError",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationerror"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationError/noQuery": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "noQuery"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/noQuery",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "PaginationError.noQuery",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationerror\/noquery"
+}
+}
+}

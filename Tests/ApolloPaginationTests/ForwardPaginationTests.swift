@@ -47,7 +47,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
 
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
-    var results: [Result<PaginationOutput<Query, Query>, Error>] = []
+    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), Error>] = []
     let firstPageExpectation = expectation(description: "First page")
     var subscription = await pager.subscribe(onUpdate: { _ in
       firstPageExpectation.fulfill()
@@ -57,11 +57,11 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     subscription.cancel()
     var result = try await XCTUnwrapping(await pager.currentValue)
     results.append(result)
-    XCTAssertSuccessResult(result) { output in
+    XCTAssertSuccessResult(result) { (output, source) in
       XCTAssertTrue(output.nextPages.isEmpty)
       XCTAssertEqual(output.initialPage.hero.friendsConnection.friends.count, 2)
       XCTAssertEqual(output.initialPage.hero.friendsConnection.totalCount, 3)
-      XCTAssertEqual(output.updateSource, .fetch)
+      XCTAssertEqual(source, .fetch)
     }
 
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
@@ -78,9 +78,9 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     result = try await XCTUnwrapping(await pager.currentValue)
     results.append(result)
 
-    try XCTAssertSuccessResult(result) { output in
+    try XCTAssertSuccessResult(result) { (output, source) in
       // Assert first page is unchanged
-      XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
+      XCTAssertEqual(try? results.first?.get().0.initialPage, try? results.last?.get().0.initialPage)
 
       XCTAssertFalse(output.nextPages.isEmpty)
       XCTAssertEqual(output.nextPages.count, 1)
@@ -88,7 +88,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertEqual(output.previousPages.count, 0)
       let page = try XCTUnwrap(output.nextPages.first)
       XCTAssertEqual(page.hero.friendsConnection.friends.count, 1)
-      XCTAssertEqual(output.updateSource, .fetch)
+      XCTAssertEqual(source, .fetch)
     }
     let previousCount = await pager.previousPageVarMap.values.count
     XCTAssertEqual(previousCount, 0)
@@ -123,13 +123,13 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       "after": "Y3Vyc29yMg==",
     ]
 
-    let expectedVariables = nextQuery.__variables?.values.compactMap { $0._jsonEncodableValue?._jsonValue } ?? []
-    let actualVariables = try await XCTUnwrapping(await pager.nextPageVarMap.keys.first as? [JSONValue])
+    let expectedVariables = Set(nextQuery.__variables?.values.compactMap { $0._jsonEncodableValue?._jsonValue } ?? [])
+    let actualVariables = try await XCTUnwrapping(await pager.nextPageVarMap.keys.first)
 
     XCTAssertEqual(expectedVariables.count, actualVariables.count)
     XCTAssertEqual(expectedVariables.count, 3)
 
-    XCTAssertEqual(Set(expectedVariables), Set(actualVariables))
+    XCTAssertEqual(expectedVariables, actualVariables)
   }
 
   func test_paginationState() async throws {
@@ -183,11 +183,11 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [serverExpectation, firstPageExpectation], timeout: 1)
     subscription.cancel()
     let result = try await XCTUnwrapping(await pager.currentValue)
-    XCTAssertSuccessResult(result) { output in
+    XCTAssertSuccessResult(result) { (output, source) in
       XCTAssertTrue(output.nextPages.isEmpty)
       XCTAssertEqual(output.initialPage.hero.friendsConnection.friends.count, 2)
       XCTAssertEqual(output.initialPage.hero.friendsConnection.totalCount, 3)
-      XCTAssertEqual(output.updateSource, .fetch)
+      XCTAssertEqual(source, .fetch)
     }
 
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
@@ -201,14 +201,14 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [secondPageExpectation, secondPageFetch], timeout: 1)
     subscription.cancel()
     let newResult = try await XCTUnwrapping(await pager.currentValue)
-    try XCTAssertSuccessResult(newResult) { output in
+    try XCTAssertSuccessResult(newResult) { (output, source) in
       // Assert first page is unchanged
-      XCTAssertEqual(try? result.get().initialPage, try? newResult.get().initialPage)
+      XCTAssertEqual(try? result.get().0.initialPage, try? newResult.get().0.initialPage)
       XCTAssertFalse(output.nextPages.isEmpty)
       XCTAssertEqual(output.nextPages.count, 1)
       let page = try XCTUnwrap(output.nextPages.first)
       XCTAssertEqual(page.hero.friendsConnection.friends.count, 1)
-      XCTAssertEqual(output.updateSource, .fetch)
+      XCTAssertEqual(source, .fetch)
     }
     let count = await pager.nextPageVarMap.values.count
     XCTAssertEqual(count, 1)
@@ -227,7 +227,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     }
     await fulfillment(of: [transactionExpectation, mutationExpectation])
     let finalResult = try await XCTUnwrapping(await pager.currentValue)
-    XCTAssertSuccessResult(finalResult) { output in
+    XCTAssertSuccessResult(finalResult) { (output, _) in
       XCTAssertEqual(output.initialPage.hero.name, "C3PO")
       XCTAssertEqual(output.nextPages.count, 1)
       XCTAssertEqual(output.nextPages.first?.hero.name, "C3PO")
@@ -250,12 +250,12 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
   func test_failingFetch_finishes() async throws {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "flirst": 2, "after": GraphQLNullable<String>.none]
-    let pager = AsyncGraphQLQueryPager<Query, Query>(
+    let pager = AsyncGraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in
         switch data {
-        case .initial(let data), .paginated(let data):
+        case .initial(let data, _), .paginated(let data, _):
           return CursorBasedPagination.Forward(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor
@@ -283,16 +283,16 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     cancellable.cancel()
   }
 
-  private func createPager() -> AsyncGraphQLQueryPager<Query, Query> {
+  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPager<Query, Query>(
+    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,
       extractPageInfo: { data in
         switch data {
-        case .initial(let data), .paginated(let data):
+        case .initial(let data, _), .paginated(let data, _):
           return CursorBasedPagination.Forward(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor

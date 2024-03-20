@@ -770,6 +770,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP9FragmentsQa",
       "text" : "Fragments"
     }
   ],

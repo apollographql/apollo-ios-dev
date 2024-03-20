@@ -302,3 +302,68 @@ extension Mocks.Hero.BidirectionalFriendsQuery {
     }
   }
 }
+
+extension Mocks.Hero.OffsetFriendsQuery {
+  static func expectationForFirstPage(server: MockGraphQLServer) -> XCTestExpectation {
+    let query = MockQuery<Mocks.Hero.OffsetFriendsQuery>()
+    query.__variables = ["id": "2001", "offset": 0, "limit": 2]
+    return server.expect(query) { _ in
+      let friends: [[String: AnyHashable]] = [
+        [
+          "__typename": "Human",
+          "name": "Luke Skywalker",
+          "id": "1000",
+        ],
+        [
+          "__typename": "Human",
+          "name": "Han Solo",
+          "id": "1002",
+        ],
+      ]
+
+      let hero: [String: AnyHashable] = [
+        "__typename": "Droid",
+        "id": "2001",
+        "name": "R2-D2",
+        "friends": friends,
+      ]
+
+      let data: [String: AnyHashable] = [
+        "hero": hero
+      ]
+
+      return [
+        "data": data
+      ]
+    }
+  }
+
+  static func expectationForLastPage(server: MockGraphQLServer) -> XCTestExpectation {
+    let query = MockQuery<Mocks.Hero.OffsetFriendsQuery>()
+    query.__variables = ["id": "2001", "offset": 2, "limit": 2]
+    return server.expect(query) { _ in
+      let friends: [[String: AnyHashable]] = [
+        [
+          "__typename": "Human",
+          "name": "Leia Organa",
+          "id": "1003",
+        ],
+      ]
+
+      let hero: [String: AnyHashable] = [
+        "__typename": "Droid",
+        "id": "2001",
+        "name": "R2-D2",
+        "friends": friends,
+      ]
+
+      let data: [String: AnyHashable] = [
+        "hero": hero
+      ]
+
+      return [
+        "data": data
+      ]
+    }
+  }
+}

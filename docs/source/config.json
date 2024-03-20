@@ -7,7 +7,16 @@
   "sidebar": {
     "Introduction": "/",
     "Get Started": "/get-started",
-    "Project Configuration": "/project-configuration",
+    "Project Configuration": [
+      {
+        "Introduction": "/project-configuration/intro",
+        "1. Project Modularization": "/project-configuration/modularization",
+        "2. Schema Types": "/project-configuration/schema-types",
+        "3. Operation Models": "/project-configuration/operation-models",
+        "SDK components": "/project-configuration/sdk-components"
+      },
+      true
+    ],
     "Migration Guides": [
       {
         "v1.0": "/migrations/1.0",
@@ -51,7 +60,9 @@
         "ApolloAPI": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloAPI",
         "ApolloWebSocket": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloWebSocket",
         "ApolloSQLite": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloSQLite",
-        "ApolloCodegenLib": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloCodegenLib"
+        "ApolloCodegenLib": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloCodegenLib",
+        "ApolloPagination": "https://www.apollographql.com/docs/ios/docc/documentation/ApolloPagination",
+        "Client Directives": "/client-directives"
       },
       true
     ],
@@ -99,6 +110,15 @@
     "Networking": [
       {
         "Creating a Client": "/networking/client-creation"
+      },
+      true
+    ],
+    "Pagination": [
+      {
+        "Introduction": "/pagination/introduction",
+        "Using Custom Response Models": "/pagination/custom-types",
+        "Directional Pagination": "/pagination/directional-pagers",
+        "Multi-query Pagination": "/pagination/multi-query"
       },
       true
     ],

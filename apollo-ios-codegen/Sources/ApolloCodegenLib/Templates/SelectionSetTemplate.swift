@@ -121,7 +121,7 @@ struct SelectionSetTemplate {
       \(SelectionSetNameDocumentation(inlineFragment))
       \(renderAccessControl())\
       struct \(inlineFragment.renderedTypeName): \(SelectionSetType(asInlineFragment: true))\
-      \(if: inlineFragment.isCompositeSelectionSet, ", \(config.ApolloAPITargetName).CompositeInlineFragment")\
+      \(if: inlineFragment.isCompositeInlineFragment, ", \(config.ApolloAPITargetName).CompositeInlineFragment")\
        {
         \(BodyTemplate(context))
       }
@@ -273,18 +273,25 @@ struct SelectionSetTemplate {
     var deprecatedArguments: [DeprecatedArgument]? =
       config.options.warningsOnDeprecatedUsage == .include ? [] : nil
 
-    let selectionsTemplate = TemplateString(
-      """
-      \(renderAccessControl())\
-      static var __selections: [\(config.ApolloAPITargetName).Selection] { [
-        \(if: shouldIncludeTypenameSelection(for: scope), ".field(\"__typename\", String.self),")
-        \(renderedSelections(groupedSelections.unconditionalSelections, &deprecatedArguments), terminator: ",")
-        \(groupedSelections.inclusionConditionGroups.map {
-        renderedConditionalSelectionGroup($0, $1, in: scope, &deprecatedArguments)
-      }, terminator: ",")
-      ] }
-      """
-    )
+    let shouldIncludeTypenameSelection = shouldIncludeTypenameSelection(for: scope)
+    let selectionsTemplate: TemplateString
+
+    if !groupedSelections.isEmpty || shouldIncludeTypenameSelection {
+      selectionsTemplate = TemplateString("""
+        \(renderAccessControl())\
+        static var __selections: [\(config.ApolloAPITargetName).Selection] { [
+          \(if: shouldIncludeTypenameSelection, ".field(\"__typename\", String.self),")
+          \(renderedSelections(groupedSelections.unconditionalSelections, &deprecatedArguments), terminator: ",")
+          \(groupedSelections.inclusionConditionGroups.map {
+          renderedConditionalSelectionGroup($0, $1, in: scope, &deprecatedArguments)
+        }, terminator: ",")
+        ] }
+        """
+      )
+    } else {
+      selectionsTemplate = ""
+    }
+
     return """
       \(if: deprecatedArguments != nil && !deprecatedArguments.unsafelyUnwrapped.isEmpty, """
       \(deprecatedArguments.unsafelyUnwrapped.map { """
@@ -751,12 +758,8 @@ private class SelectionSetNameCache {
 
 extension IR.ComputedSelectionSet {
 
-  fileprivate var isCompositeSelectionSet: Bool {
-    return direct?.isEmpty ?? true
-  }
-
   fileprivate var isCompositeInlineFragment: Bool {
-    return !self.isEntityRoot && isCompositeSelectionSet
+    return !self.isEntityRoot && !self.isUserDefined && (direct?.isEmpty ?? true)
   }
 
   fileprivate var shouldBeRendered: Bool {

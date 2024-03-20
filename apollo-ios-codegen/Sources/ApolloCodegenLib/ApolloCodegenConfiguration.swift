@@ -484,7 +484,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public let warningsOnDeprecatedUsage: Composition
     /// Rules for how to convert the names of values from the schema in generated code.
     public let conversionStrategies: ConversionStrategies
-    /// Whether unused generated files will be automatically deleted.
+    /// Whether unused previously generated files will be automatically deleted.
     ///
     /// This will automatically delete any previously generated files that no longer
     /// would be generated.

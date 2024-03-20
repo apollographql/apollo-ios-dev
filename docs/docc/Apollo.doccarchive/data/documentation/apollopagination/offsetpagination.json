@@ -1,0 +1,243 @@
+{
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:16ApolloPagination06OffsetB0O",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "enum"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "OffsetPagination"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "ApolloPagination"
+      }
+    ],
+    "navigatorTitle" : [
+      {
+        "kind" : "identifier",
+        "text" : "OffsetPagination"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Enumeration",
+    "symbolKind" : "enum",
+    "title" : "OffsetPagination"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "enum"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "OffsetPagination"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "topicSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Bidirectional",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Forward",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Reverse"
+      ],
+      "title" : "Structures"
+    }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollopagination\/offsetpagination"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://ApolloPagination/documentation/ApolloPagination": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "ApolloPagination",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/OffsetPagination": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "OffsetPagination"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "OffsetPagination"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OffsetPagination",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/offsetpagination"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/OffsetPagination/Bidirectional": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Bidirectional"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Bidirectional",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Bidirectional"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OffsetPagination.Bidirectional",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/offsetpagination\/bidirectional"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/OffsetPagination/Forward": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Forward"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Forward",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Forward"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OffsetPagination.Forward",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/offsetpagination\/forward"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/OffsetPagination/Reverse": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Reverse"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Reverse",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Reverse"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OffsetPagination.Reverse",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/offsetpagination\/reverse"
+}
+}
+}

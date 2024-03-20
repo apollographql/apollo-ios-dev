@@ -24,6 +24,7 @@ This repo contains the development environment for working on and contributing t
 
 - [apollo-ios](https://github.com/apollographql/apollo-ios)
 - [apollo-ios-codegen](https://github.com/apollographql/apollo-ios-codegen)
+- [apollo-ios-pagination](https://github.com/apollographql/apollo-ios-pagination)
 
 All code changes are pushed out to their respective repos whenever a PR is merged. This allows us to provide a cohesive development environment while also providing packages to users that contain less overall files and dependencies, such as things only really used for development and testing.
 

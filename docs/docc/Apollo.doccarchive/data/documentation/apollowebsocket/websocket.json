@@ -520,7 +520,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -529,7 +529,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?"
+      "text" : ")?"
     }
   ],
   "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/delegate",
@@ -1229,7 +1229,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": (("
+      "text" : ": (((any "
     },
     {
       "kind" : "typeIdentifier",
@@ -1238,7 +1238,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?) -> "
+      "text" : ")?) -> "
     },
     {
       "kind" : "typeIdentifier",
@@ -1528,7 +1528,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -1537,7 +1537,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?"
+      "text" : ")?"
     }
   ],
   "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/security",
@@ -1612,7 +1612,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -1621,7 +1621,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?)"
+      "text" : ")?)"
     }
   ],
   "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/streamDidError(error:)",

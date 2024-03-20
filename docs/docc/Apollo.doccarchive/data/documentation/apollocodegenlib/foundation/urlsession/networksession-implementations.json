@@ -20,6 +20,7 @@
       }
     ],
     "role" : "collectionGroup",
+    "roleHeading" : "API Collection",
     "title" : "NetworkSession Implementations"
   },
   "schemaVersion" : {
@@ -172,7 +173,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?, "
+      "text" : "?, (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -181,7 +182,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?) -> "
+      "text" : ")?) -> "
     },
     {
       "kind" : "typeIdentifier",

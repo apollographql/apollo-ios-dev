@@ -19,6 +19,7 @@
       }
     ],
     "role" : "collectionGroup",
+    "roleHeading" : "API Collection",
     "title" : "ApolloClientProtocol Implementations"
   },
   "schemaVersion" : {
@@ -35,7 +36,7 @@
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/clearCache(callbackQueue:completion:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:contextIdentifier:context:queue:resultHandler:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:publishResultToStore:context:queue:resultHandler:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/subscribe(subscription:context:queue:resultHandler:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/upload(operation:files:context:queue:resultHandler:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:context:callbackQueue:resultHandler:)"
@@ -171,7 +172,7 @@
     },
     {
       "kind" : "text",
-      "text" : ", "
+      "text" : ", any "
     },
     {
       "kind" : "typeIdentifier",
@@ -284,7 +285,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -293,7 +294,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?, "
+      "text" : ")?, "
     },
     {
       "kind" : "externalParam",
@@ -339,11 +340,12 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">?) -> "
+      "text" : ">?) -> any "
     },
     {
       "kind" : "typeIdentifier",
@@ -358,7 +360,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:contextidentifier:context:queue:resulthandler:)"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient/perform(mutation:publishResultToStore:context:queue:resultHandler:)": {
+"doc://Apollo/documentation/Apollo/ApolloClient/perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)": {
   "abstract" : [
 
   ],
@@ -422,11 +424,28 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "context"
+      "text" : "contextIdentifier"
     },
     {
       "kind" : "text",
       "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation4UUIDV",
+      "text" : "UUID"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "context"
+    },
+    {
+      "kind" : "text",
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -435,7 +454,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?, "
+      "text" : ")?, "
     },
     {
       "kind" : "externalParam",
@@ -481,11 +500,12 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">?) -> "
+      "text" : ">?) -> any "
     },
     {
       "kind" : "typeIdentifier",
@@ -493,12 +513,12 @@
       "text" : "Cancellable"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:publishResultToStore:context:queue:resultHandler:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "perform(mutation:publishResultToStore:context:queue:resultHandler:)",
+  "title" : "perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:context:queue:resulthandler:)"
+  "url" : "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:contextidentifier:context:queue:resulthandler:)"
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/subscribe(subscription:context:queue:resultHandler:)": {
   "abstract" : [
@@ -551,7 +571,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -560,7 +580,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?, "
+      "text" : ")?, "
     },
     {
       "kind" : "externalParam",
@@ -606,11 +626,12 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">) -> "
+      "text" : ">) -> any "
     },
     {
       "kind" : "typeIdentifier",
@@ -693,7 +714,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -702,7 +723,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?, "
+      "text" : ")?, "
     },
     {
       "kind" : "externalParam",
@@ -748,11 +769,12 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">?) -> "
+      "text" : ">?) -> any "
     },
     {
       "kind" : "typeIdentifier",
@@ -835,7 +857,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -844,7 +866,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?, "
+      "text" : ")?, "
     },
     {
       "kind" : "externalParam",
@@ -890,6 +912,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {

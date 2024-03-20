@@ -71,7 +71,8 @@ extension IR.NamedFragment {
           inclusionConditions: nil,
           givenAllTypesInSchema: .init([type], schemaRootTypes: .mock())
         )
-      ]
+      ],
+      isUserDefined: true
     )
     let rootEntityField = IR.EntityField.init(
       rootField,
@@ -110,7 +111,8 @@ extension IR.Operation {
         forType: .mock(),
         inclusionConditions: nil,
         givenAllTypesInSchema: .init([], schemaRootTypes: .mock()))
-      ]
+      ],
+      isUserDefined: true
     )
     let rootField = IR.EntityField(
       .mock(),

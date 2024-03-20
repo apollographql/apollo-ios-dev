@@ -8,6 +8,7 @@ let project = Project(
     organizationName: "apollographql",
     packages: [
         .package(url: "https://github.com/Quick/Nimble.git", from: "13.2.0"),
+        .package(url: "https://github.com/stephencelis/SQLite.swift.git", from: "0.13.1"),
         .package(path: "apollo-ios"),
         .package(path: "apollo-ios-codegen"),
         .package(path: "apollo-ios-pagination"),

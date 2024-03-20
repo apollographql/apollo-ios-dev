@@ -20,6 +20,7 @@
       }
     ],
     "role" : "collectionGroup",
+    "roleHeading" : "API Collection",
     "title" : "Encodable Implementations"
   },
   "schemaVersion" : {
@@ -179,7 +180,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": any "
     },
     {
       "kind" : "typeIdentifier",

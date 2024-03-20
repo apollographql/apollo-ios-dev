@@ -101,7 +101,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : ": (any "
       },
       {
         "kind" : "typeIdentifier",
@@ -110,7 +110,7 @@
       },
       {
         "kind" : "text",
-        "text" : "?, "
+        "text" : ")?, "
       },
       {
         "kind" : "externalParam",
@@ -156,11 +156,12 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
         "text" : "Data"
       },
       {
         "kind" : "text",
-        "text" : ">?) -> "
+        "text" : ">?) -> any "
       },
       {
         "kind" : "typeIdentifier",
@@ -271,7 +272,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": "
+              "text" : ": (any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestContext",
@@ -281,7 +282,7 @@
             },
             {
               "kind" : "text",
-              "text" : "?, "
+              "text" : ")?, "
             },
             {
               "kind" : "externalParam",
@@ -328,11 +329,12 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
               "text" : "Data"
             },
             {
               "kind" : "text",
-              "text" : ">?) -> "
+              "text" : ">?) -> any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable",
@@ -662,7 +664,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -671,7 +673,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?, "
+      "text" : ")?, "
     },
     {
       "kind" : "externalParam",
@@ -717,11 +719,12 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">?) -> "
+      "text" : ">?) -> any "
     },
     {
       "kind" : "typeIdentifier",

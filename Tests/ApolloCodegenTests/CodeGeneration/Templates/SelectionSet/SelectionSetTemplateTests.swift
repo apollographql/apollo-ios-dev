@@ -1447,6 +1447,57 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
+  // Related to https://github.com/apollographql/apollo-ios/issues/3326
+  func test__render_selections__givenTypeCaseWithOnlyReservedField_doesNotRenderSelections() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal]
+    }
+
+    union Animal = AnimalObject | AnimalError
+
+    type AnimalObject {
+      species: String!
+    }
+
+    type AnimalError {
+      code: Int!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... on AnimalObject {
+          __typename
+        }
+      }
+    }
+    """
+
+    let expected = """
+    public struct AsAnimalObject: TestSchema.InlineFragment {
+      public let __data: DataDict
+      public init(_dataDict: DataDict) { __data = _dataDict }
+
+      public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
+      public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.AnimalObject }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals_asAnimalObject = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "AnimalObject"]
+    )
+
+    let actual = subject.test_render(inlineFragment: allAnimals_asAnimalObject.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 2, ignoringExtraLines: true))
+  }
+
   // MARK: Selections - Fragments
 
   func test__render_selections__givenFragments_rendersFragmentSelections() async throws {
@@ -6950,6 +7001,54 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(predator_actual)
       .to(equalLineByLine(predator_expected, atLine: 21, ignoringExtraLines: true))
+  }
+
+// Related to https://github.com/apollographql/apollo-ios/issues/3326
+  func test__render_nestedSelectionSet__givenInlineFragmentWithOnlyReservedField_doesNotRenderAsCompositeInlineFragment() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal]
+    }
+
+    union Animal = AnimalObject | AnimalError
+
+    type AnimalObject {
+      species: String!
+    }
+
+    type AnimalError {
+      code: Int!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... on AnimalObject {
+          __typename
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public var asAnimalObject: AsAnimalObject? { _asInlineFragment() }
+
+      /// AllAnimal.AsAnimalObject
+      public struct AsAnimalObject: TestSchema.InlineFragment {
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
   // MARK: Nested Selection Sets - Reserved Keywords + Special Names
