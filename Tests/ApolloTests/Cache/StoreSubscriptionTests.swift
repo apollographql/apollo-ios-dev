@@ -1,3 +1,4 @@
+import Nimble
 import XCTest
 @testable import Apollo
 
@@ -38,27 +39,14 @@ class StoreSubscriptionTests: XCTestCase {
     wait(for: [cacheKeyChangeExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func testUnsubscribedSubscriberDoesNotReceiveStoreUpdate() throws {
-    let cacheKeyChangeExpectation = XCTestExpectation(description: "Subscriber is notified of cache key change")
-    cacheKeyChangeExpectation.isInverted = true
-
-    let expectedChangeKeySet: Set<String> = ["QUERY_ROOT.__typename", "QUERY_ROOT.name"]
-    let subscriber = SimpleSubscriber(cacheKeyChangeExpectation, expectedChangeKeySet)
+  func testUnsubscribeRemovesSubscriberFromApolloStore() throws {
+    let subscriber = SimpleSubscriber(XCTestExpectation(), [])
 
     store.subscribe(subscriber)
 
     store.unsubscribe(subscriber)
 
-    store.publish(
-      records: [
-        "QUERY_ROOT": [
-          "__typename": "Hero",
-          "name": "Han Solo"
-        ]
-      ]
-    )
-
-    wait(for: [cacheKeyChangeExpectation], timeout: Self.defaultWaitTimeout)
+    expect(self.store.subscribers).toEventually(beEmpty())
   }
 
   /// Fufills the provided expectation when all expected keys have been observed.

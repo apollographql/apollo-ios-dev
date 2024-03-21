@@ -25,7 +25,7 @@ public class ApolloStore {
   private let cache: NormalizedCache
   private let queue: DispatchQueue
 
-  private var subscribers: [ApolloStoreSubscriber] = []
+  internal var subscribers: [ApolloStoreSubscriber] = []
 
   /// Designated initializer
   /// - Parameters:
@@ -89,7 +89,7 @@ public class ApolloStore {
   ///
   /// - Parameters:
   ///    - subscriber: A subscriber to receive content change notificatons. To avoid a retain cycle,
-  ///                  ensure you call `unsubscribe` on this subcriber before it goes out of scope.
+  ///                  ensure you call `unsubscribe` on this subscriber before it goes out of scope.
   public func subscribe(_ subscriber: ApolloStoreSubscriber) {
     queue.async(flags: .barrier) {
       self.subscribers.append(subscriber)
