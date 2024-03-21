@@ -118,6 +118,7 @@ class EntitySelectionTree {
     rootNode.mergeSelections(
       matchingScopePath: rootTypePath,
       into: selections,
+      currentMergeStrategyScope: .ancestors,
       transformingSelections: nil
     )
   }
@@ -207,6 +208,7 @@ class EntitySelectionTree {
     func mergeSelections(
       matchingScopePath scopePathNode: LinkedList<ScopeDescriptor>.Node,
       into targetSelections: ComputedSelectionSet.Builder,
+      currentMergeStrategyScope: MergedSelections.MergingStrategy,
       transformingSelections: ((Selections) -> Selections)?
     ) {
       switch child {
@@ -215,13 +217,18 @@ class EntitySelectionTree {
         entityNode.mergeSelections(
           matchingScopePath: nextScopePathNode,
           into: targetSelections,
+          currentMergeStrategyScope: mergeStrategy,
           transformingSelections: transformingSelections
         )
 
       case let .selections(selections):
         let selections = transformingSelections?(selections) ?? selections
         for (source, scopeSelections) in selections {
-          targetSelections.mergeIn(scopeSelections, from: source)
+          targetSelections.mergeIn(
+            scopeSelections,
+            from: source,
+            with: isTargetsExactScope ? [] : currentMergeStrategyScope
+          )
         }
 
       case .none: break
@@ -235,6 +242,7 @@ class EntitySelectionTree {
             node.mergeSelections(
               matchingScopePath: scopePathNode,
               into: targetSelections,
+              currentMergeStrategyScope: .siblings,
               transformingSelections: transformingSelections
             )
           } else if case .selections = child {
@@ -248,19 +256,20 @@ class EntitySelectionTree {
         mergedFragmentTree.rootNode.mergeSelections(
           matchingScopePath: scopePathNode,
           into: targetSelections,
+          currentMergeStrategyScope: .namedFragments,
           transformingSelections: {
-            Self.transform(
-              selections: $0,
-              fromFragment: fragmentSpread
+            Self.addFragment(
+              fragmentSpread,
+              toMergedSourcesOf: $0
             )
           }
         )
       }
     }
 
-    private static func transform(
-      selections: Selections,
-      fromFragment fragment: IR.NamedFragmentSpread
+    private static func addFragment(
+      _ fragment: IR.NamedFragmentSpread,
+      toMergedSourcesOf selections: Selections
     ) -> Selections {
       var newSelections = Selections()
 

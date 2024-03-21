@@ -33,6 +33,7 @@ extension ComputedSelectionSet {
     let typeInfo: SelectionSet.TypeInfo
     private let directSelections: DirectSelections.ReadOnly?
     private let entityStorage: DefinitionEntityStorage
+    public let mergingStrategy: MergedSelections.MergingStrategy
 
     public fileprivate(set) var mergedSources: OrderedSet<MergedSelections.MergedSource> = []
     public fileprivate(set) var fields: OrderedDictionary<String, Field> = [:]
@@ -42,6 +43,7 @@ extension ComputedSelectionSet {
     public init(
       directSelections: DirectSelections.ReadOnly?,
       typeInfo: SelectionSet.TypeInfo,
+      mergingStrategy: MergedSelections.MergingStrategy,
       entityStorage: DefinitionEntityStorage
     ) {
       precondition(
@@ -51,15 +53,18 @@ extension ComputedSelectionSet {
       self.directSelections = directSelections
       self.typeInfo = typeInfo
       self.entityStorage = entityStorage
+      self.mergingStrategy = mergingStrategy
     }
 
     public convenience init(
       _ selectionSet: IR.SelectionSet,
+      mergingStrategy: MergedSelections.MergingStrategy,
       entityStorage: DefinitionEntityStorage
     ) {
       self.init(
         directSelections: selectionSet.selections?.readOnlyView,
         typeInfo: selectionSet.typeInfo,
+        mergingStrategy: mergingStrategy,
         entityStorage: entityStorage
       )
     }
@@ -71,22 +76,46 @@ extension ComputedSelectionSet {
       return finalize()
     }
 
-    func mergeIn(_ selections: EntityTreeScopeSelections, from source: MergedSelections.MergedSource) {
-      @IsEverTrue var didMergeAnySelections: Bool
+    func mergeIn(
+      _ selections: EntityTreeScopeSelections,
+      from source: MergedSelections.MergedSource,
+      with mergeStrategy: MergedSelections.MergingStrategy
+    ) {
+      guard source != .init(typeInfo: self.typeInfo, fragment: nil) else {
+        return
+      }
 
-      selections.fields.values.forEach { didMergeAnySelections = self.mergeIn($0) }
-      selections.namedFragments.values.forEach { didMergeAnySelections = self.mergeIn($0) }
+      let fieldsToMerge = self.fieldsToMerge(from: selections.fields.values)
+      let fragmentsToMerge = self.namedFragmentsToMerge(from: selections.namedFragments.values)
+      guard !fieldsToMerge.isEmpty || !fragmentsToMerge.isEmpty else { return }
+
+      mergedSelectionGroups.forEach { groupMergeStrategy, selections in
+        guard groupMergeStrategy.contains(mergeStrategy) else { return }
+
+      selectionsToMerge.fields.values.forEach { didMergeAnySelections = self.mergeIn($0) }
+      selectionsToMerge.namedFragments.values.forEach { didMergeAnySelections = self.mergeIn($0) }
 
       if didMergeAnySelections {
         mergedSources.append(source)
       }
     }
+    
+    private func fieldsToMerge<S: Sequence>(
+      from fields: S
+    ) -> [Field] where S.Element == Field {
+      fields.compactMap { field in
+        let keyInScope = field.hashForSelectionSetScope
+        if let directSelections = directSelections,
+           directSelections.fields.keys.contains(keyInScope) {
+          return nil
+        }
 
-    private func mergeIn(_ field: Field) -> Bool {
-      let keyInScope = field.hashForSelectionSetScope
-      if let directSelections = directSelections,
-         directSelections.fields.keys.contains(keyInScope) {
-        return false
+        if let entityField = field as? EntityField {
+          return createShallowlyMergedNestedEntityField(from: entityField)
+
+        } else {
+          return field
+        }
       }
 
       let fieldToMerge: Field
@@ -135,12 +164,6 @@ extension ComputedSelectionSet {
     func addMergedInlineFragment(with condition: ScopeCondition) {
       guard typeInfo.isEntityRoot else { return }
 
-      createShallowlyMergedInlineFragmentIfNeeded(with: condition)
-    }
-
-    private func createShallowlyMergedInlineFragmentIfNeeded(
-      with condition: ScopeCondition
-    ) {
       if let directSelections = directSelections,
          directSelections.inlineFragments.keys.contains(condition) {
         return
@@ -148,6 +171,15 @@ extension ComputedSelectionSet {
 
       guard !inlineFragments.keys.contains(condition) else { return }
 
+      for (groupMergeStrategy, selections) in mergedSelectionGroups {
+        guard groupMergeStrategy.contains(mergeStrategy) else { continue }
+//        guard !$0.inlineFragments.keys.contains(condition) else { return }
+
+        selections.inlineFragments[condition] = shallowInlineFragment
+      }
+    }
+
+    private func createShallowlyMergedCompositeInlineFragment(with condition: ScopeCondition) {
       let typeInfo = SelectionSet.TypeInfo(
         entity: self.typeInfo.entity,
         scopePath: self.typeInfo.scopePath.mutatingLast { $0.appending(condition) },
@@ -167,16 +199,17 @@ extension ComputedSelectionSet {
     }
 
     fileprivate func finalize() -> ComputedSelectionSet {
-      let merged = MergedSelections(
+      let mergedSelections = MergedSelections(
         mergedSources: mergedSources,
-        mergingStrategy: .all,
+        mergingStrategy: mergingStrategy,
         fields: fields,
         inlineFragments: inlineFragments,
         namedFragments: namedFragments
       )
+
       return ComputedSelectionSet(
         direct: directSelections,
-        merged: merged,
+        merged: mergedSelections,
         typeInfo: typeInfo
       )
     }
