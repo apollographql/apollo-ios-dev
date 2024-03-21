@@ -46,6 +46,7 @@ struct SelectionSetTemplate {
   ) -> SelectionSetContext {
     let computedSelectionSet = ComputedSelectionSet.Builder(
       selectionSet,
+      mergingStrategies: [.all],
       entityStorage: definition.entityStorage
     ).build()
     var validationContext = context.validationContext
@@ -73,6 +74,7 @@ struct SelectionSetTemplate {
   func renderBody() -> TemplateString {
     let computedRootSelectionSet = IR.ComputedSelectionSet.Builder(
       definition.rootField.selectionSet,
+      mergingStrategies: [.all],
       entityStorage: definition.entityStorage
     ).build()
 
@@ -177,7 +179,7 @@ struct SelectionSetTemplate {
       \(RootEntityTypealias(selectionSet))
       \(ParentTypeTemplate(selectionSet.parentType))
       \(ifLet: selectionSet.direct, { DirectSelectionsMetadataTemplate($0, scope: selectionSet.scope) })
-      \(if: selectionSet.isCompositeInlineFragment, MergedSourcesTemplate(selectionSet.merged.mergedSources))
+      \(if: selectionSet.isCompositeInlineFragment, MergedSourcesTemplate(selectionSet.merged[.all]!.mergedSources))
 
       \(section: FieldAccessorsTemplate(selectionSet))
 
@@ -425,7 +427,7 @@ struct SelectionSetTemplate {
       \(ifLet: selectionSet.direct?.fields.values, {
       "\($0.map { FieldAccessorTemplate($0, in: scope) }, separator: "\n")"
       })
-      \(selectionSet.merged.fields.values.map { FieldAccessorTemplate($0, in: scope) }, separator: "\n")
+      \(selectionSet.merged[.all]!.fields.values.map { FieldAccessorTemplate($0, in: scope) }, separator: "\n")
       """
   }
 
@@ -482,7 +484,7 @@ struct SelectionSetTemplate {
   ) -> TemplateString {
     guard
       !(selectionSet.direct?.namedFragments.isEmpty ?? true)
-        || !selectionSet.merged.namedFragments.isEmpty
+        || !selectionSet.merged[.all]!.namedFragments.isEmpty
         || (selectionSet.direct?.inlineFragments.containsDeferredFragment ?? false)
     else {
       return ""
@@ -498,7 +500,7 @@ struct SelectionSetTemplate {
         \(ifLet: selectionSet.direct?.namedFragments.values, {
         "\($0.map { NamedFragmentAccessorTemplate($0, in: scope) }, separator: "\n")"
       })
-        \(selectionSet.merged.namedFragments.values.map {
+        \(selectionSet.merged[.all]!.namedFragments.values.map {
         NamedFragmentAccessorTemplate($0, in: scope)
       }, separator: "\n")
         \(forEachIn: selectionSet.direct?.inlineFragments.values.elements ?? [], {
@@ -673,7 +675,7 @@ struct SelectionSetTemplate {
       fulfilledFragments.append(selectionSetName)
     }
 
-    for source in selectionSet.merged.mergedSources {
+    for source in selectionSet.merged[.all]!.mergedSources {
       fulfilledFragments
         .append(
           contentsOf: source.generatedSelectionSetNamesOfFullfilledFragments(
@@ -764,7 +766,7 @@ extension IR.ComputedSelectionSet {
   }
 
   fileprivate var shouldBeRendered: Bool {
-    return direct != nil || merged.mergedSources.count != 1
+    return direct != nil || merged[.all]!.mergedSources.count != 1
   }
 
   /// If the SelectionSet is a reference to another rendered SelectionSet, returns the qualified
@@ -781,7 +783,7 @@ extension IR.ComputedSelectionSet {
       return nil
     }
 
-    return merged.mergedSources
+    return merged[.all]!.mergedSources
       .first.unsafelyUnwrapped
       .generatedSelectionSetNamePath(
         from: typeInfo,

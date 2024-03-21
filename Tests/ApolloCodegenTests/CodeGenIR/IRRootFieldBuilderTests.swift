@@ -1590,8 +1590,10 @@ class IRRootFieldBuilderTests: XCTestCase {
     let aField = subject[field: "aField"]
 
     // then
-    expect(aField?.selectionSet?.computed.direct).to(shallowlyMatch(expected_direct))
-    expect(aField?.selectionSet?.computed.merged).to(shallowlyMatch(expected_merged))
+    expect(aField?.selectionSet?.computed.direct)
+      .to(shallowlyMatch(expected_direct))
+    expect(aField?.selectionSet?.computed.merged)
+      .to(shallowlyMatch(expected_merged))
   }
 
   func test__mergedSelections__givenSelectionSetWithSelectionsAndParentFields_returnsSelfAndParentFields() async throws {
@@ -4144,7 +4146,8 @@ class IRRootFieldBuilderTests: XCTestCase {
     ]
 
     // then
-    expect(allAnimals_predator.selectionSet?.computed.merged.mergedSources).to(equal(expected))
+    expect(allAnimals_predator.selectionSet?.computed.merged.mergedSources)
+      .to(equal(expected))
   }
 
   // MARK: - Referenced Fragments
