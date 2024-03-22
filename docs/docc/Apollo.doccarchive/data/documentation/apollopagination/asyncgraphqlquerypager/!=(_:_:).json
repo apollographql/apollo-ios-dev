@@ -1,23 +1,47 @@
 {
+  "abstract" : [
+    {
+      "text" : "Inherited from ",
+      "type" : "text"
+    },
+    {
+      "code" : "Equatable.!=(_:_:)",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/Equatable-Implementations"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/cancellables"
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/!=(_:_:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination22AsyncGraphQLQueryPagerC12cancellablesShy7Combine14AnyCancellableCGvp",
+    "extendedModule" : "Swift",
+    "externalID" : "s:SQsE2neoiySbx_xtFZ::SYNTHESIZED::s:16ApolloPagination22AsyncGraphQLQueryPagerC",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "var"
+        "text" : "static"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "func"
       },
       {
         "kind" : "text",
@@ -25,40 +49,50 @@
       },
       {
         "kind" : "identifier",
-        "text" : "cancellables"
+        "text" : "!="
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : " "
+      },
+      {
+        "kind" : "text",
+        "text" : "("
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:Sh",
-        "text" : "Set"
+        "text" : "Self"
       },
       {
         "kind" : "text",
-        "text" : "<"
+        "text" : ", "
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:7Combine14AnyCancellableC",
-        "text" : "AnyCancellable"
+        "text" : "Self"
       },
       {
         "kind" : "text",
-        "text" : ">"
+        "text" : ") -> "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:Sb",
+        "text" : "Bool"
       }
     ],
     "modules" : [
       {
-        "name" : "ApolloPagination"
+        "name" : "ApolloPagination",
+        "relatedModules" : [
+          "Swift"
+        ]
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Instance Property",
-    "symbolKind" : "property",
-    "title" : "cancellables"
+    "roleHeading" : "Operator",
+    "symbolKind" : "op",
+    "title" : "!=(_:_:)"
   },
   "primaryContentSections" : [
     {
@@ -72,13 +106,8 @@
           ],
           "tokens" : [
             {
-              "kind" : "attribute",
-              "text" : "@"
-            },
-            {
-              "kind" : "attribute",
-              "preciseIdentifier" : "s:6Apollo6AtomicC",
-              "text" : "Atomic"
+              "kind" : "keyword",
+              "text" : "static"
             },
             {
               "kind" : "text",
@@ -86,7 +115,7 @@
             },
             {
               "kind" : "keyword",
-              "text" : "var"
+              "text" : "func"
             },
             {
               "kind" : "text",
@@ -94,7 +123,19 @@
             },
             {
               "kind" : "identifier",
-              "text" : "cancellables"
+              "text" : "!="
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "text",
+              "text" : "("
+            },
+            {
+              "kind" : "internalParam",
+              "text" : "lhs"
             },
             {
               "kind" : "text",
@@ -102,29 +143,32 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:Sh",
-              "text" : "Set"
+              "text" : "Self"
             },
             {
               "kind" : "text",
-              "text" : "<"
+              "text" : ", "
+            },
+            {
+              "kind" : "internalParam",
+              "text" : "rhs"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:7Combine14AnyCancellableC",
-              "text" : "AnyCancellable"
+              "text" : "Self"
             },
             {
               "kind" : "text",
-              "text" : "> { "
+              "text" : ") -> "
             },
             {
-              "kind" : "keyword",
-              "text" : "get"
-            },
-            {
-              "kind" : "text",
-              "text" : " }"
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:Sb",
+              "text" : "Bool"
             }
           ]
         }
@@ -143,7 +187,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollopagination\/asyncgraphqlquerypager\/cancellables"
+        "\/documentation\/apollopagination\/asyncgraphqlquerypager\/!=(_:_:)"
       ],
       "traits" : [
         {
@@ -199,14 +243,22 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager/cancellables": {
+"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager/!=(_:_:)": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "var"
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "func"
     },
     {
       "kind" : "text",
@@ -214,37 +266,55 @@
     },
     {
       "kind" : "identifier",
-      "text" : "cancellables"
+      "text" : "!="
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : " "
+    },
+    {
+      "kind" : "text",
+      "text" : "("
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sh",
-      "text" : "Set"
+      "text" : "Self"
     },
     {
       "kind" : "text",
-      "text" : "<"
+      "text" : ", "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:7Combine14AnyCancellableC",
-      "text" : "AnyCancellable"
+      "text" : "Self"
     },
     {
       "kind" : "text",
-      "text" : ">"
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/cancellables",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/!=(_:_:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "cancellables",
+  "title" : "!=(_:_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager\/cancellables"
+  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager\/!=(_:_:)"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager/Equatable-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/Equatable-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "Equatable Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager\/equatable-implementations"
 }
 }
 }

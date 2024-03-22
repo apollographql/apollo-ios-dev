@@ -93,7 +93,8 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloPagination\/7Combine9PublisherP"
+        "doc:\/\/ApolloPagination\/7Combine9PublisherP",
+        "doc:\/\/ApolloPagination\/SQ"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -155,6 +156,7 @@
     {
       "generated" : true,
       "identifiers" : [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/Equatable-Implementations",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/Publisher-Implementations"
       ],
       "title" : "Default Implementations"
@@ -177,6 +179,11 @@
 "doc://ApolloPagination/7Combine9PublisherP": {
   "identifier" : "doc:\/\/ApolloPagination\/7Combine9PublisherP",
   "title" : "Combine.Publisher",
+  "type" : "unresolvable"
+},
+"doc://ApolloPagination/SQ": {
+  "identifier" : "doc:\/\/ApolloPagination\/SQ",
+  "title" : "Swift.Equatable",
   "type" : "unresolvable"
 },
 "doc://ApolloPagination/documentation/ApolloPagination": {
@@ -223,6 +230,17 @@
   "title" : "GraphQLQueryPager",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/graphqlquerypager"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/Equatable-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/Equatable-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "Equatable Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/equatable-implementations"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/Failure": {
   "abstract" : [

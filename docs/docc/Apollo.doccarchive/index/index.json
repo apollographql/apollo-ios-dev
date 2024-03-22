@@ -139,8 +139,18 @@
                     "type" : "method"
                   },
                   {
+                    "path" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:context:queue:resulthandler:)",
+                    "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> any Cancellable",
+                    "type" : "method"
+                  },
+                  {
                     "path" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:contextidentifier:context:queue:resulthandler:)",
                     "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> any Cancellable",
+                    "type" : "method"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:context:queue:resulthandler:)",
+                    "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> any Cancellable",
                     "type" : "method"
                   },
                   {
@@ -272,6 +282,16 @@
               {
                 "path" : "\/documentation\/apollo\/apollostore\/publish(records:identifier:callbackqueue:completion:)",
                 "title" : "func publish(records: RecordSet, identifier: UUID?, callbackQueue: DispatchQueue, completion: ((Result<Void, any Error>) -> Void)?)",
+                "type" : "method"
+              },
+              {
+                "path" : "\/documentation\/apollo\/apollostore\/subscribe(_:)",
+                "title" : "func subscribe(any ApolloStoreSubscriber)",
+                "type" : "method"
+              },
+              {
+                "path" : "\/documentation\/apollo\/apollostore\/unsubscribe(_:)",
+                "title" : "func unsubscribe(any ApolloStoreSubscriber)",
                 "type" : "method"
               },
               {
@@ -496,6 +516,11 @@
               {
                 "path" : "\/documentation\/apollo\/graphqlquerywatcher\/refetch(cachepolicy:)",
                 "title" : "func refetch(cachePolicy: CachePolicy)",
+                "type" : "method"
+              },
+              {
+                "path" : "\/documentation\/apollo\/graphqlquerywatcher\/store(_:didchangekeys:contextidentifier:)",
+                "title" : "func store(ApolloStore, didChangeKeys: Set<CacheKey>, contextIdentifier: UUID?)",
                 "type" : "method"
               }
             ],
@@ -1534,6 +1559,11 @@
                 "type" : "method"
               },
               {
+                "path" : "\/documentation\/apollo\/urlsessionclient\/sendrequest(_:rawtaskcompletionhandler:completion:)",
+                "title" : "func sendRequest(URLRequest, rawTaskCompletionHandler: URLSessionClient.RawCompletion?, completion: URLSessionClient.Completion) -> URLSessionTask",
+                "type" : "method"
+              },
+              {
                 "path" : "\/documentation\/apollo\/urlsessionclient\/sendrequest(_:taskdescription:rawtaskcompletionhandler:completion:)",
                 "title" : "func sendRequest(URLRequest, taskDescription: String?, rawTaskCompletionHandler: URLSessionClient.RawCompletion?, completion: URLSessionClient.Completion) -> URLSessionTask",
                 "type" : "method"
@@ -1830,8 +1860,18 @@
                 "type" : "method"
               },
               {
+                "path" : "\/documentation\/apollo\/apolloclientprotocol\/fetch(query:cachepolicy:context:queue:resulthandler:)",
+                "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> any Cancellable",
+                "type" : "method"
+              },
+              {
                 "path" : "\/documentation\/apollo\/apolloclientprotocol\/fetch(query:cachepolicy:contextidentifier:context:queue:resulthandler:)",
                 "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> any Cancellable",
+                "type" : "method"
+              },
+              {
+                "path" : "\/documentation\/apollo\/apolloclientprotocol\/perform(mutation:publishresulttostore:context:queue:resulthandler:)",
+                "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> any Cancellable",
                 "type" : "method"
               },
               {
@@ -1898,6 +1938,22 @@
             ],
             "path" : "\/documentation\/apollo\/apollointerceptor",
             "title" : "ApolloInterceptor",
+            "type" : "protocol"
+          },
+          {
+            "children" : [
+              {
+                "title" : "Instance Methods",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/apollostoresubscriber\/store(_:didchangekeys:contextidentifier:)",
+                "title" : "func store(ApolloStore, didChangeKeys: Set<CacheKey>, contextIdentifier: UUID?)",
+                "type" : "method"
+              }
+            ],
+            "path" : "\/documentation\/apollo\/apollostoresubscriber",
+            "title" : "ApolloStoreSubscriber",
             "type" : "protocol"
           },
           {
