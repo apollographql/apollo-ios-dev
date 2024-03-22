@@ -200,6 +200,7 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/clear(task:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/clearAllTasks()",
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/invalidate()",
+        "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/sendRequest(_:rawTaskCompletionHandler:completion:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/sendRequest(_:taskDescription:rawTaskCompletionHandler:completion:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/urlSession(_:dataTask:didBecome:)-17qvj",
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/urlSession(_:dataTask:didBecome:)-1gjp0",
@@ -680,6 +681,101 @@
   "title" : "invalidate()",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/urlsessionclient\/invalidate()"
+},
+"doc://Apollo/documentation/Apollo/URLSessionClient/sendRequest(_:rawTaskCompletionHandler:completion:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "sendRequest"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation10URLRequestV",
+      "text" : "URLRequest"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "rawTaskCompletionHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:@M@Apollo@objc(cs)URLSessionClient",
+      "text" : "URLSessionClient"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo16URLSessionClientC13RawCompletiona",
+      "text" : "RawCompletion"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "completion"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:@M@Apollo@objc(cs)URLSessionClient",
+      "text" : "URLSessionClient"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo16URLSessionClientC10Completiona",
+      "text" : "Completion"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)NSURLSessionTask",
+      "text" : "URLSessionTask"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/sendRequest(_:rawTaskCompletionHandler:completion:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "sendRequest(_:rawTaskCompletionHandler:completion:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/urlsessionclient\/sendrequest(_:rawtaskcompletionhandler:completion:)"
 },
 "doc://Apollo/documentation/Apollo/URLSessionClient/sendRequest(_:taskDescription:rawTaskCompletionHandler:completion:)": {
   "abstract" : [
