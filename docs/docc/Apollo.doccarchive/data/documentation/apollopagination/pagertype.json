@@ -97,11 +97,11 @@
     },
     {
       "identifiers" : [
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/fetch()",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/fetch(callbackQueue:completion:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/loadAll(fetchFromInitialPage:callbackQueue:completion:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/loadNext(cachePolicy:callbackQueue:completion:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/loadPrevious(cachePolicy:callbackQueue:completion:)",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/refetch(cachePolicy:)",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/refetch(cachePolicy:callbackQueue:completion:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/reset()"
       ],
       "title" : "Instance Methods"
@@ -303,7 +303,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/pagertype\/canloadprevious"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/PagerType/fetch()": {
+"doc://ApolloPagination/documentation/ApolloPagination/PagerType/fetch(callbackQueue:completion:)": {
   "abstract" : [
 
   ],
@@ -322,16 +322,50 @@
     },
     {
       "kind" : "text",
-      "text" : "()"
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "callbackQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
+      "text" : "DispatchQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "completion"
+    },
+    {
+      "kind" : "text",
+      "text" : ": (() -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s4Voida",
+      "text" : "Void"
+    },
+    {
+      "kind" : "text",
+      "text" : ")?)"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/fetch()",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/fetch(callbackQueue:completion:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
-  "title" : "fetch()",
+  "title" : "fetch(callbackQueue:completion:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/pagertype\/fetch()"
+  "url" : "\/documentation\/apollopagination\/pagertype\/fetch(callbackqueue:completion:)"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/PagerType/loadAll(fetchFromInitialPage:callbackQueue:completion:)": {
   "abstract" : [
@@ -603,7 +637,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/pagertype\/loadprevious(cachepolicy:callbackqueue:completion:)"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/PagerType/refetch(cachePolicy:)": {
+"doc://ApolloPagination/documentation/ApolloPagination/PagerType/refetch(cachePolicy:callbackQueue:completion:)": {
   "abstract" : [
 
   ],
@@ -639,16 +673,50 @@
     },
     {
       "kind" : "text",
-      "text" : ")"
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "callbackQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
+      "text" : "DispatchQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "completion"
+    },
+    {
+      "kind" : "text",
+      "text" : ": (() -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s4Voida",
+      "text" : "Void"
+    },
+    {
+      "kind" : "text",
+      "text" : ")?)"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/refetch(cachePolicy:)",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/refetch(cachePolicy:callbackQueue:completion:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
-  "title" : "refetch(cachePolicy:)",
+  "title" : "refetch(cachePolicy:callbackQueue:completion:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/pagertype\/refetch(cachepolicy:)"
+  "url" : "\/documentation\/apollopagination\/pagertype\/refetch(cachepolicy:callbackqueue:completion:)"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/PagerType/reset()": {
   "abstract" : [
