@@ -116,6 +116,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "none"
           },
           "deprecatedEnumCases" : "exclude",
+          "fieldMerging" : [
+            "all"
+          ],
           "markOperationDefinitionsAsFinal" : true,
           "operationDocumentFormat" : [
             "definition"
