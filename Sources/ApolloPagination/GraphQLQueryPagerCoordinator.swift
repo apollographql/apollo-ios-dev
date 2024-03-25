@@ -25,8 +25,15 @@ public protocol PagerType {
     callbackQueue: DispatchQueue,
     completion: ((PaginationError?) -> Void)?
   )
-  func refetch(cachePolicy: CachePolicy)
-  func fetch()
+  func refetch(
+    cachePolicy: CachePolicy,
+    callbackQueue: DispatchQueue,
+    completion: (() -> Void)?
+  )
+  func fetch(
+    callbackQueue: DispatchQueue,
+    completion: (() -> Void)?
+  )
 }
 
 /// Handles pagination in the queue by managing multiple query watchers.
@@ -151,9 +158,17 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
   }
 
   /// Discards pagination state and fetches the first page from scratch.
-  /// - Parameter cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `fetchIgnoringCacheData`.
-  func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
-    Task {
+  /// - Parameters:
+  ///   - cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `fetchIgnoringCacheData`.
+  ///   - callbackQueue: The `DispatchQueue` that the `completion` fires on. Defaults to `main`.
+  ///   - completion: A completion block that will always trigger after the execution of this  operation.
+  func refetch(
+    cachePolicy: CachePolicy = .fetchIgnoringCacheData,
+    callbackQueue: DispatchQueue = .main,
+    completion: (() -> Void)? = nil
+  ) {
+    execute(callbackQueue: callbackQueue, completion: { _ in completion?() }) { [weak self] in
+      guard let self else { return }
       for completion in await self.completionManager.completions {
         completion.execute(error: PaginationError.cancellation)
       }
@@ -162,9 +177,15 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
   }
 
   /// Fetches the first page.
-  func fetch() {
-    Task {
-      await pager.fetch()
+  /// - Parameters:
+  ///   - callbackQueue: The `DispatchQueue` that the `completion` fires on. Defaults to `main`.
+  ///   - completion: A completion block that will always trigger after the execution of this  operation.
+  func fetch(
+    callbackQueue: DispatchQueue = .main,
+    completion: (() -> Void)? = nil
+  ) {
+    execute(callbackQueue: callbackQueue, completion: { _ in completion?() }) { [weak self] in
+      await self?.pager.fetch()
     }
   }
 
