@@ -866,9 +866,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   /// different instances together to indicate all the types you would like to generate
   /// initializers for.
   public struct SelectionSetInitializers: Codable, Equatable, ExpressibleByArrayLiteral {
-    private var options: SelectionSetInitializers.Options
-    private var definitions: Set<String>
-
     /// Option to generate initializers for all named fragments.
     public static let namedFragments: SelectionSetInitializers = .init(.namedFragments)
 
@@ -894,6 +891,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public static func fragment(named: String) -> SelectionSetInitializers {
       .init(definitionName: named)
     }
+
+    private var options: SelectionSetInitializers.Options
+    private var definitions: Set<String>
 
     /// Initializes a `SelectionSetInitializer` with an array of values.
     public init(arrayLiteral elements: SelectionSetInitializers...) {
@@ -926,29 +926,41 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   ///
   /// By default, all possible fields and named fragment accessors are merged into each selection
   /// set.
-  public struct FieldMerging: OptionSet, Codable, Equatable {
+  public struct FieldMerging: Codable, Equatable, ExpressibleByArrayLiteral {
     /// Merges fields and fragment accessors from the selection set's direct ancestors.
-    public static let ancestors          = FieldMerging(rawValue: 1 << 0)
+    public static let ancestors          = FieldMerging(.ancestors)
 
     /// Merges fields and fragment accessors from sibling inline fragments that match the selection
     /// set's scope.
-    public static let siblings           = FieldMerging(rawValue: 1 << 1)
+    public static let siblings           = FieldMerging(.siblings)
 
     /// Merges fields and fragment accessors from named fragments that have been spread into the
     /// selection set.
-    public static let namedFragments     = FieldMerging(rawValue: 1 << 2)
+    public static let namedFragments     = FieldMerging(.namedFragments)
 
     /// Merges all possible fields and fragment accessors from all sources.
     public static let all: FieldMerging  = [.ancestors, .siblings, .namedFragments]
 
     /// Disables field merging entirely. Aside from removal of redundant selections, the shape of
     /// the generated models will directly mirror the GraphQL definition.
-    public static let none: FieldMerging = FieldMerging(rawValue: 0)
+    public static let none: FieldMerging = []
 
-    public let rawValue: Int
+    private var options: MergedSelections.MergingStrategy
 
-    public init(rawValue: Int) {
-      self.rawValue = rawValue
+    private init(_ options: MergedSelections.MergingStrategy) {
+      self.options = options
+    }
+
+    public init(arrayLiteral elements: FieldMerging...) {
+      self.options = []
+      for element in elements {
+        self.options.insert(element.options)
+      }
+    }
+
+    /// Inserts a `SelectionSetInitializer` into the receiver.
+    public mutating func insert(_ member: FieldMerging) {
+      self.options.insert(member.options)
     }
   }
 
@@ -1263,6 +1275,75 @@ extension ApolloCodegenConfiguration.SelectionSetInitializers {
 
     if !definitions.isEmpty {
       try container.encode(definitions.sorted(), forKey: .definitionsNamed)
+    }
+  }
+}
+
+// MARK: - FieldMerging - Private Implementation
+
+extension ApolloCodegenConfiguration.FieldMerging {
+
+  // MARK: - Codable
+
+  private enum CodableValues: String {
+    case all
+    case ancestors
+    case siblings
+    case namedFragments
+  }
+
+  public init(from decoder: any Decoder) throws {
+    var values = try decoder.unkeyedContainer()
+
+    var options: MergedSelections.MergingStrategy = []
+
+    while !values.isAtEnd {
+      let option = try values.decode(String.self)
+      switch option {
+      case CodableValues.all.rawValue:
+        self.options = [.all]
+        return
+
+      case CodableValues.ancestors.rawValue:
+        options.insert(.ancestors)
+
+      case CodableValues.siblings.rawValue:
+        options.insert(.siblings)
+
+      case CodableValues.namedFragments.rawValue:
+        options.insert(.namedFragments)
+
+      default:
+        throw DecodingError.dataCorrupted(
+          DecodingError.Context(
+            codingPath: values.codingPath,
+            debugDescription: "Unrecognized value: \(option)"
+          )
+        )
+      }
+    }
+
+    self.options = options
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.unkeyedContainer()
+
+    if options == .all {
+      try container.encode(CodableValues.all.rawValue)
+      return
+    }
+
+    if options.contains(.ancestors) {
+      try container.encode(CodableValues.ancestors.rawValue)
+    }
+
+    if options.contains(.siblings) {
+      try container.encode(CodableValues.siblings.rawValue)
+    }
+
+    if options.contains(.namedFragments) {
+      try container.encode(CodableValues.namedFragments.rawValue)
     }
   }
 }
