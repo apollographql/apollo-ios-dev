@@ -1177,7 +1177,6 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
-
   func test__render_given_mergedSelection_rendersInitializer() async throws {
     // given
     schemaSDL = """

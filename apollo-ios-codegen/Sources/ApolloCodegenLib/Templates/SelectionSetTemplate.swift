@@ -42,22 +42,53 @@ struct SelectionSetTemplate {
 
   private func createSelectionSetContext(
     for selectionSet: IR.SelectionSet,
-    inParent context: SelectionSetContext
+    inParent context: SelectionSetContext?
   ) -> SelectionSetContext {
     let computedSelectionSet = ComputedSelectionSet.Builder(
       selectionSet,
-      mergingStrategies: [.all],
+      mergingStrategies: self.mergingStrategies(for: selectionSet),
       entityStorage: definition.entityStorage
     ).build()
-    var validationContext = context.validationContext
+
+    var validationContext = context?.validationContext ??
+    SelectionSetValidationContext(config: config)
+
     validationContext.runTypeValidationFor(
       computedSelectionSet,
       recordingErrorsTo: nonFatalErrorRecorder
     )
+
     return SelectionSetContext(
       selectionSet: computedSelectionSet,
       validationContext: validationContext
     )
+  }
+
+  func mergingStrategies(
+    for selectionSet: IR.SelectionSet
+  ) -> Set<MergedSelections.MergingStrategy> {
+    if self.config.options.fieldMerging.options == .all {
+      return [.all]
+    }
+
+    /*
+     There are a number of situations in which we will need to calculate all merged
+     fields, even if the `fieldMerging` option is not set to `.all`.
+
+     1. When using `selectionSetInitializers`, the initializers must include all merged fields
+     for the type in order to initialize a fully valid and functional object.
+     2. When a selection set is a CompositeInlineFragment, we use all merged fields to calculate
+     the `__mergedSources` of the fragment.
+
+     In these situations, we should calculate both strategies. We still use the strategy provided
+     by the `fieldMerging` configuration option for generating property accessors. We only use the
+     `.all` merged fields in the necessary areas.
+     */
+    if self.generateInitializers || selectionSet.isCompositeInlineFragment {
+      return [.all, config.options.fieldMerging.options]
+    }
+
+    return [config.options.fieldMerging.options]
   }
 
   /// MARK: - Render Body
@@ -72,20 +103,9 @@ struct SelectionSetTemplate {
   ///
   /// - Returns: The `TemplateString` for the body of the `SelectionSetTemplate`.
   func renderBody() -> TemplateString {
-    let computedRootSelectionSet = IR.ComputedSelectionSet.Builder(
-      definition.rootField.selectionSet,
-      mergingStrategies: [.all],
-      entityStorage: definition.entityStorage
-    ).build()
-
-    var validationContext = SelectionSetValidationContext(config: config)
-    validationContext.runTypeValidationFor(
-      computedRootSelectionSet,
-      recordingErrorsTo: nonFatalErrorRecorder
-    )
-    let selectionSetContext = SelectionSetContext(
-      selectionSet: computedRootSelectionSet,
-      validationContext: validationContext
+    let selectionSetContext = createSelectionSetContext(
+      for: definition.rootField.selectionSet,
+      inParent: nil
     )
 
     let body = BodyTemplate(selectionSetContext)
@@ -96,6 +116,9 @@ struct SelectionSetTemplate {
   // MARK: - Child Entity
   func render(childEntity context: SelectionSetContext) -> String? {
     let selectionSet = context.selectionSet
+
+    guard selectionSet.shouldBeRendered(config) else { return nil }
+
     let fieldSelectionSetName = nameCache.selectionSetName(for: selectionSet.typeInfo)
 
     if let referencedSelectionSetName = selectionSet.nameForReferencedSelectionSet(config: config) {
@@ -166,7 +189,10 @@ struct SelectionSetTemplate {
   // MARK: - Body
   func BodyTemplate(_ context: SelectionSetContext) -> TemplateString {
     lazy var computedChildSelectionSets: [SelectionSetContext] = {
-      IteratorSequence(context.selectionSet.makeInlineFragmentIterator()).map {
+      IteratorSequence(context.selectionSet.makeInlineFragmentIterator(
+        mergingStrategy: config.options.fieldMerging.options
+      ))
+      .map {
         createSelectionSetContext(for: $0.selectionSet, inParent: context)
       }
     }()
@@ -179,7 +205,7 @@ struct SelectionSetTemplate {
       \(RootEntityTypealias(selectionSet))
       \(ParentTypeTemplate(selectionSet.parentType))
       \(ifLet: selectionSet.direct, { DirectSelectionsMetadataTemplate($0, scope: selectionSet.scope) })
-      \(if: selectionSet.isCompositeInlineFragment, MergedSourcesTemplate(selectionSet.merged[.all]!.mergedSources))
+      \(if: selectionSet.isCompositeInlineFragment, MergedSourcesTemplate(selectionSet.merged[.all].unsafelyUnwrapped.mergedSources))
 
       \(section: FieldAccessorsTemplate(selectionSet))
 
@@ -427,7 +453,12 @@ struct SelectionSetTemplate {
       \(ifLet: selectionSet.direct?.fields.values, {
       "\($0.map { FieldAccessorTemplate($0, in: scope) }, separator: "\n")"
       })
-      \(selectionSet.merged[.all]!.fields.values.map { FieldAccessorTemplate($0, in: scope) }, separator: "\n")
+      \(selectionSet
+        .merged[config.options.fieldMerging.options].unsafelyUnwrapped
+        .fields.values
+        .map { FieldAccessorTemplate($0, in: scope) },
+        separator: "\n"
+      )
       """
   }
 
@@ -484,7 +515,10 @@ struct SelectionSetTemplate {
   ) -> TemplateString {
     guard
       !(selectionSet.direct?.namedFragments.isEmpty ?? true)
-        || !selectionSet.merged[.all]!.namedFragments.isEmpty
+        || !selectionSet
+          .merged[config.options.fieldMerging.options].unsafelyUnwrapped
+          .namedFragments
+          .isEmpty
         || (selectionSet.direct?.inlineFragments.containsDeferredFragment ?? false)
     else {
       return ""
@@ -500,9 +534,13 @@ struct SelectionSetTemplate {
         \(ifLet: selectionSet.direct?.namedFragments.values, {
         "\($0.map { NamedFragmentAccessorTemplate($0, in: scope) }, separator: "\n")"
       })
-        \(selectionSet.merged[.all]!.namedFragments.values.map {
-        NamedFragmentAccessorTemplate($0, in: scope)
-      }, separator: "\n")
+        \(selectionSet
+          .merged[config.options.fieldMerging.options]
+          .unsafelyUnwrapped
+          .namedFragments.values
+          .map { NamedFragmentAccessorTemplate($0, in: scope) },
+          separator: "\n"
+        )
         \(forEachIn: selectionSet.direct?.inlineFragments.values.elements ?? [], {
         "\(ifLet: $0.typeInfo.deferCondition, DeferredFragmentAccessorTemplate)"
       })
@@ -599,7 +637,7 @@ struct SelectionSetTemplate {
     _ selectionSet: ComputedSelectionSet
   ) -> TemplateString {
     let isConcreteType = selectionSet.typeInfo.parentType is GraphQLObjectType
-    let allFields = selectionSet.makeFieldIterator()
+    let allFields = selectionSet.makeFieldIterator(mergingStrategy: .all)
 
     return TemplateString(
       """
@@ -627,7 +665,7 @@ struct SelectionSetTemplate {
     _ selectionSet: ComputedSelectionSet
   ) -> TemplateString {
     let isConcreteType = selectionSet.typeInfo.parentType is GraphQLObjectType
-    let allFields = selectionSet.makeFieldIterator()
+    let allFields = selectionSet.makeFieldIterator(mergingStrategy: .all)
 
     return TemplateString(
       """
@@ -675,7 +713,7 @@ struct SelectionSetTemplate {
       fulfilledFragments.append(selectionSetName)
     }
 
-    for source in selectionSet.merged[.all]!.mergedSources {
+    for source in selectionSet.merged[.all].unsafelyUnwrapped.mergedSources {
       fulfilledFragments
         .append(
           contentsOf: source.generatedSelectionSetNamesOfFullfilledFragments(
@@ -692,11 +730,14 @@ struct SelectionSetTemplate {
   }
 
   // MARK: - Nested Selection Sets
+
   private func ChildEntityFieldSelectionSets(
     _ context: SelectionSetContext
   ) -> TemplateString {
     let selectionSet = context.selectionSet
-    let allFields = selectionSet.makeFieldIterator { field in
+    let allFields = selectionSet.makeFieldIterator(
+      mergingStrategy: config.options.fieldMerging.options
+    ) { field in
       field is IR.EntityField
     }
 
@@ -759,14 +800,25 @@ private class SelectionSetNameCache {
 
 // MARK: - Helper Extensions
 
+extension IR.SelectionSet {
+
+  fileprivate var isCompositeInlineFragment: Bool {
+    return !self.isEntityRoot && !self.isUserDefined && (selections?.isEmpty ?? true)
+  }
+
+}
+
 extension IR.ComputedSelectionSet {
 
   fileprivate var isCompositeInlineFragment: Bool {
     return !self.isEntityRoot && !self.isUserDefined && (direct?.isEmpty ?? true)
   }
 
-  fileprivate var shouldBeRendered: Bool {
-    return direct != nil || merged[.all]!.mergedSources.count != 1
+  fileprivate func shouldBeRendered(
+    _ config: ApolloCodegen.ConfigurationContext
+  ) -> Bool {
+    return direct != nil ||
+    merged[config.options.fieldMerging.options].unsafelyUnwrapped.mergedSources.count >= 1
   }
 
   /// If the SelectionSet is a reference to another rendered SelectionSet, returns the qualified
@@ -779,11 +831,15 @@ extension IR.ComputedSelectionSet {
   fileprivate func nameForReferencedSelectionSet(
     config: ApolloCodegen.ConfigurationContext
   ) -> String? {
-    guard !shouldBeRendered else {
+    guard direct == nil &&
+            merged[config.options.fieldMerging.options].unsafelyUnwrapped.mergedSources.count == 1
+    else {
       return nil
     }
 
-    return merged[.all]!.mergedSources
+    return merged[config.options.fieldMerging.options]
+      .unsafelyUnwrapped
+      .mergedSources
       .first.unsafelyUnwrapped
       .generatedSelectionSetNamePath(
         from: typeInfo,
