@@ -1433,7 +1433,7 @@ class IRMergedSelections_FieldMergingStrategy_Tests: XCTestCase {
     let DetailsFragment = try unwrap(
       self.rootField[field: "allAnimals"]?[field: "bestFriend"]?[fragment: "Details"]
     )
-    
+
     let expected = SelectionSetMatcher(
       parentType: try unwrap(self.schema[interface: "Animal"]),
       directSelections: [
@@ -1500,7 +1500,7 @@ class IRMergedSelections_FieldMergingStrategy_Tests: XCTestCase {
     }
     """
 
-    let mergingStrategy: MergedSelections.MergingStrategy = [.siblings]
+    let mergingStrategy: MergedSelections.MergingStrategy = .siblings
 
     try await buildRootField(mergingStrategy: mergingStrategy)
 

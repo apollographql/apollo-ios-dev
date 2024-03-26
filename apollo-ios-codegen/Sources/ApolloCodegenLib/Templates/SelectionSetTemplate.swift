@@ -44,9 +44,34 @@ struct SelectionSetTemplate {
     for selectionSet: IR.SelectionSet,
     inParent context: SelectionSetContext
   ) -> SelectionSetContext {
+    let mergingStrategies: Set<MergedSelections.MergingStrategy> = {
+      if config.options.fieldMerging.options == .all {
+        return [.all]
+      }
+
+      /*
+       There are a number of situations in which we will need to calculate all merged
+       fields, even if the `fieldMerging` option is not set to `.all`. 
+
+       1. When a selection set is a CompositeInlineFragment, we use all merged fields to calculate
+       the `__mergedSources` of the fragment.
+       2. When using `selectionSetInitializers`, the initializers must include all merged fields
+       for the type in order to initialize a fully valid and functional object.
+
+       In these situations, we should calculate both strategies. We still use the strategy provided
+       by the `fieldMerging` configuration option for generating property accessors. We only use the
+       `.all` merged fields in the necessary areas.
+       */
+      if selectionSet.isCompositeInlineFragment {
+        return [.all, config.options.fieldMerging.options]
+      }
+
+      return [config.options.fieldMerging.options]
+    }()
+
     let computedSelectionSet = ComputedSelectionSet.Builder(
       selectionSet,
-      mergingStrategies: [.all],
+      mergingStrategies: mergingStrategies,
       entityStorage: definition.entityStorage
     ).build()
     var validationContext = context.validationContext
@@ -168,7 +193,10 @@ struct SelectionSetTemplate {
   // MARK: - Body
   func BodyTemplate(_ context: SelectionSetContext) -> TemplateString {
     lazy var computedChildSelectionSets: [SelectionSetContext] = {
-      IteratorSequence(context.selectionSet.makeInlineFragmentIterator()).map {
+      IteratorSequence(context.selectionSet.makeInlineFragmentIterator(
+        mergingStrategy: config.options.fieldMerging.options
+      ))
+      .map {
         createSelectionSetContext(for: $0.selectionSet, inParent: context)
       }
     }()
@@ -429,7 +457,12 @@ struct SelectionSetTemplate {
       \(ifLet: selectionSet.direct?.fields.values, {
       "\($0.map { FieldAccessorTemplate($0, in: scope) }, separator: "\n")"
       })
-      \(selectionSet.merged[.all]!.fields.values.map { FieldAccessorTemplate($0, in: scope) }, separator: "\n")
+      \(selectionSet
+        .merged[config.options.fieldMerging.options].unsafelyUnwrapped
+        .fields.values
+        .map { FieldAccessorTemplate($0, in: scope) },
+        separator: "\n"
+      )
       """
   }
 
@@ -486,7 +519,10 @@ struct SelectionSetTemplate {
   ) -> TemplateString {
     guard
       !(selectionSet.direct?.namedFragments.isEmpty ?? true)
-        || !selectionSet.merged[.all]!.namedFragments.isEmpty
+        || !selectionSet
+          .merged[config.options.fieldMerging.options].unsafelyUnwrapped
+          .namedFragments
+          .isEmpty
         || (selectionSet.direct?.inlineFragments.containsDeferredFragment ?? false)
     else {
       return ""
@@ -502,9 +538,13 @@ struct SelectionSetTemplate {
         \(ifLet: selectionSet.direct?.namedFragments.values, {
         "\($0.map { NamedFragmentAccessorTemplate($0, in: scope) }, separator: "\n")"
       })
-        \(selectionSet.merged[.all]!.namedFragments.values.map {
-        NamedFragmentAccessorTemplate($0, in: scope)
-      }, separator: "\n")
+        \(selectionSet
+          .merged[config.options.fieldMerging.options]
+          .unsafelyUnwrapped
+          .namedFragments.values
+          .map { NamedFragmentAccessorTemplate($0, in: scope) },
+          separator: "\n"
+        )
         \(forEachIn: selectionSet.direct?.inlineFragments.values.elements ?? [], {
         "\(ifLet: $0.typeInfo.deferCondition, DeferredFragmentAccessorTemplate)"
       })
@@ -765,8 +805,11 @@ extension IR.ComputedSelectionSet {
     return !self.isEntityRoot && !self.isUserDefined && (direct?.isEmpty ?? true)
   }
 
-  fileprivate var shouldBeRendered: Bool {
-    return direct != nil || merged[.all]!.mergedSources.count != 1
+  fileprivate func shouldBeRendered(
+    _ config: ApolloCodegen.ConfigurationContext
+  ) -> Bool {
+    return direct != nil ||
+    merged[config.options.fieldMerging.options].unsafelyUnwrapped.mergedSources.count != 1
   }
 
   /// If the SelectionSet is a reference to another rendered SelectionSet, returns the qualified
@@ -779,11 +822,13 @@ extension IR.ComputedSelectionSet {
   fileprivate func nameForReferencedSelectionSet(
     config: ApolloCodegen.ConfigurationContext
   ) -> String? {
-    guard !shouldBeRendered else {
+    guard !shouldBeRendered(config) else {
       return nil
     }
 
-    return merged[.all]!.mergedSources
+    return merged[config.options.fieldMerging.options]
+      .unsafelyUnwrapped
+      .mergedSources
       .first.unsafelyUnwrapped
       .generatedSelectionSetNamePath(
         from: typeInfo,
