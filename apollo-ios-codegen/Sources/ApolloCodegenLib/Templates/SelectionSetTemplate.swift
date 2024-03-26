@@ -44,45 +44,49 @@ struct SelectionSetTemplate {
     for selectionSet: IR.SelectionSet,
     inParent context: SelectionSetContext
   ) -> SelectionSetContext {
-    let mergingStrategies: Set<MergedSelections.MergingStrategy> = {
-      if config.options.fieldMerging.options == .all {
-        return [.all]
-      }
-
-      /*
-       There are a number of situations in which we will need to calculate all merged
-       fields, even if the `fieldMerging` option is not set to `.all`. 
-
-       1. When a selection set is a CompositeInlineFragment, we use all merged fields to calculate
-       the `__mergedSources` of the fragment.
-       2. When using `selectionSetInitializers`, the initializers must include all merged fields
-       for the type in order to initialize a fully valid and functional object.
-
-       In these situations, we should calculate both strategies. We still use the strategy provided
-       by the `fieldMerging` configuration option for generating property accessors. We only use the
-       `.all` merged fields in the necessary areas.
-       */
-      if selectionSet.isCompositeInlineFragment {
-        return [.all, config.options.fieldMerging.options]
-      }
-
-      return [config.options.fieldMerging.options]
-    }()
-
     let computedSelectionSet = ComputedSelectionSet.Builder(
       selectionSet,
-      mergingStrategies: mergingStrategies,
+      mergingStrategy: self.config.experimentalFeatures.fieldMerging.options,
       entityStorage: definition.entityStorage
     ).build()
+
     var validationContext = context.validationContext
     validationContext.runTypeValidationFor(
       computedSelectionSet,
       recordingErrorsTo: nonFatalErrorRecorder
     )
+
     return SelectionSetContext(
       selectionSet: computedSelectionSet,
       validationContext: validationContext
     )
+  }
+
+  func mergingStrategies(
+    for selectionSet: IR.SelectionSet
+  ) -> Set<MergedSelections.MergingStrategy> {
+    if self.config.options.fieldMerging.options == .all {
+      return [.all]
+    }
+
+    /*
+     There are a number of situations in which we will need to calculate all merged
+     fields, even if the `fieldMerging` option is not set to `.all`.
+
+     1. When using `selectionSetInitializers`, the initializers must include all merged fields
+     for the type in order to initialize a fully valid and functional object.
+     2. When a selection set is a CompositeInlineFragment, we use all merged fields to calculate
+     the `__mergedSources` of the fragment.
+
+     In these situations, we should calculate both strategies. We still use the strategy provided
+     by the `fieldMerging` configuration option for generating property accessors. We only use the
+     `.all` merged fields in the necessary areas.
+     */
+    if self.generateInitializers || selectionSet.isCompositeInlineFragment {
+      return [.all, config.options.fieldMerging.options]
+    }
+
+    return [config.options.fieldMerging.options]
   }
 
   /// MARK: - Render Body
@@ -97,9 +101,10 @@ struct SelectionSetTemplate {
   ///
   /// - Returns: The `TemplateString` for the body of the `SelectionSetTemplate`.
   func renderBody() -> TemplateString {
+    let selectionSet = definition.rootField.selectionSet
     let computedRootSelectionSet = IR.ComputedSelectionSet.Builder(
-      definition.rootField.selectionSet,
-      mergingStrategies: [.all],
+      selectionSet,
+      mergingStrategies: self.mergingStrategies(for: selectionSet),
       entityStorage: definition.entityStorage
     ).build()
 
@@ -209,7 +214,7 @@ struct SelectionSetTemplate {
       \(RootEntityTypealias(selectionSet))
       \(ParentTypeTemplate(selectionSet.parentType))
       \(ifLet: selectionSet.direct, { DirectSelectionsMetadataTemplate($0, scope: selectionSet.scope) })
-      \(if: selectionSet.isCompositeInlineFragment, MergedSourcesTemplate(selectionSet.merged[.all]!.mergedSources))
+      \(if: selectionSet.isCompositeInlineFragment, MergedSourcesTemplate(selectionSet.merged.mergedSources))
 
       \(section: FieldAccessorsTemplate(selectionSet))
 
@@ -732,11 +737,12 @@ struct SelectionSetTemplate {
   }
 
   // MARK: - Nested Selection Sets
+
   private func ChildEntityFieldSelectionSets(
     _ context: SelectionSetContext
   ) -> TemplateString {
     let selectionSet = context.selectionSet
-    let allFields = selectionSet.makeFieldIterator { field in
+    let allFields = selectionSet.makeFieldIterator(mergingStrategy: .all) { field in
       field is IR.EntityField
     }
 
