@@ -119,7 +119,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     try await buildOperation()
 
     // when
-    let actual = rootSelectionSet.computed.merged
+    let actual = self.rootSelectionSet.computed.merged[.all]
 
     // then
     expect(actual).to(beEmpty())
@@ -173,7 +173,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     let selectionSet = try XCTUnwrap(rootSelectionSet[field: "allAnimals"]?.selectionSet)
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(Interface_Animal))
@@ -225,7 +225,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
     
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -268,7 +268,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("Animal")))
@@ -328,7 +328,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("WarmBlooded")))
@@ -387,7 +387,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("WarmBlooded")))
@@ -432,7 +432,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -499,7 +499,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("Pet")))
@@ -555,7 +555,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -621,7 +621,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLInterfaceType.mock("WarmBlooded")))
@@ -670,7 +670,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -738,7 +738,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Cat")))
@@ -787,7 +787,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))
@@ -845,7 +845,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLUnionType.mock("ClassroomPet")))
@@ -913,7 +913,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Bird")))
@@ -962,7 +962,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     )
 
     // when
-    let actual = selectionSet.computed.merged
+    let actual = selectionSet.computed.merged[.all]
 
     // then
     expect(selectionSet.parentType).to(equal(GraphQLObjectType.mock("Height")))

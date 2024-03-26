@@ -13,31 +13,34 @@ extension IR.ComputedSelectionSet {
   SelectionsIterator<OrderedDictionary<String, IR.NamedFragmentSpread>.Values>
 
   func makeFieldIterator(
+    mergingStrategy: MergedSelections.MergingStrategy = .all,
     filter: ((IR.Field) -> Bool)? = nil
   ) -> FieldIterator {
     SelectionsIterator(
       direct: direct?.fields.values,
-      merged: merged.fields.values,
+      merged: merged[mergingStrategy]?.fields.values,
       filter: filter
     )
   }
 
   func makeInlineFragmentIterator(
+    mergingStrategy: MergedSelections.MergingStrategy = .all,
     filter: ((IR.InlineFragmentSpread) -> Bool)? = nil
   ) -> InlineFragmentIterator {
     SelectionsIterator(
       direct: direct?.inlineFragments.values,
-      merged: merged.inlineFragments.values,
+      merged: merged[mergingStrategy]?.inlineFragments.values,
       filter: filter
     )
   }
 
   func makeNamedFragmentIterator(
+    mergingStrategy: MergedSelections.MergingStrategy = .all,
     filter: ((IR.NamedFragmentSpread) -> Bool)? = nil
   ) -> NamedFragmentIterator {
     SelectionsIterator(
       direct: direct?.namedFragments.values,
-      merged: merged.namedFragments.values,
+      merged: merged[mergingStrategy]?.namedFragments.values,
       filter: filter
     )
   }
@@ -46,33 +49,33 @@ extension IR.ComputedSelectionSet {
     typealias SelectionType = SelectionCollection.Element
 
     private let direct: SelectionCollection?
-    private let merged: SelectionCollection
+    private let merged: SelectionCollection?
     private var directIterator: SelectionCollection.Iterator?
-    private var mergedIterator: SelectionCollection.Iterator
+    private var mergedIterator: SelectionCollection.Iterator?
     private let filter: ((SelectionType) -> Bool)?
 
     fileprivate init(
       direct: SelectionCollection?,
-      merged: SelectionCollection,
+      merged: SelectionCollection?,
       filter: ((SelectionType) -> Bool)?
     ) {
       self.direct = direct
       self.merged = merged
       self.directIterator = self.direct?.makeIterator()
-      self.mergedIterator = self.merged.makeIterator()
+      self.mergedIterator = self.merged?.makeIterator()
       self.filter = filter
     }
 
     mutating func next() -> SelectionType? {
       guard let filter else {
-        return directIterator?.next() ?? mergedIterator.next()
+        return directIterator?.next() ?? mergedIterator?.next()
       }
 
       while let next = directIterator?.next() {
         if filter(next) { return next }
       }
 
-      while let next = mergedIterator.next() {
+      while let next = mergedIterator?.next() {
         if filter(next) { return next }
       }
 
@@ -80,7 +83,7 @@ extension IR.ComputedSelectionSet {
     }
 
     var isEmpty: Bool {
-      return (direct?.isEmpty ?? true) && merged.isEmpty
+      return (direct?.isEmpty ?? true) && (merged?.isEmpty ?? true)
     }
 
   }
