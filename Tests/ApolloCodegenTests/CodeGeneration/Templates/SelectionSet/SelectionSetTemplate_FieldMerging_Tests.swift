@@ -515,6 +515,708 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
+  // MARK: - Child Entity Selection Sets
+
+  func test__render_childEntitySelectionSet__givenFieldMerging_none__givenEntityFieldMergedFromAncestor_doesNotRenderMergedChildSelectionSet() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    type Dog implements Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        predator {
+          species
+        }        
+        ... on Dog {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public var species: String? { __data["species"] }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: .none
+    )
+
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_childEntitySelectionSet__givenFieldMerging_ancestors__givenEntityFieldMergedFromAncestor_doesNotRenderMergedChildSelectionSet() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    type Dog implements Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        predator {
+          species
+        }
+        ... on Dog {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public var species: String? { __data["species"] }
+      public var predator: Predator? { __data["predator"] }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: .ancestors
+    )
+
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_childEntitySelectionSet__givenFieldMerging_ancestors__givenEntityFieldMergedFromAncestorAndSibling_doesNotRenderMergedChildSelectionSet() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    interface Pet implements Animal {
+      species: String
+      predator: Animal
+    }
+
+    type Dog implements Animal & Pet {
+      species: String
+      predator: Animal
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        predator {
+          species
+        }
+        ... on Pet {
+          predator {
+            name
+          }
+        }
+        ... on Dog {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public var species: String? { __data["species"] }
+      public var predator: Predator? { __data["predator"] }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: .ancestors
+    )
+
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_childEntitySelectionSet__givenFieldMerging_siblings__givenEntityFieldMergedFromAncestorAndSibling_rendersMergedChildSelectionSet() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    interface Pet implements Animal {
+      species: String
+      predator: Animal
+    }
+
+    type Dog implements Animal & Pet {
+      species: String
+      predator: Animal
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        predator {
+          species
+        }
+        ... on Pet {
+          predator {
+            name
+          }
+        }
+        ... on Dog {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public var species: String? { __data["species"] }
+      public var predator: Predator? { __data["predator"] }
+
+      /// AllAnimal.AsDog.Predator
+      public struct Predator: TestSchema.SelectionSet {
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: .siblings
+    )
+
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  // MARK: - Child Entity Selections - From Named Fragments
+
+  func test__render_childEntitySelectionSet__givenFieldMerging_ancestors__givenEntityFieldMergedFromNamedFragmentInAncestor_doesNotRenderChildSelectionSet() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    interface Pet implements Animal {
+      species: String
+      predator: Animal
+    }
+
+    type Dog implements Animal & Pet {
+      species: String
+      predator: Animal
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ...PredatorDetails
+        ... on Dog {
+          species
+        }
+      }
+    }
+
+    fragment PredatorDetails on Animal {
+      predator {
+        species
+      }
+    }
+    """
+
+    let expected = """
+      public var species: String? { __data["species"] }
+
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public var predatorDetails: PredatorDetails { _toFragment() }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: .ancestors
+    )
+
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_childEntitySelectionSet__givenFieldMerging_ancestorsAndNamedFragments__givenEntityFieldMergedFromNamedFragmentInAncestor_rendersChildSelectionSet() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    interface Pet implements Animal {
+      species: String
+      predator: Animal
+    }
+
+    type Dog implements Animal & Pet {
+      species: String
+      predator: Animal
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ...PredatorDetails
+        ... on Dog {
+          species
+        }
+      }
+    }
+
+    fragment PredatorDetails on Animal {
+      predator {
+        species
+      }
+    }
+    """
+
+    let expected = """
+      public var species: String? { __data["species"] }
+      public var predator: Predator? { __data["predator"] }
+
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public var predatorDetails: PredatorDetails { _toFragment() }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: [.ancestors, .namedFragments]
+    )
+
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_childEntitySelectionSet__givenFieldMerging_siblingsAndNamedFragments__givenEntityFieldMergedFromNamedFragmentInAncestor_doesNotRenderChildSelectionSet() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    interface Pet implements Animal {
+      species: String
+      predator: Animal
+    }
+
+    type Dog implements Animal & Pet {
+      species: String
+      predator: Animal
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ...PredatorDetails
+        ... on Dog {
+          species
+        }
+      }
+    }
+
+    fragment PredatorDetails on Animal {
+      predator {
+        species
+      }
+    }
+    """
+
+    let expected = """
+      public var species: String? { __data["species"] }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: [.siblings, .namedFragments]
+    )
+
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  // MARK: - Named Fragment Accessors
+
+  func test__render_fragmentAccessors__givenFieldMerging_ancestors__givenEntityFieldMergedFromNamedFragmentInAncestor_rendersFragmentAccessor() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    interface Pet implements Animal {
+      species: String
+      predator: Animal
+    }
+
+    type Dog implements Animal & Pet {
+      species: String
+      predator: Animal
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ...AnimalDetails
+        ... on Dog {
+          name
+        }
+      }
+    }
+
+    fragment AnimalDetails on Animal {
+      species
+    }
+    """
+
+    let expected = """
+      public var name: String? { __data["name"] }
+
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public var animalDetails: AnimalDetails { _toFragment() }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: .ancestors
+    )
+
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_fragmentAccessors__givenFieldMerging_siblings__givenEntityFieldMergedFromNamedFragmentInAncestor_doesNotRenderFragmentAccessor() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    interface Pet implements Animal {
+      species: String
+      predator: Animal
+    }
+
+    type Dog implements Animal & Pet {
+      species: String
+      predator: Animal
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ...AnimalDetails
+        ... on Dog {
+          name
+        }
+      }
+    }
+
+    fragment AnimalDetails on Animal {
+      species
+    }
+    """
+
+    let expected = """
+      public var name: String? { __data["name"] }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: .siblings
+    )
+
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_fragmentAccessors__givenFieldMerging_siblings__givenEntityFieldMergedFromNamedFragmentInSibling_rendersFragmentAccessor() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    interface Pet implements Animal {
+      species: String
+      predator: Animal
+    }
+
+    type Dog implements Animal & Pet {
+      species: String
+      predator: Animal
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... on Pet {
+          ...AnimalDetails
+        }
+        ... on Dog {
+          name
+        }
+      }
+    }
+
+    fragment AnimalDetails on Animal {
+      species
+    }
+    """
+
+    let expected = """
+      public var name: String? { __data["name"] }
+
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public var animalDetails: AnimalDetails { _toFragment() }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: .siblings
+    )
+
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_fragmentAccessors__givenFieldMerging_ancestors__givenEntityFieldMergedFromNamedFragmentInSibling_doesNotRenderFragmentAccessor() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    interface Pet implements Animal {
+      species: String
+      predator: Animal
+    }
+
+    type Dog implements Animal & Pet {
+      species: String
+      predator: Animal
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... on Pet {
+          ...AnimalDetails
+        }
+        ... on Dog {
+          name
+        }
+      }
+    }
+
+    fragment AnimalDetails on Animal {
+      species
+    }
+    """
+
+    let expected = """
+      public var name: String? { __data["name"] }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: .ancestors
+    )
+
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
   // MARK: - SelectionSetInitializers
 
   func test__render_selectionSetInitializer__givenFieldMerging_none_withMergedSelections_rendersInitializerWithAllMergedSelections() async throws {

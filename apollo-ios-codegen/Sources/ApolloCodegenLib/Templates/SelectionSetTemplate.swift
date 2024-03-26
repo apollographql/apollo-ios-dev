@@ -42,7 +42,7 @@ struct SelectionSetTemplate {
 
   private func createSelectionSetContext(
     for selectionSet: IR.SelectionSet,
-    inParent context: SelectionSetContext
+    inParent context: SelectionSetContext?
   ) -> SelectionSetContext {
     let computedSelectionSet = ComputedSelectionSet.Builder(
       selectionSet,
@@ -50,7 +50,9 @@ struct SelectionSetTemplate {
       entityStorage: definition.entityStorage
     ).build()
 
-    var validationContext = context.validationContext
+    var validationContext = context?.validationContext ??
+    SelectionSetValidationContext(config: config)
+
     validationContext.runTypeValidationFor(
       computedSelectionSet,
       recordingErrorsTo: nonFatalErrorRecorder
@@ -101,21 +103,9 @@ struct SelectionSetTemplate {
   ///
   /// - Returns: The `TemplateString` for the body of the `SelectionSetTemplate`.
   func renderBody() -> TemplateString {
-    let selectionSet = definition.rootField.selectionSet
-    let computedRootSelectionSet = IR.ComputedSelectionSet.Builder(
-      selectionSet,
-      mergingStrategies: self.mergingStrategies(for: selectionSet),
-      entityStorage: definition.entityStorage
-    ).build()
-
-    var validationContext = SelectionSetValidationContext(config: config)
-    validationContext.runTypeValidationFor(
-      computedRootSelectionSet,
-      recordingErrorsTo: nonFatalErrorRecorder
-    )
-    let selectionSetContext = SelectionSetContext(
-      selectionSet: computedRootSelectionSet,
-      validationContext: validationContext
+    let selectionSetContext = createSelectionSetContext(
+      for: definition.rootField.selectionSet,
+      inParent: nil
     )
 
     let body = BodyTemplate(selectionSetContext)
@@ -126,6 +116,7 @@ struct SelectionSetTemplate {
   // MARK: - Child Entity
   func render(childEntity context: SelectionSetContext) -> String? {
     let selectionSet = context.selectionSet
+
     let fieldSelectionSetName = nameCache.selectionSetName(for: selectionSet.typeInfo)
 
     if let referencedSelectionSetName = selectionSet.nameForReferencedSelectionSet(config: config) {
@@ -720,7 +711,7 @@ struct SelectionSetTemplate {
       fulfilledFragments.append(selectionSetName)
     }
 
-    for source in selectionSet.merged[.all]!.mergedSources {
+    for source in selectionSet.merged.mergedSources {
       fulfilledFragments
         .append(
           contentsOf: source.generatedSelectionSetNamesOfFullfilledFragments(
@@ -742,7 +733,9 @@ struct SelectionSetTemplate {
     _ context: SelectionSetContext
   ) -> TemplateString {
     let selectionSet = context.selectionSet
-    let allFields = selectionSet.makeFieldIterator(mergingStrategy: .all) { field in
+    let allFields = selectionSet.makeFieldIterator(
+      mergingStrategy: config.options.fieldMerging.options
+    ) { field in
       field is IR.EntityField
     }
 
@@ -815,7 +808,7 @@ extension IR.ComputedSelectionSet {
     _ config: ApolloCodegen.ConfigurationContext
   ) -> Bool {
     return direct != nil ||
-    merged[config.options.fieldMerging.options].unsafelyUnwrapped.mergedSources.count != 1
+    merged[config.options.fieldMerging.options].unsafelyUnwrapped.mergedSources.count >= 1
   }
 
   /// If the SelectionSet is a reference to another rendered SelectionSet, returns the qualified
@@ -828,7 +821,9 @@ extension IR.ComputedSelectionSet {
   fileprivate func nameForReferencedSelectionSet(
     config: ApolloCodegen.ConfigurationContext
   ) -> String? {
-    guard !shouldBeRendered(config) else {
+    guard direct == nil &&
+            merged[config.options.fieldMerging.options].unsafelyUnwrapped.mergedSources.count == 1
+    else {
       return nil
     }
 

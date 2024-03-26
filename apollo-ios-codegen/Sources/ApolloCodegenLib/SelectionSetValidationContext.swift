@@ -30,7 +30,9 @@ struct SelectionSetValidationContext {
     // Check for type conflicts resulting from singularization/pluralization of fields
     var typeNamesForEntityFields = [String: String]()
 
-    let entityFields = selections.makeFieldIterator(mergingStrategy: .all) { field in
+    let entityFields = selections.makeFieldIterator(
+      mergingStrategy: config.options.fieldMerging.options
+    ) { field in
       field is IR.EntityField
     }
 
@@ -54,7 +56,9 @@ struct SelectionSetValidationContext {
     // pass into recursive function calls
     referencedTypeNames.merge(typeNamesForEntityFields) { (current, _) in current }
 
-    IteratorSequence(selections.makeNamedFragmentIterator()).forEach { fragmentSpread in
+    IteratorSequence(selections.makeNamedFragmentIterator(
+      mergingStrategy: config.options.fieldMerging.options
+    )).forEach { fragmentSpread in
       if let existingTypeName = referencedTypeNames[fragmentSpread.fragment.generatedDefinitionName] {
         errorRecorder.record(error:
           ApolloCodegen.NonFatalError.typeNameConflict(
