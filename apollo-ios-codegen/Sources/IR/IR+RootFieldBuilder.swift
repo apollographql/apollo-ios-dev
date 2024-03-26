@@ -279,7 +279,7 @@ class RootFieldBuilder {
       return nil
     }
 
-    let type = (parentTypePath.parentType == conditionalSelectionSet.parentType)
+    let type = (parentTypePath.scope.matches(conditionalSelectionSet.parentType))
     ? nil
     : conditionalSelectionSet.parentType
 

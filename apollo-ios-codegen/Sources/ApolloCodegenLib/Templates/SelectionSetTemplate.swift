@@ -104,6 +104,8 @@ struct SelectionSetTemplate {
         "\(renderAccessControl())typealias \(fieldSelectionSetName) = \(referencedSelectionSetName)"
     }
 
+    guard selectionSet.shouldBeRendered else { return nil }
+
     return TemplateString(
       """
       \(SelectionSetNameDocumentation(selectionSet))
