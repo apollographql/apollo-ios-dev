@@ -40,6 +40,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
   ) async throws {
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
+
     operation = await ir.build(
       operation: operationDefinition,
       mergingStrategy: fieldMerging.options
@@ -1259,25 +1260,25 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
 
     let expected =
     """
-        public init(
-          bark: Bool,
-          age: Int,
-          species: String
-        ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": TestSchema.Objects.Dog.typename,
-              "bark": bark,
-              "age": age,
-              "species": species,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(TestOperationQuery.Data.AllAnimal.self),
-              ObjectIdentifier(TestOperationQuery.Data.AllAnimal.AsDog.self),
-              ObjectIdentifier(TestOperationQuery.Data.AllAnimal.AsPet.self)
-            ]
-          ))
-        }
+      public init(
+        bark: Bool,
+        age: Int,
+        species: String
+      ) {
+        self.init(_dataDict: DataDict(
+          data: [
+            "__typename": TestSchema.Objects.Dog.typename,
+            "bark": bark,
+            "age": age,
+            "species": species,
+          ],
+          fulfilledFragments: [
+            ObjectIdentifier(TestOperationQuery.Data.AllAnimal.self),
+            ObjectIdentifier(TestOperationQuery.Data.AllAnimal.AsDog.self),
+            ObjectIdentifier(TestOperationQuery.Data.AllAnimal.AsPet.self)
+          ]
+        ))
+      }
     """
 
     // when
@@ -1285,16 +1286,14 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       fieldMerging: .none,
       selectionSetInitializers: true
     )
+    
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
 
-    /*
-     We only want to test the initializer for TestOperationQuery.Data.AllAnimal.AsDog. But we must
-     render the entire operation because the IRTestWrappers only allow one merge strategy to be
-     used at a time. However the `SelectionSetTemplate` is actually determining which merge
-     strategy to use for each child selection set dynamically. We need to test this behavior.
-     */
-    let actual = subject.renderBody().description
+    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 103, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 }

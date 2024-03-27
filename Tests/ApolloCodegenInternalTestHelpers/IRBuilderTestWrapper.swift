@@ -22,7 +22,7 @@ public class IRBuilderTestWrapper {
 
   public func build(
     operation operationDefinition: CompilationResult.OperationDefinition,
-    mergingStrategy: IR.MergedSelections.MergingStrategy = .all
+    mergingStrategy: MergedSelections.MergingStrategy = .all
   ) async -> IRTestWrapper<IR.Operation> {
     let operation = await irBuilder.build(operation: operationDefinition)
     return IRTestWrapper(
@@ -36,7 +36,7 @@ public class IRBuilderTestWrapper {
 
   public func build(
     fragment fragmentDefinition: CompilationResult.FragmentDefinition,
-    mergingStrategy: IR.MergedSelections.MergingStrategy = .all
+    mergingStrategy: MergedSelections.MergingStrategy = .all
   ) async -> IRTestWrapper<IR.NamedFragment> {
     let fragment = await irBuilder.build(fragment: fragmentDefinition)
     return IRTestWrapper(
