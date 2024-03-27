@@ -19,7 +19,7 @@ In this example, a `GraphQLQueryPager` is initialized that paginates a single qu
 
 ```swift
 let initialQuery = MyQuery(first: 10, after: nil)
-let pager = GraphQLQueryPager.makeQueryPager(
+let pager = GraphQLQueryPager(
     client: client,
     initialQuery: initialQuery,
     extractPageInfo: { data in
@@ -46,9 +46,40 @@ Whenever the pager needs to load a new page, it will call the `extractPageInfo` 
 
 We could similarly support forward offset-based pagination by supplying `OffsetPagination.Forward` instead of `CursorBasedPagination.Forward` to the `extractPageInfo` closure.
 
+## Using an `AsyncGraphQLQueryPager`
+
+The `AsyncGraphQLQueryPager` class is similar to the `GraphQLQueryPager` class, but it supports `async`/`await` for use in asynchronous contexts.
+
+In this example, an `AsyncGraphQLQueryPager` is initialized that paginates a single query in the forward direction with cursor-based pagination:
+
+```swift
+let initialQuery = MyQuery(first: 10, after: nil)
+let pager = AsyncGraphQLQueryPager(
+    client: client,
+    initialQuery: initialQuery,
+    extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+            hasNext: data.values.pageInfo.hasNextPage ?? false,
+            endCursor: data.values.pageInfo.endCursor
+        )
+    },
+    pageResolver: { page, paginationDirection in
+        // As we only want to support forward pagination, we can return `nil` for reverse pagination
+        switch paginationDirection {
+        case .next:
+            return MyQuery(first: 10, after: page.endCursor ?? .none)
+        case .previous:
+            return nil
+        }
+    }
+)
+```
+
+Note that it is initialized in an identical manner to `GraphQLQueryPager`, with the same parameters.
+
 ## Subscribing to results
 
-The `GraphQLQueryPager` class can fetch data, but the caller must subscribe to the results in order to receive the data. A `subscribe` method is provided which takes a closure that is called whenever the pager fetches a new page of data. The `subscribe` method is a convenience method that ensures that the closure is called on the main thread.
+The `GraphQLQueryPager` and `AsyncGraphQLQueryPager` classes can fetch data, but the caller must subscribe to the results in order to receive the data. A `subscribe` method is provided which takes a closure that is called whenever the pager fetches a new page of data. The `subscribe` method is a convenience method that ensures that the closure is called on the main thread.
 
 ```swift
 // Guaranteed to run on the main thread
@@ -62,7 +93,7 @@ pager.subscribe { result in
 }
 ```
 
-The `GraphQLQueryPager` is also a Combine `Publisher`. As such, all `Publisher` methods are available, such as `sink`, `assign`, `map`, `filter`, and so on.
+Both the `GraphQLQueryPager` and `AsyncGraphQLQueryPager` are also Combine `Publisher`s. As such, all `Publisher` methods are available, such as `sink`, `assign`, `map`, `filter`, and so on.
 
 ```swift
 // Can run on any thread
@@ -85,6 +116,9 @@ The `GraphQLQueryPager` class provides several methods to fetch paginated data: 
 - `loadNext`: Fetches the next page of data. Can only be called after `fetch` has been called. Provides a completion handler that allows the caller to be notified when the operation is complete, with an optional `Error?` parameter that contains any usage errors that may have occurred.
 - `loadPrevious`: Fetches the previous page of data. Can only be called after `fetch` has been called. Provides a completion handler that allows the caller to be notified when the operation is complete, with an optional `Error?` parameter that contains any usage errors that may have occurred.
 - `loadAll`: Fetches all pages of data. If no initial page is detected, it will first call `fetch` to fetch the first page of data. Will continue to fetch all pages until a `PageInfo` object indicates that there are no more pages to fetch. This function is compatible with forward, reverse, and bidirectional pagination. Provides a completion handler that allows the caller to be notified when the operation is complete, with an optional `Error?` parameter that contains any usage errors that may have occurred.
+
+
+The `AsyncGraphQLQueryPager` class provides the same methods as `async` functions, but without completion handlers, as they are not needed in an asynchronous context.
 
 ## Cancelling ongoing requests
 
