@@ -43,6 +43,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ],
           deprecatedEnumCases: .exclude,
           schemaDocumentation: .exclude,
+          fieldMerging: .all,
           cocoapodsCompatibleImportStatements: true,
           warningsOnDeprecatedUsage: .exclude,
           conversionStrategies:.init(
@@ -99,6 +100,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "none"
           },
           "deprecatedEnumCases" : "exclude",
+          "fieldMerging" : [
+            "all"
+          ],
           "markOperationDefinitionsAsFinal" : true,
           "operationDocumentFormat" : [
             "definition"
@@ -757,6 +761,191 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
         from: subject
       )
     ).to(throwError())
+  }
+
+  // MARK: - Field Merging Tests
+
+  func test__encode_fieldMerging__givenAll_shouldReturnAll() throws {
+    // given
+    let subject: ApolloCodegenConfiguration.FieldMerging = .all
+
+    let expected = """
+    [
+      "all"
+    ]
+    """
+
+    // when
+    let actual = try testJSONEncoder.encode(subject).asString
+
+    // then
+    expect(actual).to(equal(expected))
+  }
+
+  func test__decode_fieldMerging__givenAll_shouldReturnAll() throws {
+    // given
+    let subject = """
+    ["all"]
+    """.asData
+
+    // when
+    let decoded = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.FieldMerging.self,
+      from: subject
+    )
+
+    // then
+    expect(decoded).to(equal(.all))
+  }
+
+  func test__encode_fieldMerging__givenAncestorsOnly_shouldReturnAncestors() throws {
+    // given
+    let subject: ApolloCodegenConfiguration.FieldMerging = .ancestors
+
+    let expected = """
+    [
+      "ancestors"
+    ]
+    """
+
+    // when
+    let actual = try testJSONEncoder.encode(subject).asString
+
+    // then
+    expect(actual).to(equal(expected))
+  }
+
+  func test__decode_fieldMerging__givenAncestorsOnly_shouldReturnAncestors() throws {
+    // given
+    let subject = """
+    ["ancestors"]
+    """.asData
+
+    // when
+    let decoded = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.FieldMerging.self,
+      from: subject
+    )
+
+    // then
+    expect(decoded).to(equal(.ancestors))
+  }
+
+  func test__encode_fieldMerging__givenSiblingsOnly_shouldReturnSiblings() throws {
+    // given
+    let subject: ApolloCodegenConfiguration.FieldMerging = .siblings
+
+    let expected = """
+    [
+      "siblings"
+    ]
+    """
+
+    // when
+    let actual = try testJSONEncoder.encode(subject).asString
+
+    // then
+    expect(actual).to(equal(expected))
+  }
+
+  func test__decode_fieldMerging__givenSiblingsOnly_shouldReturnSiblings() throws {
+    // given
+    let subject = """
+    ["siblings"]
+    """.asData
+
+    // when
+    let decoded = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.FieldMerging.self,
+      from: subject
+    )
+
+    // then
+    expect(decoded).to(equal(.siblings))
+  }
+
+  func test__encode_fieldMerging__givenNamedFragmentsOnly_shouldReturnNamedFragments() throws {
+    // given
+    let subject: ApolloCodegenConfiguration.FieldMerging = .namedFragments
+
+    let expected = """
+    [
+      "namedFragments"
+    ]
+    """
+
+    // when
+    let actual = try testJSONEncoder.encode(subject).asString
+
+    // then
+    expect(actual).to(equal(expected))
+  }
+
+  func test__decode_fieldMerging__givenNamedFragmentsOnly_shouldReturnNamedFragments() throws {
+    // given
+    let subject = """
+    ["namedFragments"]
+    """.asData
+
+    // when
+    let decoded = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.FieldMerging.self,
+      from: subject
+    )
+
+    // then
+    expect(decoded).to(equal(.namedFragments))
+  }
+
+  func test__encode_fieldMerging__givenMultipleValues_shouldReturnGivenValues() throws {
+    // given
+    let subject: ApolloCodegenConfiguration.FieldMerging = [.ancestors, .namedFragments]
+
+    let expected = """
+    [
+      "ancestors",
+      "namedFragments"
+    ]
+    """
+
+    // when
+    let actual = try testJSONEncoder.encode(subject).asString
+
+    // then
+    expect(actual).to(equal(expected))
+  }
+
+  func test__decode_fieldMerging__givenMultipleValues_shouldReturnGivenValues() throws {
+    // given
+    let subject = """
+    ["ancestors", "siblings"]
+    """.asData
+
+    // when
+    let decoded = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.FieldMerging.self,
+      from: subject
+    )
+
+    // then
+    expect(decoded).to(equal([.ancestors, .siblings]))
+  }
+
+  func test__decode_fieldMerging__givenUnrecognizedValue_shouldThrowError() throws {
+    // given
+    let subject = """
+    ["invalid"]
+    """.asData
+
+    // when
+    expect(
+      try JSONDecoder().decode(
+      ApolloCodegenConfiguration.FieldMerging.self,
+      from: subject
+      )
+    )
+    // then
+    .to(throwError(errorType: DecodingError.self))
   }
 
   // MARK: - APQConfig Tests
