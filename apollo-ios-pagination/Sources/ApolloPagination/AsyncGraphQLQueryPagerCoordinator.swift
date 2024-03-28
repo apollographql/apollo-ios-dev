@@ -212,6 +212,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
     previousPageVarMap = [:]
     nextPageVarMap = [:]
     initialPageResult = nil
+    queuedOperations.removeAll()
 
     // Ensure any active networking operations are halted.
     taskGroup?.cancelAll()
