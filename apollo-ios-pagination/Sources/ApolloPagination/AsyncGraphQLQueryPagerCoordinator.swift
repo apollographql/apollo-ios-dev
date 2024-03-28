@@ -18,6 +18,11 @@ public protocol AsyncPagerType {
 }
 
 actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: AsyncPagerType {
+
+  enum Operation: Hashable {
+    case loadNext(CachePolicy, PaginatedQuery?), loadPrevious(CachePolicy, PaginatedQuery?)
+  }
+
   private let client: any ApolloClientProtocol
   private var firstPageWatcher: GraphQLQueryWatcher<InitialQuery>?
   private var nextPageWatchers: [GraphQLQueryWatcher<PaginatedQuery>] = []
@@ -63,6 +68,8 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   private var tasks: Set<Task<Void, Error>> = []
   private var taskGroup: ThrowingTaskGroup<Void, Error>?
   private var watcherCallbackQueue: DispatchQueue
+
+  private var queuedOperations: OrderedSet<Operation> = []
 
   /// Designated Initializer
   /// - Parameters:
@@ -154,6 +161,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
     cachePolicy: CachePolicy = .fetchIgnoringCacheData
   ) async throws {
     try await paginationFetch(direction: .previous, cachePolicy: cachePolicy)
+    try await executeQueuedOperations()
   }
 
   /// Loads the next page, using the currently saved pagination information to do so.
@@ -165,6 +173,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
     cachePolicy: CachePolicy = .fetchIgnoringCacheData
   ) async throws {
     try await paginationFetch(direction: .next, cachePolicy: cachePolicy)
+    try await executeQueuedOperations()
   }
 
   func subscribe(
@@ -224,6 +233,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   // MARK: - Private
 
   private func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) async {
+    queuedOperations.removeAll()
     await execute { [weak self] publisher in
       guard let self else { return }
       if await self.firstPageWatcher == nil {
@@ -249,7 +259,17 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   ) async throws {
     // Access to `isFetching` is mutually exclusive, so these checks and modifications will prevent
     // other attempts to call this function in rapid succession.
-    if isFetching { throw PaginationError.loadInProgress }
+    if isFetching {
+      switch direction {
+      case .next:
+        guard let nextPageInfo else { return }
+        queuedOperations.append(.loadNext(cachePolicy, nextPageResolver(nextPageInfo)))
+      case .previous:
+        guard let previousPageInfo else { return }
+        queuedOperations.append(.loadPrevious(cachePolicy, previousPageResolver(previousPageInfo)))
+      }
+      throw PaginationError.loadInProgress
+    }
     isFetching = true
     defer { isFetching = false }
 
@@ -281,6 +301,20 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
       }
       await self.appendPaginationWatcher(watcher: watcher)
       watcher.refetch(cachePolicy: cachePolicy)
+    }
+  }
+
+  private func executeQueuedOperations() async throws {
+    guard !queuedOperations.isEmpty else { return }
+    var copy = queuedOperations
+    queuedOperations.removeAll()
+    for queuedOperation in copy {
+      switch queuedOperation {
+      case .loadNext(let cachePolicy, _):
+        try await loadNext(cachePolicy: cachePolicy)
+      case .loadPrevious(let cachePolicy, _):
+        try await loadPrevious(cachePolicy: cachePolicy)
+      }
     }
   }
 
