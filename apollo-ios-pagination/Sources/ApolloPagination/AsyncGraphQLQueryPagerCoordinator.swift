@@ -257,17 +257,36 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
     direction: PaginationDirection,
     cachePolicy: CachePolicy
   ) async throws {
+    do {
+      try await _paginationFetch(direction: direction, cachePolicy: cachePolicy)
+    } catch {
+      guard let e = error as? PaginationError else { throw error }
+      switch e {
+      case .loadInProgress, .missingInitialPage:
+        queueOperation()
+        throw e
+      default:
+        throw e
+      }
+    }
+
+    func queueOperation() {
+      switch direction {
+      case .next:
+        queuedOperations.append(.loadNext(cachePolicy, nextPageInfo.flatMap(nextPageResolver) ?? nil))
+      case .previous:
+        queuedOperations.append(.loadPrevious(cachePolicy, previousPageInfo.flatMap(previousPageResolver) ?? nil))
+      }
+    }
+  }
+
+  private func _paginationFetch(
+    direction: PaginationDirection,
+    cachePolicy: CachePolicy
+  ) async throws {
     // Access to `isFetching` is mutually exclusive, so these checks and modifications will prevent
     // other attempts to call this function in rapid succession.
     if isFetching {
-      switch direction {
-      case .next:
-        guard let nextPageInfo else { return }
-        queuedOperations.append(.loadNext(cachePolicy, nextPageResolver(nextPageInfo)))
-      case .previous:
-        guard let previousPageInfo else { return }
-        queuedOperations.append(.loadPrevious(cachePolicy, previousPageResolver(previousPageInfo)))
-      }
       throw PaginationError.loadInProgress
     }
     isFetching = true
