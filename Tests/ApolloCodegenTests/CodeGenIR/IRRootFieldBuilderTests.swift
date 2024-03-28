@@ -40,7 +40,7 @@ class IRRootFieldBuilderTests: XCTestCase {
   // MARK: - Helpers
 
   func buildSubjectRootField(operationName: String? = nil) async throws {
-    addDeferDirective()
+    schemaSDL.appendDeferDirective()
 
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     if let operationName {
@@ -52,22 +52,6 @@ class IRRootFieldBuilderTests: XCTestCase {
     }
     result = await ir.build(operation: operation)
     subject = result.rootField
-  }
-
-  // This function will only be needed until @defer is merged into the GraphQL spec and is
-  // considered a first-class directive in graphql-js. Right now it is a valid directive but must
-  // be 'enabled' through explicit declaration in the schema.
-  fileprivate func addDeferDirective() {
-    guard
-      let schemaSDL = self.schemaSDL,
-      !schemaSDL.contains("directive @defer")
-    else { return }
-
-    self.schemaSDL = """
-    directive @defer(label: String, if: Boolean! = true) on FRAGMENT_SPREAD | INLINE_FRAGMENT
-
-    \(schemaSDL)
-    """
   }
 
   // MARK: - Children Computation
