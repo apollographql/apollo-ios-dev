@@ -355,14 +355,14 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
   }
 
   func test_equatable() async {
-    let pagerA = await AsyncGraphQLQueryPager(pager: createPager(), transform: { previous, initial, next in
+    let pagerA = AsyncGraphQLQueryPager(pager: createPager(), transform: { previous, initial, next in
       let allPages = previous + [initial] + next
       return allPages.flatMap { data in
         data.hero.friendsConnection.friends.map { $0.name }
       }
     })
 
-    let pagerB = await AsyncGraphQLQueryPager(pager: createPager(), transform: { previous, initial, next in
+    let pagerB = AsyncGraphQLQueryPager(pager: createPager(), transform: { previous, initial, next in
       let allPages = previous + [initial] + next
       return allPages.flatMap { data in
         data.hero.friendsConnection.friends.map { $0.name }
