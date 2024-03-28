@@ -233,7 +233,6 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   // MARK: - Private
 
   private func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) async {
-    queuedOperations.removeAll()
     await execute { [weak self] publisher in
       guard let self else { return }
       if await self.firstPageWatcher == nil {
@@ -251,6 +250,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
       }
       await self.firstPageWatcher?.refetch(cachePolicy: cachePolicy)
     }
+    try? await executeQueuedOperations()
   }
 
   private func paginationFetch(
