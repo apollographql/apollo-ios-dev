@@ -306,7 +306,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
 
   private func executeQueuedOperations() async throws {
     guard !queuedOperations.isEmpty else { return }
-    var copy = queuedOperations
+    let copy = queuedOperations
     queuedOperations.removeAll()
     for queuedOperation in copy {
       switch queuedOperation {
