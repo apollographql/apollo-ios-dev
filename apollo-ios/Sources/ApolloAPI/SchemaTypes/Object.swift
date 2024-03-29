@@ -3,7 +3,7 @@
 /// Each `type` defined in the GraphQL schema will have an instance of ``Object`` generated.
 /// # See Also
 /// [GraphQLSpec - Objects](https://spec.graphql.org/draft/#sec-Objects)
-public struct Object: Hashable {
+public struct Object: Hashable, Sendable {
 
   /// Designated Initializer
   ///
