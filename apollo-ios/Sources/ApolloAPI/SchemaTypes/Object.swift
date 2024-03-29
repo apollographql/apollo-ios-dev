@@ -34,14 +34,4 @@ public struct Object: Hashable, Sendable {
   public func implements(_ interface: Interface) -> Bool {
     implementedInterfaces.contains(where: { $0 == interface })
   }
-
-  public static func == (lhs: Object, rhs: Object) -> Bool {
-    return lhs.typename == rhs.typename &&
-    lhs.implementedInterfaces == rhs.implementedInterfaces
-  }
-
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(typename)
-    hasher.combine(implementedInterfaces)
-  }
 }
