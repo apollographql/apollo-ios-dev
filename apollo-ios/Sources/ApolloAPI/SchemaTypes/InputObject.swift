@@ -7,8 +7,8 @@ public protocol InputObject: GraphQLOperationVariableValue, JSONEncodable, Hasha
 }
 
 extension InputObject {
-  public var _jsonValue: JSONValue { jsonEncodableValue?._jsonValue }
-  public var jsonEncodableValue: (any JSONEncodable)? { __data._jsonEncodableValue }
+  public var _jsonValue: JSONValue { _jsonEncodableValue?._jsonValue }
+  public var _jsonEncodableValue: (any JSONEncodable)? { __data._jsonEncodableValue }
 
   public static func == (lhs: Self, rhs: Self) -> Bool {
     lhs.__data == rhs.__data
