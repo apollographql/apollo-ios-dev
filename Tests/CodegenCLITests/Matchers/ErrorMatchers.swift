@@ -4,8 +4,8 @@ import Nimble
 
 public func throwUserValidationError(
   _ expectedError: ValidationError
-) -> Nimble.Predicate<ParsableCommand> {
-  return Predicate { actualExpression in
+) -> Nimble.Matcher<ParsableCommand> {
+  return Matcher { actualExpression in
     var actualError: Error?
     do {
       _ = try actualExpression.evaluate()
@@ -14,7 +14,7 @@ public func throwUserValidationError(
     }
 
     guard let actualError = actualError else {
-      return PredicateResult(
+      return MatcherResult(
         status: .fail,
         message: .fail("No error was thrown!")
       )
@@ -26,7 +26,7 @@ public func throwUserValidationError(
       let validationError = parserError as? ValidationError,
       validationError.message == expectedError.message
     else {
-      return PredicateResult(
+      return MatcherResult(
         status: .fail,
         message: .expectedTo(
           "equal ValidationError(\"\(expectedError.self)\"), got \(actualError)"
@@ -34,15 +34,15 @@ public func throwUserValidationError(
       )
     }
 
-    return PredicateResult(
+    return MatcherResult(
       status: .matches,
       message: .expectedTo("be equal")
     )
   }
 }
 
-public func throwUnknownOptionError() -> Nimble.Predicate<ParsableCommand> {
-  return Predicate { actualExpression in
+public func throwUnknownOptionError() -> Nimble.Matcher<ParsableCommand> {
+  return Matcher { actualExpression in
     var actualError: Error?
     do {
       _ = try actualExpression.evaluate()
@@ -51,7 +51,7 @@ public func throwUnknownOptionError() -> Nimble.Predicate<ParsableCommand> {
     }
 
     guard let actualError = actualError else {
-      return PredicateResult(
+      return MatcherResult(
         status: .fail,
         message: .fail("No error was thrown!")
       )
@@ -61,13 +61,13 @@ public func throwUnknownOptionError() -> Nimble.Predicate<ParsableCommand> {
       let commandError = actualError as? CommandError,
       case ParserError.unknownOption = commandError.parserError
     else {
-      return PredicateResult(
+      return MatcherResult(
         status: .fail,
         message: .expectedTo("equal UnknownOption(), got \(actualError)")
       )
     }
 
-    return PredicateResult(
+    return MatcherResult(
       status: .matches,
       message: .expectedTo("be equal")
     )
@@ -77,8 +77,8 @@ public func throwUnknownOptionError() -> Nimble.Predicate<ParsableCommand> {
 public func throwError(
   localizedDescription: String,
   ignoringExtraCharacters: Bool = false
-) -> Nimble.Predicate<Any> {
-  return Predicate { actualExpression in
+) -> Nimble.Matcher<Any> {
+  return Matcher { actualExpression in
     var actualError: Error?
     do {
       _ = try actualExpression.evaluate()
@@ -87,7 +87,7 @@ public func throwError(
     }
 
     guard let actualError = actualError else {
-      return PredicateResult(
+      return MatcherResult(
         status: .fail,
         message: .fail("No error was thrown!")
       )
@@ -95,7 +95,7 @@ public func throwError(
 
     if ignoringExtraCharacters {
       if !actualError.localizedDescription.starts(with: localizedDescription) {
-        return PredicateResult(
+        return MatcherResult(
           status: .doesNotMatch,
           message: .expectedTo(
             "start with \"\(localizedDescription)\", got \"\(actualError.localizedDescription)\""
@@ -104,7 +104,7 @@ public func throwError(
       }
     } else {
       if !(actualError.localizedDescription == localizedDescription) {
-        return PredicateResult(
+        return MatcherResult(
           status: .doesNotMatch,
           message: .expectedTo(
             "equal \"\(localizedDescription)\", got \"\(actualError.localizedDescription)\""
@@ -113,7 +113,7 @@ public func throwError(
       }
     }
 
-    return PredicateResult(
+    return MatcherResult(
       status: .matches,
       message: .expectedTo("be equal")
     )

@@ -270,29 +270,29 @@ extension IR.Entity.Location.FieldComponent {
 
 fileprivate func match(
   _ expectedValue: [IR.Entity.Location: IR.Entity]
-) -> Nimble.Predicate<[IR.Entity.Location: IR.Entity]> {
-  return Predicate.define { actual in
+) -> Nimble.Matcher<[IR.Entity.Location: IR.Entity]> {
+  return Matcher.define { actual in
     let message: ExpectationMessage = .expectedActualValueTo("equal \(expectedValue)")
     guard var actual = try actual.evaluate(),
           actual.count == expectedValue.count else {
-      return PredicateResult(status: .fail, message: message)
+      return MatcherResult(status: .fail, message: message)
     }
 
     for expected in expectedValue {
       guard let actual = actual.removeValue(forKey: expected.key) else {
-        return PredicateResult(status: .fail, message: message)
+        return MatcherResult(status: .fail, message: message)
       }
 
       if expected.value.rootTypePath != actual.rootTypePath ||
           expected.value.location != actual.location {
-        return PredicateResult(status: .fail, message: message)
+        return MatcherResult(status: .fail, message: message)
       }
     }
 
     guard actual.isEmpty else {
-      return PredicateResult(status: .fail, message: message)
+      return MatcherResult(status: .fail, message: message)
     }
 
-    return PredicateResult(status: .matches, message: message)
+    return MatcherResult(status: .matches, message: message)
   }
 }
