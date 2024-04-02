@@ -500,8 +500,8 @@ struct SelectionSetTemplate {
   ) -> TemplateString {
     guard
       !(selectionSet.direct?.namedFragments.isEmpty ?? true)
-        || !selectionSet.merged.namedFragments.isEmpty
-        || (selectionSet.direct?.inlineFragments.containsDeferredFragment ?? false)
+      || !selectionSet.merged.namedFragments.isEmpty
+      || (selectionSet.direct?.inlineFragments.containsDeferredFragment ?? false)
     else {
       return ""
     }
@@ -519,13 +519,16 @@ struct SelectionSetTemplate {
         \(selectionSet.merged.namedFragments.values.map {
         NamedFragmentAccessorTemplate($0, in: scope)
       }, separator: "\n")
-        \(forEachIn: selectionSet.direct?.inlineFragments.values.elements ?? [], {
-          """
-          \(ifLet: $0.typeInfo.deferCondition, {
-            DeferredFragmentAccessorTemplate(propertyName: $0.label, typeName: $0.renderedTypeName)
-          })
-          """
-      })
+        \(
+          forEachIn: selectionSet.direct?.inlineFragments.values.elements ?? [],
+          separator: "\n", {
+            """
+            \(ifLet: $0.typeInfo.deferCondition, {
+              DeferredFragmentAccessorTemplate(propertyName: $0.label, typeName: $0.renderedTypeName)
+            })
+            """
+          }
+        )
       }
       """
   }
@@ -539,14 +542,14 @@ struct SelectionSetTemplate {
     {
       return DesignatedInitializerTemplate(
         """
-        \(forEachIn: directSelections.inlineFragments.values, {
+        \(forEachIn: directSelections.inlineFragments.values, separator: "\n", {
           if let deferCondition = $0.typeInfo.deferCondition {
             return DeferredPropertyInitializationStatement(deferCondition.label)
           }
 
           return ""
         })
-        \(forEachIn: directSelections.namedFragments.values, {
+        \(forEachIn: directSelections.namedFragments.values, separator: "\n", {
           if let _ = $0.typeInfo.deferCondition {
             return DeferredPropertyInitializationStatement($0.definition.name.firstLowercased)
           }
