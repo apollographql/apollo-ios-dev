@@ -207,7 +207,7 @@ struct SelectionSetTemplate {
           \($0)
 
         """
-      }, 
+      },
         else: " \(dataInitStatement) "
       )}
       """
@@ -400,9 +400,17 @@ struct SelectionSetTemplate {
   }
 
   private func FragmentSelectionTemplate(_ fragment: IR.NamedFragmentSpread) -> TemplateString {
-    """
-    .fragment(\(fragment.definition.name.asFragmentName).self)
-    """
+    if let deferCondition = fragment.typeInfo.deferCondition {
+      return DeferredNamedFragmentSelectionTemplate(
+        deferCondition: deferCondition,
+        fragment: fragment
+      )
+
+    } else {
+      return """
+      .fragment(\(fragment.definition.name.asFragmentName).self)
+      """
+    }
   }
 
   private func DeferredInlineFragmentSelectionTemplate(
@@ -412,6 +420,17 @@ struct SelectionSetTemplate {
     .deferred(\
     \(ifLet: deferCondition.variable, { "if: \"\($0)\", " })\
     \(deferCondition.renderedTypeName).self, label: "\(deferCondition.label)")
+    """
+  }
+
+  private func DeferredNamedFragmentSelectionTemplate(
+    deferCondition: CompilationResult.DeferCondition,
+    fragment: IR.NamedFragmentSpread
+  ) -> TemplateString {
+    """
+    .deferred(\
+    \(ifLet: deferCondition.variable, { "if: \"\($0)\", " })\
+    \(fragment.definition.name.asFragmentName).self, label: "\(deferCondition.label)")
     """
   }
 
@@ -481,8 +500,8 @@ struct SelectionSetTemplate {
   ) -> TemplateString {
     guard
       !(selectionSet.direct?.namedFragments.isEmpty ?? true)
-        || !selectionSet.merged.namedFragments.isEmpty
-        || (selectionSet.direct?.inlineFragments.containsDeferredFragment ?? false)
+      || !selectionSet.merged.namedFragments.isEmpty
+      || (selectionSet.direct?.inlineFragments.containsDeferredFragment ?? false)
     else {
       return ""
     }
@@ -500,9 +519,16 @@ struct SelectionSetTemplate {
         \(selectionSet.merged.namedFragments.values.map {
         NamedFragmentAccessorTemplate($0, in: scope)
       }, separator: "\n")
-        \(forEachIn: selectionSet.direct?.inlineFragments.values.elements ?? [], {
-        "\(ifLet: $0.typeInfo.deferCondition, DeferredFragmentAccessorTemplate)"
-      })
+        \(
+          forEachIn: selectionSet.direct?.inlineFragments.values.elements ?? [],
+          separator: "\n", {
+            """
+            \(ifLet: $0.typeInfo.deferCondition, {
+              DeferredFragmentAccessorTemplate(propertyName: $0.label, typeName: $0.renderedTypeName)
+            })
+            """
+          }
+        )
       }
       """
   }
@@ -510,16 +536,25 @@ struct SelectionSetTemplate {
   private func FragmentInitializerTemplate(
     _ selectionSet: ComputedSelectionSet
   ) -> String {
-    if let inlineFragments = selectionSet.direct?.inlineFragments,
-      inlineFragments.containsDeferredFragment
+    if let directSelections = selectionSet.direct,
+      (directSelections.inlineFragments.containsDeferredFragment
+      || directSelections.namedFragments.containsDeferredFragment)
     {
       return DesignatedInitializerTemplate(
         """
-        \(forEachIn: inlineFragments.values, {
-          guard let deferCondition = $0.typeInfo.deferCondition else {
-            return nil
+        \(forEachIn: directSelections.inlineFragments.values, separator: "\n", {
+          if let deferCondition = $0.typeInfo.deferCondition {
+            return DeferredPropertyInitializationStatement(deferCondition.label)
           }
-          return DeferredPropertyInitializationStatement(deferCondition)
+
+          return ""
+        })
+        \(forEachIn: directSelections.namedFragments.values, separator: "\n", {
+          if let _ = $0.typeInfo.deferCondition {
+            return DeferredPropertyInitializationStatement($0.definition.name.firstLowercased)
+          }
+
+          return ""
         })
         """
       )
@@ -529,10 +564,8 @@ struct SelectionSetTemplate {
     }
   }
 
-  private func DeferredPropertyInitializationStatement(
-    _ deferCondition: CompilationResult.DeferCondition
-  ) -> TemplateString {
-    "_\(deferCondition.label) = Deferred(_dataDict: _dataDict)"
+  private func DeferredPropertyInitializationStatement(_ propertyName: String) -> TemplateString {
+    "_\(propertyName) = Deferred(_dataDict: _dataDict)"
   }
 
   private func NamedFragmentAccessorTemplate(
@@ -545,13 +578,22 @@ struct SelectionSetTemplate {
     let isOptional =
       fragment.inclusionConditions != nil
       && !scope.matches(fragment.inclusionConditions.unsafelyUnwrapped)
+    let isDeferred = fragment.typeInfo.deferCondition != nil
 
     return """
-      \(renderAccessControl())var \(propertyName): \(typeName)\
-      \(if: isOptional, "?") {\
+      \(if: isDeferred,
+          DeferredFragmentAccessorTemplate(
+            propertyName: fragment.definition.name.firstLowercased,
+            typeName: fragment.definition.name.asFragmentName
+          )
+      , else:
+          """
+          \(renderAccessControl())var \(propertyName): \(typeName)\(if: isOptional, "?") {\
+          \(if: !isMutable && !isDeferred, " _toFragment() }")
+          """
+      )
       \(if: isMutable,
       """
-
         get { _toFragment() }
         _modify { var f = \(propertyName); yield &f; \(
           if: isOptional,
@@ -561,16 +603,15 @@ struct SelectionSetTemplate {
         @available(*, unavailable, message: "mutate properties of the fragment instead.")
         set { preconditionFailure() }
       }
-      """,
-        else: " _toFragment() }"
-      )
+      """)
       """
   }
 
   private func DeferredFragmentAccessorTemplate(
-    _ deferCondition: CompilationResult.DeferCondition
+    propertyName: String,
+    typeName: String
   ) -> TemplateString {
-    "@Deferred public var \(deferCondition.label): \(deferCondition.renderedTypeName)?"
+    "@Deferred public var \(propertyName): \(typeName)?"
   }
 
   // MARK: - SelectionSet Initializer
@@ -1147,5 +1188,11 @@ extension CompilationResult.DeferCondition {
 extension OrderedDictionary<ScopeCondition, InlineFragmentSpread> {
   fileprivate var containsDeferredFragment: Bool {
     keys.contains(where: { $0.isDeferred })
+  }
+}
+
+extension OrderedDictionary<String, NamedFragmentSpread> {
+  fileprivate var containsDeferredFragment: Bool {
+    values.contains(where: { $0.typeInfo.deferCondition != nil })
   }
 }

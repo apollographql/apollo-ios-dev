@@ -1,6 +1,7 @@
 @testable import ApolloCodegenLib
 @testable import IR
 import GraphQLCompiler
+import OrderedCollections
 
 /// A wrapper for IR types that allows for unit tests to easily compute, access, and verify built
 /// selection sets.
@@ -79,6 +80,10 @@ public class SelectionSetTestWrapper: IRTestWrapper<IR.SelectionSet> {
       with: conditions,
       computedSelectionSetCache: computedSelectionSetCache
     )
+  }
+  
+  public var containsDeferredChildFragment: Bool {
+    self.computed.containsDeferredChildFragment
   }
 
   public override var debugDescription: String { computed.debugDescription }
@@ -283,5 +288,31 @@ class ComputedSelectionSetCache {
 
     selectionSets[selectionSet.typeInfo] = selectionSet
     return selectionSet
+  }
+}
+
+extension ComputedSelectionSet {
+  fileprivate var containsDeferredChildFragment: Bool {
+    containsDeferredChildInlineFragment || containsDeferredChildNamedFragment
+  }
+  
+  fileprivate var containsDeferredChildInlineFragment: Bool {
+    (direct?.inlineFragments.containsDeferredFragment ?? false) || merged.inlineFragments.containsDeferredFragment
+  }
+  
+  fileprivate var containsDeferredChildNamedFragment: Bool {
+    (direct?.namedFragments.containsDeferredFragment ?? false) || merged.namedFragments.containsDeferredFragment
+  }
+}
+
+extension OrderedDictionary<ScopeCondition, InlineFragmentSpread> {
+  fileprivate var containsDeferredFragment: Bool {
+    self.keys.contains { $0.isDeferred }
+  }
+}
+
+extension OrderedDictionary<String, NamedFragmentSpread> {
+  fileprivate var containsDeferredFragment: Bool {
+    self.values.contains { $0.typeInfo.isDeferred }
   }
 }
