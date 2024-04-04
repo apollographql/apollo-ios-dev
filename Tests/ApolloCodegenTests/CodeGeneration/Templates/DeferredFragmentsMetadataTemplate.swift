@@ -32,7 +32,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
   }
   
   private func buildSubjectAndOperation(named operationName: String = "TestOperation") async throws {
-    schemaSDL.appendDeferDirective()
     ir = try await .mock(schema: schemaSDL, document: document)
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
     operation = await ir.build(operation: operationDefinition)
@@ -67,7 +66,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -79,7 +78,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
           }
         }
       }
-      """
+      """.appendingDeferDirective()
 
     // when
     try await buildSubjectAndOperation()
@@ -116,7 +115,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -170,7 +169,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -226,7 +225,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         species: String!
         genus: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -293,7 +292,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         species: String!
         genus: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -361,7 +360,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         species: String!
         genus: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -419,7 +418,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -474,7 +473,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -530,7 +529,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -588,7 +587,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {

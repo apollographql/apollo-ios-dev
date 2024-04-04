@@ -1040,7 +1040,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -1055,7 +1055,6 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    schemaSDL.appendDeferDirective()
     try await buildSubjectAndOperation()
     let actual = renderSubject()
     
@@ -1099,7 +1098,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -1112,7 +1111,6 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
-    schemaSDL.appendDeferDirective()
     try await buildSubjectAndOperation()
     let actual = renderSubject()
     
