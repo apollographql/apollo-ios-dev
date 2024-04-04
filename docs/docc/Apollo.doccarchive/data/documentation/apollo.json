@@ -90,6 +90,7 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloErrorInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber",
         "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable",
         "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider",
         "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport",
@@ -424,6 +425,64 @@
   "title" : "ApolloStore",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore"
+},
+"doc://Apollo/documentation/Apollo/ApolloStoreSubscriber": {
+  "abstract" : [
+    {
+      "text" : "The ",
+      "type" : "text"
+    },
+    {
+      "code" : "ApolloStoreSubscriber",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " provides a means to observe changes to items in the ApolloStore.",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "This protocol is available for advanced use cases only. Most users will prefer using ",
+      "type" : "text"
+    },
+    {
+      "code" : "ApolloClient.watch(query:)",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ApolloStoreSubscriber"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ApolloStoreSubscriber"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloStoreSubscriber",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostoresubscriber"
 },
 "doc://Apollo/documentation/Apollo/Atomic": {
   "abstract" : [

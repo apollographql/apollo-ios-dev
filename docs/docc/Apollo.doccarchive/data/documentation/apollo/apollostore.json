@@ -113,6 +113,8 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/clearCache(callbackQueue:completion:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/load(_:callbackQueue:resultHandler:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/publish(records:identifier:callbackQueue:completion:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/subscribe(_:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/unsubscribe(_:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/withinReadTransaction(_:callbackQueue:completion:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/withinReadWriteTransaction(_:callbackQueue:completion:)"
       ],
@@ -663,6 +665,88 @@
   "title" : "publish(records:identifier:callbackQueue:completion:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/publish(records:identifier:callbackqueue:completion:)"
+},
+"doc://Apollo/documentation/Apollo/ApolloStore/subscribe(_:)": {
+  "abstract" : [
+    {
+      "text" : "Subscribes to notifications of ApolloStore content changes",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "subscribe"
+    },
+    {
+      "kind" : "text",
+      "text" : "(any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A15StoreSubscriberP",
+      "text" : "ApolloStoreSubscriber"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/subscribe(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "subscribe(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore\/subscribe(_:)"
+},
+"doc://Apollo/documentation/Apollo/ApolloStore/unsubscribe(_:)": {
+  "abstract" : [
+    {
+      "text" : "Unsubscribes from notifications of ApolloStore content changes",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "unsubscribe"
+    },
+    {
+      "kind" : "text",
+      "text" : "(any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A15StoreSubscriberP",
+      "text" : "ApolloStoreSubscriber"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/unsubscribe(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "unsubscribe(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore\/unsubscribe(_:)"
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/withinReadTransaction(_:callbackQueue:completion:)": {
   "abstract" : [

@@ -9,7 +9,7 @@
       "type" : "text"
     },
     {
-      "text" : "transforms output responses.",
+      "text" : "transforms output responses into a collection.",
       "type" : "text"
     }
   ],
@@ -23,12 +23,12 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/init(client:watcherDispatchQueue:initialQuery:extractPageInfo:pageResolver:transform:)-44yeq"
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/init(client:watcherDispatchQueue:initialQuery:extractPageInfo:pageResolver:transform:)-93v7e"
   },
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "ApolloPagination",
-    "externalID" : "s:16ApolloPagination22AsyncGraphQLQueryPagerC6client20watcherDispatchQueue12initialQuery15extractPageInfo12pageResolver9transformACyxG0A00A14ClientProtocol_p_So17OS_dispatch_queueCqd__qd_0_4DataQyd__cqd__Sgqd_0__AA0B9DirectionOtcxSayAPG_ApTtKctYac0A3API0dE0Rd__AA0bO0Rd_0_r0_lufc",
+    "externalID" : "s:16ApolloPagination22AsyncGraphQLQueryPagerC6client20watcherDispatchQueue12initialQuery15extractPageInfo12pageResolver9transformACyxG0A00A14ClientProtocol_p_So17OS_dispatch_queueCqd__qd_1_4DataQyd__cqd__Sgqd_1__AA0B9DirectionOtcxAPKctcSmRz0A3API0dE0Rd__7ElementQzRsd_0_AA0bO0Rd_1_r1_lufc",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -49,6 +49,14 @@
       {
         "kind" : "genericParameter",
         "text" : "InitialQuery"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "genericParameter",
+        "text" : "T"
       },
       {
         "kind" : "text",
@@ -184,7 +192,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": (["
+        "text" : ": ("
       },
       {
         "kind" : "typeIdentifier",
@@ -201,41 +209,7 @@
       },
       {
         "kind" : "text",
-        "text" : "], "
-      },
-      {
-        "kind" : "typeIdentifier",
-        "text" : "InitialQuery"
-      },
-      {
-        "kind" : "text",
-        "text" : "."
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-        "text" : "Data"
-      },
-      {
-        "kind" : "text",
-        "text" : ", ["
-      },
-      {
-        "kind" : "typeIdentifier",
-        "text" : "InitialQuery"
-      },
-      {
-        "kind" : "text",
-        "text" : "."
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-        "text" : "Data"
-      },
-      {
-        "kind" : "text",
-        "text" : "]) "
+        "text" : ") "
       },
       {
         "kind" : "keyword",
@@ -251,11 +225,7 @@
       },
       {
         "kind" : "text",
-        "text" : ") "
-      },
-      {
-        "kind" : "keyword",
-        "text" : "async"
+        "text" : ")"
       }
     ],
     "modules" : [
@@ -298,6 +268,14 @@
             {
               "kind" : "genericParameter",
               "text" : "InitialQuery"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "genericParameter",
+              "text" : "T"
             },
             {
               "kind" : "text",
@@ -458,7 +436,7 @@
             },
             {
               "kind" : "text",
-              "text" : " (["
+              "text" : " ("
             },
             {
               "kind" : "typeIdentifier",
@@ -475,41 +453,7 @@
             },
             {
               "kind" : "text",
-              "text" : "], "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "InitialQuery"
-            },
-            {
-              "kind" : "text",
-              "text" : "."
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-              "text" : "Data"
-            },
-            {
-              "kind" : "text",
-              "text" : ", ["
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "InitialQuery"
-            },
-            {
-              "kind" : "text",
-              "text" : "."
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-              "text" : "Data"
-            },
-            {
-              "kind" : "text",
-              "text" : "]) "
+              "text" : ") "
             },
             {
               "kind" : "keyword",
@@ -529,19 +473,28 @@
             },
             {
               "kind" : "keyword",
-              "text" : "async"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "keyword",
               "text" : "where"
             },
             {
               "kind" : "text",
               "text" : " "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Model"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:Sm",
+              "text" : "RangeReplaceableCollection"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
             },
             {
               "kind" : "typeIdentifier",
@@ -555,6 +508,31 @@
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI12GraphQLQueryP",
               "text" : "GraphQLQuery"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "T"
+            },
+            {
+              "kind" : "text",
+              "text" : " == "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Model"
+            },
+            {
+              "kind" : "text",
+              "text" : "."
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:ST7ElementQa",
+              "text" : "Element"
             },
             {
               "kind" : "text",
@@ -591,7 +569,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollopagination\/asyncgraphqlquerypager\/init(client:watcherdispatchqueue:initialquery:extractpageinfo:pageresolver:transform:)-44yeq"
+        "\/documentation\/apollopagination\/asyncgraphqlquerypager\/init(client:watcherdispatchqueue:initialquery:extractpageinfo:pageresolver:transform:)-93v7e"
       ],
       "traits" : [
         {
@@ -647,7 +625,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager/init(client:watcherDispatchQueue:initialQuery:extractPageInfo:pageResolver:transform:)-44yeq": {
+"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager/init(client:watcherDispatchQueue:initialQuery:extractPageInfo:pageResolver:transform:)-93v7e": {
   "abstract" : [
     {
       "text" : "Convenience initializer for creating a pager that has a single query and",
@@ -658,7 +636,7 @@
       "type" : "text"
     },
     {
-      "text" : "transforms output responses.",
+      "text" : "transforms output responses into a collection.",
       "type" : "text"
     }
   ],
@@ -682,6 +660,14 @@
     {
       "kind" : "genericParameter",
       "text" : "InitialQuery"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "T"
     },
     {
       "kind" : "text",
@@ -817,7 +803,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": (["
+      "text" : ": ("
     },
     {
       "kind" : "typeIdentifier",
@@ -834,41 +820,7 @@
     },
     {
       "kind" : "text",
-      "text" : "], "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "InitialQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ", ["
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "InitialQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : "]) "
+      "text" : ") "
     },
     {
       "kind" : "keyword",
@@ -884,19 +836,15 @@
     },
     {
       "kind" : "text",
-      "text" : ") "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "async"
+      "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/init(client:watcherDispatchQueue:initialQuery:extractPageInfo:pageResolver:transform:)-44yeq",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/init(client:watcherDispatchQueue:initialQuery:extractPageInfo:pageResolver:transform:)-93v7e",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "init(client:watcherDispatchQueue:initialQuery:extractPageInfo:pageResolver:transform:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager\/init(client:watcherdispatchqueue:initialquery:extractpageinfo:pageresolver:transform:)-44yeq"
+  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager\/init(client:watcherdispatchqueue:initialquery:extractpageinfo:pageresolver:transform:)-93v7e"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/PaginationDirection": {
   "abstract" : [

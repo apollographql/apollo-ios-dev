@@ -4,10 +4,10 @@ import Apollo
 @testable import ApolloWebSocket
 import ApolloAPI
 
-public func equalMessage(payload: JSONEncodableDictionary? = nil, id: String? = nil, type: OperationMessage.Types) -> Nimble.Predicate<String> {
-  return Nimble.Predicate.define { actualExpression in
+public func equalMessage(payload: JSONEncodableDictionary? = nil, id: String? = nil, type: OperationMessage.Types) -> Nimble.Matcher<String> {
+  return Nimble.Matcher.define { actualExpression in
     guard let actualValue = try actualExpression.evaluate() else {
-      return PredicateResult(
+      return MatcherResult(
         status: .fail,
         message: .fail("Message cannot be nil - type is a required parameter.")
       )
@@ -15,12 +15,12 @@ public func equalMessage(payload: JSONEncodableDictionary? = nil, id: String? = 
 
     let expected = OperationMessage(payload: payload, id: id, type: type)
     guard actualValue == expected.rawMessage! else {
-      return PredicateResult(
+      return MatcherResult(
         status: .fail,
         message: .expectedActualValueTo("equal \(expected)"))
     }
 
-    return PredicateResult(
+    return MatcherResult(
       status: .matches,
       message: .expectedTo("be equal")
     )
