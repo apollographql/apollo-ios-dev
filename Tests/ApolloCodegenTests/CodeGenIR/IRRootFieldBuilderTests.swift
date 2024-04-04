@@ -4388,8 +4388,6 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   // MARK: - Deferred Fragments - containsDeferredFragment property
 
-  #warning("Need tests for deferredFragments property")
-
   func test__deferredFragments__givenNoDeferredFragment_containsDeferredFragmentFalse() async throws {
     // given
     schemaSDL = """
