@@ -36,7 +36,6 @@ class SelectionSetTemplateTests: XCTestCase {
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = .init(),
     cocoapodsImportStatements: Bool = false
   ) async throws {
-    schemaSDL.appendDeferDirective()
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
     operation = await ir.build(operation: operationDefinition)
@@ -1591,7 +1590,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -1649,7 +1648,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -1712,7 +1711,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -1789,7 +1788,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -1866,7 +1865,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -1943,7 +1942,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -2010,7 +2009,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -2113,7 +2112,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -2222,7 +2221,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -2311,7 +2310,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -2406,7 +2405,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -2512,7 +2511,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -2639,7 +2638,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -2711,7 +2710,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -2790,7 +2789,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -2878,7 +2877,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -2950,7 +2949,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -3029,7 +3028,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -3119,7 +3118,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -3195,7 +3194,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -3283,7 +3282,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -3371,7 +3370,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -3459,7 +3458,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -3547,7 +3546,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -3653,7 +3652,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -3747,7 +3746,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6619,7 +6618,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -6676,7 +6675,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -6738,7 +6737,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -6815,7 +6814,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -6894,7 +6893,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -6971,7 +6970,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -7036,7 +7035,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -7139,7 +7138,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -7248,7 +7247,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -7338,7 +7337,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -7440,7 +7439,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -8222,7 +8221,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -8272,7 +8271,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -8327,7 +8326,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -8382,7 +8381,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -8437,7 +8436,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -8492,7 +8491,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -8541,7 +8540,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -8609,7 +8608,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -8687,7 +8686,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -8753,7 +8752,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -8820,7 +8819,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -8899,7 +8898,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -8950,7 +8949,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -9007,7 +9006,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -9062,7 +9061,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -9121,7 +9120,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -9178,7 +9177,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -9235,7 +9234,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -9292,7 +9291,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -9346,7 +9345,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -9430,7 +9429,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -9515,7 +9514,7 @@ class SelectionSetTemplateTests: XCTestCase {
         id: String!
         species: String!
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -11456,7 +11455,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -11508,7 +11507,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -11565,7 +11564,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -11624,7 +11623,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -11709,7 +11708,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -11796,7 +11795,7 @@ class SelectionSetTemplateTests: XCTestCase {
       species: String!
       genus: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {

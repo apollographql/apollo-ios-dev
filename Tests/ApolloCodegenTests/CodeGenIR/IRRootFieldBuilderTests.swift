@@ -40,8 +40,6 @@ class IRRootFieldBuilderTests: XCTestCase {
   // MARK: - Helpers
 
   func buildSubjectRootField(operationName: String? = nil) async throws {
-    schemaSDL.appendDeferDirective()
-
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     if let operationName {
       operation = try XCTUnwrap(ir.compilationResult.operations.first(
@@ -4447,7 +4445,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String
       name: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4487,7 +4485,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String
       name: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4527,7 +4525,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String
       name: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4564,7 +4562,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String
       species: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4606,7 +4604,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String
       name: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4655,7 +4653,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       species: String
       friends: [Pet]
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4700,7 +4698,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4761,7 +4759,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4830,7 +4828,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String!
       name: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4916,7 +4914,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String!
       name: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5002,7 +5000,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String!
       name: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5088,7 +5086,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String!
       name: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5160,7 +5158,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String!
       name: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5266,7 +5264,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     type Cat implements Animal {
       species: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query Test {
@@ -5359,7 +5357,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       species: String
       name: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5455,7 +5453,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       species: String
       name: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5567,7 +5565,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       species: String
       genus: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5671,7 +5669,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String
       species: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -5732,7 +5730,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String
       species: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query IncludeFirst($a: Boolean) {
@@ -5811,7 +5809,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       species: String
       genus: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -5909,7 +5907,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String
       species: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -5970,7 +5968,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String
       species: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query IncludeFirst($a: Boolean) {
@@ -6049,7 +6047,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       species: String
       genus: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -6149,7 +6147,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6212,7 +6210,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6292,7 +6290,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6373,7 +6371,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6453,7 +6451,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6527,7 +6525,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6618,7 +6616,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6694,7 +6692,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation($a: Boolean) {
@@ -6773,7 +6771,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation($a: Boolean) {
@@ -6856,7 +6854,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         species: String
         genus: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation($a: Boolean) {
@@ -6977,7 +6975,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation($a: Boolean) {
@@ -7059,7 +7057,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         species: String
         genus: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation($a: Boolean) {
