@@ -306,10 +306,6 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  // MARK: - Defer Properties
-
-  #warning("Need tests for deferredFragments property")
-
   // MARK: - Selection Set Declaration
 
   func test__generate__givenOperationSelectionSet_rendersDeclaration() async throws {
@@ -1024,5 +1020,111 @@ class OperationDefinitionTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expectedOne, atLine: 8, ignoringExtraLines: true))
     expect(actual).to(equalLineByLine(expectedTwo, atLine: 10, ignoringExtraLines: true))
+  }
+  
+  // MARK: - Defer Metadata
+  
+  func test__generateMetadata__whenContainsDeferredFragment_rendersDeferMetadata() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    schemaSDL.appendDeferDirective()
+    try await buildSubjectAndOperation()
+    let actual = renderSubject()
+    
+    // then
+    expect(self.operation.containsDeferredFragment).to(beTrue())
+    
+    expect(actual).to(equalLineByLine(
+      """
+      }
+      
+      // MARK: Deferred Fragment Metadata
+      
+      extension TestOperationQuery {
+      """,
+      atLine: 61,
+      ignoringExtraLines: true
+    ))
+    
+    expect(actual).to(equalLineByLine(
+      """
+      }
+      """,
+      atLine: 73,
+      ignoringExtraLines: false
+    ))
+  }
+  
+  func test__generateMetadata__whenDoesNotContainDeferredFragment_doesNotRenderDeferMetadata() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        species
+      }
+    }
+    """
+
+    // when
+    schemaSDL.appendDeferDirective()
+    try await buildSubjectAndOperation()
+    let actual = renderSubject()
+    
+    // then
+    expect(self.operation.containsDeferredFragment).to(beFalse())
+    
+    expect(actual).to(equalLineByLine(
+      """
+      }
+      """,
+      atLine: 37,
+      ignoringExtraLines: false
+    ))
   }
 }
