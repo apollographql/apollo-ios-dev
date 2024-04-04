@@ -42,7 +42,11 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
         ).renderBody())
       }
     }
-
+    \(section: DeferredFragmentsMetadataTemplate(
+      operation: operation,
+      config: config,
+      renderAccessControl: { accessControlModifier(for: .parent) }()
+    ).render())
     """)
   }
     
