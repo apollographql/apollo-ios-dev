@@ -27,6 +27,12 @@ A few examples of this are:
 
 For data that is short-lived, the simplicity of having a clear cache at the beginning of each application run, combined with the improved performance, may make an `InMemoryNormalizedCache` a good choice.
 
+<Note>
+
+`InMemoryNormalizedCache` **does not** implement any auto-eviction policies. This means your application is responsible for reacting to any low memory notifications and taking action to either clear the cache or remove select records. 
+
+</Note>
+
 ### Setup
 
 To use an `InMemoryNormalizedCache`, no additional work is necessary!
