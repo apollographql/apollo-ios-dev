@@ -210,6 +210,16 @@
       "kind" : "content"
     }
   ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloAPI\/s8SendableP"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
+    }
+  ],
   "schemaVersion" : {
     "major" : 0,
     "minor" : 3,
@@ -536,6 +546,11 @@
   "title" : "operationIdentifier",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/operationdocument\/operationidentifier"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 },
 "https://spec.graphql.org/draft/#Document": {
   "identifier" : "https:\/\/spec.graphql.org\/draft\/#Document",

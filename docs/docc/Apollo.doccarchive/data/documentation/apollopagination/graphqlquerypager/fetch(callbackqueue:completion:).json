@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Discards pagination state and fetches the first page from scratch.",
+      "text" : "Fetches the first page.",
       "type" : "text"
     }
   ],
@@ -15,11 +15,11 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/refetch(cachePolicy:)"
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/fetch(callbackQueue:completion:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerC7refetch11cachePolicyy0A005CacheH0O_tF",
+    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerC5fetch13callbackQueue10completionySo17OS_dispatch_queueC_yycSgtF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -31,7 +31,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "refetch"
+        "text" : "fetch"
       },
       {
         "kind" : "text",
@@ -39,7 +39,7 @@
       },
       {
         "kind" : "externalParam",
-        "text" : "cachePolicy"
+        "text" : "callbackQueue"
       },
       {
         "kind" : "text",
@@ -47,12 +47,29 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-        "text" : "CachePolicy"
+        "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
+        "text" : "DispatchQueue"
       },
       {
         "kind" : "text",
-        "text" : ")"
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "completion"
+      },
+      {
+        "kind" : "text",
+        "text" : ": (() -> "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:s4Voida",
+        "text" : "Void"
+      },
+      {
+        "kind" : "text",
+        "text" : ")?)"
       }
     ],
     "modules" : [
@@ -63,7 +80,7 @@
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
-    "title" : "refetch(cachePolicy:)"
+    "title" : "fetch(callbackQueue:completion:)"
   },
   "primaryContentSections" : [
     {
@@ -86,7 +103,7 @@
             },
             {
               "kind" : "identifier",
-              "text" : "refetch"
+              "text" : "fetch"
             },
             {
               "kind" : "text",
@@ -94,7 +111,7 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "cachePolicy"
+              "text" : "callbackQueue"
             },
             {
               "kind" : "text",
@@ -102,12 +119,29 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-              "text" : "CachePolicy"
+              "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
+              "text" : "DispatchQueue"
             },
             {
               "kind" : "text",
-              "text" : " = .fetchIgnoringCacheData)"
+              "text" : " = .main, "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "completion"
+            },
+            {
+              "kind" : "text",
+              "text" : ": (() -> "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s4Voida",
+              "text" : "Void"
+            },
+            {
+              "kind" : "text",
+              "text" : ")? = nil)"
             }
           ]
         }
@@ -122,11 +156,27 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "The apollo cache policy to trigger the first fetch with. Defaults to ",
+                  "text" : "The ",
                   "type" : "text"
                 },
                 {
-                  "code" : "fetchIgnoringCacheData",
+                  "code" : "DispatchQueue",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " that the ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "completion",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " fires on. Defaults to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "main",
                   "type" : "codeVoice"
                 },
                 {
@@ -137,7 +187,21 @@
               "type" : "paragraph"
             }
           ],
-          "name" : "cachePolicy"
+          "name" : "callbackQueue"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A completion block that will always trigger after the execution of this  operation.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "completion"
         }
       ]
     }
@@ -153,7 +217,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollopagination\/graphqlquerypager\/refetch(cachepolicy:)"
+        "\/documentation\/apollopagination\/graphqlquerypager\/fetch(callbackqueue:completion:)"
       ],
       "traits" : [
         {
@@ -209,10 +273,10 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/graphqlquerypager"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/refetch(cachePolicy:)": {
+"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/fetch(callbackQueue:completion:)": {
   "abstract" : [
     {
-      "text" : "Discards pagination state and fetches the first page from scratch.",
+      "text" : "Fetches the first page.",
       "type" : "text"
     }
   ],
@@ -227,7 +291,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "refetch"
+      "text" : "fetch"
     },
     {
       "kind" : "text",
@@ -235,7 +299,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "cachePolicy"
+      "text" : "callbackQueue"
     },
     {
       "kind" : "text",
@@ -243,20 +307,37 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-      "text" : "CachePolicy"
+      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
+      "text" : "DispatchQueue"
     },
     {
       "kind" : "text",
-      "text" : ")"
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "completion"
+    },
+    {
+      "kind" : "text",
+      "text" : ": (() -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s4Voida",
+      "text" : "Void"
+    },
+    {
+      "kind" : "text",
+      "text" : ")?)"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/refetch(cachePolicy:)",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/fetch(callbackQueue:completion:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "refetch(cachePolicy:)",
+  "title" : "fetch(callbackQueue:completion:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/refetch(cachepolicy:)"
+  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/fetch(callbackqueue:completion:)"
 }
 }
 }

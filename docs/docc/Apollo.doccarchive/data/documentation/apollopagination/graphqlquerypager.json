@@ -135,12 +135,12 @@
     },
     {
       "identifiers" : [
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/fetch()",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/fetch(callbackQueue:completion:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/loadAll(fetchFromInitialPage:callbackQueue:completion:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/loadNext(cachePolicy:callbackQueue:completion:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/loadPrevious(cachePolicy:callbackQueue:completion:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/receive(subscriber:)",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/refetch(cachePolicy:)",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/refetch(cachePolicy:callbackQueue:completion:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/reset()",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/subscribe(completion:)"
       ],
@@ -430,7 +430,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/graphqlquerypager\/cancellables"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/fetch()": {
+"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/fetch(callbackQueue:completion:)": {
   "abstract" : [
     {
       "text" : "Fetches the first page.",
@@ -452,15 +452,49 @@
     },
     {
       "kind" : "text",
-      "text" : "()"
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "callbackQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
+      "text" : "DispatchQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "completion"
+    },
+    {
+      "kind" : "text",
+      "text" : ": (() -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s4Voida",
+      "text" : "Void"
+    },
+    {
+      "kind" : "text",
+      "text" : ")?)"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/fetch()",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/fetch(callbackQueue:completion:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "fetch()",
+  "title" : "fetch(callbackQueue:completion:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/fetch()"
+  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/fetch(callbackqueue:completion:)"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/init(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:)": {
   "abstract" : [
@@ -2981,7 +3015,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/graphqlquerypager\/receive(subscriber:)"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/refetch(cachePolicy:)": {
+"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/refetch(cachePolicy:callbackQueue:completion:)": {
   "abstract" : [
     {
       "text" : "Discards pagination state and fetches the first page from scratch.",
@@ -3020,15 +3054,49 @@
     },
     {
       "kind" : "text",
-      "text" : ")"
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "callbackQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
+      "text" : "DispatchQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "completion"
+    },
+    {
+      "kind" : "text",
+      "text" : ": (() -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s4Voida",
+      "text" : "Void"
+    },
+    {
+      "kind" : "text",
+      "text" : ")?)"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/refetch(cachePolicy:)",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/refetch(cachePolicy:callbackQueue:completion:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "refetch(cachePolicy:)",
+  "title" : "refetch(cachePolicy:callbackQueue:completion:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/refetch(cachepolicy:)"
+  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/refetch(cachepolicy:callbackqueue:completion:)"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/reset()": {
   "abstract" : [
