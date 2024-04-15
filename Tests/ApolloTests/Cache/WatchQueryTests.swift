@@ -1255,7 +1255,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     }
   }
 
-  func testWatchedQueryIsUpdatedMultipleTimesIfConcurrentFetchesReturnChangedData() throws {
+  func testWatchedQueryIsUpdatedMultipleTimesIfConcurrentFetchesReturnChangedData_noDebounce() throws {
     class HeroNameSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
@@ -1277,9 +1277,12 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     let resultObserver = makeResultObserver(for: watchedQuery)
 
-    let watcher = GraphQLQueryWatcher(client: client,
-                                      query: watchedQuery,
-                                      resultHandler: resultObserver.handler)
+    let watcher = GraphQLQueryWatcher(
+      client: client,
+      query: watchedQuery,
+      debounceTimeInterval: .zero,
+      resultHandler: resultObserver.handler
+    )
     addTeardownBlock { watcher.cancel() }
 
     runActivity("Initial fetch from server") { _ in
@@ -1360,6 +1363,117 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       wait(for: [serverRequestExpectation, otherFetchesCompletedExpectation, updatedWatcherResultExpectation], timeout: 3)
 
       XCTAssertEqual(updatedWatcherResultExpectation.numberOfFulfillments, numberOfFetches)
+    }
+  }
+
+  func testWatchedQueryIsUpdatedOnceIfConcurrentFetchesReturnChangedData() throws {
+    class HeroNameSelectionSet: MockSelectionSet {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero.self)
+      ]}
+
+      var hero: Hero { __data["hero"] }
+
+      class Hero: MockSelectionSet {
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+
+        var name: String { __data["name"] }
+      }
+    }
+
+    let watchedQuery = MockQuery<HeroNameSelectionSet>()
+
+    let resultObserver = makeResultObserver(for: watchedQuery)
+
+    let watcher = GraphQLQueryWatcher(
+      client: client,
+      query: watchedQuery,
+      debounceTimeInterval: .zero,
+      resultHandler: resultObserver.handler
+    )
+    addTeardownBlock { watcher.cancel() }
+
+    runActivity("Initial fetch from server") { _ in
+      let serverRequestExpectation =
+        server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+        [
+          "data": [
+            "hero": [
+              "name": "R2-D2",
+              "__typename": "Droid"
+            ]
+          ]
+        ]
+      }
+
+      let initialWatcherResultExpectation = resultObserver.expectation(
+        description: "Watcher received initial result from server"
+      ) { result in
+        try XCTAssertSuccessResult(result) { graphQLResult in
+          XCTAssertEqual(graphQLResult.source, .server)
+          XCTAssertNil(graphQLResult.errors)
+
+          let data = try XCTUnwrap(graphQLResult.data)
+          XCTAssertEqual(data.hero.name, "R2-D2")
+        }
+      }
+
+      watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+
+      wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
+    }
+
+    let numberOfFetches = 10
+
+    runActivity("Fetch same query concurrently \(numberOfFetches) times") { _ in
+      let serverRequestExpectation =
+        server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+        [
+          "data": [
+            "hero": [
+              "name": "Artoo #\(UUID())",
+              "__typename": "Droid"
+            ]
+          ]
+        ]
+      }
+
+      serverRequestExpectation.expectedFulfillmentCount = numberOfFetches
+
+      let updatedWatcherResultExpectation = resultObserver.expectation(
+        description: "Watcher received updated result from cache"
+      ) { result in
+        try XCTAssertSuccessResult(result) { graphQLResult in
+          XCTAssertEqual(graphQLResult.source, .cache)
+          XCTAssertNil(graphQLResult.errors)
+
+          let data = try XCTUnwrap(graphQLResult.data)
+          XCTAssertTrue(try XCTUnwrap(data.hero.name).hasPrefix("Artoo"))
+        }
+      }
+
+      updatedWatcherResultExpectation.expectedFulfillmentCount = 1
+
+      let otherFetchesCompletedExpectation = expectation(description: "Other fetches completed")
+      otherFetchesCompletedExpectation.expectedFulfillmentCount = numberOfFetches
+
+      DispatchQueue.concurrentPerform(iterations: numberOfFetches) { _ in
+        client.fetch(query: MockQuery<HeroNameSelectionSet>(),
+                     cachePolicy: .fetchIgnoringCacheData) { [weak self] result in
+          otherFetchesCompletedExpectation.fulfill()
+
+          if let self = self, case .failure(let error) = result {
+            self.record(error)
+          }
+        }
+      }
+
+      wait(for: [serverRequestExpectation, otherFetchesCompletedExpectation, updatedWatcherResultExpectation], timeout: 3)
+
+      XCTAssertEqual(updatedWatcherResultExpectation.numberOfFulfillments, 1)
     }
   }
 
