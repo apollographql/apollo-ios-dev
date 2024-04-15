@@ -15,6 +15,7 @@ public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, Apollo
 
   private let contextIdentifier = UUID()
   private let context: RequestContext?
+  private let debouncer = Debounce(timeInterval: 0.5)
 
   private class WeakFetchTaskContainer {
     weak var cancellable: Cancellable?
@@ -74,7 +75,9 @@ public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, Apollo
           break
         }
 
-        self.resultHandler(result)
+        self.debouncer.queue {
+          self.resultHandler(result)
+        }
       }
     }
   }
@@ -117,7 +120,9 @@ public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, Apollo
             self.$dependentKeys.mutate {
               $0 = graphQLResult.dependentKeys
             }
-            self.resultHandler(result)
+            self.debouncer.queue {
+              self.resultHandler(result)
+            }
           }
         case .failure:
           if self.fetching.cachePolicy != .returnCacheDataDontFetch {
@@ -127,5 +132,34 @@ public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, Apollo
         }
       }
     }
+  }
+}
+
+private final class Debounce {
+  let timeInterval: TimeInterval
+
+  // using a timer avoids runloop execution on UITrackingRunLoopMode
+  // which will prevent UI updates during interaction
+  var timer: Timer?
+  var block: (() -> Void)?
+
+  init(timeInterval: TimeInterval) {
+    self.timeInterval = timeInterval
+  }
+
+  func cancel() {
+    timer?.invalidate()
+    block = nil
+  }
+
+  func queue(block: @escaping () -> Void) {
+    self.block = block
+    self.timer?.invalidate()
+    let timer = Timer(timeInterval: timeInterval, repeats: false, block: { [weak self] _ in
+      self?.block?()
+      self?.block = nil
+    })
+    self.timer = timer
+    RunLoop.current.add(timer, forMode: .default)
   }
 }
