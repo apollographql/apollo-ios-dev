@@ -1391,7 +1391,6 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     let watcher = GraphQLQueryWatcher(
       client: client,
       query: watchedQuery,
-      debounceTimeInterval: .zero,
       resultHandler: resultObserver.handler
     )
     addTeardownBlock { watcher.cancel() }
