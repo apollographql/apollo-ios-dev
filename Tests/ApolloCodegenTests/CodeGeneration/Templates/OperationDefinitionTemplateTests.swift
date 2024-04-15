@@ -636,6 +636,54 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine("    }", atLine: 35, ignoringExtraLines: true))
   }
 
+  func test__render_givenOperationSelectionSet_initializerConfig_all_fieldMergingConfig_notAll_doesNotRenderInitializer() async throws {
+    let tests: [ApolloCodegenConfiguration.FieldMerging] = [
+      .none,
+      .ancestors,
+      .namedFragments,
+      .siblings,
+      [.ancestors, .namedFragments],
+      [.siblings, .ancestors],
+      [.siblings, .namedFragments]
+    ]
+    
+    for test in tests {
+      // given
+      schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      type Animal {
+        species: String!
+      }
+      """
+
+      document = """
+      query TestOperation {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+      config = .mock(
+        options: .init(
+          selectionSetInitializers: [.all],
+          fieldMerging: test
+        )
+      )
+
+      // when
+      try await buildSubjectAndOperation()
+
+      let actual = renderSubject()
+
+      // then
+      expect(actual).to(equalLineByLine("    }", atLine: 35, ignoringExtraLines: true))
+    }
+  }
+
   // MARK: - Variables
 
   func test__generate__givenQueryWithScalarVariable_generatesQueryOperationWithVariable() async throws {

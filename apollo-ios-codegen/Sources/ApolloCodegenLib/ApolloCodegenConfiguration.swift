@@ -1189,6 +1189,8 @@ extension ApolloCodegenConfiguration.OperationsFileOutput {
 extension ApolloCodegenConfiguration.OutputOptions {
   /// Determine whether the operations files are output to the schema types module.
   func shouldGenerateSelectionSetInitializers(for operation: IR.Operation) -> Bool {
+    guard fieldMerging == .all else { return false }
+
     switch operation.definition.isLocalCacheMutation {
     case true where selectionSetInitializers.contains(.localCacheMutations):
       return true
@@ -1203,6 +1205,8 @@ extension ApolloCodegenConfiguration.OutputOptions {
 
   /// Determine whether the operations files are output to the schema types module.
   func shouldGenerateSelectionSetInitializers(for fragment: IR.NamedFragment) -> Bool {
+    guard fieldMerging == .all else { return false }
+    
     if selectionSetInitializers.contains(.namedFragments) { return true }
 
     if fragment.definition.isLocalCacheMutation &&
