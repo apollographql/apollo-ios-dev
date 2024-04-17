@@ -112,7 +112,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     // when + then
     let actual = try subject.parseIncrementalResult()
 
-    expect(actual.dependentKeys).to(equal([CacheKey("QUERY_ROOT.animal.friend")]))
+    expect(actual.0.dependentKeys).to(equal([CacheKey("QUERY_ROOT.animal.friend")]))
   }
 
   // MARK: Parsing Tests
@@ -140,15 +140,15 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     // when + then
     let actual = try subject.parseIncrementalResult()
 
-    expect(actual.label).to(equal("deferredFriend"))
-    expect(actual.path).to(equal([PathComponent("animal")]))
-    expect(actual.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
+    expect(actual.0.label).to(equal("deferredFriend"))
+    expect(actual.0.path).to(equal([PathComponent("animal")]))
+    expect(actual.0.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
       equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
     )
-    expect(actual.errors).to(equal([
+    expect(actual.0.errors).to(equal([
       GraphQLError(["message": "Forced error!"])
     ]))
-    expect(actual.extensions).to(equal([
+    expect(actual.0.extensions).to(equal([
       "key": "value",
     ]))
   }
