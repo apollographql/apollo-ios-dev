@@ -45,7 +45,10 @@ public final class GraphQLResponse<Data: RootSelectionSet> {
       ResultNormalizerFactory.networkResponseDataNormalizer(),
       GraphQLDependencyTracker()
     )
-    let executionResult = try base.execute(selectionSet: Data.self, with: accumulator)
+    let executionResult = try base.execute(
+      selectionSet: Data.self,
+      with: accumulator
+    )
     let result = makeResult(data: executionResult?.0, dependentKeys: executionResult?.2)
 
     return (result, executionResult?.1)
@@ -57,7 +60,10 @@ public final class GraphQLResponse<Data: RootSelectionSet> {
   /// This is faster than `parseResult()` and should be used when cache the response is not needed.
   public func parseResultFast() throws -> GraphQLResult<Data>  {
     let accumulator = GraphQLSelectionSetMapper<Data>()
-    let data = try base.execute(selectionSet: Data.self, with: accumulator)
+    let data = try base.execute(
+      selectionSet: Data.self,
+      with: accumulator
+    )
 
     return makeResult(data: data, dependentKeys: nil)
   }

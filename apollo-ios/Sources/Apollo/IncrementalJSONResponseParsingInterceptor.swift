@@ -98,7 +98,10 @@ public struct IncrementalJSONResponseParsingInterceptor: ApolloInterceptor {
         parsedCacheRecords = nil
 
       } else {
-        let graphQLResponse = GraphQLResponse(operation: request.operation, body: body)
+        let graphQLResponse = GraphQLResponse(
+          operation: request.operation,
+          body: body
+        )
         let (result, cacheRecords) = try graphQLResponse.parseResult(withCachePolicy: request.cachePolicy)
 
         parsedResult = result

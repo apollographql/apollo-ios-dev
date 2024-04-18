@@ -27,11 +27,17 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
   private let base: AnyGraphQLResponse
 
   public init(operation: Operation, body: JSONObject) throws {
-    guard let path = body["path"] as? [JSONValue] else { throw ResponseError.missingPath }
+    guard let path = body["path"] as? [JSONValue] else {
+      throw ResponseError.missingPath
+    }
 
     let rootKey = try CacheReference.rootCacheReference(for: Operation.operationType, path: path)
 
-    self.base = AnyGraphQLResponse(body: body, rootKey: rootKey, variables: operation.__variables)
+    self.base = AnyGraphQLResponse(
+      body: body,
+      rootKey: rootKey,
+      variables: operation.__variables
+    )
   }
 
   /// Parses the response into a `IncrementalGraphQLResult` and a `RecordSet` depending on the cache policy. The result
@@ -94,8 +100,12 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
   fileprivate func makeResult(
     executor: ((any Deferrable.Type) throws -> (data: DataDict?, dependentKeys: Set<CacheKey>?))
   ) throws -> IncrementalGraphQLResult {
-    guard let path = base.body["path"] as? [JSONValue] else { throw ResponseError.missingPath }
-    guard let label = base.body["label"] as? String else { throw ResponseError.missingLabel }
+    guard let path = base.body["path"] as? [JSONValue] else {
+      throw ResponseError.missingPath
+    }
+    guard let label = base.body["label"] as? String else {
+      throw ResponseError.missingLabel
+    }
 
     let pathComponents: [PathComponent] = path.compactMap(PathComponent.init)
     let fieldPath = pathComponents.fieldPath

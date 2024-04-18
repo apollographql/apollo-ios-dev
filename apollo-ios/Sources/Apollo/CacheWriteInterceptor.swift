@@ -7,7 +7,9 @@ import ApolloAPI
 public struct CacheWriteInterceptor: ApolloInterceptor {
 
   public enum CacheWriteError: Error, LocalizedError {
-    @available(*, deprecated, message: "Will be removed in a future version.") case noResponseToParse
+    @available(*, deprecated, message: "Will be removed in a future version.")
+    case noResponseToParse
+
     case missingCacheRecords
 
     public var errorDescription: String? {
@@ -67,7 +69,7 @@ public struct CacheWriteInterceptor: ApolloInterceptor {
         response: response,
         completion: completion
       )
-        return
+      return
     }
 
     guard !chain.isCancelled else {
