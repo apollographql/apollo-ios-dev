@@ -18,7 +18,6 @@ public class HTTPResponse<Operation: GraphQLOperation> {
   
   /// [optional] The data as parsed into a `GraphQLResponse` for legacy caching purposes. If you're not using the 
   /// `JSONResponseParsingInterceptor`, you probably shouldn't be using this property.
-  /// **NOTE:** This property will be removed when the transition to the Swift Codegen is complete.
   @available(*, deprecated, message: "Do not use. This property will be removed in a future version.")
   public var legacyResponse: GraphQLResponse<Operation.Data>? = nil
   
