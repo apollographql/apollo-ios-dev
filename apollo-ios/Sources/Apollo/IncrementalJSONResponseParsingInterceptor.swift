@@ -88,7 +88,7 @@ public struct IncrementalJSONResponseParsingInterceptor: ApolloInterceptor {
             operation: request.operation,
             body: item
           )
-          let (incrementalResult, incrementalCacheRecords) = try incrementalResponse.parseIncrementalResult(
+          let (incrementalResult, _) = try incrementalResponse.parseIncrementalResult(
             withCachePolicy: request.cachePolicy
           )
           currentResult = try currentResult.merging(incrementalResult)
