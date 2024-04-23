@@ -17,9 +17,27 @@ public final class GraphQLResponse<Data: RootSelectionSet> {
     )
   }
 
-  /// Parses a response into a `GraphQLResult` and a `RecordSet`.
-  /// The result can be sent to a completion block for a request.
-  /// The `RecordSet` can be merged into a local cache.
+  /// Parses the response into a `GraphQLResult` and a `RecordSet` depending on the cache policy. The result can be
+  /// sent to a completion block for a request and the `RecordSet` can be merged into a local cache.
+  ///
+  /// - Returns: A tuple of a `GraphQLResult` and an optional `RecordSet`.
+  /// 
+  /// - Parameter cachePolicy: Used to determine whether a cache `RecordSet` is returned. A cache policy that does
+  /// not read or write to the cache will return a `nil` cache `RecordSet`.
+  public func parseResult(withCachePolicy cachePolicy: CachePolicy) throws -> (GraphQLResult<Data>, RecordSet?) {
+    switch cachePolicy {
+    case .fetchIgnoringCacheCompletely:
+      // There is no cache, so we don't need to get any info on dependencies. Use fast parsing.
+      return (try parseResultFast(), nil)
+
+    default:
+      return try parseResult()
+    }
+  }
+
+  /// Parses a response into a `GraphQLResult` and a `RecordSet`. The result can be sent to a completion block for a 
+  /// request and the `RecordSet` can be merged into a local cache.
+  ///
   /// - Returns: A `GraphQLResult` and a `RecordSet`.
   public func parseResult() throws -> (GraphQLResult<Data>, RecordSet?) {
     let accumulator = zip(
@@ -51,13 +69,10 @@ public final class GraphQLResponse<Data: RootSelectionSet> {
   }
 
   private func makeResult(data: Data?, dependentKeys: Set<CacheKey>?) -> GraphQLResult<Data> {
-    let errors = base.parseErrors()
-    let extensions = base.parseExtensions()
-
     return GraphQLResult(
       data: data,
-      extensions: extensions,
-      errors: errors,
+      extensions: base.parseExtensions(),
+      errors: base.parseErrors(),
       source: .server,
       dependentKeys: dependentKeys
     )

@@ -40,9 +40,72 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
     )
   }
 
-  func parseIncrementalResult() throws -> IncrementalGraphQLResult {
-    guard let path = base.body["path"] as? [JSONValue] else { throw ResponseError.missingPath }
-    guard let label = base.body["label"] as? String else { throw ResponseError.missingLabel }
+  /// Parses the response into a `IncrementalGraphQLResult` and a `RecordSet` depending on the cache policy. The result
+  /// can be used to merge into a partial result and the `RecordSet` can be merged into a local cache.
+  ///
+  /// - Returns: A tuple of a `IncrementalGraphQLResult` and an optional `RecordSet`.
+  ///
+  /// - Parameter cachePolicy: Used to determine whether a cache `RecordSet` is returned. A cache policy that does
+  /// not read or write to the cache will return a `nil` cache `RecordSet`.
+  func parseIncrementalResult(
+    withCachePolicy cachePolicy: CachePolicy
+  ) throws -> (IncrementalGraphQLResult, RecordSet?) {
+    switch cachePolicy {
+    case .fetchIgnoringCacheCompletely:
+      // There is no cache, so we don't need to get any info on dependencies. Use fast parsing.
+      return (try parseIncrementalResultFast(), nil)
+
+    default:
+      return try parseIncrementalResult()
+    }
+  }
+
+  private func parseIncrementalResult() throws -> (IncrementalGraphQLResult, RecordSet?) {
+    let accumulator = zip(
+      DataDictMapper(),
+      ResultNormalizerFactory.networkResponseDataNormalizer(),
+      GraphQLDependencyTracker()
+    )
+
+    var cacheKeys: RecordSet? = nil
+    let result = try makeResult { deferrableSelectionSetType in
+      let executionResult = try base.execute(
+        selectionSet: deferrableSelectionSetType,
+        in: Operation.self,
+        with: accumulator
+      )
+      cacheKeys = executionResult?.1
+
+      return (executionResult?.0, executionResult?.2)
+    }
+
+    return (result, cacheKeys)
+  }
+
+  private func parseIncrementalResultFast() throws -> IncrementalGraphQLResult {
+    let accumulator = DataDictMapper()
+    let result = try makeResult { deferrableSelectionSetType in
+      let executionResult = try base.execute(
+        selectionSet: deferrableSelectionSetType,
+        in: Operation.self,
+        with: accumulator
+      )
+
+      return (executionResult, nil)
+    }
+
+    return result
+  }
+
+  fileprivate func makeResult(
+    executor: ((any Deferrable.Type) throws -> (data: DataDict?, dependentKeys: Set<CacheKey>?))
+  ) throws -> IncrementalGraphQLResult {
+    guard let path = base.body["path"] as? [JSONValue] else {
+      throw ResponseError.missingPath
+    }
+    guard let label = base.body["label"] as? String else {
+      throw ResponseError.missingLabel
+    }
 
     let pathComponents: [PathComponent] = path.compactMap(PathComponent.init)
     let fieldPath = pathComponents.fieldPath
@@ -55,20 +118,10 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
       throw ResponseError.missingDeferredSelectionSetType(label, fieldPath.joined(separator: "."))
     }
 
-    let accumulator = zip(
-      DataDictMapper(),
-      ResultNormalizerFactory.networkResponseDataNormalizer(),
-      GraphQLDependencyTracker()
-    )
-
-    let executionResult = try base.execute(
-      selectionSet: selectionSetType,
-      in: Operation.self,
-      with: accumulator
-    )
-
+    let executionResult = try executor(selectionSetType)
     let selectionSet: (any SelectionSet)?
-    if let data = executionResult?.0 {
+
+    if let data = executionResult.data {
       selectionSet = selectionSetType.init(_dataDict: data)
     } else {
       selectionSet = nil
@@ -80,13 +133,13 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
       data: selectionSet,
       extensions: base.parseExtensions(),
       errors: base.parseErrors(),
-      dependentKeys: executionResult?.2
+      dependentKeys: executionResult.dependentKeys
     )
   }
 }
 
-fileprivate extension CacheReference {
-  static func rootCacheReference(
+extension CacheReference {
+  fileprivate static func rootCacheReference(
     for operationType: GraphQLOperationType,
     path: [JSONValue]
   ) throws -> CacheReference {

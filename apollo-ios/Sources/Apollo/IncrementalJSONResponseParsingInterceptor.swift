@@ -72,6 +72,7 @@ public struct IncrementalJSONResponseParsingInterceptor: ApolloInterceptor {
       }
 
       let parsedResult: GraphQLResult<Operation.Data>
+      let parsedCacheRecords: RecordSet?
 
       if let currentResult = resultStorage.currentResult {
         guard var currentResult = currentResult as? GraphQLResult<Operation.Data> else {
@@ -87,27 +88,30 @@ public struct IncrementalJSONResponseParsingInterceptor: ApolloInterceptor {
             operation: request.operation,
             body: item
           )
-          let incrementalResult = try incrementalResponse.parseIncrementalResult()
+          let (incrementalResult, _) = try incrementalResponse.parseIncrementalResult(
+            withCachePolicy: request.cachePolicy
+          )
           currentResult = try currentResult.merging(incrementalResult)
         }
 
         parsedResult = currentResult
+        parsedCacheRecords = nil
 
       } else {
         let graphQLResponse = GraphQLResponse(
           operation: request.operation,
           body: body
         )
-        createdResponse.legacyResponse = graphQLResponse
-
-        let result = try parseResult(from: graphQLResponse, cachePolicy: request.cachePolicy)
+        let (result, cacheRecords) = try graphQLResponse.parseResult(withCachePolicy: request.cachePolicy)
 
         parsedResult = result
+        parsedCacheRecords = cacheRecords
       }
 
       createdResponse.parsedResponse = parsedResult
-      resultStorage.currentResult = parsedResult
+      createdResponse.cacheRecords = parsedCacheRecords
 
+      resultStorage.currentResult = parsedResult
       chain.proceedAsync(
         request: request,
         response: createdResponse,
@@ -122,20 +126,6 @@ public struct IncrementalJSONResponseParsingInterceptor: ApolloInterceptor {
         response: createdResponse,
         completion: completion
       )
-    }
-  }  
-
-  private func parseResult<Data>(
-    from response: GraphQLResponse<Data>,
-    cachePolicy: CachePolicy
-  ) throws -> GraphQLResult<Data> {
-    switch cachePolicy {
-    case .fetchIgnoringCacheCompletely:
-      // There is no cache, so we don't need to get any info on dependencies. Use fast parsing.
-      return try response.parseResultFast()
-    default:
-      let (parsedResult, _) = try response.parseResult()
-      return parsedResult
     }
   }
 
