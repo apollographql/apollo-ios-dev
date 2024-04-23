@@ -24,7 +24,7 @@ public final class GraphQLResponse<Data: RootSelectionSet> {
   /// 
   /// - Parameter cachePolicy: Used to determine whether a cache `RecordSet` is returned. A cache policy that does
   /// not read or write to the cache will return a `nil` cache `RecordSet`.
-  func parseResult(withCachePolicy cachePolicy: CachePolicy) throws -> (GraphQLResult<Data>, RecordSet?) {
+  public func parseResult(withCachePolicy cachePolicy: CachePolicy) throws -> (GraphQLResult<Data>, RecordSet?) {
     switch cachePolicy {
     case .fetchIgnoringCacheCompletely:
       // There is no cache, so we don't need to get any info on dependencies. Use fast parsing.
