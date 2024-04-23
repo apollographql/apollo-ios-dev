@@ -60,7 +60,7 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
     }
   }
 
-  func parseIncrementalResult() throws -> (IncrementalGraphQLResult, RecordSet?) {
+  private func parseIncrementalResult() throws -> (IncrementalGraphQLResult, RecordSet?) {
     let accumulator = zip(
       DataDictMapper(),
       ResultNormalizerFactory.networkResponseDataNormalizer(),
@@ -82,7 +82,7 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
     return (result, cacheKeys)
   }
 
-  func parseIncrementalResultFast() throws -> IncrementalGraphQLResult {
+  private func parseIncrementalResultFast() throws -> IncrementalGraphQLResult {
     let accumulator = DataDictMapper()
     let result = try makeResult { deferrableSelectionSetType in
       let executionResult = try base.execute(
