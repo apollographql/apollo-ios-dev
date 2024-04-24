@@ -39,12 +39,14 @@ public protocol ApolloClientProtocol: AnyObject {
   /// - Parameters:
   ///   - query: The query to fetch.
   ///   - cachePolicy: A cache policy that specifies when results should be fetched from the server or from the local cache.
+  ///   - refetchCachePolicy: If provided (not `nil`), this value is used when deciding how to repsond to watched store changes.
   ///   - context: [optional] A context that is being passed through the request chain. Should default to `nil`.
   ///   - callbackQueue: A dispatch queue on which the result handler will be called. Should default to the main queue.
   ///   - resultHandler: [optional] A closure that is called when query results are available or when an error occurs.
   /// - Returns: A query watcher object that can be used to control the watching behavior.
   func watch<Query: GraphQLQuery>(query: Query,
                                   cachePolicy: CachePolicy,
+                                  refetchCachePolicy: CachePolicy?,
                                   context: RequestContext?,
                                   callbackQueue: DispatchQueue,
                                   resultHandler: @escaping GraphQLResultHandler<Query.Data>) -> GraphQLQueryWatcher<Query>

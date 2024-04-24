@@ -94,11 +94,13 @@ extension ApolloClient: ApolloClientProtocol {
 
   public func watch<Query: GraphQLQuery>(query: Query,
                                          cachePolicy: CachePolicy = .default,
+                                         refetchCachePolicy: CachePolicy? = nil,
                                          context: RequestContext? = nil,
                                          callbackQueue: DispatchQueue = .main,
                                          resultHandler: @escaping GraphQLResultHandler<Query.Data>) -> GraphQLQueryWatcher<Query> {
     let watcher = GraphQLQueryWatcher(client: self,
                                       query: query,
+                                      refetchCachePolicy: refetchCachePolicy,
                                       context: context,
                                       callbackQueue: callbackQueue,
                                       resultHandler: resultHandler)

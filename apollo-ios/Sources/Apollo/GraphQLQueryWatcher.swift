@@ -9,6 +9,7 @@ import ApolloAPI
 public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, ApolloStoreSubscriber {
   weak var client: ApolloClientProtocol?
   public let query: Query
+  public let refetchCachePolicy: CachePolicy?
   let resultHandler: GraphQLResultHandler<Query.Data>
 
   private let callbackQueue: DispatchQueue
@@ -35,16 +36,19 @@ public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, Apollo
   /// - Parameters:
   ///   - client: The client protocol to pass in.
   ///   - query: The query to watch.
+  ///   - refetchCachePolicy: If provided (not `nil`), this value is used when deciding how to repsond to watched store changes.
   ///   - context: [optional] A context that is being passed through the request chain. Defaults to `nil`.
   ///   - callbackQueue: The queue for the result handler. Defaults to the main queue.
   ///   - resultHandler: The result handler to call with changes.
   public init(client: ApolloClientProtocol,
               query: Query,
+              refetchCachePolicy: CachePolicy? = nil,
               context: RequestContext? = nil,
               callbackQueue: DispatchQueue = .main,
               resultHandler: @escaping GraphQLResultHandler<Query.Data>) {
     self.client = client
     self.query = query
+    self.refetchCachePolicy = refetchCachePolicy
     self.resultHandler = resultHandler
     self.callbackQueue = callbackQueue
     self.context = context
@@ -120,9 +124,17 @@ public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, Apollo
             self.resultHandler(result)
           }
         case .failure:
-          if self.fetching.cachePolicy != .returnCacheDataDontFetch {
-            // If the cache fetch is not successful, for instance if the data is missing, refresh from the server.
-            self.fetch(cachePolicy: .fetchIgnoringCacheData)
+          // New code path for refetchCachePolicy
+          if let refetchCachePolicy {
+            if refetchCachePolicy != .returnCacheDataDontFetch {
+              // If the cache fetch is not successful, for instance if the data is missing, refresh from the server.
+              self.refetch(cachePolicy: refetchCachePolicy)
+            }
+          } else {
+            if self.fetching.cachePolicy != .returnCacheDataDontFetch {
+              // If the cache fetch is not successful, for instance if the data is missing, refresh from the server.
+              self.fetch(cachePolicy: .fetchIgnoringCacheData)
+            }
           }
         }
       }
