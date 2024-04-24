@@ -669,9 +669,9 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
       config = .mock(
         options: .init(
-          selectionSetInitializers: [.all],
-          fieldMerging: test
-        )
+          selectionSetInitializers: [.all]
+        ),
+        experimentalFeatures: .init(fieldMerging: test)
       )
 
       // when

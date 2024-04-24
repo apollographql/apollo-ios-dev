@@ -44,7 +44,7 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: "TestSchema",
       output: .mock(moduleType: .swiftPackageManager, operations: .inSchemaModule),
-      options: .init(
+      experimentalFeatures: .init(
         fieldMerging: fieldMerging
       )
     )

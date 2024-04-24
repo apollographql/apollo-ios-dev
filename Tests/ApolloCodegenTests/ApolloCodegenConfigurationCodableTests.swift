@@ -67,6 +67,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           markOperationDefinitionsAsFinal: true
         ),
         experimentalFeatures: .init(
+          fieldMerging: .all,
           legacySafelistingCompatibleOperations: true
         ),
         operationManifest: .init(
@@ -81,6 +82,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
       """
       {
         "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
           "legacySafelistingCompatibleOperations" : true
         },
         "input" : {
@@ -112,9 +116,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "none"
           },
           "deprecatedEnumCases" : "exclude",
-          "fieldMerging" : [
-            "all"
-          ],
           "markOperationDefinitionsAsFinal" : true,
           "operationDocumentFormat" : [
             "definition"

@@ -653,9 +653,9 @@ class FragmentTemplateTests: XCTestCase {
       // when
       try await buildSubjectAndFragment(config: .mock(
         options: .init(
-          selectionSetInitializers: [.all],
-          fieldMerging: test
-        )
+          selectionSetInitializers: [.all]
+        ),
+        experimentalFeatures: .init(fieldMerging: test)
       ))
 
       let actual = renderSubject()

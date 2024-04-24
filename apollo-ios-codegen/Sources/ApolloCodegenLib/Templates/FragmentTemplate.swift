@@ -33,7 +33,7 @@ struct FragmentTemplate: TemplateRenderer {
     """)
       \(SelectionSetTemplate(
         definition: fragment,
-        generateInitializers: config.options.shouldGenerateSelectionSetInitializers(for: fragment),
+        generateInitializers: config.config.shouldGenerateSelectionSetInitializers(for: fragment),
         config: config,
         nonFatalErrorRecorder: nonFatalErrorRecorder,
         renderAccessControl: { accessControlModifier(for: .member) }()
