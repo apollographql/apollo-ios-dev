@@ -39,12 +39,15 @@ public protocol ApolloClientProtocol: AnyObject {
   /// - Parameters:
   ///   - query: The query to fetch.
   ///   - cachePolicy: A cache policy that specifies when results should be fetched from the server or from the local cache.
+  ///   - refetchOnFailedUpdates: Should the watcher perform a network fetch when it's watched
+  ///     objects have changed, but reloading them from the cache fails. Should default to `true`.
   ///   - context: [optional] A context that is being passed through the request chain. Should default to `nil`.
   ///   - callbackQueue: A dispatch queue on which the result handler will be called. Should default to the main queue.
   ///   - resultHandler: [optional] A closure that is called when query results are available or when an error occurs.
   /// - Returns: A query watcher object that can be used to control the watching behavior.
   func watch<Query: GraphQLQuery>(query: Query,
                                   cachePolicy: CachePolicy,
+                                  refetchOnFailedUpdates: Bool,
                                   context: RequestContext?,
                                   callbackQueue: DispatchQueue,
                                   resultHandler: @escaping GraphQLResultHandler<Query.Data>) -> GraphQLQueryWatcher<Query>
@@ -122,6 +125,32 @@ public extension ApolloClientProtocol {
       contextIdentifier: nil,
       context: context,
       queue: queue,
+      resultHandler: resultHandler
+    )
+  }
+
+  /// Watches a query by first fetching an initial result from the server or from the local cache, depending on the current contents of the cache and the specified cache policy. After the initial fetch, the returned query watcher object will get notified whenever any of the data the query result depends on changes in the local cache, and calls the result handler again with the new result.
+  ///
+  /// - Parameters:
+  ///   - query: The query to fetch.
+  ///   - cachePolicy: A cache policy that specifies when results should be fetched from the server or from the local cache.
+  ///   - context: [optional] A context that is being passed through the request chain. Should default to `nil`.
+  ///   - callbackQueue: A dispatch queue on which the result handler will be called. Should default to the main queue.
+  ///   - resultHandler: [optional] A closure that is called when query results are available or when an error occurs.
+  /// - Returns: A query watcher object that can be used to control the watching behavior.
+  func watch<Query: GraphQLQuery>(
+    query: Query,
+    cachePolicy: CachePolicy,
+    context: RequestContext?,
+    callbackQueue: DispatchQueue,
+    resultHandler: @escaping GraphQLResultHandler<Query.Data>
+  ) -> GraphQLQueryWatcher<Query> {
+    self.watch(
+      query: query,
+      cachePolicy: cachePolicy,
+      refetchOnFailedUpdates: true,
+      context: context,
+      callbackQueue: callbackQueue,
       resultHandler: resultHandler
     )
   }
