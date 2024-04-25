@@ -94,6 +94,17 @@ extension ApolloClient: ApolloClientProtocol {
     }
   }
 
+  /// Watches a query by first fetching an initial result from the server or from the local cache, depending on the current contents of the cache and the specified cache policy. After the initial fetch, the returned query watcher object will get notified whenever any of the data the query result depends on changes in the local cache, and calls the result handler again with the new result.
+  ///
+  /// - Parameters:
+  ///   - query: The query to fetch.
+  ///   - cachePolicy: A cache policy that specifies when results should be fetched from the server or from the local cache.
+  ///   - refetchOnFailedUpdates: Should the watcher perform a network fetch when it's watched
+  ///     objects have changed, but reloading them from the cache fails. Should default to `true`.
+  ///   - context: [optional] A context that is being passed through the request chain. Should default to `nil`.
+  ///   - callbackQueue: A dispatch queue on which the result handler will be called. Should default to the main queue.
+  ///   - resultHandler: [optional] A closure that is called when query results are available or when an error occurs.
+  /// - Returns: A query watcher object that can be used to control the watching behavior.
   public func watch<Query: GraphQLQuery>(
     query: Query,
     cachePolicy: CachePolicy = .default,
@@ -172,4 +183,26 @@ extension ApolloClient: ApolloClientProtocol {
   }
 }
 
+// MARK: - Deprecations
 
+extension ApolloClient {
+
+  @available(*, deprecated,
+              renamed: "watch(query:cachePolicy:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)")
+  public func watch<Query: GraphQLQuery>(
+    query: Query,
+    cachePolicy: CachePolicy = .default,
+    context: RequestContext? = nil,
+    callbackQueue: DispatchQueue = .main,
+    resultHandler: @escaping GraphQLResultHandler<Query.Data>
+  ) -> GraphQLQueryWatcher<Query> {
+    let watcher = GraphQLQueryWatcher(client: self,
+                                      query: query,
+                                      context: context,
+                                      callbackQueue: callbackQueue,
+                                      resultHandler: resultHandler)
+    watcher.fetch(cachePolicy: cachePolicy)
+    return watcher
+  }
+
+}
