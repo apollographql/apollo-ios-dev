@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 #if !COCOAPODS
 import ApolloAPI
@@ -9,7 +10,7 @@ import ApolloAPI
 public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, ApolloStoreSubscriber {
   weak var client: ApolloClientProtocol?
   public let query: Query
-  let resultHandler: GraphQLResultHandler<Query.Data>
+  var resultHandler: GraphQLResultHandler<Query.Data>?
 
   private let callbackQueue: DispatchQueue
 
@@ -29,8 +30,9 @@ public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, Apollo
   @Atomic private var fetching: WeakFetchTaskContainer = .init(nil, nil)
 
   @Atomic private var dependentKeys: Set<CacheKey>? = nil
+  private var subscriptions: [WatcherSubscription<AnySubscriber<CachePublisher.Output, Never>>] = []
 
-  /// Designated initializer
+  /// Convenience initializer
   ///
   /// - Parameters:
   ///   - client: The client protocol to pass in.
@@ -38,17 +40,61 @@ public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, Apollo
   ///   - context: [optional] A context that is being passed through the request chain. Defaults to `nil`.
   ///   - callbackQueue: The queue for the result handler. Defaults to the main queue.
   ///   - resultHandler: The result handler to call with changes.
-  public init(client: ApolloClientProtocol,
-              query: Query,
-              context: RequestContext? = nil,
-              callbackQueue: DispatchQueue = .main,
-              resultHandler: @escaping GraphQLResultHandler<Query.Data>) {
+  public convenience init(
+    client: ApolloClientProtocol,
+    query: Query,
+    context: RequestContext? = nil,
+    callbackQueue: DispatchQueue = .main,
+    resultHandler: @escaping GraphQLResultHandler<Query.Data>
+  ) {
+    self.init(
+      client: client,
+      query: query,
+      context: context,
+      callbackQueue: callbackQueue,
+      handler: resultHandler
+    )
+  }
+
+  /// Conenience initializer, intended for use with the watcher's `publisher` property.
+  /// - Parameters:
+  ///   - client: The client protocol to pass in.
+  ///   - query: The query to watch.
+  ///   - context: [optional] A context that is being passed through the request chain. Defaults to `nil`.
+  ///   - callbackQueue: The queue for the result handler. Defaults to the main queue.
+  public convenience init(
+    client: ApolloClientProtocol,
+    query: Query,
+    context: RequestContext? = nil,
+    callbackQueue: DispatchQueue = .main
+  ) {
+    self.init(
+      client: client,
+      query: query,
+      context: context,
+      callbackQueue: callbackQueue,
+      handler: nil
+    )
+  }
+
+  init(
+    client: ApolloClientProtocol,
+    query: Query,
+    context: RequestContext? = nil,
+    callbackQueue: DispatchQueue = .main,
+    handler: GraphQLResultHandler<Query.Data>?
+  ) {
     self.client = client
     self.query = query
-    self.resultHandler = resultHandler
     self.callbackQueue = callbackQueue
     self.context = context
-
+    self.resultHandler = { [weak self] result in
+      guard let self else { return }
+      for subscription in self.subscriptions {
+        subscription.trigger(input: result)
+      }
+      handler?(result)
+    }
     client.store.subscribe(self)
   }
 
@@ -74,7 +120,7 @@ public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, Apollo
           break
         }
 
-        self.resultHandler(result)
+        self.resultHandler?(result)
       }
     }
   }
@@ -91,33 +137,33 @@ public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, Apollo
     if
       let incomingIdentifier = contextIdentifier,
       incomingIdentifier == self.contextIdentifier {
-        // This is from changes to the keys made from the `fetch` method above,
-        // changes will be returned through that and do not need to be returned
-        // here as well.
-        return
+      // This is from changes to the keys made from the `fetch` method above,
+      // changes will be returned through that and do not need to be returned
+      // here as well.
+      return
     }
-    
+
     guard let dependentKeys = self.dependentKeys else {
       // This query has nil dependent keys, so nothing that changed will affect it.
       return
     }
-    
+
     if !dependentKeys.isDisjoint(with: changedKeys) {
       // First, attempt to reload the query from the cache directly, in order not to interrupt any in-flight server-side fetch.
       store.load(self.query) { [weak self] result in
         guard let self = self else { return }
-        
+
         switch result {
         case .success(let graphQLResult):
           self.callbackQueue.async { [weak self] in
             guard let self = self else {
               return
             }
-            
+
             self.$dependentKeys.mutate {
               $0 = graphQLResult.dependentKeys
             }
-            self.resultHandler(result)
+            self.resultHandler?(result)
           }
         case .failure:
           if self.fetching.cachePolicy != .returnCacheDataDontFetch {
@@ -127,5 +173,46 @@ public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, Apollo
         }
       }
     }
+  }
+}
+
+extension GraphQLQueryWatcher {
+  public struct CachePublisher: Publisher {
+    public typealias Output = Result<GraphQLResult<Query.Data>, Error>
+    public typealias Failure = Never
+
+    var watcher: GraphQLQueryWatcher
+
+    public func receive<S: Subscriber>(
+      subscriber: S
+    ) where S.Input == Output, S.Failure == Failure {
+      let subscription = WatcherSubscription<AnySubscriber<Output, Failure>>()
+      subscription.target = AnySubscriber(subscriber)
+      subscriber.receive(subscription: subscription)
+      watcher.subscriptions.append(subscription)
+    }
+  }
+}
+
+private extension GraphQLQueryWatcher {
+  class WatcherSubscription<Target: Subscriber>: Subscription
+  where Target.Input == CachePublisher.Output {
+    var target: Target?
+    // We don't respond to demand, since we emit events according to the underlying cache updates
+    func request(_ demand: Subscribers.Demand) { }
+
+    func cancel() {
+      target = nil
+    }
+
+    func trigger(input: CachePublisher.Output) {
+      _ = target?.receive(input)
+    }
+  }
+}
+
+extension GraphQLQueryWatcher {
+  public func publisher() -> CachePublisher {
+    CachePublisher(watcher: self)
   }
 }

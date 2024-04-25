@@ -120,7 +120,115 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       wait(for: [serverRequestExpectation, refetchedWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
     }
   }
-  
+
+  func testRefetchWatchedQueryFromServerThroughWatcherReturnsRefetchedResults_sink() throws {
+    class SimpleMockSelectionSet: MockSelectionSet {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero.self)
+      ]}
+
+      class Hero: MockSelectionSet {
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+      }
+    }
+
+    let watchedQuery = MockQuery<SimpleMockSelectionSet>()
+
+    let resultObserver = makeResultObserver(for: watchedQuery)
+
+    let watcher = GraphQLQueryWatcher(client: client, query: watchedQuery, resultHandler: resultObserver.handler)
+    var results: [GraphQLQueryWatcher<MockQuery<SimpleMockSelectionSet>>.CachePublisher.Output] = []
+    var subscription = watcher.publisher().sink { result in
+      results.append(result)
+    }
+    addTeardownBlock {
+      subscription.cancel()
+      watcher.cancel()
+    }
+
+    runActivity("Initial fetch from server") { _ in
+      let serverRequestExpectation =
+        server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
+          [
+            "data": [
+              "hero": [
+                "name": "R2-D2",
+                "__typename": "Droid"
+              ]
+            ]
+          ]
+        }
+
+      let initialWatcherResultExpectation =
+        resultObserver.expectation(
+          description: "Watcher received initial result from server"
+        ) { result in
+          try XCTAssertSuccessResult(result) { graphQLResult in
+            XCTAssertEqual(graphQLResult.source, .server)
+            XCTAssertNil(graphQLResult.errors)
+
+            let data = try XCTUnwrap(graphQLResult.data)
+            XCTAssertEqual(data.hero?.name, "R2-D2")
+          }
+
+          let latestSinkResult = try XCTUnwrap(results.last)
+          try XCTAssertSuccessResult(latestSinkResult) { graphQLResult in
+            XCTAssertEqual(graphQLResult.source, .server)
+            XCTAssertNil(graphQLResult.errors)
+
+            let data = try XCTUnwrap(graphQLResult.data)
+            XCTAssertEqual(data.hero?.name, "R2-D2")
+          }
+      }
+
+      watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+
+      wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
+    }
+
+    runActivity("Refetch from server") { _ in
+      let serverRequestExpectation =
+        server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
+          [
+            "data": [
+              "hero": [
+                "name": "Artoo",
+                "__typename": "Droid"
+              ]
+            ]
+          ]
+        }
+
+      let refetchedWatcherResultExpectation = resultObserver.expectation(
+        description: "Watcher received refetched result from server"
+      ) { result in
+        try XCTAssertSuccessResult(result) { graphQLResult in
+          XCTAssertEqual(graphQLResult.source, .server)
+          XCTAssertNil(graphQLResult.errors)
+
+          let data = try XCTUnwrap(graphQLResult.data)
+          XCTAssertEqual(data.hero?.name, "Artoo")
+        }
+
+        let latestSinkResult = try XCTUnwrap(results.last)
+        try XCTAssertSuccessResult(latestSinkResult) { graphQLResult in
+          XCTAssertEqual(graphQLResult.source, .server)
+          XCTAssertNil(graphQLResult.errors)
+
+          let data = try XCTUnwrap(graphQLResult.data)
+          XCTAssertEqual(data.hero?.name, "Artoo")
+        }
+      }
+
+      watcher.refetch()
+
+      wait(for: [serverRequestExpectation, refetchedWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
+    }
+  }
+
   func testWatchedQueryGetsUpdatedAfterFetchingSameQueryWithChangedData() throws {
     class SimpleMockSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
