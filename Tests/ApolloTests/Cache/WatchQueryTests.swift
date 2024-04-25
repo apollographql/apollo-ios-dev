@@ -826,7 +826,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     }
   }
 
-  func testWatchedQuery_givenRefetchOnFailedUpdates_false_doesNotrefetchFromServerAfterOtherQueryUpdatesListWithIncompleteObject() throws {
+  func testWatchedQuery_givenRefetchOnFailedUpdates_false_doesNotRefetchFromServerAfterOtherQueryUpdatesListWithIncompleteObject() throws {
     class HeroAndFriendsIDsSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
         .field("hero", Hero?.self)
