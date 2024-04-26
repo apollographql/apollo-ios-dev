@@ -574,7 +574,7 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_givenNamedFragments_asLocalCacheMutation_configIncludeLocalCacheMutations_rendersInitializer() async throws {
+  func test__render_givenNamedFragments_asLocalCacheMutation_rendersInitializer() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -612,7 +612,7 @@ class FragmentTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndFragment(
       config: .mock(options: .init(
-        selectionSetInitializers: [.localCacheMutations]
+        selectionSetInitializers: []
       )))
 
     let actual = renderSubject()

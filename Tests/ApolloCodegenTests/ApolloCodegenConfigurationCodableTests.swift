@@ -137,7 +137,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           },
           "schemaDocumentation" : "exclude",
           "selectionSetInitializers" : {
-            "localCacheMutations" : true
+
           },
           "warningsOnDeprecatedUsage" : "exclude"
         },
@@ -513,66 +513,12 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
     expect(decoded).to(equal([]))
   }
 
-  func test__encode_selectionSetInitializers__givenLocalCacheMutations_shouldReturnObjectString() throws {
-    // given
-    let subject: ApolloCodegenConfiguration.SelectionSetInitializers = [.localCacheMutations]
-
-    let expected = """
-    {
-      "localCacheMutations" : true
-    }
-    """
-
-    // when
-    let actual = try testJSONEncoder.encode(subject).asString
-
-    // then
-    expect(actual).to(equal(expected))
-  }
-
-  func test__decode_selectionSetInitializers__givenLocalCacheMutations_shouldReturnOptions() throws {
-    // given
-    let subject = """
-    {
-      "localCacheMutations": true
-    }
-    """.asData
-
-    // when
-    let decoded = try JSONDecoder().decode(
-      ApolloCodegenConfiguration.SelectionSetInitializers.self,
-      from: subject
-    )
-
-    // then
-    expect(decoded).to(equal(.localCacheMutations))
-  }
-
-  func test__decode_selectionSetInitializers__givenLocalCacheMutations_false_shouldReturnEmptyOptions() throws {
-    // given
-    let subject = """
-    {
-      "localCacheMutations": false
-    }
-    """.asData
-
-    // when
-    let decoded = try JSONDecoder().decode(
-      ApolloCodegenConfiguration.SelectionSetInitializers.self,
-      from: subject
-    )
-
-    // then
-    expect(decoded).to(equal([]))
-  }
-
   func test__encode_selectionSetInitializers__givenAll_shouldReturnObjectString() throws {
     // given
     let subject: ApolloCodegenConfiguration.SelectionSetInitializers = .all
 
     let expected = """
     {
-      "localCacheMutations" : true,
       "namedFragments" : true,
       "operations" : true
     }
@@ -590,8 +536,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
     let subject = """
     {
       "operations" : true,
-      "namedFragments" : true,
-      "localCacheMutations" : true
+      "namedFragments" : true
     }
     """.asData
 

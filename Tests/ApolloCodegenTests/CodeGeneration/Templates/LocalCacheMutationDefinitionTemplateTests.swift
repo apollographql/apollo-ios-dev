@@ -670,7 +670,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
   // MARK: Initializer Rendering Config - Tests
 
-  func test__render_givenLocalCacheMutation_configIncludesLocalCacheMutations_rendersInitializer() async throws {
+  func test__render_givenLocalCacheMutation_rendersInitializer() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -700,7 +700,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     config = ApolloCodegenConfiguration.mock(
       schemaNamespace: "TestSchema",
       options: .init(
-        selectionSetInitializers: [.localCacheMutations]
+        selectionSetInitializers: []
       )
     )
 
@@ -711,86 +711,6 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
-  }
-
-  func test__render_givenLocalCacheMutation_configIncludesSpecificLocalCacheMutations_rendersInitializer() async throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    type Animal {
-      species: String!
-    }
-    """
-
-    document = """
-    query TestOperation @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        species
-      }
-    }
-    """
-
-    let expected =
-    """
-        }
-
-        init(
-    """
-
-    config = ApolloCodegenConfiguration.mock(
-      schemaNamespace: "TestSchema",
-      options: .init(
-        selectionSetInitializers: [.operation(named: "TestOperation")]
-      )
-    )
-
-    // when
-    try await buildSubjectAndOperation()
-
-    let actual = renderSubject()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
-  }
-
-  func test__render_givenLocalCacheMutation_configDoesNotIncludesLocalCacheMutations_doesNotRenderInitializer() async throws
-  {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    type Animal {
-      species: String!
-    }
-    """
-
-    document = """
-    query TestOperation @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        species
-      }
-    }
-    """
-
-    config = ApolloCodegenConfiguration.mock(
-      schemaNamespace: "TestSchema",
-      options: .init(
-        selectionSetInitializers: [.namedFragments]
-      )
-    )
-
-    // when
-    try await buildSubjectAndOperation()
-
-    let actual = renderSubject()
-
-    // then
-    expect(actual).to(equalLineByLine("    /// AllAnimal", atLine: 20, ignoringExtraLines: true))
   }
 
 }
