@@ -33,7 +33,7 @@ struct SelectionSetTemplate {
     self.nameCache = SelectionSetNameCache(config: config)
   }
 
-  /// MARK: - SelectionSetContext
+  // MARK: - SelectionSetContext
 
   struct SelectionSetContext {
     let selectionSet: IR.ComputedSelectionSet

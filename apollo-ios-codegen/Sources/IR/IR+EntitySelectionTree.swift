@@ -286,7 +286,7 @@ class EntitySelectionTree {
       // Add selections from merged fragments
       for (fragmentSpread, mergedFragmentTree) in mergedFragmentTrees {
         // If typeInfo is equal, we are merging the fragment's selections into the selection set
-        // that directly selected the fragment. The merge strategy should be just .namedFragments
+        // that directly selected the fragment. The merge strategy should be just .namedFragments.
         let mergeStrategy: MergedSelections.MergingStrategy =
         fragmentSpread.typeInfo == targetSelections.typeInfo
         ? .namedFragments
