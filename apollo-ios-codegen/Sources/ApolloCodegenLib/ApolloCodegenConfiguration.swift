@@ -512,7 +512,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       public static let additionalInflectionRules: [InflectionRule] = []
       public static let deprecatedEnumCases: Composition = .include
       public static let schemaDocumentation: Composition = .include
-      public static let selectionSetInitializers: SelectionSetInitializers = [.localCacheMutations]
+      public static let selectionSetInitializers: SelectionSetInitializers = []
       public static let operationDocumentFormat: OperationDocumentFormat = .definition
       public static let cocoapodsCompatibleImportStatements: Bool = false
       public static let warningsOnDeprecatedUsage: Composition = .include
@@ -842,12 +842,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   /// The ``SelectionSetInitializers`` configuration is used to determine if you would like
   /// initializers to be generated for your generated selection set models.
   ///
-  /// There are three categories of selection set models that initializers can be generated for:
-  /// - Operations
-  /// - Named fragments
-  /// - Local cache mutations
-  ///
-  /// By default, initializers are only generated for local cache mutations.
+  /// Initializers are always generated for local cache mutations.
+  /// You can additionally configure initializers to be generated for operations and named fragments.
   ///
   /// ``SelectionSetInitializers`` functions like an `OptionSet`, allowing you to combine multiple
   /// different instances together to indicate all the types you would like to generate
@@ -860,13 +856,10 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     /// that are not local cache mutations.
     public static let operations: SelectionSetInitializers = .init(.operations)
 
-    /// Option to generate initializers for all local cache mutations.
-    public static let localCacheMutations: SelectionSetInitializers = .init(.localCacheMutations)
-
     /// Option to generate initializers for all models.
     /// This includes named fragments, operations, and local cache mutations.
     public static let all: SelectionSetInitializers = [
-      .namedFragments, .operations, .localCacheMutations
+      .namedFragments, .operations
     ]
 
     /// An option to generate initializers for a single operation with a given name.
@@ -1195,14 +1188,13 @@ extension ApolloCodegenConfiguration {
   func shouldGenerateSelectionSetInitializers(for operation: IR.Operation) -> Bool {
     guard experimentalFeatures.fieldMerging == .all else { return false }
 
-    switch operation.definition.isLocalCacheMutation {
-    case true where options.selectionSetInitializers.contains(.localCacheMutations):
+    if operation.definition.isLocalCacheMutation {
       return true
 
-    case false where options.selectionSetInitializers.contains(.operations):
+    } else if options.selectionSetInitializers.contains(.operations) {
       return true
 
-    default:
+    } else {
       return options.selectionSetInitializers.contains(definitionNamed: operation.definition.name)
     }
   }
@@ -1213,8 +1205,7 @@ extension ApolloCodegenConfiguration {
 
     if options.selectionSetInitializers.contains(.namedFragments) { return true }
 
-    if fragment.definition.isLocalCacheMutation &&
-        options.selectionSetInitializers.contains(.localCacheMutations) {
+    if fragment.definition.isLocalCacheMutation {
       return true
     }
 
@@ -1227,7 +1218,6 @@ extension ApolloCodegenConfiguration {
 extension ApolloCodegenConfiguration.SelectionSetInitializers {
   struct Options: OptionSet, Codable, Equatable {
     let rawValue: Int
-    static let localCacheMutations = Options(rawValue: 1 << 0)
     static let namedFragments      = Options(rawValue: 1 << 1)
     static let operations          = Options(rawValue: 1 << 2)
   }
@@ -1255,7 +1245,6 @@ extension ApolloCodegenConfiguration.SelectionSetInitializers {
   enum CodingKeys: CodingKey, CaseIterable {
     case operations
     case namedFragments
-    case localCacheMutations
     case definitionsNamed
   }
 
@@ -1272,7 +1261,6 @@ extension ApolloCodegenConfiguration.SelectionSetInitializers {
 
     try decode(option: .operations, forKey: .operations)
     try decode(option: .namedFragments, forKey: .namedFragments)
-    try decode(option: .localCacheMutations, forKey: .localCacheMutations)
 
     self.options = options
     self.definitions = try values.decodeIfPresent(
@@ -1291,7 +1279,6 @@ extension ApolloCodegenConfiguration.SelectionSetInitializers {
 
     try encodeIfPresent(option: .operations, forKey: .operations)
     try encodeIfPresent(option: .namedFragments, forKey: .namedFragments)
-    try encodeIfPresent(option: .localCacheMutations, forKey: .localCacheMutations)
 
     if !definitions.isEmpty {
       try container.encode(definitions.sorted(), forKey: .definitionsNamed)
@@ -1633,6 +1620,12 @@ extension ApolloCodegenConfiguration.ConversionStrategies {
       case camelCase
   }
   
+}
+
+extension ApolloCodegenConfiguration.SelectionSetInitializers {
+  /// Option to generate initializers for all local cache mutations.
+  @available(*, deprecated, message: "Local Cache Mutations will now always have initializers generated.")
+  public static let localCacheMutations: ApolloCodegenConfiguration.SelectionSetInitializers = .init([])
 }
 
 private struct AnyCodingKey: CodingKey {

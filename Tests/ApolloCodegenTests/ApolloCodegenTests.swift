@@ -2386,12 +2386,11 @@ class ApolloCodegenTests: XCTestCase {
       [.siblings, .namedFragments]
     ]
     let initializerOptions: [ApolloCodegenConfiguration.SelectionSetInitializers] = [
-      .all,
-      .localCacheMutations,
+      .all,      
       .operations,
       .namedFragments,
       .fragment(named: "TestFragment"),
-      [.operations, .localCacheMutations]
+      [.operations, .namedFragments]
     ]
 
     for fieldMergingOption in fieldMergingOptions {
