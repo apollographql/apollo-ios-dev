@@ -52,11 +52,11 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       options: .init(
         additionalInflectionRules: inflectionRules,
         schemaDocumentation: schemaDocumentation,
-        fieldMerging: fieldMerging,
         cocoapodsCompatibleImportStatements: cocoapodsImportStatements,
         warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
         conversionStrategies: conversionStrategies
-      )
+      ),
+      experimentalFeatures: .init(fieldMerging: fieldMerging)
     ))
     let mockTemplateRenderer = MockTemplateRenderer(
       target: .operationFile(),
