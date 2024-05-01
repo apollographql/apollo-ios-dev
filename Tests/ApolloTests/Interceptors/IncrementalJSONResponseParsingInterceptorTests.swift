@@ -367,7 +367,105 @@ class IncrementalJSONResponseParsingInterceptorTests: XCTestCase {
 
   // MARK: Cache Records Tests
 
-  func test__cacheRecords__givenMultipleIncrementalResults_shouldComputeCacheRecordsMatchingResults() throws {
+  func test__cacheRecords__givenMultipleIncrementalObjectsInSingleIncrementalResponse_shouldMergeCacheRecordsForIncrementalResult() throws {
+    // given
+    let subject = InterceptorTester(interceptor: IncrementalJSONResponseParsingInterceptor())
+
+    let partialExpectation = expectation(description: "Received partial response callback")
+    let incrementalExpectation = expectation(description: "Received incremental response callback")
+
+    // when
+    subject.intercept(
+      request: .mock(operation: AnimalQuery()),
+      response: .mock(data: """
+        {
+          "data": {
+            "animal": {
+              "__typename": "Animal",
+              "species": "Canis Familiaris"
+            }
+          }
+        }
+        """.data(using: .utf8)!)
+    ) { result in
+      defer {
+        partialExpectation.fulfill()
+      }
+
+      // then
+      expect(result).to(beSuccess())
+
+      let cacheRecords = try? result.get()?.cacheRecords
+      expect(cacheRecords).to(equal(RecordSet(records: [
+        Record(key: "QUERY_ROOT", [
+          "animal": CacheReference("QUERY_ROOT.animal")
+        ]),
+        Record(key: "QUERY_ROOT.animal", [
+          "__typename": "Animal",
+          "species": "Canis Familiaris"
+        ])
+      ])))
+    }
+
+    wait(for: [partialExpectation], timeout: defaultTimeout)
+
+    subject.intercept(
+      request: .mock(operation: AnimalQuery()),
+      response: .mock(data: """
+        {
+          "incremental": [
+            {
+              "label": "deferredGenus",
+              "data": {
+                "genus": "Canis"
+              },
+              "path": [
+                "animal"
+              ]
+            },
+            {
+              "label": "deferredFriend",
+              "data": {
+                "friend": {
+                  "name": "Buster"
+                }
+              },
+              "path": [
+                "animal"
+              ]
+            }
+          ]
+        }
+        """.data(using: .utf8)!
+      )
+    ) { result in
+      defer {
+        incrementalExpectation.fulfill()
+      }
+
+      expect(result).to(beSuccess())
+
+      let cacheRecords = try? result.get()?.cacheRecords
+      expect(cacheRecords).to(equal(RecordSet(records: [
+        Record(key: "QUERY_ROOT", [
+          "animal": CacheReference("QUERY_ROOT.animal")
+        ]),
+        Record(key: "QUERY_ROOT.animal", [
+          "__typename": "Animal",
+          "genus": "Canis",
+          "species": "Canis Familiaris",
+          "friend": CacheReference("QUERY_ROOT.animal.friend")
+        ]),
+        Record(key: "QUERY_ROOT.animal.friend", [
+          "name": "Buster"
+        ])
+      ])))
+    }
+
+    wait(for: [incrementalExpectation], timeout: defaultTimeout)
+  }
+
+  func test__cacheRecords__givenMultipleIncrementalResponses_shouldComputeCacheRecordsMatchingResponses() throws {
     // given
     let subject = InterceptorTester(interceptor: IncrementalJSONResponseParsingInterceptor())
 
