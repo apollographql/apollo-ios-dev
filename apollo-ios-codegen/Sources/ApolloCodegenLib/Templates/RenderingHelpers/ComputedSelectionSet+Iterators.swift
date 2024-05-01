@@ -13,16 +13,18 @@ extension IR.ComputedSelectionSet {
   SelectionsIterator<OrderedDictionary<String, IR.NamedFragmentSpread>.Values>
 
   func makeFieldIterator(
+    mergingStrategy: MergedSelections.MergingStrategy = .all,
     filter: ((IR.Field) -> Bool)? = nil
   ) -> FieldIterator {
     SelectionsIterator(
       direct: direct?.fields.values,
-      merged: merged.fields.values,
+      merged: merged[mergingStrategy]?.fields.values,
       filter: filter
     )
   }
 
   func makeInlineFragmentIterator(
+    mergingStrategy: MergedSelections.MergingStrategy = .all,
     filter: ((IR.InlineFragmentSpread) -> Bool)? = nil
   ) -> InlineFragmentIterator {
     SelectionsIterator(
@@ -33,6 +35,7 @@ extension IR.ComputedSelectionSet {
   }
 
   func makeNamedFragmentIterator(
+    mergingStrategy: MergedSelections.MergingStrategy = .all,
     filter: ((IR.NamedFragmentSpread) -> Bool)? = nil
   ) -> NamedFragmentIterator {
     SelectionsIterator(

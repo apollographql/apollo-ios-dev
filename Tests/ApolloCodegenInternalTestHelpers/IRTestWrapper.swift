@@ -7,12 +7,16 @@ import GraphQLCompiler
 ///
 ///  This wrapper provides the subscripts for accessing child selections by automatically computing and storing the `ComputedSelectionSet` results as they are accessed in unit tests.
 ///
-///  `IRTestWrapper` types should never be initialized directly. They should be created using an
+///  - Warning: `IRTestWrapper` types should never be initialized directly. They should be created using an
 ///  `IRBuilderTestWrapper`.
 @dynamicMemberLookup
 public class IRTestWrapper<T: CustomDebugStringConvertible>: CustomDebugStringConvertible {
   public let irObject: T
   let computedSelectionSetCache: ComputedSelectionSetCache
+
+  public var mergingStrategy: MergedSelections.MergingStrategy {
+    computedSelectionSetCache.mergingStrategy
+  }
 
   init(
     irObject: T,
@@ -198,7 +202,10 @@ extension IRTestWrapper<IR.NamedFragmentSpread> {
   public var rootField: IRTestWrapper<IR.Field> {
     return IRTestWrapper<IR.Field>(
       irObject:  irObject.fragment.rootField,
-      computedSelectionSetCache: .init(entityStorage: irObject.fragment.entityStorage)
+      computedSelectionSetCache: .init(
+        mergingStrategy: self.mergingStrategy,
+        entityStorage: irObject.fragment.entityStorage
+      )
     )
   }
 
@@ -254,7 +261,7 @@ extension SelectionSetTestWrapper {
   public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
     IRTestWrapper<IR.NamedFragmentSpread>(
       irObject:
-        computed.direct?.namedFragments[fragment] ?? computed.merged.namedFragments[fragment],
+        computed.direct?.namedFragments[fragment] ?? computed.merged[mergingStrategy]!.namedFragments[fragment],
       computedSelectionSetCache: computedSelectionSetCache
     )
   }
@@ -264,20 +271,26 @@ extension SelectionSetTestWrapper {
 
 class ComputedSelectionSetCache {
   private var selectionSets: [SelectionSet.TypeInfo: ComputedSelectionSet] = [:]
+  public let mergingStrategy: MergedSelections.MergingStrategy
   public let entityStorage: DefinitionEntityStorage
 
-  init(entityStorage: DefinitionEntityStorage) {
+  init(
+    mergingStrategy: MergedSelections.MergingStrategy,
+    entityStorage: DefinitionEntityStorage
+  ) {
+    self.mergingStrategy = mergingStrategy
     self.entityStorage = entityStorage
   }
 
-  func computed(for selectionSet: SelectionSet) -> ComputedSelectionSet{
+  func computed(for selectionSet: SelectionSet) -> ComputedSelectionSet {
     if let selectionSet = selectionSets[selectionSet.typeInfo] {
       return selectionSet
     }
 
     let selectionSet = ComputedSelectionSet.Builder(
       directSelections: selectionSet.selections?.readOnlyView,
-      typeInfo: selectionSet.typeInfo,
+      typeInfo: selectionSet.typeInfo, 
+      mergingStrategies: [mergingStrategy],
       entityStorage: entityStorage
     ).build()
 

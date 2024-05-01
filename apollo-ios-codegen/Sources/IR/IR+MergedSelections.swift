@@ -53,7 +53,7 @@ extension MergedSelections {
   /// ``MergedSelections`` can compute which selections from a selection set's parents, sibling
   /// inline fragments, and named fragment spreads will also be included on the response object,
   /// given the selection set's ``SelectionSet/TypeInfo``.
-  public struct MergingStrategy: OptionSet, Equatable {
+  public struct MergingStrategy: OptionSet, Hashable, CustomStringConvertible {
     /// Merges fields and fragment accessors from the selection set's direct ancestors.
     public static let ancestors          = MergingStrategy(rawValue: 1 << 0)
 
@@ -79,6 +79,24 @@ extension MergedSelections {
 
     public init(rawValue: Int) {
       self.rawValue = rawValue
+    }
+
+    public var description: String {
+      if self == .all { return ".all" }
+
+      var values: [String] = []
+
+      if self.contains(.ancestors) {
+        values.append(".ancestors")
+      }
+      if self.contains(.siblings) {
+        values.append(".siblings")
+      }
+      if self.contains(.namedFragments) {
+        values.append(".namedFragments")
+      }
+
+      return values.description
     }
   }
 }

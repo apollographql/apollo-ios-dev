@@ -33,6 +33,7 @@ extension ComputedSelectionSet {
     let typeInfo: SelectionSet.TypeInfo
     private let directSelections: DirectSelections.ReadOnly?
     private let entityStorage: DefinitionEntityStorage
+    public let mergingStrategy: MergedSelections.MergingStrategy
 
     public fileprivate(set) var mergedSources: OrderedSet<MergedSelections.MergedSource> = []
     public fileprivate(set) var fields: OrderedDictionary<String, Field> = [:]
@@ -42,6 +43,7 @@ extension ComputedSelectionSet {
     public init(
       directSelections: DirectSelections.ReadOnly?,
       typeInfo: SelectionSet.TypeInfo,
+      mergingStrategy: MergedSelections.MergingStrategy,
       entityStorage: DefinitionEntityStorage
     ) {
       precondition(
@@ -51,15 +53,18 @@ extension ComputedSelectionSet {
       self.directSelections = directSelections
       self.typeInfo = typeInfo
       self.entityStorage = entityStorage
+      self.mergingStrategy = mergingStrategy
     }
 
     public convenience init(
       _ selectionSet: IR.SelectionSet,
+      mergingStrategy: MergedSelections.MergingStrategy,
       entityStorage: DefinitionEntityStorage
     ) {
       self.init(
         directSelections: selectionSet.selections?.readOnlyView,
         typeInfo: selectionSet.typeInfo,
+        mergingStrategy: mergingStrategy,
         entityStorage: entityStorage
       )
     }
@@ -71,11 +76,17 @@ extension ComputedSelectionSet {
       return finalize()
     }
 
-    func mergeIn(_ selections: EntityTreeScopeSelections, from source: MergedSelections.MergedSource) {
+    func mergeIn(
+      _ selectionsToMerge: EntityTreeScopeSelections,
+      from source: MergedSelections.MergedSource,
+      with mergeStrategy: MergedSelections.MergingStrategy
+    ) {
+      guard self.mergingStrategy.contains(mergeStrategy) else { return }
+
       @IsEverTrue var didMergeAnySelections: Bool
 
-      selections.fields.values.forEach { didMergeAnySelections = self.mergeIn($0) }
-      selections.namedFragments.values.forEach { didMergeAnySelections = self.mergeIn($0) }
+      selectionsToMerge.fields.values.forEach { didMergeAnySelections = self.mergeIn($0) }
+      selectionsToMerge.namedFragments.values.forEach { didMergeAnySelections = self.mergeIn($0) }
 
       if didMergeAnySelections {
         mergedSources.append(source)
@@ -132,15 +143,12 @@ extension ComputedSelectionSet {
       return true
     }
 
-    func addMergedInlineFragment(with condition: ScopeCondition) {
-      guard typeInfo.isEntityRoot else { return }
-
-      createShallowlyMergedInlineFragmentIfNeeded(with: condition)
-    }
-
-    private func createShallowlyMergedInlineFragmentIfNeeded(
-      with condition: ScopeCondition
+    func addMergedInlineFragment(
+      with condition: ScopeCondition,      
+      mergeStrategy: MergedSelections.MergingStrategy
     ) {
+      guard self.mergingStrategy.contains(mergeStrategy) && typeInfo.isEntityRoot else { return }
+
       if let directSelections = directSelections,
          directSelections.inlineFragments.keys.contains(condition) {
         return
@@ -148,6 +156,10 @@ extension ComputedSelectionSet {
 
       guard !inlineFragments.keys.contains(condition) else { return }
 
+      createShallowlyMergedCompositeInlineFragment(with: condition)
+    }
+
+    private func createShallowlyMergedCompositeInlineFragment(with condition: ScopeCondition) {
       let typeInfo = SelectionSet.TypeInfo(
         entity: self.typeInfo.entity,
         scopePath: self.typeInfo.scopePath.mutatingLast { $0.appending(condition) },
@@ -167,16 +179,17 @@ extension ComputedSelectionSet {
     }
 
     fileprivate func finalize() -> ComputedSelectionSet {
-      let merged = MergedSelections(
+      let mergedSelections = MergedSelections(
         mergedSources: mergedSources,
-        mergingStrategy: .all,
+        mergingStrategy: mergingStrategy,
         fields: fields,
         inlineFragments: inlineFragments,
         namedFragments: namedFragments
       )
+
       return ComputedSelectionSet(
         direct: directSelections,
-        merged: merged,
+        merged: mergedSelections,
         typeInfo: typeInfo
       )
     }

@@ -119,7 +119,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
     try await buildOperation()
 
     // when
-    let actual = rootSelectionSet.computed.merged
+    let actual = self.rootSelectionSet.computed.merged
 
     // then
     expect(actual).to(beEmpty())

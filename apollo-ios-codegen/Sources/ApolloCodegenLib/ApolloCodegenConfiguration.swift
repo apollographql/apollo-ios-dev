@@ -945,7 +945,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     /// the generated models will directly mirror the GraphQL definition.
     public static let none: FieldMerging = []
 
-    private var options: MergedSelections.MergingStrategy
+    var options: MergedSelections.MergingStrategy
 
     private init(_ options: MergedSelections.MergingStrategy) {
       self.options = options
