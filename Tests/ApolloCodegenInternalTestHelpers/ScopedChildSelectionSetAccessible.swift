@@ -54,7 +54,7 @@ extension ComputedSelectionSet: ScopedChildSelectionSetAccessible {
     direct?
       .inlineFragments[conditions]?
       .selectionSet ??
-    merged[computedSelectionSetCache.mergingStrategy]!
+    merged
       .inlineFragments[conditions]?
       .selectionSet
 

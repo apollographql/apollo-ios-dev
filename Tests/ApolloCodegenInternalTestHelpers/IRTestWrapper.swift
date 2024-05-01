@@ -41,9 +41,7 @@ public class IRTestWrapper<T: CustomDebugStringConvertible>: CustomDebugStringCo
     irObject[keyPath: keyPath]
   }
 
-  fileprivate func childSelectionSet(
-    with conditions: IR.ScopeCondition
-  ) -> SelectionSetTestWrapper? {
+  fileprivate func childSelectionSet(with conditions: IR.ScopeCondition) -> SelectionSetTestWrapper? {
     guard let irObject = irObject as? ScopedChildSelectionSetAccessible else {
       return nil
     }
@@ -76,11 +74,9 @@ public class SelectionSetTestWrapper: IRTestWrapper<IR.SelectionSet> {
     )
   }
 
-  override func childSelectionSet(
-    with conditions: ScopeCondition
-  ) -> SelectionSetTestWrapper? {
+  override func childSelectionSet(with conditions: ScopeCondition) -> SelectionSetTestWrapper? {
     self.computed.childSelectionSet(
-      with: conditions,
+      with: conditions,      
       computedSelectionSetCache: computedSelectionSetCache
     )
   }
@@ -91,7 +87,9 @@ public class SelectionSetTestWrapper: IRTestWrapper<IR.SelectionSet> {
 // MARK: -
 extension IRTestWrapper {
 
-  public subscript(as typeCase: String) -> SelectionSetTestWrapper? {
+  public subscript(
+    as typeCase: String
+  ) -> SelectionSetTestWrapper? {
     guard let scope = self.scopeCondition(type: typeCase, conditions: nil) else {
       return nil
     }
@@ -259,10 +257,13 @@ extension SelectionSetTestWrapper {
   }
 
   public subscript(fragment fragment: String) -> IRTestWrapper<IR.NamedFragmentSpread>? {
-    IRTestWrapper<IR.NamedFragmentSpread>(
-      irObject:
-        computed.direct?.namedFragments[fragment] ?? computed.merged[mergingStrategy]!.namedFragments[fragment],
-      computedSelectionSetCache: computedSelectionSetCache
+    guard let fragment = computed.direct?.namedFragments[fragment] ?? computed.merged.namedFragments[fragment] else { return nil }
+    return IRTestWrapper<IR.NamedFragmentSpread>(
+      irObject: fragment,
+      computedSelectionSetCache: .init(
+        mergingStrategy: self.mergingStrategy,
+        entityStorage: fragment.fragment.entityStorage
+      )
     )
   }
 }
@@ -290,7 +291,7 @@ class ComputedSelectionSetCache {
     let selectionSet = ComputedSelectionSet.Builder(
       directSelections: selectionSet.selections?.readOnlyView,
       typeInfo: selectionSet.typeInfo, 
-      mergingStrategies: [mergingStrategy],
+      mergingStrategy: mergingStrategy,
       entityStorage: entityStorage
     ).build()
 
