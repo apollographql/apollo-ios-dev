@@ -49,16 +49,6 @@ public struct CacheWriteInterceptor: ApolloInterceptor {
       return
     }
 
-    guard !Operation.hasDeferredFragments else {
-      chain.proceedAsync(
-        request: request,
-        response: response,
-        interceptor: self,
-        completion: completion
-      )
-      return
-    }
-
     guard
       let createdResponse = response,
       let cacheRecords = createdResponse.cacheRecords

@@ -44,6 +44,7 @@ public struct IncrementalJSONResponseParsingInterceptor: ApolloInterceptor {
 
   private class ResultStorage {
     var currentResult: Any?
+    var currentCacheRecords: RecordSet?
   }
 
   public init() { }
@@ -83,19 +84,25 @@ public struct IncrementalJSONResponseParsingInterceptor: ApolloInterceptor {
           throw ParsingError.couldNotParseIncrementalJSON(json: body)
         }
 
+        var currentCacheRecords = resultStorage.currentCacheRecords ?? RecordSet()
+
         for item in incrementalItems {
           let incrementalResponse = try IncrementalGraphQLResponse<Operation>(
             operation: request.operation,
             body: item
           )
-          let (incrementalResult, _) = try incrementalResponse.parseIncrementalResult(
+          let (incrementalResult, incrementalCacheRecords) = try incrementalResponse.parseIncrementalResult(
             withCachePolicy: request.cachePolicy
           )
           currentResult = try currentResult.merging(incrementalResult)
+
+          if let incrementalCacheRecords {
+            currentCacheRecords.merge(records: incrementalCacheRecords)
+          }
         }
 
         parsedResult = currentResult
-        parsedCacheRecords = nil
+        parsedCacheRecords = currentCacheRecords
 
       } else {
         let graphQLResponse = GraphQLResponse(
@@ -112,6 +119,8 @@ public struct IncrementalJSONResponseParsingInterceptor: ApolloInterceptor {
       createdResponse.cacheRecords = parsedCacheRecords
 
       resultStorage.currentResult = parsedResult
+      resultStorage.currentCacheRecords = parsedCacheRecords
+
       chain.proceedAsync(
         request: request,
         response: createdResponse,
