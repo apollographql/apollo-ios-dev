@@ -79,13 +79,18 @@ extension ComputedSelectionSet {
     func mergeIn(
       _ selectionsToMerge: EntityTreeScopeSelections,
       from source: MergedSelections.MergedSource,
-      with mergeStrategy: MergedSelections.MergingStrategy
+      with sourceMergeStrategy: MergedSelections.MergingStrategy
     ) {
-      guard self.mergingStrategy.contains(mergeStrategy) else { return }
+      guard shouldMergeIn(source: source, with: sourceMergeStrategy) else {
+        return
+      }
 
       @IsEverTrue var didMergeAnySelections: Bool
 
-      selectionsToMerge.fields.values.forEach { didMergeAnySelections = self.mergeIn($0) }
+      selectionsToMerge.fields.values.forEach {
+        didMergeAnySelections = self.mergeIn($0, from: source)
+      }
+
       selectionsToMerge.namedFragments.values.forEach { didMergeAnySelections = self.mergeIn($0) }
 
       if didMergeAnySelections {
@@ -93,30 +98,92 @@ extension ComputedSelectionSet {
       }
     }
 
-    private func mergeIn(_ field: Field) -> Bool {
+    private func shouldMergeIn(
+      source: MergedSelections.MergedSource,
+      with sourceMergeStrategy: MergedSelections.MergingStrategy
+    ) -> Bool {
+      return shouldMergeIn(from: [source], with: sourceMergeStrategy)
+//      if self.mergingStrategy.contains(sourceMergeStrategy) ||
+//          self.typeInfo.derivedFromMergedSources.contains(source)
+//      {
+//        return true
+//      }
+
+//      if self.typeInfo.derivedFromMergedSources.contains(source) { return true }
+
+//      if !self.typeInfo.isUserDefined,
+//         (source.fragment !== nil && self.mergingStrategy.contains(.namedFragments)),
+//         source.typeInfo.scopePath.count > 1
+//      {
+//        return true
+//      }
+
+//      if (source.fragment !== nil && self.mergingStrategy.contains(.namedFragments)),
+//         case let difference = self.typeInfo.scopePath.count - source.typeInfo.scopePath.count,
+//         difference >= 0 {
+//        let scopeStart = self.typeInfo.scopePath.node(at: difference)
+//        if source.typeInfo.scopePath.head == scopeStart {
+//          return true
+//        }
+//      }
+
+//      return false
+    }
+
+    private func shouldMergeIn(
+      from sources: OrderedSet<MergedSelections.MergedSource>,
+      with sourceMergeStrategy: MergedSelections.MergingStrategy
+    ) -> Bool {
+      if self.mergingStrategy.contains(sourceMergeStrategy) { return true }
+
+      for source in sources {
+        let parentTypePath = source.typeInfo.scopePath
+        let parentSource = (parentTypePath[0..<parentTypePath.count - 1], source.fragment)
+
+        if self.typeInfo.derivedFromMergedSources.contains(where: {
+          let slice = $0.typeInfo.scopePath[0..<($0.typeInfo.scopePath.count)]
+
+          return slice.elementsEqual(parentSource.0) &&
+          $0.fragment == parentSource.1
+        }) {
+          return true
+        }
+      }
+      return false
+    }
+
+    private func mergeIn(
+      _ field: Field,
+      from mergedSource: MergedSelections.MergedSource
+    ) -> Bool {
       let keyInScope = field.hashForSelectionSetScope
       if let directSelections = directSelections,
          directSelections.fields.keys.contains(keyInScope) {
         return false
       }
 
-      let fieldToMerge: Field
-      if let entityField = field as? EntityField {
-        fieldToMerge = createShallowlyMergedNestedEntityField(from: entityField)
+      let fieldToMerge: Field = {
+        guard let entityField = field as? EntityField else {
+          return field
+        }
 
-      } else {
-        fieldToMerge = field
-      }
+        let newEntityField = createOrFindShallowlyMergedNestedEntityField(from: entityField)
+        newEntityField.selectionSet.typeInfo.derivedFromMergedSources.insert(mergedSource)
+        return newEntityField
+      }()
 
       fields[keyInScope] = fieldToMerge
       return true
     }
 
-    private func createShallowlyMergedNestedEntityField(from field: EntityField) -> EntityField {
+    private func createOrFindShallowlyMergedNestedEntityField(from field: EntityField) -> EntityField {
+      if let existingMergedField = self.fields[field.hashForSelectionSetScope] as? EntityField {
+        return existingMergedField
+      }
+
       let typeInfo = SelectionSet.TypeInfo(
         entity: entityStorage.entity(for: field.underlyingField, on: typeInfo.entity),
-        scopePath: self.typeInfo.scopePath.appending(field.selectionSet.typeInfo.scope),
-        isUserDefined: false
+        scopePath: self.typeInfo.scopePath.appending(field.selectionSet.typeInfo.scope)
       )
 
       let newSelectionSet = SelectionSet(
@@ -144,26 +211,36 @@ extension ComputedSelectionSet {
     }
 
     func addMergedInlineFragment(
-      with condition: ScopeCondition,      
+      with condition: ScopeCondition,
+      from mergedSources: OrderedSet<MergedSelections.MergedSource>,
       mergeStrategy: MergedSelections.MergingStrategy
     ) {
-      guard self.mergingStrategy.contains(mergeStrategy) && typeInfo.isEntityRoot else { return }
+      guard typeInfo.isEntityRoot &&
+              self.shouldMergeIn(from: mergedSources, with: mergeStrategy) else {
+        return
+      }
 
       if let directSelections = directSelections,
          directSelections.inlineFragments.keys.contains(condition) {
         return
       }
 
-      guard !inlineFragments.keys.contains(condition) else { return }
+      let inlineFragmentToMerge = createOrFindShallowlyMergedCompositeInlineFragment(
+        with: condition
+      )
+      inlineFragmentToMerge.selectionSet.typeInfo.derivedFromMergedSources.formUnion(mergedSources)
 
-      createShallowlyMergedCompositeInlineFragment(with: condition)
+      inlineFragments[condition] = inlineFragmentToMerge
     }
 
-    private func createShallowlyMergedCompositeInlineFragment(with condition: ScopeCondition) {
+    private func createOrFindShallowlyMergedCompositeInlineFragment(
+      with condition: ScopeCondition
+    ) -> InlineFragmentSpread {
+      if let inlineFragment = self.inlineFragments[condition] { return inlineFragment }
+
       let typeInfo = SelectionSet.TypeInfo(
         entity: self.typeInfo.entity,
-        scopePath: self.typeInfo.scopePath.mutatingLast { $0.appending(condition) },
-        isUserDefined: false
+        scopePath: self.typeInfo.scopePath.mutatingLast { $0.appending(condition) }
       )
 
       let selectionSet = SelectionSet(
@@ -171,11 +248,9 @@ extension ComputedSelectionSet {
         selections: nil
       )
 
-      let inlineFragment = InlineFragmentSpread(
+      return InlineFragmentSpread(
         selectionSet: selectionSet
       )
-
-      inlineFragments[condition] = inlineFragment
     }
 
     fileprivate func finalize() -> ComputedSelectionSet {

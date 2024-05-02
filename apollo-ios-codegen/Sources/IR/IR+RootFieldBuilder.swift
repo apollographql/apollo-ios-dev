@@ -74,8 +74,7 @@ class RootFieldBuilder {
   ) async -> SelectionSet {
     let typeInfo = SelectionSet.TypeInfo(
       entity: entity,
-      scopePath: scopePath,
-      isUserDefined: true
+      scopePath: scopePath
     )
 
     var directSelections: DirectSelections? = nil
@@ -421,8 +420,7 @@ class RootFieldBuilder {
 
     let typeInfo = SelectionSet.TypeInfo(
       entity: parentTypeInfo.entity,
-      scopePath: scopePath,
-      isUserDefined: true
+      scopePath: scopePath
     )
 
     let fragmentSpread = NamedFragmentSpread(

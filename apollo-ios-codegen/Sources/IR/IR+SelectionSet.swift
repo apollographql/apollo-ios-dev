@@ -18,7 +18,9 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
     /// Indicates if the `SelectionSet` was created directly due to a selection set in the user defined `.graphql` definition file.
     ///
     /// If `false`, the selection set was artificially created by the IR. Currently, the only reason for this is a `CompositeInlineFragment` created during calculation of merged selections for field merging.
-    public var isUserDefined: Bool
+    public var isUserDefined: Bool { derivedFromMergedSources.isEmpty }
+
+    public internal(set) var derivedFromMergedSources: Set<MergedSelections.MergedSource> = []
 
     // MARK: - Computed Properties
 
@@ -46,12 +48,10 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
 
     init(
       entity: Entity,
-      scopePath: LinkedList<ScopeDescriptor>,
-      isUserDefined: Bool
+      scopePath: LinkedList<ScopeDescriptor>
     ) {
       self.entity = entity
-      self.scopePath = scopePath
-      self.isUserDefined = isUserDefined
+      self.scopePath = scopePath      
     }
 
     public static func == (lhs: TypeInfo, rhs: TypeInfo) -> Bool {

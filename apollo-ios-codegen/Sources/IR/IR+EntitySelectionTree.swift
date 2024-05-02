@@ -237,12 +237,13 @@ class EntitySelectionTree {
         var isTargetsExactScope: Bool {
           entityTypeScopePath.next == nil && currentMergeStrategyScope == .ancestors
         }
+        let mergeStrategy = isTargetsExactScope ? [] : currentMergeStrategyScope
 
         for (source, scopeSelections) in selections {
           targetSelections.mergeIn(
             scopeSelections,
             from: source,
-            with: isTargetsExactScope ? [] : currentMergeStrategyScope
+            with: mergeStrategy
           )
         }
 
@@ -275,8 +276,13 @@ class EntitySelectionTree {
             )
 
           } else if case .selections = self.child {
+            guard case let .selections(conditionSelections) = node.child else {
+              preconditionFailure()
+            }
+
             targetSelections.addMergedInlineFragment(
               with: condition,
+              from: conditionSelections.keys,
               mergeStrategy: currentMergeStrategyScope
             )
           }
