@@ -16,8 +16,8 @@ public func equalLineByLine(
   _ expectedValue: String,
   atLine startLine: Int = 1,
   ignoringExtraLines: Bool = false
-) -> Nimble.Predicate<String> {
-  return Predicate.define() { actual in
+) -> Nimble.Matcher<String> {
+  return Matcher.define() { actual in
     let actualString = try actual.evaluate()
 
     guard let actualLines = actualString?.lines(startingAt: startLine) else {
@@ -35,7 +35,7 @@ public func equalLineByLine(
       let actualLine = actualLines[index]
       guard let expectedLine = expectedLinesBuffer.popLast() else {
         if ignoringExtraLines {
-          return PredicateResult(
+          return MatcherResult(
             status: .matches,
             message: .expectedTo("be equal")
           )
@@ -56,13 +56,13 @@ public func equalLineByLine(
     }
 
     guard expectedLinesBuffer.isEmpty else {
-      return PredicateResult(
+      return MatcherResult(
         status: .fail,
         message: .fail("Expected \(expectedLines.count), actual ended at line \(actualLines.count).")
       )
     }
 
-    return PredicateResult(
+    return MatcherResult(
       status: .matches,
       message: .expectedTo("be equal")
     )
@@ -72,12 +72,12 @@ public func equalLineByLine(
 fileprivate func PrettyPrintedFailureResult(
   actual: String?,
   message: ExpectationMessage
-) -> PredicateResult {
+) -> MatcherResult {
   if let actual = actual {
     print ("Actual Document:")
     print(actual)
   }
-  return PredicateResult(
+  return MatcherResult(
     status: .fail,
     message: message
   )
@@ -102,10 +102,10 @@ extension String {
 public func equalLineByLine(
   toFileAt expectedFileURL: URL,
   trimmingImports trimImports: Bool = false
-) -> Nimble.Predicate<String> {
-  return Predicate.define() { actual in
+) -> Nimble.Matcher<String> {
+  return Matcher.define() { actual in
     guard ApolloFileManager.default.doesFileExist(atPath: expectedFileURL.path) else {
-      return PredicateResult(
+      return MatcherResult(
         status: .fail,
         message: .fail("File not found at \(expectedFileURL)")
       )

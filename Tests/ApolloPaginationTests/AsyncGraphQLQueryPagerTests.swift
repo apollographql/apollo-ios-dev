@@ -28,25 +28,30 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       "first": 2,
       "after": GraphQLNullable<String>.null
     ]
-    let pager = await AsyncGraphQLQueryPager.makeQueryPager(client: client, initialQuery: initialQuery) { page, direction in
-      switch direction {
-      case .next:
-        let nextQuery = Query()
-        nextQuery.__variables = [
-          "id": "2001",
-          "first": 2,
-          "after": page.endCursor
-        ]
-        return nextQuery
-      case .previous:
-        return nil
+    let pager = AsyncGraphQLQueryPager(
+      client: client,
+      initialQuery: initialQuery,
+      extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+          hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
+          endCursor: data.hero.friendsConnection.pageInfo.endCursor
+        )
+      }, 
+      pageResolver: { page, direction in
+        switch direction {
+        case .next:
+          let nextQuery = Query()
+          nextQuery.__variables = [
+            "id": "2001",
+            "first": 2,
+            "after": page.endCursor
+          ]
+          return nextQuery
+        case .previous:
+          return nil
+        }
       }
-    } extractPageInfo: { data in
-      CursorBasedPagination.Forward(
-        hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
-        endCursor: data.hero.friendsConnection.pageInfo.endCursor
-      )
-    }
+    )
 
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     await pager.fetch()
@@ -79,25 +84,30 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       "first": 2,
       "after": GraphQLNullable<String>.null
     ]
-    let pager = await AsyncGraphQLQueryPager.makeQueryPager(client: client, initialQuery: initialQuery) { page, direction in
-      switch direction {
-      case .next:
-        let nextQuery = Query()
-        nextQuery.__variables = [
-          "id": "2001",
-          "first": 2,
-          "after": page.endCursor
-        ]
-        return nextQuery
-      case .previous:
-        return nil
+    let pager = AsyncGraphQLQueryPager(
+      client: client,
+      initialQuery: initialQuery,
+      extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+          hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
+          endCursor: data.hero.friendsConnection.pageInfo.endCursor
+        )
+      },
+      pageResolver: { page, direction in
+        switch direction {
+        case .next:
+          let nextQuery = Query()
+          nextQuery.__variables = [
+            "id": "2001",
+            "first": 2,
+            "after": page.endCursor
+          ]
+          return nextQuery
+        case .previous:
+          return nil
+        }
       }
-    } extractPageInfo: { data in
-      CursorBasedPagination.Forward(
-        hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
-        endCursor: data.hero.friendsConnection.pageInfo.endCursor
-      )
-    }
+    )
 
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     await pager.fetch()
@@ -136,30 +146,36 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       "first": 2,
       "after": GraphQLNullable<String>.null
     ]
-    let pager = await AsyncGraphQLQueryPager.makeQueryPager(client: client, initialQuery: initialQuery) { page, direction in
-      switch direction {
-      case .next:
-        let nextQuery = Query()
-        nextQuery.__variables = [
-          "id": "2001",
-          "first": 2,
-          "after": page.endCursor
-        ]
-        return nextQuery
-      case .previous:
-        return nil
+    let pager = AsyncGraphQLQueryPager(
+      client: client,
+      initialQuery: initialQuery,
+      extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+          hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
+          endCursor: data.hero.friendsConnection.pageInfo.endCursor
+        )
+      },
+      pageResolver: { page, direction in
+        switch direction {
+        case .next:
+          let nextQuery = Query()
+          nextQuery.__variables = [
+            "id": "2001",
+            "first": 2,
+            "after": page.endCursor
+          ]
+          return nextQuery
+        case .previous:
+          return nil
+        }
+      } ,
+      transform: { previous, first, next in
+        let inOrderData = previous + [first] + next
+        return inOrderData.flatMap { data in
+          data.hero.friendsConnection.friends.map { friend in friend.name }
+        }
       }
-    } extractPageInfo: { data in
-      CursorBasedPagination.Forward(
-        hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
-        endCursor: data.hero.friendsConnection.pageInfo.endCursor
-      )
-    } transform: { previous, first, next in
-      let inOrderData = previous + [first] + next
-      return inOrderData.flatMap { data in
-        data.hero.friendsConnection.friends.map { friend in friend.name }
-      }
-    }
+    )
 
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     await pager.fetch()
@@ -192,30 +208,36 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       "first": 2,
       "after": GraphQLNullable<String>.null
     ]
-    let pager = await AsyncGraphQLQueryPager.makeQueryPager(client: client, initialQuery: initialQuery) { page, direction in
-      switch direction {
-      case .next:
-        let nextQuery = Query()
-        nextQuery.__variables = [
-          "id": "2001",
-          "first": 2,
-          "after": page.endCursor
-        ]
-        return nextQuery
-      case .previous:
-        return nil
+    let pager = AsyncGraphQLQueryPager(
+      client: client,
+      initialQuery: initialQuery,
+      extractPageInfo: { data in
+        CursorBasedPagination.Forward(
+          hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
+          endCursor: data.hero.friendsConnection.pageInfo.endCursor
+        )
+      },
+      pageResolver: { page, direction in
+        switch direction {
+        case .next:
+          let nextQuery = Query()
+          nextQuery.__variables = [
+            "id": "2001",
+            "first": 2,
+            "after": page.endCursor
+          ]
+          return nextQuery
+        case .previous:
+          return nil
+        }
+      },
+      transform: { previous, first, next in
+        let inOrderData = previous + [first] + next
+        return inOrderData.flatMap { data in
+          data.hero.friendsConnection.friends.map { friend in friend.name }
+        }
       }
-    } extractPageInfo: { data in
-      CursorBasedPagination.Forward(
-        hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
-        endCursor: data.hero.friendsConnection.pageInfo.endCursor
-      )
-    } transform: { previous, first, next in
-      let inOrderData = previous + [first] + next
-      return inOrderData.flatMap { data in
-        data.hero.friendsConnection.friends.map { friend in friend.name }
-      }
-    }
+    )
 
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     await pager.fetch()
@@ -251,7 +273,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       let name: String
     }
 
-    let anyPager = await createPager().eraseToAnyPager { data in
+    let anyPager = createPager().eraseToAnyPager { data in
       data.hero.friendsConnection.friends.map {
         ViewModel(name: $0.name)
       }
@@ -284,7 +306,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
   }
 
   func test_passesBackSeparateData() async throws {
-    let anyPager = await createPager().eraseToAnyPager { _, initial, next in
+    let anyPager = createPager().eraseToAnyPager { _, initial, next in
       if let latestPage = next.last {
         return latestPage.hero.friendsConnection.friends.last?.name
       }
@@ -330,6 +352,37 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     try await pager.loadAll()
     await fulfillment(of: [firstPageExpectation, lastPageExpectation, loadAllExpectation], timeout: 5)
     subscriber.cancel()
+  }
+
+  func test_equatable() async {
+    let pagerA = AsyncGraphQLQueryPager(pager: createPager(), transform: { previous, initial, next in
+      let allPages = previous + [initial] + next
+      return allPages.flatMap { data in
+        data.hero.friendsConnection.friends.map { $0.name }
+      }
+    })
+
+    let pagerB = AsyncGraphQLQueryPager(pager: createPager(), transform: { previous, initial, next in
+      let allPages = previous + [initial] + next
+      return allPages.flatMap { data in
+        data.hero.friendsConnection.friends.map { $0.name }
+      }
+    })
+
+    XCTAssertEqual(pagerA, pagerB)
+
+    pagerA._subject.send(.success((["Al-Khwarizmi", "Al-Jaziri", "Charles Babbage", "Ada Lovelace"], .cache)))
+    XCTAssertNotEqual(pagerA, pagerB)
+
+    pagerB._subject.send(.success((["Al-Khwarizmi", "Al-Jaziri", "Charles Babbage", "Ada Lovelace"], .cache)))
+    XCTAssertEqual(pagerA, pagerB)
+
+    pagerA._subject.send(.success((["Al-Khwarizmi", "Al-Jaziri", "Charles Babbage", "Ada Lovelace"], .fetch)))
+    XCTAssertNotEqual(pagerA, pagerB)
+
+    pagerB._subject.send(.success((["Al-Khwarizmi", "Al-Jaziri", "Charles Babbage", "Ada Lovelace"], .fetch)))
+    await pagerA.reset()
+    XCTAssertEqual(pagerA, pagerB)
   }
 
   // MARK: - Test helpers

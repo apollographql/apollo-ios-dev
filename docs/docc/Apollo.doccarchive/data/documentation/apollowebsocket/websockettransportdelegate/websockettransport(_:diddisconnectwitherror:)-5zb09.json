@@ -54,7 +54,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : ": (any "
       },
       {
         "kind" : "typeIdentifier",
@@ -63,7 +63,7 @@
       },
       {
         "kind" : "text",
-        "text" : "?)"
+        "text" : ")?)"
       }
     ],
     "modules" : [
@@ -144,7 +144,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": "
+              "text" : ": (any "
             },
             {
               "kind" : "typeIdentifier",
@@ -153,7 +153,7 @@
             },
             {
               "kind" : "text",
-              "text" : "?)"
+              "text" : ")?)"
             }
           ]
         }
@@ -319,7 +319,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -328,7 +328,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?)"
+      "text" : ")?)"
     }
   ],
   "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransport(_:didDisconnectWithError:)-19qhf",
@@ -375,7 +375,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -384,7 +384,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?)"
+      "text" : ")?)"
     }
   ],
   "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransport(_:didDisconnectWithError:)-5zb09",

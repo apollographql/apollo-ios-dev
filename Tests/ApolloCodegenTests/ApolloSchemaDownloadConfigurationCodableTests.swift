@@ -178,7 +178,7 @@ class ApolloSchemaDownloadConfigurationCodableTests: XCTestCase {
     expect(actual).to(equal(expected))
   }
 
-  func test__decodeApolloSchemaDownloadConfiguration__givenOnlyRequiredParameters_shouldReturnStruct() throws {
+  func test__decodeApolloSchemaDownloadConfiguration__givenOnlyRequiredParameters_usingPOST_shouldReturnStruct() throws {
     // given
     let subject = """
       {
@@ -186,9 +186,7 @@ class ApolloSchemaDownloadConfigurationCodableTests: XCTestCase {
           "introspection" : {
             "endpointURL" : "http://server.com",
             "httpMethod" : {
-              "POST" : {
-
-              }
+              "POST" : {}
             },
             "includeDeprecatedInputValues" : true,
             "outputFormat" : "SDL"
@@ -202,6 +200,41 @@ class ApolloSchemaDownloadConfigurationCodableTests: XCTestCase {
       using: .introspection(
         endpointURL: URL(string: "http://server.com")!,
         httpMethod: .POST,
+        outputFormat: .SDL,
+        includeDeprecatedInputValues: true),
+      outputPath: "ServerSchema.graphqls")
+
+    // when
+    let actual = try JSONDecoder().decode(ApolloSchemaDownloadConfiguration.self, from: subject)
+
+    // then
+    expect(actual).to(equal(expected))
+  }
+  
+  func test__decodeApolloSchemaDownloadConfiguration__givenOnlyRequiredParameters_usingGET_shouldReturnStruct() throws {
+    // given
+    let subject = """
+      {
+        "downloadMethod" : {
+          "introspection" : {
+            "endpointURL" : "http://server.com",
+            "httpMethod" : {
+              "GET" : {
+                "queryParameterName": "MyQuery"
+              }
+            },
+            "includeDeprecatedInputValues" : true,
+            "outputFormat" : "SDL"
+          }
+        },
+        "outputPath" : "ServerSchema.graphqls"
+      }
+      """.asData
+
+    let expected = ApolloSchemaDownloadConfiguration(
+      using: .introspection(
+        endpointURL: URL(string: "http://server.com")!,
+        httpMethod: .GET(queryParameterName: "MyQuery"),
         outputFormat: .SDL,
         includeDeprecatedInputValues: true),
       outputPath: "ServerSchema.graphqls")

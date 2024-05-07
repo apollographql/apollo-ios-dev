@@ -13,11 +13,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-  # Look into caching the xcbeautify installation to instead of installing for each test
-  - name: Install XCBeautify
-    shell: bash
-    run: |
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
   - name: Build and Test
     shell: bash
     run: |

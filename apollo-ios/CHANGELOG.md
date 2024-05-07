@@ -1,5 +1,49 @@
 # Change Log
 
+## v1.10.0
+
+### New
+
+- **Added support for visionOS ([#3320](https://github.com/apollographql/apollo-ios/issues/3320)):** All the dependecies that Apollo iOS requires have been updated to add support for visionOS, so we can now add official support for visionOS too. See PR [#333](https://github.com/apollographql/apollo-ios-dev/pull/333).
+
+### Improvement
+
+- **Add Sendable conformance to some basic SchemaTypes:** This adds `Sendable` conformance to the some of the generated schema types. This does not mean that all of the generated code is safe to use yet with complete concurrency checking of Swift 5.10 but it gets us closer to that goal. See PR [#322](https://github.com/apollographql/apollo-ios-dev/pull/322). _Thanks to [@bdbergeron](https://github.com/bdbergeron) for the contributon._
+
+## v1.9.3
+
+### Fixed
+
+- **Fix injecting of context for UploadRequest:** Any request context passed into an upload request was not being added to the HTTP request and would not be available to the interceptor chain. See PR ([#302](https://github.com/apollographql/apollo-ios-dev/pull/302)). _Thanks to [@RobertDresler](https://github.com/RobertDresler) for the contribution._
+- **Added support for SPM Package.resolved format version 3 ([#3355](https://github.com/apollographql/apollo-ios/issues/3355)):** When using Xcode 15.3 the codegen CLI would fail the `generate` command with an error stating the Package.resolve file version is unsupported. Version 3 is now accepted as a valid file format for the codegen version checker. See PR ([#304](https://github.com/apollographql/apollo-ios-dev/pull/304)).
+- **PrivacyInfo.xcprivacy file is invalid for Apollo and ApolloApi ([#3359](https://github.com/apollographql/apollo-ios/issues/3359)):** We received reports that when submitting to the App Store the submission would fail with an error stating that the privacy manifests were invalid. We identified the error and updated the privacy files. See PR ([#309](https://github.com/apollographql/apollo-ios-dev/pull/309)). _Thanks to [@azilbershtein](https://github.com/azilbershtein) for raising the issue._
+
+### Improvement
+
+- **Provide a direct means to observe changes in ApolloStore:** `ApolloStore` now exposes it's subscriber mechanism publicly. This means you can now observe and receive notifications about changes to the store. See PR ([#300](https://github.com/apollographql/apollo-ios-dev/pull/300)). _Thanks to [@jamesonwilliams](https://github.com/jamesonwilliams) for the contribution._
+- **Remove redundant iteration in EntitySelectionTree merging algorithm:** The conditions for merging selections were revisited and we identified, and removed, a redundant iteration. This is a significant performance improvement as it removes an entire additional iteration through all the conditional scopes in the tree. See PR ([#308](https://github.com/apollographql/apollo-ios-dev/pull/308)).
+
+## v1.9.2
+
+### Fixed
+
+- **Backwards Compatibility issues in 1.9.1:** 1.9.1 introduced a minor breaking change for some users who were creating a custom implementaiton of `ApolloClientProtocol`. Sorry about that! This patch release fixed the compatiblity. See PR [#290](https://github.com/apollographql/apollo-ios-dev/pull/290). _Thanks to [@michaelloo](https://github.com/michaelloo) for raising the issue._
+
+### Improvement
+
+- **Session and task descriptions parameters added to `URLSessionClient` ([#286](https://github.com/apollographql/apollo-ios-dev/pull/286)):** The `URLSessionClient` now allows you to set a `sessionDescription` on the session and `taskDescription` on each task. These are helpful when debugging, especially when analyzing HTTP traffic with Instruments. _Thanks to [@hishma](https://github.com/hishma) for the contribution._
+
+## v1.9.1
+
+### Fixed
+
+- **`SelectionSet` generated initializers don't compile with `self` parameter ([#3330](https://github.com/apollographql/apollo-ios/issues/3330)):** Selection set initializers now use a local property name when the external property name is a Swift reserved word; see PR [#257](https://github.com/apollographql/apollo-ios-dev/pull/257). _Thanks to [@grantjbutler](https://github.com/grantjbutler) for raising the issue._
+- **asXXXXXXX property on a union never returning `nil` if selection set empty ([#3326](https://github.com/apollographql/apollo-ios/issues/3326)):** - The codegen logic to determine whether a selection set is composite or not has been improved to handle the case when `__typename` was the only field in the selection set; see PR [#261](https://github.com/apollographql/apollo-ios-dev/pull/261). _Thanks to [@vincentisambart](https://github.com/vincentisambart) for raising the issue._
+
+### Improvement
+
+- **Feature/ContextIdentifier for the mutate queries ([#281](https://github.com/apollographql/apollo-ios-dev/pull/281)):** Mutation operations can now be given a context identifier to be used later in the request. _Thanks to [@VladimirK-ah](https://github.com/VladimirK-ah) for the contribution._
+
 ## v1.9.0
 
 ### Improvement

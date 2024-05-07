@@ -42,6 +42,7 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:9ApolloAPI14InlineFragmentP14RootEntityTypeQa",
         "text" : "RootEntityType"
       }
     ],
@@ -91,7 +92,9 @@
               "text" : "."
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InlineFragment\/RootEntityType",
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI14InlineFragmentP14RootEntityTypeQa",
               "text" : "RootEntityType"
             },
             {
@@ -228,6 +231,41 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/inlinefragment"
 },
+"doc://ApolloAPI/documentation/ApolloAPI/InlineFragment/RootEntityType": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "associatedtype"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "RootEntityType"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16RootSelectionSetP",
+      "text" : "RootSelectionSet"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InlineFragment\/RootEntityType",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "RootEntityType",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/inlinefragment\/rootentitytype"
+},
 "doc://ApolloAPI/documentation/ApolloAPI/InlineFragment/asRootEntityType": {
   "abstract" : [
 
@@ -259,6 +297,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI14InlineFragmentP14RootEntityTypeQa",
       "text" : "RootEntityType"
     }
   ],
