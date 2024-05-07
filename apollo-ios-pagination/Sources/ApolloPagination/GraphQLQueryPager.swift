@@ -77,8 +77,8 @@ public class GraphQLQueryPager<Model>: Publisher {
     PaginatedQuery: GraphQLQuery
   >(
     client: ApolloClientProtocol,
-    initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
+    initialQuery: InitialQuery,
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
   ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
@@ -177,7 +177,7 @@ public class GraphQLQueryPager<Model>: Publisher {
   }
 
   deinit {
-    pager.cancel()
+    pager.reset()
   }
 
   /// Subscribe to the results of the pager, with the management of the subscriber being stored internally to the `AnyGraphQLQueryPager`.
@@ -228,24 +228,55 @@ public class GraphQLQueryPager<Model>: Publisher {
   }
 
   /// Discards pagination state and fetches the first page from scratch.
-  /// - Parameter cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `fetchIgnoringCacheData`.
-  public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) {
-    pager.refetch(cachePolicy: cachePolicy)
+  /// - Parameters:
+  ///   - cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `fetchIgnoringCacheData`.
+  ///   - callbackQueue: The `DispatchQueue` that the `completion` fires on. Defaults to `main`.
+  ///   - completion: A completion block that will always trigger after the execution of this  operation.
+  public func refetch(
+    cachePolicy: CachePolicy = .fetchIgnoringCacheData,
+    callbackQueue: DispatchQueue = .main,
+    completion: (() -> Void)? = nil
+  ) {
+    pager.refetch(cachePolicy: cachePolicy, callbackQueue: callbackQueue, completion: completion)
   }
 
   /// Fetches the first page.
-  public func fetch() {
-    pager.fetch()
+  /// - Parameters:
+  ///   - callbackQueue: The `DispatchQueue` that the `completion` fires on. Defaults to `main`.
+  ///   - completion: A completion block that will always trigger after the execution of this  operation.
+  public func fetch(
+    callbackQueue: DispatchQueue = .main,
+    completion: (() -> Void)? = nil
+  ) {
+    pager.fetch(callbackQueue: callbackQueue, completion: completion)
   }
 
-  /// Resets pagination state and cancels further updates from the pager.
-  public func cancel() {
-    pager.cancel()
+  /// Resets pagination state and cancels in-flight updates from the pager.
+  public func reset() {
+    pager.reset()
   }
 
   public func receive<S>(
     subscriber: S
   ) where S: Subscriber, Never == S.Failure, Result<(Model, UpdateSource), Error> == S.Input {
     publisher.subscribe(subscriber)
+  }
+}
+
+extension GraphQLQueryPager: Equatable where Model: Equatable {
+  public static func == (lhs: GraphQLQueryPager<Model>, rhs: GraphQLQueryPager<Model>) -> Bool {
+    let left = lhs._subject.value
+    let right = rhs._subject.value
+
+    switch (left, right) {
+    case (.success((let leftValue, let leftSource)), .success((let rightValue, let rightSource))):
+      return leftValue == rightValue && leftSource == rightSource
+    case (.failure(let leftError), .failure(let rightError)):
+      return leftError.localizedDescription == rightError.localizedDescription
+    case (.none, .none):
+      return true
+    default:
+      return false
+    }
   }
 }

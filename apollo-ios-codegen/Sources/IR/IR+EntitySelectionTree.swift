@@ -224,23 +224,6 @@ class EntitySelectionTree {
           targetSelections.mergeIn(scopeSelections, from: source)
         }
 
-        if let conditionalScopes = scopeConditions {
-          for (condition, node) in conditionalScopes {
-            guard !node.scope.isDeferred else { continue }
-
-            if scopePathNode.value.matches(condition) {
-              node.mergeSelections(
-                matchingScopePath: scopePathNode,
-                into: targetSelections,
-                transformingSelections: transformingSelections
-              )
-
-            } else {
-              targetSelections.addMergedInlineFragment(with: condition)
-            }
-          }
-        }
-
       case .none: break
       }
 
@@ -254,6 +237,8 @@ class EntitySelectionTree {
               into: targetSelections,
               transformingSelections: transformingSelections
             )
+          } else if case .selections = child {
+            targetSelections.addMergedInlineFragment(with: condition)
           }
         }
       }

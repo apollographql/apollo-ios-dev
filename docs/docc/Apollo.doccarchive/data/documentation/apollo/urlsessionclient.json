@@ -184,7 +184,7 @@
   "topicSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/init(sessionConfiguration:callbackQueue:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/init(sessionConfiguration:callbackQueue:sessionDescription:)"
       ],
       "title" : "Initializers"
     },
@@ -201,6 +201,7 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/clearAllTasks()",
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/invalidate()",
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/sendRequest(_:rawTaskCompletionHandler:completion:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/sendRequest(_:taskDescription:rawTaskCompletionHandler:completion:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/urlSession(_:dataTask:didBecome:)-17qvj",
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/urlSession(_:dataTask:didBecome:)-1gjp0",
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/urlSession(_:dataTask:didReceive:)",
@@ -574,7 +575,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/urlsessionclient\/clearalltasks()"
 },
-"doc://Apollo/documentation/Apollo/URLSessionClient/init(sessionConfiguration:callbackQueue:)": {
+"doc://Apollo/documentation/Apollo/URLSessionClient/init(sessionConfiguration:callbackQueue:sessionDescription:)": {
   "abstract" : [
     {
       "text" : "Designated initializer.",
@@ -622,15 +623,32 @@
     },
     {
       "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "sessionDescription"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
       "text" : "?)"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/init(sessionConfiguration:callbackQueue:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/init(sessionConfiguration:callbackQueue:sessionDescription:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(sessionConfiguration:callbackQueue:)",
+  "title" : "init(sessionConfiguration:callbackQueue:sessionDescription:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/urlsessionclient\/init(sessionconfiguration:callbackqueue:)"
+  "url" : "\/documentation\/apollo\/urlsessionclient\/init(sessionconfiguration:callbackqueue:sessiondescription:)"
 },
 "doc://Apollo/documentation/Apollo/URLSessionClient/invalidate()": {
   "abstract" : [
@@ -666,10 +684,7 @@
 },
 "doc://Apollo/documentation/Apollo/URLSessionClient/sendRequest(_:rawTaskCompletionHandler:completion:)": {
   "abstract" : [
-    {
-      "text" : "The main method to perform a request.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
@@ -761,6 +776,121 @@
   "title" : "sendRequest(_:rawTaskCompletionHandler:completion:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/urlsessionclient\/sendrequest(_:rawtaskcompletionhandler:completion:)"
+},
+"doc://Apollo/documentation/Apollo/URLSessionClient/sendRequest(_:taskDescription:rawTaskCompletionHandler:completion:)": {
+  "abstract" : [
+    {
+      "text" : "The main method to perform a request.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "sendRequest"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation10URLRequestV",
+      "text" : "URLRequest"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "taskDescription"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "rawTaskCompletionHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:@M@Apollo@objc(cs)URLSessionClient",
+      "text" : "URLSessionClient"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo16URLSessionClientC13RawCompletiona",
+      "text" : "RawCompletion"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "completion"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:@M@Apollo@objc(cs)URLSessionClient",
+      "text" : "URLSessionClient"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo16URLSessionClientC10Completiona",
+      "text" : "Completion"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)NSURLSessionTask",
+      "text" : "URLSessionTask"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/sendRequest(_:taskDescription:rawTaskCompletionHandler:completion:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "sendRequest(_:taskDescription:rawTaskCompletionHandler:completion:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/urlsessionclient\/sendrequest(_:taskdescription:rawtaskcompletionhandler:completion:)"
 },
 "doc://Apollo/documentation/Apollo/URLSessionClient/session": {
   "abstract" : [
@@ -1260,7 +1390,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -1269,7 +1399,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?)"
+      "text" : ")?)"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/urlSession(_:didBecomeInvalidWithError:)",
@@ -1431,7 +1561,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -1440,7 +1570,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?)"
+      "text" : ")?)"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/urlSession(_:task:didCompleteWithError:)",

@@ -468,6 +468,34 @@ class ResponseLoggingInterceptor: ApolloInterceptor {
 }
 ```
 
+#### `LoggingErrorInterceptor`
+
+This example error interceptor demonstrates how it might be possible to perform custom logging of errors thrown during a request.
+
+```swift
+import Foundation
+import Apollo
+
+class LoggingErrorInterceptor: ApolloErrorInterceptor {
+  weak var errorLogger: MyErrorLogger?
+
+  init(errorLogger: MyErrorLogger) {
+    self.errorLogger = errorLogger
+  }
+
+  func handleErrorAsync<Operation: GraphQLOperation>(
+    error: Error,
+    chain: RequestChain,
+    request: Apollo.HTTPRequest<Operation>,
+    response: Apollo.HTTPResponse<Operation>?,
+    completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
+  ) {
+    errorLogger?.requestFailed(response?.httpResponse, withError: error)
+    completion(.failure(error))
+  }
+}
+```
+
 ### Example interceptor provider
 
 This `InterceptorProvider` creates request chains using all of the [default interceptors](#default-interceptors) in their usual order, with all of the [example interceptors](#example-interceptors) defined above added at the appropriate points in the request pipeline:

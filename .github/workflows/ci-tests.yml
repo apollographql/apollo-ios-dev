@@ -199,10 +199,6 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Install XCBeautify
-      shell: bash
-      run: |
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
     - name: Test Codegen Configurations
       shell: bash
       run: |

@@ -558,18 +558,18 @@ class IRFieldCollectorTests: XCTestCase {
   /// MARK: - Custom Matchers
   func equal(
     _ expected: ReferencedFields
-  ) -> Nimble.Predicate<ReferencedFields> {
-    return Predicate.define { actual in
+  ) -> Nimble.Matcher<ReferencedFields> {
+    return Matcher.define { actual in
       let message: ExpectationMessage = .expectedActualValueTo("have fields equal to \(expected)")
 
       guard let actual = try actual.evaluate(),
             expected.count == actual.count else {
-        return PredicateResult(status: .fail, message: message.appended(details: "Fields Did Not Match!"))
+        return MatcherResult(status: .fail, message: message.appended(details: "Fields Did Not Match!"))
       }
 
       for (index, field) in zip(expected, actual).enumerated() {
         guard field.0.0 == field.1.0, field.0.1 == field.1.1 else {
-          return PredicateResult(
+          return MatcherResult(
             status: .fail,
             message: message.appended(
               details: "Expected fields[\(index)] to equal \(field.0), got \(field.1)."
@@ -578,7 +578,7 @@ class IRFieldCollectorTests: XCTestCase {
         }
       }
 
-      return PredicateResult(status: .matches, message: message)
+      return MatcherResult(status: .matches, message: message)
     }
   }
 }

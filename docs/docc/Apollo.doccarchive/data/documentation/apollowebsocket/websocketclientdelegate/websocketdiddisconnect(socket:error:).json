@@ -43,7 +43,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : ": any "
       },
       {
         "kind" : "typeIdentifier",
@@ -60,7 +60,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : ": (any "
       },
       {
         "kind" : "typeIdentifier",
@@ -69,7 +69,7 @@
       },
       {
         "kind" : "text",
-        "text" : "?)"
+        "text" : ")?)"
       }
     ],
     "modules" : [
@@ -116,7 +116,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": "
+              "text" : ": any "
             },
             {
               "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketClient",
@@ -134,7 +134,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": "
+              "text" : ": (any "
             },
             {
               "kind" : "typeIdentifier",
@@ -143,7 +143,7 @@
             },
             {
               "kind" : "text",
-              "text" : "?)"
+              "text" : ")?)"
             }
           ]
         }
@@ -363,7 +363,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": any "
     },
     {
       "kind" : "typeIdentifier",
@@ -380,7 +380,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -389,7 +389,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?)"
+      "text" : ")?)"
     }
   ],
   "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketClientDelegate\/websocketDidDisconnect(socket:error:)",

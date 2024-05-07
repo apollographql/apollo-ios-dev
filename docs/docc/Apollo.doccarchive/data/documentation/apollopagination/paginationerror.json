@@ -1,0 +1,355 @@
+{
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:16ApolloPagination0B5ErrorO",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "enum"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "PaginationError"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "ApolloPagination"
+      }
+    ],
+    "navigatorTitle" : [
+      {
+        "kind" : "identifier",
+        "text" : "PaginationError"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Enumeration",
+    "symbolKind" : "enum",
+    "title" : "PaginationError"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "enum"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "PaginationError"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    }
+  ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloPagination\/s5ErrorP",
+        "doc:\/\/ApolloPagination\/s8SendableP"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "topicSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/cancellation",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/loadInProgress",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/missingInitialPage",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/noQuery",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/pageHasNoMoreContent",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/unknown(_:)"
+      ],
+      "title" : "Enumeration Cases"
+    },
+    {
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/Error-Implementations"
+      ],
+      "title" : "Default Implementations"
+    }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollopagination\/paginationerror"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://ApolloPagination/documentation/ApolloPagination": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "ApolloPagination",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationError": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "PaginationError"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "PaginationError"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PaginationError",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationerror"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationError/Error-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/Error-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "Error Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationerror\/error-implementations"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationError/cancellation": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "cancellation"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/cancellation",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "PaginationError.cancellation",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationerror\/cancellation"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationError/loadInProgress": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "loadInProgress"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/loadInProgress",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "PaginationError.loadInProgress",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationerror\/loadinprogress"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationError/missingInitialPage": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "missingInitialPage"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/missingInitialPage",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "PaginationError.missingInitialPage",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationerror\/missinginitialpage"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationError/noQuery": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "noQuery"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/noQuery",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "PaginationError.noQuery",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationerror\/noquery"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationError/pageHasNoMoreContent": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "pageHasNoMoreContent"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/pageHasNoMoreContent",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "PaginationError.pageHasNoMoreContent",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationerror\/pagehasnomorecontent"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationError/unknown(_:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "unknown"
+    },
+    {
+      "kind" : "text",
+      "text" : "(any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/unknown(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "PaginationError.unknown(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationerror\/unknown(_:)"
+},
+"doc://ApolloPagination/s5ErrorP": {
+  "identifier" : "doc:\/\/ApolloPagination\/s5ErrorP",
+  "title" : "Swift.Error",
+  "type" : "unresolvable"
+},
+"doc://ApolloPagination/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloPagination\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
+}
+}
+}

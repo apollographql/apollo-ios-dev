@@ -612,7 +612,7 @@
         "type" : "text"
       },
       {
-        "code" : "GraphQLOperationVariableValue",
+        "code" : "any GraphQLOperationVariableValue",
         "type" : "codeVoice"
       },
       {

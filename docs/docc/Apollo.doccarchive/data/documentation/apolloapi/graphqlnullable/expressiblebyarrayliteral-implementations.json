@@ -19,6 +19,7 @@
       }
     ],
     "role" : "collectionGroup",
+    "roleHeading" : "API Collection",
     "title" : "ExpressibleByArrayLiteral Implementations"
   },
   "schemaVersion" : {
@@ -217,6 +218,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s25ExpressibleByArrayLiteralP0cD7ElementQa",
       "text" : "ArrayLiteralElement"
     },
     {

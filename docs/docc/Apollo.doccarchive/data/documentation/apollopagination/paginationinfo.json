@@ -1,0 +1,451 @@
+{
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationInfo"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:16ApolloPagination0B4InfoP",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "protocol"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "PaginationInfo"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "ApolloPagination"
+      }
+    ],
+    "navigatorTitle" : [
+      {
+        "kind" : "identifier",
+        "text" : "PaginationInfo"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Protocol",
+    "symbolKind" : "protocol",
+    "title" : "PaginationInfo"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "protocol"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "PaginationInfo"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    }
+  ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloPagination\/s8SendableP"
+      ],
+      "kind" : "relationships",
+      "title" : "Inherits From",
+      "type" : "inheritsFrom"
+    },
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Bidirectional",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Forward",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Reverse",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Bidirectional",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Forward",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Reverse"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforming Types",
+      "type" : "conformingTypes"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "topicSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationInfo\/canLoadNext",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationInfo\/canLoadPrevious"
+      ],
+      "title" : "Instance Properties"
+    }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollopagination\/paginationinfo"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://ApolloPagination/documentation/ApolloPagination": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "ApolloPagination",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/CursorBasedPagination/Bidirectional": {
+  "abstract" : [
+    {
+      "text" : "A cursor based pagination strategy that can support fetching previous and next pages.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Bidirectional"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Bidirectional",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Bidirectional"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "CursorBasedPagination.Bidirectional",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/cursorbasedpagination\/bidirectional"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/CursorBasedPagination/Forward": {
+  "abstract" : [
+    {
+      "text" : "A cursor based pagination strategy that supports forward pagination; fetching the next page.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Forward"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Forward",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Forward"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "CursorBasedPagination.Forward",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/cursorbasedpagination\/forward"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/CursorBasedPagination/Reverse": {
+  "abstract" : [
+    {
+      "text" : "A cursor-basd pagination strategy that can support fetching previous pages.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Reverse"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Reverse",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Reverse"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "CursorBasedPagination.Reverse",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/cursorbasedpagination\/reverse"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/OffsetPagination/Bidirectional": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Bidirectional"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Bidirectional",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Bidirectional"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OffsetPagination.Bidirectional",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/offsetpagination\/bidirectional"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/OffsetPagination/Forward": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Forward"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Forward",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Forward"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OffsetPagination.Forward",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/offsetpagination\/forward"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/OffsetPagination/Reverse": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Reverse"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Reverse",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Reverse"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OffsetPagination.Reverse",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/offsetpagination\/reverse"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationInfo": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "PaginationInfo"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationInfo",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "PaginationInfo"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PaginationInfo",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationinfo"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationInfo/canLoadNext": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "canLoadNext"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationInfo\/canLoadNext",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "canLoadNext",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationinfo\/canloadnext"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationInfo/canLoadPrevious": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "canLoadPrevious"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationInfo\/canLoadPrevious",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "canLoadPrevious",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationinfo\/canloadprevious"
+},
+"doc://ApolloPagination/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloPagination\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
+}
+}
+}

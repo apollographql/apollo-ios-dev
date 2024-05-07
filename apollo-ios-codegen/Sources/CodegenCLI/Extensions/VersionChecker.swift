@@ -158,13 +158,14 @@ struct PackageResolvedModel {
   enum FileFormatVersion: Int {
     case v1 = 1
     case v2 = 2
+    case v3 = 3
 
     func getPackageList(fromPackageResolvedJSON json: [String: Any]) -> ObjectList? {
       switch self {
       case .v1:
         return (json["object"] as? Object)?["pins"] as? ObjectList
 
-      case .v2:
+      case .v2, .v3:
         return json["pins"] as? ObjectList
       }
     }
@@ -174,7 +175,7 @@ struct PackageResolvedModel {
       case .v1:
         return package["package"] as? String
 
-      case .v2:
+      case .v2, .v3:
         return package["identity"] as? String
       }
     }

@@ -1,0 +1,26 @@
+name: Check PR Metadata
+
+on:
+  pull_request:
+    types: [ready_for_review, opened]
+
+jobs:
+  check-pr-metadata:
+    permissions:
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if ! [[ -z "${BODY// }" ]] || [ "$DRAFT" = true ]; then
+            echo "PR is draft or description has length, skipping comment."
+          else
+            gh pr comment "$NUMBER" --body "$MESSAGE"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          DRAFT: ${{ github.event.pull_request.draft }}
+          BODY: ${{ github.event.pull_request.body }}
+          MESSAGE: >
+            It looks like you didn't add a description to your pull request. Please edit and add as much detail as possible for the reviewers. Pull requests require a description before they will be reviewed - thank you.
