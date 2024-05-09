@@ -27,6 +27,20 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     )
   }
 
+  private func readValues<T: SelectionSet, Operation: GraphQLOperation>(
+    _ selectionSet: T.Type,
+    in operation: Operation.Type,
+    from object: JSONObject,
+    variables: GraphQLOperation.Variables? = nil
+  ) throws -> T {
+    return try GraphQLExecutor_SelectionSetMapper_FromResponse_Tests.executor.execute(
+      selectionSet: selectionSet,
+      in: operation,
+      on: object,
+      accumulator: GraphQLSelectionSetMapper<T>()
+    )
+  }
+
   // MARK: - Tests
 
   // MARK: Nonnull Scalar
@@ -952,7 +966,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   // MARK: Deferred Inline Fragments
 
-  func test__deferredInlineFragment__whenExecutingOnDeferredInlineFragment_selectsFieldsAndFulfillsFragment() throws {
+  func test__deferredInlineFragment__givenPartialDataForSelection_withConditionEvaluatingTrue_collectsDeferredFragment() throws {
     // given
     class AnAnimal: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -967,7 +981,115 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self),
-          .deferred(DeferredSpecies.self, label: "deferreSpecies"),
+          .deferred(if: "varA", DeferredSpecies.self, label: "deferredSpecies"),
+        ]}
+
+        struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _deferredSpecies = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred var deferredSpecies: DeferredSpecies?
+        }
+
+        class DeferredSpecies: MockTypeCase {
+          override class var __selections: [Selection] {[
+            .field("species", String.self),
+          ]}
+        }
+      }
+    }
+
+    let object: JSONObject = [
+      "animal": [
+        "__typename": "Animal",
+        "name": "Lassie"
+      ]
+    ]
+
+    // when
+    let data = try readValues(AnAnimal.self, from: object, variables: ["varA": true])
+
+    // then
+    XCTAssertEqual(data.animal.__typename, "Animal")
+    XCTAssertEqual(data.animal.name, "Lassie")
+
+    XCTAssertEqual(data.animal.__data._deferredFragments, [ObjectIdentifier(AnAnimal.Animal.DeferredSpecies.self)])
+    XCTAssertEqual(data.animal.__data._fulfilledFragments, [ObjectIdentifier(AnAnimal.Animal.self)])
+  }
+
+  func test__deferredInlineFragment__givenPartialDataForSelection_withConditionEvaluatingFalse_doesNotCollectDeferredFragment() throws {
+    // given
+    class AnAnimal: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("animal", Animal.self),
+      ]}
+
+      var animal: Animal { __data["animal"] }
+
+      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata> {
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+          .field("name", String.self),
+          .deferred(if: "varA", DeferredSpecies.self, label: "deferredSpecies"),
+        ]}
+
+        struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _deferredSpecies = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred var deferredSpecies: DeferredSpecies?
+        }
+
+        class DeferredSpecies: MockTypeCase {
+          override class var __selections: [Selection] {[
+            .field("species", String.self),
+          ]}
+        }
+      }
+    }
+
+    let object: JSONObject = [
+      "animal": [
+        "__typename": "Animal",
+        "name": "Lassie"
+      ]
+    ]
+
+    // when
+    let data = try readValues(AnAnimal.self, from: object, variables: ["varA": false])
+
+    // then
+    XCTAssertEqual(data.animal.__typename, "Animal")
+    XCTAssertEqual(data.animal.name, "Lassie")
+
+    XCTAssertTrue(data.animal.__data._deferredFragments.isEmpty)
+    XCTAssertEqual(data.animal.__data._fulfilledFragments, [ObjectIdentifier(AnAnimal.Animal.self)])
+  }
+
+  func test__deferredInlineFragment__givenIncrementalDataForDeferredSelection_selectsFieldsAndFulfillsFragment() throws {
+    // given
+    class AnAnimal: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("animal", Animal.self),
+      ]}
+
+      var animal: Animal { __data["animal"] }
+
+      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata> {
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+          .field("name", String.self),
+          .deferred(DeferredSpecies.self, label: "deferredSpecies"),
         ]}
 
         struct Fragments: FragmentContainer {
@@ -993,17 +1115,13 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try GraphQLExecutor_SelectionSetMapper_FromResponse_Tests.executor.execute(
-      selectionSet: AnAnimal.Animal.DeferredSpecies.self,
-      in: MockQuery<AnAnimal>.self,
-      on: object,
-      accumulator: GraphQLSelectionSetMapper<AnAnimal.Animal.DeferredSpecies>()
-    )
+    let data = try readValues(AnAnimal.Animal.DeferredSpecies.self, in: MockQuery<AnAnimal>.self, from: object)
 
     // then
     XCTAssertEqual(data.species, "Canis familiaris")
 
     XCTAssertEqual(data.__data._fulfilledFragments, [ObjectIdentifier(AnAnimal.Animal.DeferredSpecies.self)])
+    XCTAssertTrue(data.__data._deferredFragments.isEmpty)
   }
 
   // MARK: - Fragments
