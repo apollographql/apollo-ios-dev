@@ -93,15 +93,30 @@ struct DefaultFieldSelectionCollector: FieldSelectionCollector {
                             info: info)
         }
 
-      case let .deferred(_, typeCase, _):
+      case let .deferred(condition, typeCase, _):
         // In Apollo's implementation (Router + Server) of deferSpec=20220824 ALL defer directives
         // will be honoured and sent as separate incremental responses. This means deferred
-        // selection fields never need to be collected because they are parsed with the incremental
-        // data, at which time they are no longer deferred.
+        // selection fields only need to be collected when they are parsed with the incremental
+        // data, at which time they are no longer deferred. The deferred fragment identifiers still
+        // need to be collected becuase that is how the user determines the state of the deferred
+        // fragment via the @Deferred property wrapper.
         //
-        // The deferred fragment identifiers still need to be collected becuase that is how the
-        // user determines the state of the deferred fragment via the @Deferred property wrapper.
-        groupedFields.addDeferredFragment(typeCase)
+        // If the defer condition evaluates to false though, the fragment is considered to be fulfilled
+        // and and the fields must be collected.
+        let isDeferred: Bool = {
+          if let condition, !condition.evaluate(with: info.variables) {
+            return false
+          }
+          return true
+        }()
+
+        if isDeferred {
+          groupedFields.addDeferredFragment(typeCase)
+
+        } else {
+          groupedFields.addFulfilledFragment(typeCase)
+          try collectFields(from: typeCase.__selections, into: &groupedFields, for: object, info: info)
+        }
 
       case let .fragment(fragment):
         groupedFields.addFulfilledFragment(fragment)
