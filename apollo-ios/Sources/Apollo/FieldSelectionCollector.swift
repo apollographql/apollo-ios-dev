@@ -108,6 +108,10 @@ struct DefaultFieldSelectionCollector: FieldSelectionCollector {
 
         if collectDeferredFragment {
           groupedFields.addDeferredFragment(typeCase)
+        } else {
+
+          groupedFields.addFulfilledFragment(typeCase)
+          try collectFields(from: typeCase.__selections, into: &groupedFields, for: object, info: info)
         }
 
       case let .fragment(fragment):
