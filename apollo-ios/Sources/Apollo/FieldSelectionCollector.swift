@@ -101,10 +101,12 @@ struct DefaultFieldSelectionCollector: FieldSelectionCollector {
         //
         // The deferred fragment identifiers still need to be collected becuase that is how the
         // user determines the state of the deferred fragment via the @Deferred property wrapper.
-        var collectDeferredFragment: Bool = true
-        if let condition {
-          collectDeferredFragment = condition.evaluate(with: info.variables)
-        }
+        let isDeferred: Bool = {
+          if let condition, !condition.evaluate(with: info.variables) {
+            return false
+          }
+          return true
+        }()
 
         if collectDeferredFragment {
           groupedFields.addDeferredFragment(typeCase)
