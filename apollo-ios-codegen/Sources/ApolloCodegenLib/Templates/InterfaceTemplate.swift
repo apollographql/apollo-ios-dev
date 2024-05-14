@@ -17,7 +17,7 @@ struct InterfaceTemplate: TemplateRenderer {
   ) -> TemplateString {
     """
     \(documentation: graphqlInterface.documentation, config: config)
-    static let \(graphqlInterface.formattedName) = Interface(name: "\(graphqlInterface.name)")
+    static let \(graphqlInterface.formattedName) = \(config.ApolloAPITargetName).Interface(name: "\(graphqlInterface.name)")
     """
   }
 }
