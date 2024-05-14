@@ -743,7 +743,7 @@ class InputObjectTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
-  func test__render__given_NullableField_WithDefault__generates_NullableParameter_NoInitializerDefault() throws {
+  func test__render__given_NullableField_WithDefault__generates_NullableParameter_InitializerNilDefault() throws {
     // given
     buildSubject(fields: [
       GraphQLInputField.mock("nullableWithDefault", type: .scalar(.integer()), defaultValue: .int(3))
@@ -751,7 +751,7 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nullableWithDefault: GraphQLNullable<Int>
+        nullableWithDefault: GraphQLNullable<Int> = nil
       ) {
         __data = InputDict([
           "nullableWithDefault": nullableWithDefault
@@ -793,7 +793,7 @@ class InputObjectTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
-  func test__render__given_NonNullableField_WithDefault__generates_OptionalParameter_NoInitializerDefault() throws {
+  func test__render__given_NonNullableField_WithDefault__generates_OptionalParameter_InitializerNilDefault() throws {
     // given
     buildSubject(fields: [
       GraphQLInputField.mock("nonNullableWithDefault", type: .nonNull(.scalar(.integer())), defaultValue: .int(3))
@@ -801,7 +801,7 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nonNullableWithDefault: Int?
+        nonNullableWithDefault: Int? = nil
       ) {
         __data = InputDict([
           "nonNullableWithDefault": nonNullableWithDefault
@@ -843,7 +843,7 @@ class InputObjectTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
-  func test__render__given_NullableList_NullableItem_WithDefault__generates_NullableParameter_OptionalItem_NoInitializerDefault() throws {
+  func test__render__given_NullableList_NullableItem_WithDefault__generates_NullableParameter_OptionalItem_InitializerNilDefault() throws {
     // given
     buildSubject(fields: [
       GraphQLInputField.mock("nullableListNullableItemWithDefault",
@@ -853,7 +853,7 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nullableListNullableItemWithDefault: GraphQLNullable<[String?]>
+        nullableListNullableItemWithDefault: GraphQLNullable<[String?]> = nil
       ) {
         __data = InputDict([
           "nullableListNullableItemWithDefault": nullableListNullableItemWithDefault
@@ -896,7 +896,7 @@ class InputObjectTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
-  func test__render__given_NullableList_NonNullableItem_WithDefault__generates_NullableParameter_NonOptionalItem_NoInitializerDefault() throws {
+  func test__render__given_NullableList_NonNullableItem_WithDefault__generates_NullableParameter_NonOptionalItem_InitializerNilDefault() throws {
     // given
     buildSubject(fields: [
       GraphQLInputField.mock("nullableListNonNullableItemWithDefault",
@@ -906,7 +906,7 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nullableListNonNullableItemWithDefault: GraphQLNullable<[String]>
+        nullableListNonNullableItemWithDefault: GraphQLNullable<[String]> = nil
       ) {
         __data = InputDict([
           "nullableListNonNullableItemWithDefault": nullableListNonNullableItemWithDefault
@@ -948,7 +948,7 @@ class InputObjectTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
-  func test__render__given_NonNullableList_NullableItem_WithDefault__generates_OptionalParameter_OptionalItem_NoInitializerDefault() throws {
+  func test__render__given_NonNullableList_NullableItem_WithDefault__generates_OptionalParameter_OptionalItem_InitializerNilDefault() throws {
     // given
     buildSubject(fields: [
       GraphQLInputField.mock("nonNullableListNullableItemWithDefault",
@@ -958,7 +958,7 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nonNullableListNullableItemWithDefault: [String?]?
+        nonNullableListNullableItemWithDefault: [String?]? = nil
       ) {
         __data = InputDict([
           "nonNullableListNullableItemWithDefault": nonNullableListNullableItemWithDefault
@@ -1000,7 +1000,7 @@ class InputObjectTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
-  func test__render__given_NonNullableList_NonNullableItem_WithDefault__generates_OptionalParameter_NonOptionalItem_NoInitializerDefault() throws {
+  func test__render__given_NonNullableList_NonNullableItem_WithDefault__generates_OptionalParameter_NonOptionalItem_InitializerNilDefault() throws {
     // given
     buildSubject(fields: [
       GraphQLInputField.mock("nonNullableListNonNullableItemWithDefault",
@@ -1010,7 +1010,7 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nonNullableListNonNullableItemWithDefault: [String]?
+        nonNullableListNonNullableItemWithDefault: [String]? = nil
       ) {
         __data = InputDict([
           "nonNullableListNonNullableItemWithDefault": nonNullableListNonNullableItemWithDefault
