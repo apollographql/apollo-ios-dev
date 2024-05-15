@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Designated initializer",
+      "text" : "Watches a query by first fetching an initial result from the server or from the local cache, depending on the current contents of the cache and the specified cache policy. After the initial fetch, the returned query watcher object will get notified whenever any of the data the query result depends on changes in the local cache, and calls the result handler again with the new result.",
       "type" : "text"
     }
   ],
@@ -9,42 +9,42 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/init(client:query:context:callbackQueue:resultHandler:)"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo19GraphQLQueryWatcherC6client5query7context13callbackQueue13resultHandlerACyxGAA0A14ClientProtocol_p_xAA14RequestContext_pSgSo17OS_dispatch_queueCys6ResultOyAA0B8QLResultVy4DataQzGs5Error_pGctcfc",
+    "extendedModule" : "Apollo",
+    "externalID" : "s:6Apollo0A6ClientC5watch5query11cachePolicy22refetchOnFailedUpdates7context13callbackQueue13resultHandlerAA19GraphQLQueryWatcherCyxGx_AA05CacheF0OSbAA14RequestContext_pSgSo17OS_dispatch_queueCys6ResultOyAA0P8QLResultVy4DataQzGs5Error_pGct0A3API0pQ0RzlF",
     "fragments" : [
       {
+        "kind" : "keyword",
+        "text" : "func"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
         "kind" : "identifier",
-        "text" : "init"
+        "text" : "watch"
       },
       {
         "kind" : "text",
-        "text" : "("
+        "text" : "<"
       },
       {
-        "kind" : "externalParam",
-        "text" : "client"
-      },
-      {
-        "kind" : "text",
-        "text" : ": any "
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo0A14ClientProtocolP",
-        "text" : "ApolloClientProtocol"
+        "kind" : "genericParameter",
+        "text" : "Query"
       },
       {
         "kind" : "text",
-        "text" : ", "
+        "text" : ">("
       },
       {
         "kind" : "externalParam",
@@ -57,6 +57,40 @@
       {
         "kind" : "typeIdentifier",
         "text" : "Query"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "cachePolicy"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+        "text" : "CachePolicy"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "refetchOnFailedUpdates"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:Sb",
+        "text" : "Bool"
       },
       {
         "kind" : "text",
@@ -128,7 +162,24 @@
       },
       {
         "kind" : "text",
-        "text" : ">)"
+        "text" : ">) -> "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC",
+        "text" : "GraphQLQueryWatcher"
+      },
+      {
+        "kind" : "text",
+        "text" : "<"
+      },
+      {
+        "kind" : "typeIdentifier",
+        "text" : "Query"
+      },
+      {
+        "kind" : "text",
+        "text" : ">"
       }
     ],
     "modules" : [
@@ -137,9 +188,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Initializer",
-    "symbolKind" : "init",
-    "title" : "init(client:query:context:callbackQueue:resultHandler:)"
+    "roleHeading" : "Instance Method",
+    "symbolKind" : "method",
+    "title" : "watch(query:cachePolicy:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)"
   },
   "primaryContentSections" : [
     {
@@ -154,29 +205,27 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "init"
+              "text" : "func"
             },
             {
               "kind" : "text",
-              "text" : "("
+              "text" : " "
             },
             {
-              "kind" : "externalParam",
-              "text" : "client"
-            },
-            {
-              "kind" : "text",
-              "text" : ": any "
-            },
-            {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol",
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo0A14ClientProtocolP",
-              "text" : "ApolloClientProtocol"
+              "kind" : "identifier",
+              "text" : "watch"
             },
             {
               "kind" : "text",
-              "text" : ", "
+              "text" : "<"
+            },
+            {
+              "kind" : "genericParameter",
+              "text" : "Query"
+            },
+            {
+              "kind" : "text",
+              "text" : ">("
             },
             {
               "kind" : "externalParam",
@@ -193,6 +242,41 @@
             {
               "kind" : "text",
               "text" : ", "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "cachePolicy"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+              "text" : "CachePolicy"
+            },
+            {
+              "kind" : "text",
+              "text" : " = .default, "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "refetchOnFailedUpdates"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:Sb",
+              "text" : "Bool"
+            },
+            {
+              "kind" : "text",
+              "text" : " = true, "
             },
             {
               "kind" : "externalParam",
@@ -270,7 +354,46 @@
             },
             {
               "kind" : "text",
-              "text" : ">)"
+              "text" : ">) -> "
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC",
+              "text" : "GraphQLQueryWatcher"
+            },
+            {
+              "kind" : "text",
+              "text" : "<"
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Query"
+            },
+            {
+              "kind" : "text",
+              "text" : "> "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "where"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Query"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI12GraphQLQueryP",
+              "text" : "GraphQLQuery"
             }
           ]
         }
@@ -285,21 +408,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "The client protocol to pass in.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "client"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The query to watch.",
+                  "text" : "The query to fetch.",
                   "type" : "text"
                 }
               ],
@@ -313,7 +422,51 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] A context that is being passed through the request chain. Defaults to ",
+                  "text" : "A cache policy that specifies when results should be fetched from the server or from the local cache.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "cachePolicy"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Should the watcher perform a network fetch when it’s watched",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "objects have changed, but reloading them from the cache fails. Should default to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "true",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "refetchOnFailedUpdates"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "[optional] A context that is being passed through the request chain. Should default to ",
                   "type" : "text"
                 },
                 {
@@ -335,7 +488,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "The queue for the result handler. Defaults to the main queue.",
+                  "text" : "A dispatch queue on which the result handler will be called. Should default to the main queue.",
                   "type" : "text"
                 }
               ],
@@ -349,7 +502,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "The result handler to call with changes.",
+                  "text" : "[optional] A closure that is called when query results are available or when an error occurs.",
                   "type" : "text"
                 }
               ],
@@ -359,6 +512,26 @@
           "name" : "resultHandler"
         }
       ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A query watcher object that can be used to control the watching behavior.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -372,7 +545,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/graphqlquerywatcher\/init(client:query:context:callbackqueue:resulthandler:)"
+        "\/documentation\/apollo\/apolloclient\/watch(query:cachepolicy:refetchonfailedupdates:context:callbackqueue:resulthandler:)"
       ],
       "traits" : [
         {
@@ -397,10 +570,18 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/ApolloClientProtocol": {
+"doc://Apollo/documentation/Apollo/ApolloClient": {
   "abstract" : [
     {
       "text" : "The ",
+      "type" : "text"
+    },
+    {
+      "code" : "ApolloClient",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " class implements the core API for Apollo by conforming to ",
       "type" : "text"
     },
     {
@@ -408,49 +589,7 @@
       "type" : "codeVoice"
     },
     {
-      "text" : " provides the core API for Apollo. This API provides methods to fetch and watch queries, and to perform mutations.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "protocol"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "ApolloClientProtocol"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "ApolloClientProtocol"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "ApolloClientProtocol",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclientprotocol"
-},
-"doc://Apollo/documentation/Apollo/GraphQLQueryWatcher": {
-  "abstract" : [
-    {
-      "text" : "A ",
-      "type" : "text"
-    },
-    {
-      "code" : "GraphQLQueryWatcher",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " is responsible for watching the store, and calling the result handler with a new result whenever any of the data the previous result depends on changes.",
+      "text" : ".",
       "type" : "text"
     }
   ],
@@ -465,54 +604,53 @@
     },
     {
       "kind" : "identifier",
-      "text" : "GraphQLQueryWatcher"
+      "text" : "ApolloClient"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "GraphQLQueryWatcher"
+      "text" : "ApolloClient"
     }
   ],
   "role" : "symbol",
-  "title" : "GraphQLQueryWatcher",
+  "title" : "ApolloClient",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlquerywatcher"
+  "url" : "\/documentation\/apollo\/apolloclient"
 },
-"doc://Apollo/documentation/Apollo/GraphQLQueryWatcher/init(client:query:context:callbackQueue:resultHandler:)": {
+"doc://Apollo/documentation/Apollo/ApolloClient/watch(query:cachePolicy:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)": {
   "abstract" : [
     {
-      "text" : "Designated initializer",
+      "text" : "Watches a query by first fetching an initial result from the server or from the local cache, depending on the current contents of the cache and the specified cache policy. After the initial fetch, the returned query watcher object will get notified whenever any of the data the query result depends on changes in the local cache, and calls the result handler again with the new result.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
       "kind" : "identifier",
-      "text" : "init"
+      "text" : "watch"
     },
     {
       "kind" : "text",
-      "text" : "("
+      "text" : "<"
     },
     {
-      "kind" : "externalParam",
-      "text" : "client"
-    },
-    {
-      "kind" : "text",
-      "text" : ": any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo0A14ClientProtocolP",
-      "text" : "ApolloClientProtocol"
+      "kind" : "genericParameter",
+      "text" : "Query"
     },
     {
       "kind" : "text",
-      "text" : ", "
+      "text" : ">("
     },
     {
       "kind" : "externalParam",
@@ -525,6 +663,40 @@
     {
       "kind" : "typeIdentifier",
       "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "cachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+      "text" : "CachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "refetchOnFailedUpdates"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
     },
     {
       "kind" : "text",
@@ -596,15 +768,108 @@
     },
     {
       "kind" : "text",
-      "text" : ">)"
+      "text" : ">) -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC",
+      "text" : "GraphQLQueryWatcher"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/init(client:query:context:callbackQueue:resultHandler:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(client:query:context:callbackQueue:resultHandler:)",
+  "title" : "watch(query:cachePolicy:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlquerywatcher\/init(client:query:context:callbackqueue:resulthandler:)"
+  "url" : "\/documentation\/apollo\/apolloclient\/watch(query:cachepolicy:refetchonfailedupdates:context:callbackqueue:resulthandler:)"
+},
+"doc://Apollo/documentation/Apollo/CachePolicy": {
+  "abstract" : [
+    {
+      "text" : "A cache policy that specifies whether results should be fetched from the server or loaded from the local cache.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "CachePolicy"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "CachePolicy"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "CachePolicy",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cachepolicy"
+},
+"doc://Apollo/documentation/Apollo/GraphQLQueryWatcher": {
+  "abstract" : [
+    {
+      "text" : "A ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLQueryWatcher",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " is responsible for watching the store, and calling the result handler with a new result whenever any of the data the previous result depends on changes.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLQueryWatcher"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLQueryWatcher"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "GraphQLQueryWatcher",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlquerywatcher"
 },
 "doc://Apollo/documentation/Apollo/GraphQLResultHandler": {
   "abstract" : [
