@@ -1,5 +1,5 @@
 import XCTest
-@testable import Apollo
+@_spi(Execution) @testable import Apollo
 import ApolloInternalTestHelpers
 
 private struct TestError: Error {}
