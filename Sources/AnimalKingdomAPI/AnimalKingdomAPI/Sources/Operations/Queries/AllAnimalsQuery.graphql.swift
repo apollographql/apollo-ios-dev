@@ -7,7 +7,7 @@ public class AllAnimalsQuery: GraphQLQuery {
   public static let operationName: String = "AllAnimalsQuery"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
-      #"query AllAnimalsQuery { allAnimals { __typename height { __typename feet inches } ...HeightInMeters ...WarmBloodedDetails species skinCovering ... on Pet { ...PetDetails ...WarmBloodedDetails ... on Animal { height { __typename relativeSize centimeters } } } ... on Cat { isJellicle } ... on ClassroomPet { ... on Bird { wingspan } } ... on Dog { favoriteToy birthdate } predators { __typename species ... on WarmBlooded { predators { __typename species } ...WarmBloodedDetails laysEggs } } } }"#,
+      #"query AllAnimalsQuery { allAnimals { __typename id height { __typename feet inches } ...HeightInMeters ...WarmBloodedDetails species skinCovering ... on Pet { ...PetDetails ...WarmBloodedDetails ... on Animal { height { __typename relativeSize centimeters } } } ... on Cat { isJellicle } ... on ClassroomPet { ... on Bird { wingspan } } ... on Dog { favoriteToy birthdate } predators { __typename species ... on WarmBlooded { predators { __typename species } ...WarmBloodedDetails laysEggs } } } }"#,
       fragments: [HeightInMeters.self, PetDetails.self, WarmBloodedDetails.self]
     ))
 
@@ -48,6 +48,7 @@ public class AllAnimalsQuery: GraphQLQuery {
       public static var __parentType: ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
+        .field("id", AnimalKingdomAPI.ID.self),
         .field("height", Height.self),
         .field("species", String.self),
         .field("skinCovering", GraphQLEnum<AnimalKingdomAPI.SkinCovering>?.self),
@@ -60,6 +61,7 @@ public class AllAnimalsQuery: GraphQLQuery {
         .fragment(HeightInMeters.self),
       ] }
 
+      public var id: AnimalKingdomAPI.ID { __data["id"] }
       public var height: Height { __data["height"] }
       public var species: String { __data["species"] }
       public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
@@ -80,6 +82,7 @@ public class AllAnimalsQuery: GraphQLQuery {
 
       public init(
         __typename: String,
+        id: AnimalKingdomAPI.ID,
         height: Height,
         species: String,
         skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
@@ -88,6 +91,7 @@ public class AllAnimalsQuery: GraphQLQuery {
         self.init(_dataDict: DataDict(
           data: [
             "__typename": __typename,
+            "id": id,
             "height": height._fieldData,
             "species": species,
             "skinCovering": skinCovering,
@@ -273,6 +277,7 @@ public class AllAnimalsQuery: GraphQLQuery {
           .fragment(WarmBloodedDetails.self),
         ] }
 
+        public var id: AnimalKingdomAPI.ID { __data["id"] }
         public var height: Height { __data["height"] }
         public var species: String { __data["species"] }
         public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
@@ -289,6 +294,7 @@ public class AllAnimalsQuery: GraphQLQuery {
 
         public init(
           __typename: String,
+          id: AnimalKingdomAPI.ID,
           height: Height,
           species: String,
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
@@ -298,6 +304,7 @@ public class AllAnimalsQuery: GraphQLQuery {
           self.init(_dataDict: DataDict(
             data: [
               "__typename": __typename,
+              "id": id,
               "height": height._fieldData,
               "species": species,
               "skinCovering": skinCovering,
@@ -364,6 +371,7 @@ public class AllAnimalsQuery: GraphQLQuery {
         ] }
 
         public var height: Height { __data["height"] }
+        public var id: AnimalKingdomAPI.ID { __data["id"] }
         public var species: String { __data["species"] }
         public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
         public var predators: [Predator] { __data["predators"] }
@@ -384,6 +392,7 @@ public class AllAnimalsQuery: GraphQLQuery {
         public init(
           __typename: String,
           height: Height,
+          id: AnimalKingdomAPI.ID,
           species: String,
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
           predators: [Predator],
@@ -395,6 +404,7 @@ public class AllAnimalsQuery: GraphQLQuery {
             data: [
               "__typename": __typename,
               "height": height._fieldData,
+              "id": id,
               "species": species,
               "skinCovering": skinCovering,
               "predators": predators._fieldData,
@@ -470,6 +480,7 @@ public class AllAnimalsQuery: GraphQLQuery {
             .fragment(WarmBloodedDetails.self),
           ] }
 
+          public var id: AnimalKingdomAPI.ID { __data["id"] }
           public var height: Height { __data["height"] }
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
@@ -490,6 +501,7 @@ public class AllAnimalsQuery: GraphQLQuery {
 
           public init(
             __typename: String,
+            id: AnimalKingdomAPI.ID,
             height: Height,
             species: String,
             skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
@@ -502,6 +514,7 @@ public class AllAnimalsQuery: GraphQLQuery {
             self.init(_dataDict: DataDict(
               data: [
                 "__typename": __typename,
+                "id": id,
                 "height": height._fieldData,
                 "species": species,
                 "skinCovering": skinCovering,
@@ -581,6 +594,7 @@ public class AllAnimalsQuery: GraphQLQuery {
         ] }
 
         public var isJellicle: Bool { __data["isJellicle"] }
+        public var id: AnimalKingdomAPI.ID { __data["id"] }
         public var height: Height { __data["height"] }
         public var species: String { __data["species"] }
         public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
@@ -601,6 +615,7 @@ public class AllAnimalsQuery: GraphQLQuery {
 
         public init(
           isJellicle: Bool,
+          id: AnimalKingdomAPI.ID,
           height: Height,
           species: String,
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
@@ -614,6 +629,7 @@ public class AllAnimalsQuery: GraphQLQuery {
             data: [
               "__typename": AnimalKingdomAPI.Objects.Cat.typename,
               "isJellicle": isJellicle,
+              "id": id,
               "height": height._fieldData,
               "species": species,
               "skinCovering": skinCovering,
@@ -693,6 +709,7 @@ public class AllAnimalsQuery: GraphQLQuery {
           .inlineFragment(AsBird.self),
         ] }
 
+        public var id: AnimalKingdomAPI.ID { __data["id"] }
         public var height: Height { __data["height"] }
         public var species: String { __data["species"] }
         public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
@@ -709,6 +726,7 @@ public class AllAnimalsQuery: GraphQLQuery {
 
         public init(
           __typename: String,
+          id: AnimalKingdomAPI.ID,
           height: Height,
           species: String,
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
@@ -717,6 +735,7 @@ public class AllAnimalsQuery: GraphQLQuery {
           self.init(_dataDict: DataDict(
             data: [
               "__typename": __typename,
+              "id": id,
               "height": height._fieldData,
               "species": species,
               "skinCovering": skinCovering,
@@ -778,6 +797,7 @@ public class AllAnimalsQuery: GraphQLQuery {
           ] }
 
           public var wingspan: Double { __data["wingspan"] }
+          public var id: AnimalKingdomAPI.ID { __data["id"] }
           public var height: Height { __data["height"] }
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
@@ -798,6 +818,7 @@ public class AllAnimalsQuery: GraphQLQuery {
 
           public init(
             wingspan: Double,
+            id: AnimalKingdomAPI.ID,
             height: Height,
             species: String,
             skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
@@ -811,6 +832,7 @@ public class AllAnimalsQuery: GraphQLQuery {
               data: [
                 "__typename": AnimalKingdomAPI.Objects.Bird.typename,
                 "wingspan": wingspan,
+                "id": id,
                 "height": height._fieldData,
                 "species": species,
                 "skinCovering": skinCovering,
@@ -895,6 +917,7 @@ public class AllAnimalsQuery: GraphQLQuery {
 
         public var favoriteToy: String { __data["favoriteToy"] }
         public var birthdate: AnimalKingdomAPI.CustomDate? { __data["birthdate"] }
+        public var id: AnimalKingdomAPI.ID { __data["id"] }
         public var height: Height { __data["height"] }
         public var species: String { __data["species"] }
         public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
@@ -915,6 +938,7 @@ public class AllAnimalsQuery: GraphQLQuery {
         public init(
           favoriteToy: String,
           birthdate: AnimalKingdomAPI.CustomDate? = nil,
+          id: AnimalKingdomAPI.ID,
           height: Height,
           species: String,
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
@@ -928,6 +952,7 @@ public class AllAnimalsQuery: GraphQLQuery {
               "__typename": AnimalKingdomAPI.Objects.Dog.typename,
               "favoriteToy": favoriteToy,
               "birthdate": birthdate,
+              "id": id,
               "height": height._fieldData,
               "species": species,
               "skinCovering": skinCovering,

@@ -4,5 +4,5 @@
 import ApolloAPI
 
 public extension Interfaces {
-  static let Pet = Interface(name: "Pet")
+  static let Pet = ApolloAPI.Interface(name: "Pet")
 }
