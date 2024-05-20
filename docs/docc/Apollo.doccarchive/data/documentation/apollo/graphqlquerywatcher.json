@@ -185,13 +185,14 @@
   "topicSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/init(client:query:context:callbackQueue:resultHandler:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/init(client:query:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)"
       ],
       "title" : "Initializers"
     },
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/query"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/query",
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/refetchOnFailedUpdates"
       ],
       "title" : "Instance Properties"
     },
@@ -398,7 +399,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlquerywatcher\/cancel()"
 },
-"doc://Apollo/documentation/Apollo/GraphQLQueryWatcher/init(client:query:context:callbackQueue:resultHandler:)": {
+"doc://Apollo/documentation/Apollo/GraphQLQueryWatcher/init(client:query:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)": {
   "abstract" : [
     {
       "text" : "Designated initializer",
@@ -442,6 +443,23 @@
     {
       "kind" : "typeIdentifier",
       "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "refetchOnFailedUpdates"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
     },
     {
       "kind" : "text",
@@ -516,12 +534,12 @@
       "text" : ">)"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/init(client:query:context:callbackQueue:resultHandler:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/init(client:query:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(client:query:context:callbackQueue:resultHandler:)",
+  "title" : "init(client:query:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlquerywatcher\/init(client:query:context:callbackqueue:resulthandler:)"
+  "url" : "\/documentation\/apollo\/graphqlquerywatcher\/init(client:query:refetchonfailedupdates:context:callbackqueue:resulthandler:)"
 },
 "doc://Apollo/documentation/Apollo/GraphQLQueryWatcher/query": {
   "abstract" : [
@@ -604,6 +622,59 @@
   "title" : "refetch(cachePolicy:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlquerywatcher\/refetch(cachepolicy:)"
+},
+"doc://Apollo/documentation/Apollo/GraphQLQueryWatcher/refetchOnFailedUpdates": {
+  "abstract" : [
+    {
+      "text" : "Determines if the watcher should perform a network fetch when it’s watched objects have",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "changed, but reloading them from the cache fails. Defaults to ",
+      "type" : "text"
+    },
+    {
+      "code" : "true",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "refetchOnFailedUpdates"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/refetchOnFailedUpdates",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "refetchOnFailedUpdates",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlquerywatcher\/refetchonfailedupdates"
 },
 "doc://Apollo/documentation/Apollo/GraphQLQueryWatcher/store(_:didChangeKeys:contextIdentifier:)": {
   "abstract" : [
