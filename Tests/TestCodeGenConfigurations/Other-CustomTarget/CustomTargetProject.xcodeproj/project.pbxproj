@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		665BDA882AE30E9D004DD21F /* Object.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665BDA872AE30E9D004DD21F /* Object.swift */; };
 		DE454BCC28B43262009DC80E /* CustomTargetProject.h in Headers */ = {isa = PBXBuildFile; fileRef = DE454BCB28B43262009DC80E /* CustomTargetProject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DE4790B22BFBDA8500939CCC /* ID.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790B12BFBDA8400939CCC /* ID.swift */; };
 		E6BACC1C29FC909F008B46F2 /* AnimalKingdomAPI.h in Headers */ = {isa = PBXBuildFile; fileRef = E6BACC1B29FC909F008B46F2 /* AnimalKingdomAPI.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E6BACC2129FC90CC008B46F2 /* ApolloAPI in Frameworks */ = {isa = PBXBuildFile; productRef = E6BACC2029FC90CC008B46F2 /* ApolloAPI */; };
 		E6BACC5729FC9468008B46F2 /* PetDetailsMutation.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6BACC2329FC9468008B46F2 /* PetDetailsMutation.graphql.swift */; };
@@ -105,6 +106,7 @@
 		665BDA872AE30E9D004DD21F /* Object.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Object.swift; sourceTree = "<group>"; };
 		DE454BC928B43262009DC80E /* CustomTargetProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CustomTargetProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE454BCB28B43262009DC80E /* CustomTargetProject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomTargetProject.h; sourceTree = "<group>"; };
+		DE4790B12BFBDA8400939CCC /* ID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ID.swift; sourceTree = "<group>"; };
 		E6BACC1329FC8C8B008B46F2 /* apollo-codegen-config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "apollo-codegen-config.json"; sourceTree = "<group>"; };
 		E6BACC1929FC909F008B46F2 /* AnimalKingdomAPI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AnimalKingdomAPI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6BACC1B29FC909F008B46F2 /* AnimalKingdomAPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimalKingdomAPI.h; sourceTree = "<group>"; };
@@ -287,6 +289,7 @@
 			isa = PBXGroup;
 			children = (
 				665BDA872AE30E9D004DD21F /* Object.swift */,
+				DE4790B12BFBDA8400939CCC /* ID.swift */,
 				E6BACC2A29FC9468008B46F2 /* CustomDate.swift */,
 			);
 			path = CustomScalars;
@@ -579,6 +582,7 @@
 				E6BACC5E29FC9468008B46F2 /* Rat.graphql.swift in Sources */,
 				E6BACC6129FC9468008B46F2 /* Dog.graphql.swift in Sources */,
 				E6BACC5C29FC9468008B46F2 /* SkinCovering.graphql.swift in Sources */,
+				DE4790B22BFBDA8500939CCC /* ID.swift in Sources */,
 				E6BACC6D29FC9468008B46F2 /* SchemaMetadata.graphql.swift in Sources */,
 				E6BACC6A29FC9468008B46F2 /* PetAdoptionInput.graphql.swift in Sources */,
 				665BDA882AE30E9D004DD21F /* Object.swift in Sources */,
