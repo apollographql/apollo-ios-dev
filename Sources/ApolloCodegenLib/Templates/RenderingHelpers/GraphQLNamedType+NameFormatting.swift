@@ -26,7 +26,8 @@ extension GraphQLScalarType {
   }
 
   override var formattedName: String {
-    if !isCustomScalar {
+    // ID should be suffixed if it's used as the name for any type other than built-in scalar ID.
+    if !isCustomScalar || name == "ID" {
       return swiftName
     }
 
