@@ -1,10 +1,11 @@
 import Foundation
 import IR
+import GraphQLCompiler
 import TemplateString
 
 struct MockObjectTemplate: TemplateRenderer {
   /// IR representation of source [GraphQL Object](https://spec.graphql.org/draft/#sec-Objects).
-  let irObject: IR.ObjectType
+  let graphqlObject: GraphQLObjectType
 
   let fields: [(String, GraphQLType, deprecationReason: String?)]
 
@@ -26,7 +27,7 @@ struct MockObjectTemplate: TemplateRenderer {
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
-    let objectName = irObject.render(as: .typename, config: config)
+    let objectName = graphqlObject.render(as: .typename)
     let fields: [TemplateField] = fields
       .sorted { $0.0 < $1.0 }
       .map {
@@ -127,7 +128,7 @@ struct MockObjectTemplate: TemplateRenderer {
         case is GraphQLInterfaceType, is GraphQLUnionType:
           mockType = "AnyMock"
         default:
-          mockType = "Mock<\(graphQLCompositeType.formattedName)>"
+          mockType = "Mock<\(graphQLCompositeType.render(as: .typename))>"
         }
         return TemplateString("\(mockType)\(if: !forceNonNull, "?")").description
       case .scalar,

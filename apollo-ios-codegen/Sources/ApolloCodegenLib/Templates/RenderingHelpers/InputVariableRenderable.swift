@@ -31,8 +31,11 @@ extension InputVariableRenderable {
     case let .int(int): return TemplateString(int.description)
     case let .float(float): return TemplateString(float.description)
     case let .enum(enumValue):
-      let name = GraphQLEnumValue.Name(value: enumValue)
-      return ".init(.\(name.rendered(as: .swiftEnumCase, config: config)))"
+      let enumCase = GraphQLEnumValue(
+        name: GraphQLName(schemaName: enumValue),
+        documentation: nil,
+        deprecationReason: nil)
+      return ".init(.\(enumCase.render(as: .enumCase, config: config)))"
     case let .list(list):
       switch type {
       case let .nonNull(.list(listInnerType)),
@@ -85,7 +88,7 @@ fileprivate extension GraphQLInputObjectType {
     }
 
     return """
-    \(if: !config.output.operations.isInModule, "\(config.schemaNamespace.firstUppercased).")\(name)(\(list: entries))
+    \(if: !config.output.operations.isInModule, "\(config.schemaNamespace.firstUppercased).")\(render(as: .typename))(\(list: entries))
     """
   }
 }

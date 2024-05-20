@@ -20,8 +20,8 @@ protocol GraphQLSchemaType: JavaScriptReferencedObject {
 }
 
 public class GraphQLNamedType: 
-  JavaScriptReferencedObject, @unchecked Sendable, Hashable, CustomDebugStringConvertible {
-  public let name: String
+  JavaScriptReferencedObject, @unchecked Sendable, Hashable, CustomDebugStringConvertible, GraphQLNamedItem {
+  public let name: GraphQLName
 
   public let documentation: String?
 
@@ -29,7 +29,7 @@ public class GraphQLNamedType:
     _ jsValue: JSValue,
     bridge: isolated JavaScriptBridge
   ) {
-    self.name = jsValue["name"]
+    self.name = .init(schemaName: jsValue["name"])
     self.documentation = jsValue["description"]
   }
 
@@ -37,7 +37,7 @@ public class GraphQLNamedType:
 
   /// Initializer to be used for creating mock objects in tests only.
   init(
-    name: String,
+    name: GraphQLName,
     documentation: String?
   ) {
     self.name = name
@@ -60,7 +60,7 @@ public class GraphQLNamedType:
   }
 
   public var debugDescription: String {
-    name
+    name.schemaName
   }
 }
 
@@ -71,7 +71,7 @@ public final class GraphQLScalarType: GraphQLNamedType {
   public var isCustomScalar: Bool {
     guard self.specifiedByURL == nil else { return true }
 
-    switch name {
+    switch name.schemaName {
     case "String", "Int", "Float", "Boolean", "ID":
       return false
     default:
@@ -86,7 +86,7 @@ public final class GraphQLScalarType: GraphQLNamedType {
 
   /// Initializer to be used for creating mock objects in tests only.
   init(
-    name: String,
+    name: GraphQLName,
     documentation: String?,
     specifiedByURL: String?
   ) {
@@ -109,7 +109,7 @@ public final class GraphQLEnumType: GraphQLNamedType {
 
   /// Initializer to be used for creating mock objects in tests only.
   init(
-    name: String,
+    name: GraphQLName,
     documentation: String?,
     values: [GraphQLEnumValue]
   ) {
@@ -118,17 +118,9 @@ public final class GraphQLEnumType: GraphQLNamedType {
   }
 }
 
-public struct GraphQLEnumValue: JavaScriptObjectDecodable {
+public struct GraphQLEnumValue: JavaScriptObjectDecodable, GraphQLNamedItem {
 
-  public struct Name {
-    public let value: String
-
-    public init(value: String) {
-      self.value = value
-    }
-  }
-
-  public let name: Name
+  public let name: GraphQLName
 
   public let documentation: String?
 
@@ -136,8 +128,8 @@ public struct GraphQLEnumValue: JavaScriptObjectDecodable {
 
   public var isDeprecated: Bool { deprecationReason != nil }
 
-  init(
-    name: Name,
+  public init(
+    name: GraphQLName,
     documentation: String?,
     deprecationReason: String?
   ) {
@@ -151,7 +143,7 @@ public struct GraphQLEnumValue: JavaScriptObjectDecodable {
     bridge: isolated JavaScriptBridge
   ) -> GraphQLEnumValue {
     self.init(
-      name: .init(value: jsValue["name"]),
+      name: .init(schemaName: jsValue["name"]),
       documentation: jsValue["description"],
       deprecationReason: jsValue["deprecationReason"]
     )
@@ -173,7 +165,7 @@ public final class GraphQLInputObjectType: GraphQLNamedType {
 
   /// Initializer to be used for creating mock objects in tests only.
   init(
-    name: String,
+    name: GraphQLName,
     documentation: String?,
     fields: GraphQLInputFieldDictionary
   ) {
@@ -182,8 +174,8 @@ public final class GraphQLInputObjectType: GraphQLNamedType {
   }
 }
 
-public struct GraphQLInputField: JavaScriptObjectDecodable {
-  public let name: String
+public struct GraphQLInputField: JavaScriptObjectDecodable, GraphQLNamedItem {
+  public let name: GraphQLName
 
   public let type: GraphQLType
 
@@ -198,7 +190,7 @@ public struct GraphQLInputField: JavaScriptObjectDecodable {
     bridge: isolated JavaScriptBridge
   ) -> GraphQLInputField {
     self.init(
-      name: jsValue["name"],
+      name: .init(schemaName: jsValue["name"]),
       type: GraphQLType.fromJSValue(jsValue["type"], bridge: bridge),
       documentation: jsValue["description"],
       deprecationReason: jsValue["deprecationReason"],
@@ -207,7 +199,7 @@ public struct GraphQLInputField: JavaScriptObjectDecodable {
   }
 
   init(
-    name: String,
+    name: GraphQLName,
     type: GraphQLType,
     documentation: String?,
     deprecationReason: String?,
@@ -245,7 +237,7 @@ public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImpl
 
   /// Initializer to be used for creating mock objects in tests only.
   init(
-    name: String,
+    name: GraphQLName,
     documentation: String?,
     fields: [String: GraphQLField],
     interfaces: [GraphQLInterfaceType]
@@ -280,7 +272,7 @@ public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceIm
 
   /// Initializer to be used for creating mock objects in tests only.
   init(
-    name: String,
+    name: GraphQLName,
     documentation: String?,
     fields: [String: GraphQLField],
     interfaces: [GraphQLInterfaceType]
@@ -314,7 +306,7 @@ public final class GraphQLUnionType: GraphQLAbstractType {
 
   /// Initializer to be used for creating mock objects in tests only.
   init(
-    name: String,
+    name: GraphQLName,
     documentation: String?,
     types: [GraphQLObjectType]
   ) {

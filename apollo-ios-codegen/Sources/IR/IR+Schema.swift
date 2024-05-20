@@ -16,70 +16,51 @@ public final class Schema {
   }
 
   public final class ReferencedTypes: CustomDebugStringConvertible {
-    public let allTypes: OrderedSet<NamedType>
+    public let allTypes: OrderedSet<GraphQLNamedType>
     public let schemaRootTypes: CompilationResult.RootTypeDefinition
 
-    public let objects: OrderedSet<ObjectType>
-    public let interfaces: OrderedSet<InterfaceType>
-    public let unions: OrderedSet<UnionType>
-    public let scalars: OrderedSet<ScalarType>
-    public let customScalars: OrderedSet<ScalarType>
-    public let enums: OrderedSet<EnumType>
-    public let inputObjects: OrderedSet<InputObjectType>
+    public let objects: OrderedSet<GraphQLObjectType>
+    public let interfaces: OrderedSet<GraphQLInterfaceType>
+    public let unions: OrderedSet<GraphQLUnionType>
+    public let scalars: OrderedSet<GraphQLScalarType>
+    public let customScalars: OrderedSet<GraphQLScalarType>
+    public let enums: OrderedSet<GraphQLEnumType>
+    public let inputObjects: OrderedSet<GraphQLInputObjectType>
 
-    private let typeToUnionMap: [ObjectType: Set<UnionType>]
+    private let typeToUnionMap: [GraphQLObjectType: Set<GraphQLUnionType>]
 
     init(
       _ types: [GraphQLNamedType],
       schemaRootTypes: CompilationResult.RootTypeDefinition
     ) {
-//      self.allTypes = OrderedSet(types.map { NamedType($0) })
+      self.allTypes = OrderedSet(types)
       self.schemaRootTypes = schemaRootTypes
 
-      var allTypes = OrderedSet<NamedType>()
-      var objects = OrderedSet<ObjectType>()
-      var interfaces = OrderedSet<InterfaceType>()
-      var unions = OrderedSet<UnionType>()
-      var scalars = OrderedSet<ScalarType>()
-      var customScalars = OrderedSet<ScalarType>()
-      var enums = OrderedSet<EnumType>()
-      var inputObjects = OrderedSet<InputObjectType>()
+      var objects = OrderedSet<GraphQLObjectType>()
+      var interfaces = OrderedSet<GraphQLInterfaceType>()
+      var unions = OrderedSet<GraphQLUnionType>()
+      var scalars = OrderedSet<GraphQLScalarType>()
+      var customScalars = OrderedSet<GraphQLScalarType>()
+      var enums = OrderedSet<GraphQLEnumType>()
+      var inputObjects = OrderedSet<GraphQLInputObjectType>()
 
-      for type in types {
+      for type in allTypes {
         switch type {
-        case let type as GraphQLObjectType: 
-          let irObject = ObjectType(type)
-          objects.append(irObject)
-          allTypes.append(irObject)
-        case let type as GraphQLInterfaceType:
-          let irInterace = InterfaceType(type)
-          interfaces.append(irInterace)
-          allTypes.append(irInterace)
-        case let type as GraphQLUnionType:
-          let irUnion = UnionType(type)
-          unions.append(irUnion)
-          allTypes.append(irUnion)
+        case let type as GraphQLObjectType: objects.append(type)
+        case let type as GraphQLInterfaceType: interfaces.append(type)
+        case let type as GraphQLUnionType: unions.append(type)
         case let type as GraphQLScalarType:
-          let irScalar = ScalarType(type)
           if type.isCustomScalar {
-            customScalars.append(irScalar)
+            customScalars.append(type)
           } else {
-            scalars.append(irScalar)
+            scalars.append(type)
           }
-          allTypes.append(irScalar)
-        case let type as GraphQLEnumType:
-          let irEnum = EnumType(type)
-          enums.append(irEnum)
-          allTypes.append(irEnum)
-        case let type as GraphQLInputObjectType:
-          let irInputObject = InputObjectType(type)
-          inputObjects.append(irInputObject)
-          allTypes.append(irInputObject)
+        case let type as GraphQLEnumType: enums.append(type)
+        case let type as GraphQLInputObjectType: inputObjects.append(type)
         default: continue
         }
       }
 
-      self.allTypes = allTypes
       self.objects = objects
       self.interfaces = interfaces
       self.unions = unions
@@ -87,33 +68,15 @@ public final class Schema {
       self.customScalars = customScalars
       self.enums = enums
       self.inputObjects = inputObjects
-      
-      for objType in self.objects {
-        for graphqlInterface in objType.graphqlObjectType.interfaces {
-          if let irInterface = self.interfaces.first(where: { $0.graphqlInterfaceType == graphqlInterface }) {
-            objType.interfaces.append(irInterface)
-          }
-        }
-      }
-      
-      for unionType in self.unions {
-        for graphqlObject in unionType.graphqlUnionType.types {
-          if let irObject = self.objects.first(where: { $0.graphqlObjectType == graphqlObject }) {
-            unionType.types.append(irObject)
-          }
-        }
-      }
 
-      var typeToUnionMap: [ObjectType: Set<UnionType>] = [:]
+      var typeToUnionMap: [GraphQLObjectType: Set<GraphQLUnionType>] = [:]
       objects.forEach { type in
-        typeToUnionMap[type] = Set(unions.filter {
-          $0.types.contains(type)
-        })
+        typeToUnionMap[type] = Set(unions.filter { $0.types.contains(type) })
       }
       self.typeToUnionMap = typeToUnionMap
     }
 
-    public func unions(including type: ObjectType) -> Set<UnionType> {
+    public func unions(including type: GraphQLObjectType) -> Set<GraphQLUnionType> {
       typeToUnionMap[type].unsafelyUnwrapped
     }
 

@@ -307,7 +307,7 @@ class RootFieldBuilder {
 
     let inclusionConditions = inclusionResult.conditions
 
-    if field.type.namedType is CompositeType {
+    if field.type.namedType is GraphQLCompositeType {
       let irSelectionSet = await buildSelectionSet(
         forField: field,
         with: inclusionConditions,
@@ -453,7 +453,7 @@ class RootFieldBuilder {
 // MARK: - Helpers
 
 fileprivate protocol ConditionallyIncludable {
-  var parentType: CompositeType { get }
+  var parentType: GraphQLCompositeType { get }
   var inclusionConditions: [CompilationResult.InclusionCondition]? { get }
 }
 

@@ -1,10 +1,10 @@
 import Foundation
 
-public protocol NamedItem {
-  var name: Name { get }
+public protocol GraphQLNamedItem {
+  var name: GraphQLName { get }
 }
 
-public class Name: Hashable {
+public class GraphQLName: Hashable {
   public let schemaName: String
   
   public let typenameSuffix: String
@@ -33,17 +33,8 @@ public class Name: Hashable {
     hasher.combine(schemaName)
   }
   
-  public static func == (lhs: Name, rhs: Name) -> Bool {
+  public static func == (lhs: GraphQLName, rhs: GraphQLName) -> Bool {
     return lhs.schemaName == rhs.schemaName
-  }
-  
-  // MARK: - Render Context
-  
-  public enum RenderContext {
-    case enumCase
-    case enumRawValue
-    case filename
-    case typename
   }
   
 }

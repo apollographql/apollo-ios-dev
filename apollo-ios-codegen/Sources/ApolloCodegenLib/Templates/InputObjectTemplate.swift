@@ -1,12 +1,12 @@
 import Foundation
-import IR
+import GraphQLCompiler
 import TemplateString
 
 /// Provides the format to convert a [GraphQL Input Object](https://spec.graphql.org/draft/#sec-Input-Objects)
 /// into Swift code.
 struct InputObjectTemplate: TemplateRenderer {
   /// IR representation of source [GraphQL Input Object](https://spec.graphql.org/draft/#sec-Input-Objects).
-  let irInputObject: IR.InputObjectType
+  let graphqlInputObject: GraphQLInputObjectType
 
   let config: ApolloCodegen.ConfigurationContext
 
@@ -15,14 +15,14 @@ struct InputObjectTemplate: TemplateRenderer {
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
-    let (validFields, deprecatedFields) = filterFields(irInputObject.fields)
+    let (validFields, deprecatedFields) = filterFields(graphqlInputObject.fields)
     let memberAccessControl = accessControlModifier(for: .member)
 
     return TemplateString(
     """
-    \(documentation: irInputObject.documentation, config: config)
+    \(documentation: graphqlInputObject.documentation, config: config)
     \(accessControlModifier(for: .parent))\
-    struct \(irInputObject.render(as: .typename, config: config)): InputObject {
+    struct \(graphqlInputObject.render(as: .typename)): InputObject {
       \(memberAccessControl)private(set) var __data: InputDict
     
       \(memberAccessControl)init(_ data: InputDict) {
@@ -44,14 +44,14 @@ struct InputObjectTemplate: TemplateRenderer {
       @available(*, deprecated, message: "\(deprecatedMessage(for: deprecatedFields))")
       """)
       \(memberAccessControl)init(
-        \(InitializerParametersTemplate(irInputObject.fields))
+        \(InitializerParametersTemplate(graphqlInputObject.fields))
       ) {
         __data = InputDict([
-          \(InputDictInitializerTemplate(irInputObject.fields))
+          \(InputDictInitializerTemplate(graphqlInputObject.fields))
         ])
       }
 
-      \(irInputObject.fields.map({ "\(FieldPropertyTemplate($1))" }), separator: "\n\n")
+      \(graphqlInputObject.fields.map({ "\(FieldPropertyTemplate($1))" }), separator: "\n\n")
     }
 
     """
@@ -63,10 +63,10 @@ struct InputObjectTemplate: TemplateRenderer {
   }
 
   private func filterFields(
-    _ fields: IR.InputFieldDictionary
-  ) -> (valid: IR.InputFieldDictionary, deprecated: IR.InputFieldDictionary) {
-    var valid: IR.InputFieldDictionary = [:]
-    var deprecated: IR.InputFieldDictionary = [:]
+    _ fields: GraphQLInputFieldDictionary
+  ) -> (valid: GraphQLInputFieldDictionary, deprecated: GraphQLInputFieldDictionary) {
+    var valid: GraphQLInputFieldDictionary = [:]
+    var deprecated: GraphQLInputFieldDictionary = [:]
 
     for (key, value) in fields {
       if let _ = value.deprecationReason {
@@ -79,10 +79,10 @@ struct InputObjectTemplate: TemplateRenderer {
     return (valid: valid, deprecated: deprecated)
   }
 
-  private func deprecatedMessage(for fields: IR.InputFieldDictionary) -> String {
+  private func deprecatedMessage(for fields: GraphQLInputFieldDictionary) -> String {
     guard !fields.isEmpty else { return "" }
 
-    let names: String = fields.values.map({ $0.name }).joined(separator: ", ")
+    let names: String = fields.values.map({ $0.render(config: config) }).joined(separator: ", ")
 
     if fields.count > 1 {
       return "Arguments '\(names)' are deprecated."
@@ -92,31 +92,31 @@ struct InputObjectTemplate: TemplateRenderer {
   }
 
   private func InitializerParametersTemplate(
-    _ fields: IR.InputFieldDictionary
+    _ fields: GraphQLInputFieldDictionary
   ) -> TemplateString {
     TemplateString("""
     \(fields.map({
-      "\($1.customName ?? $1.name.renderAsInputObjectName(config: config.config)): \($1.renderInputValueType(includeDefault: true, config: config.config))"
+      "\($1.render(config: config)): \($1.renderInputValueType(includeDefault: true, config: config.config))"
     }), separator: ",\n")
     """)
   }
 
   private func InputDictInitializerTemplate(
-    _ fields: IR.InputFieldDictionary
+    _ fields: GraphQLInputFieldDictionary
   ) -> TemplateString {
     TemplateString("""
-    \(fields.map({ "\"\($1.name)\": \($1.customName ?? $1.name.renderAsInputObjectName(config: config.config))" }), separator: ",\n")
+    \(fields.map({ "\"\($1.name)\": \($1.render(config: config))" }), separator: ",\n")
     """)
   }
 
-  private func FieldPropertyTemplate(_ field: IR.InputField) -> TemplateString {
+  private func FieldPropertyTemplate(_ field: GraphQLInputField) -> TemplateString {
     """
     \(documentation: field.documentation, config: config)
     \(deprecationReason: field.deprecationReason, config: config)
     \(accessControlModifier(for: .member))\
-    var \(field.customName ?? field.name.renderAsInputObjectName(config: config.config)): \(field.renderInputValueType(config: config.config)) {
-      get { __data["\(field.name)"] }
-      set { __data["\(field.name)"] = newValue }
+    var \(field.render(config: config)): \(field.renderInputValueType(config: config.config)) {
+      get { __data["\(field.name.schemaName)"] }
+      set { __data["\(field.name.schemaName)"] = newValue }
     }
     """
   }

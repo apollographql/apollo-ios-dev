@@ -1,17 +1,17 @@
 import Foundation
-import IR
+import GraphQLCompiler
 
 /// Generates a file containing the Swift representation of a [GraphQL Union](https://spec.graphql.org/draft/#sec-Unions).
 struct UnionFileGenerator: FileGenerator {
   /// Source GraphQL union.
-  let irUnion: IR.UnionType
+  let graphqlUnion: GraphQLUnionType
   /// Shared codegen configuration.
   let config: ApolloCodegen.ConfigurationContext
 
   var template: TemplateRenderer { UnionTemplate(
-    irUnion: irUnion,
+    graphqlUnion: graphqlUnion,
     config: config
   ) }
   var target: FileTarget { .union }
-  var fileName: String { irUnion.render(as: .filename, config: config) }
+  var fileName: String { graphqlUnion.render(as: .filename) }
 }

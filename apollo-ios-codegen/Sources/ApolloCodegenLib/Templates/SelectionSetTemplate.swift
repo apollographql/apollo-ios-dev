@@ -156,7 +156,7 @@ struct SelectionSetTemplate {
           pluralizer: config.pluralizer))
     \(if: config.options.schemaDocumentation == .include, """
       ///
-      /// Parent Type: `\(selectionSet.typeInfo.parentType.formattedName)`
+      /// Parent Type: `\(selectionSet.typeInfo.parentType.render(as: .typename))`
       """)
     """
   }
@@ -259,7 +259,7 @@ struct SelectionSetTemplate {
   }
 
   private func GeneratedSchemaTypeReference(_ type: GraphQLCompositeType) -> TemplateString {
-    "\(config.schemaNamespace.firstUppercased).\(type.schemaTypesNamespace).\(type.formattedName)"
+    "\(config.schemaNamespace.firstUppercased).\(type.schemaTypesNamespace).\(type.render(as: .typename))"
   }
 
   // MARK: - Selections
@@ -1076,7 +1076,7 @@ extension IR.ScopeCondition {
     } else {
       return TemplateString(
         """
-        \(ifLet: type, { "As\($0.formattedName)" })\
+        \(ifLet: type, { "As\($0.render(as: .typename))" })\
         \(ifLet: conditions, { "If\($0.typeNameComponents)"})
         """
       ).description
