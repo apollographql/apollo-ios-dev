@@ -5,5 +5,5 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Entities that can be subscribed to for web and email notifications.
-  static let Subscribable = Interface(name: "Subscribable")
+  static let Subscribable = ApolloAPI.Interface(name: "Subscribable")
 }

@@ -45,6 +45,7 @@ class ApolloCodegenTests: XCTestCase {
     }
 
     type Author {
+      id: ID!
       name: String!
       books: [Book!]!
     }
@@ -184,6 +185,42 @@ class ApolloCodegenTests: XCTestCase {
 
     // then
     await expect { try await subject.compileGraphQLResult().operations }.to(haveCount(2))
+  }
+
+  func test_compileResults_givenIDScalarIsReferenced_referencedTypesShouldIncludeScalar() async throws {
+    // given
+    try createFile(containing: schemaData, named: "schema.graphqls", inDirectory: "CustomRoot")
+
+    try createFile(
+      body: """
+      query getAuthors {
+        authors {
+          id
+          name
+        }
+      }
+      """,
+      filename: "TestQuery.graphql")
+
+    let rootURL = directoryURL.appendingPathComponent("CustomRoot")
+
+    let config = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(input: .init(
+      schemaSearchPaths: ["./**/*.graphqls"],
+      operationSearchPaths: [directoryURL.appendingPathComponent("*.graphql").path]
+    )), rootURL: rootURL)
+
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
+    let actual = try await subject.compileGraphQLResult()
+
+    // then
+    expect(actual.operations).to(haveCount(1))
+    expect(actual.referencedTypes).to(haveCount(4))
+    expect(actual.referencedTypes).to(contain(GraphQLScalarType.mock(name: "ID")))
   }
 
   func test_compileResults_givenRelativeSearchPath_relativeToRootURL_hasOperations_shouldReturnOperationsRelativeToRoot() async throws {
@@ -661,6 +698,7 @@ class ApolloCodegenTests: XCTestCase {
 
       directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/CustomDate.swift").path,
       directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/Object.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/ID.swift").path,
 
       directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsIncludeSkipQuery.graphql.swift").path,
@@ -770,6 +808,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("Sources/Objects/Dog.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/CustomScalars/CustomDate.swift").path,
       directoryURL.appendingPathComponent("Sources/CustomScalars/Object.swift").path,
+      directoryURL.appendingPathComponent("Sources/CustomScalars/ID.swift").path,
 
       operationsOutputURL.appendingPathComponent("Queries/AllAnimalsQuery.graphql.swift").path,
       operationsOutputURL.appendingPathComponent("Queries/DogQuery.graphql.swift").path,
@@ -956,6 +995,7 @@ class ApolloCodegenTests: XCTestCase {
 
       directoryURL.appendingPathComponent("RelativePath/Sources/Schema/CustomScalars/CustomDate.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/Schema/CustomScalars/Object.swift").path,
+      directoryURL.appendingPathComponent("RelativePath/Sources/Schema/CustomScalars/ID.swift").path,
 
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/AllAnimalsQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/DogQuery.graphql.swift").path,
@@ -1068,6 +1108,7 @@ class ApolloCodegenTests: XCTestCase {
 
       directoryURL.appendingPathComponent("RelativePath/Sources/CustomScalars/CustomDate.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/CustomScalars/Object.swift").path,
+      directoryURL.appendingPathComponent("RelativePath/Sources/CustomScalars/ID.swift").path,
 
       directoryURL.appendingPathComponent("RelativeOperations/Queries/AllAnimalsQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativeOperations/Queries/DogQuery.graphql.swift").path,
