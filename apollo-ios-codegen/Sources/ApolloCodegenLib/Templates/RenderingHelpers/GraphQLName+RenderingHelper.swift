@@ -37,12 +37,29 @@ extension GraphQLNamedType {
     case is GraphQLObjectType:
       let uppercasedName = self.name.swiftName.firstUppercased
       return SwiftKeywords.TypeNamesToSuffix.contains(uppercasedName) ?
-      "\(uppercasedName)\(self.name.typenameSuffix)" : uppercasedName
+      "\(uppercasedName)\(typenameSuffix)" : uppercasedName
     default:
       break
     }
     
     return self.name.swiftName
+  }
+  
+  private var typenameSuffix: String {
+    switch self {
+    case is GraphQLInputObjectType:
+      return "_InputObject"
+    case is GraphQLInterfaceType:
+      return "_Interface"
+    case is GraphQLObjectType:
+      return "_Object"
+    case is GraphQLScalarType:
+      return "_Scalar"
+    case is GraphQLUnionType:
+      return "_Union"
+    default:
+      return "_GraphQL"
+    }
   }
   
 }

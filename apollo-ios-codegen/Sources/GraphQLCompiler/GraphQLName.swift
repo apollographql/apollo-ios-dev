@@ -7,8 +7,6 @@ public protocol GraphQLNamedItem {
 public class GraphQLName: Hashable {
   public let schemaName: String
   
-  public let typenameSuffix: String
-  
   public var customName: String?
   
   public var swiftName: String {
@@ -20,11 +18,9 @@ public class GraphQLName: Hashable {
   }
   
   public init(
-    schemaName: String,
-    typenameSuffix: String = "GraphQL"
+    schemaName: String
   ) {
     self.schemaName = schemaName
-    self.typenameSuffix = typenameSuffix
   }
   
   // MARK: - Hashable
