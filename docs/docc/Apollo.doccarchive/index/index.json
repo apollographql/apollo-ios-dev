@@ -33,6 +33,15 @@
                 "type" : "property"
               },
               {
+                "title" : "Instance Methods",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/apolloclient\/watch(query:cachepolicy:refetchonfailedupdates:context:callbackqueue:resulthandler:)",
+                "title" : "func watch<Query>(query: Query, cachePolicy: CachePolicy, refetchOnFailedUpdates: Bool, context: (any RequestContext)?, callbackQueue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>) -> GraphQLQueryWatcher<Query>",
+                "type" : "method"
+              },
+              {
                 "title" : "Enumerations",
                 "type" : "groupMarker"
               },
@@ -491,8 +500,8 @@
                 "type" : "groupMarker"
               },
               {
-                "path" : "\/documentation\/apollo\/graphqlquerywatcher\/init(client:query:context:callbackqueue:resulthandler:)",
-                "title" : "init(client: any ApolloClientProtocol, query: Query, context: (any RequestContext)?, callbackQueue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>)",
+                "path" : "\/documentation\/apollo\/graphqlquerywatcher\/init(client:query:refetchonfailedupdates:context:callbackqueue:resulthandler:)",
+                "title" : "init(client: any ApolloClientProtocol, query: Query, refetchOnFailedUpdates: Bool, context: (any RequestContext)?, callbackQueue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>)",
                 "type" : "init"
               },
               {
@@ -502,6 +511,11 @@
               {
                 "path" : "\/documentation\/apollo\/graphqlquerywatcher\/query",
                 "title" : "let query: Query",
+                "type" : "property"
+              },
+              {
+                "path" : "\/documentation\/apollo\/graphqlquerywatcher\/refetchonfailedupdates",
+                "title" : "let refetchOnFailedUpdates: Bool",
                 "type" : "property"
               },
               {

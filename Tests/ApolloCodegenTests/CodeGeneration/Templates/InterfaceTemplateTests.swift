@@ -42,7 +42,7 @@ class InterfaceTemplateTests: XCTestCase {
     buildSubject(name: "aDog")
 
     let expected = """
-    static let ADog = Interface(name: "aDog")
+    static let ADog = ApolloAPI.Interface(name: "aDog")
     """
 
     // when
@@ -64,7 +64,7 @@ class InterfaceTemplateTests: XCTestCase {
 
     let expected = """
     /// \(documentation)
-    static let Dog = Interface(name: "Dog")
+    static let Dog = ApolloAPI.Interface(name: "Dog")
     """
 
     // when
@@ -84,7 +84,7 @@ class InterfaceTemplateTests: XCTestCase {
     )
 
     let expected = """
-    static let Dog = Interface(name: "Dog")
+    static let Dog = ApolloAPI.Interface(name: "Dog")
     """
 
     // when
@@ -94,6 +94,26 @@ class InterfaceTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
   
+  // MARK: Namespacing Tests
+
+  func test_render_givenCocoapodsCompatibleImportStatements_generatesWithApolloNamespace() throws {
+    // given
+    buildSubject(
+      name: "Dog",
+      config: .mock(.other, options: .init(cocoapodsCompatibleImportStatements: true))
+    )
+
+    let expected = """
+    static let Dog = Apollo.Interface(name: "Dog")
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+
   // MARK: - Reserved Keyword Tests
   
   func test_render_givenSchemaInterfaceUsingReservedKeyword_generatesWithEscapedType() throws {
@@ -104,7 +124,7 @@ class InterfaceTemplateTests: XCTestCase {
       buildSubject(name: keyword)
 
       let expected = """
-      static let \(keyword.firstUppercased)_Interface = Interface(name: "\(keyword)")
+      static let \(keyword.firstUppercased)_Interface = ApolloAPI.Interface(name: "\(keyword)")
       """
 
       // when
