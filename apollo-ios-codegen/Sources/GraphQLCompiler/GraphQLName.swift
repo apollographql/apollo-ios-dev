@@ -17,6 +17,20 @@ public class GraphQLName: Hashable {
     }
   }
   
+  public var shouldRenderDocumentation: Bool {
+    if let customName, !customName.isEmpty {
+      return true
+    }
+    return false
+  }
+  
+  public var typeNameDocumentation: String {
+    """
+    // This type has been renamed from the schema type '\(schemaName)'
+    // using schema customization configuration.
+    """
+  }
+  
   public init(
     schemaName: String
   ) {

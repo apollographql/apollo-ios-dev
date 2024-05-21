@@ -18,6 +18,10 @@ struct UnionTemplate: TemplateRenderer {
     TemplateString(
     """
     \(documentation: graphqlUnion.documentation, config: config)
+    \(if: graphqlUnion.name.shouldRenderDocumentation, """
+      \(graphqlUnion.name.typeNameDocumentation)
+      """
+    )
     static let \(graphqlUnion.render(as: .typename)) = Union(
       name: "\(graphqlUnion.name.schemaName)",
       possibleTypes: \(PossibleTypesTemplate())
