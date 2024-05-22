@@ -35,7 +35,7 @@ class EnumFileGeneratorTests: XCTestCase {
     // given
     buildSubject()
 
-    let expected = graphqlEnum.formattedName
+    let expected = graphqlEnum.name.schemaName
 
     // then
     expect(self.subject.fileName).to(equal(expected))

@@ -31,8 +31,12 @@ extension GraphQLNamedType {
         return self.name.swiftName
       }
       fallthrough
+    case is GraphQLAbstractType: fallthrough
+    case is GraphQLCompositeType: fallthrough
+    case is GraphQLEnumType: fallthrough
     case is GraphQLInputObjectType: fallthrough
     case is GraphQLInterfaceType: fallthrough
+    case is GraphQLNamedType: fallthrough
     case is GraphQLUnionType:fallthrough
     case is GraphQLObjectType:
       let uppercasedName = self.name.swiftName.firstUppercased
@@ -47,6 +51,8 @@ extension GraphQLNamedType {
   
   private var typenameSuffix: String {
     switch self {
+    case is GraphQLEnumType:
+      return "_Enum"
     case is GraphQLInputObjectType:
       return "_InputObject"
     case is GraphQLInterfaceType:

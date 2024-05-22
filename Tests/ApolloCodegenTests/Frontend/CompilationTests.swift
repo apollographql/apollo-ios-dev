@@ -77,7 +77,7 @@ class CompilationTests: XCTestCase {
     let operation = try XCTUnwrap(compilationResult.operations.first)
     XCTAssertEqual(operation.name, "HeroAndFriendsNames")
     XCTAssertEqual(operation.operationType, .query)
-    XCTAssertEqual(operation.rootType.name, "Query")
+    XCTAssertEqual(operation.rootType.name.schemaName, "Query")
     
     XCTAssertEqual(operation.variables[0].name, "episode")
     XCTAssertEqual(operation.variables[0].type.typeReference, "Episode")
@@ -94,7 +94,7 @@ class CompilationTests: XCTestCase {
     XCTAssertEqual(friendsField.name, "friends")
     XCTAssertEqual(friendsField.type.typeReference, "[Character]")
     
-    XCTAssertEqualUnordered(compilationResult.referencedTypes.map(\.name),
+    XCTAssertEqualUnordered(compilationResult.referencedTypes.map(\.name.schemaName),
                             ["Human", "Droid", "Query", "Episode", "Character", "String"])
   }
 
@@ -158,7 +158,7 @@ class CompilationTests: XCTestCase {
     let compilationResult = try await compileFrontend()
 
     let inputObject = try XCTUnwrap(
-      compilationResult.referencedTypes.first { $0.name == "TestInput"} as? GraphQLInputObjectType
+      compilationResult.referencedTypes.first { $0.name.schemaName == "TestInput"} as? GraphQLInputObjectType
     )
     let listField = try XCTUnwrap(inputObject.fields["listField"])
     let defaultValue = try XCTUnwrap(listField.defaultValue)

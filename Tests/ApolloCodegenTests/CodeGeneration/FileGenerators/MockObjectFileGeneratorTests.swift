@@ -37,7 +37,7 @@ class MockObjectFileGeneratorTests: XCTestCase {
     // given
     buildSubject()
 
-    let expected = "\(graphqlObject.name)+Mock"
+    let expected = "\(graphqlObject.name.schemaName)+Mock"
 
     // then
     expect(self.subject.fileName).to(equal(expected))

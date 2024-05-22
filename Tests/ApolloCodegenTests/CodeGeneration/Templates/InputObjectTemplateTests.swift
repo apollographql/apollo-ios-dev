@@ -22,7 +22,8 @@ class InputObjectTemplateTests: XCTestCase {
       graphqlInputObject: GraphQLInputObjectType.mock(
         name,
         fields: fields,
-        documentation: documentation
+        documentation: documentation,
+        config: config
       ),
       config: ApolloCodegen.ConfigurationContext(config: config)
     )

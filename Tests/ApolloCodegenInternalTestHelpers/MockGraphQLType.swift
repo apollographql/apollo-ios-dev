@@ -9,7 +9,7 @@ public extension GraphQLCompositeType {
     _ name: String = ""
   ) -> GraphQLCompositeType {
     GraphQLCompositeType(
-      name: name,
+      name: GraphQLName(schemaName: name),
       documentation: nil
     )
   }
@@ -23,7 +23,7 @@ public extension GraphQLObjectType {
     documentation: String? = nil
   ) -> GraphQLObjectType {
     GraphQLObjectType(
-      name: name,
+      name: GraphQLName(schemaName: name),
       documentation: documentation,
       fields: fields,
       interfaces: interfaces
@@ -39,7 +39,7 @@ public extension GraphQLInterfaceType {
     documentation: String? = nil
   ) -> GraphQLInterfaceType {
     GraphQLInterfaceType(
-      name: name,
+      name: GraphQLName(schemaName: name),
       documentation: documentation,
       fields: fields,
       interfaces: interfaces
@@ -54,7 +54,7 @@ public extension GraphQLUnionType {
     documentation: String? = nil
   ) -> GraphQLUnionType {
     GraphQLUnionType(
-      name: name,
+      name: GraphQLName(schemaName: name),
       documentation: documentation,
       types: types
     )
@@ -73,7 +73,7 @@ public extension GraphQLScalarType {
     documentation: String? = nil
   ) -> GraphQLScalarType {
     GraphQLScalarType(
-      name: name,
+      name: GraphQLName(schemaName: name),
       documentation: documentation,
       specifiedByURL: specifiedByURL
     )
@@ -112,7 +112,7 @@ public extension GraphQLEnumType {
     documentation: String? = nil
   ) -> GraphQLEnumType {
     GraphQLEnumType(
-      name: name,
+      name: GraphQLName(schemaName: name),
       documentation: documentation,
       values: values
     )
@@ -126,7 +126,7 @@ public extension GraphQLEnumValue {
     documentation: String? = nil
   ) -> GraphQLEnumValue {
     GraphQLEnumValue(
-      name: Name(value: name),
+      name: GraphQLName(schemaName: name),
       documentation: documentation,
       deprecationReason: deprecationReason
     )
@@ -137,12 +137,13 @@ public extension GraphQLInputObjectType {
   class func mock(
     _ name: String,
     fields: [GraphQLInputField] = [],
-    documentation: String? = nil
+    documentation: String? = nil,
+    config: ApolloCodegenConfiguration = .mock()
   ) -> GraphQLInputObjectType {
     GraphQLInputObjectType(
-      name: name,
+      name: GraphQLName(schemaName: name),
       documentation: documentation,
-      fields: OrderedDictionary.init(uniqueKeysWithValues: fields.map({ ($0.name, $0) }))
+      fields: OrderedDictionary.init(uniqueKeysWithValues: fields.map({ ($0.render(config: config), $0) }))
     )
   }
 }
@@ -156,7 +157,7 @@ public extension GraphQLInputField {
     deprecationReason: String? = nil
   ) -> GraphQLInputField {
     GraphQLInputField(
-      name: name,
+      name: GraphQLName(schemaName: name),
       type: type,
       documentation: documentation,
       deprecationReason: deprecationReason,

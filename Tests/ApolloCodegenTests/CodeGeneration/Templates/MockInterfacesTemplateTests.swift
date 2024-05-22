@@ -25,7 +25,7 @@ class MockInterfacesTemplateTests: XCTestCase {
     let config = ApolloCodegenConfiguration.mock(output: .mock(testMocks: testMocks))
 
     subject = MockInterfacesTemplate(
-      graphQLInterfaces: interfaces,
+      graphqlInterfaces: interfaces,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }

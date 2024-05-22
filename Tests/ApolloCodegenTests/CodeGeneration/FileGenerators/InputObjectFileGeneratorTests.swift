@@ -35,7 +35,7 @@ class InputObjectFileGeneratorTests: XCTestCase {
     // given
     buildSubject()
 
-    let expected = graphqlInputObject.name
+    let expected = graphqlInputObject.name.schemaName
 
     // then
     expect(self.subject.fileName).to(equal(expected))

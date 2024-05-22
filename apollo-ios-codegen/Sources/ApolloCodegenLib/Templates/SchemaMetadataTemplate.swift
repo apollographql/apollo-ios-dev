@@ -58,7 +58,7 @@ struct SchemaMetadataTemplate: TemplateRenderer {
     static func objectType(forTypename typename: String) -> \(config.ApolloAPITargetName).Object? {
       switch typename {
       \(schema.referencedTypes.objects.map {
-        "case \"\($0.render(as: .typename))\": return \(schemaNamespace).Objects.\($0.render(as: .typename))"
+        "case \"\($0.name.schemaName)\": return \(schemaNamespace).Objects.\($0.render(as: .typename))"
       }, separator: "\n")
       default: return nil
       }

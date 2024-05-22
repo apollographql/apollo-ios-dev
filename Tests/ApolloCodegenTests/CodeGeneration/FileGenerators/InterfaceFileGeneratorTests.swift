@@ -35,7 +35,7 @@ class InterfaceFileGeneratorTests: XCTestCase {
     // given
     buildSubject()
 
-    let expected = graphqlInterface.name
+    let expected = graphqlInterface.name.schemaName
 
     // then
     expect(self.subject.fileName).to(equal(expected))

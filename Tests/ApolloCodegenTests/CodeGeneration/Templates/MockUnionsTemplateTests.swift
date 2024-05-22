@@ -25,7 +25,7 @@ class MockUnionsTemplateTests: XCTestCase {
     let config = ApolloCodegenConfiguration.mock(output: .mock(testMocks: testMocks))
 
     subject = MockUnionsTemplate(
-      graphQLUnions: unions,
+      graphqlUnions: unions,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
