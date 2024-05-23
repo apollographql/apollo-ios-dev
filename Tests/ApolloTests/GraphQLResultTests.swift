@@ -319,33 +319,3 @@ final class GraphQLResultTests: XCTestCase {
   }
 
 }
-
-extension Deferrable {
-
-  /// Initializes a `Deferrable` `SelectionSet` with a raw JSON response object.
-  ///
-  /// The process of converting a JSON response into `SelectionSetData` is done by using a
-  /// `GraphQLExecutor` with a`GraphQLSelectionSetMapper` to parse, validate, and transform
-  /// the JSON response data into the format expected by the `Deferrable` `SelectionSet`.
-  ///
-  /// - Parameters:
-  ///   - data: A dictionary representing a JSON response object for a GraphQL object.
-  ///   - operation: The operation which contains `data`.
-  fileprivate init(
-    data: JSONObject,
-    in operation: any GraphQLOperation.Type
-  ) throws {
-    let accumulator = GraphQLSelectionSetMapper<Self>(
-      handleMissingValues: .allowForOptionalFields
-    )
-    let executor = GraphQLExecutor(executionSource: NetworkResponseExecutionSource())
-
-    self = try executor.execute(
-      selectionSet: Self.self,
-      in: operation,
-      on: data,
-      accumulator: accumulator
-    )
-  }
-
-}
