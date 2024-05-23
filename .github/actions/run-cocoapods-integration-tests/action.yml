@@ -12,7 +12,7 @@ runs:
     shell: bash
     working-directory: Tests/CodegenCLITests/pod-install-test/
     run: |
-      ./Pods/Apollo/apollo-ios-cli init --schema-name NewTestSchema --module-type other
+      ./Pods/Apollo/apollo-ios-cli init --schema-namespace NewTestSchema --module-type other
   - name: CocoaPods - CLI Test (generate)
     shell: bash
     working-directory: Tests/CodegenCLITests/pod-install-test/

@@ -721,6 +721,45 @@ class SelectionSetTemplateTests: XCTestCase {
     }
   }
 
+  func test__render_selections__givenCustomScalar_ID_rendersFieldSelectionWithoutSuffix() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    type Animal {
+      id: ID!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        id
+      }
+    }
+    """
+
+    let expected = """
+      public static var __selections: [ApolloAPI.Selection] { [
+        .field("__typename", String.self),
+        .field("id", TestSchema.ID.self),
+      ] }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
+  }
+
   func test__render_selections__givenFieldWithUppercasedName_rendersFieldSelections() async throws {
     // given
     schemaSDL = """
@@ -4746,6 +4785,42 @@ class SelectionSetTemplateTests: XCTestCase {
       // then
       expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
     }
+  }
+
+  func test__render_fieldAccessors__givenCustomScalar_ID_rendersFieldAccessorWithTypeNameWithoutSuffix() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      AllAnimals: [Animal!]
+    }
+
+    type Animal {
+      id: ID!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      AllAnimals {
+        id
+      }
+    }
+    """
+
+    let expected = """
+      public var id: TestSchema.ID { __data["id"] }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "AllAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
   func test__render_fieldAccessors__givenFieldWithUpperCaseName_rendersFieldAccessorWithLowercaseName() async throws {

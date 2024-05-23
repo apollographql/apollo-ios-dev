@@ -15,7 +15,7 @@ public struct PetAdoptionInput: InputObject {
     petID: ID,
     humanName: GraphQLNullable<String> = nil,
     favoriteToy: String,
-    isSpayedOrNeutered: Bool?,
+    isSpayedOrNeutered: Bool? = nil,
     measurements: GraphQLNullable<MeasurementsInput> = nil
   ) {
     __data = InputDict([

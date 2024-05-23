@@ -135,6 +135,8 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
     expected = (
       fields: [
+        .mock("id",
+              type: .nonNull(.scalar(GraphQLScalarType.mock(name: "ID")))),
         .mock("height",
               type: .nonNull(.entity(GraphQLObjectType.mock("Height")))),
         .mock("species",
@@ -369,6 +371,8 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
     expected = (
       fields: [
+        .mock("id",
+              type: .nonNull(.scalar(GraphQLScalarType.mock(name: "ID")))),
         .mock("height",
               type: .nonNull(.entity(GraphQLObjectType.mock("Height")))),
         .mock("species",
@@ -478,6 +482,8 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
     expected = (
       fields: [
+        .mock("id",
+              type: .nonNull(.scalar(GraphQLScalarType.mock(name: "ID")))),
         .mock("species",
               type: .nonNull(.scalar(GraphQLScalarType.string()))),
         .mock("skinCovering",
@@ -596,6 +602,8 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
     expected = (
       fields: [
+        .mock("id",
+              type: .nonNull(.scalar(GraphQLScalarType.mock(name: "ID")))),
         .mock("height",
               type: .nonNull(.entity(GraphQLObjectType.mock("Height")))),
         .mock("species",
@@ -712,6 +720,8 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
     expected = (
       fields: [
+        .mock("id",
+              type: .nonNull(.scalar(GraphQLScalarType.mock(name: "ID")))),
         .mock("height",
               type: .nonNull(.entity(GraphQLObjectType.mock("Height")))),
         .mock("species",
@@ -828,6 +838,8 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
     expected = (
       fields: [
+        .mock("id",
+              type: .nonNull(.scalar(GraphQLScalarType.mock(name: "ID")))),
         .mock("height",
               type: .nonNull(.entity(GraphQLObjectType.mock("Height")))),
         .mock("species",
@@ -887,6 +899,8 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
     expected = (
       fields: [
+        .mock("id",
+              type: .nonNull(.scalar(GraphQLScalarType.mock(name: "ID")))),
         .mock("height",
               type: .nonNull(.entity(GraphQLObjectType.mock("Height")))),
         .mock("species",

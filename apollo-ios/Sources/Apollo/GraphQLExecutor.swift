@@ -3,7 +3,8 @@ import Foundation
 import ApolloAPI
 #endif
 
-class ObjectExecutionInfo {
+@_spi(Execution)
+public class ObjectExecutionInfo {
   let rootType: any SelectionSet.Type
   let variables: GraphQLOperation.Variables?
   let schema: any SchemaMetadata.Type
@@ -59,7 +60,8 @@ class ObjectExecutionInfo {
 ///
 /// GraphQL validation makes sure all fields sharing the same response key have the same
 /// arguments and are of the same type, so we only need to resolve one field.
-class FieldExecutionInfo {
+@_spi(Execution)
+public class FieldExecutionInfo {
   let field: Selection.Field
   let parentInfo: ObjectExecutionInfo
 
@@ -177,17 +179,19 @@ public struct GraphQLExecutionError: Error, LocalizedError {
 /// The methods in this class closely follow the
 /// [execution algorithm described in the GraphQL specification]
 /// (http://spec.graphql.org/draft/#sec-Execution)
-final class GraphQLExecutor<Source: GraphQLExecutionSource> {
+@_spi(Execution)
+public final class GraphQLExecutor<Source: GraphQLExecutionSource> {
 
   private let executionSource: Source
 
-  init(executionSource: Source) {
+  public init(executionSource: Source) {
     self.executionSource = executionSource
   }
 
   // MARK: - Execution
 
-  func execute<
+  @_spi(Execution)
+  public func execute<
     Accumulator: GraphQLResultAccumulator,
     SelectionSet: RootSelectionSet
   >(
