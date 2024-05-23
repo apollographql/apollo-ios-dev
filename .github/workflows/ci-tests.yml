@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  XCODE_VERSION: "15.2"
+  XCODE_VERSION: "15.4"
 
 jobs:
   changes:
