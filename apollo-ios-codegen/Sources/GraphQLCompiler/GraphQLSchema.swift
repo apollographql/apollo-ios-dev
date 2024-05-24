@@ -72,7 +72,7 @@ public final class GraphQLScalarType: GraphQLNamedType {
     guard self.specifiedByURL == nil else { return true }
 
     switch name {
-    case "String", "Int", "Float", "Boolean", "ID":
+    case "String", "Int", "Float", "Boolean":
       return false
     default:
       return true

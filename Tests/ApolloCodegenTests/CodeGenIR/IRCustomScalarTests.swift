@@ -53,7 +53,7 @@ class IRCustomScalarTests: XCTestCase {
     expect(subject.customScalars).to(beEmpty())
   }
 
-  func test__givenScalarID__shouldAppendToScalarsSet() {
+  func test__givenScalarID__shouldAppendToCustomScalarsSet() {
     // given
     let scalar = GraphQLScalarType.mock(name: "ID")
 
@@ -61,8 +61,8 @@ class IRCustomScalarTests: XCTestCase {
     let subject = IR.Schema.ReferencedTypes.init([scalar], schemaRootTypes: .mock())
 
     // then
-    expect(subject.scalars).to(equal([scalar]))
-    expect(subject.customScalars).to(beEmpty())
+    expect(subject.customScalars).to(equal([scalar]))
+    expect(subject.scalars).to(beEmpty())
   }
 
   func test__givenCustomScalar__shouldAppendToCustomScalarsSet() {

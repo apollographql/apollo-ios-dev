@@ -22,8 +22,6 @@ struct SchemaMetadataTemplate: TemplateRenderer {
 
     return TemplateString(
     """
-    \(parentAccessLevel)typealias ID = String
-
     \(if: !config.output.schemaTypes.isInModule,
       TemplateString("""
       \(parentAccessLevel)typealias SelectionSet = \(schemaNamespace)_SelectionSet
