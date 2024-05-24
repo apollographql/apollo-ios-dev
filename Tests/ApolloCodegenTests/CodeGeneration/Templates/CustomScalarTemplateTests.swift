@@ -19,10 +19,14 @@ class CustomScalarTemplateTests: XCTestCase {
 
   private func buildSubject(
     name: String = "MyCustomScalar",
+    customName: String? = nil,
     config: ApolloCodegenConfiguration = .mock()
   ) {
+    let scalarType = GraphQLScalarType.mock(name: name)
+    scalarType.name.customName = customName
+    
     subject = CustomScalarTemplate(
-      graphqlScalar: GraphQLScalarType.mock(name: name),
+      graphqlScalar: scalarType,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
@@ -251,6 +255,28 @@ class CustomScalarTemplateTests: XCTestCase {
       // then
       expect(rendered).to(equalLineByLine(expected))
     }
+  }
+  
+  // MARK: - Schema Customization Tests
+  
+  func test__render__givenCustomScalar_withCustomName_shouldRenderWithCustomName() throws {
+    // given
+    buildSubject(
+      name: "MyScalar",
+      customName: "MyCustomScalar"
+    )
+
+    let expected = """
+    \((subject as! CustomScalarTemplate).graphqlScalar.name.typeNameDocumentation)
+    typealias MyCustomScalar = String
+
+    """
+
+    // when
+    let rendered = renderSubject()
+
+    // then
+    expect(rendered).to(equalLineByLine(expected))
   }
   
 }

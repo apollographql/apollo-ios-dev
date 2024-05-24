@@ -23,22 +23,27 @@ class EnumTemplateTests: XCTestCase {
   ///   - config: Code generation configuration.
   private func buildSubject(
     name: String = "TestEnum",
+    customName: String? = nil,
     documentation: String? = nil,
-    values: [(String, String?, documentation: String?)] = [("ONE", nil, nil), ("TWO", nil, nil)],
+    values: [(String, String?, documentation: String?, customName: String?)] = [("ONE", nil, nil, nil), ("TWO", nil, nil, nil)],
     config: ApolloCodegenConfiguration = ApolloCodegenConfiguration.mock()
   ) {
+    let enumType = GraphQLEnumType.mock(
+      name: name,
+      values: values.map({
+        let enumValue = GraphQLEnumValue.mock(
+          name: $0.0,
+          deprecationReason: $0.1,
+          documentation: $0.documentation
+        )
+        enumValue.name.customName = $0.customName
+        return enumValue
+      }),
+      documentation: documentation
+    )
+    enumType.name.customName = customName
     subject = EnumTemplate(
-      graphqlEnum: GraphQLEnumType.mock(
-        name: name,
-        values: values.map({
-          GraphQLEnumValue.mock(
-            name: $0.0,
-            deprecationReason: $0.1,
-            documentation: $0.documentation
-          )
-        }),
-        documentation: documentation
-      ),
+      graphqlEnum: enumType,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
@@ -132,20 +137,20 @@ class EnumTemplateTests: XCTestCase {
       name: "casedEnum",
       values: [
         // Mixed case
-        ("lowercase", nil, nil),
-        ("UPPERCASE", nil, nil),
-        ("Capitalized", nil, nil),
-        ("snake_case", nil, nil),
-        ("UPPER_SNAKE_CASE", nil, nil),
-        ("_1", nil, nil),
-        ("_one_two_three_", nil, nil),
-        ("camelCased", nil, nil),
-        ("UpperCamelCase", nil, nil),
-        ("BEFORE2023", nil, nil),
+        ("lowercase", nil, nil, nil),
+        ("UPPERCASE", nil, nil, nil),
+        ("Capitalized", nil, nil, nil),
+        ("snake_case", nil, nil, nil),
+        ("UPPER_SNAKE_CASE", nil, nil, nil),
+        ("_1", nil, nil, nil),
+        ("_one_two_three_", nil, nil, nil),
+        ("camelCased", nil, nil, nil),
+        ("UpperCamelCase", nil, nil, nil),
+        ("BEFORE2023", nil, nil, nil),
 
         // Escaped keywords
-        ("associatedtype", nil, nil),
-        ("Protocol", nil, nil),
+        ("associatedtype", nil, nil, nil),
+        ("Protocol", nil, nil, nil),
       ],
       config: .mock(
         options: .init(conversionStrategies: .init(enumCases: .camelCase))
@@ -183,20 +188,20 @@ class EnumTemplateTests: XCTestCase {
       name: "casedEnum",
       values: [
         // Mixed case
-        ("lowercase", nil, nil),
-        ("UPPERCASE", nil, nil),
-        ("Capitalized", nil, nil),
-        ("snake_case", nil, nil),
-        ("UPPER_SNAKE_CASE", nil, nil),
-        ("_1", nil, nil),
-        ("_one_two_three_", nil, nil),
-        ("camelCased", nil, nil),
-        ("UpperCamelCase", nil, nil),
-        ("BEFORE2023", nil, nil),
+        ("lowercase", nil, nil, nil),
+        ("UPPERCASE", nil, nil, nil),
+        ("Capitalized", nil, nil, nil),
+        ("snake_case", nil, nil, nil),
+        ("UPPER_SNAKE_CASE", nil, nil, nil),
+        ("_1", nil, nil, nil),
+        ("_one_two_three_", nil, nil, nil),
+        ("camelCased", nil, nil, nil),
+        ("UpperCamelCase", nil, nil, nil),
+        ("BEFORE2023", nil, nil, nil),
 
         // Escaped keywords
-        ("associatedtype", nil, nil),
-        ("Protocol", nil, nil),
+        ("associatedtype", nil, nil, nil),
+        ("Protocol", nil, nil, nil),
       ],
       config: .mock(
         options: .init(conversionStrategies: .init(enumCases: .none))
@@ -234,9 +239,9 @@ class EnumTemplateTests: XCTestCase {
     // given / when
     buildSubject(
       values: [
-        ("ONE", nil, nil),
-        ("TWO", "Deprecated for tests", nil),
-        ("THREE", nil, nil)
+        ("ONE", nil, nil, nil),
+        ("TWO", "Deprecated for tests", nil, nil),
+        ("THREE", nil, nil, nil)
       ],
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .include,
@@ -265,9 +270,9 @@ class EnumTemplateTests: XCTestCase {
     // given / when
     buildSubject(
       values: [
-        ("ONE", nil, nil),
-        ("TWO", "Deprecated for tests", nil),
-        ("THREE", nil, nil)
+        ("ONE", nil, nil, nil),
+        ("TWO", "Deprecated for tests", nil, nil),
+        ("THREE", nil, nil, nil)
       ],
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .include,
@@ -296,9 +301,9 @@ class EnumTemplateTests: XCTestCase {
     // given / when
     buildSubject(
       values: [
-        ("ONE", "Deprecated for tests", nil),
-        ("TWO", nil, nil),
-        ("THREE", "Deprecated for tests", nil)
+        ("ONE", "Deprecated for tests", nil, nil),
+        ("TWO", nil, nil, nil),
+        ("THREE", "Deprecated for tests", nil, nil)
       ],
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .exclude,
@@ -324,9 +329,9 @@ class EnumTemplateTests: XCTestCase {
     // given / when
     buildSubject(
       values: [
-        ("ONE", "Deprecated for tests", nil),
-        ("TWO", nil, nil),
-        ("THREE", "Deprecated for tests", nil)
+        ("ONE", "Deprecated for tests", nil, nil),
+        ("TWO", nil, nil, nil),
+        ("THREE", "Deprecated for tests", nil, nil)
       ],
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .exclude,
@@ -356,9 +361,9 @@ class EnumTemplateTests: XCTestCase {
     buildSubject(
       documentation: documentation,
       values: [
-        ("ONE", "Deprecated for tests", "Doc: One"),
-        ("TWO", nil, "Doc: Two"),
-        ("THREE", "Deprecated for tests", nil)
+        ("ONE", "Deprecated for tests", "Doc: One", nil),
+        ("TWO", nil, "Doc: Two", nil),
+        ("THREE", "Deprecated for tests", nil, nil)
       ],
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .include,
@@ -395,9 +400,9 @@ class EnumTemplateTests: XCTestCase {
     buildSubject(
       documentation: documentation,
       values: [
-        ("ONE", "Deprecated for tests", "Doc: One"),
-        ("TWO", nil, "Doc: Two"),
-        ("THREE", "Deprecated for tests", nil)
+        ("ONE", "Deprecated for tests", "Doc: One", nil),
+        ("TWO", nil, "Doc: Two", nil),
+        ("THREE", "Deprecated for tests", nil, nil)
       ],
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .include,
@@ -434,9 +439,9 @@ class EnumTemplateTests: XCTestCase {
     buildSubject(
       documentation: documentation,
       values: [
-        ("ONE", "Deprecated for tests", "Doc: One"),
-        ("TWO", nil, "Doc: Two"),
-        ("THREE", "Deprecated for tests", nil)
+        ("ONE", "Deprecated for tests", "Doc: One", nil),
+        ("TWO", nil, "Doc: Two", nil),
+        ("THREE", "Deprecated for tests", nil, nil)
       ],
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .include,
@@ -482,6 +487,38 @@ class EnumTemplateTests: XCTestCase {
       // then
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     }
+  }
+  
+  // MARK: - Schema Customization Tests
+  
+  func test__render__givenEnumAndValues_withCustomNames_shouldRenderWithCustomNames() throws {
+    // given
+    buildSubject(
+      name: "MyEnum",
+      customName: "MyCustomEnum",
+      values: [
+        // Mixed case
+        ("caseOne", nil, nil, nil),
+        ("myCase", nil, nil, "myCustomCase")
+      ]
+    )
+
+    let expected = """
+    \(subject.graphqlEnum.name.typeNameDocumentation)
+    enum MyCustomEnum: String, EnumType {
+      case caseOne = "caseOne"
+      // This type has been renamed from the schema type 'myCase'
+      // using schema customization configuration.
+      case myCustomCase = "myCase"
+    }
+    
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
   }
   
 }

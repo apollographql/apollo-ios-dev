@@ -163,4 +163,26 @@ class MockInterfacesTemplateTests: XCTestCase {
     }
   }
   
+  // Schema Customization Tests
+  
+  func test__render__givenInterface_withCustomName_shouldRenderWithCustomName() throws {
+    // given
+    let myInterface = GraphQLInterfaceType.mock("MyInterface")
+    myInterface.name.customName = "MyCustomInterface"
+    buildSubject(interfaces: [myInterface])
+
+    let expected = """
+    public extension MockObject {
+      typealias MyCustomInterface = Interface
+    }
+
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+  
 }
