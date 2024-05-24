@@ -1,5 +1,24 @@
 # Change Log
 
+## v1.12.2
+
+### Fixed
+- **Rebuilt the CLI binary with the correct version number:** The CLI binary included in the `1.12.1` package was built with an incorrect version number causing a version mismatch when attempting to execute code generation.
+
+## v1.12.1
+
+### Fixed
+- **Rebuilt the CLI binary:** The CLI binary included in the `1.12.0` package was built with inconsistent SDK versions resulting in the linker signing not working correctly.
+
+## v1.12.0
+
+### New
+- **`ID` as a custom scalar ([#3379](https://github.com/apollographql/apollo-ios/issues/3379)):** This changes the generation of the built-in GraphQL `ID` scalar to be treated as a custom scalar that can be modified by the user. See PR [#363](https://github.com/apollographql/apollo-ios-dev/pull/363).
+
+### Fixed
+- **Adds visionOS deployment to ApolloTestSupport podspec ([#364](https://github.com/apollographql/apollo-ios-dev/pull/364)):** This adds the `visionOS` deployment target to the ApolloTestSupport podspec to match the other package managers.
+- **Add `@_spi(Execution)` to executor for import in test mocks ([#362](https://github.com/apollographql/apollo-ios-dev/pull/362)):** This replaces the use of `@testable` in ApolloTestSupport with specific `@_spi` scopes. This resolves a few issues that have been reported where the Apollo module could not be built for testing in non-debug configurations.
+
 ## v1.11.0
 
 ### New
