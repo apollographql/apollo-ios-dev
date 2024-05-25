@@ -173,14 +173,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
     onUpdate: @escaping (Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>) -> Void
   ) -> AnyCancellable {
     $currentValue.compactMap({ $0 })
-      .sink { [weak self] result in
-        Task { [weak self] in
-          guard let self else { return }
-          let isLoadingAll = await self.isLoadingAll
-          guard !isLoadingAll else { return }
-          onUpdate(result)
-        }
-      }
+      .sink(receiveValue: onUpdate)
   }
 
   /// Reloads all data, starting at the first query, resetting pagination state.
