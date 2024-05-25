@@ -63,6 +63,21 @@ jobs:
           ./Derived/*
         key: ${{ github.run_id }}-dependencies
 
+  unused:
+    name: Periphery
+    runs-on: macos-14-xlarge
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Periphery
+        run: |
+          brew install peripheryapp/periphery/periphery
+
+      - name: Run Periphery
+        run: |
+          ruby scripts/periphery.rb
+
   run-swift-builds:
     runs-on: macos-latest
     timeout-minutes: 15
