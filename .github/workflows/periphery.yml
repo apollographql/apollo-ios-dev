@@ -2,9 +2,6 @@ on:
     pull_request:
   
   name: Unused Code
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    GITHUB_ACCESS_TOKEN: ${{ secrets.PAT_TOKEN }}
   jobs:
     unused:
       name: Periphery
