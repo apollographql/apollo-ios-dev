@@ -66,8 +66,7 @@ jobs:
   unused:
     name: Periphery
     runs-on: macos-latest
-    permissions:
-      contents: write
+    needs: [tuist-generation, changes]
     steps:
       - uses: actions/checkout@v4
       - name: Retrieve Build Cache
