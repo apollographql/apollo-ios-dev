@@ -9,7 +9,6 @@ import XCTest
 final class GraphQLQueryPagerTests: XCTestCase {
   private typealias Query = MockQuery<Mocks.Hero.FriendsQuery>
   private typealias ReverseQuery = MockQuery<Mocks.Hero.ReverseFriendsQuery>
-
   private var store: ApolloStore!
   private var server: MockGraphQLServer!
   private var networkTransport: MockNetworkTransport!
