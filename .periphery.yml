@@ -1,0 +1,21 @@
+retain_public: true
+schemes:
+- ApolloAPI
+- ApolloCodegenLib
+- ApolloPagination
+- ApolloSQLite
+- ApolloWebSocket
+- ApolloWrapper
+- CodegenCLI
+- apollo-ios-cli
+targets:
+- Apollo.Apollo
+- Apollo.ApolloAPI
+- Apollo.ApolloSQLite
+- Apollo.ApolloWebSocket
+- ApolloCodegen.ApolloCodegenLib
+- ApolloCodegen.CodegenCLI
+- ApolloCodegenLibWrapper
+- ApolloPagination.ApolloPagination
+- ApolloWrapper
+workspace: ApolloDev.xcworkspace
