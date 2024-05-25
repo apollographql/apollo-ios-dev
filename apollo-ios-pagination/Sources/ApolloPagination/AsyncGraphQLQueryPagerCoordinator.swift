@@ -9,6 +9,7 @@ public protocol AsyncPagerType {
   associatedtype PaginatedQuery: GraphQLQuery
   var canLoadNext: Bool { get async }
   var canLoadPrevious: Bool { get async }
+  var isLoadingAll: Bool { get async }
   func reset() async
   func loadPrevious(cachePolicy: CachePolicy) async throws
   func loadNext(cachePolicy: CachePolicy) async throws
@@ -22,7 +23,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   private var firstPageWatcher: GraphQLQueryWatcher<InitialQuery>?
   private var nextPageWatchers: [GraphQLQueryWatcher<PaginatedQuery>] = []
   let initialQuery: InitialQuery
-  var isLoadingAll: Bool = false
+  @Published var isLoadingAll: Bool = false
   var isFetching: Bool = false
   let nextPageResolver: (PaginationInfo) -> PaginatedQuery?
   let previousPageResolver: (PaginationInfo) -> PaginatedQuery?
@@ -37,9 +38,10 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   var publishers: (
     previousPageVarMap: Published<OrderedDictionary<Set<JSONValue>, PaginatedQuery.Data>>.Publisher,
     initialPageResult: Published<InitialQuery.Data?>.Publisher,
-    nextPageVarMap: Published<OrderedDictionary<Set<JSONValue>, PaginatedQuery.Data>>.Publisher
+    nextPageVarMap: Published<OrderedDictionary<Set<JSONValue>, PaginatedQuery.Data>>.Publisher,
+    isLoadingAll: Published<Bool>.Publisher
   ) {
-    return ($previousPageVarMap, $initialPageResult, $nextPageVarMap)
+    return ($previousPageVarMap, $initialPageResult, $nextPageVarMap, $isLoadingAll)
   }
 
   typealias ResultType = Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>

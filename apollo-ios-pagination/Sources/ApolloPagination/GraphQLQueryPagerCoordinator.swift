@@ -9,6 +9,7 @@ public protocol PagerType {
 
   var canLoadNext: Bool { get }
   var canLoadPrevious: Bool { get }
+  var isLoadingAll: Bool { get }
   func reset()
   func loadPrevious(
     cachePolicy: CachePolicy,
@@ -46,27 +47,34 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
     get async { await pager.$currentValue.compactMap { $0 }.eraseToAnyPublisher() }
   }
 
-  init<P: PaginationInfo>(
+  convenience init<P: PaginationInfo>(
     client: ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, PaginationOutput<InitialQuery, PaginatedQuery>?>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
   ) {
-    pager = .init(
+    self.init(pager: .init(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: watcherDispatchQueue,
       extractPageInfo: extractPageInfo,
       pageResolver: pageResolver
-    )
+    ))
+  }
+
+  /// Convenience initializer
+  /// - Parameter pager: An `AsyncGraphQLQueryPager`.
+  init(pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>) {
+    self.pager = pager
+
     Task { [weak self] in
       guard let self else { return }
-      let (previousPageVarMapPublisher, initialPublisher, nextPageVarMapPublisher) = await pager.publishers
+      let (previousPageVarMapPublisher, initialPublisher, nextPageVarMapPublisher, isLoadingAllPublisher) = await pager.publishers
       let publishSubscriber = previousPageVarMapPublisher.combineLatest(
         initialPublisher,
         nextPageVarMapPublisher
-      ).sink { [weak self] _ in
+      ).sink { [weak self] value in
         guard !Task.isCancelled else { return }
         Task { [weak self] in
           guard let self else { return }
@@ -75,14 +83,11 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
           self.$canLoadPrevious.mutate { $0 = canLoadPrevious }
         }
       }
-      await subscriptions.store(subscription: publishSubscriber)
+      let loadingAllSubscriber = isLoadingAllPublisher.removeDuplicates().sink { [weak self] value in
+        self?.$isLoadingAll.mutate { $0 = value }
+      }
+      await subscriptions.store(publishSubscriber, loadingAllSubscriber)
     }
-  }
-
-  /// Convenience initializer
-  /// - Parameter pager: An `AsyncGraphQLQueryPager`.
-  init(pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>) {
-    self.pager = pager
   }
 
   /// Allows the caller to subscribe to new pagination results.
@@ -91,7 +96,7 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
     Task { [weak self] in
       guard let self else { return }
       let subscription = await self.pager.subscribe(onUpdate: onUpdate)
-      await subscriptions.store(subscription: subscription)
+      await subscriptions.store(subscription)
     }
   }
 
@@ -99,6 +104,9 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
   @Atomic var canLoadNext: Bool = false
   /// Whether or not we can load the previous page. Initializes with a `false` value that is updated after the initial fetch.
   @Atomic var canLoadPrevious: Bool = false
+
+  /// Whether or not we are currently loading all pages.
+  @Atomic var isLoadingAll: Bool = false
 
   /// Reset all pagination state and cancel all in-flight operations.
   func reset() {
@@ -152,6 +160,7 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
     callbackQueue: DispatchQueue = .main,
     completion: ((PaginationError?) -> Void)? = nil
   ) {
+    $isLoadingAll.mutate { $0 = true }
     execute(callbackQueue: callbackQueue, completion: completion) { [weak self] in
       try await self?.pager.loadAll(fetchFromInitialPage: fetchFromInitialPage)
     }
@@ -206,8 +215,10 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
 private actor Subscriptions {
   var subscriptions: Set<AnyCancellable> = []
 
-  func store(subscription: AnyCancellable) {
-    subscriptions.insert(subscription)
+  func store(_ subscriptions: AnyCancellable...) {
+    for subscription in subscriptions {
+      self.subscriptions.insert(subscription)
+    }
   }
 }
 
