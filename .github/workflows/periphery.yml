@@ -1,22 +1,23 @@
+name: "Unused Code"
+
 on:
-    pull_request:
+  pull_request:
   
-  name: Unused Code
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    GITHUB_ACCESS_TOKEN: ${{ secrets.PAT_TOKEN }}
-  jobs:
-    unused:
-      name: Periphery
-      runs-on: macos-14-xlarge
-      permissions:
-        contents: write
-      steps:
-        - uses: actions/checkout@v4
-        - name: Install Periphery
-          run: |
-            brew install peripheryapp/periphery/periphery
-    
-        - name: Run Periphery
-          run: |
-            ruby scripts/periphery.rb
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_ACCESS_TOKEN: ${{ secrets.PAT_TOKEN }}
+jobs:
+  unused:
+    name: Periphery
+    runs-on: macos-14-xlarge
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Periphery
+        run: |
+          brew install peripheryapp/periphery/periphery
+
+      - name: Run Periphery
+        run: |
+          ruby scripts/periphery.rb
