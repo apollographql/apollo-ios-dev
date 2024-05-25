@@ -1,6 +1,7 @@
 import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
+import Combine
 import XCTest
 
 @testable import ApolloPagination
@@ -13,12 +14,19 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
   private var networkTransport: MockNetworkTransport!
   private var client: ApolloClient!
 
+  private var subscriptions: Set<AnyCancellable> = []
+
   override func setUp() {
     super.setUp()
     store = ApolloStore(cache: InMemoryNormalizedCache())
     server = MockGraphQLServer()
     networkTransport = MockNetworkTransport(server: server, store: store)
     client = ApolloClient(networkTransport: networkTransport, store: store)
+  }
+
+  override func tearDown() {
+    super.tearDown()
+    subscriptions = []
   }
 
   func test_forwardInit_simple() async throws {
@@ -284,7 +292,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     let subscriptionExpectation = expectation(description: "Subscription")
     subscriptionExpectation.expectedFulfillmentCount = 2
     var expectedViewModels: [ViewModel]?
-    anyPager.subscribe { (result: Result<([ViewModel], UpdateSource), Error>) in
+    anyPager.sink { (result: Result<([ViewModel], UpdateSource), Error>) in
       switch result {
       case .success((let viewModels, _)):
         expectedViewModels = viewModels
@@ -293,7 +301,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       default:
         XCTFail("Failed to get view models from pager.")
       }
-    }
+    }.store(in: &subscriptions)
 
     await fetchFirstPage(pager: anyPager)
     await fulfillment(of: [fetchExpectation], timeout: 1)
@@ -316,7 +324,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     let initialExpectation = expectation(description: "Initial")
     let secondExpectation = expectation(description: "Second")
     var expectedViewModel: String?
-    anyPager.subscribe { (result: Result<(String?, UpdateSource), Error>) in
+    anyPager.sink { (result: Result<(String?, UpdateSource), Error>) in
       switch result {
       case .success((let viewModel, _)):
         let oldValue = expectedViewModel
@@ -329,7 +337,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       default:
         XCTFail("Failed to get view models from pager.")
       }
-    }
+    }.store(in: &subscriptions)
 
     await fetchFirstPage(pager: anyPager)
     await fulfillment(of: [initialExpectation], timeout: 1.0)

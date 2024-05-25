@@ -193,16 +193,6 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     }
   }
 
-
-  /// Subscribe to the results of the pager, with the management of the subscriber being stored internally to the `AnyGraphQLQueryPager`.
-  /// - Parameter completion: The closure to trigger when new values come in.
-  public func subscribe(completion: @MainActor @escaping (Output) -> Void) {
-    let cancellable = publisher.sink { result in
-      Task { await completion(result) }
-    }
-    _ = $cancellables.mutate { $0.insert(cancellable) }
-  }
-
   /// Load the next page, if available.
   /// - Parameters:
   ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
