@@ -9,6 +9,7 @@ import XCTest
 final class GraphQLQueryPagerTests: XCTestCase {
   private typealias Query = MockQuery<Mocks.Hero.FriendsQuery>
   private typealias ReverseQuery = MockQuery<Mocks.Hero.ReverseFriendsQuery>
+
   private var store: ApolloStore!
   private var server: MockGraphQLServer!
   private var networkTransport: MockNetworkTransport!
@@ -198,6 +199,8 @@ final class GraphQLQueryPagerTests: XCTestCase {
     XCTAssertEqual(results.count, 3)
     XCTAssertEqual(results.map(\.name), ["Luke Skywalker", "Han Solo", "Leia Organa"])
   }
+
+  func empty() { }
 
   func test_transformless_init() throws {
     let pager = GraphQLQueryPager(pager: createPager())
