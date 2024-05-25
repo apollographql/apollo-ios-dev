@@ -180,13 +180,9 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     let previousPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
     let lastPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
 
-    let loadAllExpectation = expectation(description: "Load all pages")
-    await pager.subscribe(onUpdate: { _ in
-      loadAllExpectation.fulfill()
-    }).store(in: &cancellables)
     try await pager.loadAll()
     await fulfillment(
-      of: [firstPageExpectation, lastPageExpectation, previousPageExpectation, loadAllExpectation],
+      of: [firstPageExpectation, lastPageExpectation, previousPageExpectation],
       timeout: 5
     )
 
@@ -290,7 +286,9 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     var currentValue: GraphQLQueryPager<PaginationOutput<BidirectionalPaginationTests.Query, BidirectionalPaginationTests.Query>>.Output?
     pager.sink { result in
       currentValue = result
-      loadAllExpectation.fulfill()
+      if !pager.isLoadingAll {
+        loadAllExpectation.fulfill()
+      }
     }.store(in: &cancellables)
     pager.loadAll()
     XCTAssertTrue(pager.isLoadingAll)
