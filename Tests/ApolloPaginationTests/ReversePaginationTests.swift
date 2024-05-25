@@ -103,7 +103,9 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
     let lastPageExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForPreviousItem(server: server)
     try await pager.loadAll()
     await fulfillment(of: [firstPageExpectation, lastPageExpectation], timeout: 5)
-    guard let value = try await pager.currentValue?.get() else { return XCTFail() }
+    if try await pager.currentValue?.get() == nil {
+      XCTFail()
+    }
   }
 
   private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
