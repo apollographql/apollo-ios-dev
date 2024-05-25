@@ -70,6 +70,15 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+      - name: Retrieve Build Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./ApolloDev.xcodeproj
+            ./ApolloDev.xcworkspace
+            ./Derived/*
+          key: ${{ github.run_id }}-dependencies
+          fail-on-cache-miss: true
       - name: Install Periphery
         run: |
           brew install peripheryapp/periphery/periphery
