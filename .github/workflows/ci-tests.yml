@@ -66,6 +66,7 @@ jobs:
   unused:
     name: Periphery
     runs-on: macos-14-xlarge
+    needs: [tuist-generation]
     permissions:
       contents: write
     steps:
