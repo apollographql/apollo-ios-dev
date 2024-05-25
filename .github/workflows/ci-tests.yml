@@ -68,7 +68,10 @@ jobs:
     runs-on: macos-latest
     needs: [tuist-generation, changes]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
       - name: Retrieve Build Cache
         uses: actions/cache@v3
         with:
