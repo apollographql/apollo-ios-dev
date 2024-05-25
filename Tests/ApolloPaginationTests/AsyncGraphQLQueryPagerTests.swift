@@ -347,7 +347,9 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     let lastPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     try await pager.loadAll()
     await fulfillment(of: [firstPageExpectation, lastPageExpectation], timeout: 5)
-    guard let value = try await pager.currentValue?.get() else { return XCTFail() }
+    if try await pager.currentValue?.get() == nil {
+      XCTFail()
+    }
   }
 
   func test_equatable() async {
