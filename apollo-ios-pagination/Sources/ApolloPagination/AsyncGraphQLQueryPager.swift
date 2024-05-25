@@ -270,3 +270,7 @@ extension AsyncGraphQLQueryPager: Equatable where Model: Equatable {
     }
   }
 }
+
+private func empty() {
+  
+}

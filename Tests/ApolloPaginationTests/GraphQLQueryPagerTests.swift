@@ -200,8 +200,6 @@ final class GraphQLQueryPagerTests: XCTestCase {
     XCTAssertEqual(results.map(\.name), ["Luke Skywalker", "Han Solo", "Leia Organa"])
   }
 
-  func empty() { }
-
   func test_transformless_init() throws {
     let pager = GraphQLQueryPager(pager: createPager())
     let fetchExpectation = expectation(description: "Initial Fetch")
