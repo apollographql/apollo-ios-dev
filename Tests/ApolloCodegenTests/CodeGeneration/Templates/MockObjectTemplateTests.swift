@@ -21,6 +21,7 @@ class MockObjectTemplateTests: XCTestCase {
 
   private func buildSubject(
     name: String = "Dog",
+    customName: String? = nil,
     interfaces: [GraphQLInterfaceType] = [],
     fields: [String : GraphQLField] = [:],
     schemaNamespace: String = "TestSchema",
@@ -35,12 +36,14 @@ class MockObjectTemplateTests: XCTestCase {
     )
     ir = IRBuilder.mock(compilationResult: .mock())
 
+    let objectType = GraphQLObjectType.mock(
+      name,
+      interfaces: interfaces
+    )
+    objectType.name.customName = customName
     subject = MockObjectTemplate(
-      graphqlObject: GraphQLObjectType.mock(
-        name,
-        interfaces: interfaces
-      ),
-      fields: fields        
+      graphqlObject: objectType,
+      fields: fields
         .map { ($0.key, $0.value.type, $0.value.deprecationReason) },
       config: ApolloCodegen.ConfigurationContext(config: config),
       ir: ir
@@ -940,6 +943,29 @@ class MockObjectTemplateTests: XCTestCase {
       // then
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     }
+  }
+  
+  // MARK: - Schema Customization Tests
+  
+  func test__render__givenMockObject_withCustomName_shouldRenderWithCustomName() throws {
+    // given
+    buildSubject(
+      name: "MyObject",
+      customName: "MyCustomObject"
+    )
+    
+    let expected = """
+    public class MyCustomObject: MockObject {
+      public static let objectType: ApolloAPI.Object = TestSchema.Objects.MyCustomObject
+      public static let _mockFields = MockFields()
+      public typealias MockValueCollectionType = Array<Mock<MyCustomObject>>
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
 }

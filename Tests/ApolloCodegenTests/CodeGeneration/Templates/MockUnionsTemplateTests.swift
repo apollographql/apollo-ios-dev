@@ -160,4 +160,26 @@ class MockUnionsTemplateTests: XCTestCase {
     }
   }
   
+  // Schema Customization Tests
+  
+  func test__render__givenUnion_withCustomName_shouldRenderWithCustomName() throws {
+    // given
+    let myUnion = GraphQLUnionType.mock("MyUnion")
+    myUnion.name.customName = "MyCustomUnion"
+    buildSubject(unions: [myUnion])
+
+    let expected = """
+    public extension MockObject {
+      typealias MyCustomUnion = Union
+    }
+
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+  
 }

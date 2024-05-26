@@ -324,7 +324,7 @@ public class ApolloCodegen {
     }
   }
   
-  private func processSchemaCustomizations(ir: IRBuilder) {
+  func processSchemaCustomizations(ir: IRBuilder) {
     ir.schema.referencedTypes.allTypes.forEach { type in
       if type is GraphQLObjectType ||
           type is GraphQLInterfaceType ||
