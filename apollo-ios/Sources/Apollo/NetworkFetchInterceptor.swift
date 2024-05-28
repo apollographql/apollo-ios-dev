@@ -36,7 +36,7 @@ public class NetworkFetchInterceptor: ApolloInterceptor, Cancellable {
       return
     }
     
-    var taskDescription = Operation.operationName
+    var taskDescription = "\(Operation.operationType) \(Operation.operationName)"
     if let operationIdentifier = Operation.operationIdentifier {
         taskDescription += " \(operationIdentifier)"
     }
