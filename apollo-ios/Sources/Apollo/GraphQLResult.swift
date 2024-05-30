@@ -55,10 +55,19 @@ extension GraphQLResult {
   /// - Returns: A `[String: Any]` JSON dictionary representing the ``GraphQLResult``.
   public func asJSONDictionary() -> [String: Any] {
     var dict: [String: Any] = [:]
-    if let data { dict["data"] = convert(value: data.__data) }
+    if let data { dict["data"] = data.__data.asJSONDictionary() }
     if let errors { dict["errors"] = errors.map { $0.asJSONDictionary() } }
     if let extensions { dict["extensions"] = extensions }
     return dict
+  }
+}
+
+extension DataDict {
+  /// Converts a ``DataDict`` into a basic JSON dictionary for use.
+  ///
+  /// - Returns: A `[String: Any]` JSON dictionary representing the ``DataDict``.
+  public func asJSONDictionary() -> [String: Any] {
+    _data.mapValues(convert(value:))
   }
   
   private func convert(value: Any) -> Any {
