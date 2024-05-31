@@ -261,7 +261,7 @@ jobs:
       uses: ./.github/actions/run-cocoapods-integration-tests
 
   run-integration-tests:
-    runs-on: macos-13
+    runs-on: macos-latest
     needs: [tuist-generation, changes]
     if: ${{ needs.changes.outputs.ios  == 'true' }}
     timeout-minutes: 20
@@ -269,7 +269,7 @@ jobs:
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: 15.2
+        xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Setup Node 12.22.10
