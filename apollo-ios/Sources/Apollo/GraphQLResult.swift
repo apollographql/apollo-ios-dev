@@ -63,10 +63,7 @@ extension GraphQLResult {
 }
 
 extension DataDict {
-  /// Converts a ``DataDict`` into a basic JSON dictionary for use.
-  ///
-  /// - Returns: A `[String: Any]` JSON dictionary representing the ``DataDict``.
-  public func asJSONDictionary() -> [String: Any] {
+  internal func asJSONDictionary() -> [String: Any] {
     _data.mapValues(convert(value:))
   }
   
