@@ -236,7 +236,7 @@ struct SelectionSetTemplate {
   private func ParentTypeTemplate(_ type: GraphQLCompositeType) -> String {
     """
     \(renderAccessControl())\
-    static var __parentType: \(config.ApolloAPITargetName).ParentType { \
+    static var __parentType: any \(config.ApolloAPITargetName).ParentType { \
     \(GeneratedSchemaTypeReference(type)) }
     """
   }

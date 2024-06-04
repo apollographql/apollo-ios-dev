@@ -31,7 +31,7 @@ public class CreateReviewForEpisodeMutation: GraphQLMutation {
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Mutation }
+    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Mutation }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("createReview", CreateReview?.self, arguments: [
         "episode": .variable("episode"),
@@ -62,7 +62,7 @@ public class CreateReviewForEpisodeMutation: GraphQLMutation {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
+      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("stars", Int.self),

@@ -208,7 +208,7 @@ class FragmentTemplateTests: XCTestCase {
     """
 
     let expected = """
-      static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Animal }
+      static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
     """
 
     // when
@@ -238,7 +238,7 @@ class FragmentTemplateTests: XCTestCase {
     """
 
     let expected = """
-      static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
     """
 
     // when
@@ -272,7 +272,7 @@ class FragmentTemplateTests: XCTestCase {
     """
 
     let expected = """
-      static var __parentType: ApolloAPI.ParentType { TestSchema.Unions.Animal }
+      static var __parentType: any ApolloAPI.ParentType { TestSchema.Unions.Animal }
     """
 
     // when
@@ -302,7 +302,7 @@ class FragmentTemplateTests: XCTestCase {
       let __data: DataDict
       init(_dataDict: DataDict) { __data = _dataDict }
 
-      static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Query }
+      static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
     }
 
     """
@@ -333,7 +333,7 @@ class FragmentTemplateTests: XCTestCase {
       let __data: DataDict
       init(_dataDict: DataDict) { __data = _dataDict }
 
-      static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Animal }
+      static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
       static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
       ] }
@@ -690,7 +690,7 @@ class FragmentTemplateTests: XCTestCase {
       var __data: DataDict
       init(_dataDict: DataDict) { __data = _dataDict }
 
-      static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Query }
+      static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
       static var __selections: [ApolloAPI.Selection] { [
         .field("allAnimals", [AllAnimal]?.self),
       ] }

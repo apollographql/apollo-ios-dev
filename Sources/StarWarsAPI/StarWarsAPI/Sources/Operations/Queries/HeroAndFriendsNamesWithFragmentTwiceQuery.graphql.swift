@@ -24,7 +24,7 @@ public class HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
@@ -52,7 +52,7 @@ public class HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("friends", [Friend?]?.self),
@@ -86,7 +86,7 @@ public class HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .fragment(CharacterName.self),
@@ -127,7 +127,7 @@ public class HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = HeroAndFriendsNamesWithFragmentTwiceQuery.Data.Hero
-        public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
+        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("friends", [Friend?]?.self),
         ] }
@@ -157,7 +157,7 @@ public class HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
           public let __data: DataDict
           public init(_dataDict: DataDict) { __data = _dataDict }
 
-          public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+          public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
           public static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
             .fragment(CharacterName.self),
