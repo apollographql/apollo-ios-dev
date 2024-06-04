@@ -8,7 +8,7 @@ public protocol Matchable {
 
 extension JSONDecodingError: Matchable {
   public typealias Base = Error
-  public static func ~=(pattern: JSONDecodingError, value: Error) -> Bool {
+  public static func ~=(pattern: JSONDecodingError, value: any Error) -> Bool {
     guard let value = value as? JSONDecodingError else {
       return false
     }

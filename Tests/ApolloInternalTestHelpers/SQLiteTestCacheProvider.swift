@@ -5,7 +5,7 @@ import ApolloSQLite
 public class SQLiteTestCacheProvider: TestCacheProvider {
   /// Execute a test block rather than return a cache synchronously, since cache setup may be
   /// asynchronous at some point.
-  public static func withCache(initialRecords: RecordSet? = nil, fileURL: URL? = nil, execute test: (NormalizedCache) throws -> ()) throws {
+  public static func withCache(initialRecords: RecordSet? = nil, fileURL: URL? = nil, execute test: (any NormalizedCache) throws -> ()) throws {
     let fileURL = fileURL ?? temporarySQLiteFileURL()
     let cache = try! SQLiteNormalizedCache(fileURL: fileURL)
     if let initialRecords = initialRecords {
@@ -14,7 +14,7 @@ public class SQLiteTestCacheProvider: TestCacheProvider {
     try test(cache)
   }
   
-  public static func makeNormalizedCache(_ completionHandler: (Result<TestDependency<NormalizedCache>, Error>) -> ()) {
+  public static func makeNormalizedCache(_ completionHandler: (Result<TestDependency<any NormalizedCache>, any Error>) -> ()) {
     let fileURL = temporarySQLiteFileURL()
     let cache = try! SQLiteNormalizedCache(fileURL: fileURL)
     completionHandler(.success((cache, nil)))

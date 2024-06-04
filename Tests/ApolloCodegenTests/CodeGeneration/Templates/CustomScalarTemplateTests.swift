@@ -7,7 +7,7 @@ import GraphQLCompiler
 
 class CustomScalarTemplateTests: XCTestCase {
   // Since the base protocol is actually used, Use TemplateRenderer. This can be confirmed that no unintended implementation is using.
-  var subject: TemplateRenderer!
+  var subject: (any TemplateRenderer)!
 
   // MARK: Helpers
 

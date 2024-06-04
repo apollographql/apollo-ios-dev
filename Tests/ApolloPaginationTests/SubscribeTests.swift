@@ -7,11 +7,11 @@ import XCTest
 @testable import ApolloPagination
 
 final class SubscribeTest: XCTestCase, CacheDependentTesting {
-  var cacheType: TestCacheProvider.Type {
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
 
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var server: MockGraphQLServer!
   var client: ApolloClient!
   var cancellables: [AnyCancellable] = []
@@ -45,8 +45,8 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     let initialFetchExpectation = expectation(description: "Results")
     initialFetchExpectation.assertForOverFulfill = false
 
-    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), Error>] = []
-    var otherResults: [Result<(PaginationOutput<Query, Query>, UpdateSource), Error>] = []
+    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
+    var otherResults: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
     await pager.$currentValue.compactMap({ $0 }).sink { result in
       results.append(result)
       initialFetchExpectation.fulfill()

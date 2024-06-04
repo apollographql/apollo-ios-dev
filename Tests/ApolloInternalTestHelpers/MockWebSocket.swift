@@ -5,7 +5,7 @@ public class MockWebSocket: WebSocketClient {
   
   public var request: URLRequest
   public var callbackQueue: DispatchQueue = DispatchQueue.main
-  public var delegate: WebSocketClientDelegate? = nil
+  public var delegate: (any WebSocketClientDelegate)? = nil
   public var isConnected: Bool = false
     
   public required init(request: URLRequest, protocol: WebSocket.WSProtocol) {

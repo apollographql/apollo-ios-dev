@@ -7,13 +7,13 @@ import ApolloSQLite
 import ApolloInternalTestHelpers
 
 class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
-  var cacheType: TestCacheProvider.Type {
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
 
   static let defaultWaitTimeout: TimeInterval = 5.0
 
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var store: ApolloStore!
   
   override func setUpWithError() throws {

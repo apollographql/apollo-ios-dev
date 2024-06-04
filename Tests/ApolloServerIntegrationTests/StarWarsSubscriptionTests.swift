@@ -352,8 +352,8 @@ class StarWarsSubscriptionTests: XCTestCase {
     let expectation = self.expectation(description: "Subscribers connected and received events")
     expectation.expectedFulfillmentCount = 2
     
-    var sub1: Cancellable?
-    var sub2: Cancellable?
+    var sub1: (any Cancellable)?
+    var sub2: (any Cancellable)?
         
     concurrentQueue.async {
       sub1 = self.client.subscribe(subscription: firstSubscription) { _ in
@@ -563,7 +563,7 @@ extension StarWarsSubscriptionTests: WebSocketTransportDelegate {
     self.reconnectedExpectation?.fulfill()
   }
   
-  func webSocketTransport(_ webSocketTransport: WebSocketTransport, didDisconnectWithError error: Error?) {
+  func webSocketTransport(_ webSocketTransport: WebSocketTransport, didDisconnectWithError error: (any Error)?) {
     self.disconnectedExpectation?.fulfill()
   }
 }
