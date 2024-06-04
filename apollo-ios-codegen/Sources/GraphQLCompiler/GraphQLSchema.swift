@@ -72,7 +72,7 @@ public final class GraphQLScalarType: GraphQLNamedType {
     guard self.specifiedByURL == nil else { return true }
 
     switch name.schemaName {
-    case "String", "Int", "Float", "Boolean", "ID":
+    case "String", "Int", "Float", "Boolean":
       return false
     default:
       return true
@@ -174,7 +174,7 @@ public final class GraphQLInputObjectType: GraphQLNamedType {
   }
 }
 
-public struct GraphQLInputField: JavaScriptObjectDecodable, GraphQLNamedItem {
+public class GraphQLInputField: JavaScriptObjectDecodable, GraphQLNamedItem {
   public let name: GraphQLName
 
   public let type: GraphQLType
@@ -188,7 +188,7 @@ public struct GraphQLInputField: JavaScriptObjectDecodable, GraphQLNamedItem {
   static func fromJSValue(
     _ jsValue: JSValue,
     bridge: isolated JavaScriptBridge
-  ) -> GraphQLInputField {
+  ) -> Self {
     self.init(
       name: .init(schemaName: jsValue["name"]),
       type: GraphQLType.fromJSValue(jsValue["type"], bridge: bridge),
@@ -198,7 +198,7 @@ public struct GraphQLInputField: JavaScriptObjectDecodable, GraphQLNamedItem {
     )
   }
 
-  init(
+  required init(
     name: GraphQLName,
     type: GraphQLType,
     documentation: String?,

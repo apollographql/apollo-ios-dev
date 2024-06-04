@@ -84,7 +84,7 @@ fileprivate extension GraphQLInputObjectType {
 
       let variable = InputVariable(type: field.type, defaultValue: entry.value)
 
-      return "\(entry.0): " + variable.renderVariableDefaultValue(config: config)
+      return "\(field.render(config: config)): " + variable.renderVariableDefaultValue(config: config)
     }
 
     return """

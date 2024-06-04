@@ -8,7 +8,7 @@ public extension MyAPI {
     public static let operationName: String = "AllAnimalsQuery"
     public static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query AllAnimalsQuery { allAnimals { __typename height { __typename feet inches } ...HeightInMeters ...WarmBloodedDetails species skinCovering ... on Pet { ...PetDetails ...WarmBloodedDetails ... on Animal { height { __typename relativeSize centimeters } } } ... on Cat { isJellicle } ... on ClassroomPet { ... on Bird { wingspan } } ... on Dog { favoriteToy birthdate } predators { __typename species ... on WarmBlooded { predators { __typename species } ...WarmBloodedDetails laysEggs } } } }"#,
+        #"query AllAnimalsQuery { allAnimals { __typename id height { __typename feet inches } ...HeightInMeters ...WarmBloodedDetails species skinCovering ... on Pet { ...PetDetails ...WarmBloodedDetails ... on Animal { height { __typename relativeSize centimeters } } } ... on Cat { isJellicle } ... on ClassroomPet { ... on Bird { wingspan } } ... on Dog { favoriteToy birthdate } predators { __typename species ... on WarmBlooded { predators { __typename species } ...WarmBloodedDetails laysEggs } } } }"#,
         fragments: [HeightInMeters.self, PetDetails.self, WarmBloodedDetails.self]
       ))
 
@@ -35,6 +35,7 @@ public extension MyAPI {
         public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.Animal }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
+          .field("id", MyAPI.ID.self),
           .field("height", Height.self),
           .field("species", String.self),
           .field("skinCovering", GraphQLEnum<MyAPI.SkinCovering>?.self),
@@ -47,6 +48,7 @@ public extension MyAPI {
           .fragment(HeightInMeters.self),
         ] }
 
+        public var id: MyAPI.ID { __data["id"] }
         public var height: Height { __data["height"] }
         public var species: String { __data["species"] }
         public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -164,6 +166,7 @@ public extension MyAPI {
             .fragment(WarmBloodedDetails.self),
           ] }
 
+          public var id: MyAPI.ID { __data["id"] }
           public var height: Height { __data["height"] }
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -191,8 +194,6 @@ public extension MyAPI {
             public var inches: Int? { __data["inches"] }
             public var meters: Int { __data["meters"] }
           }
-
-
         }
 
         /// AllAnimal.AsPet
@@ -211,6 +212,7 @@ public extension MyAPI {
           ] }
 
           public var height: Height { __data["height"] }
+          public var id: MyAPI.ID { __data["id"] }
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
           public var predators: [Predator] { __data["predators"] }
@@ -249,8 +251,6 @@ public extension MyAPI {
             public var meters: Int { __data["meters"] }
           }
 
-
-
           public typealias Owner = PetDetails.Owner
 
           /// AllAnimal.AsPet.AsWarmBlooded
@@ -266,6 +266,7 @@ public extension MyAPI {
               .fragment(WarmBloodedDetails.self),
             ] }
 
+            public var id: MyAPI.ID { __data["id"] }
             public var height: Height { __data["height"] }
             public var species: String { __data["species"] }
             public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -300,8 +301,6 @@ public extension MyAPI {
               public var centimeters: Double { __data["centimeters"] }
             }
 
-
-
             public typealias Owner = PetDetails.Owner
           }
         }
@@ -320,6 +319,7 @@ public extension MyAPI {
           ] }
 
           public var isJellicle: Bool { __data["isJellicle"] }
+          public var id: MyAPI.ID { __data["id"] }
           public var height: Height { __data["height"] }
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -354,8 +354,6 @@ public extension MyAPI {
             public var centimeters: Double { __data["centimeters"] }
           }
 
-
-
           public typealias Owner = PetDetails.Owner
         }
 
@@ -372,6 +370,7 @@ public extension MyAPI {
             .inlineFragment(AsBird.self),
           ] }
 
+          public var id: MyAPI.ID { __data["id"] }
           public var height: Height { __data["height"] }
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -400,8 +399,6 @@ public extension MyAPI {
             public var meters: Int { __data["meters"] }
           }
 
-
-
           /// AllAnimal.AsClassroomPet.AsBird
           ///
           /// Parent Type: `Bird`
@@ -416,6 +413,7 @@ public extension MyAPI {
             ] }
 
             public var wingspan: Double { __data["wingspan"] }
+            public var id: MyAPI.ID { __data["id"] }
             public var height: Height { __data["height"] }
             public var species: String { __data["species"] }
             public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -450,8 +448,6 @@ public extension MyAPI {
               public var centimeters: Double { __data["centimeters"] }
             }
 
-
-
             public typealias Owner = PetDetails.Owner
           }
         }
@@ -472,6 +468,7 @@ public extension MyAPI {
 
           public var favoriteToy: String { __data["favoriteToy"] }
           public var birthdate: MyAPI.CustomDate? { __data["birthdate"] }
+          public var id: MyAPI.ID { __data["id"] }
           public var height: Height { __data["height"] }
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -504,8 +501,6 @@ public extension MyAPI {
             public var relativeSize: GraphQLEnum<MyAPI.RelativeSize> { __data["relativeSize"] }
             public var centimeters: Double { __data["centimeters"] }
           }
-
-
 
           public typealias Owner = PetDetails.Owner
         }

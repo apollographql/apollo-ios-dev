@@ -196,8 +196,6 @@ public extension MyAPI {
             public var inches: Int? { __data["inches"] }
             public var meters: Int { __data["meters"] }
           }
-
-
         }
 
         /// AllAnimal.AsWarmBloodedIfGetWarmBlooded
@@ -240,8 +238,6 @@ public extension MyAPI {
             public var inches: Int? { __data["inches"] }
             public var meters: Int { __data["meters"] }
           }
-
-
         }
 
         /// AllAnimal.AsPet
@@ -299,8 +295,6 @@ public extension MyAPI {
             public var inches: Int? { __data["inches"] }
           }
 
-
-
           public typealias Owner = PetDetails.Owner
 
           /// AllAnimal.AsPet.AsWarmBlooded
@@ -349,8 +343,6 @@ public extension MyAPI {
               public var centimeters: Double? { __data["centimeters"] }
               public var meters: Int { __data["meters"] }
             }
-
-
 
             public typealias Owner = PetDetails.Owner
           }
@@ -403,8 +395,6 @@ public extension MyAPI {
             public var centimeters: Double? { __data["centimeters"] }
             public var meters: Int { __data["meters"] }
           }
-
-
 
           public typealias Owner = PetDetails.Owner
         }
@@ -483,8 +473,6 @@ public extension MyAPI {
               public var centimeters: Double? { __data["centimeters"] }
               public var meters: Int { __data["meters"] }
             }
-
-
 
             public typealias Owner = PetDetails.Owner
           }

@@ -27,7 +27,7 @@ extension GraphQLNamedType {
   private func renderTypeName() -> String {
     switch self {
     case let type as GraphQLScalarType:
-      if !type.isCustomScalar {
+      if !type.isCustomScalar || self.name.schemaName == "ID" {
         return self.name.swiftName
       }
       fallthrough
@@ -36,8 +36,7 @@ extension GraphQLNamedType {
     case is GraphQLEnumType: fallthrough
     case is GraphQLInputObjectType: fallthrough
     case is GraphQLInterfaceType: fallthrough
-    case is GraphQLNamedType: fallthrough
-    case is GraphQLUnionType:fallthrough
+    case is GraphQLUnionType: fallthrough
     case is GraphQLObjectType:
       let uppercasedName = self.name.swiftName.firstUppercased
       return SwiftKeywords.TypeNamesToSuffix.contains(uppercasedName) ?
@@ -124,7 +123,7 @@ extension GraphQLInputField {
   func render(
     config: ApolloCodegenConfiguration
   ) -> String {
-    //If the name has been customized and its not for .enumRawValue, return it unchanged
+    //If the name has been customized return it unchanged
     if let customName = name.customName {
       return customName
     }

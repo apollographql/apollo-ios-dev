@@ -325,77 +325,66 @@ public class ApolloCodegen {
   }
   
   func processSchemaCustomizations(ir: IRBuilder) {
-    ir.schema.referencedTypes.allTypes.forEach { type in
-      if type is GraphQLObjectType ||
-          type is GraphQLInterfaceType ||
-          type is GraphQLUnionType {
-        guard let typeCustomization = config.options.schemaCustomization.customTypeNames[type.name.schemaName] else {
-          return
-        }
-        
-        switch typeCustomization {
-        case .type(let name):
-          type.name.customName = name
-        default:
-          break
-        }
-      } else if let scalarType = type as? GraphQLScalarType {
-        guard scalarType.isCustomScalar,
-              let typeCustomization = config.options.schemaCustomization.customTypeNames[scalarType.name.schemaName] else {
-          return
-        }
-        
-        switch typeCustomization {
-        case .type(let name):
-          type.name.customName = name
-        default:
-          break
-        }
-      } else if let enumType = type as? GraphQLEnumType {
-        guard let typeCustomization = config.options.schemaCustomization.customTypeNames[enumType.name.schemaName] else {
-          return
-        }
-        
-        switch typeCustomization {
-        case .type(let name):
-          enumType.name.customName = name
-          break
-        case .enum(let name, let cases):
-          enumType.name.customName = name
+    for (name, customization) in config.options.schemaCustomization.customTypeNames {
+      if let type = ir.schema.referencedTypes.allTypes.first(where: { $0.name.schemaName == name }) {
+        if type is GraphQLObjectType ||
+            type is GraphQLInterfaceType ||
+            type is GraphQLUnionType {
+          switch customization {
+          case .type(let name):
+            type.name.customName = name
+          default:
+            break
+          }
+        } else if let scalarType = type as? GraphQLScalarType {
+          guard scalarType.isCustomScalar else {
+            return
+          }
           
-          if let cases = cases {
-            for value in enumType.values {
-              if let caseName = cases[value.name.schemaName] {
-                value.name.customName = caseName
+          switch customization {
+          case .type(let name):
+            type.name.customName = name
+          default:
+            break
+          }
+        } else if let enumType = type as? GraphQLEnumType {
+          switch customization {
+          case .type(let name):
+            enumType.name.customName = name
+            break
+          case .enum(let name, let cases):
+            enumType.name.customName = name
+            
+            if let cases = cases {
+              for value in enumType.values {
+                if let caseName = cases[value.name.schemaName] {
+                  value.name.customName = caseName
+                }
               }
             }
+            break
+          default:
+            break
           }
-          break
-        default:
-          break
-        }
-      } else if let inputObjectType = type as? GraphQLInputObjectType {
-        guard let typeCustomization = config.options.schemaCustomization.customTypeNames[inputObjectType.name.schemaName] else {
-          return
-        }
-        
-        switch typeCustomization {
-        case .type(let name):
-          inputObjectType.name.customName = name
-          break
-        case .inputObject(let name, let fields):
-          inputObjectType.name.customName = name
-          
-          if let fields = fields {
-            for (_, field) in inputObjectType.fields {
-              if let fieldName = fields[field.name.schemaName] {
-                field.name.customName = fieldName
+        } else if let inputObjectType = type as? GraphQLInputObjectType {
+          switch customization {
+          case .type(let name):
+            inputObjectType.name.customName = name
+            break
+          case .inputObject(let name, let fields):
+            inputObjectType.name.customName = name
+            
+            if let fields = fields {
+              for (_, field) in inputObjectType.fields {
+                if let fieldName = fields[field.name.schemaName] {
+                  field.name.customName = fieldName
+                }
               }
             }
+            break
+          default:
+            break
           }
-          break
-        default:
-          break
         }
       }
     }
