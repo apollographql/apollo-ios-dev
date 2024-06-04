@@ -14,6 +14,7 @@ public class GraphQLQueryPager<Model>: Publisher {
 
   public var canLoadNext: Bool { pager.canLoadNext }
   public var canLoadPrevious: Bool { pager.canLoadPrevious }
+  public var isLoadingAll: Bool { pager.isLoadingAll }
 
   init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager,

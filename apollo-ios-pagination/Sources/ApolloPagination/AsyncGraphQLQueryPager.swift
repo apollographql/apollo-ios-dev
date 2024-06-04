@@ -14,6 +14,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
 
   public var canLoadNext: Bool { get async { await pager.canLoadNext } }
   public var canLoadPrevious: Bool { get async { await pager.canLoadPrevious } }
+  public var isLoadingAll: Bool { get async { await pager.isLoadingAll } }
 
   init<Pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager,

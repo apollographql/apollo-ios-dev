@@ -180,13 +180,9 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     let previousPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
     let lastPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
 
-    let loadAllExpectation = expectation(description: "Load all pages")
-    await pager.subscribe(onUpdate: { _ in
-      loadAllExpectation.fulfill()
-    }).store(in: &cancellables)
     try await pager.loadAll()
     await fulfillment(
-      of: [firstPageExpectation, lastPageExpectation, previousPageExpectation, loadAllExpectation],
+      of: [firstPageExpectation, lastPageExpectation, previousPageExpectation],
       timeout: 5
     )
 
@@ -279,24 +275,27 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     }
   }
 
-  func test_loadAll() async throws {
-    let pager = GraphQLQueryPagerCoordinator(pager: createPager())
+  func test_loadAll() throws {
+    let pager = GraphQLQueryPager(pager: GraphQLQueryPagerCoordinator(pager: createPager()))
 
     let firstPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(server: server)
     let previousPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
     let lastPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
 
     let loadAllExpectation = expectation(description: "Load all pages")
-    pager.subscribe(onUpdate: { _ in
-      loadAllExpectation.fulfill()
-    })
+    var currentValue: GraphQLQueryPager<PaginationOutput<BidirectionalPaginationTests.Query, BidirectionalPaginationTests.Query>>.Output?
+    pager.sink { result in
+      currentValue = result
+      if !pager.isLoadingAll {
+        loadAllExpectation.fulfill()
+      }
+    }.store(in: &cancellables)
     pager.loadAll()
-    await fulfillment(
-      of: [firstPageExpectation, lastPageExpectation, previousPageExpectation, loadAllExpectation],
-      timeout: 5
-    )
+    XCTAssertTrue(pager.isLoadingAll)
+    wait(for: [firstPageExpectation, lastPageExpectation, previousPageExpectation, loadAllExpectation], timeout: 5)
+    XCTAssertFalse(pager.isLoadingAll)
 
-    let result = try await XCTUnwrapping(try await pager.pager.currentValue?.get().0)
+    let result = try XCTUnwrap(try currentValue?.get().0)
     XCTAssertFalse(result.previousPages.isEmpty)
     XCTAssertEqual(result.initialPage.hero.friendsConnection.friends.count, 1)
     XCTAssertFalse(result.nextPages.isEmpty)
