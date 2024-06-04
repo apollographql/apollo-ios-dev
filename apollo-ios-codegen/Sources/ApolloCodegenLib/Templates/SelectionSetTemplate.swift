@@ -7,7 +7,7 @@ import Utilities
 
 struct SelectionSetTemplate {
 
-  let definition: IR.Definition
+  let definition: any IR.Definition
   let generateInitializers: Bool
   let config: ApolloCodegen.ConfigurationContext
   let nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
@@ -18,7 +18,7 @@ struct SelectionSetTemplate {
   var isMutable: Bool { definition.isMutable }
 
   init(
-    definition: IR.Definition,
+    definition: any IR.Definition,
     generateInitializers: Bool,
     config: ApolloCodegen.ConfigurationContext,
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder,

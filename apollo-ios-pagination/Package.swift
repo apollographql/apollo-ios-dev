@@ -30,7 +30,8 @@ let package = Package(
         .product(name: "Apollo", package: "apollo-ios"),
         .product(name: "ApolloAPI", package: "apollo-ios"),
         .product(name: "OrderedCollections", package: "swift-collections"),
-      ]
+      ],
+      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
     ),
   ]
 )

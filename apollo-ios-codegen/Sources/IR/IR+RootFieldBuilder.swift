@@ -270,7 +270,7 @@ class RootFieldBuilder {
   }
 
   private func scopeCondition(
-    for conditionalSelectionSet: ConditionallyIncludable,
+    for conditionalSelectionSet: any ConditionallyIncludable,
     in parentTypePath: SelectionSet.TypeInfo,
     isDeferred: Bool = false
   ) -> ScopeCondition? {
