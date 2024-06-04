@@ -99,6 +99,17 @@ public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, Apollo
   public func store(_ store: ApolloStore,
                     didChangeKeys changedKeys: Set<CacheKey>,
                     contextIdentifier: UUID?) {
+    // not implemented, deprecated
+  }
+
+  public func store(_ store: Apollo.ApolloStore,
+             activity: Apollo.ApolloStore.Activity,
+             contextIdentifier: UUID?) throws {
+    // To match the old didChangeKeys ApolloStoreSubscriber behavior, only operation on the "did merge" action.
+    guard case .did(perform: .merge, outcome: .changedKeys(let changedKeys)) = activity else {
+      return
+    }
+
     if
       let incomingIdentifier = contextIdentifier,
       incomingIdentifier == self.contextIdentifier {
