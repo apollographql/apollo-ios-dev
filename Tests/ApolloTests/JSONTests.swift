@@ -2,7 +2,6 @@ import XCTest
 @testable import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
-import StarWarsAPI
 
 class JSONTests: XCTestCase {
   func testMissingValueMatchable() {
@@ -118,18 +117,41 @@ class JSONTests: XCTestCase {
       "name": "Johnny Tsunami"
     ]
     
-    let converted = try JSONConvert.selectionSetToJSONObject(Hero(data: expected))
+    let converted = try JSONConverter.convert(Hero(data: expected))
     XCTAssertEqual(converted, expected)
   }
   
   func testJSONConvertGraphQLResultEncoding() throws {
+    class MockData: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("hero", Hero?.self)
+      ]}
+
+      var hero: Hero? { __data["hero"] }
+
+      class Hero: MockSelectionSet {
+        typealias Schema = MockSchemaMetadata
+
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+          .field("name", String?.self)
+        ]}
+
+        var name: String? { __data["name"] }
+      }
+    }
+
     let jsonObj: [String: AnyHashable] = [
       "hero": [
         "name": "Luke Skywalker",
         "__typename": "Human"
       ]
     ]
-    let heroData = try StarWarsAPI.HeroNameQuery.Data(data: jsonObj)
+    
+    let heroData = try MockData(data: jsonObj)
+
     let result = GraphQLResult(
       data: heroData,
       extensions: nil,
@@ -147,7 +169,7 @@ class JSONTests: XCTestCase {
       ]
     ]
     
-    let converted = JSONConvert.graphQLResultToJSONObject(result)
+    let converted = JSONConverter.convert(result)
     XCTAssertEqual(converted, expected)
   }
 }
