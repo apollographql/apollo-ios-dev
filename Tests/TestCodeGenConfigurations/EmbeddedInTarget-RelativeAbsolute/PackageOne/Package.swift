@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -45,12 +45,16 @@ let package = Package(
         "graphql/PetDetails.graphql",
         "graphql/AllAnimalsIncludeSkipQuery.graphql",
         "graphql/PetAdoptionMutation.graphql"
-      ]),
+      ],
+      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+    ),
     .testTarget(
       name: "PackageOneTests",
       dependencies: [
         "PackageOne",
         .product(name: "TestMocks", package: "PackageTwo")
-      ]),
+      ],
+      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+    ),
   ]
 )

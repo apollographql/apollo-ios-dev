@@ -18,7 +18,7 @@ public extension MyAPI {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Query }
+      public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Query }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("classroomPets", [ClassroomPet?]?.self),
       ] }
@@ -32,7 +32,7 @@ public extension MyAPI {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { MyAPI.Unions.ClassroomPet }
+        public static var __parentType: any ApolloAPI.ParentType { MyAPI.Unions.ClassroomPet }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .fragment(ClassroomPetDetails.self),
@@ -60,7 +60,7 @@ public extension MyAPI {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = ClassroomPetsQuery.Data.ClassroomPet
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.Animal }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.Animal }
           public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
             ClassroomPetsQuery.Data.ClassroomPet.self,
             ClassroomPetDetails.AsAnimal.self
@@ -84,7 +84,7 @@ public extension MyAPI {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = ClassroomPetsQuery.Data.ClassroomPet
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.Pet }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.Pet }
           public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
             ClassroomPetsQuery.Data.ClassroomPet.self,
             ClassroomPetDetails.AsPet.self
@@ -108,7 +108,7 @@ public extension MyAPI {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = ClassroomPetsQuery.Data.ClassroomPet
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.WarmBlooded }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.WarmBlooded }
           public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
             ClassroomPetsQuery.Data.ClassroomPet.self,
             ClassroomPetDetails.AsAnimal.self,
@@ -134,7 +134,7 @@ public extension MyAPI {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = ClassroomPetsQuery.Data.ClassroomPet
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Cat }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Cat }
           public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
             ClassroomPetsQuery.Data.ClassroomPet.self,
             ClassroomPetDetails.AsAnimal.self,
@@ -165,7 +165,7 @@ public extension MyAPI {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = ClassroomPetsQuery.Data.ClassroomPet
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Bird }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Bird }
           public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
             ClassroomPetsQuery.Data.ClassroomPet.self,
             ClassroomPetDetails.AsAnimal.self,
@@ -195,7 +195,7 @@ public extension MyAPI {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = ClassroomPetsQuery.Data.ClassroomPet
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.PetRock }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.PetRock }
           public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
             ClassroomPetsQuery.Data.ClassroomPet.self,
             ClassroomPetDetails.AsPet.self,

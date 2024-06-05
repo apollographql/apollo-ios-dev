@@ -8,7 +8,7 @@ public extension MyAPI {
     public static let operationName: String = "AllAnimalsQuery"
     public static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query AllAnimalsQuery { allAnimals { __typename height { __typename feet inches } ...HeightInMeters ...WarmBloodedDetails species skinCovering ... on Pet { ...PetDetails ...WarmBloodedDetails ... on Animal { height { __typename relativeSize centimeters } } } ... on Cat { isJellicle } ... on ClassroomPet { ... on Bird { wingspan } } ... on Dog { favoriteToy birthdate } predators { __typename species ... on WarmBlooded { predators { __typename species } ...WarmBloodedDetails laysEggs } } } }"#,
+        #"query AllAnimalsQuery { allAnimals { __typename id height { __typename feet inches } ...HeightInMeters ...WarmBloodedDetails species skinCovering ... on Pet { ...PetDetails ...WarmBloodedDetails ... on Animal { height { __typename relativeSize centimeters } } } ... on Cat { isJellicle } ... on ClassroomPet { ... on Bird { wingspan } } ... on Dog { favoriteToy birthdate } predators { __typename species ... on WarmBlooded { predators { __typename species } ...WarmBloodedDetails laysEggs } } } }"#,
         fragments: [HeightInMeters.self, PetDetails.self, WarmBloodedDetails.self]
       ))
 
@@ -18,7 +18,7 @@ public extension MyAPI {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Query }
+      public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Query }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("allAnimals", [AllAnimal].self),
       ] }
@@ -32,9 +32,10 @@ public extension MyAPI {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.Animal }
+        public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.Animal }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
+          .field("id", MyAPI.ID.self),
           .field("height", Height.self),
           .field("species", String.self),
           .field("skinCovering", GraphQLEnum<MyAPI.SkinCovering>?.self),
@@ -47,6 +48,7 @@ public extension MyAPI {
           .fragment(HeightInMeters.self),
         ] }
 
+        public var id: MyAPI.ID { __data["id"] }
         public var height: Height { __data["height"] }
         public var species: String { __data["species"] }
         public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -72,7 +74,7 @@ public extension MyAPI {
           public let __data: DataDict
           public init(_dataDict: DataDict) { __data = _dataDict }
 
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Height }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Height }
           public static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
             .field("feet", Int.self),
@@ -91,7 +93,7 @@ public extension MyAPI {
           public let __data: DataDict
           public init(_dataDict: DataDict) { __data = _dataDict }
 
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.Animal }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.Animal }
           public static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
             .field("species", String.self),
@@ -110,7 +112,7 @@ public extension MyAPI {
             public init(_dataDict: DataDict) { __data = _dataDict }
 
             public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal.Predator
-            public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.WarmBlooded }
+            public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.WarmBlooded }
             public static var __selections: [ApolloAPI.Selection] { [
               .field("predators", [Predator].self),
               .field("laysEggs", Bool.self),
@@ -138,7 +140,7 @@ public extension MyAPI {
               public let __data: DataDict
               public init(_dataDict: DataDict) { __data = _dataDict }
 
-              public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.Animal }
+              public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.Animal }
               public static var __selections: [ApolloAPI.Selection] { [
                 .field("__typename", String.self),
                 .field("species", String.self),
@@ -159,11 +161,12 @@ public extension MyAPI {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.WarmBlooded }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.WarmBlooded }
           public static var __selections: [ApolloAPI.Selection] { [
             .fragment(WarmBloodedDetails.self),
           ] }
 
+          public var id: MyAPI.ID { __data["id"] }
           public var height: Height { __data["height"] }
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -185,14 +188,12 @@ public extension MyAPI {
             public let __data: DataDict
             public init(_dataDict: DataDict) { __data = _dataDict }
 
-            public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Height }
+            public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Height }
 
             public var feet: Int { __data["feet"] }
             public var inches: Int? { __data["inches"] }
             public var meters: Int { __data["meters"] }
           }
-
-
         }
 
         /// AllAnimal.AsPet
@@ -203,7 +204,7 @@ public extension MyAPI {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.Pet }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.Pet }
           public static var __selections: [ApolloAPI.Selection] { [
             .field("height", Height.self),
             .inlineFragment(AsWarmBlooded.self),
@@ -211,6 +212,7 @@ public extension MyAPI {
           ] }
 
           public var height: Height { __data["height"] }
+          public var id: MyAPI.ID { __data["id"] }
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
           public var predators: [Predator] { __data["predators"] }
@@ -235,7 +237,7 @@ public extension MyAPI {
             public let __data: DataDict
             public init(_dataDict: DataDict) { __data = _dataDict }
 
-            public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Height }
+            public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Height }
             public static var __selections: [ApolloAPI.Selection] { [
               .field("__typename", String.self),
               .field("relativeSize", GraphQLEnum<MyAPI.RelativeSize>.self),
@@ -249,8 +251,6 @@ public extension MyAPI {
             public var meters: Int { __data["meters"] }
           }
 
-
-
           public typealias Owner = PetDetails.Owner
 
           /// AllAnimal.AsPet.AsWarmBlooded
@@ -261,11 +261,12 @@ public extension MyAPI {
             public init(_dataDict: DataDict) { __data = _dataDict }
 
             public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-            public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.WarmBlooded }
+            public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.WarmBlooded }
             public static var __selections: [ApolloAPI.Selection] { [
               .fragment(WarmBloodedDetails.self),
             ] }
 
+            public var id: MyAPI.ID { __data["id"] }
             public var height: Height { __data["height"] }
             public var species: String { __data["species"] }
             public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -291,7 +292,7 @@ public extension MyAPI {
               public let __data: DataDict
               public init(_dataDict: DataDict) { __data = _dataDict }
 
-              public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Height }
+              public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Height }
 
               public var feet: Int { __data["feet"] }
               public var inches: Int? { __data["inches"] }
@@ -299,8 +300,6 @@ public extension MyAPI {
               public var relativeSize: GraphQLEnum<MyAPI.RelativeSize> { __data["relativeSize"] }
               public var centimeters: Double { __data["centimeters"] }
             }
-
-
 
             public typealias Owner = PetDetails.Owner
           }
@@ -314,12 +313,13 @@ public extension MyAPI {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Cat }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Cat }
           public static var __selections: [ApolloAPI.Selection] { [
             .field("isJellicle", Bool.self),
           ] }
 
           public var isJellicle: Bool { __data["isJellicle"] }
+          public var id: MyAPI.ID { __data["id"] }
           public var height: Height { __data["height"] }
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -345,7 +345,7 @@ public extension MyAPI {
             public let __data: DataDict
             public init(_dataDict: DataDict) { __data = _dataDict }
 
-            public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Height }
+            public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Height }
 
             public var feet: Int { __data["feet"] }
             public var inches: Int? { __data["inches"] }
@@ -353,8 +353,6 @@ public extension MyAPI {
             public var relativeSize: GraphQLEnum<MyAPI.RelativeSize> { __data["relativeSize"] }
             public var centimeters: Double { __data["centimeters"] }
           }
-
-
 
           public typealias Owner = PetDetails.Owner
         }
@@ -367,11 +365,12 @@ public extension MyAPI {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Unions.ClassroomPet }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Unions.ClassroomPet }
           public static var __selections: [ApolloAPI.Selection] { [
             .inlineFragment(AsBird.self),
           ] }
 
+          public var id: MyAPI.ID { __data["id"] }
           public var height: Height { __data["height"] }
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -393,14 +392,12 @@ public extension MyAPI {
             public let __data: DataDict
             public init(_dataDict: DataDict) { __data = _dataDict }
 
-            public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Height }
+            public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Height }
 
             public var feet: Int { __data["feet"] }
             public var inches: Int? { __data["inches"] }
             public var meters: Int { __data["meters"] }
           }
-
-
 
           /// AllAnimal.AsClassroomPet.AsBird
           ///
@@ -410,12 +407,13 @@ public extension MyAPI {
             public init(_dataDict: DataDict) { __data = _dataDict }
 
             public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-            public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Bird }
+            public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Bird }
             public static var __selections: [ApolloAPI.Selection] { [
               .field("wingspan", Double.self),
             ] }
 
             public var wingspan: Double { __data["wingspan"] }
+            public var id: MyAPI.ID { __data["id"] }
             public var height: Height { __data["height"] }
             public var species: String { __data["species"] }
             public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -441,7 +439,7 @@ public extension MyAPI {
               public let __data: DataDict
               public init(_dataDict: DataDict) { __data = _dataDict }
 
-              public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Height }
+              public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Height }
 
               public var feet: Int { __data["feet"] }
               public var inches: Int? { __data["inches"] }
@@ -449,8 +447,6 @@ public extension MyAPI {
               public var relativeSize: GraphQLEnum<MyAPI.RelativeSize> { __data["relativeSize"] }
               public var centimeters: Double { __data["centimeters"] }
             }
-
-
 
             public typealias Owner = PetDetails.Owner
           }
@@ -464,7 +460,7 @@ public extension MyAPI {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Dog }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Dog }
           public static var __selections: [ApolloAPI.Selection] { [
             .field("favoriteToy", String.self),
             .field("birthdate", MyAPI.CustomDate?.self),
@@ -472,6 +468,7 @@ public extension MyAPI {
 
           public var favoriteToy: String { __data["favoriteToy"] }
           public var birthdate: MyAPI.CustomDate? { __data["birthdate"] }
+          public var id: MyAPI.ID { __data["id"] }
           public var height: Height { __data["height"] }
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<MyAPI.SkinCovering>? { __data["skinCovering"] }
@@ -496,7 +493,7 @@ public extension MyAPI {
             public let __data: DataDict
             public init(_dataDict: DataDict) { __data = _dataDict }
 
-            public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Height }
+            public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Height }
 
             public var feet: Int { __data["feet"] }
             public var inches: Int? { __data["inches"] }
@@ -504,8 +501,6 @@ public extension MyAPI {
             public var relativeSize: GraphQLEnum<MyAPI.RelativeSize> { __data["relativeSize"] }
             public var centimeters: Double { __data["centimeters"] }
           }
-
-
 
           public typealias Owner = PetDetails.Owner
         }
