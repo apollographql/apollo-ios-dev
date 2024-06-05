@@ -507,8 +507,7 @@ class EnumTemplateTests: XCTestCase {
     \(subject.graphqlEnum.name.typeNameDocumentation)
     enum MyCustomEnum: String, EnumType {
       case caseOne = "caseOne"
-      // This type has been renamed from the schema type 'myCase'
-      // using schema customization configuration.
+      // Renamed from GraphQL schema value: 'myCase'
       case myCustomCase = "myCase"
     }
     

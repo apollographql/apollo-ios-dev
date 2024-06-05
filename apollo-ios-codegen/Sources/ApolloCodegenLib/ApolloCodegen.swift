@@ -118,7 +118,6 @@ public class ApolloCodegen {
     try config.validateConfigValues()
 
     let compilationResult = try await compileGraphQLResult()
-    
     try config.validate(compilationResult)
 
     let ir = IRBuilder(compilationResult: compilationResult)

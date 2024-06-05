@@ -2592,8 +2592,7 @@ class InputObjectTemplateTests: XCTestCase {
         set { __data["fieldOne"] = newValue }
       }
 
-      // This type has been renamed from the schema type 'myField'
-      // using schema customization configuration.
+      // Renamed from GraphQL schema value: 'myField'      
       public var myCustomField: String {
         get { __data["myField"] }
         set { __data["myField"] = newValue }
