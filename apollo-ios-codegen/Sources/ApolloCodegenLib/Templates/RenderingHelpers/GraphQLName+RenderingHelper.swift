@@ -14,7 +14,7 @@ extension GraphQLNamedType {
     //If the name has been customized return it unchanged
     if let customName = name.customName {
       return customName
-  }
+    }
     
     switch context {
     case .filename:
