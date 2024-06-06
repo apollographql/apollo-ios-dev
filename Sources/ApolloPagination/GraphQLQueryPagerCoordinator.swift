@@ -42,12 +42,12 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
   private var subscriptions = Subscriptions()
   private var completionManager = CompletionManager()
 
-  var publisher: AnyPublisher<Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>, Never> {
+  var publisher: AnyPublisher<Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), any Error>, Never> {
     get async { await pager.$currentValue.compactMap { $0 }.eraseToAnyPublisher() }
   }
 
   init<P: PaginationInfo>(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, PaginationOutput<InitialQuery, PaginatedQuery>?>) -> P,
@@ -87,7 +87,7 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
 
   /// Allows the caller to subscribe to new pagination results.
   /// - Parameter onUpdate: A closure which provides the most recent pagination result. Execution may be on any thread.
-  func subscribe(onUpdate: @escaping (Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), Error>) -> Void) {
+  func subscribe(onUpdate: @escaping (Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), any Error>) -> Void) {
     Task { [weak self] in
       guard let self else { return }
       let subscription = await self.pager.subscribe(onUpdate: onUpdate)
