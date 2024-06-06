@@ -18,7 +18,7 @@ struct MockInterfacesFileGenerator: FileGenerator {
     self.config = config
   }
 
-  var template: TemplateRenderer {
+  var template: any TemplateRenderer {
     MockInterfacesTemplate(
       graphQLInterfaces: graphQLInterfaces,
       config: config

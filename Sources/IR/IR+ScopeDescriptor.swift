@@ -130,7 +130,7 @@ public struct ScopeDescriptor: Hashable, CustomDebugStringConvertible {
     var newScope = scope ?? []
     newScope.append(newType)
 
-    if let newType = newType as? GraphQLInterfaceImplementingType {
+    if let newType = newType as? (any GraphQLInterfaceImplementingType) {
       newScope.formUnion(newType.interfaces)
     }
 

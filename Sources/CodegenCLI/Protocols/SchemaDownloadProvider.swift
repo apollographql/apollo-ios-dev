@@ -6,7 +6,7 @@ public protocol SchemaDownloadProvider {
   static func fetch(
     configuration: ApolloSchemaDownloadConfiguration,
     withRootURL rootURL: URL?,
-    session: NetworkSession?
+    session: (any NetworkSession)?
   ) async throws
 }
 

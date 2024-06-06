@@ -53,7 +53,7 @@ public struct ApolloSchemaDownloadConfiguration: Equatable, Codable {
         case variant
       }
 
-      public init(from decoder: Decoder) throws {
+      public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self.apiKey = try container.decode(String.self, forKey: .apiKey)
@@ -185,7 +185,7 @@ public struct ApolloSchemaDownloadConfiguration: Equatable, Codable {
     case outputPath
   }
 
-  public init(from decoder: Decoder) throws {
+  public init(from decoder: any Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
 
     self.downloadMethod = try container.decode(DownloadMethod.self, forKey: .downloadMethod)

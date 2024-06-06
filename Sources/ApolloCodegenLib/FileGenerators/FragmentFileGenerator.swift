@@ -8,7 +8,7 @@ struct FragmentFileGenerator: FileGenerator {
   /// Shared codegen configuration.
   let config: ApolloCodegen.ConfigurationContext
   
-  var template: TemplateRenderer { FragmentTemplate(
+  var template: any TemplateRenderer { FragmentTemplate(
     fragment: irFragment,
     config: config
   ) }

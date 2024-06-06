@@ -8,7 +8,7 @@ protocol FileGenerator {
   var fileName: String { get }
   var fileExtension: String { get }
   var overwrite: Bool { get }
-  var template: TemplateRenderer { get }
+  var template: any TemplateRenderer { get }
   var target: FileTarget { get }
 }
 

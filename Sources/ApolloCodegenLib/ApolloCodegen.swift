@@ -553,7 +553,7 @@ public class ApolloCodegen {
 
 extension ApolloCodegen {
   fileprivate func nonFatalErrorCollectingTaskGroup(
-    _ block: (inout ThrowingTaskGroup<NonFatalErrors.DefinitionEntry, Swift.Error>) async throws -> Void
+    _ block: (inout ThrowingTaskGroup<NonFatalErrors.DefinitionEntry, any Swift.Error>) async throws -> Void
   ) async throws -> NonFatalErrors {
     return try await withThrowingTaskGroup(
       of: (NonFatalErrors.DefinitionEntry).self
@@ -571,8 +571,8 @@ extension ApolloCodegen {
   }
 
   fileprivate func addFileGenerationTask(
-    for fileGenerator: FileGenerator,
-    to group: inout ThrowingTaskGroup<ApolloCodegen.NonFatalErrors.DefinitionEntry, Swift.Error>,
+    for fileGenerator: any FileGenerator,
+    to group: inout ThrowingTaskGroup<ApolloCodegen.NonFatalErrors.DefinitionEntry, any Swift.Error>,
     fileManager: ApolloFileManager
   ) {
     let config = config

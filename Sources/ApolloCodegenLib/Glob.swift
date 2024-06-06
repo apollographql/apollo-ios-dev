@@ -151,9 +151,9 @@ public struct Glob {
 
     do {
       let resourceKeys: [URLResourceKey] = [.isDirectoryKey]
-      var enumeratorError: Error?
+      var enumeratorError: (any Error)?
 
-      let errorHandler: ((URL, Error) -> Bool) = { url, error in
+      let errorHandler: ((URL, any Error) -> Bool) = { url, error in
         enumeratorError = error
         return false // aborts enumeration
       }
