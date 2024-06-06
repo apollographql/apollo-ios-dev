@@ -23,7 +23,7 @@ public class HeroFriendsDetailsConditionalInclusionQuery: GraphQLQuery {
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self),
     ] }
@@ -51,7 +51,7 @@ public class HeroFriendsDetailsConditionalInclusionQuery: GraphQLQuery {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .include(if: "includeFriendsDetails", .field("friends", [Friend?]?.self)),
@@ -82,7 +82,7 @@ public class HeroFriendsDetailsConditionalInclusionQuery: GraphQLQuery {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("name", String.self),
@@ -117,7 +117,7 @@ public class HeroFriendsDetailsConditionalInclusionQuery: GraphQLQuery {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = HeroFriendsDetailsConditionalInclusionQuery.Data.Hero.Friend
-          public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
+          public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
           public static var __selections: [ApolloAPI.Selection] { [
             .field("primaryFunction", String?.self),
           ] }

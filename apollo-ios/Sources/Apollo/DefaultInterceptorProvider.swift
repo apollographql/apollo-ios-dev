@@ -53,7 +53,7 @@ open class DefaultInterceptorProvider: InterceptorProvider {
     }
   }
 
-  open func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> ApolloErrorInterceptor? {
+  open func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
     return nil
   }
 }

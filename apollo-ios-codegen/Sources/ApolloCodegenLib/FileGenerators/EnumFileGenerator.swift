@@ -8,7 +8,7 @@ struct EnumFileGenerator: FileGenerator {
   /// Shared codegen configuration.
   let config: ApolloCodegen.ConfigurationContext
 
-  var template: TemplateRenderer {
+  var template: any TemplateRenderer {
     EnumTemplate(graphqlEnum: graphqlEnum, config: config)
   }
 

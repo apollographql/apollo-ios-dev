@@ -16,7 +16,7 @@ public class ObjectExecutionInfo {
   fileprivate init(
     rootType: any SelectionSet.Type,
     variables: GraphQLOperation.Variables?,
-    schema: any SchemaMetadata.Type,
+    schema: (any SchemaMetadata.Type),
     responsePath: ResponsePath,
     cachePath: ResponsePath
   ) {
@@ -31,7 +31,7 @@ public class ObjectExecutionInfo {
   fileprivate init(
     rootType: any SelectionSet.Type,
     variables: GraphQLOperation.Variables?,
-    schema: any SchemaMetadata.Type,
+    schema: (any SchemaMetadata.Type),
     withRootCacheReference root: CacheReference? = nil
   ) {
     self.rootType = rootType
@@ -159,7 +159,7 @@ public struct GraphQLExecutionError: Error, LocalizedError {
   public var pathString: String { path.description }
 
   /// The error that occurred during parsing.
-  public let underlying: Error
+  public let underlying: any Error
 
   /// A description of the error which includes the path where the error occurred.
   public var errorDescription: String? {
@@ -239,7 +239,7 @@ public final class GraphQLExecutor<Source: GraphQLExecutionSource> {
     on data: Source.RawObjectData,
     withRootCacheReference root: CacheReference? = nil,
     variables: GraphQLOperation.Variables? = nil,
-    schema: SchemaMetadata.Type,
+    schema: (any SchemaMetadata.Type),
     accumulator: Accumulator
   ) throws -> Accumulator.FinalResult {
     let info = ObjectExecutionInfo(

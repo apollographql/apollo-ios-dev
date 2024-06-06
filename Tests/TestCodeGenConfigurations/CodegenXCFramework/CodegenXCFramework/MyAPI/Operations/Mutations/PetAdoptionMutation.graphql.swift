@@ -23,7 +23,7 @@ public extension MyAPI {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Mutation }
+      public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Mutation }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("adoptPet", AdoptPet.self, arguments: ["input": .variable("input")]),
       ] }
@@ -37,7 +37,7 @@ public extension MyAPI {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.Pet }
+        public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.Pet }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("id", MyAPI.ID.self),

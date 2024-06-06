@@ -12,7 +12,7 @@ on:
 jobs:
   split-subtrees:
     if: ${{ github.event.pull_request.merged }}
-    runs-on: macos-13
+    runs-on: macos-latest
     name: Split and Push Subtrees
     steps:
     - name: Checkout Repo

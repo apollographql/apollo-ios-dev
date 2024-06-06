@@ -7,7 +7,7 @@ class ClearCacheTests: XCTestCase {
 
   var store: ApolloStore!
   var server: MockGraphQLServer!
-  var transport: NetworkTransport!
+  var transport: (any NetworkTransport)!
   var client: ApolloClient!
 
   override func setUp() {

@@ -9,7 +9,7 @@ struct SchemaMetadataFileGenerator: FileGenerator {
   /// Shared codegen configuration
   let config: ApolloCodegen.ConfigurationContext
 
-  var template: TemplateRenderer { SchemaMetadataTemplate(schema: schema, config: config) }
+  var template: any TemplateRenderer { SchemaMetadataTemplate(schema: schema, config: config) }
   var target: FileTarget { .schema }
   var fileName: String { "SchemaMetadata" }
 }

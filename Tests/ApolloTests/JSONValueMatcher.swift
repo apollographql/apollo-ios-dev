@@ -2,7 +2,7 @@ import Nimble
 import Apollo
 import ApolloAPI
 
-public func equalJSONValue(_ expectedValue: JSONEncodable?) -> Matcher<JSONEncodable> {
+public func equalJSONValue(_ expectedValue: (any JSONEncodable)?) -> Matcher<any JSONEncodable> {
   return Matcher { actual in
     let msg = ExpectationMessage.expectedActualValueTo("equal <\(stringify(expectedValue))>")
     if let actualValue = try actual.evaluate(), let expectedValue = expectedValue {

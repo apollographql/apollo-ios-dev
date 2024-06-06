@@ -24,7 +24,7 @@ public class HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self),
     ] }
@@ -52,7 +52,7 @@ public class HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .include(if: "includeDetails", .inlineFragment(IfIncludeDetails.self)),
@@ -88,7 +88,7 @@ public class HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = HeroDetailsFragmentConditionalInclusionQuery.Data.Hero
-        public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
         public static var __selections: [ApolloAPI.Selection] { [
           .fragment(HeroDetails.self),
         ] }

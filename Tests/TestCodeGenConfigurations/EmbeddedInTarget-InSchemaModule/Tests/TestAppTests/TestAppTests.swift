@@ -53,10 +53,10 @@ class MockNetworkTransport: NetworkTransport {
     operation: Operation,
     cachePolicy: CachePolicy,
     contextIdentifier: UUID?,
-    context: RequestContext?,
+    context: (any RequestContext)?,
     callbackQueue: DispatchQueue,
-    completionHandler: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
-  ) -> Cancellable where Operation : GraphQLOperation {
+    completionHandler: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
+  ) -> any Cancellable where Operation : GraphQLOperation {
     return EmptyCancellable()
   }
   var clientName: String { "Mock" }

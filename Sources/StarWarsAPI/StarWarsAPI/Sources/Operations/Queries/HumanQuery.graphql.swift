@@ -23,7 +23,7 @@ public class HumanQuery: GraphQLQuery {
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("human", Human?.self, arguments: ["id": .variable("id")]),
     ] }
@@ -51,7 +51,7 @@ public class HumanQuery: GraphQLQuery {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
+      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("name", String.self),

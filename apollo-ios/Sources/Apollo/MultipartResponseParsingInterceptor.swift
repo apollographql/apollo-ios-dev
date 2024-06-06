@@ -23,7 +23,7 @@ public struct MultipartResponseParsingInterceptor: ApolloInterceptor {
     }
   }
 
-  private static let responseParsers: [String: MultipartResponseSpecificationParser.Type] = [
+  private static let responseParsers: [String: any MultipartResponseSpecificationParser.Type] = [
     MultipartResponseSubscriptionParser.protocolSpec: MultipartResponseSubscriptionParser.self,
     MultipartResponseDeferParser.protocolSpec: MultipartResponseDeferParser.self,
   ]
@@ -33,10 +33,10 @@ public struct MultipartResponseParsingInterceptor: ApolloInterceptor {
   public init() { }
 
   public func interceptAsync<Operation>(
-    chain: RequestChain,
+    chain: any RequestChain,
     request: HTTPRequest<Operation>,
     response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
+    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
   ) where Operation : GraphQLOperation {
 
     guard let response else {
@@ -133,7 +133,7 @@ protocol MultipartResponseSpecificationParser {
   /// when the chunk was successfully parsed but there is no action to take on the message, such as
   /// a heartbeat message. Successful results with a `nil` data value will not be returned to the
   /// user.
-  static func parse(_ chunk: String) -> Result<Data?, Error>
+  static func parse(_ chunk: String) -> Result<Data?, any Error>
 }
 
 extension MultipartResponseSpecificationParser {

@@ -12,7 +12,7 @@ public extension MyAPI {
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: ApolloAPI.ParentType { MyAPI.Unions.ClassroomPet }
+    public static var __parentType: any ApolloAPI.ParentType { MyAPI.Unions.ClassroomPet }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("__typename", String.self),
       .inlineFragment(AsAnimal.self),
@@ -38,7 +38,7 @@ public extension MyAPI {
       public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = ClassroomPetDetails
-      public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.Animal }
+      public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.Animal }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("species", String.self),
       ] }
@@ -54,7 +54,7 @@ public extension MyAPI {
       public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = ClassroomPetDetails
-      public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.Pet }
+      public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.Pet }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("humanName", String?.self),
       ] }
@@ -70,7 +70,7 @@ public extension MyAPI {
       public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = ClassroomPetDetails
-      public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.WarmBlooded }
+      public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.WarmBlooded }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("laysEggs", Bool.self),
       ] }
@@ -87,7 +87,7 @@ public extension MyAPI {
       public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = ClassroomPetDetails
-      public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Cat }
+      public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Cat }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("bodyTemperature", Int.self),
         .field("isJellicle", Bool.self),
@@ -108,7 +108,7 @@ public extension MyAPI {
       public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = ClassroomPetDetails
-      public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Bird }
+      public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Bird }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("wingspan", Double.self),
       ] }
@@ -127,7 +127,7 @@ public extension MyAPI {
       public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = ClassroomPetDetails
-      public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.PetRock }
+      public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.PetRock }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("favoriteToy", String.self),
       ] }

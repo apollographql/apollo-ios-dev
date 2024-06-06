@@ -73,14 +73,14 @@ class RequestChainTests: XCTestCase {
 
   func test__send__ErrorInterceptorGetsCalledAfterAnErrorIsReceived() {
     class ErrorInterceptor: ApolloErrorInterceptor {
-      var error: Error? = nil
+      var error: (any Error)? = nil
 
       func handleErrorAsync<Operation: GraphQLOperation>(
-          error: Error,
-          chain: RequestChain,
+        error: any Error,
+          chain: any RequestChain,
           request: HTTPRequest<Operation>,
           response: HTTPResponse<Operation>?,
-          completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void) {
+          completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
 
         self.error = error
         completion(.failure(error))
@@ -98,7 +98,7 @@ class RequestChainTests: XCTestCase {
         ]
       }
 
-      func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> ApolloErrorInterceptor? {
+      func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
         return self.errorInterceptor
       }
     }
@@ -145,14 +145,14 @@ class RequestChainTests: XCTestCase {
 
   func test__upload__ErrorInterceptorGetsCalledAfterAnErrorIsReceived() throws {
     class ErrorInterceptor: ApolloErrorInterceptor {
-      var error: Error? = nil
+      var error: (any Error)? = nil
 
       func handleErrorAsync<Operation: GraphQLOperation>(
-          error: Error,
-          chain: RequestChain,
+        error: any Error,
+          chain: any RequestChain,
           request: HTTPRequest<Operation>,
           response: HTTPResponse<Operation>?,
-          completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void) {
+          completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
 
         self.error = error
         completion(.failure(error))
@@ -170,7 +170,7 @@ class RequestChainTests: XCTestCase {
         ]
       }
 
-      func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> ApolloErrorInterceptor? {
+      func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
         return self.errorInterceptor
       }
     }
@@ -224,14 +224,14 @@ class RequestChainTests: XCTestCase {
 
   func testErrorInterceptorGetsCalledInDefaultInterceptorProviderSubclass() {
     class ErrorInterceptor: ApolloErrorInterceptor {
-      var error: Error? = nil
+      var error: (any Error)? = nil
 
       func handleErrorAsync<Operation: GraphQLOperation>(
-        error: Error,
-        chain: RequestChain,
+        error: any Error,
+        chain: any RequestChain,
         request: HTTPRequest<Operation>,
         response: HTTPResponse<Operation>?,
-        completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void) {
+        completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
 
         self.error = error
         completion(.failure(error))
@@ -250,7 +250,7 @@ class RequestChainTests: XCTestCase {
         ]
       }
 
-      override func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> ApolloErrorInterceptor? {
+      override func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
         return self.errorInterceptor
       }
     }
@@ -307,10 +307,10 @@ class RequestChainTests: XCTestCase {
     }
 
     func interceptAsync<Operation>(
-      chain: RequestChain,
+      chain: any RequestChain,
       request: HTTPRequest<Operation>,
       response: HTTPResponse<Operation>?,
-      completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>
+      completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>
     ) -> Void) {
       callback(try! request.toURLRequest())
     }
@@ -504,10 +504,10 @@ class RequestChainTests: XCTestCase {
     }
 
     func interceptAsync<Operation>(
-      chain: RequestChain,
+      chain: any RequestChain,
       request: HTTPRequest<Operation>,
       response: HTTPResponse<Operation>?,
-      completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>
+      completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>
     ) -> Void) {
       DispatchQueue.main.asyncAfter(wallDeadline: DispatchWallTime.now() + seconds) {
         chain.proceedAsync(
@@ -539,11 +539,11 @@ class RequestChainTests: XCTestCase {
       """.data(using: .utf8)
     )
 
-    var requestChain: RequestChain? = InterceptorRequestChain(interceptors: [
+    var requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
       NetworkFetchInterceptor(client: client),
       JSONResponseParsingInterceptor()
     ])
-    weak var weakRequestChain: RequestChain? = requestChain
+    weak var weakRequestChain: (any RequestChain)? = requestChain
 
     let expectedData = try Hero(data: [
       "__typename": "Hero",
@@ -617,12 +617,12 @@ class RequestChainTests: XCTestCase {
       """.crlfFormattedData()
     )
 
-    var requestChain: RequestChain? = InterceptorRequestChain(interceptors: [
+    var requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
       NetworkFetchInterceptor(client: client),
       MultipartResponseParsingInterceptor(),
       JSONResponseParsingInterceptor()
     ])
-    weak var weakRequestChain: RequestChain? = requestChain
+    weak var weakRequestChain: (any RequestChain)? = requestChain
 
     let expectedData = try Hero(data: [
       "__typename": "Hero",
@@ -782,12 +782,12 @@ class RequestChainTests: XCTestCase {
       data: nil
     )
 
-    var requestChain: RequestChain? = InterceptorRequestChain(interceptors: [
+    var requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
       CacheReadInterceptor(store: store),
       NetworkFetchInterceptor(client: client),
       JSONResponseParsingInterceptor()
     ])
-    weak var weakRequestChain: RequestChain? = requestChain
+    weak var weakRequestChain: (any RequestChain)? = requestChain
 
     let expectedData = try Hero(data: [
       "__typename": "Hero",
@@ -838,13 +838,13 @@ class RequestChainTests: XCTestCase {
       data: nil
     )
 
-    var requestChain: RequestChain? = InterceptorRequestChain(interceptors: [
+    var requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
       CacheReadInterceptor(store: ApolloStore()),
       NetworkFetchInterceptor(client: client),
       JSONResponseParsingInterceptor()
     ])
 
-    weak var weakRequestChain: RequestChain? = requestChain
+    weak var weakRequestChain: (any RequestChain)? = requestChain
 
     let expectation = expectation(description: "Response received")
 
@@ -904,12 +904,12 @@ class RequestChainTests: XCTestCase {
       """.data(using: .utf8)
     )
 
-    var requestChain: RequestChain? = InterceptorRequestChain(interceptors: [
+    var requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
       CacheReadInterceptor(store: store),
       NetworkFetchInterceptor(client: client),
       JSONResponseParsingInterceptor()
     ])
-    weak var weakRequestChain: RequestChain? = requestChain
+    weak var weakRequestChain: (any RequestChain)? = requestChain
 
     let expectedData = try Hero(data: [
       "__typename": "Hero",
@@ -963,13 +963,13 @@ class RequestChainTests: XCTestCase {
       data: nil
     )
 
-    var requestChain: RequestChain? = InterceptorRequestChain(interceptors: [
+    var requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
       CacheReadInterceptor(store: store),
       NetworkFetchInterceptor(client: client),
       JSONResponseParsingInterceptor()
     ])
 
-    weak var weakRequestChain: RequestChain? = requestChain
+    weak var weakRequestChain: (any RequestChain)? = requestChain
 
     let expectation = expectation(description: "Response received")
     expectation.expectedFulfillmentCount = 2
@@ -1037,10 +1037,10 @@ class RequestChainTests: XCTestCase {
     let expectation: XCTestExpectation
 
     func interceptAsync<Operation>(
-      chain: Apollo.RequestChain,
+      chain: any Apollo.RequestChain,
       request: Apollo.HTTPRequest<Operation>,
       response: Apollo.HTTPResponse<Operation>?,
-      completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, Error>) -> Void
+      completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
     ) {
       expectation.fulfill()
 
@@ -1054,10 +1054,10 @@ class RequestChainTests: XCTestCase {
     let expectation: XCTestExpectation
 
     func interceptAsync<Operation>(
-      chain: Apollo.RequestChain,
+      chain: any Apollo.RequestChain,
       request: Apollo.HTTPRequest<Operation>,
       response: Apollo.HTTPResponse<Operation>?,
-      completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, Error>) -> Void
+      completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
     ) {
       expectation.fulfill()
 

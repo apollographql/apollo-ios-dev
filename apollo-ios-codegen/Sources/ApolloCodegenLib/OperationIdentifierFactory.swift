@@ -10,7 +10,7 @@ public typealias OperationIdentifierProvider = (_ operation: OperationDescriptor
 actor OperationIdentifierFactory {
 
   private enum CacheEntry {
-    case inProgress(Task<String, Error>)
+    case inProgress(Task<String, any Error>)
     case ready(String)
   }
 

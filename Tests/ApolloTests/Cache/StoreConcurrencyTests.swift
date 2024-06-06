@@ -5,13 +5,13 @@ import ApolloInternalTestHelpers
 
 class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
   
-  var cacheType: TestCacheProvider.Type {
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
   
   var defaultWaitTimeout: TimeInterval = 60
   
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var store: ApolloStore!
   
   override func setUpWithError() throws {

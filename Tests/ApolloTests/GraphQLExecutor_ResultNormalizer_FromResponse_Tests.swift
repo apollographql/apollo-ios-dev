@@ -303,14 +303,14 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
         ]}
 
         class AsHuman: MockTypeCase {
-          override class var __parentType: ParentType { Types.Human }
+          override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("name", alias: "property", String.self)
           ]}
         }
 
         class AsDroid: MockTypeCase {
-          override class var __parentType: ParentType { Types.Droid }
+          override class var __parentType: any ParentType { Types.Droid }
           override class var __selections: [Selection] {[
             .field("primaryFunction", alias: "property", String.self)
           ]}
@@ -359,7 +359,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
         ]}
 
         class AsHuman: MockTypeCase {
-          override class var __parentType: ParentType { Types.Human }
+          override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
             .field("name", alias: "property", String.self)
@@ -367,7 +367,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
         }
 
         class AsDroid: MockTypeCase {
-          override class var __parentType: ParentType { Types.Droid }
+          override class var __parentType: any ParentType { Types.Droid }
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
             .field("primaryFunction", alias: "property", String.self)
@@ -417,7 +417,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
         ]}
 
         class AsHuman: MockTypeCase {
-          override class var __parentType: ParentType { Types.Human }
+          override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("friend", Friend.self),
           ]}
@@ -430,7 +430,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
         }
 
         class AsDroid: MockTypeCase {
-          override class var __parentType: ParentType { Types.Droid }
+          override class var __parentType: any ParentType { Types.Droid }
           override class var __selections: [Selection] {[
             .field("friend", Friend.self),
           ]}
@@ -490,7 +490,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
         ]}
 
         class AsHuman: MockTypeCase {
-          override class var __parentType: ParentType { Types.Human }
+          override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("friend", Friend.self),
           ]}
@@ -503,7 +503,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
         }
 
         class AsDroid: MockTypeCase {
-          override class var __parentType: ParentType { Types.Droid }
+          override class var __parentType: any ParentType { Types.Droid }
           override class var __selections: [Selection] {[
             .field("friend", Friend.self),
           ]}

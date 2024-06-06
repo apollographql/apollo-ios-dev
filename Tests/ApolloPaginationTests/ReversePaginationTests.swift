@@ -10,11 +10,11 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
 
   private typealias Query = MockQuery<Mocks.Hero.ReverseFriendsQuery>
 
-  var cacheType: TestCacheProvider.Type {
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
 
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var server: MockGraphQLServer!
   var client: ApolloClient!
   var cancellables: [AnyCancellable] = []
@@ -47,7 +47,7 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
 
     let serverExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForLastItem(server: server)
 
-    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), Error>] = []
+    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
     let firstPageExpectation = expectation(description: "First page")
     var subscription = await pager.subscribe(onUpdate: { _ in
       firstPageExpectation.fulfill()
