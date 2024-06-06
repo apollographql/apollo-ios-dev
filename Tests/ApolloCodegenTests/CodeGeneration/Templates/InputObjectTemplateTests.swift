@@ -2569,7 +2569,7 @@ class InputObjectTemplateTests: XCTestCase {
     )
 
     let expected = """
-    \(subject.graphqlInputObject.name.typeNameDocumentation)
+    // Renamed from GraphQL schema value: 'MyInputObject'
     public struct MyCustomInputObject: InputObject {
       public private(set) var __data: InputDict
 
@@ -2592,7 +2592,7 @@ class InputObjectTemplateTests: XCTestCase {
         set { __data["fieldOne"] = newValue }
       }
 
-      // Renamed from GraphQL schema value: 'myField'      
+      // Renamed from GraphQL schema value: 'myField'
       public var myCustomField: String {
         get { __data["myField"] }
         set { __data["myField"] = newValue }

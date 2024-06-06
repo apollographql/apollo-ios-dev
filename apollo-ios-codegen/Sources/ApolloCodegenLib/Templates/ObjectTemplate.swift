@@ -17,10 +17,7 @@ struct ObjectTemplate: TemplateRenderer {
   ) -> TemplateString {    
     """
     \(documentation: graphqlObject.documentation, config: config)
-    \(if: graphqlObject.name.shouldRenderDocumentation, """
-      \(graphqlObject.name.typeNameDocumentation)
-      """
-    )
+    \(graphqlObject.name.typeNameDocumentation)
     static let \(graphqlObject.render(as: .typename)) = \(config.ApolloAPITargetName).Object(
       typename: "\(graphqlObject.name.schemaName)\",
       implementedInterfaces: \(ImplementedInterfacesTemplate())

@@ -18,10 +18,7 @@ struct EnumTemplate: TemplateRenderer {
     TemplateString(
     """
     \(documentation: graphqlEnum.documentation, config: config)
-    \(if: graphqlEnum.name.shouldRenderDocumentation, """
-      \(graphqlEnum.name.typeNameDocumentation)
-      """
-    )
+    \(graphqlEnum.name.typeNameDocumentation)
     \(accessControlModifier(for: .parent))\
     enum \(graphqlEnum.render(as: .typename)): String, EnumType {
       \(graphqlEnum.values.compactMap({

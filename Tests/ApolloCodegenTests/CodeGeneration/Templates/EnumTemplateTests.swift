@@ -504,7 +504,7 @@ class EnumTemplateTests: XCTestCase {
     )
 
     let expected = """
-    \(subject.graphqlEnum.name.typeNameDocumentation)
+    // Renamed from GraphQL schema value: 'MyEnum'
     enum MyCustomEnum: String, EnumType {
       case caseOne = "caseOne"
       // Renamed from GraphQL schema value: 'myCase'

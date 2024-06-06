@@ -21,10 +21,7 @@ struct InputObjectTemplate: TemplateRenderer {
     return TemplateString(
     """
     \(documentation: graphqlInputObject.documentation, config: config)
-    \(if: graphqlInputObject.name.shouldRenderDocumentation, """
-      \(graphqlInputObject.name.typeNameDocumentation)
-      """
-    )
+    \(graphqlInputObject.name.typeNameDocumentation)
     \(accessControlModifier(for: .parent))\
     struct \(graphqlInputObject.render(as: .typename)): InputObject {
       \(memberAccessControl)private(set) var __data: InputDict
@@ -117,10 +114,7 @@ struct InputObjectTemplate: TemplateRenderer {
     """
     \(documentation: field.documentation, config: config)
     \(deprecationReason: field.deprecationReason, config: config)
-    \(if: field.name.shouldRenderDocumentation, """
-      \(field.name.typeNameDocumentation)
-      """
-    )
+    \(field.name.typeNameDocumentation)
     \(accessControlModifier(for: .member))\
     var \(field.render(config: config)): \(field.renderInputValueType(config: config.config)) {
       get { __data["\(field.name.schemaName)"] }

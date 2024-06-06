@@ -1,4 +1,5 @@
 import Foundation
+import TemplateString
 
 public protocol GraphQLNamedItem {
   var name: GraphQLName { get }
@@ -27,8 +28,7 @@ public class GraphQLName: Hashable {
   public var typeNameDocumentation: TemplateString? {
     guard shouldRenderDocumentation else { return nil }
     return """
-    // This type has been renamed from the schema type '\(schemaName)'
-    // using schema customization configuration.
+    // Renamed from GraphQL schema value: '\(schemaName)'
     """
   }
   

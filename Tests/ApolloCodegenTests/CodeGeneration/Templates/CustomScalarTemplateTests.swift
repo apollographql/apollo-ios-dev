@@ -267,7 +267,7 @@ class CustomScalarTemplateTests: XCTestCase {
     )
 
     let expected = """
-    \((subject as! CustomScalarTemplate).graphqlScalar.name.typeNameDocumentation)
+    // Renamed from GraphQL schema value: 'MyScalar'
     typealias MyCustomScalar = String
 
     """

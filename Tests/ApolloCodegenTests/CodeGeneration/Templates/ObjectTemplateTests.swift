@@ -210,7 +210,7 @@ class ObjectTemplateTests: XCTestCase {
     )
 
     let expected = """
-    \(subject.graphqlObject.name.typeNameDocumentation)
+    // Renamed from GraphQL schema value: 'MyObject'
     static let MyCustomObject = ApolloAPI.Object(
       typename: "MyObject",
       implementedInterfaces: [TestSchema.Interfaces.MyCustomInterface.self]

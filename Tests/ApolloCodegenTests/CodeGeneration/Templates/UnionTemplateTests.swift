@@ -303,7 +303,7 @@ class UnionTemplateTests: XCTestCase {
     
     
     let expected = """
-    \(subject.graphqlUnion.name.typeNameDocumentation)
+    // Renamed from GraphQL schema value: 'MyUnion'
     static let MyCustomUnion = Union(
       name: "MyUnion",
       possibleTypes: [

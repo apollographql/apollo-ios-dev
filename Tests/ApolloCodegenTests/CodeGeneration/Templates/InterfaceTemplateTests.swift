@@ -149,7 +149,7 @@ class InterfaceTemplateTests: XCTestCase {
     )
     
     let expected = """
-    \(subject.graphqlInterface.name.typeNameDocumentation)
+    // Renamed from GraphQL schema value: 'MyInterface'
     static let MyCustomInterface = ApolloAPI.Interface(name: "MyInterface")
     """
     
