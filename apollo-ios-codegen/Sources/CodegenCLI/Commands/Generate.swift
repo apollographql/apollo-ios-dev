@@ -29,9 +29,9 @@ public struct Generate: AsyncParsableCommand {
   func _run(
     fileManager: FileManager = .default,
     projectRootURL: URL? = nil,
-    codegenProvider: CodegenProvider.Type = ApolloCodegen.self,
-    schemaDownloadProvider: SchemaDownloadProvider.Type = ApolloSchemaDownloader.self,
-    logger: LogLevelSetter.Type = CodegenLogger.self
+    codegenProvider: any CodegenProvider.Type = ApolloCodegen.self,
+    schemaDownloadProvider: any SchemaDownloadProvider.Type = ApolloSchemaDownloader.self,
+    logger: any LogLevelSetter.Type = CodegenLogger.self
   ) async throws {
     logger.SetLoggingLevel(verbose: inputs.verbose)
 
@@ -49,8 +49,8 @@ public struct Generate: AsyncParsableCommand {
 
   private func generate(
     configuration: ApolloCodegenConfiguration,
-    codegenProvider: CodegenProvider.Type,
-    schemaDownloadProvider: SchemaDownloadProvider.Type
+    codegenProvider: any CodegenProvider.Type,
+    schemaDownloadProvider: any SchemaDownloadProvider.Type
   ) async throws {
     if fetchSchema {
       guard
@@ -86,7 +86,7 @@ public struct Generate: AsyncParsableCommand {
 
   private func fetchSchema(
     configuration: ApolloSchemaDownloadConfiguration,
-    schemaDownloadProvider: SchemaDownloadProvider.Type
+    schemaDownloadProvider: any SchemaDownloadProvider.Type
   ) async throws {
     try await schemaDownloadProvider.fetch(
       configuration: configuration,

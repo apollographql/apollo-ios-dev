@@ -62,7 +62,7 @@ final class OffsetTests: XCTestCase {
   }
 
   // This is due to a timing issue in unit tests only wherein we deinit immediately after waiting for expectations
-  private func ignoringCancellations(error: Error?) {
+  private func ignoringCancellations(error: (any Error)?) {
     if PaginationError.isCancellation(error: error as? PaginationError) {
       return
     } else {
@@ -102,7 +102,7 @@ final class OffsetTests: XCTestCase {
             ViewModel(name: friend.name)
           }
         }
-        return Result<[ViewModel], Error>.success(friends)
+        return Result<[ViewModel], any Error>.success(friends)
       case .failure(let error):
         return .failure(error)
       }

@@ -40,7 +40,7 @@ public class IRTestWrapper<T: CustomDebugStringConvertible>: CustomDebugStringCo
   fileprivate func childSelectionSet(
     with conditions: IR.ScopeCondition
   ) -> SelectionSetTestWrapper? {
-    guard let irObject = irObject as? ScopedChildSelectionSetAccessible else {
+    guard let irObject = irObject as? (any ScopedChildSelectionSetAccessible) else {
       return nil
     }
 

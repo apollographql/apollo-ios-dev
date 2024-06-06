@@ -45,11 +45,11 @@ public func XCTAssertMatch<Pattern: Matchable>(_ valueExpression: @autoclosure (
 // We need overloaded versions instead of relying on default arguments
 // due to https://bugs.swift.org/browse/SR-1534
 
-public func XCTAssertSuccessResult<Success>(_ expression: @autoclosure () throws -> Result<Success, Error>, file: StaticString = #file, line: UInt = #line) rethrows {
+public func XCTAssertSuccessResult<Success>(_ expression: @autoclosure () throws -> Result<Success, any Error>, file: StaticString = #file, line: UInt = #line) rethrows {
   try XCTAssertSuccessResult(expression(), file: file, line: line, {_ in })
 }
 
-public func XCTAssertSuccessResult<Success>(_ expression: @autoclosure () throws -> Result<Success, Error>, file: StaticString = #file, line: UInt = #line, _ successHandler: (_ value: Success) throws -> Void) rethrows {
+public func XCTAssertSuccessResult<Success>(_ expression: @autoclosure () throws -> Result<Success, any Error>, file: StaticString = #file, line: UInt = #line, _ successHandler: (_ value: Success) throws -> Void) rethrows {
   let result = try expression()
   
   switch result {
@@ -60,11 +60,11 @@ public func XCTAssertSuccessResult<Success>(_ expression: @autoclosure () throws
   }
 }
 
-public func XCTAssertFailureResult<Success>(_ expression: @autoclosure () throws -> Result<Success, Error>, file: StaticString = #file, line: UInt = #line) rethrows {
+public func XCTAssertFailureResult<Success>(_ expression: @autoclosure () throws -> Result<Success, any Error>, file: StaticString = #file, line: UInt = #line) rethrows {
   try XCTAssertFailureResult(expression(), file: file, line: line, {_ in })
 }
 
-public func XCTAssertFailureResult<Success>(_ expression: @autoclosure () throws -> Result<Success, Error>, file: StaticString = #file, line: UInt = #line, _ errorHandler: (_ error: Error) throws -> Void) rethrows {
+public func XCTAssertFailureResult<Success>(_ expression: @autoclosure () throws -> Result<Success, any Error>, file: StaticString = #file, line: UInt = #line, _ errorHandler: (_ error: any Error) throws -> Void) rethrows {
   let result = try expression()
   
   switch result {

@@ -18,7 +18,7 @@ public extension MyAPI {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Query }
+      public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Query }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("allAnimals", [AllAnimal].self),
       ] }
@@ -32,7 +32,7 @@ public extension MyAPI {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { MyAPI.Interfaces.Animal }
+        public static var __parentType: any ApolloAPI.ParentType { MyAPI.Interfaces.Animal }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("id", MyAPI.ID.self),
@@ -53,7 +53,7 @@ public extension MyAPI {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = DogQuery.Data.AllAnimal
-          public static var __parentType: ApolloAPI.ParentType { MyAPI.Objects.Dog }
+          public static var __parentType: any ApolloAPI.ParentType { MyAPI.Objects.Dog }
           public static var __selections: [ApolloAPI.Selection] { [
             .field("houseDetails", MyAPI.Object?.self),
             .fragment(DogFragment.self),

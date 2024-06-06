@@ -13,14 +13,14 @@ public protocol NetworkSession {
   /// to `resume`.
   @discardableResult func loadData(
     with urlRequest: URLRequest,
-    completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void
+    completionHandler: @escaping (Data?, URLResponse?, (any Error)?) -> Void
   ) -> URLSessionDataTask?
 }
 
 extension URLSession: NetworkSession {
   public func loadData(
     with urlRequest: URLRequest,
-    completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void
+    completionHandler: @escaping (Data?, URLResponse?, (any Error)?) -> Void
   ) -> URLSessionDataTask? {
     let task = dataTask(with: urlRequest) { (data, response, error) in
       completionHandler(data, response, error)
@@ -33,7 +33,7 @@ extension URLSession: NetworkSession {
 
 /// A class to help download things from a given remote URL to a given local file URL
 class URLDownloader {
-  let session: NetworkSession
+  let session: any NetworkSession
   
   enum DownloadError: Swift.Error, LocalizedError {
     case badResponse(code: Int, response: String?)
@@ -63,7 +63,7 @@ class URLDownloader {
   /// - Parameters:
   ///   - session: The NetworkSession conforming instance used for downloads, defaults to the
   ///   shared URLSession singleton object.
-  init(session: NetworkSession? = nil) {
+  init(session: (any NetworkSession)? = nil) {
     self.session = session ?? URLSession.shared
   }
   
@@ -80,10 +80,10 @@ class URLDownloader {
     timeout: Double
   ) throws {
     let semaphore = DispatchSemaphore(value: 0)
-    var errorToThrow: Error? = DownloadError.downloadTimedOut(after: timeout)
+    var errorToThrow: (any Error)? = DownloadError.downloadTimedOut(after: timeout)
 
     session.loadData(with: request) { data, response, error in
-      func finished(_ error: Error? = nil) {
+      func finished(_ error: (any Error)? = nil) {
         errorToThrow = error
         semaphore.signal()
       }

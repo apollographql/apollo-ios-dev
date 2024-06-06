@@ -13,7 +13,7 @@ struct MockObjectFileGenerator: FileGenerator {
 
   let config: ApolloCodegen.ConfigurationContext
 
-  var template: TemplateRenderer {
+  var template: any TemplateRenderer {
     MockObjectTemplate(
       graphqlObject: graphqlObject,
       fields: fields,

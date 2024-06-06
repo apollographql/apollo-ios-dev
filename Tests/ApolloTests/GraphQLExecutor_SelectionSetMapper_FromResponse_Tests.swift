@@ -847,7 +847,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
     class GivenSelectionSet: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
-      override class var __parentType: ParentType { Object.mock }
+      override class var __parentType: any ParentType { Object.mock }
       override class var __selections: [Selection] {[
         .field("child", Child.self),
       ]}
@@ -855,14 +855,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       class Child: MockSelectionSet {
         typealias Schema = MockSchemaMetadata
 
-        override class var __parentType: ParentType { Types.MockChildObject }
+        override class var __parentType: any ParentType { Types.MockChildObject }
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .inlineFragment(AsHuman.self)
         ]}
 
         class AsHuman: MockTypeCase {
-          override class var __parentType: ParentType { Types.Human }
+          override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("name", String.self),
           ]}
@@ -904,7 +904,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     }
 
     class GivenFragment: MockFragment {
-      override class var __parentType: ParentType { Types.MockChildObject }
+      override class var __parentType: any ParentType { Types.MockChildObject }
       override class var __selections: [Selection] {[
         .field("child", Child.self)
       ]}
@@ -917,7 +917,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     }
 
     class GivenSelectionSet: AbstractMockSelectionSet<GivenSelectionSet.Fragments, MockSchemaMetadata> {
-      override class var __parentType: ParentType { Types.MockChildObject }
+      override class var __parentType: any ParentType { Types.MockChildObject }
       override class var __selections: [Selection] {[
         .fragment(GivenFragment.self)
       ]}
@@ -1162,7 +1162,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       ]}
 
       class AsPerson: MockTypeCase {
-        override class var __parentType: ParentType { Types.Person }
+        override class var __parentType: any ParentType { Types.Person }
         override class var __selections: [Selection] {[
           .field("name", String.self),
         ]}
@@ -1196,7 +1196,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       ]}
 
       class AsPerson: MockTypeCase {
-        override class var __parentType: ParentType { Types.Person }
+        override class var __parentType: any ParentType { Types.Person }
         override class var __selections: [Selection] {[
           .field("name", String.self),
         ]}
@@ -1230,7 +1230,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       ]}
 
       class AsPerson: MockTypeCase {
-        override class var __parentType: ParentType { Types.Person }
+        override class var __parentType: any ParentType { Types.Person }
         override class var __selections: [Selection] {[
           .field("name", String.self),
         ]}
@@ -1264,7 +1264,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       ]}
 
       class AsPerson: MockTypeCase {
-        override class var __parentType: ParentType { Types.Person }
+        override class var __parentType: any ParentType { Types.Person }
         override class var __selections: [Selection] {[
           .include(if: "variable", .field("name", String.self)),
         ]}
@@ -1298,7 +1298,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       ]}
 
       class AsPerson: MockTypeCase {
-        override class var __parentType: ParentType { Types.Person }
+        override class var __parentType: any ParentType { Types.Person }
         override class var __selections: [Selection] {[
           .include(if: "variable", .field("name", String.self)),
         ]}
@@ -1337,7 +1337,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       ]}
 
       class AsPerson: MockTypeCase {
-        override class var __parentType: ParentType { Types.Person }
+        override class var __parentType: any ParentType { Types.Person }
         override class var __selections: [Selection] {[
           .fragment(GivenFragment.self),
         ]}
@@ -1787,7 +1787,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     class Character: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
-      override class var __parentType: ParentType { Types.Character }
+      override class var __parentType: any ParentType { Types.Character }
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .field("friend", Friend.self),
@@ -1799,7 +1799,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       class Friend: MockSelectionSet {
         typealias Schema = MockSchemaMetadata
 
-        override class var __parentType: ParentType { Types.Character }
+        override class var __parentType: any ParentType { Types.Character }
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
         ]}
@@ -1808,7 +1808,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       class AsHero: ConcreteMockTypeCase<Character> {
         typealias Schema = MockSchemaMetadata
 
-        override class var __parentType: ParentType { Types.Hero }
+        override class var __parentType: any ParentType { Types.Hero }
         override class var __selections: [Selection] {[
           .field("friend", Friend.self),
         ]}
@@ -1818,7 +1818,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
         class Friend: MockSelectionSet {
           typealias Schema = MockSchemaMetadata
 
-          override class var __parentType: ParentType { Types.Character }
+          override class var __parentType: any ParentType { Types.Character }
           override class var __selections: [Selection] {[
             .field("heroName", String.self),
           ]}

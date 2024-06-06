@@ -210,7 +210,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
 
     /// `Decodable` implementation to allow for properties to be optional in the encoded JSON with
     /// specified defaults when not present.
-    public init(from decoder: Decoder) throws {
+    public init(from decoder: any Decoder) throws {
       let values = try decoder.container(keyedBy: CodingKeys.self)
       try throwIfContainsUnexpectedKey(container: values, type: Self.self, decoder: decoder)
       schemaTypes = try values.decode(
@@ -232,7 +232,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       )
     }
 
-    public func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
       var container = encoder.container(keyedBy: CodingKeys.self)
 
       try container.encode(self.schemaTypes, forKey: .schemaTypes)
@@ -294,7 +294,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       /// location.
       case other
 
-      public init(from decoder: Decoder) throws {
+      public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         guard let key = container.allKeys.first else {
@@ -344,7 +344,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     /// control the visibility of generated code, defaults to `.public`.
     case absolute(path: String, accessModifier: AccessModifier = .public)
 
-    public init(from decoder: Decoder) throws {
+    public init(from decoder: any Decoder) throws {
       let container = try decoder.container(keyedBy: CodingKeys.self)
 
       guard let key = container.allKeys.first else {
@@ -414,7 +414,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     /// will fail.
     case swiftPackage(targetName: String? = nil)
 
-    public init(from decoder: Decoder) throws {
+    public init(from decoder: any Decoder) throws {
       let container = try decoder.container(keyedBy: CodingKeys.self)
 
       guard let key = container.allKeys.first else {
@@ -581,7 +581,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case markOperationDefinitionsAsFinal
     }
 
-    public init(from decoder: Decoder) throws {
+    public init(from decoder: any Decoder) throws {
       let values = try decoder.container(keyedBy: CodingKeys.self)
       try throwIfContainsUnexpectedKey(container: values, type: Self.self, decoder: decoder)
 
@@ -641,7 +641,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       ) ?? Default.markOperationDefinitionsAsFinal
     }
 
-    public func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
       var container = encoder.container(keyedBy: CodingKeys.self)
 
       try container.encode(self.additionalInflectionRules, forKey: .additionalInflectionRules)
@@ -744,7 +744,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     }
 
     @available(*, deprecated) // Deprecation attribute added to supress warning.
-    public init(from decoder: Decoder) throws {
+    public init(from decoder: any Decoder) throws {
       let values = try decoder.container(keyedBy: CodingKeys.self)
       guard values.allKeys.first != nil else {
         throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
@@ -804,7 +804,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case operationId
     }
 
-    public init(from decoder: Decoder) throws {
+    public init(from decoder: any Decoder) throws {
       self = OperationDocumentFormat(rawValue: 0)
 
       var container = try decoder.unkeyedContainer()
@@ -828,7 +828,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       }
     }
 
-    public func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
       var container = encoder.unkeyedContainer()
       if self.contains(.definition) {
         try container.encode(CodingKeys.definition.rawValue)
@@ -931,7 +931,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case legacySafelistingCompatibleOperations
     }
 
-    public init(from decoder: Decoder) throws {
+    public init(from decoder: any Decoder) throws {
       let values = try decoder.container(keyedBy: CodingKeys.self)
 
       legacySafelistingCompatibleOperations = try values.decodeIfPresent(
@@ -1015,7 +1015,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     case operationManifest
   }
 
-  public func encode(to encoder: Encoder) throws {
+  public func encode(to encoder: any Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
 
     try container.encode(self.schemaNamespace, forKey: .schemaNamespace)
@@ -1033,7 +1033,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     }
   }
 
-  public init(from decoder: Decoder) throws {
+  public init(from decoder: any Decoder) throws {
     let values = try decoder.container(keyedBy: CodingKeys.self)
     try throwIfContainsUnexpectedKey(container: values, type: Self.self, decoder: decoder)
 
@@ -1177,7 +1177,7 @@ extension ApolloCodegenConfiguration.SelectionSetInitializers {
     case definitionsNamed
   }
 
-  public init(from decoder: Decoder) throws {
+  public init(from decoder: any Decoder) throws {
     let values = try decoder.container(keyedBy: CodingKeys.self)
     try throwIfContainsUnexpectedKey(container: values, type: Self.self, decoder: decoder)
     var options: Options = []
@@ -1198,7 +1198,7 @@ extension ApolloCodegenConfiguration.SelectionSetInitializers {
       forKey: .definitionsNamed) ?? []
   }
 
-  public func encode(to encoder: Encoder) throws {
+  public func encode(to encoder: any Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
 
     func encodeIfPresent(option: Options, forKey key: CodingKeys) throws {
@@ -1502,7 +1502,7 @@ private struct AnyCodingKey: CodingKey {
 func throwIfContainsUnexpectedKey<T, C: CodingKey & CaseIterable>(
   container: KeyedDecodingContainer<C>,
   type: T.Type,
-  decoder: Decoder
+  decoder: any Decoder
 ) throws {
   // Map all keys from the input object
   let allKeys = Set(try decoder.container(keyedBy: AnyCodingKey.self).allKeys.map(\.stringValue))

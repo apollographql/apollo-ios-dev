@@ -16,8 +16,6 @@ public protocol MyAPI_MutableInlineFragment: ApolloAPI.MutableSelectionSet & Apo
 where Schema == MyAPI.SchemaMetadata {}
 
 public extension MyAPI {
-  typealias ID = String
-
   typealias SelectionSet = MyAPI_SelectionSet
 
   typealias InlineFragment = MyAPI_InlineFragment
@@ -27,7 +25,7 @@ public extension MyAPI {
   typealias MutableInlineFragment = MyAPI_MutableInlineFragment
 
   enum SchemaMetadata: ApolloAPI.SchemaMetadata {
-    public static let configuration: ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
+    public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
 
     public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
       switch typename {

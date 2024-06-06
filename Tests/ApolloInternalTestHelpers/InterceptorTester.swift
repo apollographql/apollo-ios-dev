@@ -14,7 +14,7 @@ public class InterceptorTester {
   public func intercept<Operation>(
     request: Apollo.HTTPRequest<Operation>,
     response: Apollo.HTTPResponse<Operation>? = nil,
-    completion: @escaping (Result<Data?, Error>) -> Void
+    completion: @escaping (Result<Data?, any Error>) -> Void
   ) {
     let requestChain = ResponseCaptureRequestChain({ result in
       completion(result)
@@ -29,21 +29,21 @@ public class InterceptorTester {
 
 fileprivate class ResponseCaptureRequestChain: RequestChain {
   var isCancelled: Bool = false
-  let completion: (Result<Data?, Error>) -> Void
+  let completion: (Result<Data?, any Error>) -> Void
 
-  init(_ completion: @escaping (Result<Data?, Error>) -> Void) {
+  init(_ completion: @escaping (Result<Data?, any Error>) -> Void) {
     self.completion = completion
   }
 
   func kickoff<Operation>(
     request: Apollo.HTTPRequest<Operation>,
-    completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, Error>) -> Void
+    completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
   ) {}
 
   func proceedAsync<Operation>(
     request: Apollo.HTTPRequest<Operation>,
     response: Apollo.HTTPResponse<Operation>?,
-    completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, Error>) -> Void
+    completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
   ) {
     self.completion(.success(response?.rawData))
   }
@@ -52,7 +52,7 @@ fileprivate class ResponseCaptureRequestChain: RequestChain {
     request: HTTPRequest<Operation>,
     response: HTTPResponse<Operation>?,
     interceptor: any ApolloInterceptor,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
+    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
   ) {
     self.completion(.success(response?.rawData))
   }
@@ -61,14 +61,14 @@ fileprivate class ResponseCaptureRequestChain: RequestChain {
 
   func retry<Operation>(
     request: Apollo.HTTPRequest<Operation>,
-    completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, Error>) -> Void
+    completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
   ) {}
 
   func handleErrorAsync<Operation>(
-    _ error: Error,
+    _ error: any Error,
     request: Apollo.HTTPRequest<Operation>,
     response: Apollo.HTTPResponse<Operation>?,
-    completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, Error>) -> Void
+    completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
   ) {
     self.completion(.failure(error))
   }
@@ -76,6 +76,6 @@ fileprivate class ResponseCaptureRequestChain: RequestChain {
   func returnValueAsync<Operation>(
     for request: Apollo.HTTPRequest<Operation>,
     value: Apollo.GraphQLResult<Operation.Data>,
-    completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, Error>) -> Void
+    completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
   ) {}
 }

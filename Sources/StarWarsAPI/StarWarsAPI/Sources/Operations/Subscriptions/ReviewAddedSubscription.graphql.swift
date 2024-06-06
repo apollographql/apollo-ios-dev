@@ -23,7 +23,7 @@ public class ReviewAddedSubscription: GraphQLSubscription {
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Subscription }
+    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Subscription }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("reviewAdded", ReviewAdded?.self, arguments: ["episode": .variable("episode")]),
     ] }
@@ -51,7 +51,7 @@ public class ReviewAddedSubscription: GraphQLSubscription {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
+      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("episode", GraphQLEnum<StarWarsAPI.Episode>?.self),

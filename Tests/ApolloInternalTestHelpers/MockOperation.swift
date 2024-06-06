@@ -61,7 +61,7 @@ open class AbstractMockSelectionSet<F, S: SchemaMetadata>: RootSelectionSet, Has
   public typealias Fragments = F
 
   open class var __selections: [Selection] { [] }
-  open class var __parentType: ParentType { Object.mock }
+  open class var __parentType: any ParentType { Object.mock }
 
   public var __data: DataDict = .empty()
 
