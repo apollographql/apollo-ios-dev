@@ -6,7 +6,7 @@ import Foundation
 /// Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.
 public class AsyncGraphQLQueryPager<Model>: Publisher {
   public typealias Failure = Never
-  public typealias Output = Result<(Model, UpdateSource), Error>
+  public typealias Output = Result<(Model, UpdateSource), any Error>
   let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
   var publisher: AnyPublisher<Output, Never> { _subject.compactMap({ $0 }).eraseToAnyPublisher() }
   @Atomic public var cancellables: Set<AnyCancellable> = []
@@ -92,7 +92,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     PaginatedQuery: GraphQLQuery,
     Element
   >(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
@@ -138,7 +138,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     InitialQuery: GraphQLQuery,
     PaginatedQuery: GraphQLQuery
   >(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
@@ -161,7 +161,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     InitialQuery: GraphQLQuery,
     PaginatedQuery: GraphQLQuery
   >(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
@@ -248,7 +248,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
 
   public func receive<S>(
     subscriber: S
-  ) where S: Subscriber, Never == S.Failure, Result<(Model, UpdateSource), Error> == S.Input {
+  ) where S: Subscriber, Never == S.Failure, Result<(Model, UpdateSource), any Error> == S.Input {
     publisher.subscribe(subscriber)
   }
 }

@@ -461,7 +461,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
         let __data: DataDict
         init(_dataDict: DataDict) { __data = _dataDict }
 
-        static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Query }
+        static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
     """
 
     // when

@@ -22,7 +22,7 @@ public class UploadOneFileMutation: GraphQLMutation {
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: ApolloAPI.ParentType { UploadAPI.Objects.Mutation }
+    public static var __parentType: any ApolloAPI.ParentType { UploadAPI.Objects.Mutation }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("singleUpload", SingleUpload.self, arguments: ["file": .variable("file")]),
     ] }
@@ -36,7 +36,7 @@ public class UploadOneFileMutation: GraphQLMutation {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { UploadAPI.Objects.File }
+      public static var __parentType: any ApolloAPI.ParentType { UploadAPI.Objects.File }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("id", UploadAPI.ID.self),

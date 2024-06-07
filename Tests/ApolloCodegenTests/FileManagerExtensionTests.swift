@@ -8,7 +8,7 @@ import Nimble
 class FileManagerExtensionTests: XCTestCase {
   var uniquePath: String { testFilePathBuilder.testIsolatedOutputFolder.path }
 
-  lazy var uniqueError: Error! = {
+  lazy var uniqueError: (any Error)! = {
     NSError(domain: "FileManagerExtensionTest", code: Int.random(in: 1...100))
   }()
 

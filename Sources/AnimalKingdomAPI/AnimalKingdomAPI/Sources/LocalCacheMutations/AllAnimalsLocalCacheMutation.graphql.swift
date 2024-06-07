@@ -12,7 +12,7 @@ public class AllAnimalsLocalCacheMutation: LocalCacheMutation {
     public var __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
+    public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("allAnimals", [AllAnimal].self),
     ] }
@@ -43,7 +43,7 @@ public class AllAnimalsLocalCacheMutation: LocalCacheMutation {
       public var __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
+      public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("species", String.self),
@@ -90,7 +90,7 @@ public class AllAnimalsLocalCacheMutation: LocalCacheMutation {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = AllAnimalsLocalCacheMutation.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Bird }
+        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Bird }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("wingspan", Double.self),
         ] }

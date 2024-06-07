@@ -18,7 +18,7 @@ struct MockUnionsFileGenerator: FileGenerator {
     self.config = config
   }
 
-  var template: TemplateRenderer {
+  var template: any TemplateRenderer {
     MockUnionsTemplate(
       graphqlUnions: graphqlUnions,
       config: config

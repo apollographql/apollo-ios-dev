@@ -215,7 +215,7 @@ actor JavaScriptBridge {
   // We keep a bidirectional mapping between constructors and wrapper types so we can both access the
   // corresponding wrapper type, and perform an `instanceof` check based on the corresponding constructor
   // for the expected wrapper type in case there isn't a direct match and we are receiving a subtype.
-  private var constructorToWrapperType: [JSValue /* constructor function */: JavaScriptObjectDecodable.Type] = [:]
+  private var constructorToWrapperType: [JSValue /* constructor function */: any JavaScriptObjectDecodable.Type] = [:]
   private var wrapperTypeToConstructor: [AnyHashable /* JavaScriptObjectDecodable.Type */: JSValue] = [:]
 
   /// We keep a map between `JSValue` objects and wrapper objects, to avoid repeatedly creating new
@@ -238,7 +238,7 @@ actor JavaScriptBridge {
   }
 
   public func register(
-    _ wrapperType: JavaScriptObjectDecodable.Type,
+    _ wrapperType: any JavaScriptObjectDecodable.Type,
     forJavaScriptClass className: String? = nil,
     from scope: JSValue
   ) {
@@ -252,9 +252,9 @@ actor JavaScriptBridge {
   }
 
   public func register(
-    _ wrapperType: JavaScriptObjectDecodable.Type,
+    _ wrapperType: any JavaScriptObjectDecodable.Type,
     forJavaScriptClass className: String? = nil,
-    from scope: JavaScriptCallable
+    from scope: any JavaScriptCallable
   ) {
     register(wrapperType, forJavaScriptClass: className, from: scope.jsValue)
   }
@@ -275,7 +275,7 @@ actor JavaScriptBridge {
      defaultType: Wrapper.self
    )
 
-    guard let wrapperType = wrapperType as? JavaScriptReferencedObject.Type else {
+    guard let wrapperType = wrapperType as? any JavaScriptReferencedObject.Type else {
       preconditionFailure("Expected JavaScriptReferencedObject.Type, got \(wrapperType).")
     }
 
@@ -287,8 +287,8 @@ actor JavaScriptBridge {
 
   private func wrapperTypeForInitializingObject(
     from jsValue: JSValue,
-    defaultType: JavaScriptObjectDecodable.Type
-  ) -> JavaScriptObjectDecodable.Type {
+    defaultType: any JavaScriptObjectDecodable.Type
+  ) -> any JavaScriptObjectDecodable.Type {
     let constructor = jsValue["constructor"]
 
     // If an object doesn't have a prototype or has `Object` as its direct prototype,
@@ -447,7 +447,7 @@ actor JavaScriptBridge {
         defaultType: JavaScriptError.self
       )
 
-      guard let errorType = errorType as? JavaScriptErrorType.Type else {
+      guard let errorType = errorType as? any JavaScriptErrorType.Type else {
         throw Error.unrecognizedJavaScriptErrorThrown(exception)
       }
 

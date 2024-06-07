@@ -8,7 +8,7 @@ struct UnionFileGenerator: FileGenerator {
   /// Shared codegen configuration.
   let config: ApolloCodegen.ConfigurationContext
 
-  var template: TemplateRenderer { UnionTemplate(
+  var template: any TemplateRenderer { UnionTemplate(
     graphqlUnion: graphqlUnion,
     config: config
   ) }

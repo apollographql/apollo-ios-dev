@@ -17,7 +17,7 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: ApolloAPI.ParentType { GitHubAPI.Objects.Query }
+    public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("repository", Repository?.self, arguments: [
         "name": "apollo-ios",
@@ -35,7 +35,7 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { GitHubAPI.Objects.Repository }
+      public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Repository }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("name", String.self),
@@ -54,7 +54,7 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { GitHubAPI.Objects.IssueConnection }
+        public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.IssueConnection }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("nodes", [Node?]?.self),
@@ -70,7 +70,7 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
           public let __data: DataDict
           public init(_dataDict: DataDict) { __data = _dataDict }
 
-          public static var __parentType: ApolloAPI.ParentType { GitHubAPI.Objects.Issue }
+          public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Issue }
           public static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
             .field("title", String.self),
@@ -95,7 +95,7 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
             public let __data: DataDict
             public init(_dataDict: DataDict) { __data = _dataDict }
 
-            public static var __parentType: ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
+            public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
             public static var __selections: [ApolloAPI.Selection] { [
               .field("__typename", String.self),
               .fragment(AuthorDetails.self),
@@ -121,7 +121,7 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
               public init(_dataDict: DataDict) { __data = _dataDict }
 
               public typealias RootEntityType = IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Author
-              public static var __parentType: ApolloAPI.ParentType { GitHubAPI.Objects.User }
+              public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.User }
               public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
                 IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Author.self,
                 AuthorDetails.self,
@@ -150,7 +150,7 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
             public let __data: DataDict
             public init(_dataDict: DataDict) { __data = _dataDict }
 
-            public static var __parentType: ApolloAPI.ParentType { GitHubAPI.Objects.IssueCommentConnection }
+            public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.IssueCommentConnection }
             public static var __selections: [ApolloAPI.Selection] { [
               .field("__typename", String.self),
               .field("nodes", [Node?]?.self),
@@ -166,7 +166,7 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
               public let __data: DataDict
               public init(_dataDict: DataDict) { __data = _dataDict }
 
-              public static var __parentType: ApolloAPI.ParentType { GitHubAPI.Objects.IssueComment }
+              public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.IssueComment }
               public static var __selections: [ApolloAPI.Selection] { [
                 .field("__typename", String.self),
                 .field("body", String.self),
@@ -185,7 +185,7 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
                 public let __data: DataDict
                 public init(_dataDict: DataDict) { __data = _dataDict }
 
-                public static var __parentType: ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
+                public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
                 public static var __selections: [ApolloAPI.Selection] { [
                   .field("__typename", String.self),
                   .fragment(AuthorDetails.self),
@@ -211,7 +211,7 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
                   public init(_dataDict: DataDict) { __data = _dataDict }
 
                   public typealias RootEntityType = IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Comments.Node.Author
-                  public static var __parentType: ApolloAPI.ParentType { GitHubAPI.Objects.User }
+                  public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.User }
                   public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
                     IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Comments.Node.Author.self,
                     AuthorDetails.self,

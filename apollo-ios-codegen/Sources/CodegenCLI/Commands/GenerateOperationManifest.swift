@@ -23,8 +23,8 @@ public struct GenerateOperationManifest: AsyncParsableCommand {
   func _run(
     fileManager: FileManager = .default,
     projectRootURL: URL? = nil,
-    codegenProvider: CodegenProvider.Type = ApolloCodegen.self,
-    logger: LogLevelSetter.Type = CodegenLogger.self
+    codegenProvider: any CodegenProvider.Type = ApolloCodegen.self,
+    logger: any LogLevelSetter.Type = CodegenLogger.self
   ) async throws {
     logger.SetLoggingLevel(verbose: inputs.verbose)
 
@@ -40,7 +40,7 @@ public struct GenerateOperationManifest: AsyncParsableCommand {
   
   private func generateManifest(
     configuration: ApolloCodegenConfiguration,
-    codegenProvider: CodegenProvider.Type
+    codegenProvider: any CodegenProvider.Type
   ) async throws {
     try await codegenProvider.build(
       with: configuration,

@@ -126,7 +126,7 @@ struct MockObjectTemplate: TemplateRenderer {
         let mockType: String
         switch graphQLCompositeType {
         case is GraphQLInterfaceType, is GraphQLUnionType:
-          mockType = "AnyMock"
+          mockType = "(any AnyMock)"
         default:
           mockType = "Mock<\(graphQLCompositeType.render(as: .typename))>"
         }

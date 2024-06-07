@@ -7,13 +7,13 @@ import ApolloAPI
 
 class StarWarsWebSocketTests: XCTestCase, CacheDependentTesting {
     
-  var cacheType: TestCacheProvider.Type {
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
   
   static let defaultWaitTimeout: TimeInterval = 5
   
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var client: ApolloClient!
   
   override func setUpWithError() throws {

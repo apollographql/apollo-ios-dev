@@ -4,7 +4,7 @@ public class ConcurrentTaskContainer {
   private let actor = Actor()
 
   private actor Actor {
-    private var tasks = [UUID: Task<Void, Error>]()
+    private var tasks = [UUID: Task<Void, any Error>]()
     private var waitForAllTaskContinuations = [CheckedContinuation<Void, Never>]()
 
     deinit {
@@ -48,7 +48,7 @@ public class ConcurrentTaskContainer {
   @discardableResult
   public func dispatch(
     _ operation: @escaping @Sendable () async throws -> Void
-  ) -> Task<Void, Error> {
+  ) -> Task<Void, any Error> {
     return Task {
       await actor.dispatch(operation)
     }

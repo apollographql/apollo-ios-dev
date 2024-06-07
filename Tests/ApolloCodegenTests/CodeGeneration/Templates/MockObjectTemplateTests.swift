@@ -488,10 +488,10 @@ class MockObjectTemplateTests: XCTestCase {
         enumList: [GraphQLEnum<TestSchema.EnumType>]? = nil,
         enumOptionalList: [GraphQLEnum<TestSchema.EnumType>]? = nil,
         enumType: GraphQLEnum<TestSchema.EnumType>? = nil,
-        interface: AnyMock? = nil,
-        interfaceList: [AnyMock]? = nil,
-        interfaceNestedList: [[AnyMock]]? = nil,
-        interfaceOptionalList: [AnyMock?]? = nil,
+        interface: (any AnyMock)? = nil,
+        interfaceList: [(any AnyMock)]? = nil,
+        interfaceNestedList: [[(any AnyMock)]]? = nil,
+        interfaceOptionalList: [(any AnyMock)?]? = nil,
         object: Mock<Cat>? = nil,
         objectList: [Mock<Cat>]? = nil,
         objectNestedList: [[Mock<Cat>]]? = nil,
@@ -501,10 +501,10 @@ class MockObjectTemplateTests: XCTestCase {
         stringList: [String]? = nil,
         stringNestedList: [[String]]? = nil,
         stringOptionalList: [String]? = nil,
-        union: AnyMock? = nil,
-        unionList: [AnyMock]? = nil,
-        unionNestedList: [[AnyMock]]? = nil,
-        unionOptionalList: [AnyMock?]? = nil
+        union: (any AnyMock)? = nil,
+        unionList: [(any AnyMock)]? = nil,
+        unionNestedList: [[(any AnyMock)]]? = nil,
+        unionOptionalList: [(any AnyMock)?]? = nil
       ) {
         self.init()
         _setScalar(customScalar, for: \\.customScalar)

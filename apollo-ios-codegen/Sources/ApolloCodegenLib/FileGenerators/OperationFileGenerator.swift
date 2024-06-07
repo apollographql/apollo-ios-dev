@@ -10,7 +10,7 @@ struct OperationFileGenerator: FileGenerator {
   /// Shared codegen configuration
   let config: ApolloCodegen.ConfigurationContext
   
-  var template: TemplateRenderer {
+  var template: any TemplateRenderer {
     irOperation.definition.isLocalCacheMutation ?
     LocalCacheMutationDefinitionTemplate(
       operation: irOperation,

@@ -6,13 +6,13 @@ import ApolloInternalTestHelpers
 
 class WatchQueryTests: XCTestCase, CacheDependentTesting {
   
-  var cacheType: TestCacheProvider.Type {
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
   
   static let defaultWaitTimeout: TimeInterval = 1
   
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var server: MockGraphQLServer!
   var client: ApolloClient!
   

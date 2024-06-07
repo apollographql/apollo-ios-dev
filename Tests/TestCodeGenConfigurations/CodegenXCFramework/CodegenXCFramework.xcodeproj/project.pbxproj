@@ -3,16 +3,100 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		665BDB642B03DE8C004DD21F /* MyAPI in Resources */ = {isa = PBXBuildFile; fileRef = 665BDB632B03DE8C004DD21F /* MyAPI */; };
+		DE4790F42C10D8F700939CCC /* ClassroomPetDetails.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790BE2C10D8E000939CCC /* ClassroomPetDetails.graphql.swift */; };
+		DE4790F52C10D8FA00939CCC /* CrocodileFragment.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790BF2C10D8E000939CCC /* CrocodileFragment.graphql.swift */; };
+		DE4790F62C10D8FC00939CCC /* DogFragment.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790C02C10D8E000939CCC /* DogFragment.graphql.swift */; };
+		DE4790F72C10D8FF00939CCC /* HeightInMeters.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790C12C10D8E000939CCC /* HeightInMeters.graphql.swift */; };
+		DE4790F82C10D90300939CCC /* PetDetails.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790C22C10D8E000939CCC /* PetDetails.graphql.swift */; };
+		DE4790F92C10D90500939CCC /* WarmBloodedDetails.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790C32C10D8E000939CCC /* WarmBloodedDetails.graphql.swift */; };
+		DE4790FA2C10D90800939CCC /* AllAnimalsLocalCacheMutation.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790C52C10D8E000939CCC /* AllAnimalsLocalCacheMutation.graphql.swift */; };
+		DE4790FB2C10D90A00939CCC /* PetDetailsMutation.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790C62C10D8E000939CCC /* PetDetailsMutation.graphql.swift */; };
+		DE4790FC2C10D90B00939CCC /* PetSearchLocalCacheMutation.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790C72C10D8E000939CCC /* PetSearchLocalCacheMutation.graphql.swift */; };
+		DE4790FD2C10D91000939CCC /* PetAdoptionMutation.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790C92C10D8E000939CCC /* PetAdoptionMutation.graphql.swift */; };
+		DE4790FE2C10D91200939CCC /* AllAnimalsIncludeSkipQuery.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790CB2C10D8E000939CCC /* AllAnimalsIncludeSkipQuery.graphql.swift */; };
+		DE4790FF2C10D91400939CCC /* AllAnimalsQuery.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790CC2C10D8E000939CCC /* AllAnimalsQuery.graphql.swift */; };
+		DE4791002C10D91500939CCC /* ClassroomPetsQuery.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790CD2C10D8E000939CCC /* ClassroomPetsQuery.graphql.swift */; };
+		DE4791012C10D91600939CCC /* DogQuery.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790CE2C10D8E000939CCC /* DogQuery.graphql.swift */; };
+		DE4791022C10D91700939CCC /* PetSearchQuery.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790CF2C10D8E000939CCC /* PetSearchQuery.graphql.swift */; };
+		DE4791032C10D91A00939CCC /* MyAPI.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790F22C10D8E000939CCC /* MyAPI.graphql.swift */; };
+		DE4791042C10D91D00939CCC /* CustomDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790D22C10D8E000939CCC /* CustomDate.swift */; };
+		DE4791052C10D91F00939CCC /* Object.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790D32C10D8E000939CCC /* Object.swift */; };
+		DE4791062C10D92600939CCC /* RelativeSize.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790D52C10D8E000939CCC /* RelativeSize.graphql.swift */; };
+		DE4791072C10D92700939CCC /* SkinCovering.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790D62C10D8E000939CCC /* SkinCovering.graphql.swift */; };
+		DE4791082C10D92900939CCC /* MeasurementsInput.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790D82C10D8E000939CCC /* MeasurementsInput.graphql.swift */; };
+		DE4791092C10D92E00939CCC /* PetSearchFilters.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790DA2C10D8E000939CCC /* PetSearchFilters.graphql.swift */; };
+		DE47910A2C10D93700939CCC /* PetAdoptionInput.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790D92C10D8E000939CCC /* PetAdoptionInput.graphql.swift */; };
+		DE47910B2C10D93D00939CCC /* Animal.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790DC2C10D8E000939CCC /* Animal.graphql.swift */; };
+		DE47910C2C10D93E00939CCC /* HousePet.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790DD2C10D8E000939CCC /* HousePet.graphql.swift */; };
+		DE47910D2C10D93F00939CCC /* Pet.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790DE2C10D8E000939CCC /* Pet.graphql.swift */; };
+		DE47910E2C10D94000939CCC /* WarmBlooded.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790DF2C10D8E000939CCC /* WarmBlooded.graphql.swift */; };
+		DE4791102C10D96B00939CCC /* Bird.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790E12C10D8E000939CCC /* Bird.graphql.swift */; };
+		DE4791112C10D96D00939CCC /* Cat.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790E22C10D8E000939CCC /* Cat.graphql.swift */; };
+		DE4791122C10D97000939CCC /* Crocodile.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790E32C10D8E000939CCC /* Crocodile.graphql.swift */; };
+		DE4791132C10D97100939CCC /* Dog.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790E42C10D8E000939CCC /* Dog.graphql.swift */; };
+		DE4791142C10D97300939CCC /* Fish.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790E52C10D8E000939CCC /* Fish.graphql.swift */; };
+		DE4791152C10D97400939CCC /* Height.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790E62C10D8E000939CCC /* Height.graphql.swift */; };
+		DE4791162C10D97500939CCC /* Human.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790E72C10D8E000939CCC /* Human.graphql.swift */; };
+		DE4791172C10D97700939CCC /* Mutation.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790E82C10D8E000939CCC /* Mutation.graphql.swift */; };
+		DE4791182C10D97900939CCC /* PetRock.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790E92C10D8E000939CCC /* PetRock.graphql.swift */; };
+		DE4791192C10D97C00939CCC /* Query.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790EA2C10D8E000939CCC /* Query.graphql.swift */; };
+		DE47911A2C10D97E00939CCC /* Rat.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790EB2C10D8E000939CCC /* Rat.graphql.swift */; };
+		DE47911B2C10D98200939CCC /* ClassroomPet.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790ED2C10D8E000939CCC /* ClassroomPet.graphql.swift */; };
+		DE47911C2C10D98300939CCC /* SchemaConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790EF2C10D8E000939CCC /* SchemaConfiguration.swift */; };
+		DE47911D2C10D98400939CCC /* SchemaMetadata.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790F02C10D8E000939CCC /* SchemaMetadata.graphql.swift */; };
+		DE4791202C10DDF900939CCC /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = DE47911F2C10DDF900939CCC /* Apollo */; };
+		DE4791222C10DDF900939CCC /* ApolloAPI in Frameworks */ = {isa = PBXBuildFile; productRef = DE4791212C10DDF900939CCC /* ApolloAPI */; };
+		DE4791242C10E91500939CCC /* ID.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4791232C10E91500939CCC /* ID.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		665BDB592B029D6F004DD21F /* CodegenXCFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CodegenXCFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		665BDB632B03DE8C004DD21F /* MyAPI */ = {isa = PBXFileReference; lastKnownFileType = folder; path = MyAPI; sourceTree = "<group>"; };
+		DE4790BE2C10D8E000939CCC /* ClassroomPetDetails.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassroomPetDetails.graphql.swift; sourceTree = "<group>"; };
+		DE4790BF2C10D8E000939CCC /* CrocodileFragment.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrocodileFragment.graphql.swift; sourceTree = "<group>"; };
+		DE4790C02C10D8E000939CCC /* DogFragment.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogFragment.graphql.swift; sourceTree = "<group>"; };
+		DE4790C12C10D8E000939CCC /* HeightInMeters.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeightInMeters.graphql.swift; sourceTree = "<group>"; };
+		DE4790C22C10D8E000939CCC /* PetDetails.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDetails.graphql.swift; sourceTree = "<group>"; };
+		DE4790C32C10D8E000939CCC /* WarmBloodedDetails.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarmBloodedDetails.graphql.swift; sourceTree = "<group>"; };
+		DE4790C52C10D8E000939CCC /* AllAnimalsLocalCacheMutation.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllAnimalsLocalCacheMutation.graphql.swift; sourceTree = "<group>"; };
+		DE4790C62C10D8E000939CCC /* PetDetailsMutation.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDetailsMutation.graphql.swift; sourceTree = "<group>"; };
+		DE4790C72C10D8E000939CCC /* PetSearchLocalCacheMutation.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetSearchLocalCacheMutation.graphql.swift; sourceTree = "<group>"; };
+		DE4790C92C10D8E000939CCC /* PetAdoptionMutation.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetAdoptionMutation.graphql.swift; sourceTree = "<group>"; };
+		DE4790CB2C10D8E000939CCC /* AllAnimalsIncludeSkipQuery.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllAnimalsIncludeSkipQuery.graphql.swift; sourceTree = "<group>"; };
+		DE4790CC2C10D8E000939CCC /* AllAnimalsQuery.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllAnimalsQuery.graphql.swift; sourceTree = "<group>"; };
+		DE4790CD2C10D8E000939CCC /* ClassroomPetsQuery.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassroomPetsQuery.graphql.swift; sourceTree = "<group>"; };
+		DE4790CE2C10D8E000939CCC /* DogQuery.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogQuery.graphql.swift; sourceTree = "<group>"; };
+		DE4790CF2C10D8E000939CCC /* PetSearchQuery.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetSearchQuery.graphql.swift; sourceTree = "<group>"; };
+		DE4790D22C10D8E000939CCC /* CustomDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDate.swift; sourceTree = "<group>"; };
+		DE4790D32C10D8E000939CCC /* Object.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Object.swift; sourceTree = "<group>"; };
+		DE4790D52C10D8E000939CCC /* RelativeSize.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelativeSize.graphql.swift; sourceTree = "<group>"; };
+		DE4790D62C10D8E000939CCC /* SkinCovering.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinCovering.graphql.swift; sourceTree = "<group>"; };
+		DE4790D82C10D8E000939CCC /* MeasurementsInput.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasurementsInput.graphql.swift; sourceTree = "<group>"; };
+		DE4790D92C10D8E000939CCC /* PetAdoptionInput.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetAdoptionInput.graphql.swift; sourceTree = "<group>"; };
+		DE4790DA2C10D8E000939CCC /* PetSearchFilters.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetSearchFilters.graphql.swift; sourceTree = "<group>"; };
+		DE4790DC2C10D8E000939CCC /* Animal.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animal.graphql.swift; sourceTree = "<group>"; };
+		DE4790DD2C10D8E000939CCC /* HousePet.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HousePet.graphql.swift; sourceTree = "<group>"; };
+		DE4790DE2C10D8E000939CCC /* Pet.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pet.graphql.swift; sourceTree = "<group>"; };
+		DE4790DF2C10D8E000939CCC /* WarmBlooded.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarmBlooded.graphql.swift; sourceTree = "<group>"; };
+		DE4790E12C10D8E000939CCC /* Bird.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bird.graphql.swift; sourceTree = "<group>"; };
+		DE4790E22C10D8E000939CCC /* Cat.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cat.graphql.swift; sourceTree = "<group>"; };
+		DE4790E32C10D8E000939CCC /* Crocodile.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crocodile.graphql.swift; sourceTree = "<group>"; };
+		DE4790E42C10D8E000939CCC /* Dog.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dog.graphql.swift; sourceTree = "<group>"; };
+		DE4790E52C10D8E000939CCC /* Fish.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fish.graphql.swift; sourceTree = "<group>"; };
+		DE4790E62C10D8E000939CCC /* Height.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Height.graphql.swift; sourceTree = "<group>"; };
+		DE4790E72C10D8E000939CCC /* Human.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Human.graphql.swift; sourceTree = "<group>"; };
+		DE4790E82C10D8E000939CCC /* Mutation.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mutation.graphql.swift; sourceTree = "<group>"; };
+		DE4790E92C10D8E000939CCC /* PetRock.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetRock.graphql.swift; sourceTree = "<group>"; };
+		DE4790EA2C10D8E000939CCC /* Query.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Query.graphql.swift; sourceTree = "<group>"; };
+		DE4790EB2C10D8E000939CCC /* Rat.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rat.graphql.swift; sourceTree = "<group>"; };
+		DE4790ED2C10D8E000939CCC /* ClassroomPet.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassroomPet.graphql.swift; sourceTree = "<group>"; };
+		DE4790EF2C10D8E000939CCC /* SchemaConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemaConfiguration.swift; sourceTree = "<group>"; };
+		DE4790F02C10D8E000939CCC /* SchemaMetadata.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemaMetadata.graphql.swift; sourceTree = "<group>"; };
+		DE4790F22C10D8E000939CCC /* MyAPI.graphql.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyAPI.graphql.swift; sourceTree = "<group>"; };
+		DE4791232C10E91500939CCC /* ID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ID.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -20,6 +104,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DE4791222C10DDF900939CCC /* ApolloAPI in Frameworks */,
+				DE4791202C10DDF900939CCC /* Apollo in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -29,7 +115,7 @@
 		665BDB4F2B029D6F004DD21F = {
 			isa = PBXGroup;
 			children = (
-				665BDB5B2B029D6F004DD21F /* CodegenXCFramework */,
+				DE4790F32C10D8E000939CCC /* MyAPI */,
 				665BDB5A2B029D6F004DD21F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -42,12 +128,150 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		665BDB5B2B029D6F004DD21F /* CodegenXCFramework */ = {
+		DE4790C42C10D8E000939CCC /* Fragments */ = {
 			isa = PBXGroup;
 			children = (
-				665BDB632B03DE8C004DD21F /* MyAPI */,
+				DE4790BE2C10D8E000939CCC /* ClassroomPetDetails.graphql.swift */,
+				DE4790BF2C10D8E000939CCC /* CrocodileFragment.graphql.swift */,
+				DE4790C02C10D8E000939CCC /* DogFragment.graphql.swift */,
+				DE4790C12C10D8E000939CCC /* HeightInMeters.graphql.swift */,
+				DE4790C22C10D8E000939CCC /* PetDetails.graphql.swift */,
+				DE4790C32C10D8E000939CCC /* WarmBloodedDetails.graphql.swift */,
 			);
-			path = CodegenXCFramework;
+			path = Fragments;
+			sourceTree = "<group>";
+		};
+		DE4790C82C10D8E000939CCC /* LocalCacheMutations */ = {
+			isa = PBXGroup;
+			children = (
+				DE4790C52C10D8E000939CCC /* AllAnimalsLocalCacheMutation.graphql.swift */,
+				DE4790C62C10D8E000939CCC /* PetDetailsMutation.graphql.swift */,
+				DE4790C72C10D8E000939CCC /* PetSearchLocalCacheMutation.graphql.swift */,
+			);
+			path = LocalCacheMutations;
+			sourceTree = "<group>";
+		};
+		DE4790CA2C10D8E000939CCC /* Mutations */ = {
+			isa = PBXGroup;
+			children = (
+				DE4790C92C10D8E000939CCC /* PetAdoptionMutation.graphql.swift */,
+			);
+			path = Mutations;
+			sourceTree = "<group>";
+		};
+		DE4790D02C10D8E000939CCC /* Queries */ = {
+			isa = PBXGroup;
+			children = (
+				DE4790CB2C10D8E000939CCC /* AllAnimalsIncludeSkipQuery.graphql.swift */,
+				DE4790CC2C10D8E000939CCC /* AllAnimalsQuery.graphql.swift */,
+				DE4790CD2C10D8E000939CCC /* ClassroomPetsQuery.graphql.swift */,
+				DE4790CE2C10D8E000939CCC /* DogQuery.graphql.swift */,
+				DE4790CF2C10D8E000939CCC /* PetSearchQuery.graphql.swift */,
+			);
+			path = Queries;
+			sourceTree = "<group>";
+		};
+		DE4790D12C10D8E000939CCC /* Operations */ = {
+			isa = PBXGroup;
+			children = (
+				DE4790CA2C10D8E000939CCC /* Mutations */,
+				DE4790D02C10D8E000939CCC /* Queries */,
+			);
+			path = Operations;
+			sourceTree = "<group>";
+		};
+		DE4790D42C10D8E000939CCC /* CustomScalars */ = {
+			isa = PBXGroup;
+			children = (
+				DE4790D22C10D8E000939CCC /* CustomDate.swift */,
+				DE4791232C10E91500939CCC /* ID.swift */,
+				DE4790D32C10D8E000939CCC /* Object.swift */,
+			);
+			path = CustomScalars;
+			sourceTree = "<group>";
+		};
+		DE4790D72C10D8E000939CCC /* Enums */ = {
+			isa = PBXGroup;
+			children = (
+				DE4790D52C10D8E000939CCC /* RelativeSize.graphql.swift */,
+				DE4790D62C10D8E000939CCC /* SkinCovering.graphql.swift */,
+			);
+			path = Enums;
+			sourceTree = "<group>";
+		};
+		DE4790DB2C10D8E000939CCC /* InputObjects */ = {
+			isa = PBXGroup;
+			children = (
+				DE4790D82C10D8E000939CCC /* MeasurementsInput.graphql.swift */,
+				DE4790D92C10D8E000939CCC /* PetAdoptionInput.graphql.swift */,
+				DE4790DA2C10D8E000939CCC /* PetSearchFilters.graphql.swift */,
+			);
+			path = InputObjects;
+			sourceTree = "<group>";
+		};
+		DE4790E02C10D8E000939CCC /* Interfaces */ = {
+			isa = PBXGroup;
+			children = (
+				DE4790DC2C10D8E000939CCC /* Animal.graphql.swift */,
+				DE4790DD2C10D8E000939CCC /* HousePet.graphql.swift */,
+				DE4790DE2C10D8E000939CCC /* Pet.graphql.swift */,
+				DE4790DF2C10D8E000939CCC /* WarmBlooded.graphql.swift */,
+			);
+			path = Interfaces;
+			sourceTree = "<group>";
+		};
+		DE4790EC2C10D8E000939CCC /* Objects */ = {
+			isa = PBXGroup;
+			children = (
+				DE4790E12C10D8E000939CCC /* Bird.graphql.swift */,
+				DE4790E22C10D8E000939CCC /* Cat.graphql.swift */,
+				DE4790E32C10D8E000939CCC /* Crocodile.graphql.swift */,
+				DE4790E42C10D8E000939CCC /* Dog.graphql.swift */,
+				DE4790E52C10D8E000939CCC /* Fish.graphql.swift */,
+				DE4790E62C10D8E000939CCC /* Height.graphql.swift */,
+				DE4790E72C10D8E000939CCC /* Human.graphql.swift */,
+				DE4790E82C10D8E000939CCC /* Mutation.graphql.swift */,
+				DE4790E92C10D8E000939CCC /* PetRock.graphql.swift */,
+				DE4790EA2C10D8E000939CCC /* Query.graphql.swift */,
+				DE4790EB2C10D8E000939CCC /* Rat.graphql.swift */,
+			);
+			path = Objects;
+			sourceTree = "<group>";
+		};
+		DE4790EE2C10D8E000939CCC /* Unions */ = {
+			isa = PBXGroup;
+			children = (
+				DE4790ED2C10D8E000939CCC /* ClassroomPet.graphql.swift */,
+			);
+			path = Unions;
+			sourceTree = "<group>";
+		};
+		DE4790F12C10D8E000939CCC /* Schema */ = {
+			isa = PBXGroup;
+			children = (
+				DE4790D42C10D8E000939CCC /* CustomScalars */,
+				DE4790D72C10D8E000939CCC /* Enums */,
+				DE4790DB2C10D8E000939CCC /* InputObjects */,
+				DE4790E02C10D8E000939CCC /* Interfaces */,
+				DE4790EC2C10D8E000939CCC /* Objects */,
+				DE4790EE2C10D8E000939CCC /* Unions */,
+				DE4790EF2C10D8E000939CCC /* SchemaConfiguration.swift */,
+				DE4790F02C10D8E000939CCC /* SchemaMetadata.graphql.swift */,
+			);
+			path = Schema;
+			sourceTree = "<group>";
+		};
+		DE4790F32C10D8E000939CCC /* MyAPI */ = {
+			isa = PBXGroup;
+			children = (
+				DE4790C42C10D8E000939CCC /* Fragments */,
+				DE4790C82C10D8E000939CCC /* LocalCacheMutations */,
+				DE4790D12C10D8E000939CCC /* Operations */,
+				DE4790F12C10D8E000939CCC /* Schema */,
+				DE4790F22C10D8E000939CCC /* MyAPI.graphql.swift */,
+			);
+			name = MyAPI;
+			path = CodegenXCFramework/MyAPI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -77,6 +301,10 @@
 			dependencies = (
 			);
 			name = CodegenXCFramework;
+			packageProductDependencies = (
+				DE47911F2C10DDF900939CCC /* Apollo */,
+				DE4791212C10DDF900939CCC /* ApolloAPI */,
+			);
 			productName = CodegenXCFramework;
 			productReference = 665BDB592B029D6F004DD21F /* CodegenXCFramework.framework */;
 			productType = "com.apple.product-type.framework";
@@ -88,7 +316,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					665BDB582B029D6F004DD21F = {
 						CreatedOnToolsVersion = 15.0;
@@ -104,6 +332,9 @@
 				Base,
 			);
 			mainGroup = 665BDB4F2B029D6F004DD21F;
+			packageReferences = (
+				DE47911E2C10DDF900939CCC /* XCLocalSwiftPackageReference "../../../apollo-ios" */,
+			);
 			productRefGroup = 665BDB5A2B029D6F004DD21F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -118,7 +349,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				665BDB642B03DE8C004DD21F /* MyAPI in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,6 +359,48 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DE4790FA2C10D90800939CCC /* AllAnimalsLocalCacheMutation.graphql.swift in Sources */,
+				DE4790F72C10D8FF00939CCC /* HeightInMeters.graphql.swift in Sources */,
+				DE4790F42C10D8F700939CCC /* ClassroomPetDetails.graphql.swift in Sources */,
+				DE4790FC2C10D90B00939CCC /* PetSearchLocalCacheMutation.graphql.swift in Sources */,
+				DE4790F82C10D90300939CCC /* PetDetails.graphql.swift in Sources */,
+				DE4790FD2C10D91000939CCC /* PetAdoptionMutation.graphql.swift in Sources */,
+				DE4790FE2C10D91200939CCC /* AllAnimalsIncludeSkipQuery.graphql.swift in Sources */,
+				DE4790FF2C10D91400939CCC /* AllAnimalsQuery.graphql.swift in Sources */,
+				DE4791002C10D91500939CCC /* ClassroomPetsQuery.graphql.swift in Sources */,
+				DE4791022C10D91700939CCC /* PetSearchQuery.graphql.swift in Sources */,
+				DE4791012C10D91600939CCC /* DogQuery.graphql.swift in Sources */,
+				DE4790FB2C10D90A00939CCC /* PetDetailsMutation.graphql.swift in Sources */,
+				DE4790F62C10D8FC00939CCC /* DogFragment.graphql.swift in Sources */,
+				DE4791052C10D91F00939CCC /* Object.swift in Sources */,
+				DE4791042C10D91D00939CCC /* CustomDate.swift in Sources */,
+				DE4790F92C10D90500939CCC /* WarmBloodedDetails.graphql.swift in Sources */,
+				DE47910A2C10D93700939CCC /* PetAdoptionInput.graphql.swift in Sources */,
+				DE4791082C10D92900939CCC /* MeasurementsInput.graphql.swift in Sources */,
+				DE47910B2C10D93D00939CCC /* Animal.graphql.swift in Sources */,
+				DE4791102C10D96B00939CCC /* Bird.graphql.swift in Sources */,
+				DE4791112C10D96D00939CCC /* Cat.graphql.swift in Sources */,
+				DE4791122C10D97000939CCC /* Crocodile.graphql.swift in Sources */,
+				DE4791132C10D97100939CCC /* Dog.graphql.swift in Sources */,
+				DE4791142C10D97300939CCC /* Fish.graphql.swift in Sources */,
+				DE4791152C10D97400939CCC /* Height.graphql.swift in Sources */,
+				DE4791162C10D97500939CCC /* Human.graphql.swift in Sources */,
+				DE4791172C10D97700939CCC /* Mutation.graphql.swift in Sources */,
+				DE47911D2C10D98400939CCC /* SchemaMetadata.graphql.swift in Sources */,
+				DE47911A2C10D97E00939CCC /* Rat.graphql.swift in Sources */,
+				DE47911C2C10D98300939CCC /* SchemaConfiguration.swift in Sources */,
+				DE4791192C10D97C00939CCC /* Query.graphql.swift in Sources */,
+				DE47911B2C10D98200939CCC /* ClassroomPet.graphql.swift in Sources */,
+				DE4791242C10E91500939CCC /* ID.swift in Sources */,
+				DE4791182C10D97900939CCC /* PetRock.graphql.swift in Sources */,
+				DE47910D2C10D93F00939CCC /* Pet.graphql.swift in Sources */,
+				DE4791092C10D92E00939CCC /* PetSearchFilters.graphql.swift in Sources */,
+				DE47910C2C10D93E00939CCC /* HousePet.graphql.swift in Sources */,
+				DE47910E2C10D94000939CCC /* WarmBlooded.graphql.swift in Sources */,
+				DE4791072C10D92700939CCC /* SkinCovering.graphql.swift in Sources */,
+				DE4791062C10D92600939CCC /* RelativeSize.graphql.swift in Sources */,
+				DE4790F52C10D8FA00939CCC /* CrocodileFragment.graphql.swift in Sources */,
+				DE4791032C10D91A00939CCC /* MyAPI.graphql.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -193,6 +465,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "-enable-upcoming-feature ExistentialAny";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -252,6 +525,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "-enable-upcoming-feature ExistentialAny";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
@@ -263,6 +537,7 @@
 		665BDB612B029D6F004DD21F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -293,6 +568,7 @@
 		665BDB622B029D6F004DD21F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -342,6 +618,24 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		DE47911E2C10DDF900939CCC /* XCLocalSwiftPackageReference "../../../apollo-ios" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../../apollo-ios";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DE47911F2C10DDF900939CCC /* Apollo */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Apollo;
+		};
+		DE4791212C10DDF900939CCC /* ApolloAPI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ApolloAPI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 665BDB502B029D6F004DD21F /* Project object */;
 }

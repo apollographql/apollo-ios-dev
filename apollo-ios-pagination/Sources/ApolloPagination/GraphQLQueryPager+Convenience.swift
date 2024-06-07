@@ -9,7 +9,7 @@ public extension GraphQLQueryPager {
   /// Convenience initializer for creating a pager that has a single query and does not 
   /// transform output responses.
   convenience init<InitialQuery: GraphQLQuery, P: PaginationInfo>(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
     initialQuery: InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
@@ -28,7 +28,7 @@ public extension GraphQLQueryPager {
   /// Convenience initializer for creating a pager that has a single query and 
   /// transforms output responses.
   convenience init<InitialQuery: GraphQLQuery, P: PaginationInfo>(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
     initialQuery: InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
@@ -50,7 +50,7 @@ public extension GraphQLQueryPager {
   /// Convenience initializer for creating a pager that has a single query and 
   /// transforms output responses into a collection.
   convenience init<InitialQuery: GraphQLQuery, T, P: PaginationInfo>(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
     initialQuery: InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
@@ -73,7 +73,7 @@ public extension GraphQLQueryPager {
   /// Convenience initializer for creating a multi-query pager that does not
   /// transform output responses.
   convenience init<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery, P: PaginationInfo>(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
@@ -96,7 +96,7 @@ public extension GraphQLQueryPager {
 
   /// Convenience initializer for creating a multi-query pager that transforms output responses.
   convenience init<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery, P: PaginationInfo>(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
@@ -122,7 +122,7 @@ public extension GraphQLQueryPager {
   /// Convenience initializer for creating a multi-query pager that 
   /// transforms output responses into collections
   convenience init<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery, T, P: PaginationInfo>(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
@@ -154,7 +154,7 @@ public extension AsyncGraphQLQueryPager {
   /// Convenience initializer for creating a pager that has a single query and does not
   /// transform output responses.
   convenience init<InitialQuery: GraphQLQuery, P: PaginationInfo>(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
     initialQuery: InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
@@ -173,7 +173,7 @@ public extension AsyncGraphQLQueryPager {
   /// Convenience initializer for creating a pager that has a single query and 
   /// transforms output responses.
   convenience init<InitialQuery: GraphQLQuery, P: PaginationInfo>(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
     initialQuery: InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
@@ -195,7 +195,7 @@ public extension AsyncGraphQLQueryPager {
   /// Convenience initializer for creating a pager that has a single query and 
   /// transforms output responses into a collection.
   convenience init<InitialQuery: GraphQLQuery, T, P: PaginationInfo>(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
     initialQuery: InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
@@ -218,7 +218,7 @@ public extension AsyncGraphQLQueryPager {
   /// Convenience initializer for creating a multi-query pager that does not 
   /// transform output responses.
   convenience init<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery, P: PaginationInfo>(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
@@ -242,7 +242,7 @@ public extension AsyncGraphQLQueryPager {
   /// Convenience initializer for creating a multi-query pager that
   /// transforms output responses.
   convenience init<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery, P: PaginationInfo>(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
@@ -268,7 +268,7 @@ public extension AsyncGraphQLQueryPager {
   /// Convenience initializer for creating a multi-query pager that 
   /// transforms output responses into collections
   convenience init<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery, T, P: PaginationInfo>(
-    client: ApolloClientProtocol,
+    client: any ApolloClientProtocol,
     initialQuery: InitialQuery,
     watcherDispatchQueue: DispatchQueue = .main,
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,

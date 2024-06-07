@@ -11,7 +11,7 @@ public struct CharacterNameAndAppearsInWithNestedFragments: StarWarsAPI.Selectio
   public let __data: DataDict
   public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+  public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
   public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .fragment(CharacterNameWithNestedAppearsInFragment.self),

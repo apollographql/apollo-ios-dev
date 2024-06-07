@@ -109,7 +109,7 @@ public class MockGraphQLServer {
     }
   }
 
-  func serve<Operation>(request: HTTPRequest<Operation>, completionHandler: @escaping (Result<JSONObject, Error>) -> Void) where Operation: GraphQLOperation {
+  func serve<Operation>(request: HTTPRequest<Operation>, completionHandler: @escaping (Result<JSONObject, any Error>) -> Void) where Operation: GraphQLOperation {
     let operationType = type(of: request.operation)
 
     if let expectation = self[request.operation] ?? self[operationType] {
