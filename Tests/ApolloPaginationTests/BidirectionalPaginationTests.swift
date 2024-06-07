@@ -10,11 +10,11 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
 
   private typealias Query = MockQuery<Mocks.Hero.BidirectionalFriendsQuery>
 
-  var cacheType: TestCacheProvider.Type {
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
 
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var server: MockGraphQLServer!
   var client: ApolloClient!
   var cancellables: [AnyCancellable] = []
@@ -92,7 +92,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     let pager = createPager()
     let serverExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(server: server)
 
-    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), Error>] = []
+    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
     let firstPageExpectation = expectation(description: "First page")
     var subscription = await pager.subscribe(onUpdate: { _ in
       firstPageExpectation.fulfill()
@@ -206,7 +206,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     let pager = GraphQLQueryPagerCoordinator(pager: createPager())
     let serverExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(server: server)
 
-    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), Error>] = []
+    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
     let firstPageExpectation = expectation(description: "First page")
     var subscription = await pager.publisher.sink { _ in
       firstPageExpectation.fulfill()

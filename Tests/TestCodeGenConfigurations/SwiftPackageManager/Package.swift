@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.9
 
 import PackageDescription
 
@@ -23,7 +23,8 @@ let package = Package(
       dependencies: [
         .product(name: "Apollo", package: "apollo-ios"),
         .product(name: "AnimalKingdomAPI", package: "AnimalKingdomAPI")
-      ]
+      ],
+      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
     ),
     .testTarget(
       name: "SwiftPackageTests",
@@ -31,7 +32,8 @@ let package = Package(
         .product(name: "Apollo", package: "apollo-ios"),
         .product(name: "ApolloTestSupport", package: "apollo-ios"),
         .product(name: "AnimalKingdomAPITestMocks", package: "AnimalKingdomAPI")
-      ]
+      ],
+      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
     )
   ]
 )

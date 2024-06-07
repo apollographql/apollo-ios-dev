@@ -22,7 +22,7 @@ private final class MockBatchedNormalizedCache: NormalizedCache {
   
   func loadRecords(forKeys keys: [CacheKey],
                    callbackQueue: DispatchQueue?,
-                   completion: @escaping (Result<[Record?], Error>) -> Void) {
+                   completion: @escaping (Result<[Record?], any Error>) -> Void) {
     $numberOfBatchLoads.increment()
     
     DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(1)) {
@@ -47,7 +47,7 @@ private final class MockBatchedNormalizedCache: NormalizedCache {
   
   func merge(records: RecordSet,
              callbackQueue: DispatchQueue?,
-             completion: @escaping (Result<Set<CacheKey>, Error>) -> Void) {
+             completion: @escaping (Result<Set<CacheKey>, any Error>) -> Void) {
     DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(1)) {
       let changedKeys = self.records.merge(records: records)
       DispatchQueue.returnResultAsyncIfNeeded(on: callbackQueue,
@@ -56,7 +56,7 @@ private final class MockBatchedNormalizedCache: NormalizedCache {
     }
   }
   
-  func clear(callbackQueue: DispatchQueue?, completion: ((Result<Void, Error>) -> Void)?) {
+  func clear(callbackQueue: DispatchQueue?, completion: ((Result<Void, any Error>) -> Void)?) {
     DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(1)) {
       self.records.clear()
       DispatchQueue.returnResultAsyncIfNeeded(on: callbackQueue,

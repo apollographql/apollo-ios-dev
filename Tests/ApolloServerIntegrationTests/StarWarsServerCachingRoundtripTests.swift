@@ -5,19 +5,19 @@ import StarWarsAPI
 import ApolloAPI
 
 class SQLiteStarWarsServerCachingRoundtripTests: StarWarsServerCachingRoundtripTests {
-  override var cacheType: TestCacheProvider.Type {
+  override var cacheType: any TestCacheProvider.Type {
     SQLiteTestCacheProvider.self
   }
 }
 
 class StarWarsServerCachingRoundtripTests: XCTestCase, CacheDependentTesting {
-  var cacheType: TestCacheProvider.Type {
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
   
   static let defaultWaitTimeout: TimeInterval = 5
   
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var store: ApolloStore!
   var client: ApolloClient!
   

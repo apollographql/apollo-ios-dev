@@ -9,7 +9,7 @@ public actor FieldCollector {
   ] = [:]
 
   func collectFields(from selectionSet: CompilationResult.SelectionSet) {
-    guard let type = selectionSet.parentType as? GraphQLInterfaceImplementingType else { return }
+    guard let type = selectionSet.parentType as? (any GraphQLInterfaceImplementingType) else { return }
     for case let .field(field) in selectionSet.selections {
       add(field: field, to: type)
     }
@@ -17,7 +17,7 @@ public actor FieldCollector {
 
   func add<T: Sequence>(
     fields: T,
-    to type: GraphQLInterfaceImplementingType
+    to type: any GraphQLInterfaceImplementingType
   ) where T.Element == CompilationResult.Field {
     for field in fields {
       add(field: field, to: type)
@@ -26,7 +26,7 @@ public actor FieldCollector {
 
   func add(
     field: CompilationResult.Field,
-    to type: GraphQLInterfaceImplementingType
+    to type: any GraphQLInterfaceImplementingType
   ) {
     var fields = collectedFields[type] ?? [:]
     add(field, to: &fields)
@@ -44,7 +44,7 @@ public actor FieldCollector {
   }
 
   public func collectedFields(
-    for type: GraphQLInterfaceImplementingType
+    for type: any GraphQLInterfaceImplementingType
   ) -> [(String, GraphQLType, deprecationReason: String?)] {
     var fields = collectedFields[type] ?? [:]
 

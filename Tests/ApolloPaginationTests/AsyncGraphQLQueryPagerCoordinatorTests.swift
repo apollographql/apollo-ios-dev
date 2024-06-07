@@ -10,11 +10,11 @@ final class AsyncGraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTe
   private typealias ReverseQuery = MockQuery<Mocks.Hero.ReverseFriendsQuery>
   private typealias ForwardQuery = MockQuery<Mocks.Hero.FriendsQuery>
 
-  var cacheType: TestCacheProvider.Type {
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
 
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var server: MockGraphQLServer!
   var client: ApolloClient!
   var cancellables: [AnyCancellable] = []

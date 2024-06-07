@@ -17,7 +17,7 @@ public final class MockURLSessionClient: URLSessionClient {
     return nil
   }
   public var response: HTTPURLResponse?
-  public var error: Error?
+  public var error: (any Error)?
   
   private let callbackQueue: DispatchQueue
   
@@ -56,7 +56,7 @@ public final class MockURLSessionClient: URLSessionClient {
       }
     }
 
-    let mockTaskType: URLSessionDataTaskMockProtocol.Type = URLSessionDataTaskMock.self
+    let mockTaskType: any URLSessionDataTaskMockProtocol.Type = URLSessionDataTaskMock.self
     let mockTask = mockTaskType.init() as! URLSessionDataTaskMock
     return mockTask
   }

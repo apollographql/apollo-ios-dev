@@ -11,7 +11,7 @@ public struct CrocodileFragment: AnimalKingdomAPI.SelectionSet, Fragment {
   public let __data: DataDict
   public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Crocodile }
+  public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Crocodile }
   public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("species", String.self),

@@ -5,24 +5,24 @@ public typealias TearDownHandler = () throws -> ()
 public typealias TestDependency<Resource> = (Resource, TearDownHandler?)
 
 public protocol TestCacheProvider: AnyObject {
-  static func makeNormalizedCache(_ completionHandler: (Result<TestDependency<NormalizedCache>, Error>) -> ())
+  static func makeNormalizedCache(_ completionHandler: (Result<TestDependency<any NormalizedCache>, any Error>) -> ())
 }
 
 public class InMemoryTestCacheProvider: TestCacheProvider {
-  public static func makeNormalizedCache(_ completionHandler: (Result<TestDependency<NormalizedCache>, Error>) -> ()) {
+  public static func makeNormalizedCache(_ completionHandler: (Result<TestDependency<any NormalizedCache>, any Error>) -> ()) {
     let cache = InMemoryNormalizedCache()
     completionHandler(.success((cache, nil)))
   }
 }
 
 public protocol CacheDependentTesting {
-  var cacheType: TestCacheProvider.Type { get }
-  var cache: NormalizedCache! { get }  
+  var cacheType: any TestCacheProvider.Type { get }
+  var cache: (any NormalizedCache)! { get }  
 }
 
 extension CacheDependentTesting where Self: XCTestCase {
-  public func makeNormalizedCache() throws -> NormalizedCache {
-    var result: Result<NormalizedCache, Error> = .failure(XCTestError(.timeoutWhileWaiting))
+  public func makeNormalizedCache() throws -> any NormalizedCache {
+    var result: Result<any NormalizedCache, any Error> = .failure(XCTestError(.timeoutWhileWaiting))
     
     let expectation = XCTestExpectation(description: "Initialized normalized cache")
           

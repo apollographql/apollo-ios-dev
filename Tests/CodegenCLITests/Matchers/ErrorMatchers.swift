@@ -6,7 +6,7 @@ public func throwUserValidationError(
   _ expectedError: ValidationError
 ) -> Nimble.Matcher<ParsableCommand> {
   return Matcher { actualExpression in
-    var actualError: Error?
+    var actualError: (any Error)?
     do {
       _ = try actualExpression.evaluate()
     } catch {
@@ -43,7 +43,7 @@ public func throwUserValidationError(
 
 public func throwUnknownOptionError() -> Nimble.Matcher<ParsableCommand> {
   return Matcher { actualExpression in
-    var actualError: Error?
+    var actualError: (any Error)?
     do {
       _ = try actualExpression.evaluate()
     } catch {
@@ -79,7 +79,7 @@ public func throwError(
   ignoringExtraCharacters: Bool = false
 ) -> Nimble.Matcher<Any> {
   return Matcher { actualExpression in
-    var actualError: Error?
+    var actualError: (any Error)?
     do {
       _ = try actualExpression.evaluate()
     } catch {

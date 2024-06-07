@@ -122,7 +122,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Animal }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
     """
 
     // when
@@ -159,7 +159,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
     """
 
     // when
@@ -199,7 +199,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Unions.Animal }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Unions.Animal }
     """
 
     // when
@@ -239,7 +239,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: Apollo.ParentType { TestSchema.Unions.Animal }
+      public static var __parentType: any Apollo.ParentType { TestSchema.Unions.Animal }
     """
 
     // when
@@ -340,7 +340,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Nested }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Nested }
 
       public var a: Int { __data["a"] }
     """
@@ -1521,7 +1521,7 @@ class SelectionSetTemplateTests: XCTestCase {
       public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.AnimalObject }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.AnimalObject }
     }
     """
 
@@ -5866,7 +5866,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Badge }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Badge }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("a", String?.self),
@@ -5880,7 +5880,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.ProductBadge }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.ProductBadge }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("b", String?.self),
@@ -5942,7 +5942,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Badge }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Badge }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("a", String?.self),
@@ -5956,7 +5956,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.ProductBadge }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.ProductBadge }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("b", String?.self),
@@ -6669,7 +6669,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("species", String.self),
@@ -8323,7 +8323,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Type_Interface }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Type_Interface }
     """
 
     // when
@@ -8373,7 +8373,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Unions.Type_Union }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Unions.Type_Union }
     """
 
     // when
@@ -8410,7 +8410,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Type_Object }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Type_Object }
     """
 
     // when

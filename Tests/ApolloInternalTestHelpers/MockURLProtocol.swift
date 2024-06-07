@@ -49,7 +49,7 @@ public class MockURLProtocol<RequestProvider: MockRequestProvider>: URLProtocol 
 }
 
 public protocol MockRequestProvider {
-  typealias MockRequestHandler = ((URLRequest) throws -> Result<(HTTPURLResponse, Data?), Error>)
+  typealias MockRequestHandler = ((URLRequest) throws -> Result<(HTTPURLResponse, Data?), any Error>)
   
   // Dictionary of mock request handlers where the `key` is the URL of the request.
   static var requestHandlers: [URL: MockRequestHandler] { get set }

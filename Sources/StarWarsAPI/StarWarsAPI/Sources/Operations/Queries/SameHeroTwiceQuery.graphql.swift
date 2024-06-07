@@ -17,7 +17,7 @@ public class SameHeroTwiceQuery: GraphQLQuery {
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self),
       .field("hero", alias: "r2", R2?.self),
@@ -49,7 +49,7 @@ public class SameHeroTwiceQuery: GraphQLQuery {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("name", String.self),
@@ -81,7 +81,7 @@ public class SameHeroTwiceQuery: GraphQLQuery {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("appearsIn", [GraphQLEnum<StarWarsAPI.Episode>?].self),

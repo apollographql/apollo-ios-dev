@@ -4,7 +4,7 @@ import ApolloCodegenInternalTestHelpers
 import XCTest
 
 fileprivate class FailingNetworkSession: NetworkSession {
-  func loadData(with urlRequest: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask? {
+  func loadData(with urlRequest: URLRequest, completionHandler: @escaping (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionDataTask? {
     XCTFail("You must call setRequestHandler before using downloader!")
 
     return nil
@@ -16,7 +16,7 @@ class URLDownloaderTests: XCTestCase {
   let downloadURL = URL(string: "file://anywhere/nowhere/somewhere")!
   let defaultTimeout = 0.5
   var downloader: URLDownloader!
-  var session: NetworkSession!
+  var session: (any NetworkSession)!
 
   override func setUp() {
     downloader = URLDownloader(session: FailingNetworkSession())
@@ -28,7 +28,7 @@ class URLDownloaderTests: XCTestCase {
     session = nil
   }
 
-  private func setRequestHandler(statusCode: Int, data: Data? = nil, error: Error? = nil, abandon: Bool = false) {
+  private func setRequestHandler(statusCode: Int, data: Data? = nil, error: (any Error)? = nil, abandon: Bool = false) {
     session = MockNetworkSession(statusCode: statusCode, data: data, error: error, abandon: abandon)
     downloader = URLDownloader(session: session)
   }
@@ -102,7 +102,7 @@ class URLDownloaderTests: XCTestCase {
 
   func testDownloadError_withIncorrectResponseType_shouldThrow() throws {
     class CustomNetworkSession: NetworkSession {
-      func loadData(with urlRequest: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask? {
+      func loadData(with urlRequest: URLRequest, completionHandler: @escaping (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionDataTask? {
         completionHandler(nil,  URLResponse(), nil)
 
         return nil

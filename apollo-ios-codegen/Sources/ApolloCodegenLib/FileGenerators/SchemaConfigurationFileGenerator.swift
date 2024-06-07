@@ -6,7 +6,7 @@ struct SchemaConfigurationFileGenerator: FileGenerator {
   /// Shared codegen configuration
   let config: ApolloCodegen.ConfigurationContext
 
-  var template: TemplateRenderer { SchemaConfigurationTemplate(config: config) }
+  var template: any TemplateRenderer { SchemaConfigurationTemplate(config: config) }
   var overwrite: Bool { false }
   var target: FileTarget { .schema }
   var fileName: String { "SchemaConfiguration" }
