@@ -13,6 +13,6 @@ struct CustomScalarFileGenerator: FileGenerator {
   }
 
   var target: FileTarget { .customScalar }
-  var fileName: String { graphqlScalar.name }
+  var fileName: String { graphqlScalar.render(as: .filename) }
   var overwrite: Bool { false }
 }

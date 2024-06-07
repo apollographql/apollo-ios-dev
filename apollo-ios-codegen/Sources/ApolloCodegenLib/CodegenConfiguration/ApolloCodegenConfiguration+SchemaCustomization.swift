@@ -32,7 +32,7 @@ extension ApolloCodegenConfiguration {
       case customTypeNames
     }
     
-    public init(from decoder: Decoder) throws {
+    public init(from decoder: any Decoder) throws {
       let values = try decoder.container(keyedBy: CodingKeys.self)
       try throwIfContainsUnexpectedKey(
         container: values,
@@ -46,7 +46,7 @@ extension ApolloCodegenConfiguration {
       )
     }
     
-    public func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
       var container = encoder.container(keyedBy: CodingKeys.self)
       
       try container.encode(self.customTypeNames, forKey: .customTypeNames)
@@ -83,7 +83,7 @@ extension ApolloCodegenConfiguration {
         case fields
       }
       
-      public init(from decoder: Decoder) throws {
+      public init(from decoder: any Decoder) throws {
         guard let originalTypeName = decoder.codingPath.last?.stringValue else {
           preconditionFailure("Unable to get original type name value from JSON during decoding.")
         }
@@ -147,7 +147,7 @@ extension ApolloCodegenConfiguration {
         }
       }
       
-      public func encode(to encoder: Encoder) throws {
+      public func encode(to encoder: any Encoder) throws {
         guard let originalTypeName = encoder.codingPath.last?.stringValue else {
           preconditionFailure("Unable to get original type name value from type during decoding.")
         }

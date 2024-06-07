@@ -35,7 +35,7 @@ class ObjectFileGeneratorTests: XCTestCase {
     // given
     buildSubject()
 
-    let expected = graphqlObject.name
+    let expected = graphqlObject.name.schemaName
 
     // then
     expect(self.subject.fileName).to(equal(expected))
@@ -47,5 +47,17 @@ class ObjectFileGeneratorTests: XCTestCase {
 
     // then
     expect(self.subject.overwrite).to(beTrue())
+  }
+  
+  // MARK: Schema Customization Tests
+  
+  func test__filename_matchesCustomName() throws {
+    // given
+    let customName = "MyCustomObject"
+    graphqlObject.name.customName = customName
+    buildSubject()
+    
+    // then
+    expect(self.subject.fileName).to(equal(customName))
   }
 }

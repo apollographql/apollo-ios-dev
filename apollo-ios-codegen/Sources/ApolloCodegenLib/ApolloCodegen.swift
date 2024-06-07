@@ -118,10 +118,11 @@ public class ApolloCodegen {
     try config.validateConfigValues()
 
     let compilationResult = try await compileGraphQLResult()
-
     try config.validate(compilationResult)
 
     let ir = IRBuilder(compilationResult: compilationResult)
+    
+    processSchemaCustomizations(ir: ir)
 
     try await withThrowingTaskGroup(of: Void.self) { group in
       if itemsToGenerate.contains(.operationManifest) {
@@ -321,6 +322,72 @@ public class ApolloCodegen {
       }
     }
   }
+  
+  func processSchemaCustomizations(ir: IRBuilder) {
+    for (name, customization) in config.options.schemaCustomization.customTypeNames {
+      if let type = ir.schema.referencedTypes.allTypes.first(where: { $0.name.schemaName == name }) {
+        if type is GraphQLObjectType ||
+            type is GraphQLInterfaceType ||
+            type is GraphQLUnionType {
+          switch customization {
+          case .type(let name):
+            type.name.customName = name
+          default:
+            break
+          }
+        } else if let scalarType = type as? GraphQLScalarType {
+          guard scalarType.isCustomScalar else {
+            return
+          }
+          
+          switch customization {
+          case .type(let name):
+            type.name.customName = name
+          default:
+            break
+          }
+        } else if let enumType = type as? GraphQLEnumType {
+          switch customization {
+          case .type(let name):
+            enumType.name.customName = name
+            break
+          case .enum(let name, let cases):
+            enumType.name.customName = name
+            
+            if let cases = cases {
+              for value in enumType.values {
+                if let caseName = cases[value.name.schemaName] {
+                  value.name.customName = caseName
+                }
+              }
+            }
+            break
+          default:
+            break
+          }
+        } else if let inputObjectType = type as? GraphQLInputObjectType {
+          switch customization {
+          case .type(let name):
+            inputObjectType.name.customName = name
+            break
+          case .inputObject(let name, let fields):
+            inputObjectType.name.customName = name
+            
+            if let fields = fields {
+              for (_, field) in inputObjectType.fields {
+                if let fieldName = fields[field.name.schemaName] {
+                  field.name.customName = fieldName
+                }
+              }
+            }
+            break
+          default:
+            break
+          }
+        }
+      }
+    }
+  }
 
   /// Generates the schema types and schema metadata files for the `ir`'s compiled schema.
   private func generateSchemaFiles(
@@ -333,10 +400,10 @@ public class ApolloCodegen {
 
     nonFatalErrors.merge(
       try await nonFatalErrorCollectingTaskGroup() { group in
-        for graphQLObject in ir.schema.referencedTypes.objects {
+        for graphqlObject in ir.schema.referencedTypes.objects {
           addFileGenerationTask(
             for: ObjectFileGenerator(
-              graphqlObject: graphQLObject,
+              graphqlObject: graphqlObject,
               config: config
             ),
             to: &group,
@@ -344,10 +411,10 @@ public class ApolloCodegen {
           )
 
           if config.output.testMocks != .none {
-            let fields = await ir.fieldCollector.collectedFields(for: graphQLObject)
+            let fields = await ir.fieldCollector.collectedFields(for: graphqlObject)
             addFileGenerationTask(
               for: MockObjectFileGenerator(
-                graphqlObject: graphQLObject,
+                graphqlObject: graphqlObject,
                 fields: fields,
                 ir: ir,
                 config: config
@@ -362,10 +429,10 @@ public class ApolloCodegen {
 
     nonFatalErrors.merge(
       try await nonFatalErrorCollectingTaskGroup() { group in
-        for graphQLEnum in ir.schema.referencedTypes.enums {
+        for graphqlEnum in ir.schema.referencedTypes.enums {
           addFileGenerationTask(
             for: EnumFileGenerator(
-              graphqlEnum: graphQLEnum,
+              graphqlEnum: graphqlEnum,
               config: config
             ),
             to: &group,
@@ -378,10 +445,10 @@ public class ApolloCodegen {
 
     nonFatalErrors.merge(
       try await nonFatalErrorCollectingTaskGroup() { group in
-        for graphQLInterface in ir.schema.referencedTypes.interfaces {
+        for graphqlInterface in ir.schema.referencedTypes.interfaces {
           addFileGenerationTask(
             for: InterfaceFileGenerator(
-              graphqlInterface: graphQLInterface,
+              graphqlInterface: graphqlInterface,
               config: config
             ),
             to: &group,
@@ -393,10 +460,10 @@ public class ApolloCodegen {
 
     nonFatalErrors.merge(
       try await nonFatalErrorCollectingTaskGroup() { group in
-        for graphQLUnion in ir.schema.referencedTypes.unions {
+        for graphqlUnion in ir.schema.referencedTypes.unions {
           addFileGenerationTask(
             for: UnionFileGenerator(
-              graphqlUnion: graphQLUnion,
+              graphqlUnion: graphqlUnion,
               config: config
             ),
             to: &group,
@@ -408,10 +475,10 @@ public class ApolloCodegen {
 
     nonFatalErrors.merge(
       try await nonFatalErrorCollectingTaskGroup() { group in
-        for graphQLInputObject in ir.schema.referencedTypes.inputObjects {
+        for graphqlInputObject in ir.schema.referencedTypes.inputObjects {
           addFileGenerationTask(
             for: InputObjectFileGenerator(
-              graphqlInputObject: graphQLInputObject,
+              graphqlInputObject: graphqlInputObject,
               config: config
             ),
             to: &group,
@@ -423,10 +490,10 @@ public class ApolloCodegen {
 
     nonFatalErrors.merge(
       try await nonFatalErrorCollectingTaskGroup() { group in
-        for graphQLScalar in ir.schema.referencedTypes.customScalars {
+        for graphqlScalar in ir.schema.referencedTypes.customScalars {
           addFileGenerationTask(
             for: CustomScalarFileGenerator(
-              graphqlScalar: graphQLScalar,
+              graphqlScalar: graphqlScalar,
               config: config
             ),
             to: &group, fileManager: fileManager

@@ -67,7 +67,7 @@ extension ApolloCodegen.ConfigurationContext {
   func validate(_ compilationResult: CompilationResult) throws {
     guard
       !compilationResult.referencedTypes.contains(where: { namedType in
-        namedType.swiftName == self.schemaNamespace.firstUppercased
+        namedType.name.swiftName == self.schemaNamespace.firstUppercased
       }),
       !compilationResult.fragments.contains(where: { fragmentDefinition in
         fragmentDefinition.name == self.schemaNamespace.firstUppercased

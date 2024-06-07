@@ -35,7 +35,7 @@ class EnumFileGeneratorTests: XCTestCase {
     // given
     buildSubject()
 
-    let expected = graphqlEnum.formattedName
+    let expected = graphqlEnum.name.schemaName
 
     // then
     expect(self.subject.fileName).to(equal(expected))
@@ -47,5 +47,17 @@ class EnumFileGeneratorTests: XCTestCase {
 
     // then
     expect(self.subject.overwrite).to(beTrue())
+  }
+  
+  // MARK: Schema Customization Tests
+  
+  func test__filename_matchesCustomName() throws {
+    // given
+    let customName = "MyCustomEnum"
+    graphqlEnum.name.customName = customName
+    buildSubject()
+    
+    // then
+    expect(self.subject.fileName).to(equal(customName))
   }
 }
