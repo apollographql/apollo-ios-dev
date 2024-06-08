@@ -445,7 +445,28 @@ The top-level properties are:
 		"inputObjects": "camelCase"
 	},
 	"pruneGeneratedFiles": true,
-	"markOperationDefinitionsAsFinal": true
+	"markOperationDefinitionsAsFinal": true,
+	"schemaCustomization" : {
+    "customTypeNames" : {
+      "MyEnum" : {
+        "enum" : {
+          "cases" : {
+            "MyCase" : "CustomCase"
+          },
+          "name" : "CustomEnum"
+        }
+      },
+      "MyObject" : "CustomAnimal",
+      "MyInputObject" : {
+        "inputObject" : {
+          "fields" : {
+            "myField" : "customField"
+          },
+          "name" : "CustomInputObject"
+        }
+      }
+    }
+  }
 }
 ```
 
@@ -464,7 +485,7 @@ let configuration = ApolloCodegenConfiguration(
 		selectionSetInitializers: [
 			.localCacheMutations,
 			.operation(named: "MyOperation"),
-			.fragment(named: "MyFragment)
+			.fragment(named: "MyFragment")
 		],
 		operationDocumentFormat: [.document, .operationId],
 		cocoapodsCompatibleImportStatements: false,
@@ -475,7 +496,105 @@ let configuration = ApolloCodegenConfiguration(
 			inputObjects: .camelCase
 		),
 		pruneGeneratedFiles: true,
-		markOperationDefinitionsAsFinal: true
+		markOperationDefinitionsAsFinal: true,
+		schemaCustomization: .init(
+      customTypeNames: [
+        "MyEnum" : .enum(
+          name: "CustomEnum",
+          cases: [
+            "MyCase" : "CustomCase"
+          ]
+        ),
+        "MyObject" : .type(
+          name: "CustomObject"
+        ),
+        "MyInputObject" : .inputObject(
+          name: "CustomInputObject",
+          fields: [
+            "myField" : "customField"
+          ]
+        )
+      ]
+    )
+	)
+)
+```
+
+</MultiCodeBlock>
+
+### Schema Customization
+
+#### Custom Type Names
+
+Schema types can have their names used in Swift code customized by using the [`customTypeNames`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/schemacustomization/customtypenames) option under [`schemaCustomization`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/schemacustomization) to provide new names for the types which you wish to rename in Swift. This does not affect your schema directly, or network requests sent to your server, only the type names used by you in your Swift code. The `customTypeNames` option accepts a Dictionary which maps schema type names given as a `String` to a [`CustomSchemaTypeName`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/schemacustomization/customschematypename) enum case with associated values for how to customize the given schema type.
+
+You can customize the name of the following schema types:
+- Custom Scalar
+- Enum (including individual case names)
+- Input Object (including individual field names)
+- Interface
+- Object
+- Union
+
+The `CustomSchemaTypeName` enum contains the following possible cases:
+
+| Case | Descriptions |
+| ---- | ------------ |
+| `.type(name:)` | This case can be used to customize the name of any type in your schema by supplying a `String` to the `name` parameter representing the desired new name. |
+| `.enum(name:cases:)` | This case must be used when you want to customize the cases of an enum type. You can optionally supply a `String` to the `name` parameter to customize the name of the enum itself, and supply a `[String: String]` dictionary to the `cases` parameter to customize any cases you desire. |
+| `.inputObject(name:fields:)` | This case must be used when you want to customize the fields of an input object type. You can optionally supply a `String` to the `name` parameter to customize the name of the input object itself, and supply a `[String: String]` dictionary to the `fields` parameter to customize any fields you desire. |
+
+<MultiCodeBlock>
+
+```json title="CLI Configuration JSON"
+"options": {
+	"schemaCustomization" : {
+    "customTypeNames" : {
+      "MyEnum" : {
+        "enum" : {
+          "cases" : {
+            "MyCase" : "CustomCase"
+          },
+          "name" : "CustomEnum"
+        }
+      },
+      "MyObject" : "CustomAnimal",
+      "MyInputObject" : {
+        "inputObject" : {
+          "fields" : {
+            "myField" : "customField"
+          },
+          "name" : "CustomInputObject"
+        }
+      }
+    }
+  }
+}
+```
+
+```swift title="Swift Codegen Setup"
+let configuration = ApolloCodegenConfiguration(
+	// Other properties not shown
+	options: ApolloCodegenConfiguration.OutputOptions(
+		schemaCustomization: .init(
+      customTypeNames: [
+        "MyEnum" : .enum(
+          name: "CustomEnum",
+          cases: [
+            "MyCase" : "CustomCase"
+          ]
+        ),
+        "MyObject" : .type(
+          name: "CustomObject"
+        ),
+        "MyInputObject" : .inputObject(
+          name: "CustomInputObject",
+          fields: [
+            "myField" : "customField"
+          ]
+        )
+      ]
+    )
 	)
 )
 ```
