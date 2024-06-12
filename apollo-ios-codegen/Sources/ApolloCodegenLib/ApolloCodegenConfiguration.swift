@@ -466,6 +466,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public let schemaDocumentation: Composition
     /// Which generated selection sets should include generated initializers.
     public let selectionSetInitializers: SelectionSetInitializers
+    /// Which merged fields and named fragment accessors are generated. Defaults to `.all`.
+    public let fieldMerging: FieldMerging
     /// How to generate the operation documents for your generated operations.
     public let operationDocumentFormat: OperationDocumentFormat
     /// Generate import statements that are compatible with including `Apollo` via Cocoapods.
@@ -513,6 +515,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       public static let deprecatedEnumCases: Composition = .include
       public static let schemaDocumentation: Composition = .include
       public static let selectionSetInitializers: SelectionSetInitializers = [.localCacheMutations]
+      public static let fieldMerging: FieldMerging = [.all]
       public static let operationDocumentFormat: OperationDocumentFormat = .definition
       public static let cocoapodsCompatibleImportStatements: Bool = false
       public static let warningsOnDeprecatedUsage: Composition = .include
@@ -530,6 +533,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     ///   - schemaDocumentation: Whether schema documentation is added to the generated files.
     ///   - selectionSetInitializers: Which generated selection sets should include
     ///     generated initializers.
+    ///   - fieldMerging: Which merged fields and named fragment accessors are generated.
     ///   - operationDocumentFormat: How to generate the operation documents for your generated operations.
     ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
     ///     including `Apollo` via Cocoapods.
@@ -545,6 +549,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       deprecatedEnumCases: Composition = Default.deprecatedEnumCases,
       schemaDocumentation: Composition = Default.schemaDocumentation,
       selectionSetInitializers: SelectionSetInitializers = Default.selectionSetInitializers,
+      fieldMerging: FieldMerging = Default.fieldMerging,
       operationDocumentFormat: OperationDocumentFormat = Default.operationDocumentFormat,
       cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
       warningsOnDeprecatedUsage: Composition = Default.warningsOnDeprecatedUsage,
@@ -556,6 +561,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       self.deprecatedEnumCases = deprecatedEnumCases
       self.schemaDocumentation = schemaDocumentation
       self.selectionSetInitializers = selectionSetInitializers
+      self.fieldMerging = fieldMerging
       self.operationDocumentFormat = operationDocumentFormat
       self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
       self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
@@ -572,6 +578,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case deprecatedEnumCases
       case schemaDocumentation
       case selectionSetInitializers
+      case fieldMerging
       case apqs
       case operationDocumentFormat
       case cocoapodsCompatibleImportStatements
@@ -604,6 +611,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         SelectionSetInitializers.self,
         forKey: .selectionSetInitializers
       ) ?? Default.selectionSetInitializers
+
+      fieldMerging = try values.decodeIfPresent(
+        FieldMerging.self,
+        forKey: .fieldMerging
+      ) ?? Default.fieldMerging
 
       operationDocumentFormat = try values.decodeIfPresent(
         OperationDocumentFormat.self,
@@ -648,6 +660,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       try container.encode(self.deprecatedEnumCases, forKey: .deprecatedEnumCases)
       try container.encode(self.schemaDocumentation, forKey: .schemaDocumentation)
       try container.encode(self.selectionSetInitializers, forKey: .selectionSetInitializers)
+      try container.encode(self.fieldMerging, forKey: .fieldMerging)
       try container.encode(self.operationDocumentFormat, forKey: .operationDocumentFormat)
       try container.encode(self.cocoapodsCompatibleImportStatements, forKey: .cocoapodsCompatibleImportStatements)
       try container.encode(self.warningsOnDeprecatedUsage, forKey: .warningsOnDeprecatedUsage)
@@ -853,9 +866,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   /// different instances together to indicate all the types you would like to generate
   /// initializers for.
   public struct SelectionSetInitializers: Codable, Equatable, ExpressibleByArrayLiteral {
-    private var options: SelectionSetInitializers.Options
-    private var definitions: Set<String>
-
     /// Option to generate initializers for all named fragments.
     public static let namedFragments: SelectionSetInitializers = .init(.namedFragments)
 
@@ -882,6 +892,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       .init(definitionName: named)
     }
 
+    private var options: SelectionSetInitializers.Options
+    private var definitions: Set<String>
+
     /// Initializes a `SelectionSetInitializer` with an array of values.
     public init(arrayLiteral elements: SelectionSetInitializers...) {
       guard var options = elements.first else {
@@ -899,6 +912,55 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public mutating func insert(_ member: SelectionSetInitializers) {
       self.options = self.options.union(member.options)
       self.definitions = self.definitions.union(member.definitions)
+    }
+  }
+
+  /// The `FieldMerging` configuration is used to determine what merged fields and named fragment
+  /// accessors are present on the generated selection set models. Field merging generates
+  /// selection set models that are easier to use, but more verbose.
+  ///
+  /// Property accessors are always generated for each field directly included in a selection
+  /// set in the GraphQL definition. In addition, the code generation engine can compute which
+  /// selections from a selection set's parents, sibling inline fragments, and named fragment
+  /// spreads will also be included on the response object, given the selection set's scope.
+  ///
+  /// By default, all possible fields and named fragment accessors are merged into each selection
+  /// set.
+  public struct FieldMerging: Codable, Equatable, ExpressibleByArrayLiteral {
+    /// Merges fields and fragment accessors from the selection set's direct ancestors.
+    public static let ancestors          = FieldMerging(.ancestors)
+
+    /// Merges fields and fragment accessors from sibling inline fragments that match the selection
+    /// set's scope.
+    public static let siblings           = FieldMerging(.siblings)
+
+    /// Merges fields and fragment accessors from named fragments that have been spread into the
+    /// selection set.
+    public static let namedFragments     = FieldMerging(.namedFragments)
+
+    /// Merges all possible fields and fragment accessors from all sources.
+    public static let all: FieldMerging  = [.ancestors, .siblings, .namedFragments]
+
+    /// Disables field merging entirely. Aside from removal of redundant selections, the shape of
+    /// the generated models will directly mirror the GraphQL definition.
+    public static let none: FieldMerging = []
+
+    private var options: MergedSelections.MergingStrategy
+
+    private init(_ options: MergedSelections.MergingStrategy) {
+      self.options = options
+    }
+
+    public init(arrayLiteral elements: FieldMerging...) {
+      self.options = []
+      for element in elements {
+        self.options.insert(element.options)
+      }
+    }
+
+    /// Inserts a `SelectionSetInitializer` into the receiver.
+    public mutating func insert(_ member: FieldMerging) {
+      self.options.insert(member.options)
     }
   }
 
@@ -1217,6 +1279,75 @@ extension ApolloCodegenConfiguration.SelectionSetInitializers {
   }
 }
 
+// MARK: - FieldMerging - Private Implementation
+
+extension ApolloCodegenConfiguration.FieldMerging {
+
+  // MARK: - Codable
+
+  private enum CodableValues: String {
+    case all
+    case ancestors
+    case siblings
+    case namedFragments
+  }
+
+  public init(from decoder: any Decoder) throws {
+    var values = try decoder.unkeyedContainer()
+
+    var options: MergedSelections.MergingStrategy = []
+
+    while !values.isAtEnd {
+      let option = try values.decode(String.self)
+      switch option {
+      case CodableValues.all.rawValue:
+        self.options = [.all]
+        return
+
+      case CodableValues.ancestors.rawValue:
+        options.insert(.ancestors)
+
+      case CodableValues.siblings.rawValue:
+        options.insert(.siblings)
+
+      case CodableValues.namedFragments.rawValue:
+        options.insert(.namedFragments)
+
+      default:
+        throw DecodingError.dataCorrupted(
+          DecodingError.Context(
+            codingPath: values.codingPath,
+            debugDescription: "Unrecognized value: \(option)"
+          )
+        )
+      }
+    }
+
+    self.options = options
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.unkeyedContainer()
+
+    if options == .all {
+      try container.encode(CodableValues.all.rawValue)
+      return
+    }
+
+    if options.contains(.ancestors) {
+      try container.encode(CodableValues.ancestors.rawValue)
+    }
+
+    if options.contains(.siblings) {
+      try container.encode(CodableValues.siblings.rawValue)
+    }
+
+    if options.contains(.namedFragments) {
+      try container.encode(CodableValues.namedFragments.rawValue)
+    }
+  }
+}
+
 // MARK: - Deprecations
 
 extension ApolloCodegenConfiguration {
@@ -1332,6 +1463,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///   - schemaDocumentation: Whether schema documentation is added to the generated files.
   ///   - selectionSetInitializers: Which generated selection sets should include
   ///     generated initializers.
+  ///   - fieldMerging: Which merged fields and named fragment accessors are generated.
   ///   - apqs: Whether the generated operations should use Automatic Persisted Queries.
   ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
   ///     including `Apollo` via Cocoapods.
@@ -1351,6 +1483,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     deprecatedEnumCases: ApolloCodegenConfiguration.Composition = Default.deprecatedEnumCases,
     schemaDocumentation: ApolloCodegenConfiguration.Composition = Default.schemaDocumentation,
     selectionSetInitializers: ApolloCodegenConfiguration.SelectionSetInitializers = Default.selectionSetInitializers,
+    fieldMerging: ApolloCodegenConfiguration.FieldMerging = Default.fieldMerging,
     apqs: ApolloCodegenConfiguration.APQConfig,
     cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
@@ -1362,6 +1495,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.deprecatedEnumCases = deprecatedEnumCases
     self.schemaDocumentation = schemaDocumentation
     self.selectionSetInitializers = selectionSetInitializers
+    self.fieldMerging = fieldMerging
     self.operationDocumentFormat = apqs.operationDocumentFormat
     self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
     self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
@@ -1381,6 +1515,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///   - schemaDocumentation: Whether schema documentation is added to the generated files.
   ///   - selectionSetInitializers: Which generated selection sets should include
   ///     generated initializers.
+  ///   - fieldMerging: Which merged fields and named fragment accessors are generated.
   ///   - operationDocumentFormat: How to generate the operation documents for your generated operations.
   ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
   ///     including `Apollo` via Cocoapods.
@@ -1400,6 +1535,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     deprecatedEnumCases: ApolloCodegenConfiguration.Composition = Default.deprecatedEnumCases,
     schemaDocumentation: ApolloCodegenConfiguration.Composition = Default.schemaDocumentation,
     selectionSetInitializers: ApolloCodegenConfiguration.SelectionSetInitializers = Default.selectionSetInitializers,
+    fieldMerging: ApolloCodegenConfiguration.FieldMerging = Default.fieldMerging,
     operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat = Default.operationDocumentFormat,
     cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
@@ -1411,6 +1547,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.deprecatedEnumCases = deprecatedEnumCases
     self.schemaDocumentation = schemaDocumentation
     self.selectionSetInitializers = selectionSetInitializers
+    self.fieldMerging = fieldMerging
     self.operationDocumentFormat = operationDocumentFormat
     self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
     self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage

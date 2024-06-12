@@ -169,6 +169,7 @@ extension ComputedSelectionSet {
     fileprivate func finalize() -> ComputedSelectionSet {
       let merged = MergedSelections(
         mergedSources: mergedSources,
+        mergingStrategy: .all,
         fields: fields,
         inlineFragments: inlineFragments,
         namedFragments: namedFragments
