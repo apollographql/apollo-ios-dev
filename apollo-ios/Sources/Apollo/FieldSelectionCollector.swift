@@ -4,10 +4,10 @@ import ApolloAPI
 #endif
 
 @_spi(Execution)
-public struct FieldSelectionGrouping: Sequence {
-  private var fieldInfoList: [String: FieldExecutionInfo] = [:]
+public struct FieldSelectionGrouping {
+  fileprivate(set) var fieldInfoList: [String: FieldExecutionInfo] = [:]
   fileprivate(set) var fulfilledFragments: Set<ObjectIdentifier> = []
-  fileprivate(set) var deferredFragments: Set<ObjectIdentifier> = []
+  fileprivate(set) var deferredFragments: [String: any Deferrable.Type] = []
 
   init(info: ObjectExecutionInfo) {
     self.fulfilledFragments = info.fulfilledFragments
@@ -43,10 +43,7 @@ public struct FieldSelectionGrouping: Sequence {
 
     deferredFragments.insert(ObjectIdentifier(type))
   }
-
-  public func makeIterator() -> Dictionary<String, FieldExecutionInfo>.Iterator {
-    fieldInfoList.makeIterator()
-  }
+  
 }
 
 /// A protocol for a type that defines how to collect and group the selections for an object
