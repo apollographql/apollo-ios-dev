@@ -25,7 +25,7 @@ class MockInterfacesTemplateTests: XCTestCase {
     let config = ApolloCodegenConfiguration.mock(output: .mock(testMocks: testMocks))
 
     subject = MockInterfacesTemplate(
-      graphQLInterfaces: interfaces,
+      graphqlInterfaces: interfaces,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
@@ -161,6 +161,28 @@ class MockInterfacesTemplateTests: XCTestCase {
       // then
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     }
+  }
+  
+  // Schema Customization Tests
+  
+  func test__render__givenInterface_withCustomName_shouldRenderWithCustomName() throws {
+    // given
+    let myInterface = GraphQLInterfaceType.mock("MyInterface")
+    myInterface.name.customName = "MyCustomInterface"
+    buildSubject(interfaces: [myInterface])
+
+    let expected = """
+    public extension MockObject {
+      typealias MyCustomInterface = Interface
+    }
+
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
   }
   
 }

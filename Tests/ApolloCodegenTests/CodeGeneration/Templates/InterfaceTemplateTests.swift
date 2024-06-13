@@ -17,16 +17,20 @@ class InterfaceTemplateTests: XCTestCase {
 
   private func buildSubject(
     name: String = "Dog",
+    customName: String? = nil,
     documentation: String? = nil,
     config: ApolloCodegenConfiguration = .mock()
   ) {
+    let interfaceType = GraphQLInterfaceType.mock(
+      name,
+      fields: [:],
+      interfaces: [],
+      documentation: documentation
+    )
+    interfaceType.name.customName = customName
+    
     subject = InterfaceTemplate(
-      graphqlInterface: GraphQLInterfaceType.mock(
-        name,
-        fields: [:],
-        interfaces: [],
-        documentation: documentation
-      ),
+      graphqlInterface: interfaceType,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
@@ -133,6 +137,27 @@ class InterfaceTemplateTests: XCTestCase {
       // then
       expect(actual).to(equalLineByLine(expected))
     }
+  }
+  
+  // MARK: Schema Customization Tests
+  
+  func test__render__givenInterface_withCustomName_shouldRenderWithCustomName() throws {
+    // given
+    buildSubject(
+      name: "MyInterface",
+      customName: "MyCustomInterface"
+    )
+    
+    let expected = """
+    // Renamed from GraphQL schema value: 'MyInterface'
+    static let MyCustomInterface = ApolloAPI.Interface(name: "MyInterface")
+    """
+    
+    // when
+    let actual = renderSubject()
+    
+    // then
+    expect(actual).to(equalLineByLine(expected))
   }
   
 }
