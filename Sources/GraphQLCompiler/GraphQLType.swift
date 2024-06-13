@@ -15,7 +15,7 @@ public indirect enum GraphQLType: Sendable, Hashable {
          let .scalar(type as GraphQLNamedType),
          let .enum(type as GraphQLNamedType),
          let .inputObject(type as GraphQLNamedType):
-      return type.name
+      return type.name.schemaName
 
     case let .nonNull(ofType):
       return "\(ofType.typeReference)!"

@@ -31,7 +31,7 @@ extension String {
     SwiftKeywords.TestMockConflictingFieldNames.contains(self)
   }
 
-  private func escapeIf(in set: Set<String>) -> String {
+  func escapeIf(in set: Set<String>) -> String {
     set.contains(self) ? "`\(self)`" : self
   }
 
@@ -85,22 +85,6 @@ extension String {
       .aliasIf(in: SwiftKeywords.FieldAccessorNamesToEscape)
 
     return propertyName
-  }
-
-  func renderAsInputObjectName(
-    config: ApolloCodegenConfiguration
-  ) -> String {
-    var propertyName = self
-
-    switch config.options.conversionStrategies.inputObjects {
-    case .none:
-      break
-    case .camelCase:
-      propertyName = propertyName.convertToCamelCase()
-      break
-    }
-    
-    return propertyName.escapeIf(in: SwiftKeywords.FieldAccessorNamesToEscape)
   }
   
   /// Convert to `camelCase` from a number of different `snake_case` variants.
@@ -181,7 +165,7 @@ enum SwiftKeywords {
     "hash"
   ]
 
-  fileprivate static let FieldAccessorNamesToEscape: Set<String> = [
+  static let FieldAccessorNamesToEscape: Set<String> = [
     "associatedtype",
     "class",
     "deinit",

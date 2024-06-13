@@ -137,13 +137,16 @@ extension GraphQLType {
 
 extension GraphQLNamedType {
 
-  var testMockFieldTypeName: String {
-    if SwiftKeywords.TestMockFieldAbstractTypeNamesToNamespace.contains(name) &&
+  func testMockFieldTypeName(
+    _ config: ApolloCodegenConfiguration
+  ) -> String {
+    let typename = render(as: .typename)
+    if SwiftKeywords.TestMockFieldAbstractTypeNamesToNamespace.contains(typename) &&
         self is GraphQLAbstractType {
-      return "MockObject.\(formattedName)"
+      return "MockObject.\(typename)"
     }
 
-    return formattedName
+    return typename
   }
 
   fileprivate func qualifiedRootTypeName(
@@ -154,9 +157,9 @@ extension GraphQLNamedType {
 
     let typeName: String = {
       if case .testMockField = context {
-        return newTypeName ?? testMockFieldTypeName.firstUppercased
+        return newTypeName ?? testMockFieldTypeName(config)
       } else {
-        return newTypeName ?? self.formattedName
+        return newTypeName ?? self.render(as: .typename)
       }
     }()
 

@@ -18,8 +18,9 @@ struct EnumTemplate: TemplateRenderer {
     TemplateString(
     """
     \(documentation: graphqlEnum.documentation, config: config)
+    \(graphqlEnum.name.typeNameDocumentation)
     \(accessControlModifier(for: .parent))\
-    enum \(graphqlEnum.formattedName): String, EnumType {
+    enum \(graphqlEnum.render(as: .typename)): String, EnumType {
       \(graphqlEnum.values.compactMap({
         enumCase(for: $0)
       }), separator: "\n")
@@ -43,15 +44,16 @@ struct EnumTemplate: TemplateRenderer {
       \(if: shouldRenderDocumentation, "///")
       \(documentation: "**Deprecated**: \($0.escapedSwiftStringSpecialCharacters())")
       """ })
+    \(graphqlEnumValue.name.typeNameDocumentation)
     \(caseDefinition(for: graphqlEnumValue))
     """
   }
 
   private func caseDefinition(for graphqlEnumValue: GraphQLEnumValue) -> TemplateString {
     """
-    case \(graphqlEnumValue.name.rendered(as: .swiftEnumCase, config: config.config))\
+    case \(graphqlEnumValue.render(as: .enumCase, config: config))\
     \(if: config.options.conversionStrategies.enumCases != .none, """
-       = "\(graphqlEnumValue.name.rendered(as: .rawValue, config: config.config))"
+       = "\(graphqlEnumValue.render(as: .enumRawValue, config: config))"
       """)
     """
   }
