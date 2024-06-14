@@ -6,8 +6,8 @@ import ApolloAPI
 @_spi(Execution)
 public struct FieldSelectionGrouping {
   fileprivate(set) var fieldInfoList: [String: FieldExecutionInfo] = [:]
-  fileprivate(set) var fulfilledFragments: Set<SelectionSetMetatypeWrapper> = []
-  fileprivate(set) var deferredFragments: Set<SelectionSetMetatypeWrapper> = []
+  fileprivate(set) var fulfilledFragments: Set<SelectionSetMetatype> = []
+  fileprivate(set) var deferredFragments: Set<SelectionSetMetatype> = []
 
   init(info: ObjectExecutionInfo) {
     self.fulfilledFragments = info.fulfilledFragments
@@ -32,7 +32,7 @@ public struct FieldSelectionGrouping {
       "Cannot fulfill \(type.self) fragment, it's already deferred!"
     )
 
-    fulfilledFragments.insert(SelectionSetMetatypeWrapper(metatype: type))
+    fulfilledFragments.insert(SelectionSetMetatype(type))
   }
 
   mutating func addDeferredFragment<T: SelectionSet>(_ type: T.Type) {
@@ -41,7 +41,7 @@ public struct FieldSelectionGrouping {
       "Cannot defer \(type.self) fragment, it's already fulfilled!"
     )
 
-    deferredFragments.insert(SelectionSetMetatypeWrapper(metatype: type))
+    deferredFragments.insert(SelectionSetMetatype(type))
   }
   
 }
@@ -210,8 +210,8 @@ struct CustomCacheDataWritingFieldSelectionCollector: FieldSelectionCollector {
   }
 }
 
-fileprivate extension Set<SelectionSetMetatypeWrapper> {
+fileprivate extension Set<SelectionSetMetatype> {
   func contains(_ metatype: any SelectionSet.Type) -> Bool {
-    contains(SelectionSetMetatypeWrapper(metatype: metatype))
+    contains(SelectionSetMetatype(metatype))
   }
 }

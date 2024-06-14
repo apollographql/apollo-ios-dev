@@ -18,7 +18,7 @@ public struct Deferred<Fragment: Deferrable> {
   }
 
   public var state: State {
-    let metatypeWrapper = SelectionSetMetatypeWrapper(metatype: Fragment.self)
+    let metatypeWrapper = SelectionSetMetatype(Fragment.self)
     if __data._fulfilledFragments.contains(metatypeWrapper) {
       return .fulfilled(Fragment.init(_dataDict: __data))
     }
