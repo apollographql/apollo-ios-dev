@@ -18,6 +18,8 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
   /// against the cache data.
   weak var transaction: ApolloStore.ReadTransaction?
 
+  var shouldAttemptDeferredFragmentExecution: Bool { true }
+
   init(transaction: ApolloStore.ReadTransaction) {
     self.transaction = transaction
   }

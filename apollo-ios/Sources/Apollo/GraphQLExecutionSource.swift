@@ -17,6 +17,8 @@ public protocol GraphQLExecutionSource {
   /// GraphQL execution.
   associatedtype FieldCollector: FieldSelectionCollector<RawObjectData>
 
+  var shouldAttemptDeferredFragmentExecution: Bool { get }
+
   /// Resolves the value for given field on a data object from the source.
   ///
   ///  Because data may be loaded from a database, these loads are batched for performance reasons.

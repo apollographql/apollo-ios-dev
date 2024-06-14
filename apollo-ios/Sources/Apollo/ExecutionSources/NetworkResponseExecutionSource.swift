@@ -9,6 +9,8 @@ public struct NetworkResponseExecutionSource: GraphQLExecutionSource, CacheKeyCo
   public typealias RawObjectData = JSONObject
   public typealias FieldCollector = DefaultFieldSelectionCollector
 
+  public var shouldAttemptDeferredFragmentExecution: Bool { false }
+
   public init() {}
 
   public func resolveField(
