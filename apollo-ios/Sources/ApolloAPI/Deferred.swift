@@ -18,11 +18,11 @@ public struct Deferred<Fragment: Deferrable> {
   }
 
   public var state: State {
-    let fragment = ObjectIdentifier(Fragment.self)
-    if __data._fulfilledFragments.contains(fragment) {
+    let metatypeWrapper = SelectionSetMetatypeWrapper(metatype: Fragment.self)
+    if __data._fulfilledFragments.contains(metatypeWrapper) {
       return .fulfilled(Fragment.init(_dataDict: __data))
     }
-    else if __data._deferredFragments.contains(fragment) {
+    else if __data._deferredFragments.contains(metatypeWrapper) {
       return .pending
     } else {
       return .notExecuted

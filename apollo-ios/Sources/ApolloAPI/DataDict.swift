@@ -40,7 +40,7 @@ public struct DataDict: Hashable {
   /// This allows conversion of a ``SelectionSet`` to its fragment models to be done safely.
   ///
   /// Each `ObjectIdentifier` in the set corresponds to a specific `SelectionSet` type.
-  @inlinable public var _fulfilledFragments: Set<ObjectIdentifier> {
+  @inlinable public var _fulfilledFragments: Set<SelectionSetMetatypeWrapper> {
     _storage.fulfilledFragments
   }
 
@@ -48,14 +48,14 @@ public struct DataDict: Hashable {
   /// response.
   ///
   /// Each `ObjectIdentifier` in the set corresponds to a specific `SelectionSet` type.
-  @inlinable public var _deferredFragments: Set<ObjectIdentifier> {
+  @inlinable public var _deferredFragments: Set<SelectionSetMetatypeWrapper> {
     _storage.deferredFragments
   }
 
   public init(
     data: [String: AnyHashable],
-    fulfilledFragments: Set<ObjectIdentifier>,
-    deferredFragments: Set<ObjectIdentifier> = []
+    fulfilledFragments: Set<SelectionSetMetatypeWrapper>,
+    deferredFragments: Set<SelectionSetMetatypeWrapper> = []
   ) {
     self._storage = .init(
       data: data,
@@ -108,25 +108,25 @@ public struct DataDict: Hashable {
   }
 
   @usableFromInline func fragmentIsFulfilled<T: SelectionSet>(_ type: T.Type) -> Bool {
-    let id = ObjectIdentifier(T.self)
+    let id = SelectionSetMetatypeWrapper(metatype: T.self)
     return _fulfilledFragments.contains(id)
   }
 
   @usableFromInline func fragmentsAreFulfilled(_ types: [any SelectionSet.Type]) -> Bool {
-    let typeIds = types.lazy.map(ObjectIdentifier.init)
+    let typeIds = types.lazy.map { SelectionSetMetatypeWrapper(metatype: $0) }
     return _fulfilledFragments.isSuperset(of: typeIds)
   }
 
   // MARK: - DataDict._Storage
   @usableFromInline class _Storage: Hashable {
     @usableFromInline var data: [String: AnyHashable]
-    @usableFromInline let fulfilledFragments: Set<ObjectIdentifier>
-    @usableFromInline let deferredFragments: Set<ObjectIdentifier>
+    @usableFromInline let fulfilledFragments: Set<SelectionSetMetatypeWrapper>
+    @usableFromInline let deferredFragments: Set<SelectionSetMetatypeWrapper>
 
     init(
       data: [String: AnyHashable],
-      fulfilledFragments: Set<ObjectIdentifier>,
-      deferredFragments: Set<ObjectIdentifier>
+      fulfilledFragments: Set<SelectionSetMetatypeWrapper>,
+      deferredFragments: Set<SelectionSetMetatypeWrapper>
     ) {
       self.data = data
       self.fulfilledFragments = fulfilledFragments

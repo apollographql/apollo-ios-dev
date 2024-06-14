@@ -4,10 +4,10 @@ import ApolloAPI
 #endif
 
 @_spi(Execution)
-public struct FieldSelectionGrouping: Sequence {
-  private var fieldInfoList: [String: FieldExecutionInfo] = [:]
-  fileprivate(set) var fulfilledFragments: Set<ObjectIdentifier> = []
-  fileprivate(set) var deferredFragments: Set<ObjectIdentifier> = []
+public struct FieldSelectionGrouping {
+  fileprivate(set) var fieldInfoList: [String: FieldExecutionInfo] = [:]
+  fileprivate(set) var fulfilledFragments: Set<SelectionSetMetatypeWrapper> = []
+  fileprivate(set) var deferredFragments: Set<SelectionSetMetatypeWrapper> = []
 
   init(info: ObjectExecutionInfo) {
     self.fulfilledFragments = info.fulfilledFragments
@@ -28,25 +28,22 @@ public struct FieldSelectionGrouping: Sequence {
 
   mutating func addFulfilledFragment<T: SelectionSet>(_ type: T.Type) {
     precondition(
-      !deferredFragments.contains(type: type),
+      !deferredFragments.contains(type),
       "Cannot fulfill \(type.self) fragment, it's already deferred!"
     )
 
-    fulfilledFragments.insert(ObjectIdentifier(type))
+    fulfilledFragments.insert(SelectionSetMetatypeWrapper(metatype: type))
   }
 
   mutating func addDeferredFragment<T: SelectionSet>(_ type: T.Type) {
     precondition(
-      !fulfilledFragments.contains(type: type),
+      !fulfilledFragments.contains(type),
       "Cannot defer \(type.self) fragment, it's already fulfilled!"
     )
 
-    deferredFragments.insert(ObjectIdentifier(type))
+    deferredFragments.insert(SelectionSetMetatypeWrapper(metatype: type))
   }
-
-  public func makeIterator() -> Dictionary<String, FieldExecutionInfo>.Iterator {
-    fieldInfoList.makeIterator()
-  }
+  
 }
 
 /// A protocol for a type that defines how to collect and group the selections for an object
@@ -192,7 +189,7 @@ struct CustomCacheDataWritingFieldSelectionCollector: FieldSelectionCollector {
       case .deferred(_, _, _):
         assertionFailure("Defer execution must be implemented (#3145).")
       case let .fragment(fragment):
-        if groupedFields.fulfilledFragments.contains(type: fragment) {
+        if groupedFields.fulfilledFragments.contains(fragment) {
           try collectFields(from: fragment.__selections,
                             into: &groupedFields,
                             for: object,
@@ -201,7 +198,7 @@ struct CustomCacheDataWritingFieldSelectionCollector: FieldSelectionCollector {
         }
 
       case let .inlineFragment(typeCase):
-        if groupedFields.fulfilledFragments.contains(type: typeCase) {
+        if groupedFields.fulfilledFragments.contains(typeCase) {
           try collectFields(from: typeCase.__selections,
                             into: &groupedFields,
                             for: object,
@@ -213,8 +210,8 @@ struct CustomCacheDataWritingFieldSelectionCollector: FieldSelectionCollector {
   }
 }
 
-fileprivate extension Set<ObjectIdentifier> {
-  func contains(type: Any.Type) -> Bool {
-    contains(ObjectIdentifier(type.self))
+fileprivate extension Set<SelectionSetMetatypeWrapper> {
+  func contains(_ metatype: any SelectionSet.Type) -> Bool {
+    contains(SelectionSetMetatypeWrapper(metatype: metatype))
   }
 }
