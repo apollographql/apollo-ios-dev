@@ -1,26 +1,26 @@
 import Foundation
 import IR
-import GraphQLCompiler
 import OrderedCollections
+import GraphQLCompiler
 
 /// Generates a file providing the ability to mock the GraphQLUnionTypes in a schema
 /// for testing purposes.
 struct MockUnionsFileGenerator: FileGenerator {
 
-  let graphQLUnions: OrderedSet<GraphQLUnionType>
+  let graphqlUnions: OrderedSet<GraphQLUnionType>
 
   let config: ApolloCodegen.ConfigurationContext
 
   init?(ir: IRBuilder, config: ApolloCodegen.ConfigurationContext) {
     let unions = ir.schema.referencedTypes.unions
     guard !unions.isEmpty else { return nil }
-    self.graphQLUnions = unions
+    self.graphqlUnions = unions
     self.config = config
   }
 
   var template: any TemplateRenderer {
     MockUnionsTemplate(
-      graphQLUnions: graphQLUnions,
+      graphqlUnions: graphqlUnions,
       config: config
     )
   }

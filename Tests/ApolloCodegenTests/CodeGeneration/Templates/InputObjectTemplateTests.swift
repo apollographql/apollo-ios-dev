@@ -14,16 +14,21 @@ class InputObjectTemplateTests: XCTestCase {
 
   private func buildSubject(
     name: String = "MockInput",
+    customName: String? = nil,
     fields: [GraphQLInputField] = [],
     documentation: String? = nil,
     config: ApolloCodegenConfiguration = .mock(.swiftPackageManager)
   ) {
+    let inputObject = GraphQLInputObjectType.mock(
+      name,
+      fields: fields,
+      documentation: documentation,
+      config: config
+    )
+    inputObject.name.customName = customName
+    
     subject = InputObjectTemplate(
-      graphqlInputObject: GraphQLInputObjectType.mock(
-        name,
-        fields: fields,
-        documentation: documentation
-      ),
+      graphqlInputObject: inputObject,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
@@ -2538,6 +2543,68 @@ class InputObjectTemplateTests: XCTestCase {
       // then
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     }
+  }
+  
+  // MARK: - Schema Customization Tests
+  
+  func test__render__givenInputObjectAndField_withCustomNames_shouldRenderWithCustomNames() throws {
+    // given
+    let customInputField = GraphQLInputField.mock(
+      "myField",
+      type: .nonNull(.string()),
+      defaultValue: nil
+    )
+    customInputField.name.customName = "myCustomField"
+    buildSubject(
+      name: "MyInputObject",
+      customName: "MyCustomInputObject",
+      fields: [
+        GraphQLInputField.mock(
+          "fieldOne",
+          type: .nonNull(.string()),
+          defaultValue: nil
+        ),
+        customInputField
+      ]
+    )
+
+    let expected = """
+    // Renamed from GraphQL schema value: 'MyInputObject'
+    public struct MyCustomInputObject: InputObject {
+      public private(set) var __data: InputDict
+
+      public init(_ data: InputDict) {
+        __data = data
+      }
+
+      public init(
+        fieldOne: String,
+        myCustomField: String
+      ) {
+        __data = InputDict([
+          "fieldOne": fieldOne,
+          "myField": myCustomField
+        ])
+      }
+
+      public var fieldOne: String {
+        get { __data["fieldOne"] }
+        set { __data["fieldOne"] = newValue }
+      }
+
+      // Renamed from GraphQL schema value: 'myField'
+      public var myCustomField: String {
+        get { __data["myField"] }
+        set { __data["myField"] = newValue }
+      }
+    }
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
   
 }

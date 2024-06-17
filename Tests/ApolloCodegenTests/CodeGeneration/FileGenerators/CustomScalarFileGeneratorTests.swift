@@ -35,7 +35,7 @@ class CustomScalarFileGeneratorTests: XCTestCase {
     // given
     buildSubject()
 
-    let expected = graphqlScalar.name
+    let expected = graphqlScalar.name.schemaName
 
     // then
     expect(self.subject.fileName).to(equal(expected))
@@ -48,4 +48,17 @@ class CustomScalarFileGeneratorTests: XCTestCase {
     // then
     expect(self.subject.overwrite).to(beFalse())
   }
+  
+  // MARK: Schema Customization Tests
+  
+  func test__filename_matchesCustomName() throws {
+    // given
+    let customName = "MyCustomScalar"
+    graphqlScalar.name.customName = customName
+    buildSubject()
+    
+    // then
+    expect(self.subject.fileName).to(equal(customName))
+  }
+  
 }

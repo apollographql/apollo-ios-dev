@@ -14,7 +14,31 @@
     "pruneGeneratedFiles" : true,
     "queryStringLiteralFormat" : "multiline",
     "warningsOnDeprecatedUsage" : "include",
-    "operationDocumentFormat" : ["operationId"]
+    "operationDocumentFormat" : ["operationId"],
+    "schemaCustomization" : {
+      "customTypeNames" : {
+        "SkinCovering" : {
+          "enum" : {
+            "cases" : {
+              "HAIR" : "CUSTOMHAIR"
+            },
+            "name" : "CustomSkinCovering"
+          }
+        },
+        "Animal" : "CustomAnimal",
+        "Crocodile" : "CustomCrocodile",
+        "ClassroomPet" : "CustomClassroomPet",
+        "Date" : "CustomDate",
+        "PetSearchFilters" : {
+          "inputObject" : {
+            "fields" : {
+              "size" : "customSize"
+            },
+            "name" : "CustomPetSearchFilters"
+          }
+        }
+      }
+    }
   },
   "input" : {
     "operationSearchPaths" : [

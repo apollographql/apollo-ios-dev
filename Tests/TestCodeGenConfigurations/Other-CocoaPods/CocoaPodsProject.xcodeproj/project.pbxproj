@@ -9,6 +9,12 @@
 /* Begin PBXBuildFile section */
 		1B7ED6E41035FB2A0D763AD8 /* Pods_CocoaPodsProjectTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E998DF0E4DCCF80C445451 /* Pods_CocoaPodsProjectTests.framework */; };
 		665BDA862AE30BE2004DD21F /* Object.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665BDA852AE30BE2004DD21F /* Object.swift */; };
+		66F434EB2C12B5EC00679212 /* CustomClassroomPet.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F434EA2C12B5EC00679212 /* CustomClassroomPet.graphql.swift */; };
+		66F434ED2C12B60800679212 /* CustomSkinCovering.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F434EC2C12B60800679212 /* CustomSkinCovering.graphql.swift */; };
+		66F434EF2C12B60E00679212 /* CustomCrocodile.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F434EE2C12B60E00679212 /* CustomCrocodile.graphql.swift */; };
+		66F434F12C12B61400679212 /* CustomPetSearchFilters.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F434F02C12B61400679212 /* CustomPetSearchFilters.graphql.swift */; };
+		66F434F32C12B61900679212 /* CustomAnimal.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F434F22C12B61900679212 /* CustomAnimal.graphql.swift */; };
+		66F434F52C12B67E00679212 /* CustomCrocodile+Mock.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F434F42C12B67E00679212 /* CustomCrocodile+Mock.graphql.swift */; };
 		B51EE231D8798C8408AB9CD5 /* Pods_CocoaPodsProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C684794938D6314DF12AB411 /* Pods_CocoaPodsProject.framework */; };
 		DE4790B02BFBD66E00939CCC /* ID.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4790AF2BFBD66E00939CCC /* ID.swift */; };
 		E607A69C29FB43F80059899E /* CocoaPodsProjectApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A69B29FB43F80059899E /* CocoaPodsProjectApp.swift */; };
@@ -30,9 +36,7 @@
 		E607A75629FB692F0059899E /* AllAnimalsQuery.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A72629FB692F0059899E /* AllAnimalsQuery.graphql.swift */; };
 		E607A75729FB692F0059899E /* AllAnimalsIncludeSkipQuery.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A72729FB692F0059899E /* AllAnimalsIncludeSkipQuery.graphql.swift */; };
 		E607A75829FB692F0059899E /* PetSearchQuery.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A72829FB692F0059899E /* PetSearchQuery.graphql.swift */; };
-		E607A75929FB692F0059899E /* ClassroomPet.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A72B29FB692F0059899E /* ClassroomPet.graphql.swift */; };
 		E607A75A29FB692F0059899E /* CustomDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A72D29FB692F0059899E /* CustomDate.swift */; };
-		E607A75B29FB692F0059899E /* SkinCovering.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A72F29FB692F0059899E /* SkinCovering.graphql.swift */; };
 		E607A75C29FB692F0059899E /* RelativeSize.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A73029FB692F0059899E /* RelativeSize.graphql.swift */; };
 		E607A75D29FB692F0059899E /* Rat.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A73229FB692F0059899E /* Rat.graphql.swift */; };
 		E607A75E29FB692F0059899E /* Bird.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A73329FB692F0059899E /* Bird.graphql.swift */; };
@@ -44,15 +48,12 @@
 		E607A76429FB69300059899E /* Cat.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A73929FB692F0059899E /* Cat.graphql.swift */; };
 		E607A76529FB69300059899E /* Fish.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A73A29FB692F0059899E /* Fish.graphql.swift */; };
 		E607A76629FB69300059899E /* Human.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A73B29FB692F0059899E /* Human.graphql.swift */; };
-		E607A76729FB69300059899E /* Crocodile.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A73C29FB692F0059899E /* Crocodile.graphql.swift */; };
 		E607A76829FB69300059899E /* SchemaConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A73D29FB692F0059899E /* SchemaConfiguration.swift */; };
 		E607A76929FB69300059899E /* PetAdoptionInput.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A73F29FB692F0059899E /* PetAdoptionInput.graphql.swift */; };
-		E607A76A29FB69300059899E /* PetSearchFilters.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A74029FB692F0059899E /* PetSearchFilters.graphql.swift */; };
 		E607A76B29FB69300059899E /* MeasurementsInput.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A74129FB692F0059899E /* MeasurementsInput.graphql.swift */; };
 		E607A76C29FB69300059899E /* SchemaMetadata.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A74229FB692F0059899E /* SchemaMetadata.graphql.swift */; };
 		E607A76D29FB69300059899E /* HousePet.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A74429FB692F0059899E /* HousePet.graphql.swift */; };
 		E607A76E29FB69300059899E /* Pet.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A74529FB692F0059899E /* Pet.graphql.swift */; };
-		E607A76F29FB69300059899E /* Animal.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A74629FB692F0059899E /* Animal.graphql.swift */; };
 		E607A77029FB69300059899E /* WarmBlooded.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A74729FB692F0059899E /* WarmBlooded.graphql.swift */; };
 		E607A77F29FB69920059899E /* Human+Mock.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A77229FB69920059899E /* Human+Mock.graphql.swift */; };
 		E607A78029FB69920059899E /* Height+Mock.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A77329FB69920059899E /* Height+Mock.graphql.swift */; };
@@ -66,7 +67,6 @@
 		E607A78829FB69920059899E /* Dog+Mock.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A77B29FB69920059899E /* Dog+Mock.graphql.swift */; };
 		E607A78929FB69920059899E /* Fish+Mock.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A77C29FB69920059899E /* Fish+Mock.graphql.swift */; };
 		E607A78A29FB69920059899E /* Mutation+Mock.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A77D29FB69920059899E /* Mutation+Mock.graphql.swift */; };
-		E607A78B29FB69920059899E /* Crocodile+Mock.graphql.swift in Sources */ = {isa = PBXBuildFile; fileRef = E607A77E29FB69920059899E /* Crocodile+Mock.graphql.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +82,12 @@
 /* Begin PBXFileReference section */
 		4C671E51FD3FF74D8B077F45 /* Pods-CocoaPodsProjectTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPodsProjectTests.release.xcconfig"; path = "Target Support Files/Pods-CocoaPodsProjectTests/Pods-CocoaPodsProjectTests.release.xcconfig"; sourceTree = "<group>"; };
 		665BDA852AE30BE2004DD21F /* Object.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Object.swift; sourceTree = "<group>"; };
+		66F434EA2C12B5EC00679212 /* CustomClassroomPet.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomClassroomPet.graphql.swift; sourceTree = "<group>"; };
+		66F434EC2C12B60800679212 /* CustomSkinCovering.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomSkinCovering.graphql.swift; sourceTree = "<group>"; };
+		66F434EE2C12B60E00679212 /* CustomCrocodile.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomCrocodile.graphql.swift; sourceTree = "<group>"; };
+		66F434F02C12B61400679212 /* CustomPetSearchFilters.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPetSearchFilters.graphql.swift; sourceTree = "<group>"; };
+		66F434F22C12B61900679212 /* CustomAnimal.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAnimal.graphql.swift; sourceTree = "<group>"; };
+		66F434F42C12B67E00679212 /* CustomCrocodile+Mock.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CustomCrocodile+Mock.graphql.swift"; sourceTree = "<group>"; };
 		7D6507DAD078EC7A270097F0 /* Pods-CocoaPodsProject.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPodsProject.release.xcconfig"; path = "Target Support Files/Pods-CocoaPodsProject/Pods-CocoaPodsProject.release.xcconfig"; sourceTree = "<group>"; };
 		951B5BB1CBB3B06FF1E6F602 /* Pods-CocoaPodsProject.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPodsProject.debug.xcconfig"; path = "Target Support Files/Pods-CocoaPodsProject/Pods-CocoaPodsProject.debug.xcconfig"; sourceTree = "<group>"; };
 		C684794938D6314DF12AB411 /* Pods_CocoaPodsProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CocoaPodsProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,9 +117,7 @@
 		E607A72629FB692F0059899E /* AllAnimalsQuery.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllAnimalsQuery.graphql.swift; sourceTree = "<group>"; };
 		E607A72729FB692F0059899E /* AllAnimalsIncludeSkipQuery.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllAnimalsIncludeSkipQuery.graphql.swift; sourceTree = "<group>"; };
 		E607A72829FB692F0059899E /* PetSearchQuery.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PetSearchQuery.graphql.swift; sourceTree = "<group>"; };
-		E607A72B29FB692F0059899E /* ClassroomPet.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassroomPet.graphql.swift; sourceTree = "<group>"; };
 		E607A72D29FB692F0059899E /* CustomDate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomDate.swift; sourceTree = "<group>"; };
-		E607A72F29FB692F0059899E /* SkinCovering.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SkinCovering.graphql.swift; sourceTree = "<group>"; };
 		E607A73029FB692F0059899E /* RelativeSize.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RelativeSize.graphql.swift; sourceTree = "<group>"; };
 		E607A73229FB692F0059899E /* Rat.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rat.graphql.swift; sourceTree = "<group>"; };
 		E607A73329FB692F0059899E /* Bird.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bird.graphql.swift; sourceTree = "<group>"; };
@@ -125,15 +129,12 @@
 		E607A73929FB692F0059899E /* Cat.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cat.graphql.swift; sourceTree = "<group>"; };
 		E607A73A29FB692F0059899E /* Fish.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fish.graphql.swift; sourceTree = "<group>"; };
 		E607A73B29FB692F0059899E /* Human.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Human.graphql.swift; sourceTree = "<group>"; };
-		E607A73C29FB692F0059899E /* Crocodile.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crocodile.graphql.swift; sourceTree = "<group>"; };
 		E607A73D29FB692F0059899E /* SchemaConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaConfiguration.swift; sourceTree = "<group>"; };
 		E607A73F29FB692F0059899E /* PetAdoptionInput.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PetAdoptionInput.graphql.swift; sourceTree = "<group>"; };
-		E607A74029FB692F0059899E /* PetSearchFilters.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PetSearchFilters.graphql.swift; sourceTree = "<group>"; };
 		E607A74129FB692F0059899E /* MeasurementsInput.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeasurementsInput.graphql.swift; sourceTree = "<group>"; };
 		E607A74229FB692F0059899E /* SchemaMetadata.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaMetadata.graphql.swift; sourceTree = "<group>"; };
 		E607A74429FB692F0059899E /* HousePet.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HousePet.graphql.swift; sourceTree = "<group>"; };
 		E607A74529FB692F0059899E /* Pet.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pet.graphql.swift; sourceTree = "<group>"; };
-		E607A74629FB692F0059899E /* Animal.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Animal.graphql.swift; sourceTree = "<group>"; };
 		E607A74729FB692F0059899E /* WarmBlooded.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WarmBlooded.graphql.swift; sourceTree = "<group>"; };
 		E607A77229FB69920059899E /* Human+Mock.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Human+Mock.graphql.swift"; sourceTree = "<group>"; };
 		E607A77329FB69920059899E /* Height+Mock.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Height+Mock.graphql.swift"; sourceTree = "<group>"; };
@@ -147,7 +148,6 @@
 		E607A77B29FB69920059899E /* Dog+Mock.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Dog+Mock.graphql.swift"; sourceTree = "<group>"; };
 		E607A77C29FB69920059899E /* Fish+Mock.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Fish+Mock.graphql.swift"; sourceTree = "<group>"; };
 		E607A77D29FB69920059899E /* Mutation+Mock.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Mutation+Mock.graphql.swift"; sourceTree = "<group>"; };
-		E607A77E29FB69920059899E /* Crocodile+Mock.graphql.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Crocodile+Mock.graphql.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -321,7 +321,7 @@
 		E607A72A29FB692F0059899E /* Unions */ = {
 			isa = PBXGroup;
 			children = (
-				E607A72B29FB692F0059899E /* ClassroomPet.graphql.swift */,
+				66F434EA2C12B5EC00679212 /* CustomClassroomPet.graphql.swift */,
 			);
 			path = Unions;
 			sourceTree = "<group>";
@@ -339,7 +339,7 @@
 		E607A72E29FB692F0059899E /* Enums */ = {
 			isa = PBXGroup;
 			children = (
-				E607A72F29FB692F0059899E /* SkinCovering.graphql.swift */,
+				66F434EC2C12B60800679212 /* CustomSkinCovering.graphql.swift */,
 				E607A73029FB692F0059899E /* RelativeSize.graphql.swift */,
 			);
 			path = Enums;
@@ -348,6 +348,7 @@
 		E607A73129FB692F0059899E /* Objects */ = {
 			isa = PBXGroup;
 			children = (
+				66F434EE2C12B60E00679212 /* CustomCrocodile.graphql.swift */,
 				E607A73229FB692F0059899E /* Rat.graphql.swift */,
 				E607A73329FB692F0059899E /* Bird.graphql.swift */,
 				E607A73429FB692F0059899E /* PetRock.graphql.swift */,
@@ -358,7 +359,6 @@
 				E607A73929FB692F0059899E /* Cat.graphql.swift */,
 				E607A73A29FB692F0059899E /* Fish.graphql.swift */,
 				E607A73B29FB692F0059899E /* Human.graphql.swift */,
-				E607A73C29FB692F0059899E /* Crocodile.graphql.swift */,
 			);
 			path = Objects;
 			sourceTree = "<group>";
@@ -366,8 +366,8 @@
 		E607A73E29FB692F0059899E /* InputObjects */ = {
 			isa = PBXGroup;
 			children = (
+				66F434F02C12B61400679212 /* CustomPetSearchFilters.graphql.swift */,
 				E607A73F29FB692F0059899E /* PetAdoptionInput.graphql.swift */,
-				E607A74029FB692F0059899E /* PetSearchFilters.graphql.swift */,
 				E607A74129FB692F0059899E /* MeasurementsInput.graphql.swift */,
 			);
 			path = InputObjects;
@@ -376,9 +376,9 @@
 		E607A74329FB692F0059899E /* Interfaces */ = {
 			isa = PBXGroup;
 			children = (
+				66F434F22C12B61900679212 /* CustomAnimal.graphql.swift */,
 				E607A74429FB692F0059899E /* HousePet.graphql.swift */,
 				E607A74529FB692F0059899E /* Pet.graphql.swift */,
-				E607A74629FB692F0059899E /* Animal.graphql.swift */,
 				E607A74729FB692F0059899E /* WarmBlooded.graphql.swift */,
 			);
 			path = Interfaces;
@@ -387,6 +387,7 @@
 		E607A77129FB69920059899E /* AnimalKingdomAPITestMocks */ = {
 			isa = PBXGroup;
 			children = (
+				66F434F42C12B67E00679212 /* CustomCrocodile+Mock.graphql.swift */,
 				E607A77229FB69920059899E /* Human+Mock.graphql.swift */,
 				E607A77329FB69920059899E /* Height+Mock.graphql.swift */,
 				E607A77429FB69920059899E /* Query+Mock.graphql.swift */,
@@ -399,7 +400,6 @@
 				E607A77B29FB69920059899E /* Dog+Mock.graphql.swift */,
 				E607A77C29FB69920059899E /* Fish+Mock.graphql.swift */,
 				E607A77D29FB69920059899E /* Mutation+Mock.graphql.swift */,
-				E607A77E29FB69920059899E /* Crocodile+Mock.graphql.swift */,
 			);
 			path = AnimalKingdomAPITestMocks;
 			sourceTree = "<group>";
@@ -573,42 +573,42 @@
 			files = (
 				E607A76029FB692F0059899E /* Dog.graphql.swift in Sources */,
 				E607A74A29FB692F0059899E /* ClassroomPetDetails.graphql.swift in Sources */,
-				E607A75929FB692F0059899E /* ClassroomPet.graphql.swift in Sources */,
+				66F434EB2C12B5EC00679212 /* CustomClassroomPet.graphql.swift in Sources */,
 				E607A75F29FB692F0059899E /* PetRock.graphql.swift in Sources */,
 				E607A76129FB69300059899E /* Height.graphql.swift in Sources */,
 				665BDA862AE30BE2004DD21F /* Object.swift in Sources */,
 				E607A76C29FB69300059899E /* SchemaMetadata.graphql.swift in Sources */,
 				E607A76329FB69300059899E /* Query.graphql.swift in Sources */,
 				E607A75229FB692F0059899E /* DogQuery.graphql.swift in Sources */,
+				66F434ED2C12B60800679212 /* CustomSkinCovering.graphql.swift in Sources */,
 				E607A75829FB692F0059899E /* PetSearchQuery.graphql.swift in Sources */,
-				E607A76A29FB69300059899E /* PetSearchFilters.graphql.swift in Sources */,
 				E607A76629FB69300059899E /* Human.graphql.swift in Sources */,
+				66F434EF2C12B60E00679212 /* CustomCrocodile.graphql.swift in Sources */,
 				E607A76229FB69300059899E /* Mutation.graphql.swift in Sources */,
 				E607A76E29FB69300059899E /* Pet.graphql.swift in Sources */,
 				E607A76929FB69300059899E /* PetAdoptionInput.graphql.swift in Sources */,
 				E607A75029FB692F0059899E /* PetSearchLocalCacheMutation.graphql.swift in Sources */,
 				E607A76429FB69300059899E /* Cat.graphql.swift in Sources */,
 				E607A75D29FB692F0059899E /* Rat.graphql.swift in Sources */,
-				E607A75B29FB692F0059899E /* SkinCovering.graphql.swift in Sources */,
 				E607A74B29FB692F0059899E /* DogFragment.graphql.swift in Sources */,
+				66F434F12C12B61400679212 /* CustomPetSearchFilters.graphql.swift in Sources */,
 				E607A74E29FB692F0059899E /* PetDetailsMutation.graphql.swift in Sources */,
 				E607A74F29FB692F0059899E /* AllAnimalsLocalCacheMutation.graphql.swift in Sources */,
 				E607A75729FB692F0059899E /* AllAnimalsIncludeSkipQuery.graphql.swift in Sources */,
 				E607A76529FB69300059899E /* Fish.graphql.swift in Sources */,
 				E607A75E29FB692F0059899E /* Bird.graphql.swift in Sources */,
-				E607A76729FB69300059899E /* Crocodile.graphql.swift in Sources */,
 				E607A74929FB692F0059899E /* HeightInMeters.graphql.swift in Sources */,
 				E607A76829FB69300059899E /* SchemaConfiguration.swift in Sources */,
 				E607A75629FB692F0059899E /* AllAnimalsQuery.graphql.swift in Sources */,
 				E607A75429FB692F0059899E /* ClassroomPetsQuery.graphql.swift in Sources */,
 				E607A74D29FB692F0059899E /* WarmBloodedDetails.graphql.swift in Sources */,
+				66F434F32C12B61900679212 /* CustomAnimal.graphql.swift in Sources */,
 				E607A69E29FB43F80059899E /* ContentView.swift in Sources */,
 				DE4790B02BFBD66E00939CCC /* ID.swift in Sources */,
 				E607A76B29FB69300059899E /* MeasurementsInput.graphql.swift in Sources */,
 				E607A74829FB692F0059899E /* PetDetails.graphql.swift in Sources */,
 				E607A76D29FB69300059899E /* HousePet.graphql.swift in Sources */,
 				E607A75A29FB692F0059899E /* CustomDate.swift in Sources */,
-				E607A76F29FB69300059899E /* Animal.graphql.swift in Sources */,
 				E607A75C29FB692F0059899E /* RelativeSize.graphql.swift in Sources */,
 				E607A69C29FB43F80059899E /* CocoaPodsProjectApp.swift in Sources */,
 				E607A75129FB692F0059899E /* PetAdoptionMutation.graphql.swift in Sources */,
@@ -620,6 +620,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66F434F52C12B67E00679212 /* CustomCrocodile+Mock.graphql.swift in Sources */,
 				E607A78629FB69920059899E /* MockObject+Unions.graphql.swift in Sources */,
 				E607A78729FB69920059899E /* Cat+Mock.graphql.swift in Sources */,
 				E607A78029FB69920059899E /* Height+Mock.graphql.swift in Sources */,
@@ -631,7 +632,6 @@
 				E607A6AE29FB43F90059899E /* CocoaPodsProjectTests.swift in Sources */,
 				E607A78229FB69920059899E /* PetRock+Mock.graphql.swift in Sources */,
 				E607A78A29FB69920059899E /* Mutation+Mock.graphql.swift in Sources */,
-				E607A78B29FB69920059899E /* Crocodile+Mock.graphql.swift in Sources */,
 				E607A78129FB69920059899E /* Query+Mock.graphql.swift in Sources */,
 				E607A78329FB69920059899E /* Bird+Mock.graphql.swift in Sources */,
 			);

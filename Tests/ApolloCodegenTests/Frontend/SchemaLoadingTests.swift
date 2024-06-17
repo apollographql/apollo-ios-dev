@@ -30,7 +30,7 @@ class SchemaLoadingTests: XCTestCase {
       from: [try codegenFrontend.makeSource(introspectionResult, filePath: "schema.json")]
     )
 
-    await expect { try await schema.getType(named: "Character")?.name }
+    await expect { try await schema.getType(named: "Character")?.name.schemaName }
       .to(equal("Character"))
   }
   
@@ -46,7 +46,7 @@ class SchemaLoadingTests: XCTestCase {
 
     let schema = try await codegenFrontend.loadSchema(from: [source])
     
-    await expect { try await schema.getType(named: "Character")?.name }
+    await expect { try await schema.getType(named: "Character")?.name.schemaName }
       .to(equal("Character"))
   }
   

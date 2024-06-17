@@ -2484,5 +2484,117 @@ class ApolloCodegenTests: XCTestCase {
     expect(matches.contains(where: { $0.contains(".swiftpm") })).to(beFalse())
     expect(matches.contains(where: { $0.contains(".Pods") })).to(beFalse())
   }
+  
+  // MARK: - Schema Customization Tests
+  
+  func test_typeNames_givenSchemaCustomization_shouldGenerateCustomTypeNames() async throws {
+    // given
+    let schemaPath = ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.Schema.path
+    let operationsPath = ApolloCodegenInternalTestHelpers.Resources.url
+      .appendingPathComponent("animalkingdom-graphql")
+      .appendingPathComponent("**/*.graphql").path
+
+    let config =  ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration(
+      schemaNamespace: "AnimalKingdomAPI",
+      input: .init(schemaPath: schemaPath, operationSearchPaths: [operationsPath]),
+      output: .init(
+        schemaTypes: .init(path: directoryURL.path,
+                           moduleType: .swiftPackageManager),
+        operations: .inSchemaModule
+      ),
+      options: .init(
+        schemaCustomization: .init(
+                  customTypeNames: [
+                    "Crocodile": .type(name: "CustomCrocodile"), // Object
+                    "Animal": .type(name: "CustomAnimal"), // Interface
+                    "ClassroomPet": .type(name: "CustomClassroomPet"), // Union
+                    "Date": .type(name: "CustomDate"), // Custom Scalar
+                    "SkinCovering": .enum( // Enum
+                      name: "CustomSkinCovering",
+                      cases: [
+                        "HAIR": "CUSTOMHAIR"
+                      ]
+                    ),
+                    "PetSearchFilters": .inputObject( // Input Object
+                      name: "CustomPetSearchFilters",
+                      fields: [
+                        "size": "customSize"
+                      ]
+                    )
+                  ]
+                )
+      )
+    ), rootURL: nil)
+
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
+    // when
+    let compilationResult = try await subject.compileGraphQLResult()
+
+    let ir = IRBuilder(compilationResult: compilationResult)
+    
+    subject.processSchemaCustomizations(ir: ir)
+    
+    for objType in ir.schema.referencedTypes.objects {
+      if objType.name.schemaName == "Crocodile" {
+        expect(objType.name.customName).to(equal("CustomCrocodile"))
+        break
+      }
+    }
+    
+    for interfaceType in ir.schema.referencedTypes.interfaces {
+      if interfaceType.name.schemaName == "Animal" {
+        expect(interfaceType.name.customName).to(equal("CustomAnimal"))
+        break
+      }
+    }
+    
+    for unionType in ir.schema.referencedTypes.unions {
+      if unionType.name.schemaName == "ClassroomPet" {
+        expect(unionType.name.customName).to(equal("CustomClassroomPet"))
+        break
+      }
+    }
+    
+    for customScalarType in ir.schema.referencedTypes.customScalars {
+      if customScalarType.name.schemaName == "Date" {
+        expect(customScalarType.name.customName).to(equal("CustomDate"))
+        break
+      }
+    }
+
+    for enumType in ir.schema.referencedTypes.enums {
+      if enumType.name.schemaName == "SkinCovering" {
+        expect(enumType.name.customName).to(equal("CustomSkinCovering"))
+        
+        for enumCase in enumType.values {
+          if enumCase.name.schemaName == "HAIR" {
+            expect(enumCase.name.customName).to(equal("CUSTOMHAIR"))
+          }
+        }
+        
+        break
+      }
+    }
+    
+    for inputObjectType in ir.schema.referencedTypes.inputObjects {
+      if inputObjectType.name.schemaName == "PetSearchFilters" {
+        expect(inputObjectType.name.customName).to(equal("CustomPetSearchFilters"))
+        
+        for inputField in inputObjectType.fields.values {
+          if inputField.name.schemaName == "size" {
+            expect(inputField.name.customName).to(equal("customSize"))
+          }
+        }
+        
+        break
+      }
+    }
+
+  }
 
 }
