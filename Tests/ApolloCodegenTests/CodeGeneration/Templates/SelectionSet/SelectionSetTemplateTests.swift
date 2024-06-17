@@ -11564,7 +11564,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
       """,
       atLine: 1,
       ignoringExtraLines: true
@@ -11616,7 +11616,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
       """,
       atLine: 1,
       ignoringExtraLines: true
@@ -11673,7 +11673,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
       """,
       atLine: 1,
       ignoringExtraLines: true
@@ -11738,7 +11738,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
       """,
       atLine: 1,
       ignoringExtraLines: true
@@ -11752,7 +11752,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
       """,
       atLine: 1,
       ignoringExtraLines: true
@@ -11824,7 +11824,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
       """,
       atLine: 1,
       ignoringExtraLines: true
@@ -11838,7 +11838,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Cat }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Cat }
       """,
       atLine: 1,
       ignoringExtraLines: true
@@ -11917,7 +11917,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
       """,
       atLine: 1,
       ignoringExtraLines: true
@@ -11931,7 +11931,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal.AsDog.Outer.Friend
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Cat }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Cat }
       """,
       atLine: 1,
       ignoringExtraLines: true
