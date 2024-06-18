@@ -19,7 +19,6 @@
       }
     ],
     "role" : "collectionGroup",
-    "roleHeading" : "API Collection",
     "title" : "NormalizedCache Implementations"
   },
   "schemaVersion" : {

@@ -48,7 +48,7 @@
       },
       {
         "kind" : "text",
-        "text" : " : any "
+        "text" : " : "
       },
       {
         "kind" : "typeIdentifier",
@@ -125,7 +125,7 @@
             },
             {
               "kind" : "text",
-              "text" : " : any "
+              "text" : " : "
             },
             {
               "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
@@ -362,7 +362,7 @@
     },
     {
       "kind" : "text",
-      "text" : " : any "
+      "text" : " : "
     },
     {
       "kind" : "typeIdentifier",

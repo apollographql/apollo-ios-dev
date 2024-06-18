@@ -142,6 +142,7 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
         "doc:\/\/Apollo\/documentation\/Apollo\/Constants",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLHTTPRequestError",
+        "doc:\/\/Apollo\/documentation\/Apollo\/JSONConverter",
         "doc:\/\/Apollo\/documentation\/Apollo\/RootSelectionSetInitializeError"
       ],
       "title" : "Enumerations"
@@ -1370,6 +1371,37 @@
   "title" : "InterceptorRequestChain",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/interceptorrequestchain"
+},
+"doc://Apollo/documentation/Apollo/JSONConverter": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "JSONConverter"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONConverter",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "JSONConverter"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "JSONConverter",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/jsonconverter"
 },
 "doc://Apollo/documentation/Apollo/JSONRequest": {
   "abstract" : [

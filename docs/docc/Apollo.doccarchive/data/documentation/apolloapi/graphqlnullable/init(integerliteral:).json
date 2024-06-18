@@ -89,7 +89,6 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:s27ExpressibleByIntegerLiteralP0cD4TypeQa",
         "text" : "IntegerLiteralType"
       },
       {
@@ -152,7 +151,6 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:s27ExpressibleByIntegerLiteralP0cD4TypeQa",
               "text" : "IntegerLiteralType"
             },
             {
@@ -363,7 +361,6 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s27ExpressibleByIntegerLiteralP0cD4TypeQa",
       "text" : "IntegerLiteralType"
     },
     {
