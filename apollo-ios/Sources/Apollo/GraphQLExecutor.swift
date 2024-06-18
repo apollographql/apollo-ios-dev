@@ -10,8 +10,8 @@ public class ObjectExecutionInfo {
   let schema: any SchemaMetadata.Type
   private(set) var responsePath: ResponsePath = []
   private(set) var cachePath: ResponsePath = []
-  fileprivate(set) var fulfilledFragments: Set<SelectionSetMetatype>
-  fileprivate(set) var deferredFragments: Set<SelectionSetMetatype> = []
+  fileprivate(set) var fulfilledFragments: Set<ObjectIdentifier>
+  fileprivate(set) var deferredFragments: Set<ObjectIdentifier> = []
 
   fileprivate init(
     rootType: any SelectionSet.Type,
@@ -25,7 +25,7 @@ public class ObjectExecutionInfo {
     self.schema = schema
     self.responsePath = responsePath
     self.cachePath = cachePath
-    self.fulfilledFragments = [SelectionSetMetatype(rootType)]
+    self.fulfilledFragments = [ObjectIdentifier(rootType)]
   }
 
   fileprivate init(
@@ -40,7 +40,7 @@ public class ObjectExecutionInfo {
     if let root = root {
       cachePath = [root.key]
     }
-    self.fulfilledFragments = [SelectionSetMetatype(rootType)]
+    self.fulfilledFragments = [ObjectIdentifier(rootType)]
   }
 
   func runtimeObjectType(
@@ -129,7 +129,7 @@ public class FieldExecutionInfo {
       guard case let .object(selectionSet) = field.type.namedType else {
         return
       }
-      childExecutionInfo.fulfilledFragments.insert(SelectionSetMetatype(selectionSet.self))
+      childExecutionInfo.fulfilledFragments.insert(ObjectIdentifier(selectionSet.self))
       childSelections.append(contentsOf: selectionSet.__selections)
     }
 
