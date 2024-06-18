@@ -28,13 +28,23 @@ jobs:
           ${{ secrets.APOLLO_IOS_DEV_DEPLOY_KEY }}
     - name: Configure Git
       uses: ./.github/actions/configure-git
-    - name: Run Commands
+    - name: Get Previous Version
       shell: bash
       run: |
         previousVersion=$(sh apollo-ios/scripts/get-version.sh)
         echo "PREVIOUS_VERSION=$previousVersion" >> ${GITHUB_ENV}
+    - name: Set New Version
+      shell: bash
+      run: |
         sh ./scripts/set-version.sh "${{ env.VERSION_NUMBER }}"
-        (cd SwiftScripts && swift run DocumentationGenerator)
+    - name: Generate Documentation
+      shell: bash
+      run: |
+        cd SwiftScripts
+        swift run DocumentationGenerator
+    - name: Archive CLI
+      shell: bash
+      run: |
         make archive-cli-to-apollo-package
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v6
