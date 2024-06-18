@@ -301,7 +301,7 @@ public final class GraphQLExecutor<Source: GraphQLExecutionSource> {
 
       if executionSource.shouldAttemptDeferredFragmentExecution {
         for deferredFragment in groupedFields.deferredFragments {
-          guard let fragmentType = groupedFields.cachedFragmentIdentifiers[deferredFragment] else {
+          guard let fragmentType = groupedFields.cachedFragmentIdentifierTypes[deferredFragment] else {
             info.deferredFragments.insert(deferredFragment)
             continue
           }

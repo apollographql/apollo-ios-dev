@@ -8,7 +8,7 @@ public struct FieldSelectionGrouping {
   fileprivate(set) var fieldInfoList: [String: FieldExecutionInfo] = [:]
   fileprivate(set) var fulfilledFragments: Set<ObjectIdentifier> = []
   fileprivate(set) var deferredFragments: Set<ObjectIdentifier> = []
-  fileprivate(set) var cachedFragmentIdentifiers: [ObjectIdentifier: any SelectionSet.Type] = [:]
+  fileprivate(set) var cachedFragmentIdentifierTypes: [ObjectIdentifier: any SelectionSet.Type] = [:]
 
   init(info: ObjectExecutionInfo) {
     self.fulfilledFragments = info.fulfilledFragments
@@ -35,7 +35,7 @@ public struct FieldSelectionGrouping {
 
     let identifier = ObjectIdentifier(type)
     fulfilledFragments.insert(identifier)
-    cachedFragmentIdentifiers[identifier] = type
+    cachedFragmentIdentifierTypes[identifier] = type
   }
 
   mutating func addDeferredFragment<T: SelectionSet>(_ type: T.Type) {
@@ -46,7 +46,7 @@ public struct FieldSelectionGrouping {
 
     let identifier = ObjectIdentifier(type)
     deferredFragments.insert(identifier)
-    cachedFragmentIdentifiers[identifier] = type
+    cachedFragmentIdentifierTypes[identifier] = type
   }
   
 }
