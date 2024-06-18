@@ -34,7 +34,7 @@ class StarWarsApolloSchemaDownloaderTests: XCTestCase {
     let source = try await frontend.makeSource(from: URL(fileURLWithPath: configuration.outputPath))
     let schema = try await frontend.loadSchema(from: [source])
     let episodeType = try await schema.getType(named: "Episode")
-    XCTAssertEqual(episodeType?.name, "Episode")
+    XCTAssertEqual(episodeType?.name.schemaName, "Episode")
 
     // OK delete it now
     try ApolloFileManager.default.deleteFile(atPath: configuration.outputPath)
