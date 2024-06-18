@@ -10,6 +10,7 @@ on:
 env:
   BRANCH_NAME: "release/${{ github.event.inputs.versionNumber }}"
   VERSION_NUMBER: ${{ github.event.inputs.versionNumber }}
+  CURRENT_SHA: ${{ github.sha }}
 
 jobs:
   create-release-pr:
@@ -48,7 +49,7 @@ jobs:
           Release ${{ env.VERSION_NUMBER }}
         body: |
           #### Diff
-          [See diff since last version](https://github.com/apollographql/apollo-ios-dev/compare/${{ env.PREVIOUS_VERSION }}...${{ github.sha }}).
+          [See diff since last version](https://github.com/apollographql/apollo-ios-dev/compare/${{ env.PREVIOUS_VERSION }}...${{ env.CURRENT_SHA }}).
 
           #### Things to do in this PR
           - [ ] Update [`CHANGELOG.md`](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) with all relevant changes since the prior version. _Please include PR numbers and mention contributors for external PR submissions._
