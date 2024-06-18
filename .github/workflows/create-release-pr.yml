@@ -53,4 +53,11 @@ jobs:
           [See diff since last version](https://github.com/apollographql/apollo-ios-dev/compare/${{ env.PREVIOUS_VERSION }}...${{ github.sha }}).
 
           #### Things to do in this PR
-          - [] Update [`CHANGELOG.md`](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) with all relevant changes since the prior version. _Please include PR numbers and mention contributors for external PR submissions._
+          - [ ] Update [`CHANGELOG.md`](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) with all relevant changes since the prior version. _Please include PR numbers and mention contributors for external PR submissions._
+
+          #### Things to do as part of releasing
+          - [ ] Add tag of format `major.minor.patch` to GitHub.
+          - [ ] Create a release on GitHub with the new tag, using the latest [`CHANGELOG.md`](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) contents.
+          - [ ] Attach CLI binary to the GitHub release. _Use the `make archive-cli-for-release` command which builds both Intel and ARM architectures, and creates the tar archive for you._
+          - [ ] Run `pod trunk push Apollo.podspec` and `pod trunk push ApolloTestSupport.podspec` to publish to CocoaPods. _You will need write permissions for this, please contact one of the [maintainers](https://github.com/apollographql/apollo-ios/blob/main/README.md#maintainers) if you need access to do this._
+          - [ ] Run "[Release New Version](https://github.com/apollographql/apollo-ios-xcframework/actions/workflows/release-new-version.yml)" workflow in `apollo-ios-xcframework`
