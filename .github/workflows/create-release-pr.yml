@@ -11,7 +11,7 @@ on:
 
 env:
   BRANCH_NAME: "release/19.8.29"
-  versionNumer: "19.8.29"
+  versionNumber: "19.8.29"
 
 jobs:
   create-release-pr:
