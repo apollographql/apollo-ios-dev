@@ -301,10 +301,15 @@ public final class GraphQLExecutor<Source: GraphQLExecutionSource> {
 
       if executionSource.shouldAttemptDeferredFragmentExecution {
         for deferredFragment in groupedFields.deferredFragments {
+          guard let fragmentType = groupedFields.cachedFragmentIdentifiers[deferredFragment] else {
+            info.deferredFragments.insert(deferredFragment)
+            continue
+          }
+
           do {
             let deferredFragmentFieldEntries = try lazilyEvaluateAll(
               execute(
-                selections: deferredFragment.wrapped.__selections,
+                selections: fragmentType.__selections,
                 on: object,
                 info: info,
                 accumulator: accumulator
