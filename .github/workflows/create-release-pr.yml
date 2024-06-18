@@ -1,17 +1,14 @@
 name: "Create Release PR"
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-  # workflow_dispatch:
-  #   inputs:
-  #     versionNumber:
-  #       description: 'Version Number'
-  #       required: true
+  workflow_dispatch:
+    inputs:
+      versionNumber:
+        description: 'Version Number'
+        required: true
 
 env:
-  BRANCH_NAME: "release/19.8.29"
-  versionNumber: "19.8.29"
+  BRANCH_NAME: "release/${{ github.event.inputs.versionNumber }}"
 
 jobs:
   create-release-pr:
@@ -35,7 +32,7 @@ jobs:
       run: |
         previousVersion=$(sh apollo-ios/scripts/get-version.sh)
         echo "PREVIOUS_VERSION=$previousVersion" >> ${GITHUB_ENV}
-        sh ./scripts/set-version.sh ${{ env.versionNumber }}
+        sh ./scripts/set-version.sh ${{ github.event.inputs.versionNumber }}
         (cd SwiftScripts && swift run DocumentationGenerator)
         make archive-cli-to-apollo-package
     - name: Create Pull Request
@@ -43,11 +40,11 @@ jobs:
       with:
         branch: ${{ env.BRANCH_NAME }}
         commit-message: |
-          Setting up Release ${{ env.versionNumber }}
+          Setting up Release ${{ github.event.inputs.versionNumber }}
 
           Created By GitHub Action Workflow
         title: |
-          Release ${{ env.versionNumber }}
+          Release ${{ github.event.inputs.versionNumber }}
         body: |
           #### Diff
           [See diff since last version](https://github.com/apollographql/apollo-ios-dev/compare/${{ env.PREVIOUS_VERSION }}...${{ github.sha }}).
