@@ -67,7 +67,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": (any "
+        "text" : ": ("
       },
       {
         "kind" : "typeIdentifier",
@@ -122,12 +122,11 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
         "text" : "Data"
       },
       {
         "kind" : "text",
-        "text" : ">) -> any "
+        "text" : ">) -> "
       },
       {
         "kind" : "typeIdentifier",
@@ -203,7 +202,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": (any "
+              "text" : ": ("
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestContext",
@@ -268,12 +267,11 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
               "text" : "Data"
             },
             {
               "kind" : "text",
-              "text" : ">) -> any "
+              "text" : ">) -> "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable",
@@ -547,7 +545,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": (any "
+      "text" : ": ("
     },
     {
       "kind" : "typeIdentifier",
@@ -602,12 +600,11 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">) -> any "
+      "text" : ">) -> "
     },
     {
       "kind" : "typeIdentifier",

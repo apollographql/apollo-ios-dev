@@ -89,7 +89,6 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:s25ExpressibleByArrayLiteralP0cD7ElementQa",
         "text" : "ArrayLiteralElement"
       },
       {
@@ -152,7 +151,6 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:s25ExpressibleByArrayLiteralP0cD7ElementQa",
               "text" : "ArrayLiteralElement"
             },
             {
@@ -363,7 +361,6 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s25ExpressibleByArrayLiteralP0cD7ElementQa",
       "text" : "ArrayLiteralElement"
     },
     {

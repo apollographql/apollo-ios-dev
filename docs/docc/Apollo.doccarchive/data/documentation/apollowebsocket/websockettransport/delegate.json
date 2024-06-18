@@ -29,7 +29,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": (any "
+        "text" : ": ("
       },
       {
         "kind" : "typeIdentifier",
@@ -84,7 +84,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": (any "
+              "text" : ": ("
             },
             {
               "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate",
@@ -212,7 +212,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": (any "
+      "text" : ": ("
     },
     {
       "kind" : "typeIdentifier",

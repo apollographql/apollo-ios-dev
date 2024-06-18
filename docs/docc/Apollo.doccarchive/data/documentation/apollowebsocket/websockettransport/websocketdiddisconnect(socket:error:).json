@@ -53,7 +53,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": any "
+        "text" : ": "
       },
       {
         "kind" : "typeIdentifier",
@@ -70,7 +70,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": (any "
+        "text" : ": ("
       },
       {
         "kind" : "typeIdentifier",
@@ -125,7 +125,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": any "
+              "text" : ": "
             },
             {
               "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketClient",
@@ -143,7 +143,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": (any "
+              "text" : ": ("
             },
             {
               "kind" : "typeIdentifier",
@@ -331,7 +331,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": any "
+      "text" : ": "
     },
     {
       "kind" : "typeIdentifier",
@@ -348,7 +348,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": (any "
+      "text" : ": ("
     },
     {
       "kind" : "typeIdentifier",

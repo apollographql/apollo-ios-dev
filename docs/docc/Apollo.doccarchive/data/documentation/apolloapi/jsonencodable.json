@@ -822,7 +822,7 @@
         "type" : "text"
       },
       {
-        "code" : "any JSONEncodable",
+        "code" : "JSONEncodable",
         "type" : "codeVoice"
       },
       {
