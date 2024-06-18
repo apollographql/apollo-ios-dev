@@ -1,0 +1,54 @@
+name: "Create Release PR"
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionNumber:
+        description: 'Version Number'
+        required: true
+
+env:
+  BRANCH_NAME: "release/${{ github.event.inputs.versionNumber }}"
+
+# github.event.inputs.versionNumber
+jobs:
+  create-release-pr:
+    runs-on: macos-latest
+    timeout-minutes: 5
+    name: "Create Release PR"
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+      with:
+        ref: main
+    - name: Setup SSH Keys
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: |
+          ${{ secrets.APOLLO_IOS_DEV_DEPLOY_KEY }}
+    - name: Configure Git
+      uses: ./.github/actions/configure-git
+    - name: Run Commands
+      shell: bash
+      run: |
+        previousVersion=$(sh apollo-ios/scripts/get-version.sh)
+        echo "PREVIOUS_VERSION=$previousVersion" >> ${GITHUB_ENV}
+        sh ./scripts/set-version.sh ${{ github.event.inputs.versionNumber }}
+        (cd SwiftScripts && swift run DocumentationGenerator)
+        make archive-cli-to-apollo-package
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v6
+      with:
+        branch: ${{ env.BRANCH_NAME }}
+        commit-message: |
+          Setting up Release ${{ github.event.inputs.versionNumber }}
+
+          Created By GitHub Action Workflow
+        title: |
+          Release ${{ github.event.inputs.versionNumber }}
+        body: |
+          #### Diff
+          [See diff since last version](https://github.com/apollographql/apollo-ios-dev/compare/${{ env.PREVIOUS_VERSION }}...${{ github.sha }}).
+
+          #### Things to do in this PR
+          - [] Update [`CHANGELOG.md`](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) with all relevant changes since the prior version. _Please include PR numbers and mention contributors for external PR submissions._
