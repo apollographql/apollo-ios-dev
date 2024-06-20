@@ -17,6 +17,8 @@ public protocol GraphQLExecutionSource {
   /// GraphQL execution.
   associatedtype FieldCollector: FieldSelectionCollector<RawObjectData>
 
+  /// Used to determine whether deferred selections within a selection set should be executed at the same
+  /// time as the other selections.
   var shouldAttemptDeferredFragmentExecution: Bool { get }
 
   /// Resolves the value for given field on a data object from the source.
