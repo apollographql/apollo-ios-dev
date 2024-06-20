@@ -249,7 +249,7 @@ public final class GraphQLExecutor<Source: GraphQLExecutionSource> {
       withRootCacheReference: root
     )
 
-    let rootValue = execute(
+    let rootValue: PossiblyDeferred<Accumulator.ObjectResult> = execute(
       selections: selectionSet.__selections,
       on: data,
       info: info,
@@ -265,27 +265,76 @@ public final class GraphQLExecutor<Source: GraphQLExecutionSource> {
     info: ObjectExecutionInfo,
     accumulator: Accumulator
   ) -> PossiblyDeferred<Accumulator.ObjectResult> {
+    let fieldEntries: [PossiblyDeferred<Accumulator.FieldEntry?>] = execute(
+      selections: selections,
+      on: object,
+      info: info,
+      accumulator: accumulator
+    )
+
+    return compactLazilyEvaluateAll(fieldEntries).map {
+      try accumulator.accept(fieldEntries: $0, info: info)
+    }
+  }
+
+  private func execute<Accumulator: GraphQLResultAccumulator>(
+    selections: [Selection],
+    on object: Source.RawObjectData,
+    info: ObjectExecutionInfo,
+    accumulator: Accumulator
+  ) -> [PossiblyDeferred<Accumulator.FieldEntry?>] {
     do {
       let groupedFields = try groupFields(selections, on: object, info: info)
       info.fulfilledFragments = groupedFields.fulfilledFragments
-      info.deferredFragments = groupedFields.deferredFragments
+      info.deferredFragments = []
 
       var fieldEntries: [PossiblyDeferred<Accumulator.FieldEntry?>] = []
       fieldEntries.reserveCapacity(groupedFields.count)
 
-      for (_, fields) in groupedFields {
-        let fieldEntry = execute(fields: fields,
-                                 on: object,
-                                 accumulator: accumulator)
+      for (_, fields) in groupedFields.fieldInfoList {
+        let fieldEntry = execute(
+          fields: fields,
+          on: object,
+          accumulator: accumulator)
         fieldEntries.append(fieldEntry)
       }
-      
-      return compactLazilyEvaluateAll(fieldEntries).map {
-        try accumulator.accept(fieldEntries: $0, info: info)
+
+      if executionSource.shouldAttemptDeferredFragmentExecution {
+        for deferredFragment in groupedFields.deferredFragments {
+          guard let fragmentType = groupedFields.cachedFragmentIdentifierTypes[deferredFragment] else {
+            info.deferredFragments.insert(deferredFragment)
+            continue
+          }
+
+          do {
+            let deferredFragmentFieldEntries = try lazilyEvaluateAll(
+              execute(
+                selections: fragmentType.__selections,
+                on: object,
+                info: info,
+                accumulator: accumulator
+              )
+            )
+            .get()
+            .compactMap { PossiblyDeferred.immediate(.success($0)) }
+
+            fieldEntries.append(contentsOf: deferredFragmentFieldEntries)
+            info.fulfilledFragments.insert(deferredFragment)
+
+          } catch {
+            info.deferredFragments.insert(deferredFragment)
+            continue
+          }
+        }
+
+      } else {
+        info.deferredFragments = groupedFields.deferredFragments
       }
 
+      return fieldEntries
+
     } catch {
-      return .immediate(.failure(error))
+      return [.immediate(.failure(error))]
     }
   }
 

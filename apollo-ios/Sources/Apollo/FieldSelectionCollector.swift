@@ -4,10 +4,11 @@ import ApolloAPI
 #endif
 
 @_spi(Execution)
-public struct FieldSelectionGrouping: Sequence {
-  private var fieldInfoList: [String: FieldExecutionInfo] = [:]
+public struct FieldSelectionGrouping {
+  fileprivate(set) var fieldInfoList: [String: FieldExecutionInfo] = [:]
   fileprivate(set) var fulfilledFragments: Set<ObjectIdentifier> = []
   fileprivate(set) var deferredFragments: Set<ObjectIdentifier> = []
+  fileprivate(set) var cachedFragmentIdentifierTypes: [ObjectIdentifier: any SelectionSet.Type] = [:]
 
   init(info: ObjectExecutionInfo) {
     self.fulfilledFragments = info.fulfilledFragments
@@ -32,7 +33,9 @@ public struct FieldSelectionGrouping: Sequence {
       "Cannot fulfill \(type.self) fragment, it's already deferred!"
     )
 
-    fulfilledFragments.insert(ObjectIdentifier(type))
+    let identifier = ObjectIdentifier(type)
+    fulfilledFragments.insert(identifier)
+    cachedFragmentIdentifierTypes[identifier] = type
   }
 
   mutating func addDeferredFragment<T: SelectionSet>(_ type: T.Type) {
@@ -41,12 +44,11 @@ public struct FieldSelectionGrouping: Sequence {
       "Cannot defer \(type.self) fragment, it's already fulfilled!"
     )
 
-    deferredFragments.insert(ObjectIdentifier(type))
+    let identifier = ObjectIdentifier(type)
+    deferredFragments.insert(identifier)
+    cachedFragmentIdentifierTypes[identifier] = type
   }
-
-  public func makeIterator() -> Dictionary<String, FieldExecutionInfo>.Iterator {
-    fieldInfoList.makeIterator()
-  }
+  
 }
 
 /// A protocol for a type that defines how to collect and group the selections for an object
