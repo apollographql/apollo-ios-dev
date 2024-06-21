@@ -85,5 +85,5 @@ jobs:
           gem install cocoapods
           set -eo pipefail
           cd apollo-ios
-          pod trunk push ApolloTest.podspec
+          pod trunk push Apollo.podspec
           pod trunk push ApolloTestSupport.podspec
