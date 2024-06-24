@@ -29,7 +29,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": any "
+        "text" : ": "
       },
       {
         "kind" : "typeIdentifier",
@@ -72,7 +72,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": any "
+              "text" : ": "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestBodyCreator",
@@ -175,7 +175,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": any "
+      "text" : ": "
     },
     {
       "kind" : "typeIdentifier",

@@ -89,7 +89,6 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:s27ExpressibleByBooleanLiteralP0cD4TypeQa",
         "text" : "BooleanLiteralType"
       },
       {
@@ -152,7 +151,6 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:s27ExpressibleByBooleanLiteralP0cD4TypeQa",
               "text" : "BooleanLiteralType"
             },
             {
@@ -363,7 +361,6 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s27ExpressibleByBooleanLiteralP0cD4TypeQa",
       "text" : "BooleanLiteralType"
     },
     {

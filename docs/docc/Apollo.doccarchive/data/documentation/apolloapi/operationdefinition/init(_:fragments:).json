@@ -38,7 +38,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": [any "
+        "text" : ": ["
       },
       {
         "kind" : "typeIdentifier",
@@ -110,7 +110,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": [any "
+              "text" : ": ["
             },
             {
               "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Fragment",
@@ -307,7 +307,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": [any "
+      "text" : ": ["
     },
     {
       "kind" : "typeIdentifier",
