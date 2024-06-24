@@ -1,0 +1,89 @@
+name: "Publish Release"
+
+on:
+  workflow_dispatch
+
+jobs:
+  publish-release:
+    runs-on: macos-latest
+    name: Publish Release
+    steps:
+      # Checkout apollo-ios-dev repo
+      - name: Checkout apollo-ios-dev Repo
+        uses: actions/checkout@v4
+
+      # Checkout apollo-ios repo
+      - name: Checkout apollo-ios Repo
+        uses: actions/checkout@v4
+        with:
+          repository: apollographql/apollo-ios
+          path: "../apollo-ios"
+          ref: main
+
+      # Checkout apollo-ios-codegen repo
+      - name: Checkout apollo-ios-codegen Repo
+        uses: actions/checkout@v4
+        with:
+          repository: apollographql/apollo-ios-codegen
+          path: "../apollo-ios-codegen"
+          ref: main
+
+      # Setup SSH Keys
+      - name: Setup SSH Keys
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.APOLLO_IOS_DEPLOY_KEY }}
+            ${{ secrets.APOLLO_IOS_CODEGEN_DEPLOY_KEY }}
+            ${{ secrets.APOLLO_IOS_DEV_DEPLOY_KEY }}
+
+      # Configure Git
+      - name: Configure Git
+        uses: ./.github/actions/configure-git
+
+      # Get version
+      - name: Get Version
+        shell: bash
+        run: |
+          releaseVersion=$(sh apollo-ios/scripts/get-version.sh)
+          echo "RELEASE_VERSION=$releaseVersion" >> ${GITHUB_ENV}
+
+      # Tag Dev, ios, and codegen repos
+      - name: Tag Commits
+        shell: bash
+        run: |
+          git tag ${{ env.RELEASE_VERSION }}
+          git push --tags
+          cd ../apollo-ios
+          git tag ${{ env.RELEASE_VERSION }}
+          git push --tags
+          cd ../apollo-ios-codegen
+          git tag ${{ env.RELEASE_VERSION }}
+          git push --tags
+
+      # Create Draft Release on GitHub with tag of version
+      - name: Create Draft Release
+        shell: bash
+        run: |
+          gh auth login -p ssh
+          gh create release ${{ env.RELEASE_VERSION }} '/apollo-ios/CLI/apollo-ios-cli.tar.gz#apollo-ios-cli.tar.gz' -d --repo "apollographql/apollo-ios"
+
+      # Trigger "Release New Version" workflow in the apollo-ios-xcframework repo
+      - name: Dispatch apollo-ios-xcframework
+        uses: ./.github/actions/repo-dispatch
+        with:
+          access-token: ${{ secrets.APOLLO_IOS_PAT }}
+          repo: "apollo-ios-xcframework"
+          client-payload: "{\"event_type\":\"release-new-version\",\"client_payload\":{\"versionNumber\":\"${{ env.RELEASE_VERSION }}\"}}"
+
+      # Push Pods for Apollo iOS and Test Support
+      - name: Push Cocoapods
+        shell: bash
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+        run: |
+          gem install cocoapods
+          set -eo pipefail
+          cd apollo-ios
+          pod trunk push Apollo.podspec
+          pod trunk push ApolloTestSupport.podspec
