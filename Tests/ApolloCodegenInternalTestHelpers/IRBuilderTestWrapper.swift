@@ -55,11 +55,16 @@ public class IRBuilderTestWrapper {
       guard let fragment = await wrappedStorage.getFragmentIfBuilt(named: name) else {
         return nil
       }
-
+      
       return IRTestWrapper(
         irObject: fragment,
         computedSelectionSetCache: .init(entityStorage: fragment.entityStorage)
       )
     }
   }
+}
+
+/// This is an unsafe hack for unit tests _only_. IR types are not Sendable at this time.
+extension IR.NamedFragment: @unchecked @retroactive Sendable {
+
 }
