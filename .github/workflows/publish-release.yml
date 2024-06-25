@@ -65,7 +65,7 @@ jobs:
       - name: Create Draft Release
         shell: bash
         run: |
-          gh release create ${{ env.RELEASE_VERSION }} '/apollo-ios/CLI/apollo-ios-cli.tar.gz#apollo-ios-cli.tar.gz' -d --repo "apollographql/apollo-ios"
+          gh release create ${{ env.RELEASE_VERSION }} 'apollo-ios/CLI/apollo-ios-cli.tar.gz#apollo-ios-cli.tar.gz' -d --repo "apollographql/apollo-ios"
         env:
           GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
 
