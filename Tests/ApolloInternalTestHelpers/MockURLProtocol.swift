@@ -10,19 +10,22 @@ public class MockURLProtocol<RequestProvider: MockRequestProvider>: URLProtocol 
     return request
   }
   
+  @MainActor
   override public func startLoading() {
     guard let url = self.request.url,
           let handler = RequestProvider.requestHandlers[url] else {
       fatalError("No MockRequestHandler available for URL.")
     }
 
-    DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in: 0.0...0.25)) {
+    Task {
+      try await Task.sleep(nanoseconds: UInt64(.random(in: 0.0...0.25) * 1_000_000_000))
+    
       defer {
         RequestProvider.requestHandlers.removeValue(forKey: url)
       }
       
       do {
-        let result = try handler(self.request)
+        let result = try handler(request)
         
         switch result {
         case let .success((response, data)):
@@ -49,8 +52,8 @@ public class MockURLProtocol<RequestProvider: MockRequestProvider>: URLProtocol 
 }
 
 public protocol MockRequestProvider {
-  typealias MockRequestHandler = ((URLRequest) throws -> Result<(HTTPURLResponse, Data?), any Error>)
-  
+  typealias MockRequestHandler = (@Sendable (URLRequest) throws -> Result<(HTTPURLResponse, Data?), any Error>)
+
   // Dictionary of mock request handlers where the `key` is the URL of the request.
   static var requestHandlers: [URL: MockRequestHandler] { get set }
 }

@@ -131,7 +131,7 @@ class URLSessionClientTests: XCTestCase {
     request.httpMethod = GraphQLHTTPMethod.POST.rawValue
 
     let expectation = self.expectation(description: "POST request with JSON completed")
-    self.client.sendRequest(request) { result in
+    self.client.sendRequest(request) { [request] result in
       defer {
         expectation.fulfill()
       }
@@ -207,50 +207,51 @@ class URLSessionClientTests: XCTestCase {
 
   }
   
-  func testMultipleSimultaneousRequests() {
+  func testMultipleSimultaneousRequests() async {
     let expectation = self.expectation(description: "request sent, response received")
     let iterations = 20
     expectation.expectedFulfillmentCount = iterations
-    @Atomic var taskIDs: [Int] = []
-    
-    var responseStrings = [Int: String]()
-    var requests = [Int: URLRequest]()
+
+    var requestsAndResponses = [(URLRequest, String)]()
     for i in 0..<iterations {
       let url = URL(string: "http://www.test.com/multipleSimultaneousRequests\(i)")!
       let responseStr = "Simultaneous Request \(i)"
       let request = self.request(for: url,
                                  responseData: responseStr.data(using: .utf8),
                                  statusCode: 200)
-      responseStrings[i] = responseStr
-      requests[i] = request
+      requestsAndResponses.append((request, responseStr))
     }
 
-    DispatchQueue.concurrentPerform(iterations: iterations, execute: { index in
-      guard let request = requests[index] else {
-        XCTFail("Unable to find URLRequest")
-        return
-      }
-      let task = self.client.sendRequest(request) { result in
-        let responseStr = responseStrings[index]
-        switch result {
-        case .success((let data, let response)):
-          XCTAssertEqual(response.url, request.url)
-          XCTAssertFalse(data.isEmpty)
-          let httpResponseStr = String(data: data, encoding: .utf8)
-          XCTAssertEqual(responseStr, httpResponseStr)
-        case .failure(let error):
-          XCTFail("Unexpected error: \(error)")
+    let taskIDs = await withTaskGroup(of: URLSessionTask.self) { [client] group in
+      for (request, responseStr) in requestsAndResponses {
+
+        group.addTask {
+          client!.sendRequest(request) { result in
+            switch result {
+            case .success((let data, let response)):
+              XCTAssertEqual(response.url, request.url)
+              XCTAssertFalse(data.isEmpty)
+              let httpResponseStr = String(data: data, encoding: .utf8)
+              XCTAssertEqual(responseStr, httpResponseStr)
+            case .failure(let error):
+              XCTFail("Unexpected error: \(error)")
+            }
+
+            DispatchQueue.main.async {
+              expectation.fulfill()
+            }
+          }
         }
-
-        DispatchQueue.main.async {
-          expectation.fulfill()
-        }
       }
 
-      $taskIDs.mutate { $0.append(task.taskIdentifier) }
-    })
+      var taskIDs = [Int]()
+      for await task in group {
+        taskIDs.append(task.taskIdentifier)
+      }
+      return taskIDs
+    }
 
-    self.wait(for: [expectation], timeout: 30)
+    await fulfillment(of: [expectation], timeout: 30)
 
     // Were the correct number of tasks created?
     XCTAssertEqual(taskIDs.count, iterations)
@@ -340,10 +341,10 @@ class URLSessionClientTests: XCTestCase {
 
 extension URLSessionClientTests: MockRequestProvider {
   
-  private static let testObserver = TestObserver() { _ in
+  nonisolated(unsafe) private static let testObserver = TestObserver() { _ in
     requestHandlers = [:]
   }
   
-  public static var requestHandlers = [URL: MockRequestHandler]()
-  
+  nonisolated(unsafe) public static var requestHandlers = [URL: MockRequestHandler]()
+
 }

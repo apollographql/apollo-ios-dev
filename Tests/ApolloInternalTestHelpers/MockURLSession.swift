@@ -2,13 +2,17 @@ import Foundation
 import Apollo
 import ApolloAPI
 
+/// In order to allow mutable stubbing of response data and capturing of requests, **this mock is
+/// not thread-safe**. It uses `nonisolated(unsafe)` to disable Strict Concurrency checks.
 public final class MockURLSessionClient: URLSessionClient {
 
-  @Atomic public var lastRequest: URLRequest?
-  @Atomic public var requestCount = 0
+  nonisolated(unsafe) public var requestCount = 0
 
-  public var jsonData: JSONObject?
-  public var data: Data?
+  public var lastRequest: URLRequest? { _lastRequest.wrappedValue }
+  nonisolated(unsafe) private var _lastRequest: Atomic<URLRequest?> = .init(wrappedValue: nil)
+
+  nonisolated(unsafe) public var jsonData: JSONObject?
+  nonisolated(unsafe) public var data: Data?
   var responseData: Data? {
     if let data = data { return data }
     if let jsonData = jsonData {
@@ -16,9 +20,10 @@ public final class MockURLSessionClient: URLSessionClient {
     }
     return nil
   }
-  public var response: HTTPURLResponse?
-  public var error: (any Error)?
-  
+
+  nonisolated(unsafe) public var response: HTTPURLResponse?
+  nonisolated(unsafe) public var error: (any Error)?
+
   private let callbackQueue: DispatchQueue
   
   public init(callbackQueue: DispatchQueue? = nil, response: HTTPURLResponse? = nil, data: Data? = nil) {
@@ -31,8 +36,10 @@ public final class MockURLSessionClient: URLSessionClient {
                                    taskDescription: String? = nil,
                                    rawTaskCompletionHandler: URLSessionClient.RawCompletion? = nil,
                                    completion: @escaping URLSessionClient.Completion) -> URLSessionTask {
-    self.$lastRequest.mutate { $0 = request }
-    self.$requestCount.increment()
+    self._lastRequest.mutate {
+      $0 = request
+      self.requestCount += 1
+    }
 
     // Capture data, response, and error instead of self to ensure we complete with the current state
     // even if it is changed before the block runs.
@@ -66,7 +73,7 @@ protocol URLSessionDataTaskMockProtocol {
   init()
 }
 
-private final class URLSessionDataTaskMock: URLSessionDataTask, URLSessionDataTaskMockProtocol {
+private final class URLSessionDataTaskMock: URLSessionDataTask, URLSessionDataTaskMockProtocol, @unchecked Sendable {
 
   override func resume() {
     // No-op

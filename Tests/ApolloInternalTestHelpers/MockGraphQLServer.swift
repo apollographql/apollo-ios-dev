@@ -44,7 +44,9 @@ public class MockGraphQLServer {
   public var customDelay: DispatchTimeInterval?
   public typealias RequestHandler<Operation: GraphQLOperation> = (HTTPRequest<Operation>) -> JSONObject
 
-  private class RequestExpectation<Operation: GraphQLOperation>: XCTestExpectation {
+  private class RequestExpectation<Operation: GraphQLOperation>: 
+    XCTestExpectation, @unchecked Sendable
+  {
     let file: StaticString
     let line: UInt
     let handler: RequestHandler<Operation>

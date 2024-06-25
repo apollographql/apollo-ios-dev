@@ -1,7 +1,7 @@
 import XCTest
 import Apollo
 
-public typealias TearDownHandler = () throws -> ()
+public typealias TearDownHandler = @Sendable () throws -> ()
 public typealias TestDependency<Resource> = (Resource, TearDownHandler?)
 
 public protocol TestCacheProvider: AnyObject {
@@ -15,6 +15,7 @@ public class InMemoryTestCacheProvider: TestCacheProvider {
   }
 }
 
+@MainActor
 public protocol CacheDependentTesting {
   var cacheType: any TestCacheProvider.Type { get }
   var cache: (any NormalizedCache)! { get }  

@@ -14,13 +14,14 @@ public class JavaScriptError: JavaScriptObjectDecodable, Error, @unchecked Senda
   public let message: String?
   public let stack: String?
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  @JSActor
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.name = jsValue["name"]
     self.message = jsValue["message"]
     self.stack = jsValue["stack"]
   }
 
-  static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+  static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
     self.init(jsValue, bridge: bridge)
   }
 }
@@ -46,7 +47,7 @@ protocol JavaScriptReferencedObject: AnyObject, JavaScriptObjectDecodable {
   /// - Warning: This function should not be called directly to initialize an instance. Instead use
   /// `fromJSValue(_:bridge)`, which will return the existing object if it has already been
   /// initialized or call this and then `finalize(_: bridge:)` to initialize and store the object in the `bridge`.
-  init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge)
+  @JSActor init(_ jsValue: JSValue, bridge: JavaScriptBridge)
 
   /// This function will be after being initialized by a `JavaScriptBridge` to allow the object to
   /// complete setup of its values.
@@ -54,15 +55,15 @@ protocol JavaScriptReferencedObject: AnyObject, JavaScriptObjectDecodable {
   /// Some properties of the object may be self-referential. In order to avoid infinite recursion,
   /// while initializing these objects, these properties must be set up after the object has been
   /// initialized and stored by the `JavaScriptBridge`.
-  func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge)
+  @JSActor func finalize(_ jsValue: JSValue, bridge: JavaScriptBridge)
 }
 
 extension JavaScriptReferencedObject {
-  static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+  @JSActor static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
     bridge.getReferenceOrInitialize(jsValue)
   }
 
-  func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) { }
+  func finalize(_ jsValue: JSValue, bridge: JavaScriptBridge) { }
 }
 
 // MARK: - JavaScriptCallable
@@ -164,11 +165,12 @@ public class JavaScriptObject: JavaScriptReferencedObject, JavaScriptCallable {
   let jsValue: JSValue
   let bridge: JavaScriptBridge
 
-  static func initializeNewObject(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+  @JSActor
+  static func initializeNewObject(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
     self.init(jsValue, bridge: bridge)
   }
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     precondition(jsValue.isObject)
         
     self.jsValue = jsValue
@@ -183,14 +185,19 @@ extension JavaScriptObject: CustomDebugStringConvertible {
   }
 }
 
-// MARK: - JavaScriptBridge
-
-/// The JavaScript bridge is responsible for converting values to and from type-safe wrapper objects. It also ensures exceptions thrown from JavaScript wrapped and rethrown.
-actor JavaScriptBridge {
+@globalActor
+actor JSActor {
+  static let shared = JSActor()
 
   nonisolated var unownedExecutor: UnownedSerialExecutor {
     MainActor.sharedUnownedExecutor
   }
+}
+
+// MARK: - JavaScriptBridge
+
+/// The JavaScript bridge is responsible for converting values to and from type-safe wrapper objects. It also ensures exceptions thrown from JavaScript wrapped and rethrown.
+@JSActor final class JavaScriptBridge {
 
   public enum Error: Swift.Error {
     case failedToCreateJSContext
@@ -426,7 +433,7 @@ actor JavaScriptBridge {
   // MARK: Error Handling
 
   @discardableResult func throwingJavaScriptErrorIfNeeded<ReturnValue>(
-    body: () -> ReturnValue
+    body: @JSActor () -> ReturnValue
   ) throws -> ReturnValue {
     let previousExceptionHandler = context.exceptionHandler
 
@@ -467,11 +474,11 @@ actor JavaScriptBridge {
 
 /// A type that can decode itself from a JavaScript value that represents an object.
 protocol JavaScriptObjectDecodable {
-  static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self
+  @JSActor static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self
 }
 
 extension Optional: JavaScriptObjectDecodable where Wrapped: JavaScriptObjectDecodable {
-  static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+  static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
     if jsValue.isUndefined || jsValue.isNull {
       return .none
     } else {
@@ -481,19 +488,19 @@ extension Optional: JavaScriptObjectDecodable where Wrapped: JavaScriptObjectDec
 }
 
 extension Array: JavaScriptObjectDecodable where Element: JavaScriptObjectDecodable {
-  static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+  static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
     jsValue.toArray { Element.fromJSValue($0, bridge: bridge) }
   }
 }
 
 extension Dictionary: JavaScriptObjectDecodable where Key == String, Value: JavaScriptObjectDecodable {
-  static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+  static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
     jsValue.toDictionary { Value.fromJSValue($0, bridge: bridge) }
   }
 }
 
 extension OrderedDictionary: JavaScriptObjectDecodable where Key == String, Value: JavaScriptObjectDecodable {
-  static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+  static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
     jsValue.toOrderedDictionary { Value.fromJSValue($0, bridge: bridge) }
   }
 }

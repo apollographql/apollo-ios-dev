@@ -1,6 +1,6 @@
 import Foundation
 
-public class ConcurrentTaskContainer {
+public final class ConcurrentTaskContainer: Sendable {
   private let actor = Actor()
 
   private actor Actor {

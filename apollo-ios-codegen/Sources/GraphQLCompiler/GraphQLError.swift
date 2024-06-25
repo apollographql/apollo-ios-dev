@@ -5,22 +5,24 @@ import JavaScriptCore
 /// Corresponds to [graphql-js/GraphQLError](https://graphql.org/graphql-js/error/#graphqlerror)
 /// You can get error details if you need them, or call `error.logLines` to get errors in a format
 /// that lets Xcode show inline errors.
-public final class GraphQLError: JavaScriptError {
+public final class GraphQLError: JavaScriptError, @unchecked Sendable {
   private let source: GraphQLSource
   /// The source locations associated with this error.
   public let sourceLocations: [GraphQLSourceLocation]?
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  @JSActor
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     let source = GraphQLSource.fromJSValue(jsValue["source"], bridge: bridge)
     self.source = source
     self.sourceLocations = Self.computeSourceLocations(for: source, from: jsValue, bridge: bridge)
     super.init(jsValue, bridge: bridge)
   }
 
+  @JSActor
   private static func computeSourceLocations(
     for source: GraphQLSource,
     from jsValue: JSValue,
-    bridge: isolated JavaScriptBridge
+    bridge: JavaScriptBridge
   ) -> [GraphQLSourceLocation]? {
     guard let locations = (jsValue["locations"]).toArray() as? [[String: Int]] else {
       return nil
@@ -65,10 +67,11 @@ public final class GraphQLError: JavaScriptError {
 }
 
 /// A GraphQL schema validation error. This wraps one or more underlying validation errors.
-public class GraphQLSchemaValidationError: JavaScriptError {
+public class GraphQLSchemaValidationError: JavaScriptError, @unchecked Sendable {
   public let validationErrors: [GraphQLError]
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  @JSActor
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.validationErrors = .fromJSValue(jsValue["validationErrors"], bridge: bridge)
     super.init(jsValue, bridge: bridge)
   }
