@@ -66,6 +66,8 @@ jobs:
         shell: bash
         run: |
           gh release create ${{ env.RELEASE_VERSION }} '/apollo-ios/CLI/apollo-ios-cli.tar.gz#apollo-ios-cli.tar.gz' -d --repo "apollographql/apollo-ios"
+        env:
+          GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
 
       # Trigger "Release New Version" workflow in the apollo-ios-xcframework repo
       - name: Dispatch apollo-ios-xcframework
