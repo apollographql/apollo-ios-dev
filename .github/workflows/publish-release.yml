@@ -73,18 +73,18 @@ jobs:
       - name: Dispatch apollo-ios-xcframework
         shell: bash
         run: |
-          gh workflow run release-new-version.yml -f versionNumber=${{ env.RELEASE_VERSION }} --repo "apollographql/apollo-ios-xcframework"
+          gh workflow run release-new-version.yml -f remoteRef=${{ env.RELEASE_VERSION }} --repo "apollographql/apollo-ios-xcframework"
         env:
           GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
 
       # Push Pods for Apollo iOS and Test Support
-      - name: Push Cocoapods
-        shell: bash
-        env:
-          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
-        run: |
-          gem install cocoapods
-          set -eo pipefail
-          cd apollo-ios
-          pod trunk push Apollo.podspec
-          pod trunk push ApolloTestSupport.podspec
+      # - name: Push Cocoapods
+      #   shell: bash
+      #   env:
+      #     COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+      #   run: |
+      #     gem install cocoapods
+      #     set -eo pipefail
+      #     cd apollo-ios
+      #     pod trunk push Apollo.podspec
+      #     pod trunk push ApolloTestSupport.podspec
