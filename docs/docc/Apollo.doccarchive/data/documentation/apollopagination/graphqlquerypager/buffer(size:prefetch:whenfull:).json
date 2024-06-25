@@ -126,7 +126,6 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:7Combine9PublisherP7FailureQa",
         "text" : "Failure"
       },
       {
@@ -309,7 +308,6 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:7Combine9PublisherP7FailureQa",
               "text" : "Failure"
             },
             {
@@ -526,7 +524,6 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:7Combine9PublisherP7FailureQa",
       "text" : "Failure"
     },
     {

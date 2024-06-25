@@ -166,7 +166,6 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:7Combine10SubscriberP7FailureQa",
               "text" : "Failure"
             },
             {
@@ -192,7 +191,6 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:7Combine10SubscriberP5InputQa",
               "text" : "Input"
             },
             {
@@ -224,7 +222,7 @@
             },
             {
               "kind" : "text",
-              "text" : "), any "
+              "text" : "), "
             },
             {
               "kind" : "typeIdentifier",
