@@ -74,7 +74,6 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP9FragmentsQa",
         "text" : "Fragments"
       }
     ],
@@ -124,9 +123,7 @@
               "text" : "."
             },
             {
-              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Fragments-swift.associatedtype",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP9FragmentsQa",
               "text" : "Fragments"
             },
             {
@@ -323,7 +320,6 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP9FragmentsQa",
       "text" : "Fragments"
     }
   ],
@@ -333,80 +329,6 @@
   "title" : "fragments",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/mutableselectionset\/fragments"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/Fragments-swift.associatedtype": {
-  "abstract" : [
-    {
-      "text" : "A type representing all of the fragments the ",
-      "type" : "text"
-    },
-    {
-      "code" : "SelectionSet",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " can be converted to.",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "Defaults to a stub type with no fragments.",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "A ",
-      "type" : "text"
-    },
-    {
-      "code" : "SelectionSet",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " with fragments should provide a type that conforms to ",
-      "type" : "text"
-    },
-    {
-      "code" : "FragmentContainer",
-      "type" : "codeVoice"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "associatedtype"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "Fragments"
-    },
-    {
-      "kind" : "text",
-      "text" : " = "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI11NoFragmentsO",
-      "text" : "NoFragments"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Fragments-swift.associatedtype",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "Fragments",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selectionset\/fragments-swift.associatedtype"
 }
 }
 }

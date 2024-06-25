@@ -822,7 +822,7 @@
         "type" : "text"
       },
       {
-        "code" : "any JSONEncodable",
+        "code" : "JSONEncodable",
         "type" : "codeVoice"
       },
       {
@@ -901,7 +901,7 @@
         "type" : "text"
       },
       {
-        "code" : "JSONEncodable",
+        "code" : "AnyScalarType",
         "type" : "codeVoice"
       },
       {

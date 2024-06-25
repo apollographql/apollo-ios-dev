@@ -29,7 +29,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": any "
+        "text" : ": "
       },
       {
         "kind" : "typeIdentifier",
@@ -72,7 +72,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": any "
+              "text" : ": "
             },
             {
               "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType",
@@ -172,7 +172,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": any "
+      "text" : ": "
     },
     {
       "kind" : "typeIdentifier",

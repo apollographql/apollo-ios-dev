@@ -19,7 +19,6 @@
       }
     ],
     "role" : "collectionGroup",
-    "roleHeading" : "API Collection",
     "title" : "ExpressibleByStringLiteral Implementations"
   },
   "schemaVersion" : {
@@ -218,7 +217,6 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s26ExpressibleByStringLiteralP0cD4TypeQa",
       "text" : "StringLiteralType"
     },
     {
