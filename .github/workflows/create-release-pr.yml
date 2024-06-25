@@ -54,6 +54,8 @@ jobs:
           Setting up Release ${{ env.VERSION_NUMBER }}
 
           Created By GitHub Action Workflow
+        reviewers: |
+          AnthonyMDev,calvincestari,bobafetters
         title: |
           Release ${{ env.VERSION_NUMBER }}
         body: |
@@ -64,8 +66,4 @@ jobs:
           - [ ] Update [`CHANGELOG.md`](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) with all relevant changes since the prior version. _Please include PR numbers and mention contributors for external PR submissions._
 
           #### Things to do as part of releasing
-          - [ ] Add tag of format `major.minor.patch` to GitHub.
-          - [ ] Create a release on GitHub with the new tag, using the latest [`CHANGELOG.md`](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) contents.
-          - [ ] Attach CLI binary to the GitHub release.
-          - [ ] Run `pod trunk push Apollo.podspec` and `pod trunk push ApolloTestSupport.podspec` to publish to CocoaPods. _You will need write permissions for this, please contact one of the [maintainers](https://github.com/apollographql/apollo-ios/blob/main/README.md#maintainers) if you need access to do this._
-          - [ ] Run "[Release New Version](https://github.com/apollographql/apollo-ios-xcframework/actions/workflows/release-new-version.yml)" workflow in `apollo-ios-xcframework`
+          - [ ] Update and publish the draft release created by CI using the latest [`CHANGELOG.md`](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) contents
