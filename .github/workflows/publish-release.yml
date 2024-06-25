@@ -48,24 +48,24 @@ jobs:
           releaseVersion=$(sh apollo-ios/scripts/get-version.sh)
           echo "RELEASE_VERSION=$releaseVersion" >> ${GITHUB_ENV}
 
-      # Tag Dev, ios, and codegen repos
-      - name: Tag Commits
-        shell: bash
-        run: |
-          git tag ${{ env.RELEASE_VERSION }}
-          git push --tags
-          cd checkout/apollo-ios
-          git tag ${{ env.RELEASE_VERSION }}
-          git push --tags
-          cd ../apollo-ios-codegen
-          git tag ${{ env.RELEASE_VERSION }}
-          git push --tags
+      # # Tag Dev, ios, and codegen repos
+      # - name: Tag Commits
+      #   shell: bash
+      #   run: |
+      #     git tag ${{ env.RELEASE_VERSION }}
+      #     git push --tags
+      #     cd checkout/apollo-ios
+      #     git tag ${{ env.RELEASE_VERSION }}
+      #     git push --tags
+      #     cd ../apollo-ios-codegen
+      #     git tag ${{ env.RELEASE_VERSION }}
+      #     git push --tags
 
       # Create Draft Release on GitHub with tag of version
       - name: Create Draft Release
         shell: bash
         run: |
-          gh create release ${{ env.RELEASE_VERSION }} '/apollo-ios/CLI/apollo-ios-cli.tar.gz#apollo-ios-cli.tar.gz' -d --repo "apollographql/apollo-ios"
+          gh release create ${{ env.RELEASE_VERSION }} '/apollo-ios/CLI/apollo-ios-cli.tar.gz#apollo-ios-cli.tar.gz' -d --repo "apollographql/apollo-ios"
 
       # Trigger "Release New Version" workflow in the apollo-ios-xcframework repo
       - name: Dispatch apollo-ios-xcframework
