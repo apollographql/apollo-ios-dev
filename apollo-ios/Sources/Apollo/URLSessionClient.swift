@@ -40,10 +40,10 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
   }
   
   /// A completion block to be called when the raw task has completed, with the raw information from the session
-  public typealias RawCompletion = (Data?, HTTPURLResponse?, (any Error)?) -> Void
+  public typealias RawCompletion = @Sendable (Data?, HTTPURLResponse?, (any Error)?) -> Void
   
   /// A completion block returning a result. On `.success` it will contain a tuple with non-nil `Data` and its corresponding `HTTPURLResponse`. On `.failure` it will contain an error.
-  public typealias Completion = (Result<(Data, HTTPURLResponse), any Error>) -> Void
+  public typealias Completion = @Sendable (Result<(Data, HTTPURLResponse), any Error>) -> Void
   
   @Atomic private var tasks: [Int: TaskData] = [:]
   

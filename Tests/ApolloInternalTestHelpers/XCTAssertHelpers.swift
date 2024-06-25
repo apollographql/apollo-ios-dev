@@ -45,11 +45,11 @@ public func XCTAssertMatch<Pattern: Matchable>(_ valueExpression: @autoclosure (
 // We need overloaded versions instead of relying on default arguments
 // due to https://bugs.swift.org/browse/SR-1534
 
-public func XCTAssertSuccessResult<Success>(_ expression: @autoclosure () throws -> Result<Success, any Error>, file: StaticString = #file, line: UInt = #line) rethrows {
+public func XCTAssertSuccessResult<Success>(_ expression: @autoclosure () throws -> Result<Success, any Error>, file: StaticString = #filePath, line: UInt = #line) rethrows {
   try XCTAssertSuccessResult(expression(), file: file, line: line, {_ in })
 }
 
-public func XCTAssertSuccessResult<Success>(_ expression: @autoclosure () throws -> Result<Success, any Error>, file: StaticString = #file, line: UInt = #line, _ successHandler: (_ value: Success) throws -> Void) rethrows {
+public func XCTAssertSuccessResult<Success>(_ expression: @autoclosure () throws -> Result<Success, any Error>, file: StaticString = #filePath, line: UInt = #line, _ successHandler: (_ value: Success) throws -> Void) rethrows {
   let result = try expression()
   
   switch result {
@@ -60,11 +60,11 @@ public func XCTAssertSuccessResult<Success>(_ expression: @autoclosure () throws
   }
 }
 
-public func XCTAssertFailureResult<Success>(_ expression: @autoclosure () throws -> Result<Success, any Error>, file: StaticString = #file, line: UInt = #line) rethrows {
+public func XCTAssertFailureResult<Success>(_ expression: @autoclosure () throws -> Result<Success, any Error>, file: StaticString = #filePath, line: UInt = #line) rethrows {
   try XCTAssertFailureResult(expression(), file: file, line: line, {_ in })
 }
 
-public func XCTAssertFailureResult<Success>(_ expression: @autoclosure () throws -> Result<Success, any Error>, file: StaticString = #file, line: UInt = #line, _ errorHandler: (_ error: any Error) throws -> Void) rethrows {
+public func XCTAssertFailureResult<Success>(_ expression: @autoclosure () throws -> Result<Success, any Error>, file: StaticString = #filePath, line: UInt = #line, _ errorHandler: (_ error: any Error) throws -> Void) rethrows {
   let result = try expression()
   
   switch result {
@@ -84,7 +84,7 @@ public func XCTAssertFailureResult<Success>(_ expression: @autoclosure () throws
 ///   - test: An autoclosure for the condition to test for truthiness.
 ///   - timeout: The timeout, at which point the test will fail. Defaults to 1 second.
 ///   - message: A message to send on failure.
-public func XCTAssertTrueEventually(_ test: @autoclosure () -> Bool, timeout: TimeInterval = 1.0, message: String = "", file: StaticString = #file, line: UInt = #line) {
+public func XCTAssertTrueEventually(_ test: @autoclosure () -> Bool, timeout: TimeInterval = 1.0, message: String = "", file: StaticString = #filePath, line: UInt = #line) {
   let runLoop = RunLoop.current
   let timeoutDate = Date(timeIntervalSinceNow: timeout)
   repeat {
@@ -106,7 +106,7 @@ public func XCTAssertTrueEventually(_ test: @autoclosure () -> Bool, timeout: Ti
 ///   - test: An autoclosure for the condition to test for falsiness.
 ///   - timeout: The timeout, at which point the test will fail. Defaults to 1 second.
 ///   - message: A message to send on failure.
-public func XCTAssertFalseEventually(_ test: @autoclosure () -> Bool, timeout: TimeInterval = 1.0, message: String = "", file: StaticString = #file, line: UInt = #line) {
+public func XCTAssertFalseEventually(_ test: @autoclosure () -> Bool, timeout: TimeInterval = 1.0, message: String = "", file: StaticString = #filePath, line: UInt = #line) {
   XCTAssertTrueEventually(!test(), timeout: timeout, message: message, file: file, line: line)
 }
 
@@ -144,8 +144,10 @@ public struct XCTFailure: Error, CustomNSError {
   /// The error code within the given domain.
   public let errorCode: Int = 0
   
+  public var errorUserInfo: [String : Any] { _errorUserInfo }
+  
   /// The user-info dictionary.
-  public let errorUserInfo: [String : Any] = [
+  private let _errorUserInfo: [String : any Sendable] = [
     // Make sure the thrown error doesn't show up as a test failure, because we already record
     // a more detailed failure (with the right source location) ourselves.
     "XCTestErrorUserInfoKeyShouldIgnore": true

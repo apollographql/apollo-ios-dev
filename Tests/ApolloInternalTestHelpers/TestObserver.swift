@@ -1,7 +1,7 @@
 import Apollo
 import XCTest
 
-public class TestObserver: NSObject, XCTestObservation {
+public final class TestObserver: NSObject, XCTestObservation {
 
   private let onFinish: (XCTestCase) -> Void  
 

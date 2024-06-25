@@ -9,8 +9,8 @@ extension GraphQLJSFrontend {
     document: String,
     config: ApolloCodegen.ConfigurationContext
   ) async throws -> CompilationResult {
-    async let schemaSource = try makeSource(schema, filePath: "")
-    async let documentSource = try makeSource(document, filePath: "")
+    let schemaSource = try await makeSource(schema, filePath: "")
+    let documentSource = try await makeSource(document, filePath: "")
 
     let schema = try await loadSchema(from: [schemaSource])
     let document = try await parseDocument(documentSource)
@@ -40,7 +40,7 @@ extension GraphQLJSFrontend {
     documents: [String],
     config: ApolloCodegen.ConfigurationContext
   ) async throws -> CompilationResult {
-    async let schemaSource = try makeSource(schema, filePath: "")
+    let schemaSource = try await makeSource(schema, filePath: "")
 
     let sources: [GraphQLSource] = try await documents.enumerated().asyncMap {
       try await makeSource($0.element, filePath: "Doc_\($0.offset)")
@@ -90,8 +90,8 @@ extension GraphQLJSFrontend {
     document: String,
     config: ApolloCodegen.ConfigurationContext
   ) async throws -> CompilationResult {
-    async let documentSource = try makeSource(document, filePath: "")
-    async let schemaSource = try makeSource(schemaJSON, filePath: "schema.json")
+    let documentSource = try await makeSource(document, filePath: "")
+    let schemaSource = try await makeSource(schemaJSON, filePath: "schema.json")
 
     let schema = try await loadSchema(from: [schemaSource])
     let document = try await parseDocument(documentSource)

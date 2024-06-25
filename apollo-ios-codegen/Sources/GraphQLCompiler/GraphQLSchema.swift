@@ -27,13 +27,13 @@ public class GraphQLNamedType:
 
   required init(
     _ jsValue: JSValue,
-    bridge: isolated JavaScriptBridge
+    bridge: JavaScriptBridge
   ) {
     self.name = .init(schemaName: jsValue["name"])
     self.documentation = jsValue["description"]
   }
 
-  func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) { }
+  func finalize(_ jsValue: JSValue, bridge: JavaScriptBridge) { }
 
   /// Initializer to be used for creating mock objects in tests only.
   init(
@@ -44,9 +44,10 @@ public class GraphQLNamedType:
     self.documentation = documentation
   }
 
+  @JSActor
   static func initializeNewObject(
     _ jsValue: JSValue,
-    bridge: isolated JavaScriptBridge
+    bridge: JavaScriptBridge
   ) -> Self {
     return self.init(jsValue, bridge: bridge)
   }
@@ -64,7 +65,7 @@ public class GraphQLNamedType:
   }
 }
 
-public final class GraphQLScalarType: GraphQLNamedType {
+public final class GraphQLScalarType: GraphQLNamedType, @unchecked Sendable {
 
   public let specifiedByURL: String?
 
@@ -79,7 +80,7 @@ public final class GraphQLScalarType: GraphQLNamedType {
     }
   }
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.specifiedByURL = jsValue["specifiedByUrl"]
     super.init(jsValue, bridge: bridge)
   }
@@ -96,14 +97,14 @@ public final class GraphQLScalarType: GraphQLNamedType {
 
 }
 
-public final class GraphQLEnumType: GraphQLNamedType {
+public final class GraphQLEnumType: GraphQLNamedType, @unchecked Sendable {
   public private(set) var values: [GraphQLEnumValue]!
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     super.init(jsValue, bridge: bridge)
   }
 
-  override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  override func finalize(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.values = try! bridge.invokeMethod("getValues", on: jsValue)
   }
 
@@ -140,7 +141,7 @@ public struct GraphQLEnumValue: JavaScriptObjectDecodable, GraphQLNamedItem {
 
   static func fromJSValue(
     _ jsValue: JSValue,
-    bridge: isolated JavaScriptBridge
+    bridge: JavaScriptBridge
   ) -> GraphQLEnumValue {
     self.init(
       name: .init(schemaName: jsValue["name"]),
@@ -152,14 +153,14 @@ public struct GraphQLEnumValue: JavaScriptObjectDecodable, GraphQLNamedItem {
 
 public typealias GraphQLInputFieldDictionary = OrderedDictionary<String, GraphQLInputField>
 
-public final class GraphQLInputObjectType: GraphQLNamedType {
+public final class GraphQLInputObjectType: GraphQLNamedType, @unchecked Sendable {
   public private(set) var fields: GraphQLInputFieldDictionary!
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     super.init(jsValue, bridge: bridge)
   }
 
-  override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  override func finalize(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
   }
 
@@ -187,7 +188,7 @@ public class GraphQLInputField: JavaScriptObjectDecodable, GraphQLNamedItem {
 
   static func fromJSValue(
     _ jsValue: JSValue,
-    bridge: isolated JavaScriptBridge
+    bridge: JavaScriptBridge
   ) -> Self {
     self.init(
       name: .init(schemaName: jsValue["name"]),
@@ -213,7 +214,7 @@ public class GraphQLInputField: JavaScriptObjectDecodable, GraphQLNamedItem {
   }
 }
 
-public class GraphQLCompositeType: GraphQLNamedType {
+public class GraphQLCompositeType: GraphQLNamedType, @unchecked Sendable {
   public override var debugDescription: String {
     "Type - \(name)"
   }
@@ -229,7 +230,7 @@ public extension GraphQLInterfaceImplementingType {
   }
 }
 
-public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImplementingType {
+public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImplementingType, @unchecked Sendable {
 
   public private(set) var fields: [String: GraphQLField]!
 
@@ -247,11 +248,11 @@ public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImpl
     super.init(name: name, documentation: documentation)
   }
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     super.init(jsValue, bridge: bridge)
   }
 
-  override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  override func finalize(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
     self.interfaces = try! bridge.invokeMethod("getInterfaces", on: jsValue)
   }
@@ -261,10 +262,11 @@ public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImpl
   }
 }
 
-public class GraphQLAbstractType: GraphQLCompositeType {
+public class GraphQLAbstractType: GraphQLCompositeType, @unchecked Sendable {
 }
 
-public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceImplementingType {
+public final class GraphQLInterfaceType: 
+  GraphQLAbstractType, GraphQLInterfaceImplementingType, @unchecked Sendable {
 
   public private(set) var fields: [String: GraphQLField]!
 
@@ -282,11 +284,11 @@ public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceIm
     super.init(name: name, documentation: documentation)
   }
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     super.init(jsValue, bridge: bridge)
   }
 
-  override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  override func finalize(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
     self.interfaces = try! bridge.invokeMethod("getInterfaces", on: jsValue)
   }
@@ -296,10 +298,10 @@ public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceIm
   }
 }
 
-public final class GraphQLUnionType: GraphQLAbstractType {
+public final class GraphQLUnionType: GraphQLAbstractType, @unchecked Sendable {
   public let types: [GraphQLObjectType]
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.types = try! bridge.invokeMethod("getTypes", on: jsValue)
     super.init(jsValue, bridge: bridge)
   }
@@ -349,7 +351,7 @@ public final class GraphQLField:
 
   static func fromJSValue(
     _ jsValue: JSValue,
-    bridge: isolated JavaScriptBridge
+    bridge: JavaScriptBridge
   ) -> GraphQLField {
     self.init(
       name: jsValue["name"],
@@ -401,7 +403,7 @@ public struct GraphQLFieldArgument: JavaScriptObjectDecodable, Sendable, Hashabl
 
   static func fromJSValue(
     _ jsValue: JSValue,
-    bridge: isolated JavaScriptBridge
+    bridge: JavaScriptBridge
   ) -> GraphQLFieldArgument {
     self.init(
       name: jsValue["name"],

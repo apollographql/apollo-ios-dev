@@ -7,7 +7,7 @@ extension IR.MergedSelections.MergedSource {
 
   public static func mock(
     _ field: IRTestWrapper<IR.Field>?,
-    file: StaticString = #file,
+    file: StaticString = #filePath,
     line: UInt = #line
   ) throws -> Self {
     self.init(
@@ -18,7 +18,7 @@ extension IR.MergedSelections.MergedSource {
 
   public static func mock(
     _ typeCase: IRTestWrapper<IR.SelectionSet>?,
-    file: StaticString = #file,
+    file: StaticString = #filePath,
     line: UInt = #line
   ) throws -> Self {
     self.init(
@@ -29,7 +29,7 @@ extension IR.MergedSelections.MergedSource {
 
   public static func mock(
     _ fragment: IRTestWrapper<IR.NamedFragmentSpread>?,
-    file: StaticString = #file,
+    file: StaticString = #filePath,
     line: UInt = #line
   ) throws -> Self {
     let fragment = try XCTUnwrap(fragment, file: file, line: line)
@@ -42,7 +42,7 @@ extension IR.MergedSelections.MergedSource {
   public static func mock(
     for field: IRTestWrapper<IR.Field>?,
     from fragment: IRTestWrapper<IR.NamedFragmentSpread>?,
-    file: StaticString = #file,
+    file: StaticString = #filePath,
     line: UInt = #line
   ) throws -> Self {
     self.init(
@@ -54,7 +54,7 @@ extension IR.MergedSelections.MergedSource {
   public static func mock(
     for field: IRTestWrapper<IR.EntityField>?,
     from fragment: IRTestWrapper<IR.NamedFragmentSpread>?,
-    file: StaticString = #file,
+    file: StaticString = #filePath,
     line: UInt = #line
   ) throws -> Self {
     self.init(

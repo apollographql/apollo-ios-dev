@@ -22,7 +22,7 @@ public extension XCTestCase {
   
   /// Invoke a throwing closure, and record any thrown errors without rethrowing. This is useful if you need to run code that may throw
   /// in a place where throwing isn't allowed, like `measure` blocks.
-  func whileRecordingErrors(file: StaticString = #file, line: UInt = #line, _ perform: () throws -> Void) {
+  func whileRecordingErrors(file: StaticString = #filePath, line: UInt = #line, _ perform: () throws -> Void) {
     do {
       try perform()
     } catch {
@@ -35,6 +35,7 @@ public extension XCTestCase {
   }
   
   /// Wrapper around `XCTContext.runActivity` to  allow for future extension.
+  @MainActor
   func runActivity<Result>(_ name: String, perform: (any XCTActivity) throws -> Result) rethrows -> Result {
     return try XCTContext.runActivity(named: name, block: perform)
   }

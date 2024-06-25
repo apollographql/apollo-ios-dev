@@ -8,7 +8,7 @@ public final class GraphQLSource: JavaScriptObject {
 
   public let body: String
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.filePath = jsValue["name"]
     self.body = jsValue["body"]
     super.init(jsValue, bridge: bridge)
@@ -39,13 +39,14 @@ public class ASTNode: JavaScriptObject {
 
   public var filePath: String? { source?.filePath }
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.kind = jsValue["kind"]
     self.source = .fromJSValue(jsValue["loc"]["source"], bridge: bridge)
     super.init(jsValue, bridge: bridge)
   }
 
-  static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+  @JSActor
+  static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
     self.init(jsValue, bridge: bridge)
   }
 
@@ -55,7 +56,7 @@ public class ASTNode: JavaScriptObject {
 public final class GraphQLDocument: ASTNode {
   public let definitions: [ASTNode]
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.definitions = .fromJSValue(jsValue["definitions"], bridge: bridge)
     super.init(jsValue, bridge: bridge)
 

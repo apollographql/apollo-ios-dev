@@ -15,14 +15,16 @@ public class MockWebSocket: WebSocketClient {
   }
   
   open func reportDidConnect() {
+    nonisolated(unsafe) let unsafeSelf = self
     callbackQueue.async {
-      self.delegate?.websocketDidConnect(socket: self)
+      unsafeSelf.delegate?.websocketDidConnect(socket: unsafeSelf)
     }
   }
   
   open func write(string: String) {
+    nonisolated(unsafe) let unsafeSelf = self
     callbackQueue.async {
-      self.delegate?.websocketDidReceiveMessage(socket: self, text: string)
+      unsafeSelf.delegate?.websocketDidReceiveMessage(socket: unsafeSelf, text: string)
     }
   }
   

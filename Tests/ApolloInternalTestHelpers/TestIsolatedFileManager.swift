@@ -9,7 +9,7 @@ import XCTest
 ///
 /// You can create a file manager from within a specific unit test with the
 /// `testIsolatedFileManager()` function on `XCTestCase`.
-public class TestIsolatedFileManager {
+public actor TestIsolatedFileManager {
 
   public var directoryURL: URL { filePathBuilder.testIsolatedOutputFolder }
   public let fileManager: FileManager
@@ -111,7 +111,7 @@ public extension XCTestCase {
   /// current process to it's `directoryURL`.** After the test finishes, the current working
   /// directory is reset to its previous value.
   func testIsolatedFileManager(
-    with fileManager: FileManager = .default
+    with fileManager: sending FileManager = .default
   ) throws -> TestIsolatedFileManager {
     let manager = try TestIsolatedFileManager(
       filePathBuilder: TestFilePathBuilder(test: self),
@@ -119,7 +119,7 @@ public extension XCTestCase {
     )
 
     addTeardownBlock {
-      try manager.cleanUp()
+      try await manager.cleanUp()
     }
 
     return manager

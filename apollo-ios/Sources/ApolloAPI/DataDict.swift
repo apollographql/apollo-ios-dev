@@ -160,7 +160,7 @@ extension DataDict {
   /// A common value used to represent a null value in a `DataDict`.
   ///
   /// This value can be cast to `NSNull` and will bridge automatically.
-  public static let _NullValue = {
+  nonisolated(unsafe) public static let _NullValue = {
     if DataDict._AnyHashableCanBeCoerced {
       return AnyHashable(Optional<AnyHashable>.none)
     } else {

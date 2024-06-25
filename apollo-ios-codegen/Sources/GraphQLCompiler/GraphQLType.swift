@@ -63,7 +63,7 @@ extension GraphQLType: CustomDebugStringConvertible {
 }
 
 extension GraphQLType: JavaScriptObjectDecodable {
-  static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+  static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
     precondition(jsValue.isObject, "Expected JavaScript object but found: \(jsValue)")
 
     let tag = jsValue[jsValue.context.globalObject["Symbol"]["toStringTag"]].toString()
