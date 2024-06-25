@@ -124,8 +124,12 @@ public struct LinkedList<T>: ExpressibleByArrayLiteral {
   }
 
   private mutating func copyOnWriteIfNeeded() {
-    if !isKnownUniquelyReferenced(&headNode) {
-      headNode = headNode.copy()
+    // Ensure we check `isKnownUniquelyReferenced` on a unique variable reference to the `headNode`.
+    // See https://forums.swift.org/t/isknownuniquelyreferenced-thread-safety/22933 for details.
+    var storage = headNode
+    if !isKnownUniquelyReferenced(&storage) {
+      storage = storage.copy()
+      headNode = storage
     }
   }
 
@@ -179,6 +183,8 @@ public struct LinkedList<T>: ExpressibleByArrayLiteral {
   }
 
 }
+
+extension LinkedList: @unchecked Sendable where T: Sendable {}
 
 extension LinkedList.Node: Equatable where T: Equatable {
   public static func == (lhs: LinkedList<T>.Node, rhs: LinkedList<T>.Node) -> Bool {
