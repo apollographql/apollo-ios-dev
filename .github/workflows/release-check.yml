@@ -260,7 +260,7 @@ jobs:
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: ${{ env.XCODE_VERSION }}
+        xcode-version: 15.2
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Setup Node 12.22.10
