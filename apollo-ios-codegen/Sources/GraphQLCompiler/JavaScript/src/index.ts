@@ -115,7 +115,7 @@ export function compileDocument(
 
 // While @defer is experimental the directive needs to be manually added to the list of available 
 // directives for the schema document. If the directive is already in the document it must be 
-// validated to ensure it matches the directive definition that Apollo iOS defer support was
+// validated to ensure it matches the directive definition that the Apollo iOS defer feature was
 // built to support.
 //
 // Once defer is part of the GraphQL spec and the directive is no longer considered experimental
