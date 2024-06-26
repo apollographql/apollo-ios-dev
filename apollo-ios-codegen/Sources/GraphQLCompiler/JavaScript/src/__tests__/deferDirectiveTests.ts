@@ -16,11 +16,151 @@ import {
   Source,
   GraphQLSchema,
   DocumentNode,
-  GraphQLError
+  GraphQLError,
+  buildASTSchema,
+  parse
 } from "graphql";
 import { emptyValidationOptions } from "../__testUtils__/validationHelpers";
 
-describe("given schema", () => {
+describe("given schema SDL without any defer directive", () => {
+  const schemaSDL: string = `
+  type Query {
+    allAnimals: [Animal!]
+  }
+
+  interface Animal {
+    species: String!
+    friend: Animal!
+  }
+
+  type Dog implements Animal {
+    species: String!
+    friend: Animal!
+  }
+  `;
+
+  // Directive Definition Tests
+
+  describe("automatically adds a defer directive", () => {
+    const schema: GraphQLSchema = loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
+
+    const documentString: string = `
+    query Test {
+      allAnimals {
+        ... on Animal @defer(label: "deferred") {
+          species
+        }
+      }
+    }
+    `;
+
+    const document: DocumentNode = parseOperationDocument(
+      new Source(documentString, "Test Query", { line: 1, column: 1 })
+    );
+
+    it("should pass validation", () => {
+      const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
+
+      expect(validationErrors).toHaveLength(0)
+    });
+  })
+
+  // This test is being used as a fail-safe to automatically know when graphql-js removes the 'experimental'
+  // designation from the defer directive and it is automatically made available to operations. When this 
+  // test starts failing the automatic addition of the experimental defer directive we do in loadSchemaFromSources
+  // must be removed.
+  describe("does not add a defer directive", () => {
+    // Note we're not calling loadSchemaFromSources which adds the experimental defer directive
+    const schemaDocument = parse(schemaSDL)
+    const schema: GraphQLSchema = buildASTSchema(schemaDocument, { assumeValid: true, assumeValidSDL: true });
+
+    const documentString: string = `
+    query Test {
+      allAnimals {
+        ... on Animal @defer(label: "deferred") {
+          species
+        }
+      }
+    }
+    `;
+
+    const document: DocumentNode = parseOperationDocument(
+      new Source(documentString, "Test Query", { line: 1, column: 1 })
+    );
+
+    it("should fail validation", () => {
+      const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
+
+      expect(validationErrors).toHaveLength(1)
+      expect(validationErrors[0].message).toEqual(
+        "Unknown directive \"@defer\"."
+      )
+    });
+  });
+})
+
+describe("test invalid directive definitions", () => {
+
+  // Directive Definition Tests
+
+  describe("given mismatched location in directive", () => {
+    const schemaSDL: string = `
+    directive @defer(label: String, if: Boolean! = true) on FIELD
+
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+      friend: Animal!
+    }
+
+    type Dog implements Animal {
+      species: String!
+      friend: Animal!
+    }
+    `;
+
+    it("should throw when loading documents", () => {
+      expect(() => {
+        loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
+      }).toThrow(
+        Error("Mismatched @defer directive found.")
+      )
+    })
+  })
+
+  describe("given mismatched arguments in directive", () => {
+    const schemaSDL: string = `
+    directive @defer(first: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+      friend: Animal!
+    }
+
+    type Dog implements Animal {
+      species: String!
+      friend: Animal!
+    }
+    `;
+
+    it("should throw when loading documents", () => {
+      expect(() => {
+        loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
+      }).toThrow(
+        Error("Mismatched @defer directive found.")
+      )
+    })
+  })
+})
+
+describe("given schema with valid defer directive", () => {
   const schemaSDL: string = `
   directive @defer(label: String, if: Boolean! = true) on FRAGMENT_SPREAD | INLINE_FRAGMENT
 
@@ -47,7 +187,9 @@ describe("given schema", () => {
     const documentString: string = `
     query Test {
       allAnimals {
-        species
+        ... on Animal @defer(label: "deferred") {
+          species
+        }
       }
     }
     `;
@@ -63,13 +205,13 @@ describe("given schema", () => {
     });
   })
 
-  // Disabling Tests
+  // Compilation Tests
 
   describe("query has inline fragment with @defer directive", () => {
     const documentString: string = `
     query Test {
       allAnimals {
-        ... on Animal @defer {
+        ... on Animal @defer(label: "deferred") {
           species
         }
       }
