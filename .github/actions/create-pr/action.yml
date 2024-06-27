@@ -1,0 +1,33 @@
+name: "Create Pull Request"
+description: "Creates a pull request with the given parameters."
+inputs:
+  access-token:
+    description: "The Personal Access Token with proper permissions to the given repository."
+    required: true
+  repo:
+    description: "The name of the repository to create the PR in."
+    required: true
+  base-branch:
+    description: "The target branch for the pull request"
+    required: true
+    default: "main"
+  head-branch:
+    description: "The branch containing the commits for your pull request."
+    required: true
+  reviewers:
+    description: "The reviewers to add to the pull request."
+  title:
+    description: "The title for the pull request."
+    required: true
+  body:
+    description: "The body information for the pull request."
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Repository Dispatch
+      shell: bash
+      run: |
+        gh pr create --repo ${{ inputs.repo }} --base ${{ inputs.base-branch }} --head ${{ inputs.head-branch }} --reviewer ${{ inputs.reviewers }} --title ${{ inputs.title }} --body ${{ inputs.body }}
+      env:
+        GH_TOKEN: ${{ inputs.access-token }}
