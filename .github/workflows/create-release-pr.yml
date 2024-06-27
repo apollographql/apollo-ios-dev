@@ -60,6 +60,7 @@ jobs:
         reviewers: AnthonyMDev,calvincestari,bobafetters
         title: Release ${{ env.VERSION_NUMBER }}
         body: |
+          |
           #### Diff
           [See diff since last version](https://github.com/apollographql/apollo-ios-dev/compare/${{ env.PREVIOUS_VERSION }}...${{ github.sha }}).
 
