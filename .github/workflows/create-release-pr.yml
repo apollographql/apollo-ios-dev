@@ -19,8 +19,6 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
-      with:
-        ref: main
     - name: Setup SSH Keys
       uses: webfactory/ssh-agent@v0.7.0
       with:
