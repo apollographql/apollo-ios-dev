@@ -28,6 +28,6 @@ runs:
     - name: Repository Dispatch
       shell: bash
       run: |
-        gh pr create --repo ${{ inputs.repo }} --base ${{ inputs.base-branch }} --head ${{ inputs.head-branch }} --reviewer ${{ inputs.reviewers }} --title ${{ inputs.title }} --body ${{ inputs.body }}
+        gh pr create --repo "${{ inputs.repo }}" --base "${{ inputs.base-branch }}" --head "${{ inputs.head-branch }}" --reviewer "${{ inputs.reviewers }}" --title "${{ inputs.title }}" --body "${{ inputs.body }}"
       env:
         GH_TOKEN: ${{ inputs.access-token }}
