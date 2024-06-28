@@ -64,7 +64,7 @@ jobs:
           [See diff since last version](https://github.com/apollographql/apollo-ios-dev/compare/${{ env.PREVIOUS_VERSION }}...${{ github.sha }}).
 
           #### Things to do in this PR
-          - [ ] Update "[`CHANGELOG.md`](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md)" with all relevant changes since the prior version. _Please include PR numbers and mention contributors for external PR submissions._
+          - [ ] Update [CHANGELOG.md](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) with all relevant changes since the prior version. _Please include PR numbers and mention contributors for external PR submissions._
 
           #### Things to do as part of releasing
-          - [ ] Update and publish the draft release created by CI using the latest "[`CHANGELOG.md`](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md)" contents
+          - [ ] Update and publish the draft release created by CI using the latest [CHANGELOG.md](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) contents
