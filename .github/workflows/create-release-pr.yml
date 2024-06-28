@@ -76,7 +76,7 @@ jobs:
     #       - [ ] Update and publish the draft release created by CI using the latest [CHANGELOG.md](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) contents
 
   publish-test:
-    if: success('create-release-pr') && startsWith(github.ref, 'refs/heads/release/')
+    if: success('create-release-pr') && startsWith(github.ref, 'refs/heads/release/${{ needs.create-release-pr.outputs.new-output }}')
     needs: create-release-pr
     runs-on: macos-latest
     name: Publish Test
