@@ -69,15 +69,9 @@ jobs:
       run: |
         git fetch
         git push
-    - name: Get Version
-      id: getVersion
-      shell: bash
-      run: |
-        releaseVersion=$(sh apollo-ios/scripts/get-version.sh)
-        echo "RELEASE_VERSION=$releaseVersion" >> "$GITHUB_OUTPUT"
 
   publish-release:
-    if: success('split-subtrees') && github.event.pull_request.base.ref == "release/${{ needs.split-subtrees.outputs.releaseVersion }}"
+    if: success('split-subtrees') && startsWith(github.ref, 'refs/heads/release/')
     needs: split-subtrees
     runs-on: macos-latest
     name: Publish Release
