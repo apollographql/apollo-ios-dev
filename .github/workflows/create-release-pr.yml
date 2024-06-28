@@ -19,8 +19,6 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
-      with:
-        ref: main
     - name: Setup SSH Keys
       uses: webfactory/ssh-agent@v0.7.0
       with:
@@ -46,26 +44,27 @@ jobs:
       shell: bash
       run: |
         make archive-cli-to-apollo-package
+    - name: Commit and Push Branch
+      shell: bash
+      run: |
+        git checkout -b ${{ env.BRANCH_NAME }}
+        git add -A
+        git commit -m "Setting up Release ${{ env.VERSION_NUMBER }}"
+        git push -u origin ${{ env.BRANCH_NAME }}
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v6
+      uses: ./.github/actions/create-pr
       with:
-        branch: ${{ env.BRANCH_NAME }}
-        commit-message: |
-          Setting up Release ${{ env.VERSION_NUMBER }}
-
-          Created By GitHub Action Workflow
-        title: |
-          Release ${{ env.VERSION_NUMBER }}
+        access-token: ${{ secrets.APOLLO_IOS_PAT }}
+        repo: "apollographql/apollo-ios-dev"
+        head-branch: "${{ env.BRANCH_NAME }}"
+        reviewers: AnthonyMDev,calvincestari,bobafetters
+        title: Release ${{ env.VERSION_NUMBER }}
         body: |
           #### Diff
           [See diff since last version](https://github.com/apollographql/apollo-ios-dev/compare/${{ env.PREVIOUS_VERSION }}...${{ github.sha }}).
 
           #### Things to do in this PR
-          - [ ] Update [`CHANGELOG.md`](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) with all relevant changes since the prior version. _Please include PR numbers and mention contributors for external PR submissions._
+          - [ ] Update [CHANGELOG.md](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) with all relevant changes since the prior version. _Please include PR numbers and mention contributors for external PR submissions._
 
           #### Things to do as part of releasing
-          - [ ] Add tag of format `major.minor.patch` to GitHub.
-          - [ ] Create a release on GitHub with the new tag, using the latest [`CHANGELOG.md`](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) contents.
-          - [ ] Attach CLI binary to the GitHub release.
-          - [ ] Run `pod trunk push Apollo.podspec` and `pod trunk push ApolloTestSupport.podspec` to publish to CocoaPods. _You will need write permissions for this, please contact one of the [maintainers](https://github.com/apollographql/apollo-ios/blob/main/README.md#maintainers) if you need access to do this._
-          - [ ] Run "[Release New Version](https://github.com/apollographql/apollo-ios-xcframework/actions/workflows/release-new-version.yml)" workflow in `apollo-ios-xcframework`
+          - [ ] Update and publish the draft release created by CI using the latest [CHANGELOG.md](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) contents

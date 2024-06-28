@@ -13,7 +13,7 @@
     "npm": ">=7"
   },
   "dependencies": {
-    "graphql": "17.0.0-alpha.3",
+    "graphql": "17.0.0-alpha.5",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
@@ -27,6 +27,6 @@
     "rollup": "4.18.0",
     "@rollup/plugin-terser": "0.4.4",
     "ts-jest": "29.1.5",
-    "typescript": "5.4.5"
+    "typescript": "5.5.2"
   }
 }
