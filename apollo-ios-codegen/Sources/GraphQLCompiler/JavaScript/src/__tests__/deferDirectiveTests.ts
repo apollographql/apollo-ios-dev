@@ -65,10 +65,9 @@ describe("given schema SDL without any defer directive", () => {
     });
   })
 
-  // This test is being used as a fail-safe to automatically know when graphql-js removes the 'experimental'
-  // designation from the defer directive and it is automatically made available to operations. When this 
-  // test starts failing the automatic addition of the experimental defer directive we do in loadSchemaFromSources
-  // must be removed.
+  // This test is being used as a fail-safe to know when graphql-js removes the 'experimental' designation from
+  // the defer directive and it is automatically made available to operations. When this test starts failing 
+  // the automatic addition of the experimental defer directive done in loadSchemaFromSources must be removed.
   describe("does not add a defer directive", () => {
     // Note we're not calling loadSchemaFromSources which adds the experimental defer directive
     const schemaDocument = parse(schemaSDL)
@@ -99,64 +98,49 @@ describe("given schema SDL without any defer directive", () => {
   });
 })
 
-describe("test invalid directive definitions", () => {
+describe("given schema with unsupported defer directive", () => {
+  const schemaSDL: string = `
+  directive @defer(label: String, if: Boolean! = true) on FIELD
+
+  type Query {
+    allAnimals: [Animal!]
+  }
+
+  interface Animal {
+    species: String!
+    friend: Animal!
+  }
+
+  type Dog implements Animal {
+    species: String!
+    friend: Animal!
+  }
+  `;
+
+  const schema: GraphQLSchema = loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
 
   // Directive Definition Tests
 
-  describe("given mismatched location in directive", () => {
-    const schemaSDL: string = `
-    directive @defer(label: String, if: Boolean! = true) on FIELD
-
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      species: String!
-      friend: Animal!
-    }
-
-    type Dog implements Animal {
-      species: String!
-      friend: Animal!
+  describe("replaces unsupported defer directive with experimental supported definition", () => {
+    const documentString: string = `
+    query Test {
+      allAnimals {
+        ... on Animal @defer(label: "deferred") { # This would fail validation if the original definition were not replaced
+          species
+        }
+      }
     }
     `;
 
-    it("should throw when loading documents", () => {
-      expect(() => {
-        loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
-      }).toThrow(
-        Error("Mismatched @defer directive found.")
-      )
-    })
-  })
+    const document: DocumentNode = parseOperationDocument(
+      new Source(documentString, "Test Query", { line: 1, column: 1 })
+    );
 
-  describe("given mismatched arguments in directive", () => {
-    const schemaSDL: string = `
-    directive @defer(first: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+    it("should pass validation", () => {
+      const validationErrors: readonly GraphQLError[] = validateDocument(schema, document, emptyValidationOptions)
 
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      species: String!
-      friend: Animal!
-    }
-
-    type Dog implements Animal {
-      species: String!
-      friend: Animal!
-    }
-    `;
-
-    it("should throw when loading documents", () => {
-      expect(() => {
-        loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
-      }).toThrow(
-        Error("Mismatched @defer directive found.")
-      )
-    })
+      expect(validationErrors).toHaveLength(0)
+    });
   })
 })
 
