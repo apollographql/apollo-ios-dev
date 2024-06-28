@@ -226,14 +226,6 @@
         "type" : "text"
       },
       {
-        "code" : "AnyScalarType",
-        "type" : "codeVoice"
-      },
-      {
-        "text" : " and ",
-        "type" : "text"
-      },
-      {
         "code" : "Hashable",
         "type" : "codeVoice"
       },
@@ -454,7 +446,7 @@
         "type" : "text"
       },
       {
-        "code" : "AnyScalarType",
+        "code" : "JSONEncodable",
         "type" : "codeVoice"
       },
       {
