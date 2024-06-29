@@ -141,16 +141,19 @@ final class GraphQLQueryPagerTests: XCTestCase {
     let subscriptionExpectation = expectation(description: "Subscription")
     subscriptionExpectation.expectedFulfillmentCount = 2
     var expectedViewModels: [ViewModel]?
-    anyPager.subscribe { (result: Result<([ViewModel], UpdateSource), Error>) in
-      switch result {
-      case .success((let viewModels, _)):
-        expectedViewModels = viewModels
-        fetchExpectation.fulfill()
-        subscriptionExpectation.fulfill()
-      default:
-        XCTFail("Failed to get view models from pager.")
+    anyPager
+      .receive(on: RunLoop.main)
+      .sink { (result: Result<([ViewModel], UpdateSource), Error>) in
+        switch result {
+        case .success((let viewModels, _)):
+          expectedViewModels = viewModels
+          fetchExpectation.fulfill()
+          subscriptionExpectation.fulfill()
+        default:
+          XCTFail("Failed to get view models from pager.")
+        }
       }
-    }
+      .store(in: &subscriptions)
 
     fetchFirstPage(pager: anyPager)
     wait(for: [fetchExpectation], timeout: 1)
@@ -270,20 +273,23 @@ final class GraphQLQueryPagerTests: XCTestCase {
     let initialExpectation = expectation(description: "Initial")
     let secondExpectation = expectation(description: "Second")
     var expectedViewModel: String?
-    anyPager.subscribe { (result: Result<(String?, UpdateSource), Error>) in
-      switch result {
-      case .success((let viewModel, _)):
-        let oldValue = expectedViewModel
-        expectedViewModel = viewModel
-        if oldValue == nil {
-          initialExpectation.fulfill()
-        } else {
-          secondExpectation.fulfill()
+    anyPager
+      .receive(on: RunLoop.main)
+      .sink { (result: Result<(String?, UpdateSource), Error>) in
+        switch result {
+        case .success((let viewModel, _)):
+          let oldValue = expectedViewModel
+          expectedViewModel = viewModel
+          if oldValue == nil {
+            initialExpectation.fulfill()
+          } else {
+            secondExpectation.fulfill()
+          }
+        default:
+          XCTFail("Failed to get view models from pager.")
         }
-      default:
-        XCTFail("Failed to get view models from pager.")
       }
-    }
+      .store(in: &subscriptions)
 
     reverseFetchLastPage(pager: anyPager)
     wait(for: [initialExpectation], timeout: 1.0)
