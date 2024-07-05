@@ -4,7 +4,7 @@ on:
   workflow_dispatch
 
 env:
-  XCODE_VERSION: "16.0"
+  XCODE_VERSION: "16.0.0"
 
 jobs:
   changes:
