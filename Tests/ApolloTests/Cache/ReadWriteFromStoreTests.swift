@@ -1051,8 +1051,6 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
           var givenFragment: GivenFragment {
             get { _toFragment() }
             _modify { var f = givenFragment; yield &f; __data = f.__data }
-            @available(*, unavailable, message: "mutate properties of the fragment instead.")
-            set { preconditionFailure() }
           }
         }
       }
@@ -1204,8 +1202,6 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
           var givenFragment: GivenFragment? {
             get { _toFragment() }
             _modify { var f = givenFragment; yield &f; if let newData = f?.__data { __data = newData } }
-            @available(*, unavailable, message: "mutate properties of the fragment instead.")
-            set { preconditionFailure() }
           }
         }
       }
