@@ -38,7 +38,7 @@ All deferred fragments are annotated with the `@Deferred` property wrapper. This
 client.fetch(query: ExampleQuery()) { result in
   switch (result) {
   case let .success(data):
-    if let friends = data.data?.person.asUser?.fragments.deferredFriends? {
+    if case .fulfilled = data.data?.person.asUser?.fragments.$deferredFriends {
       print("Query Success! Received all fields.")
     } else {
       print("Query Success! Received basic fields only.")
