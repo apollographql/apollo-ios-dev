@@ -1,6 +1,6 @@
 #if !COCOAPODS
 import Apollo
-import ApolloAPI
+@_spi(JSON) import ApolloAPI
 #endif
 import Foundation
 
@@ -186,10 +186,12 @@ public class WebSocketTransport {
       guard
         let type = parseHandler.type,
         let messageType = OperationMessage.Types(rawValue: type) else {
-          self.notifyErrorAllHandlers(WebSocketError(payload: parseHandler.payload,
-                                                     error: parseHandler.error,
-                                                     kind: .unprocessedMessage(text)))
-          return
+        self.notifyErrorAllHandlers(WebSocketError(
+          payload: SendableJSONObject(unsafe: parseHandler.payload),
+          error: parseHandler.error,
+          kind: .unprocessedMessage(text))
+        )
+        return
       }
 
       switch messageType {
@@ -202,15 +204,19 @@ public class WebSocketTransport {
           } else if let error = parseHandler.error {
             responseHandler(.failure(error))
           } else {
-            let websocketError = WebSocketError(payload: parseHandler.payload,
-                                                error: parseHandler.error,
-                                                kind: .neitherErrorNorPayloadReceived)
+            let websocketError = WebSocketError(
+              payload: SendableJSONObject(unsafe: parseHandler.payload),
+              error: parseHandler.error,
+              kind: .neitherErrorNorPayloadReceived
+            )
             responseHandler(.failure(websocketError))
           }
         } else {
-          let websocketError = WebSocketError(payload: parseHandler.payload,
-                                              error: parseHandler.error,
-                                              kind: .unprocessedMessage(text))
+          let websocketError = WebSocketError(
+            payload: SendableJSONObject(unsafe: parseHandler.payload),
+            error: parseHandler.error,
+            kind: .unprocessedMessage(text)
+          )
           self.notifyErrorAllHandlers(websocketError)
         }
       case .complete:
@@ -220,9 +226,11 @@ public class WebSocketTransport {
             subscribers.removeValue(forKey: id)
           }
         } else {
-          notifyErrorAllHandlers(WebSocketError(payload: parseHandler.payload,
-                                                error: parseHandler.error,
-                                                kind: .unprocessedMessage(text)))
+          notifyErrorAllHandlers(WebSocketError(
+            payload: SendableJSONObject(unsafe: parseHandler.payload),
+            error: parseHandler.error,
+            kind: .unprocessedMessage(text))
+          )
         }
 
       case .connectionAck:
@@ -246,9 +254,11 @@ public class WebSocketTransport {
            .start,
            .stop,
            .connectionError:
-        notifyErrorAllHandlers(WebSocketError(payload: parseHandler.payload,
-                                              error: parseHandler.error,
-                                              kind: .unprocessedMessage(text)))
+        notifyErrorAllHandlers(WebSocketError(
+          payload: SendableJSONObject(unsafe: parseHandler.payload),
+          error: parseHandler.error,
+          kind: .unprocessedMessage(text))
+        )
       }
     }
   }
@@ -279,7 +289,7 @@ public class WebSocketTransport {
     processingQueue.async {
       self.acked = false
 
-      if let str = OperationMessage(payload: self.config.connectingPayload,
+      if let str = OperationMessage(payload: self.config.connectingPayload?._jsonObject,
                                     type: .connectionInit).rawMessage {
         self.write(str, force:true)
       }
@@ -336,7 +346,7 @@ public class WebSocketTransport {
     default: return nil
     }
 
-    guard let message = OperationMessage(payload: body, id: identifier, type: messageType).rawMessage else {
+    guard let message = OperationMessage(payload: body._jsonObject, id: identifier, type: messageType).rawMessage else {
       return nil
     }
 

@@ -1,5 +1,5 @@
 import Apollo
-import ApolloAPI
+@_spi(JSON) import ApolloAPI
 import XCTest
 
 /// A `MockGraphQLServer` can be used during tests to check whether expected GraphQL requests are received, and to respond with appropriate test data for a particular request.
@@ -111,13 +111,17 @@ public class MockGraphQLServer {
     }
   }
 
-  func serve<Operation>(request: HTTPRequest<Operation>, completionHandler: @escaping (Result<JSONObject, any Error>) -> Void) where Operation: GraphQLOperation {
+  func serve<Operation>(
+    request: HTTPRequest<Operation>,
+    completionHandler: @escaping (Result<SendableJSONObject, any Error>) -> Void
+  ) where Operation: GraphQLOperation {
     let operationType = type(of: request.operation)
 
+    nonisolated(unsafe) let completionHandler = completionHandler
     if let expectation = self[request.operation] ?? self[operationType] {
       // Dispatch after a small random delay to spread out concurrent requests and simulate somewhat real-world conditions.
       queue.asyncAfter(deadline: .now() + (customDelay ?? .milliseconds(Int.random(in: 10...50)))) {
-        completionHandler(.success(expectation.handler(request)))
+        completionHandler(.success(SendableJSONObject(unsafe: expectation.handler(request))))
         expectation.fulfill()
       }
 
@@ -129,3 +133,9 @@ public class MockGraphQLServer {
 
   }
 }
+
+/// This is an unsafe hack for unit tests _only_. `HTTPRequest` is not Sendable at this time.
+extension Apollo.HTTPRequest: @unchecked @retroactive Sendable {
+
+}
+

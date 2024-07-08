@@ -4,7 +4,7 @@ import ApolloAPI
 #endif
 
 /// Data about a response received by an HTTP request.
-public class HTTPResponse<Operation: GraphQLOperation> {
+public struct HTTPResponse<Operation: GraphQLOperation>: Sendable {
   
   /// The `HTTPURLResponse` received from the URL loading system
   public var httpResponse: HTTPURLResponse

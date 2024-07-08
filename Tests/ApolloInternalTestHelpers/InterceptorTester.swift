@@ -28,7 +28,7 @@ public class InterceptorTester {
   }
 }
 
-fileprivate class ResponseCaptureRequestChain<T: GraphQLOperation>: RequestChain {
+fileprivate class ResponseCaptureRequestChain<T: GraphQLOperation>: RequestChain, @unchecked Sendable {
   var isCancelled: Bool = false
   let completion: (Result<HTTPResponse<T>?, any Error>) -> Void
 

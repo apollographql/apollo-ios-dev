@@ -36,7 +36,7 @@ public struct MultipartResponseParsingInterceptor: ApolloInterceptor {
     chain: any RequestChain,
     request: HTTPRequest<Operation>,
     response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
+    completion: @escaping @Sendable (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
   ) where Operation : GraphQLOperation {
 
     guard let response else {

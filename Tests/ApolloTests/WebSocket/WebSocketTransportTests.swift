@@ -28,7 +28,7 @@ class WebSocketTransportTests: XCTestCase {
     XCTAssertEqual(self.webSocketTransport.websocket.request.allHTTPHeaderFields?["Authorization"], "UpdatedToken")
   }
 
-  func testUpdateConnectingPayload() {
+  func testUpdateConnectingPayload() async {
     let request = URLRequest(url: TestURL.mockServer.url)
 
     self.webSocketTransport = WebSocketTransport(
@@ -60,7 +60,7 @@ class WebSocketTransportTests: XCTestCase {
     self.webSocketTransport.updateConnectingPayload(["Authorization": "UpdatedToken"])
     self.webSocketTransport.initServer()
 
-    waitForExpectations(timeout: 3, handler: nil)
+    await fulfillment(of: [exp], timeout: 3)    
   }
 
   func testCloseConnectionAndInit() {

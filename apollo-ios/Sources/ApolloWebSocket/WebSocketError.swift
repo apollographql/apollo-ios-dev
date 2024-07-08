@@ -32,7 +32,7 @@ public struct WebSocketError: Error, LocalizedError {
   }
 
   /// The payload of the response.
-  public let payload: JSONObject?
+  public let payload: SendableJSONObject?
 
   /// The underlying error, or nil if one was not returned
   public let error: (any Error)?

@@ -51,7 +51,7 @@ private class MockGraphQLServerInterceptor: ApolloInterceptor {
   }
 
   public func interceptAsync<Operation>(chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) where Operation: GraphQLOperation {
-    server.serve(request: request) { result in
+    server.serve(request: request) { [chain] result in
       let httpResponse = HTTPURLResponse(url: TestURL.mockServer.url,
                                          statusCode: 200,
                                          httpVersion: nil,
@@ -64,7 +64,7 @@ private class MockGraphQLServerInterceptor: ApolloInterceptor {
                                response: response,
                                completion: completion)
       case .success(let body):
-        let data = try! JSONSerializationFormat.serialize(value: body)
+        let data = try! JSONSerializationFormat.serialize(value: body.base)
         let response = HTTPResponse<Operation>(response: httpResponse,
                                                rawData: data,
                                                parsedResponse: nil)

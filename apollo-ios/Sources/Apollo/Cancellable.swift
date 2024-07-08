@@ -1,7 +1,7 @@
 import Foundation
 
 /// An object that can be used to cancel an in progress action.
-public protocol Cancellable: AnyObject {
+public protocol Cancellable: AnyObject, Sendable {
     /// Cancel an in progress action.
     func cancel()
 }

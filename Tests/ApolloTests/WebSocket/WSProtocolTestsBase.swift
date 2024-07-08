@@ -62,9 +62,11 @@ class WSProtocolTestsBase: XCTestCase {
   }
 
   func sendAsync(message: OperationMessage) {
-    websocketTransport.processingQueue.async {
-      self.websocketTransport.websocketDidReceiveMessage(
-        socket: self.mockWebSocket,
+    nonisolated(unsafe) let transport = websocketTransport!
+    nonisolated(unsafe) let socket = mockWebSocket!
+    websocketTransport.processingQueue.async { @Sendable in
+      transport.websocketDidReceiveMessage(
+        socket: socket,
         text: message.rawMessage!
       )
     }

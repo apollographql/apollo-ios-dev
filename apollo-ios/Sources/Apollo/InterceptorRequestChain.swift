@@ -26,7 +26,7 @@ final public class InterceptorRequestChain: Cancellable, RequestChain {
   private let interceptors: [any ApolloInterceptor]
   private let callbackQueue: DispatchQueue
 
-  private var interceptorIndexes: [String: Int] = [:]
+  private let interceptorIndexes: [String: Int]
   private var currentIndex: Int
 
   @Atomic public var isCancelled: Bool = false
@@ -47,9 +47,11 @@ final public class InterceptorRequestChain: Cancellable, RequestChain {
     self.callbackQueue = callbackQueue
     self.currentIndex = 0
 
+    var interceptorIndexes: [String: Int] = [:]
     for (index, interceptor) in interceptors.enumerated() {
-      self.interceptorIndexes[interceptor.id] = index
+      interceptorIndexes[interceptor.id] = index
     }
+    self.interceptorIndexes = interceptorIndexes
   }
 
   /// Kicks off the request from the beginning of the interceptor array.

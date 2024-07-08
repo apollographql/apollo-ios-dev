@@ -1,10 +1,10 @@
 #if !COCOAPODS
 import Apollo
-import ApolloAPI
+@_spi(JSON) import ApolloAPI
 #endif
 import Foundation
 
-final class OperationMessage {
+final class OperationMessage: Sendable {
   enum Types : String {
     case connectionInit = "connection_init"            // Client -> Server
     case connectionTerminate = "connection_terminate"  // Client -> Server
@@ -26,8 +26,8 @@ final class OperationMessage {
   }
 
   let serializationFormat = JSONSerializationFormat.self
-  let message: JSONEncodableDictionary
-  var serialized: String?
+  let message: SendableJSONObject
+  let serialized: String?
 
   var rawMessage : String? {
     let serialized = try! serializationFormat.serialize(value: message)
@@ -38,10 +38,10 @@ final class OperationMessage {
     }
   }
 
-  init(payload: JSONEncodableDictionary? = nil,
+  init(payload: JSONObject? = nil,
        id: String? = nil,
        type: Types) {
-    var message: JSONEncodableDictionary = [:]
+    var message: JSONObject = [:]
     if let payload = payload {
       message["payload"] = payload
     }
@@ -49,7 +49,8 @@ final class OperationMessage {
       message["id"] = id
     }
     message["type"] = type.rawValue
-    self.message = message
+    self.message = SendableJSONObject(unsafe: message)
+    self.serialized = nil
   }
 
   init(serialized: String) {
@@ -98,7 +99,7 @@ final class OperationMessage {
       handler(ParseHandler(type,
                            id,
                            payload,
-                           WebSocketError(payload: payload,
+                           WebSocketError(payload: SendableJSONObject(unsafe: payload),
                                           error: error,
                                           kind: .unprocessedMessage(serialized))))
     }

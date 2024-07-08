@@ -59,7 +59,7 @@ class WebSocketTests: XCTestCase {
     super.tearDown()
   }
     
-  func testLocalSingleSubscription() throws {
+  func testLocalSingleSubscription() async throws {
     let expectation = self.expectation(description: "Single subscription")
     
     let subject = client.subscribe(
@@ -91,13 +91,13 @@ class WebSocketTests: XCTestCase {
     ]
         
     networkTransport.write(message: message)
-        
-    waitForExpectations(timeout: 5, handler: nil)
+
+    await fulfillment(of: [expectation], timeout: 5)
 
     subject.cancel()
   }
   
-  func testLocalMissingSubscription() throws {
+  func testLocalMissingSubscription() async throws {
     let expectation = self.expectation(description: "Missing subscription")
     expectation.isInverted = true
 
@@ -105,12 +105,12 @@ class WebSocketTests: XCTestCase {
       expectation.fulfill()
     }
     
-    waitForExpectations(timeout: 2, handler: nil)
+    await fulfillment(of: [expectation], timeout: 2)
 
     subject.cancel()
   }
   
-  func testLocalErrorUnknownId() throws {
+  func testLocalErrorUnknownId() async throws {
     let expectation = self.expectation(description: "Unknown id for subscription")
     
     let subject = client.subscribe(subscription: MockSubscription<ReviewAddedData>()) { result in
@@ -151,12 +151,12 @@ class WebSocketTests: XCTestCase {
     
     networkTransport.write(message: message)
     
-    waitForExpectations(timeout: 2, handler: nil)
+    await fulfillment(of: [expectation], timeout: 2)
 
     subject.cancel()
   }
   
-  func testSingleSubscriptionWithCustomOperationMessageIdCreator() throws {
+  func testSingleSubscriptionWithCustomOperationMessageIdCreator() async throws {
     let expectation = self.expectation(description: "Single Subscription with Custom Operation Message Id Creator")
     
     let store = ApolloStore.mock()
@@ -199,7 +199,7 @@ class WebSocketTests: XCTestCase {
     
     networkTransport.write(message: message)
     
-    waitForExpectations(timeout: 2, handler: nil)
+    await fulfillment(of: [expectation], timeout: 2)
 
     subject.cancel()
   }

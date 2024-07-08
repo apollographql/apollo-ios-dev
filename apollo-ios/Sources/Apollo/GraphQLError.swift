@@ -1,16 +1,17 @@
 import Foundation
 #if !COCOAPODS
-import ApolloAPI
+@_spi(JSON) import ApolloAPI
 #endif
 
 /// Represents an error encountered during the execution of a GraphQL operation.
 ///
 ///  - SeeAlso: [The Response Format section in the GraphQL specification](https://facebook.github.io/graphql/#sec-Response-Format)
 public struct GraphQLError: Error, Hashable {
-  private let object: JSONObject
+  private let object: SendableJSONObject
 
+#warning("THIS IS UNSAFE; FIX")
   public init(_ object: JSONObject) {
-    self.object = object
+    self.object = SendableJSONObject(unsafe: object)
   }
 
   init(_ message: String) {
@@ -38,8 +39,8 @@ public struct GraphQLError: Error, Hashable {
   }
 
   /// A dictionary which services can use however they see fit to provide additional information in errors to clients.
-  public var extensions: [String : Any]? {
-    return self["extensions"] as? [String : Any]
+  public var extensions: [String : AnyHashable]? {
+    return self["extensions"] as? [String : AnyHashable]
   }
 
   /// Represents a location in a GraphQL document.

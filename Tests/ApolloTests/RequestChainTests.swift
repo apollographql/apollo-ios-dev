@@ -509,6 +509,9 @@ class RequestChainTests: XCTestCase {
       response: HTTPResponse<Operation>?,
       completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>
     ) -> Void) {
+      nonisolated(unsafe) let chain = chain
+      nonisolated(unsafe) let response = response
+      nonisolated(unsafe) let completion = completion
       DispatchQueue.main.asyncAfter(wallDeadline: DispatchWallTime.now() + seconds) {
         chain.proceedAsync(
           request: request,

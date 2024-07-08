@@ -1,16 +1,8 @@
-//
-//  CancellationHandlingInterceptor.swift
-//  ApolloTests
-//
-//  Created by Ellen Shapiro on 9/17/20.
-//  Copyright © 2020 Apollo GraphQL. All rights reserved.
-//
-
 import Foundation
 import Apollo
 import ApolloAPI
 
-class CancellationHandlingInterceptor: ApolloInterceptor, Cancellable {
+class CancellationHandlingInterceptor: ApolloInterceptor, Cancellable, @unchecked Sendable {
   private(set) var hasBeenCancelled = false
 
   public var id: String = UUID().uuidString
@@ -19,7 +11,7 @@ class CancellationHandlingInterceptor: ApolloInterceptor, Cancellable {
     chain: any RequestChain,
     request: HTTPRequest<Operation>,
     response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
+    completion: @escaping @Sendable (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
     
     guard !self.hasBeenCancelled else {
       return
