@@ -5,7 +5,57 @@
 public typealias JSONValue = AnyHashable
 
 /// Represents a JSON Dictionary
+///
+/// - precondition: A `JSONObject` must only contain values types that are valid for JSON
+/// serialization and must be both `Hashable` and `Sendable`. This typealias does not validate
+/// that the its values are valid JSON. It functions only as an indicator of the semantic intentions
+/// of the underlying value.
+///
+/// Because this typealias cannot conform to `Sendable`, use `JSONObject` to wrap the value
+/// whenever you need to send the JSON across isolation boundaries.
 public typealias JSONObject = [String: JSONValue]
+
+/// Represents a JSON Dictionary as a wrapper struct that conforms to `Sendable` and `Hashable`.
+///
+/// This wrapper struct is useful when you need a ``JSONObject`` to conform to `Sendable`.
+/// When used in a synchronous context, ``JSONObject`` can be used.
+///
+/// - warning: No validation of the underlying data is actually performed during initialization.
+/// `SendableJSONObject` instances created by `Apollo` are guaranteed to be valid JSON.
+public struct SendableJSONObject: @unchecked Sendable, Hashable, ExpressibleByDictionaryLiteral {
+
+  public let base: JSONObject
+
+  /// Designated Initializer
+  ///
+  /// - Parameter base: A valid `JSONDictionary`
+  ///
+  /// - precondition: The ``JSONObject`` must only contain values types that are valid for JSON
+  /// serialization and must be both `Hashable` and `Sendable`.
+  @_spi(JSON) @inlinable
+  public init(unsafe base: JSONObject) {
+    self.base = base
+  }
+
+  @_spi(JSON) @inlinable
+  public init?(unsafe base: JSONObject?) {
+    guard let base else { return nil }
+    self.base = base
+  }
+
+  /// ExpressibleByDictionaryLiteral initializer
+  ///
+  /// - precondition: The ``JSONObject`` must only contain values types that are valid for JSON
+  /// serialization and must be both `Hashable` and `Sendable`.
+  @_spi(JSON) @inlinable
+  public init(dictionaryLiteral elements: (String, JSONValue)...) {
+    self.base = Dictionary(elements)
+  }
+
+  public subscript(_ key: String) -> JSONValue? {
+    base[key]
+  }
+}
 
 /// Represents a Dictionary that can be converted into a ``JSONObject``
 ///

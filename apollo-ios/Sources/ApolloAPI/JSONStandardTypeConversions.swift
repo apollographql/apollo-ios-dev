@@ -129,7 +129,7 @@ extension NSNull: JSONEncodable {
   @inlinable public var _jsonValue: JSONValue { self }
 }
 
-extension JSONEncodableDictionary: JSONEncodable {
+extension JSONEncodableDictionary: JSONEncodable {  
   @inlinable public var _jsonValue: JSONValue { _jsonObject }
 
   @inlinable public var _jsonObject: JSONObject {

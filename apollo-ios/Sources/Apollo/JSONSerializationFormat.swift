@@ -12,6 +12,10 @@ public final class JSONSerializationFormat {
     return try JSONSerialization.sortedData(withJSONObject: value)
   }
 
+  public class func serialize(value: SendableJSONObject) throws -> Data {
+    return try JSONSerialization.sortedData(withJSONObject: value.base)
+  }
+
   public class func deserialize(data: Data) throws -> JSONValue {
     return try JSONSerialization.jsonObject(with: data, options: []) as! AnyHashable
   }

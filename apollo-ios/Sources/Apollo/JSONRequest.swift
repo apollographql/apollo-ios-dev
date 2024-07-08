@@ -1,6 +1,6 @@
 import Foundation
 #if !COCOAPODS
-import ApolloAPI
+@_spi(JSON) import ApolloAPI
 #endif
 
 /// A request which sends JSON related to a GraphQL operation.

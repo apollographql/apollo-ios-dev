@@ -13,7 +13,7 @@ public func equalMessage(payload: JSONEncodableDictionary? = nil, id: String? = 
       )
     }
 
-    let expected = OperationMessage(payload: payload, id: id, type: type)
+    let expected = OperationMessage(payload: payload?._jsonObject, id: id, type: type)
     guard actualValue == expected.rawMessage! else {
       return MatcherResult(
         status: .fail,

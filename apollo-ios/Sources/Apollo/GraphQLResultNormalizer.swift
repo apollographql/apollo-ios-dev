@@ -57,7 +57,7 @@ class BaseGraphQLResultNormalizer: GraphQLResultAccumulator {
   ) throws -> CacheReference {
     let cachePath = info.cachePath.joined
 
-    let object = JSONObject(fieldEntries, uniquingKeysWith: { (_, last) in last })
+    let object = Dictionary(fieldEntries, uniquingKeysWith: { (_, last) in last })
     records.merge(record: Record(key: cachePath, object))
 
     return CacheReference(cachePath)
