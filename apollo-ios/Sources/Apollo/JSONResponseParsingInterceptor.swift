@@ -1,6 +1,6 @@
 import Foundation
 #if !COCOAPODS
-import ApolloAPI
+@_spi(unsafe_JSON) import ApolloAPI
 #endif
 
 /// An interceptor which parses JSON response data into a `GraphQLResult` and attaches it to the `HTTPResponse`.
@@ -39,7 +39,7 @@ public struct JSONResponseParsingInterceptor: ApolloInterceptor {
     response: HTTPResponse<Operation>?,
     completion: @escaping @Sendable (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
   ) {
-    guard let createdResponse = response else {
+    guard var createdResponse = response else {
       chain.handleErrorAsync(
         JSONResponseParsingError.noResponseToParse,
         request: request,
@@ -56,7 +56,10 @@ public struct JSONResponseParsingInterceptor: ApolloInterceptor {
         throw JSONResponseParsingError.couldNotParseToJSON(data: createdResponse.rawData)
       }
 
-      let graphQLResponse = GraphQLResponse(operation: request.operation, body: body)
+      let graphQLResponse = GraphQLResponse(
+        operation: request.operation,
+        body: SendableJSONObject(unsafe: body)
+      )
       let (result, cacheRecords) = try graphQLResponse.parseResult(withCachePolicy: request.cachePolicy)
       
       createdResponse.parsedResponse = result

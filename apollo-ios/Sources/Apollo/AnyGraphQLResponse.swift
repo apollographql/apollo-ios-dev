@@ -1,5 +1,5 @@
 #if !COCOAPODS
-import ApolloAPI
+@_spi(unsafe_JSON) import ApolloAPI
 #endif
 
 /// An abstract GraphQL response used for full and incremental responses.
@@ -76,11 +76,13 @@ struct AnyGraphQLResponse: Sendable {
       return nil
     }
 
-    return errorsEntry.map(GraphQLError.init)
+    return errorsEntry.map {
+      GraphQLError(SendableJSONObject(unsafe: $0))
+    }
   }
 
-  func parseExtensions() -> JSONObject? {
-    return self.body["extensions"] as? JSONObject
+  func parseExtensions() -> SendableJSONObject? {
+    return SendableJSONObject(unsafe: self.body["extensions"] as? JSONObject)
   }
 }
 

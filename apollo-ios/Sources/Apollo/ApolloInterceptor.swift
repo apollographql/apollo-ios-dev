@@ -3,7 +3,7 @@ import ApolloAPI
 #endif
 
 /// A protocol to set up a chainable unit of networking work.
-public protocol ApolloInterceptor: Sendable {
+public protocol ApolloInterceptor {
 
   /// Used to uniquely identify this interceptor from other interceptors in a request chain.
   ///

@@ -1,6 +1,6 @@
 import Foundation
 #if !COCOAPODS
-@_spi(JSON) import ApolloAPI
+@_spi(unsafe_JSON) import ApolloAPI
 #endif
 
 /// Represents an error encountered during the execution of a GraphQL operation.
@@ -9,9 +9,8 @@ import Foundation
 public struct GraphQLError: Error, Hashable {
   private let object: SendableJSONObject
 
-#warning("THIS IS UNSAFE; FIX")
-  public init(_ object: JSONObject) {
-    self.object = SendableJSONObject(unsafe: object)
+  public init(_ object: SendableJSONObject) {
+    self.object = object
   }
 
   init(_ message: String) {

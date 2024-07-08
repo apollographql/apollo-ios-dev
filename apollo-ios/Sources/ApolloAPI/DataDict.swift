@@ -1,7 +1,7 @@
 import Foundation
 
 /// A structure that wraps the underlying data for a ``SelectionSet``.
-public struct DataDict: Hashable {
+public struct DataDict: Hashable, @unchecked Sendable {
   @usableFromInline var _storage: _Storage
 
   /// The underlying data for a `SelectionSet`.
@@ -19,17 +19,27 @@ public struct DataDict: Hashable {
   @inlinable public var _data: [String: AnyHashable] {
     get { _storage.data }
     set {
-      if !isKnownUniquelyReferenced(&_storage) {
-        _storage = _storage.copy()
+      // Ensure we check `isKnownUniquelyReferenced` on a unique variable reference to the `_storage`.
+      // See https://forums.swift.org/t/isknownuniquelyreferenced-thread-safety/22933 for details.
+      var storage = _storage
+      if !isKnownUniquelyReferenced(&storage) {
+        storage = storage.copy()
       }
-      _storage.data = newValue
+      storage.data = newValue
+      _storage = storage
     }
     _modify {
+      // Ensure we check `isKnownUniquelyReferenced` on a unique variable reference to the `_storage`.
+      // See https://forums.swift.org/t/isknownuniquelyreferenced-thread-safety/22933 for details.
+      var storage = _storage
       if !isKnownUniquelyReferenced(&_storage) {
-        _storage = _storage.copy()
+        storage = storage.copy()
       }
-      var data = _storage.data
-      defer { _storage.data = data }
+      var data = storage.data
+      defer {
+        storage.data = data
+        _storage = storage
+      }
       yield &data
     }
   }
@@ -118,7 +128,7 @@ public struct DataDict: Hashable {
   }
 
   // MARK: - DataDict._Storage
-  @usableFromInline class _Storage: Hashable {
+  @usableFromInline final class _Storage: Hashable {
     @usableFromInline var data: [String: AnyHashable]
     @usableFromInline let fulfilledFragments: Set<ObjectIdentifier>
     @usableFromInline let deferredFragments: Set<ObjectIdentifier>

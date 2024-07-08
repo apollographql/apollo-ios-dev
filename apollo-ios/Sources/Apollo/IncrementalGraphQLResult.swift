@@ -19,7 +19,7 @@ struct IncrementalGraphQLResult {
   /// A list of errors, or `nil` if the operation completed without encountering any errors.
   let errors: [GraphQLError]?
   /// A dictionary which services can use however they see fit to provide additional information to clients.
-  let extensions: [String: AnyHashable]?
+  let extensions: SendableJSONObject?
 
   let dependentKeys: Set<CacheKey>?
 
@@ -27,7 +27,7 @@ struct IncrementalGraphQLResult {
     label: String,
     path: [PathComponent],
     data: (any SelectionSet)?,
-    extensions: [String: AnyHashable]?,
+    extensions: SendableJSONObject?,
     errors: [GraphQLError]?,
     dependentKeys: Set<CacheKey>?
   ) {

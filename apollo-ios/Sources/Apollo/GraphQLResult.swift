@@ -1,12 +1,12 @@
 #if !COCOAPODS
-import ApolloAPI
+@_spi(unsafe_JSON) import ApolloAPI
 #endif
 
 /// Represents the result of a GraphQL operation.
-public struct GraphQLResult<Data: RootSelectionSet> {
+public struct GraphQLResult<Data: RootSelectionSet>: Sendable {
 
   /// Represents source of data
-  public enum Source: Hashable {
+  public enum Source: Sendable, Hashable {
     case cache
     case server
   }
@@ -16,15 +16,16 @@ public struct GraphQLResult<Data: RootSelectionSet> {
   /// A list of errors, or `nil` if the operation completed without encountering any errors.
   public let errors: [GraphQLError]?
   /// A dictionary which services can use however they see fit to provide additional information to clients.
-  public let extensions: [String: AnyHashable]?
+  public let extensions: SendableJSONObject?
   /// Source of data
   public let source: Source
 
   let dependentKeys: Set<CacheKey>?
 
+
   public init(
     data: Data?,
-    extensions: [String: AnyHashable]?,
+    extensions: SendableJSONObject?,
     errors: [GraphQLError]?,
     source: Source,
     dependentKeys: Set<CacheKey>?
@@ -56,8 +57,8 @@ public struct GraphQLResult<Data: RootSelectionSet> {
     }
 
     let mergedExtensions = try merge(
-      incrementalResult.extensions,
-      into: self.extensions
+      incrementalResult.extensions?.base,
+      into: self.extensions?.base
     ) { currentExtensions, incrementalExtensions in
       currentExtensions.merging(incrementalExtensions) { _, new in new }
     }
@@ -71,7 +72,7 @@ public struct GraphQLResult<Data: RootSelectionSet> {
 
     return GraphQLResult(
       data: mergedData,
-      extensions: mergedExtensions,
+      extensions: SendableJSONObject(unsafe: mergedExtensions),
       errors: mergedErrors,
       source: source,
       dependentKeys: mergedDependentKeys

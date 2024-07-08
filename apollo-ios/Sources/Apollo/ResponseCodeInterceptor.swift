@@ -1,6 +1,6 @@
 import Foundation
 #if !COCOAPODS
-import ApolloAPI
+@_spi(unsafe_JSON) import ApolloAPI
 #endif
 
 /// An interceptor to check the response code returned with a request.
@@ -39,7 +39,7 @@ public struct ResponseCodeInterceptor: ApolloInterceptor {
       case .invalidResponseCode(_, let rawData):
         if let jsonRawData = rawData,
            let jsonData = try? JSONSerialization.jsonObject(with: jsonRawData, options: .allowFragments) as? JSONObject {
-          return GraphQLError(jsonData)
+          return GraphQLError(SendableJSONObject(unsafe: jsonData))
         }
         return nil
       }
