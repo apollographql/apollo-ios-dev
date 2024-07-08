@@ -11,7 +11,7 @@ public typealias JSONValue = AnyHashable
 /// that the its values are valid JSON. It functions only as an indicator of the semantic intentions
 /// of the underlying value.
 ///
-/// Because this typealias cannot conform to `Sendable`, use `JSONObject` to wrap the value
+/// Because this typealias cannot conform to `Sendable`, use ``SendableJSONObject`` to wrap the value
 /// whenever you need to send the JSON across isolation boundaries.
 public typealias JSONObject = [String: JSONValue]
 
@@ -28,16 +28,16 @@ public struct SendableJSONObject: @unchecked Sendable, Hashable, ExpressibleByDi
 
   /// Designated Initializer
   ///
-  /// - Parameter base: A valid `JSONDictionary`
+  /// - Parameter base: A valid ``JSONObject``
   ///
   /// - precondition: The ``JSONObject`` must only contain values types that are valid for JSON
   /// serialization and must be both `Hashable` and `Sendable`.
-  @_spi(JSON) @inlinable
+  @_spi(unsafe_JSON) @inlinable
   public init(unsafe base: JSONObject) {
     self.base = base
   }
 
-  @_spi(JSON) @inlinable
+  @_spi(unsafe_JSON) @inlinable
   public init?(unsafe base: JSONObject?) {
     guard let base else { return nil }
     self.base = base
@@ -47,7 +47,7 @@ public struct SendableJSONObject: @unchecked Sendable, Hashable, ExpressibleByDi
   ///
   /// - precondition: The ``JSONObject`` must only contain values types that are valid for JSON
   /// serialization and must be both `Hashable` and `Sendable`.
-  @_spi(JSON) @inlinable
+  @_spi(unsafe_JSON) @inlinable
   public init(dictionaryLiteral elements: (String, JSONValue)...) {
     self.base = Dictionary(elements)
   }
