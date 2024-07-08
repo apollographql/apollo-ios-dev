@@ -3,14 +3,15 @@ import ApolloAPI
 #endif
 
 /// An abstract GraphQL response used for full and incremental responses.
-struct AnyGraphQLResponse {
-  let body: JSONObject
+struct AnyGraphQLResponse: Sendable {
+
+  public let body: SendableJSONObject
 
   private let rootKey: CacheReference
   private let variables: GraphQLOperation.Variables?
 
   init(
-    body: JSONObject,
+    body: SendableJSONObject,
     rootKey: CacheReference,
     variables: GraphQLOperation.Variables?
   ) {

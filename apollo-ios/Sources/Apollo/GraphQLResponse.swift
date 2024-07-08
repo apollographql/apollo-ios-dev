@@ -2,13 +2,14 @@
 import ApolloAPI
 #endif
 
+
 /// Represents a complete GraphQL response received from a server.
-public final class GraphQLResponse<Data: RootSelectionSet> {
+public final class GraphQLResponse<Data: RootSelectionSet>: Sendable {
   private let base: AnyGraphQLResponse
 
   public init<Operation: GraphQLOperation>(
     operation: Operation,
-    body: JSONObject
+    body: SendableJSONObject
   ) where Operation.Data == Data {
     self.base = AnyGraphQLResponse(
       body: body,
