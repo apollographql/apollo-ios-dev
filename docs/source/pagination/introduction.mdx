@@ -11,6 +11,8 @@ Apollo Pagination provides a convenient and easy way to interact with and watch 
 
 Apollo Pagination provides two classes to interact with paginated endpoints: `GraphQLQueryPager` and `AsyncGraphQLQueryPager`. They have very similar APIs, but the latter supports `async`/`await` for use in asynchronous contexts.
 
+> Apollo Pagination is its own Swift Package, in order to use the pagination functionality you will need to include the [apollo-ios-pagination](https://github.com/apollographql/apollo-ios-pagination) SPM package in your project along with [apollo-ios](https://github.com/apollographql/apollo-ios)
+
 ## Using a `GraphQLQueryPager`
 
 The `GraphQLQueryPager` class is intended to be a simple, flexible, and powerful way to interact with paginated data. While it has a standard initializer, it is recommended to use the convenience initializers, which simplify the process of creating a `GraphQLQueryPager` instance.
