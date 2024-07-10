@@ -64,7 +64,7 @@ extension StoreLoading where Self: XCTestCase {
     operation: Operation,
     file: StaticString = #filePath,
     line: UInt = #line,
-    resultHandler: @escaping AsyncResultObserver<GraphQLResult<Operation.Data>, Error>.ResultHandler
+    resultHandler: @escaping AsyncResultObserver<GraphQLResult<Operation.Data>, any Error>.ResultHandler
   ) {
     let resultObserver = makeResultObserver(for: operation, file: file, line: line)
         
