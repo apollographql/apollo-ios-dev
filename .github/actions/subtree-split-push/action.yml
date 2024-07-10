@@ -21,9 +21,11 @@ runs:
   steps:
   - name: Split and Push ${{ inputs.subtree }}
     shell: bash
+    env:
+      PR_TITLE: ${{ inputs.pr-title }}
     run: |
       git fetch ${{ inputs.remote }} ${{ inputs.target-branch }}
-      sh git-subtree.sh pull -P ${{ inputs.subtree }} --squash -m "pull: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - ${{ inputs.pr-title }}" ${{ inputs.remote }} ${{ inputs.target-branch }} 
+      sh git-subtree.sh pull -P ${{ inputs.subtree }} --squash -m "pull: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE" ${{ inputs.remote }} ${{ inputs.target-branch }} 
       splitResult=$(sh git-subtree.sh -P ${{ inputs.subtree }} split --squash --rejoin -m "split: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - ${{ inputs.pr-title }}")
       if [ ! -z "$splitResult" ]
       then
