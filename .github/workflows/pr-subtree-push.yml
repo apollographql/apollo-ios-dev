@@ -37,7 +37,7 @@ jobs:
       env:
         PR_TITLE: ${{ github.event.pull_request.title }}
       run: |
-        git commit --allow-empty --amend -m "${{ env.PR_TITLE }} (apollographql/apollo-ios-dev#${{ github.event.pull_request.number }})"
+        git commit --allow-empty --amend -m "$PR_TITLE (apollographql/apollo-ios-dev#${{ github.event.pull_request.number }})"
         git push --force-with-lease
     - name: Subtree - Apollo iOS
       uses: ./.github/actions/subtree-split-push
