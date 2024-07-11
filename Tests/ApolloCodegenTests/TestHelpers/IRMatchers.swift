@@ -587,7 +587,7 @@ extension Nimble.Matcher {
   func mappingActualTo<U>(
     _ actualMapper: @escaping ((U?) throws -> T?)
   ) -> Nimble.Matcher<U> {
-    Nimble.Matcher<U>.define { (actual: Expression<U>) in
+    Nimble.Matcher<U>.define { (actual: Nimble.Expression<U>) in
       let newActual = actual.cast(actualMapper)
       return try self.satisfies(newActual)
     }

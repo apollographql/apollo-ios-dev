@@ -336,8 +336,6 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
         public var animalDetails: AnimalDetails {
           get { _toFragment() }
           _modify { var f = animalDetails; yield &f; __data = f.__data }
-          @available(*, unavailable, message: "mutate properties of the fragment instead.")
-          set { preconditionFailure() }
         }
     """
 
@@ -381,8 +379,6 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
         public var animalDetails: AnimalDetails? {
           get { _toFragment() }
           _modify { var f = animalDetails; yield &f; if let newData = f?.__data { __data = newData } }
-          @available(*, unavailable, message: "mutate properties of the fragment instead.")
-          set { preconditionFailure() }
         }
     """
 
