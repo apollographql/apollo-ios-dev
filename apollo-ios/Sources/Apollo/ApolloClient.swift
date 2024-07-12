@@ -1,5 +1,4 @@
 import Foundation
-import Dispatch
 #if !COCOAPODS
 import ApolloAPI
 #endif
@@ -66,32 +65,26 @@ public class ApolloClient {
     
     self.init(networkTransport: transport, store: store)
   }
-}
-
-// MARK: - ApolloClientProtocol conformance
-
-extension ApolloClient: ApolloClientProtocol {
 
   public func clearCache(callbackQueue: DispatchQueue = .main,
                          completion: ((Result<Void, any Error>) -> Void)? = nil) {
     self.store.clearCache(callbackQueue: callbackQueue, completion: completion)
   }
   
-  @discardableResult public func fetch<Query: GraphQLQuery>(
+  public func fetch<Query: GraphQLQuery>(
     query: Query,
     cachePolicy: CachePolicy = .default,
-    contextIdentifier: UUID? = nil,
-    context: (any RequestContext)? = nil,
-    queue: DispatchQueue = .main,
-    resultHandler: GraphQLResultHandler<Query.Data>? = nil
-  ) -> (any Cancellable) {
-    return self.networkTransport.send(operation: query,
-                                      cachePolicy: cachePolicy,
-                                      contextIdentifier: contextIdentifier,
-                                      context: context,
-                                      callbackQueue: queue) { result in
-      resultHandler?(result)
-    }
+    context: (any RequestContext)? = nil
+  ) -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error> {
+    let request = GraphQLRequest(operation: query, context: context)
+    return self.kickoff(request: request, cachePolicy: cachePolicy)
+  }
+
+  public func kickoff<Operation: GraphQLOperation>(
+    request: GraphQLRequest<Operation>,
+    cachePolicy: CachePolicy
+  ) -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+    return self.networkTransport.send(request: request)
   }
 
   /// Watches a query by first fetching an initial result from the server or from the local cache, depending on the current contents of the cache and the specified cache policy. After the initial fetch, the returned query watcher object will get notified whenever any of the data the query result depends on changes in the local cache, and calls the result handler again with the new result.
@@ -109,18 +102,27 @@ extension ApolloClient: ApolloClientProtocol {
     query: Query,
     cachePolicy: CachePolicy = .default,
     refetchOnFailedUpdates: Bool = true,
-    context: (any RequestContext)? = nil,
-    callbackQueue: DispatchQueue = .main,
-    resultHandler: @escaping GraphQLResultHandler<Query.Data>
-  ) -> GraphQLQueryWatcher<Query> {
-    let watcher = GraphQLQueryWatcher(client: self,
-                                      query: query,
-                                      refetchOnFailedUpdates: refetchOnFailedUpdates,
-                                      context: context,
-                                      callbackQueue: callbackQueue,
-                                      resultHandler: resultHandler)
-    watcher.fetch(cachePolicy: cachePolicy)
-    return watcher
+    context: (any RequestContext)? = nil
+  ) -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error> {
+    return AsyncThrowingStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
+      let watcher = GraphQLQueryWatcher(
+        client: self,
+        query: query,
+        refetchOnFailedUpdates: refetchOnFailedUpdates,
+        context: context
+      ) { result in
+        switch result {
+        case let .success(value):
+          continuation.yield(value)
+        case let .failure(error):
+          continuation.finish(throwing: error)
+        }
+      }
+
+      continuation.onTermination = { @Sendable _ in
+        watcher.cancel()
+      }
+    }
   }
 
   @discardableResult
@@ -128,20 +130,32 @@ extension ApolloClient: ApolloClientProtocol {
     mutation: Mutation,
     publishResultToStore: Bool = true,
     contextIdentifier: UUID? = nil,
-    context: (any RequestContext)? = nil,
-    queue: DispatchQueue = .main,
-    resultHandler: GraphQLResultHandler<Mutation.Data>? = nil
-  ) -> (any Cancellable) {
-    return self.networkTransport.send(
-      operation: mutation,
-      cachePolicy: publishResultToStore ? .default : .fetchIgnoringCacheCompletely,
-      contextIdentifier: contextIdentifier,
-      context: context,
-      callbackQueue: queue,
-      completionHandler: { result in
-        resultHandler?(result)
-      }
+    context: (any RequestContext)? = nil
+  ) -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error> {
+    let request = GraphQLRequest(operation: mutation, context: context)
+    return self.kickoff(
+      request: request,
+      cachePolicy: publishResultToStore ? .default : .fetchIgnoringCacheCompletely
     )
+
+//    return self.networkTransport.send(
+//      operation: mutation,
+//      cachePolicy: publishResultToStore ? .default : .fetchIgnoringCacheCompletely,
+//      contextIdentifier: contextIdentifier,
+//      context: context,
+//      callbackQueue: queue,
+//      completionHandler: { result in
+//        resultHandler?(result)
+//      }
+//    )
+  }
+
+  public func subscribe<Subscription: GraphQLSubscription>(
+    subscription: Subscription,
+    context: (any RequestContext)? = nil    
+  ) -> AsyncThrowingStream<GraphQLResult<Subscription.Data>, any Error> {
+    let request = GraphQLRequest(operation: subscription, context: context)
+    return self.kickoff(request: request, cachePolicy: .default)
   }
 
   @discardableResult
@@ -166,20 +180,6 @@ extension ApolloClient: ApolloClientProtocol {
                                      callbackQueue: queue) { result in
       resultHandler?(result)
     }
-  }
-
-  public func subscribe<Subscription: GraphQLSubscription>(
-    subscription: Subscription,
-    context: (any RequestContext)? = nil,
-    queue: DispatchQueue = .main,
-    resultHandler: @escaping GraphQLResultHandler<Subscription.Data>
-  ) -> any Cancellable {
-    return self.networkTransport.send(operation: subscription,
-                                      cachePolicy: .default,
-                                      contextIdentifier: nil,
-                                      context: context,
-                                      callbackQueue: queue,
-                                      completionHandler: resultHandler)
   }
 }
 

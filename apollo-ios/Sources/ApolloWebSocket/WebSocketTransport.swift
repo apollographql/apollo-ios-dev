@@ -434,6 +434,16 @@ extension URLRequest {
 // MARK: - NetworkTransport conformance
 
 extension WebSocketTransport: NetworkTransport {
+
+  #warning("Todo")
+  public func send<Operation: GraphQLOperation>(
+    request: GraphQLRequest<Operation>
+  ) -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+    AsyncThrowingStream { continuation in
+      continuation.finish()
+    }
+  }
+
   public func send<Operation: GraphQLOperation>(
     operation: Operation,
     cachePolicy: CachePolicy,

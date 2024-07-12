@@ -3,6 +3,15 @@ import Foundation
 import ApolloAPI
 #endif
 
+public struct GraphQLRequest<Operation: GraphQLOperation> {
+
+  /// The GraphQL Operation to execute
+  public let operation: Operation
+
+  /// [optional] A context that is being passed through the request chain.
+  public let context: (any RequestContext)?
+}
+
 /// Encapsulation of all information about a request before it hits the network
 open class HTTPRequest<Operation: GraphQLOperation>: Hashable {
   

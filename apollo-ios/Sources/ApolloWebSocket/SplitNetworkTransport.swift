@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 #if !COCOAPODS
 import Apollo
 import ApolloAPI
@@ -44,27 +45,39 @@ public class SplitNetworkTransport {
 
 extension SplitNetworkTransport: NetworkTransport {
 
-  public func send<Operation: GraphQLOperation>(operation: Operation,
-                                                cachePolicy: CachePolicy,
-                                                contextIdentifier: UUID? = nil,
-                                                context: (any RequestContext)? = nil,
-                                                callbackQueue: DispatchQueue = .main,
-                                                completionHandler: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Cancellable {
-    if Operation.operationType == .subscription {
-      return webSocketNetworkTransport.send(operation: operation,
-                                            cachePolicy: cachePolicy,
-                                            contextIdentifier: contextIdentifier,
-                                            context: context,
-                                            callbackQueue: callbackQueue,
-                                            completionHandler: completionHandler)
-    } else {
-      return uploadingNetworkTransport.send(operation: operation,
-                                            cachePolicy: cachePolicy,
-                                            contextIdentifier: contextIdentifier,
-                                            context: context,
-                                            callbackQueue: callbackQueue,
-                                            completionHandler: completionHandler)
+  #warning("Implement")
+  public func send<Operation: GraphQLOperation>(
+    request: GraphQLRequest<Operation>
+  ) -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+    return AsyncThrowingStream { continuation in
+      continuation.finish()
     }
+  }
+
+
+  public func send<Operation: GraphQLOperation>(
+    operation: Operation,
+    cachePolicy: CachePolicy,
+    contextIdentifier: UUID? = nil,
+    context: (any RequestContext)? = nil,
+    callbackQueue: DispatchQueue = .main,
+    completionHandler: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Apollo.Cancellable {
+      EmptyCancellable()
+//      if Operation.operationType == .subscription {
+//        return webSocketNetworkTransport.send(operation: operation,
+//                                            cachePolicy: cachePolicy,
+//                                            contextIdentifier: contextIdentifier,
+//                                            context: context,
+//                                            callbackQueue: callbackQueue,
+//                                            completionHandler: completionHandler)
+//    } else {
+//      return uploadingNetworkTransport.send(operation: operation,
+//                                            cachePolicy: cachePolicy,
+//                                            contextIdentifier: contextIdentifier,
+//                                            context: context,
+//                                            callbackQueue: callbackQueue,
+//                                            completionHandler: completionHandler)
+//    }
   }
 }
 
@@ -77,11 +90,12 @@ extension SplitNetworkTransport: UploadingNetworkTransport {
     files: [GraphQLFile],
     context: (any RequestContext)?,
     callbackQueue: DispatchQueue = .main,
-    completionHandler: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Cancellable {
-    return uploadingNetworkTransport.upload(operation: operation,
-                                            files: files,
-                                            context: context,
-                                            callbackQueue: callbackQueue,
-                                            completionHandler: completionHandler)
+    completionHandler: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Apollo.Cancellable {
+      return EmptyCancellable()
+//    return uploadingNetworkTransport.upload(operation: operation,
+//                                            files: files,
+//                                            context: context,
+//                                            callbackQueue: callbackQueue,
+//                                            completionHandler: completionHandler)
   }
 }

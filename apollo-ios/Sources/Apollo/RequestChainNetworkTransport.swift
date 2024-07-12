@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 #if !COCOAPODS
 import ApolloAPI
 #endif
@@ -118,7 +119,16 @@ open class RequestChainNetworkTransport: NetworkTransport {
   }
   
   // MARK: - NetworkTransport Conformance
-  
+
+  #warning("Todo")
+  public func send<Operation: GraphQLOperation>(
+    request: GraphQLRequest<Operation>
+  ) -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+    AsyncThrowingStream { continuation in
+      continuation.finish()
+    }
+  }
+
   public var clientName = RequestChainNetworkTransport.defaultClientName
   public var clientVersion = RequestChainNetworkTransport.defaultClientVersion
   
@@ -135,8 +145,9 @@ open class RequestChainNetworkTransport: NetworkTransport {
       for: operation,
       cachePolicy: cachePolicy,
       contextIdentifier: contextIdentifier,
-      context: context)
-    
+      context: context
+    )
+
     chain.kickoff(request: request, completion: completionHandler)
     return chain
   }
