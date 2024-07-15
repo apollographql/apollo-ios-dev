@@ -33,7 +33,7 @@ public extension GraphQLQueryPager {
     initialQuery: InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
     pageResolver: @escaping (P, PaginationDirection) -> InitialQuery?,
-    transform: @escaping ([InitialQuery.Data], InitialQuery.Data, [InitialQuery.Data]) throws -> Model
+    transform: @escaping (PaginationOutput<InitialQuery, InitialQuery>) throws -> Model
   ) {
     self.init(
       pager: GraphQLQueryPagerCoordinator(
@@ -55,7 +55,7 @@ public extension GraphQLQueryPager {
     initialQuery: InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
     pageResolver: @escaping (P, PaginationDirection) -> InitialQuery?,
-    transform: @escaping (InitialQuery.Data) throws -> Model
+    transform: @escaping (PaginationOutput<InitialQuery, InitialQuery>) throws -> Model
   ) where Model: RangeReplaceableCollection, T == Model.Element {
     self.init(
       pager: GraphQLQueryPagerCoordinator(
@@ -65,8 +65,7 @@ public extension GraphQLQueryPager {
         extractPageInfo: pageExtraction(transform: extractPageInfo),
         pageResolver: pageResolver
       ),
-      initialTransform: transform,
-      pageTransform: transform
+      transform: transform
     )
   }
 
@@ -102,7 +101,7 @@ public extension GraphQLQueryPager {
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
     extractNextPageInfo: @escaping (PaginatedQuery.Data) -> P,
     pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery?,
-    transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
+    transform: @escaping (PaginationOutput<InitialQuery, PaginatedQuery>) throws -> Model
   ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
     self.init(
       pager: .init(
@@ -116,34 +115,6 @@ public extension GraphQLQueryPager {
         pageResolver: pageResolver
       ),
       transform: transform
-    )
-  }
-
-  /// Convenience initializer for creating a multi-query pager that 
-  /// transforms output responses into collections
-  convenience init<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery, T, P: PaginationInfo>(
-    client: any ApolloClientProtocol,
-    initialQuery: InitialQuery,
-    watcherDispatchQueue: DispatchQueue = .main,
-    extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
-    extractNextPageInfo: @escaping (PaginatedQuery.Data) -> P,
-    pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery?,
-    initialTransform: @escaping (InitialQuery.Data) throws -> Model,
-    pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
-  ) where Model: RangeReplaceableCollection, T == Model.Element {
-    self.init(
-      pager: .init(
-        client: client,
-        initialQuery: initialQuery,
-        watcherDispatchQueue: watcherDispatchQueue,
-        extractPageInfo: pageExtraction(
-          initialTransfom: extractInitialPageInfo,
-          paginatedTransform: extractNextPageInfo
-        ),
-        pageResolver: pageResolver
-      ),
-      initialTransform: initialTransform,
-      pageTransform: pageTransform
     )
   }
 }
@@ -178,7 +149,7 @@ public extension AsyncGraphQLQueryPager {
     initialQuery: InitialQuery,
     extractPageInfo: @escaping (InitialQuery.Data) -> P,
     pageResolver: @escaping (P, PaginationDirection) -> InitialQuery?,
-    transform: @escaping ([InitialQuery.Data], InitialQuery.Data, [InitialQuery.Data]) throws -> Model
+    transform: @escaping (PaginationOutput<InitialQuery, InitialQuery>) throws -> Model
   ) {
     self.init(
       pager: AsyncGraphQLQueryPagerCoordinator(
@@ -248,7 +219,7 @@ public extension AsyncGraphQLQueryPager {
     extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
     extractNextPageInfo: @escaping (PaginatedQuery.Data) -> P,
     pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery?,
-    transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
+    transform: @escaping (PaginationOutput<InitialQuery, PaginatedQuery>) throws -> Model
   ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
     self.init(
       pager: .init(

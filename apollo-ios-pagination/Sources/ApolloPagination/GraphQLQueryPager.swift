@@ -17,7 +17,7 @@ public class GraphQLQueryPager<Model>: Publisher {
 
   init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager,
-    transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
+    transform: @escaping (PaginationOutput<InitialQuery, PaginatedQuery>) throws -> Model
   ) {
     self.pager = pager
     pager.subscribe { [weak self] result in
@@ -27,7 +27,7 @@ public class GraphQLQueryPager<Model>: Publisher {
       switch result {
       case let .success((output, source)):
         do {
-          let transformedModels = try transform(output.previousPages, output.initialPage, output.nextPages)
+          let transformedModels = try transform(output)
           returnValue = .success((transformedModels, source))
         } catch {
           returnValue = .failure(error)
@@ -48,27 +48,6 @@ public class GraphQLQueryPager<Model>: Publisher {
       guard let self else { return }
       _subject.send(result)
     }
-  }
-
-  convenience init<
-    Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>,
-    InitialQuery,
-    PaginatedQuery,
-    Element
-  >(
-    pager: Pager,
-    initialTransform: @escaping (InitialQuery.Data) throws -> Model,
-    pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
-  ) where Model: RangeReplaceableCollection, Model.Element == Element {
-    self.init(
-      pager: pager,
-      transform: { previousData, initialData, nextData in
-        let previous = try previousData.flatMap { try pageTransform($0) }
-        let initial = try initialTransform(initialData)
-        let next = try nextData.flatMap { try pageTransform($0) }
-        return previous + initial + next
-      }
-    )
   }
 
   public convenience init<
@@ -95,53 +74,6 @@ public class GraphQLQueryPager<Model>: Publisher {
   public convenience init<
     P: PaginationInfo,
     InitialQuery: GraphQLQuery,
-    PaginatedQuery: GraphQLQuery,
-    Element
-  >(
-    client: any ApolloClientProtocol,
-    initialQuery: InitialQuery,
-    watcherDispatchQueue: DispatchQueue = .main,
-    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
-    pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
-    initialTransform: @escaping (InitialQuery.Data) throws -> Model,
-    pageTransform: @escaping (PaginatedQuery.Data) throws -> Model
-  ) where Model: RangeReplaceableCollection, Model.Element == Element {
-    let pager = GraphQLQueryPagerCoordinator(
-      client: client,
-      initialQuery: initialQuery,
-      watcherDispatchQueue: watcherDispatchQueue,
-      extractPageInfo: { data in
-        switch data {
-        case .initial(let data, let output):
-          return extractPageInfo(.initial(data, convertOutput(result: output)))
-        case .paginated(let data, let output):
-          return extractPageInfo(.paginated(data, convertOutput(result: output)))
-        }
-      },
-      pageResolver: pageResolver
-    )
-    self.init(
-      pager: pager,
-      initialTransform: initialTransform,
-      pageTransform: pageTransform
-    )
-
-    func convertOutput(result: PaginationOutput<InitialQuery, PaginatedQuery>?) -> Model? {
-      guard let result else { return nil }
-
-      let transform: ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model = { previousData, initialData, nextData in
-        let previous = try previousData.flatMap { try pageTransform($0) }
-        let initial = try initialTransform(initialData)
-        let next = try nextData.flatMap { try pageTransform($0) }
-        return previous + initial + next
-      }
-      return try? transform(result.previousPages, result.initialPage, result.nextPages)
-    }
-  }
-
-  public convenience init<
-    P: PaginationInfo,
-    InitialQuery: GraphQLQuery,
     PaginatedQuery: GraphQLQuery
   >(
     client: any ApolloClientProtocol,
@@ -149,7 +81,7 @@ public class GraphQLQueryPager<Model>: Publisher {
     watcherDispatchQueue: DispatchQueue = .main,
     extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
-    transform: @escaping ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data]) throws -> Model
+    transform: @escaping (PaginationOutput<InitialQuery, PaginatedQuery>) throws -> Model
   ) {
     let pager = GraphQLQueryPagerCoordinator(
       client: client,
@@ -158,9 +90,9 @@ public class GraphQLQueryPager<Model>: Publisher {
       extractPageInfo: { data in
         switch data {
         case .initial(let data, let output):
-          return extractPageInfo(.initial(data, convertOutput(result: output)))
+          return extractPageInfo(.initial(data, try? output.flatMap(transform)))
         case .paginated(let data, let output):
-          return extractPageInfo(.paginated(data, convertOutput(result: output)))
+          return extractPageInfo(.paginated(data, try? output.flatMap(transform)))
         }
       },
       pageResolver: pageResolver
@@ -169,11 +101,6 @@ public class GraphQLQueryPager<Model>: Publisher {
       pager: pager,
       transform: transform
     )
-
-    func convertOutput(result: PaginationOutput<InitialQuery, PaginatedQuery>?) -> Model? {
-      guard let result else { return nil }
-      return try? transform(result.previousPages, result.initialPage, result.nextPages)
-    }
   }
 
   deinit {

@@ -122,8 +122,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     let subscription = pager
       .compactMap { output -> [ViewModel]? in
         guard case .success((let output, _)) = output else { return nil }
-        let inOrderData = output.previousPages + [output.initialPage] + output.nextPages
-        let models = inOrderData.flatMap { data in
+        let models = output.allPages.flatMap { data in
           data.hero.friendsConnection.friends.map { friend in ViewModel(name: friend.name) }
         }
         return models
@@ -169,9 +168,8 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
           return nil
         }
       } ,
-      transform: { previous, first, next in
-        let inOrderData = previous + [first] + next
-        return inOrderData.flatMap { data in
+      transform: { output in
+        output.allPages.flatMap { data in
           data.hero.friendsConnection.friends.map { friend in friend.name }
         }
       }
@@ -231,9 +229,8 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
           return nil
         }
       },
-      transform: { previous, first, next in
-        let inOrderData = previous + [first] + next
-        return inOrderData.flatMap { data in
+      transform: { output in
+        output.allPages.flatMap { data in
           data.hero.friendsConnection.friends.map { friend in friend.name }
         }
       }
@@ -274,8 +271,10 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     }
 
     let anyPager = createPager().eraseToAnyPager { data in
-      data.hero.friendsConnection.friends.map {
-        ViewModel(name: $0.name)
+      data.allPages.flatMap { data in
+        data.hero.friendsConnection.friends.map {
+          ViewModel(name: $0.name)
+        }
       }
     }
 
@@ -306,11 +305,11 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
   }
 
   func test_passesBackSeparateData() async throws {
-    let anyPager = createPager().eraseToAnyPager { _, initial, next in
-      if let latestPage = next.last {
+    let anyPager = createPager().eraseToAnyPager { output in
+      if let latestPage = output.nextPages.last {
         return latestPage.hero.friendsConnection.friends.last?.name
       }
-      return initial.hero.friendsConnection.friends.last?.name
+      return output.initialPage?.hero.friendsConnection.friends.last?.name
     }
 
     let initialExpectation = expectation(description: "Initial")
@@ -355,16 +354,14 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
   }
 
   func test_equatable() async {
-    let pagerA = AsyncGraphQLQueryPager(pager: createPager(), transform: { previous, initial, next in
-      let allPages = previous + [initial] + next
-      return allPages.flatMap { data in
+    let pagerA = AsyncGraphQLQueryPager(pager: createPager(), transform: { output in
+      output.allPages.flatMap { data in
         data.hero.friendsConnection.friends.map { $0.name }
       }
     })
 
-    let pagerB = AsyncGraphQLQueryPager(pager: createPager(), transform: { previous, initial, next in
-      let allPages = previous + [initial] + next
-      return allPages.flatMap { data in
+    let pagerB = AsyncGraphQLQueryPager(pager: createPager(), transform: { output in
+      return output.allPages.flatMap { data in
         data.hero.friendsConnection.friends.map { $0.name }
       }
     })
@@ -404,7 +401,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     subscription.cancel()
   }
 
-  func test_errors_noSuccess() async throws {
+  func test_errors_noData() async throws {
     let pager = AsyncGraphQLQueryPager(pager: createPager())
     var expectedResults: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPageErrorsOnly(server: server)

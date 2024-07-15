@@ -59,8 +59,8 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
     results.append(result)
     XCTAssertSuccessResult(result) { (output, source) in
       XCTAssertTrue(output.nextPages.isEmpty)
-      XCTAssertEqual(output.initialPage.hero.friendsConnection.friends.count, 2)
-      XCTAssertEqual(output.initialPage.hero.friendsConnection.totalCount, 3)
+      XCTAssertEqual(output.initialPage?.hero.friendsConnection.friends.count, 2)
+      XCTAssertEqual(output.initialPage?.hero.friendsConnection.totalCount, 3)
       XCTAssertEqual(source, .fetch)
     }
 

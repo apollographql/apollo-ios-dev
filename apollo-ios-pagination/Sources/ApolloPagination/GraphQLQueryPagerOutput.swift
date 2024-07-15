@@ -9,7 +9,7 @@ public struct PaginationOutput<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   public let previousPages: [PaginatedQuery.Data]
 
   /// The initial page that we fetched.
-  public let initialPage: InitialQuery.Data
+  public let initialPage: InitialQuery.Data?
 
   /// An array of pages after the initial page.
   public let nextPages: [PaginatedQuery.Data]
@@ -18,7 +18,7 @@ public struct PaginationOutput<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 
   public init(
     previousPages: [PaginatedQuery.Data],
-    initialPage: InitialQuery.Data,
+    initialPage: InitialQuery.Data?,
     nextPages: [PaginatedQuery.Data],
     errors: [GraphQLError]
   ) {
@@ -26,5 +26,11 @@ public struct PaginationOutput<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
     self.initialPage = initialPage
     self.nextPages = nextPages
     self.errors = errors
+  }
+}
+
+extension PaginationOutput where InitialQuery == PaginatedQuery {
+  public var allPages: [InitialQuery.Data] {
+    previousPages + [initialPage].compactMap { $0 } + nextPages
   }
 }
