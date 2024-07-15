@@ -335,12 +335,13 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
           previousPageVarMap[variables] = data.data as? PaginatedQuery.Data
         }
 
+        let allErrors = (try? queuedValue?.get().0.errors) ?? (try? currentValue?.get().0.errors) ?? []
         if let latest {
           output = .init(
             previousPages: latest.previous,
             initialPage: latest.initial,
             nextPages: latest.next,
-            errors: data.errors ?? []
+            errors: isLoadingAll ? allErrors + (data.errors ?? []) : data.errors ?? []
           )
         }
       }
