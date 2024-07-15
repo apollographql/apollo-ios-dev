@@ -1,3 +1,4 @@
+import Apollo
 import ApolloAPI
 import Foundation
 
@@ -13,13 +14,17 @@ public struct PaginationOutput<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// An array of pages after the initial page.
   public let nextPages: [PaginatedQuery.Data]
 
+  public let errors: [GraphQLError]
+
   public init(
     previousPages: [PaginatedQuery.Data],
     initialPage: InitialQuery.Data,
-    nextPages: [PaginatedQuery.Data]
+    nextPages: [PaginatedQuery.Data],
+    errors: [GraphQLError]
   ) {
     self.previousPages = previousPages
     self.initialPage = initialPage
     self.nextPages = nextPages
+    self.errors = errors
   }
 }

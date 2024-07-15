@@ -299,11 +299,6 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
       }
       publisher.send(completion: .finished)
     case .success(let data):
-      guard let pageData = data.data else {
-        publisher.send(completion: .finished)
-        return
-      }
-
       let shouldUpdate: Bool
       if cachePolicy == .returnCacheDataAndFetch && data.source == .cache {
         shouldUpdate = false
@@ -315,13 +310,13 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
       var output: ([PaginatedQuery.Data], InitialQuery.Data, [PaginatedQuery.Data])?
       switch fetchType {
       case .initial:
-        guard let pageData = pageData as? InitialQuery.Data else { return }
+        guard let pageData = data.data as? InitialQuery.Data else { return }
         initialPageResult = pageData
         if let latest {
           output = (latest.previous, pageData, latest.next)
         }
       case .paginated(let direction, let query):
-        guard let pageData = pageData as? PaginatedQuery.Data else { return }
+        guard let pageData = data.data as? PaginatedQuery.Data else { return }
 
         let variables = Set(query.__variables?.underlyingJson ?? [])
         switch direction {
@@ -341,7 +336,8 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
           PaginationOutput(
             previousPages: previousPages,
             initialPage: initialPage,
-            nextPages: nextPages
+            nextPages: nextPages,
+            errors: data.errors ?? []
           ),
           data.source == .cache ? .cache : .fetch
         ))
