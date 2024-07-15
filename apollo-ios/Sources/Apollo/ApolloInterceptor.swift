@@ -1,8 +1,10 @@
 #if !COCOAPODS
 import ApolloAPI
 #endif
+import Combine
 
 /// A protocol to set up a chainable unit of networking work.
+#warning("Rename to RequestChainInterceptor?")
 public protocol ApolloInterceptor {
 
   /// Used to uniquely identify this interceptor from other interceptors in a request chain.
@@ -19,9 +21,8 @@ public protocol ApolloInterceptor {
   ///   - request: The request, as far as it has been constructed
   ///   - response: [optional] The response, if received
   ///   - completion: The completion block to fire when data needs to be returned to the UI.
-  func interceptAsync<Operation: GraphQLOperation>(
-    chain: any RequestChain,
+  func intercept<Operation: GraphQLOperation>(
     request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping @Sendable (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)
+    response: HTTPResponse<Operation>?
+  ) async throws -> RequestChain.NextAction<Operation>
 }

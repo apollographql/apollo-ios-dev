@@ -49,33 +49,17 @@ public struct ResponseCodeInterceptor: ApolloInterceptor {
   /// Designated initializer
   public init() {}
   
-  public func interceptAsync<Operation: GraphQLOperation>(
-    chain: any RequestChain,
+  public func intercept<Operation: GraphQLOperation>(
     request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
-    
-    
+    response: HTTPResponse<Operation>?
+  ) async throws -> RequestChain.NextAction<Operation> {
     guard response?.httpResponse.isSuccessful == true else {
-      let error = ResponseCodeError.invalidResponseCode(
+      throw ResponseCodeError.invalidResponseCode(
         response: response?.httpResponse,
         rawData: response?.rawData
       )
-      
-      chain.handleErrorAsync(
-        error,
-        request: request,
-        response: response,
-        completion: completion
-      )
-      return
     }
     
-      chain.proceedAsync(
-        request: request,
-        response: response,
-        interceptor: self,
-        completion: completion
-      )
+    return .proceed(request: request, response: response)      
   }
 }

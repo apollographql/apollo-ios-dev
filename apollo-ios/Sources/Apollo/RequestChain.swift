@@ -2,49 +2,33 @@
 import ApolloAPI
 #endif
 
-public protocol RequestChain: Sendable, Cancellable {
-
-  typealias RequestCompletionHandler<Operation: GraphQLOperation> = 
-  @Sendable (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
-
-  func kickoff<Operation>(
-    request: HTTPRequest<Operation>,
-    completion: @escaping RequestCompletionHandler<Operation>
-  ) where Operation : GraphQLOperation
-
-  @available(*, deprecated, renamed: "proceedAsync(request:response:interceptor:completion:)")
-  func proceedAsync<Operation>(
-    request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping RequestCompletionHandler<Operation>
-  ) where Operation : GraphQLOperation
-
-  func proceedAsync<Operation>(
-    request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    interceptor: any ApolloInterceptor,
-    completion: @escaping RequestCompletionHandler<Operation>
-  ) where Operation : GraphQLOperation
-
-  func cancel()
-
-  func retry<Operation>(
-    request: HTTPRequest<Operation>,
-    completion: @escaping RequestCompletionHandler<Operation>
-  ) where Operation : GraphQLOperation
-
-  func handleErrorAsync<Operation>(
-    _ error: any Error,
-    request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping RequestCompletionHandler<Operation>
-  ) where Operation : GraphQLOperation
-
-  func returnValueAsync<Operation>(
-    for request: HTTPRequest<Operation>,
-    value: GraphQLResult<Operation.Data>,
-    completion: @escaping RequestCompletionHandler<Operation>
-  ) where Operation : GraphQLOperation
-
-  var isCancelled: Bool { get }
-}
+//public protocol RequestChain: Sendable, Cancellable {
+//
+//  var isCancelled: Bool { get }
+//
+//  func kickoff<Operation: GraphQLOperation>(
+//    request: HTTPRequest<Operation>
+//  ) async -> Result<GraphQLResult<Operation.Data>, any Error>
+//
+//  func proceed<Operation: GraphQLOperation>(
+//    request: HTTPRequest<Operation>,
+//    response: HTTPResponse<Operation>?,
+//    interceptor: any ApolloInterceptor
+//  ) async -> Result<GraphQLResult<Operation.Data>, any Error>
+//
+//  func retry<Operation: GraphQLOperation>(
+//    request: HTTPRequest<Operation>
+//  ) async -> Result<GraphQLResult<Operation.Data>, any Error>
+//
+//  func handleErrorAsync<Operation: GraphQLOperation>(
+//    _ error: any Error,
+//    request: HTTPRequest<Operation>,
+//    response: HTTPResponse<Operation>?
+//  ) async -> Result<GraphQLResult<Operation.Data>, any Error>
+//
+//  func returnValueAsync<Operation: GraphQLOperation>(
+//    for request: HTTPRequest<Operation>,
+//    value: GraphQLResult<Operation.Data>
+//  ) async -> Result<GraphQLResult<Operation.Data>, any Error>
+//
+//}

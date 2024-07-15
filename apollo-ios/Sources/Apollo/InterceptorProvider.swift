@@ -6,12 +6,21 @@ import ApolloAPI
 
 /// A protocol to allow easy creation of an array of interceptors for a given operation.
 public protocol InterceptorProvider {
-  
+
+//  func preflightInterceptors<Operation: GraphQLOperation>(
+//    for operation: Operation
+//  ) -> [any GraphQLRequestInterceptor]
+//
+//  func postflightInterceptors<Operation: GraphQLOperation>(
+//    for operation: Operation
+//  ) -> [any GraphQLResultInterceptor]
+
   /// Creates a new array of interceptors when called
   ///
   /// - Parameter operation: The operation to provide interceptors for
+  @available(*, deprecated, message: "Parse your data by hand instead")
   func interceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any ApolloInterceptor]
-  
+
   /// Provides an additional error interceptor for any additional handling of errors
   /// before returning to the UI, such as logging.
   /// - Parameter operation: The operation to provide an additional error interceptor for

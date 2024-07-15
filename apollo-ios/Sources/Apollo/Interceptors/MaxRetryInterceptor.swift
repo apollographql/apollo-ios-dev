@@ -29,33 +29,18 @@ public class MaxRetryInterceptor: ApolloInterceptor {
     self.maxRetries = maxRetriesAllowed
   }
   
-  public func interceptAsync<Operation: GraphQLOperation>(
-    chain: any RequestChain,
+  public func intercept<Operation: GraphQLOperation>(
     request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
+    response: HTTPResponse<Operation>?
+  ) async throws -> RequestChain.NextAction<Operation> {
     guard self.hitCount <= self.maxRetries else {
-      let error = RetryError.hitMaxRetryCount(
+      throw RetryError.hitMaxRetryCount(
         count: self.maxRetries,
         operationName: Operation.operationName
       )
-
-      chain.handleErrorAsync(
-        error,
-        request: request,
-        response: response,
-        completion: completion
-      )
-      
-      return
     }
     
     self.hitCount += 1
-    chain.proceedAsync(
-      request: request,
-      response: response,
-      interceptor: self,
-      completion: completion
-    )
+    return .proceed(request: request, response: response)    
   }
 }

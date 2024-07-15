@@ -11,15 +11,10 @@ public struct HTTPResponse<Operation: GraphQLOperation>: Sendable {
   
   /// The raw data received from the URL loading system
   public var rawData: Data
-  
-  /// [optional] The data as parsed into a `GraphQLResult`, which can eventually be returned to the UI. Will be nil 
-  /// if not yet parsed.
-  public var parsedResponse: GraphQLResult<Operation.Data>?
-  
-  /// [optional] The data as parsed into a `GraphQLResponse` for legacy caching purposes. If you're not using the 
-  /// `JSONResponseParsingInterceptor`, you probably shouldn't be using this property.
-  @available(*, deprecated, message: "Do not use. This property will be removed in a future version.")
-  public var legacyResponse: GraphQLResponse<Operation.Data>? = nil
+
+  /// [optional] The data as parsed into a `GraphQLResult`, which can eventually be returned to the 
+  /// UI. Will be nil if not yet parsed.
+  public var parsedResult: GraphQLResult<Operation.Data>?
   
   /// A set of cache records from the response
   var cacheRecords: RecordSet?
@@ -29,16 +24,16 @@ public struct HTTPResponse<Operation: GraphQLOperation>: Sendable {
   /// - Parameters:
   ///   - response: The `HTTPURLResponse` received from the server.
   ///   - rawData: The raw, unparsed data received from the server.
-  ///   - parsedResponse: [optional] The response parsed into the `ParsedValue` type. Will be nil if not yet parsed, 
+  ///   - parsedResult: [optional] The response parsed into the `ParsedValue` type. Will be nil if not yet parsed,
   ///   or if parsing failed.
   public init(
     response: HTTPURLResponse,
     rawData: Data,
-    parsedResponse: GraphQLResult<Operation.Data>?
+    parsedResult: GraphQLResult<Operation.Data>?
   ) {
     self.httpResponse = response
     self.rawData = rawData
-    self.parsedResponse = parsedResponse
+    self.parsedResult = parsedResult
   }
 }
 
@@ -48,7 +43,7 @@ extension HTTPResponse: Equatable where Operation.Data: Equatable {
   public static func == (lhs: HTTPResponse<Operation>, rhs: HTTPResponse<Operation>) -> Bool {
     lhs.httpResponse == rhs.httpResponse &&
     lhs.rawData == rhs.rawData &&
-    lhs.parsedResponse == rhs.parsedResponse &&
+    lhs.parsedResult == rhs.parsedResult &&
     lhs.cacheRecords == rhs.cacheRecords
   }
 }
@@ -59,7 +54,7 @@ extension HTTPResponse: Hashable where Operation.Data: Hashable {
   public func hash(into hasher: inout Hasher) {
     hasher.combine(httpResponse)
     hasher.combine(rawData)
-    hasher.combine(parsedResponse)
+    hasher.combine(parsedResult)
     hasher.combine(cacheRecords)
   }
 }
