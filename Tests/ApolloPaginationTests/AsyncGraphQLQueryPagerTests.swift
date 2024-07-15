@@ -385,6 +385,43 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     XCTAssertEqual(pagerA, pagerB)
   }
 
+  func test_errors_partialSuccess() async throws {
+    let pager = AsyncGraphQLQueryPager(pager: createPager())
+    var expectedResults: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPageWithErrors(server: server)
+    let fetchExpectation = expectation(description: "Fetch")
+    await pager.fetch()
+    let subscription = pager.sink { output in
+      expectedResults.append(output)
+      fetchExpectation.fulfill()
+    }
+    await fulfillment(of: [serverExpectation, fetchExpectation], timeout: 3)
+    XCTAssertEqual(expectedResults.count, 1)
+    let result = try XCTUnwrap(expectedResults.first)
+    let successValue = try result.get().0
+    XCTAssertFalse(successValue.errors.isEmpty)
+    XCTAssertEqual(successValue.initialPage?.hero.name, "R2-D2")
+    subscription.cancel()
+  }
+
+  func test_errors_noSuccess() async throws {
+    let pager = AsyncGraphQLQueryPager(pager: createPager())
+    var expectedResults: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPageErrorsOnly(server: server)
+    let fetchExpectation = expectation(description: "Fetch")
+    await pager.fetch()
+    let subscription = pager.sink { output in
+      expectedResults.append(output)
+      fetchExpectation.fulfill()
+    }
+    await fulfillment(of: [serverExpectation, fetchExpectation], timeout: 3)
+    XCTAssertEqual(expectedResults.count, 1)
+    let result = try XCTUnwrap(expectedResults.first)
+    let successValue = try result.get().0
+    XCTAssertFalse(successValue.errors.isEmpty)
+    subscription.cancel()
+  }
+
   // MARK: - Test helpers
 
   private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
