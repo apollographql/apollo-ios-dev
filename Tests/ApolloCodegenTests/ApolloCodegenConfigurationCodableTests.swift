@@ -42,7 +42,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             .pluralization(singularRegex: "animal", replacementRegex: "animals")
           ],
           deprecatedEnumCases: .exclude,
-          schemaDocumentation: .exclude,        
+          schemaDocumentation: .exclude,
           schemaCustomization: .init(
             customTypeNames: [
               "MyEnum": .enum(

@@ -278,7 +278,6 @@ class EntitySelectionTree {
           } else if case .selections = self.child {
             guard case let .selections(conditionSelections) = node.child else {
               continue
-//              preconditionFailure()
             }
 
             targetSelections.addMergedInlineFragment(

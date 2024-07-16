@@ -919,6 +919,10 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   ///
   /// By default, all possible fields and named fragment accessors are merged into each selection
   /// set.
+  ///
+  ///  - Note: Disabling field merging and `selectionSetInitializers` functionality are
+  /// incompatible. If using `selectionSetInitializers`, `fieldMerging` must be set to `.all`,
+  /// otherwise a validation error will be thrown when runnning code generation.
   public struct FieldMerging: Codable, Equatable, ExpressibleByArrayLiteral {
     /// Merges fields and fragment accessors from the selection set's direct ancestors.
     public static let ancestors          = FieldMerging(.ancestors)
@@ -1482,7 +1486,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///   - deprecatedEnumCases: How deprecated enum cases from the schema should be handled.
   ///   - schemaDocumentation: Whether schema documentation is added to the generated files.
   ///   - selectionSetInitializers: Which generated selection sets should include
-  ///     generated initializers.  
+  ///     generated initializers.
   ///   - apqs: Whether the generated operations should use Automatic Persisted Queries.
   ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
   ///     including `Apollo` via Cocoapods.
