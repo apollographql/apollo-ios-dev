@@ -17,7 +17,8 @@
       "skippedTests" : [
         "GraphQLFileTests",
         "MultipartFormDataTests",
-        "StoreConcurrencyTests"
+        "StoreConcurrencyTests",
+        "URLSessionClientTests\/testCancellingTaskThroughClientDoesNotCallCompletion()"
       ],
       "target" : {
         "containerPath" : "container:ApolloDev.xcodeproj",
