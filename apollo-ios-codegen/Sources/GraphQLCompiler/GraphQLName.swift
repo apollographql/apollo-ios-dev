@@ -5,7 +5,7 @@ public protocol GraphQLNamedItem {
   var name: GraphQLName { get }
 }
 
-public class GraphQLName: Hashable {
+public class GraphQLName: Hashable, CustomDebugStringConvertible {
   public let schemaName: String
   
   public var customName: String?
@@ -47,5 +47,9 @@ public class GraphQLName: Hashable {
   public static func == (lhs: GraphQLName, rhs: GraphQLName) -> Bool {
     return lhs.schemaName == rhs.schemaName
   }
-  
+
+  public var debugDescription: String {
+    schemaName
+  }
+
 }
