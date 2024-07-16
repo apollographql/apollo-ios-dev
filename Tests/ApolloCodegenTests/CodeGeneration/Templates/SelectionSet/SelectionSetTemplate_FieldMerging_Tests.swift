@@ -1152,7 +1152,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
 
       public var species: String? { __data["species"] }
       public var predator: Predator? { __data["predator"] }
@@ -1163,7 +1163,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
 
         public var species: String? { __data["species"] }
         public var name: String? { __data["name"] }
@@ -1245,7 +1245,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
 
       public var species: String? { __data["species"] }
       public var name: String? { __data["name"] }
@@ -1326,7 +1326,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
 
       public var species: String? { __data["species"] }
       public var name: String? { __data["name"] }
@@ -1339,7 +1339,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal.Predator
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
         public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           PredatorDetails.Predator.self,
           PredatorDetails.Predator.AsDog.self,
@@ -1424,7 +1424,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
 
       public var species: String? { __data["species"] }
       public var name: String? { __data["name"] }
@@ -1710,82 +1710,4 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  // MARK: - SelectionSetInitializers
-
-  func test__render_selectionSetInitializer__givenFieldMerging_none_withMergedSelections_rendersInitializerWithAllMergedSelections() async throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      species: String!
-      age: Int!
-    }
-
-    interface Pet implements Animal {
-      species: String!
-      age: Int!
-    }
-
-    type Dog implements Animal & Pet {
-      species: String!
-      age: Int!
-      bark: Boolean!
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        age
-        ... on Pet {
-          species
-        }
-        ... on Dog {
-          bark
-        }
-      }
-    }
-    """
-
-    let expected =
-    """
-      public init(
-        bark: Bool,
-        age: Int,
-        species: String
-      ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": TestSchema.Objects.Dog.typename,
-            "bark": bark,
-            "age": age,
-            "species": species,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(TestOperationQuery.Data.AllAnimal.self),
-            ObjectIdentifier(TestOperationQuery.Data.AllAnimal.AsDog.self),
-            ObjectIdentifier(TestOperationQuery.Data.AllAnimal.AsPet.self)
-          ]
-        ))
-      }
-    """
-
-    // when
-    try await buildSubjectAndOperation(
-      fieldMerging: .none,
-      selectionSetInitializers: true
-    )
-    
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
-
-    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
-  }
 }

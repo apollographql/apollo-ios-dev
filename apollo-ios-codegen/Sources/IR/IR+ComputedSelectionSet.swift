@@ -103,31 +103,6 @@ extension ComputedSelectionSet {
       with sourceMergeStrategy: MergedSelections.MergingStrategy
     ) -> Bool {
       return shouldMergeIn(from: [source], with: sourceMergeStrategy)
-//      if self.mergingStrategy.contains(sourceMergeStrategy) ||
-//          self.typeInfo.derivedFromMergedSources.contains(source)
-//      {
-//        return true
-//      }
-
-//      if self.typeInfo.derivedFromMergedSources.contains(source) { return true }
-
-//      if !self.typeInfo.isUserDefined,
-//         (source.fragment !== nil && self.mergingStrategy.contains(.namedFragments)),
-//         source.typeInfo.scopePath.count > 1
-//      {
-//        return true
-//      }
-
-//      if (source.fragment !== nil && self.mergingStrategy.contains(.namedFragments)),
-//         case let difference = self.typeInfo.scopePath.count - source.typeInfo.scopePath.count,
-//         difference >= 0 {
-//        let scopeStart = self.typeInfo.scopePath.node(at: difference)
-//        if source.typeInfo.scopePath.head == scopeStart {
-//          return true
-//        }
-//      }
-
-//      return false
     }
 
     private func shouldMergeIn(

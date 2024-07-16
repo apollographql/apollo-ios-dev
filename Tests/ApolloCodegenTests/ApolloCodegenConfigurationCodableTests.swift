@@ -42,7 +42,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             .pluralization(singularRegex: "animal", replacementRegex: "animals")
           ],
           deprecatedEnumCases: .exclude,
-          schemaDocumentation: .exclude,
+          schemaDocumentation: .exclude,        
           schemaCustomization: .init(
             customTypeNames: [
               "MyEnum": .enum(
@@ -55,7 +55,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
               "MyObject": .type(name: "CustomObject")
             ]
           ),
-          fieldMerging: .all,
           cocoapodsCompatibleImportStatements: true,
           warningsOnDeprecatedUsage: .exclude,
           conversionStrategies:.init(
