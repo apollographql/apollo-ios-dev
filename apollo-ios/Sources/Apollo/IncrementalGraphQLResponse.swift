@@ -1,6 +1,6 @@
 import Foundation
 #if !COCOAPODS
-import ApolloAPI
+@_spi(unsafe_JSON) import ApolloAPI
 #endif
 
 /// Represents an incremental GraphQL response received from a server.
@@ -34,7 +34,7 @@ final class IncrementalGraphQLResponse<Operation: GraphQLOperation> {
     let rootKey = try CacheReference.rootCacheReference(for: Operation.operationType, path: path)
 
     self.base = AnyGraphQLResponse(
-      body: body,
+      body: SendableJSONObject(unsafe: body),
       rootKey: rootKey,
       variables: operation.__variables
     )

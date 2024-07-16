@@ -1,11 +1,10 @@
 import Foundation
 #if !COCOAPODS
-import ApolloAPI
+@_spi(unsafe_JSON) import ApolloAPI
 #endif
 
-/// An interceptor which parses JSON response data into a `GraphQLResult` and attaches it to the 
-/// `HTTPResponse`.
-public struct IncrementalJSONResponseParsingInterceptor: ApolloInterceptor {
+/// Parses JSON response data into a `GraphQLResult`.
+public struct JSONResponseParser {
 
   public enum ParsingError: Error, LocalizedError {
     case noResponseToParse
@@ -42,41 +41,56 @@ public struct IncrementalJSONResponseParsingInterceptor: ApolloInterceptor {
   public var id: String = UUID().uuidString
   private let resultStorage = ResultStorage()
 
-  private class ResultStorage {
+  private actor ResultStorage {
     var currentResult: Any?
     var currentCacheRecords: RecordSet?
+
+    func mutate<T>(_ block: (isolated ResultStorage) throws -> T) rethrows -> T {
+      try block(self)
+    }
   }
 
   public init() { }
 
-  public func interceptAsync<Operation: GraphQLOperation>(
-    chain: any RequestChain,
+  public func parseJSONResult<Operation: GraphQLOperation>(
     request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
-  ) {
-    guard let createdResponse = response else {
-      chain.handleErrorAsync(
-        ParsingError.noResponseToParse,
-        request: request,
-        response: response,
-        completion: completion
-      )
-      return
+    response: HTTPResponse<Operation>
+  ) async throws -> (result: GraphQLResult<Operation.Data>, cacheRecords: RecordSet?) {
+    guard
+      let body = try? JSONSerializationFormat.deserialize(data: response.rawData) as? JSONObject
+    else {
+      throw ParsingError.couldNotParseToJSON(data: response.rawData)
     }
 
-    do {
-      guard
-        let body = try? JSONSerializationFormat.deserialize(data: createdResponse.rawData) as? JSONObject
-      else {
-        throw ParsingError.couldNotParseToJSON(data: createdResponse.rawData)
+    return try await resultStorage.mutate { isolatedStorage in
+      try Task.checkCancellation()
+
+      let parsed = try parseResponse(with: body, storage: isolatedStorage)
+
+      isolatedStorage.currentResult = parsed.result
+      isolatedStorage.currentCacheRecords = parsed.cacheRecords
+
+      return parsed
+    }
+
+    func parseResponse(
+      with body: JSONObject,
+      storage: isolated ResultStorage
+    ) throws -> (result: GraphQLResult<Operation.Data>, cacheRecords: RecordSet?) {
+      if let currentResult = storage.currentResult {
+        return try parseIncrementalResponse(
+          adding: body,
+          to: (currentResult, storage.currentCacheRecords)
+        )
+      } else {
+        return try parseNonIncrementalResponse(with: body)
       }
 
-      let parsedResult: GraphQLResult<Operation.Data>
-      let parsedCacheRecords: RecordSet?
-
-      if let currentResult = resultStorage.currentResult {
-        guard var currentResult = currentResult as? GraphQLResult<Operation.Data> else {
+      func parseIncrementalResponse(
+        adding body: JSONObject,
+        to previous: (result: Any, cacheRecords: RecordSet?)
+      ) throws -> (GraphQLResult<Operation.Data>, RecordSet?) {
+        guard var currentResult = previous.result as? GraphQLResult<Operation.Data> else {
           throw ParsingError.mismatchedCurrentResultType
         }
 
@@ -84,7 +98,7 @@ public struct IncrementalJSONResponseParsingInterceptor: ApolloInterceptor {
           throw ParsingError.couldNotParseIncrementalJSON(json: body)
         }
 
-        var currentCacheRecords = resultStorage.currentCacheRecords ?? RecordSet()
+        var currentCacheRecords = previous.cacheRecords ?? RecordSet()
 
         for item in incrementalItems {
           let incrementalResponse = try IncrementalGraphQLResponse<Operation>(
@@ -101,40 +115,18 @@ public struct IncrementalJSONResponseParsingInterceptor: ApolloInterceptor {
           }
         }
 
-        parsedResult = currentResult
-        parsedCacheRecords = currentCacheRecords
-
-      } else {
-        let graphQLResponse = GraphQLResponse(
-          operation: request.operation,
-          body: body
-        )
-        let (result, cacheRecords) = try graphQLResponse.parseResult(withCachePolicy: request.cachePolicy)
-
-        parsedResult = result
-        parsedCacheRecords = cacheRecords
+        return (currentResult, currentCacheRecords)
       }
 
-      createdResponse.parsedResponse = parsedResult
-      createdResponse.cacheRecords = parsedCacheRecords
-
-      resultStorage.currentResult = parsedResult
-      resultStorage.currentCacheRecords = parsedCacheRecords
-
-      chain.proceedAsync(
-        request: request,
-        response: createdResponse,
-        interceptor: self,
-        completion: completion
-      )
-
-    } catch {
-      chain.handleErrorAsync(
-        error,
-        request: request,
-        response: createdResponse,
-        completion: completion
-      )
+      func parseNonIncrementalResponse(
+        with body: JSONObject
+      ) throws -> (GraphQLResult<Operation.Data>, RecordSet?) {
+        let graphQLResponse = GraphQLResponse(
+          operation: request.operation,
+          body: SendableJSONObject(unsafe: body)
+        )
+        return try graphQLResponse.parseResult(withCachePolicy: request.cachePolicy)
+      }
     }
   }
 

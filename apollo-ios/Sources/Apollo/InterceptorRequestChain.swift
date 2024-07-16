@@ -18,6 +18,8 @@ public struct RequestChain {
       response: HTTPResponse<Operation>?
     )
 
+    case multiProceed(AsyncThrowingStream<Self, any Error>)
+
     case exitEarlyAndEmit(
       result: GraphQLResult<Operation.Data>,
       request: HTTPRequest<Operation>
@@ -27,31 +29,9 @@ public struct RequestChain {
       request: HTTPRequest<Operation>
     )
 
-    fileprivate var request: HTTPRequest<Operation> {
-      switch self {
-      case 
-        let .exitEarlyAndEmit(_, request),
-        let .retry(request),
-        let .proceed(request, _),
-        let .proceedAndEmit(_, request, _):
-          return request
-      }
-    }
-
-    fileprivate var response: HTTPResponse<Operation>? {
-      switch self {
-      case .exitEarlyAndEmit, .retry: return nil
-
-      case
-        let .proceed(_, response),
-        let .proceedAndEmit(_, _, response):
-        return response
-      }
-    }
-
     fileprivate var result: GraphQLResult<Operation.Data>? {
       switch self {
-      case .retry: return nil
+      case .retry, .multiProceed: return nil
 
       case let .exitEarlyAndEmit(result, _): return result
 
@@ -104,18 +84,32 @@ public struct RequestChain {
   /// - Parameters:
   ///   - request: The request to send.
   ///   - completion: The completion closure to call when the request has completed.
-  public func kickoff<Operation: GraphQLOperation>(
+  func kickoff<Operation: GraphQLOperation>(
     request: HTTPRequest<Operation>
   ) -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+    proceed(
+      through: interceptors,
+      with: request,
+      nextAction: .proceed(
+        request: request,
+        response: nil
+      )
+    )
+  }
+
+  private func proceed<Operation: GraphQLOperation, I: Collection<any ApolloInterceptor>>(
+    through interceptors: I,
+    with request: HTTPRequest<Operation>,
+    nextAction: NextAction<Operation>
+  ) -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> where I.Index == Int {
     AsyncThrowingStream { continuation in
       let task = Task {
-        var nextAction: NextAction<Operation> = .proceed(
-          request: request,
-          response: nil
-        )
+        var nextAction = nextAction
+        var currentRequest: HTTPRequest<Operation> = request
+        var currentResponse: HTTPResponse<Operation>? = nil
 
         do {
-          for interceptor in interceptors {
+          for (index, interceptor) in interceptors.enumerated() {
             try Task.checkCancellation()
 
             switch nextAction {
@@ -126,11 +120,31 @@ public struct RequestChain {
               fallthrough
 
             case let .proceed(request, response):
+              currentRequest = request
+              currentResponse = response
+
               nextAction = try await interceptor.intercept(
                 request: request,
                 response: response
               )
               continue
+
+            case let .multiProceed(stream):
+              let remainingInterceptors = interceptors[index..<interceptors.count]
+              for try await action in stream {
+                let actionStream = proceed(
+                  through: remainingInterceptors,
+                  with: currentRequest,
+                  nextAction: action
+                )
+
+                for try await result in actionStream {
+                  continuation.yield(result)
+                }
+              }
+
+              continuation.finish()
+              return
 
             case let .exitEarlyAndEmit(result, _):
               continuation.yield(result)
@@ -141,6 +155,8 @@ public struct RequestChain {
               for try await result in kickoff(request: request) {
                 continuation.yield(result)
               }
+              continuation.finish()
+              return
             }
           }
 
@@ -156,8 +172,8 @@ public struct RequestChain {
           do {
             let errorRecoveryResult = try await handleError(
               error,
-              request: nextAction.request,
-              response: nextAction.response
+              request: currentRequest,
+              response: currentResponse
             )
             continuation.yield(errorRecoveryResult)
             continuation.finish()
@@ -182,7 +198,7 @@ public struct RequestChain {
   ///   - request: The request, as far as it has been constructed.
   ///   - response: The response, as far as it has been constructed.
   ///   - completion: The completion closure to call when work is complete.
-  public func handleError<Operation: GraphQLOperation>(
+  func handleError<Operation: GraphQLOperation>(
     _ error: any Error,
     request: HTTPRequest<Operation>,
     response: HTTPResponse<Operation>?

@@ -29,12 +29,15 @@ public struct HTTPResponse<Operation: GraphQLOperation>: Sendable {
   public init(
     response: HTTPURLResponse,
     rawData: Data,
-    parsedResult: GraphQLResult<Operation.Data>?
+    parsedResult: GraphQLResult<Operation.Data>?,
+    cacheRecords: RecordSet?
   ) {
     self.httpResponse = response
     self.rawData = rawData
     self.parsedResult = parsedResult
+    self.cacheRecords = cacheRecords
   }
+
 }
 
 // MARK: - Equatable Conformance

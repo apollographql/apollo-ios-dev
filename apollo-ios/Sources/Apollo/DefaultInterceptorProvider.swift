@@ -37,21 +37,11 @@ open class DefaultInterceptorProvider: InterceptorProvider {
         CacheReadInterceptor(store: self.store),
         NetworkFetchInterceptor(client: self.client),
         ResponseCodeInterceptor(),
-        MultipartResponseParsingInterceptor(),
-        jsonParsingInterceptor(for: operation),
+        JSONResponseParsingInterceptor(),
         AutomaticPersistedQueryInterceptor(),
         CacheWriteInterceptor(store: self.store),
     ]
-  }
-
-  private func jsonParsingInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> any ApolloInterceptor {
-    if Operation.hasDeferredFragments {
-      return IncrementalJSONResponseParsingInterceptor()
-
-    } else {
-      return JSONResponseParsingInterceptor()
-    }
-  }
+  }  
 
   open func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
     return nil
