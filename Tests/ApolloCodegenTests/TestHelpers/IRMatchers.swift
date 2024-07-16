@@ -109,12 +109,13 @@ func shallowlyMatch(
   ]
 
   if !expectedValue.ignoreMergedSelections {
-    let mergingStrategy = expectedValue.mergingStrategy
     matchers.append(contentsOf: [
       shallowlyMatch(expectedValue.merged)
         .mappingActualTo { $0?.computed.merged },
       equal(expectedValue.mergedSources)
-        .mappingActualTo { $0?.computed.merged.mergedSources }
+        .mappingActualTo { $0?.computed.merged.mergedSources },
+      equal(expectedValue.mergingStrategy)
+        .mappingActualTo { $0?.mergingStrategy }
     ])
   }
 

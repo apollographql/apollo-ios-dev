@@ -181,6 +181,9 @@ class EntitySelectionTree {
     ) {
       updateSelections {
         $0.updateValue(forKey: source, default: EntityTreeScopeSelections()) {
+          // Can we take the scopePath of the merged source here and use it to define the scopePath of self?
+          // Selections key could be just scopePath and not merged source, since fragments are not merged in any more!!!!
+
           $0.mergeIn(selections)
         }
       }
@@ -277,7 +280,8 @@ class EntitySelectionTree {
 
           } else if case .selections = self.child {
             guard case let .selections(conditionSelections) = node.child else {
-              preconditionFailure()
+              continue
+//              preconditionFailure()
             }
 
             targetSelections.addMergedInlineFragment(

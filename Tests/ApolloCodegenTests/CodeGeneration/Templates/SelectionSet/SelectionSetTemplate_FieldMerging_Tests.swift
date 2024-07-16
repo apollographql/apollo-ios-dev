@@ -1186,8 +1186,88 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
+  func test__render_childEntitySelectionSet__givenFieldMerging_namedFragments__givenEntityFieldMergedFromNamedFragment_withMatchingInlineFragments_doesNotRenderChildSelectionSet() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
 
-  func test__render_childEntitySelectionSet__givenFieldMerging_namedFragments__givenEntityFieldMergedFromMultipleNamedFragment_withMatchingInlineFragmentsInBoth_rendersChildSelectionSets() async throws {
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    interface Pet implements Animal {
+      species: String
+      predator: Animal
+    }
+
+    type Dog implements Animal & Pet {
+      species: String
+      predator: Animal
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ...PredatorDetails
+        ...PredatorName
+        species
+      }
+    }
+
+    fragment PredatorDetails on Animal {
+      predator {
+        species
+        ... on Dog {
+          name
+        }
+      }
+    }
+
+    fragment PredatorName on Animal {
+      predator {
+        name
+        ... on Dog {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+    /// AllAnimal.Predator
+    public struct Predator: TestSchema.SelectionSet {
+      public let __data: DataDict
+      public init(_dataDict: DataDict) { __data = _dataDict }
+
+      public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+
+      public var species: String? { __data["species"] }
+      public var name: String? { __data["name"] }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: [.namedFragments]
+    )
+
+    let allAnimals_predator = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_predator.selectionSet!.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+
+  func test__render_childEntitySelectionSet__givenFieldMerging_namedFragmentsAndAncestors__givenEntityFieldMergedFromMultipleNamedFragment_withMatchingInlineFragmentsInBoth_rendersChildSelectionSets() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1254,11 +1334,18 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       public var asDog: AsDog? { _asInlineFragment() }
 
       /// AllAnimal.Predator.AsDog
-      public struct Predator: TestSchema.CompositeInlineFragment {
+      public struct AsDog: TestSchema.InlineFragment, ApolloAPI.CompositeInlineFragment {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+        public typealias RootEntityType = TestOperationQuery.Data.AllAnimal.Predator
+        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
+        public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
+          PredatorDetails.Predator.self,
+          PredatorDetails.Predator.AsDog.self,
+          PredatorName.Predator.self,
+          PredatorName.Predator.AsDog.self
+        ] }
 
         public var species: String? { __data["species"] }
         public var name: String? { __data["name"] }
@@ -1268,7 +1355,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
 
     // when
     try await buildSubjectAndOperation(
-      fieldMerging: .namedFragments
+      fieldMerging: [.namedFragments, .ancestors]
     )
 
     let allAnimals_predator = try XCTUnwrap(
@@ -1281,7 +1368,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__render_childEntitySelectionSet__givenFieldMerging_namedFragments__givenEntityFieldMergedFromMultipleNamedFragment_withInlineFragmentInOnlyOneSource_rendersChildSelectionSetWithInlineFragmentTypealiasToFragment() async throws {
+  func test__render_childEntitySelectionSet__givenFieldMerging_namedFragmentsAndAncestors__givenEntityFieldMergedFromMultipleNamedFragment_withInlineFragmentInOnlyOneSource_rendersChildSelectionSetWithInlineFragmentTypealiasToFragment() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1350,7 +1437,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
 
     // when
     try await buildSubjectAndOperation(
-      fieldMerging: .namedFragments
+      fieldMerging: [.namedFragments, .ancestors]
     )
 
     let allAnimals_predator = try XCTUnwrap(
