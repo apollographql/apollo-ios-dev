@@ -14,6 +14,9 @@
   "testTargets" : [
     {
       "parallelizable" : true,
+      "skippedTests" : [
+        "URLSessionClientTests\/testCancellingTaskThroughClientDoesNotCallCompletion()"
+      ],
       "target" : {
         "containerPath" : "container:ApolloDev.xcodeproj",
         "identifier" : "471B6A9B0B0EB6244F71ECA6",

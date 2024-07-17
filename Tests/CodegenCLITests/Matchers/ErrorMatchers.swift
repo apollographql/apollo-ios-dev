@@ -4,7 +4,7 @@ import Nimble
 
 public func throwUserValidationError(
   _ expectedError: ValidationError
-) -> Nimble.Matcher<ParsableCommand> {
+) -> Nimble.Matcher<any ParsableCommand> {
   return Matcher { actualExpression in
     var actualError: (any Error)?
     do {
@@ -41,7 +41,7 @@ public func throwUserValidationError(
   }
 }
 
-public func throwUnknownOptionError() -> Nimble.Matcher<ParsableCommand> {
+public func throwUnknownOptionError() -> Nimble.Matcher<any ParsableCommand> {
   return Matcher { actualExpression in
     var actualError: (any Error)?
     do {

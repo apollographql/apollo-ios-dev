@@ -600,8 +600,6 @@ struct SelectionSetTemplate {
             "if let newData = f?.__data { __data = newData }",
           else: "__data = f.__data"
         ) }
-        @available(*, unavailable, message: "mutate properties of the fragment instead.")
-        set { preconditionFailure() }
       }
       """)
       """
