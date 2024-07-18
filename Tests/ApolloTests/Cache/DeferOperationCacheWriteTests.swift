@@ -53,33 +53,30 @@ fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
 
         class Friend: AbstractMockSelectionSet<Friend.Fragments, MockSchemaMetadata> {
           override class var __selections: [Selection] {[
-            .field("name", String.self),
-            .deferred(DeferredFriendSpecies.self, label: "deferredFriendSpecies"),
+            .deferred(DeferredFriendName.self, label: "deferredFriendName"),
           ]}
-
-          var name: String { __data["name"] }
 
           struct Fragments: FragmentContainer {
             public let __data: DataDict
             public init(_dataDict: DataDict) {
               __data = _dataDict
-              _deferredFriendSpecies = Deferred(_dataDict: _dataDict)
+              _deferredFriendName = Deferred(_dataDict: _dataDict)
             }
 
-            @Deferred var deferredFriendSpecies: DeferredFriendSpecies?
-          }
-
-          class DeferredFriendSpecies: MockTypeCase {
-            override class var __selections: [Selection] {[
-              .field("species", String.self),
-            ]}
-
-            var species: String { __data["species"] }
+            @Deferred var deferredFriendName: DeferredFriendName?
           }
         }
       }
     }
   }
+}
+
+fileprivate class DeferredFriendName: MockFragment {
+  override class var __selections: [Selection] {[
+    .field("name", String.self),
+  ]}
+
+  var name: String { __data["name"] }
 }
 
 class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoading {
@@ -106,7 +103,7 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
     store = nil
   }
 
-  func test__write__givenOnlyPartialFragmentsAsFulfilled_returnsAllDeferredFragmentsAsPending() throws {
+  func test__write__givenOnlyPartialDataAsFulfilled_returnsAllDeferredFragmentsAsPending() throws {
     // given
     let data = AnimalQuery.AnAnimal(_dataDict: DataDict(
       data: [
@@ -118,6 +115,8 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
           ],
           fulfilledFragments: [
             ObjectIdentifier(AnimalQuery.AnAnimal.Animal.self),
+            // DeferredGenus not fulfilled
+            // DeferredFriend not fulfilled
           ]
         )
       ],
@@ -151,8 +150,7 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
       expect(data.animal.__typename).to(equal("Animal"))
       expect(data.animal.species).to(equal("Canis latrans"))
       expect(data.animal.fragments.deferredGenus?.genus).to(beNil())
-      expect(data.animal.fragments.deferredFriend?.friend.name).to(beNil())
-      expect(data.animal.fragments.deferredFriend?.friend.fragments.deferredFriendSpecies?.species).to(beNil())
+      expect(data.animal.fragments.deferredFriend?.friend.fragments.deferredFriendName?.name).to(beNil())
 
       expect(data.animal.fragments.$deferredGenus).to(equal(.pending))
       expect(data.animal.fragments.$deferredFriend).to(equal(.pending))
@@ -161,7 +159,7 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
     self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__write__givenSingleDeferredFragmentsAsFulfilled_returnsSingleDeferredFragmentsAsFulfilled() throws {
+  func test__write__givenSingleDeferredFragmentAsFulfilled_returnsSingleDeferredFragmentAsFulfilled() throws {
     // given
     let animalData = DataDict(
       data: [
@@ -172,6 +170,7 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
       fulfilledFragments: [
         ObjectIdentifier(AnimalQuery.AnAnimal.Animal.self),
         ObjectIdentifier(AnimalQuery.AnAnimal.Animal.DeferredGenus.self),
+        // DeferredFriend not fulfilled
       ]
     )
 
@@ -210,8 +209,7 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
       expect(data.animal.__typename).to(equal("Animal"))
       expect(data.animal.species).to(equal("Canis latrans"))
       expect(data.animal.fragments.deferredGenus?.genus).to(equal("Canis"))
-      expect(data.animal.fragments.deferredFriend?.friend.name).to(beNil())
-      expect(data.animal.fragments.deferredFriend?.friend.fragments.deferredFriendSpecies?.species).to(beNil())
+      expect(data.animal.fragments.deferredFriend?.friend.fragments.deferredFriendName?.name).to(beNil())
 
       expect(data.animal.fragments.$deferredGenus).to(equal(
         .fulfilled(AnimalQuery.AnAnimal.Animal.DeferredGenus(_dataDict: animalData))
@@ -227,11 +225,9 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
     let friendData = DataDict(
       data: [
         "name": "American Badger",
-        "species": "Taxidea taxus"
       ],
       fulfilledFragments: [
-        ObjectIdentifier(AnimalQuery.AnAnimal.Animal.DeferredFriend.Friend.self),
-        ObjectIdentifier(AnimalQuery.AnAnimal.Animal.DeferredFriend.Friend.DeferredFriendSpecies.self),
+        ObjectIdentifier(DeferredFriendName.self),
       ]
     )
 
@@ -284,8 +280,7 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
       expect(data.animal.__typename).to(equal("Animal"))
       expect(data.animal.species).to(equal("Canis latrans"))
       expect(data.animal.fragments.deferredGenus?.genus).to(equal("Canis"))
-      expect(data.animal.fragments.deferredFriend?.friend.name).to(equal("American Badger"))
-      expect(data.animal.fragments.deferredFriend?.friend.fragments.deferredFriendSpecies?.species).to(equal("Taxidea taxus"))
+      expect(data.animal.fragments.deferredFriend?.friend.fragments.deferredFriendName?.name).to(equal("American Badger"))
 
       expect(data.animal.fragments.$deferredGenus).to(equal(
         .fulfilled(AnimalQuery.AnAnimal.Animal.DeferredGenus(_dataDict: animalData))
@@ -293,25 +288,25 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
       expect(data.animal.fragments.$deferredFriend).to(equal(
         .fulfilled(AnimalQuery.AnAnimal.Animal.DeferredFriend(_dataDict: animalData))
       ))
-      expect(data.animal.fragments.deferredFriend?.friend.fragments.$deferredFriendSpecies).to(equal(
-        .fulfilled(AnimalQuery.AnAnimal.Animal.DeferredFriend.Friend.DeferredFriendSpecies(_dataDict: friendData))
+      expect(data.animal.fragments.deferredFriend?.friend.fragments.$deferredFriendName).to(equal(
+        .fulfilled(DeferredFriendName(_dataDict: friendData))
       ))
     }
 
     self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__write__givenDeferredData_withoutFragmentFulfilled_doesNotReturnDeferredFragmentAsFulfilled() throws {
+  func test__write__givenDeferredData_withoutFragmentFulfilled_returnsDeferredFragmentAsPending() throws {
     // given
     let animalData = DataDict(
       data: [
         "__typename": "Animal",
         "species": "Canis latrans",
-        "genus": "Canis",
+        "genus": "Canis", // DeferredGenus fragment data
       ],
       fulfilledFragments: [
         ObjectIdentifier(AnimalQuery.AnAnimal.Animal.self),
-        // DeferredGenus fragment not marked as fulfilled
+        // DeferredGenus not fulfilled
       ]
     )
 
@@ -350,11 +345,70 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
       expect(data.animal.__typename).to(equal("Animal"))
       expect(data.animal.species).to(equal("Canis latrans"))
       expect(data.animal.fragments.deferredGenus?.genus).to(beNil())
-      expect(data.animal.fragments.deferredFriend?.friend.name).to(beNil())
-      expect(data.animal.fragments.deferredFriend?.friend.fragments.deferredFriendSpecies?.species).to(beNil())
+      expect(data.animal.fragments.deferredFriend?.friend.fragments.deferredFriendName?.name).to(beNil())
 
       expect(data.animal.fragments.$deferredGenus).to(equal(.pending))
       expect(data.animal.fragments.$deferredFriend).to(equal(.pending))
+    }
+
+    self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
+  }
+
+  func test__write__givenDeferredNamedFragment_returnsDeferredNamedFragmentAsFulfilled() throws {
+    // given
+    let friendData = DataDict(
+      data: [
+        "name": "American Badger",
+      ],
+      fulfilledFragments: [
+        ObjectIdentifier(DeferredFriendName.self),
+      ]
+    )
+
+    let friendSelectionSet = DeferredFriendName(_dataDict: friendData)
+
+    mergeRecordsIntoCache([
+      "QUERY_ROOT": [
+        "animal": CacheReference("QUERY_ROOT.animal"),
+      ],
+      "QUERY_ROOT.animal": [
+        "__typename": "Animal",
+        "species": "Canis latrans",
+        "genus": "Canis",
+        "friend": CacheReference("QUERY_ROOT.animal.friend"),
+      ]
+    ])
+
+    // when
+    let writeCompletedExpectation = expectation(description: "Cache write completed")
+
+    store.withinReadWriteTransaction({ transaction in
+      try transaction.write(selectionSet: friendSelectionSet, withKey: CacheKey("QUERY_ROOT.animal.friend"))
+
+    }, completion: { result in
+      defer { writeCompletedExpectation.fulfill() }
+
+      expect(result).to(beSuccess())
+    })
+
+    self.wait(for: [writeCompletedExpectation], timeout: Self.defaultWaitTimeout)
+
+    // then
+    let readCompletedExpectation = expectation(description: "Cache read completed")
+
+    store.withinReadTransaction { transaction in
+      defer { readCompletedExpectation.fulfill() }
+
+      let data = try transaction.read(query: AnimalQuery())
+
+      expect(data.animal.__typename).to(equal("Animal"))
+      expect(data.animal.species).to(equal("Canis latrans"))
+      expect(data.animal.fragments.deferredGenus?.genus).to(equal("Canis"))
+      expect(data.animal.fragments.deferredFriend?.friend.fragments.deferredFriendName?.name).to(equal("American Badger"))
+
+      expect(data.animal.fragments.deferredFriend?.friend.fragments.$deferredFriendName).to(equal(
+        .fulfilled(DeferredFriendName(_dataDict: friendData))
+      ))
     }
 
     self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
