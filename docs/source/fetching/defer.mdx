@@ -62,4 +62,10 @@ Query Success! Received all fields.
 
 ### Caching
 
+#### Reading cache data
+
 Typical caching behaviour and functionality is supported for operations with the `@defer` directive too. Cache reads behave slightly differently to network requests in that _all_ cached data, including any cached deferred fragments, will be returned in the first response. In other words, if the entire query has been cached then there will only be one response with all basic and deferred fragments. If you manually added only the basic data to the cache then you would receive only the basic data in the first response and depending on the cache policy used may get the deferred fragments returned from the network separately.
+
+#### Writing cache data
+
+We're still building [Selection Set Initializer](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/selectionsetinitializers) compatibility for deferred fragments. Until that is complete, writing to the cache requires that the local cache mutation, or named fragment selection set, be initialized using the private `.init(_dataDict: DataDict)` function.
