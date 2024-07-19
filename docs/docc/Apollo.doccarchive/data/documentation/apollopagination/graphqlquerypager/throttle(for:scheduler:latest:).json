@@ -73,6 +73,7 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:7Combine9SchedulerP0B8TimeTypeQa",
         "text" : "SchedulerTimeType"
       },
       {
@@ -81,6 +82,7 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:Sx6StrideQa",
         "text" : "Stride"
       },
       {
@@ -259,6 +261,7 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:7Combine9SchedulerP0B8TimeTypeQa",
               "text" : "SchedulerTimeType"
             },
             {
@@ -267,6 +270,7 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:Sx6StrideQa",
               "text" : "Stride"
             },
             {
@@ -492,6 +496,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:7Combine9SchedulerP0B8TimeTypeQa",
       "text" : "SchedulerTimeType"
     },
     {
@@ -500,6 +505,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sx6StrideQa",
       "text" : "Stride"
     },
     {

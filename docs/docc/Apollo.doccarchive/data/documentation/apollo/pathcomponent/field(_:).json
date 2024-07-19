@@ -1,23 +1,29 @@
 {
+  "abstract" : [
+    {
+      "text" : "A String value for a field in a GraphQL query",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse"
+        "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/body"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent\/field(_:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo15GraphQLResponseC4bodySDySSs11AnyHashableVGvp",
+    "externalID" : "s:6Apollo13PathComponentO5fieldyACSScACmF",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "let"
+        "text" : "case"
       },
       {
         "kind" : "text",
@@ -25,16 +31,20 @@
       },
       {
         "kind" : "identifier",
-        "text" : "body"
+        "text" : "field"
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : "("
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI10JSONObjecta",
-        "text" : "JSONObject"
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
+      },
+      {
+        "kind" : "text",
+        "text" : ")"
       }
     ],
     "modules" : [
@@ -43,9 +53,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Instance Property",
-    "symbolKind" : "property",
-    "title" : "body"
+    "roleHeading" : "Case",
+    "symbolKind" : "case",
+    "title" : "PathComponent.field(_:)"
   },
   "primaryContentSections" : [
     {
@@ -60,7 +70,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "let"
+              "text" : "case"
             },
             {
               "kind" : "text",
@@ -68,16 +78,20 @@
             },
             {
               "kind" : "identifier",
-              "text" : "body"
+              "text" : "field"
             },
             {
               "kind" : "text",
-              "text" : ": "
+              "text" : "("
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI10JSONObjecta",
-              "text" : "JSONObject"
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
+            },
+            {
+              "kind" : "text",
+              "text" : ")"
             }
           ]
         }
@@ -96,7 +110,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/graphqlresponse\/body"
+        "\/documentation\/apollo\/pathcomponent\/field(_:)"
       ],
       "traits" : [
         {
@@ -121,17 +135,17 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/GraphQLResponse": {
+"doc://Apollo/documentation/Apollo/PathComponent": {
   "abstract" : [
     {
-      "text" : "Represents a GraphQL response received from a server.",
+      "text" : "Represents a path in a GraphQL query.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -139,30 +153,33 @@
     },
     {
       "kind" : "identifier",
-      "text" : "GraphQLResponse"
+      "text" : "PathComponent"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "GraphQLResponse"
+      "text" : "PathComponent"
     }
   ],
   "role" : "symbol",
-  "title" : "GraphQLResponse",
+  "title" : "PathComponent",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlresponse"
+  "url" : "\/documentation\/apollo\/pathcomponent"
 },
-"doc://Apollo/documentation/Apollo/GraphQLResponse/body": {
+"doc://Apollo/documentation/Apollo/PathComponent/field(_:)": {
   "abstract" : [
-
+    {
+      "text" : "A String value for a field in a GraphQL query",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "let"
+      "text" : "case"
     },
     {
       "kind" : "text",
@@ -170,24 +187,28 @@
     },
     {
       "kind" : "identifier",
-      "text" : "body"
+      "text" : "field"
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : "("
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI10JSONObjecta",
-      "text" : "JSONObject"
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/body",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent\/field(_:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "body",
+  "title" : "PathComponent.field(_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlresponse\/body"
+  "url" : "\/documentation\/apollo\/pathcomponent\/field(_:)"
 }
 }
 }

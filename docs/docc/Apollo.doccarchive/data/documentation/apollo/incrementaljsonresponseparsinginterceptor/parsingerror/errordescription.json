@@ -1,7 +1,15 @@
 {
   "abstract" : [
     {
-      "text" : "A String value for a field in a GraphQL query",
+      "text" : "Inherited from ",
+      "type" : "text"
+    },
+    {
+      "code" : "LocalizedError.errorDescription",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
       "type" : "text"
     }
   ],
@@ -9,22 +17,22 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry"
+        "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor",
+        "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry\/field(_:)"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError\/errorDescription"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo12GraphQLErrorV9PathEntryO5fieldyAESScAEmF",
+    "externalID" : "s:6Apollo41IncrementalJSONResponseParsingInterceptorV0D5ErrorO16errorDescriptionSSSgvp",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "case"
+        "text" : "var"
       },
       {
         "kind" : "text",
@@ -32,11 +40,11 @@
       },
       {
         "kind" : "identifier",
-        "text" : "field"
+        "text" : "errorDescription"
       },
       {
         "kind" : "text",
-        "text" : "("
+        "text" : ": "
       },
       {
         "kind" : "typeIdentifier",
@@ -45,7 +53,7 @@
       },
       {
         "kind" : "text",
-        "text" : ")"
+        "text" : "?"
       }
     ],
     "modules" : [
@@ -54,9 +62,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Case",
-    "symbolKind" : "case",
-    "title" : "GraphQLError.PathEntry.field(_:)"
+    "roleHeading" : "Instance Property",
+    "symbolKind" : "property",
+    "title" : "errorDescription"
   },
   "primaryContentSections" : [
     {
@@ -71,7 +79,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "case"
+              "text" : "var"
             },
             {
               "kind" : "text",
@@ -79,11 +87,11 @@
             },
             {
               "kind" : "identifier",
-              "text" : "field"
+              "text" : "errorDescription"
             },
             {
               "kind" : "text",
-              "text" : "("
+              "text" : ": "
             },
             {
               "kind" : "typeIdentifier",
@@ -92,7 +100,15 @@
             },
             {
               "kind" : "text",
-              "text" : ")"
+              "text" : "? { "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "get"
+            },
+            {
+              "kind" : "text",
+              "text" : " }"
             }
           ]
         }
@@ -111,7 +127,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/graphqlerror\/pathentry\/field(_:)"
+        "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/errordescription"
       ],
       "traits" : [
         {
@@ -136,10 +152,30 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/GraphQLError": {
+"doc://Apollo/documentation/Apollo/IncrementalJSONResponseParsingInterceptor": {
   "abstract" : [
     {
-      "text" : "Represents an error encountered during the execution of a GraphQL operation.",
+      "text" : "An interceptor which parses JSON response data into a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLResult",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " and attaches it to the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "code" : "HTTPResponse",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
       "type" : "text"
     }
   ],
@@ -154,28 +190,25 @@
     },
     {
       "kind" : "identifier",
-      "text" : "GraphQLError"
+      "text" : "IncrementalJSONResponseParsingInterceptor"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "GraphQLError"
+      "text" : "IncrementalJSONResponseParsingInterceptor"
     }
   ],
   "role" : "symbol",
-  "title" : "GraphQLError",
+  "title" : "IncrementalJSONResponseParsingInterceptor",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror"
+  "url" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor"
 },
-"doc://Apollo/documentation/Apollo/GraphQLError/PathEntry": {
+"doc://Apollo/documentation/Apollo/IncrementalJSONResponseParsingInterceptor/ParsingError": {
   "abstract" : [
-    {
-      "text" : "Represents a path in a GraphQL query.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
@@ -188,33 +221,30 @@
     },
     {
       "kind" : "identifier",
-      "text" : "PathEntry"
+      "text" : "ParsingError"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "PathEntry"
+      "text" : "ParsingError"
     }
   ],
   "role" : "symbol",
-  "title" : "GraphQLError.PathEntry",
+  "title" : "IncrementalJSONResponseParsingInterceptor.ParsingError",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror\/pathentry"
+  "url" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror"
 },
-"doc://Apollo/documentation/Apollo/GraphQLError/PathEntry/field(_:)": {
+"doc://Apollo/documentation/Apollo/IncrementalJSONResponseParsingInterceptor/ParsingError/errorDescription": {
   "abstract" : [
-    {
-      "text" : "A String value for a field in a GraphQL query",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "case"
+      "text" : "var"
     },
     {
       "kind" : "text",
@@ -222,11 +252,11 @@
     },
     {
       "kind" : "identifier",
-      "text" : "field"
+      "text" : "errorDescription"
     },
     {
       "kind" : "text",
-      "text" : "("
+      "text" : ": "
     },
     {
       "kind" : "typeIdentifier",
@@ -235,15 +265,15 @@
     },
     {
       "kind" : "text",
-      "text" : ")"
+      "text" : "?"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry\/field(_:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError\/errorDescription",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "GraphQLError.PathEntry.field(_:)",
+  "title" : "errorDescription",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror\/pathentry\/field(_:)"
+  "url" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/errordescription"
 }
 }
 }

@@ -75,7 +75,7 @@
       },
       {
         "kind" : "text",
-        "text" : ") -> ("
+        "text" : ") -> (any "
       },
       {
         "kind" : "typeIdentifier",
@@ -155,7 +155,7 @@
             },
             {
               "kind" : "text",
-              "text" : ") -> ("
+              "text" : ") -> (any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloErrorInterceptor",
@@ -372,7 +372,7 @@
     },
     {
       "kind" : "text",
-      "text" : ") -> ("
+      "text" : ") -> (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -435,7 +435,7 @@
     },
     {
       "kind" : "text",
-      "text" : ") -> ("
+      "text" : ") -> (any "
     },
     {
       "kind" : "typeIdentifier",

@@ -73,6 +73,16 @@
       "kind" : "declarations"
     }
   ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloAPI\/SQ"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
+    }
+  ],
   "schemaVersion" : {
     "major" : 0,
     "minor" : 3,
@@ -89,6 +99,13 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred\/State-swift.enum\/pending"
       ],
       "title" : "Enumeration Cases"
+    },
+    {
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred\/State-swift.enum\/Equatable-Implementations"
+      ],
+      "title" : "Default Implementations"
     }
   ],
   "variants" : [
@@ -128,6 +145,11 @@
   ],
   "type" : "link",
   "url" : "\/documentation\/apollocodegenlib"
+},
+"doc://ApolloAPI/SQ": {
+  "identifier" : "doc:\/\/ApolloAPI\/SQ",
+  "title" : "Swift.Equatable",
+  "type" : "unresolvable"
 },
 "doc://ApolloAPI/documentation/ApolloAPI": {
   "abstract" : [
@@ -229,6 +251,17 @@
   "title" : "Deferred.State",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/deferred\/state-swift.enum"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/Deferred/State-swift.enum/Equatable-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred\/State-swift.enum\/Equatable-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "Equatable Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/deferred\/state-swift.enum\/equatable-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Deferred/State-swift.enum/fulfilled(_:)": {
   "abstract" : [

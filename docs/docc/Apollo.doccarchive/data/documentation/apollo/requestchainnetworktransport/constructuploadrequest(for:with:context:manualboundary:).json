@@ -85,7 +85,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": ("
+        "text" : ": (any "
       },
       {
         "kind" : "typeIdentifier",
@@ -232,7 +232,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": ("
+              "text" : ": (any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestContext",
@@ -656,7 +656,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",

@@ -165,7 +165,7 @@
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry"
       ],
-      "title" : "Enumerations"
+      "title" : "Type Aliases"
     },
     {
       "generated" : true,
@@ -335,15 +335,12 @@
 },
 "doc://Apollo/documentation/Apollo/GraphQLError/PathEntry": {
   "abstract" : [
-    {
-      "text" : "Represents a path in a GraphQL query.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "enum"
+      "text" : "typealias"
     },
     {
       "kind" : "text",
@@ -572,7 +569,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV9PathEntryO",
+      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV9PathEntrya",
       "text" : "PathEntry"
     },
     {

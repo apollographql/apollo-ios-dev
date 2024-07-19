@@ -98,6 +98,7 @@
   "topicSections" : [
     {
       "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/CacheWriteInterceptor\/CacheWriteError\/missingCacheRecords",
         "doc:\/\/Apollo\/documentation\/Apollo\/CacheWriteInterceptor\/CacheWriteError\/noResponseToParse"
       ],
       "title" : "Enumeration Cases"
@@ -313,10 +314,36 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/cachewriteinterceptor\/cachewriteerror\/errordescription"
 },
+"doc://Apollo/documentation/Apollo/CacheWriteInterceptor/CacheWriteError/missingCacheRecords": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "missingCacheRecords"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheWriteInterceptor\/CacheWriteError\/missingCacheRecords",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "CacheWriteInterceptor.CacheWriteError.missingCacheRecords",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cachewriteinterceptor\/cachewriteerror\/missingcacherecords"
+},
 "doc://Apollo/documentation/Apollo/CacheWriteInterceptor/CacheWriteError/noResponseToParse": {
   "abstract" : [
 
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
