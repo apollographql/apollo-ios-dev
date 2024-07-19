@@ -191,8 +191,18 @@ struct CustomCacheDataWritingFieldSelectionCollector: FieldSelectionCollector {
                           for: object,
                           info: info,
                           asConditionalFields: true)
-      case .deferred(_, _, _):
-        assertionFailure("Defer execution must be implemented (#3145).")
+
+      case let .deferred(_, deferredFragment, _):
+        if groupedFields.fulfilledFragments.contains(type: deferredFragment) {
+          try collectFields(
+            from: deferredFragment.__selections,
+            into: &groupedFields, 
+            for: object,
+            info: info,
+            asConditionalFields: false
+          )
+        }
+
       case let .fragment(fragment):
         if groupedFields.fulfilledFragments.contains(type: fragment) {
           try collectFields(from: fragment.__selections,
