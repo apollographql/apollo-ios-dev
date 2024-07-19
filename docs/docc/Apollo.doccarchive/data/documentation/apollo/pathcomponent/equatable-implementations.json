@@ -3,14 +3,13 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry"
+        "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry\/Equatable-Implementations"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent\/Equatable-Implementations"
   },
   "kind" : "article",
   "metadata" : {
@@ -20,6 +19,7 @@
       }
     ],
     "role" : "collectionGroup",
+    "roleHeading" : "API Collection",
     "title" : "Equatable Implementations"
   },
   "schemaVersion" : {
@@ -34,7 +34,7 @@
     {
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry\/!=(_:_:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent\/!=(_:_:)"
       ],
       "title" : "Operators"
     }
@@ -55,41 +55,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/GraphQLError": {
-  "abstract" : [
-    {
-      "text" : "Represents an error encountered during the execution of a GraphQL operation.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "struct"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "GraphQLError"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "GraphQLError"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "GraphQLError",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror"
-},
-"doc://Apollo/documentation/Apollo/GraphQLError/PathEntry": {
+"doc://Apollo/documentation/Apollo/PathComponent": {
   "abstract" : [
     {
       "text" : "Represents a path in a GraphQL query.",
@@ -107,23 +73,23 @@
     },
     {
       "kind" : "identifier",
-      "text" : "PathEntry"
+      "text" : "PathComponent"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "PathEntry"
+      "text" : "PathComponent"
     }
   ],
   "role" : "symbol",
-  "title" : "GraphQLError.PathEntry",
+  "title" : "PathComponent",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror\/pathentry"
+  "url" : "\/documentation\/apollo\/pathcomponent"
 },
-"doc://Apollo/documentation/Apollo/GraphQLError/PathEntry/!=(_:_:)": {
+"doc://Apollo/documentation/Apollo/PathComponent/!=(_:_:)": {
   "abstract" : [
 
   ],
@@ -178,12 +144,12 @@
       "text" : "Bool"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry\/!=(_:_:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent\/!=(_:_:)",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "!=(_:_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror\/pathentry\/!=(_:_:)"
+  "url" : "\/documentation\/apollo\/pathcomponent\/!=(_:_:)"
 }
 }
 }

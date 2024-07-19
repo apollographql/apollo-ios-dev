@@ -1,26 +1,20 @@
 {
-  "abstract" : [
-    {
-      "text" : "An Int value for an index in a GraphQL List",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry"
+        "doc:\/\/Apollo\/documentation\/Apollo\/CacheWriteInterceptor",
+        "doc:\/\/Apollo\/documentation\/Apollo\/CacheWriteInterceptor\/CacheWriteError"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry\/index(_:)"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheWriteInterceptor\/CacheWriteError\/missingCacheRecords"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo12GraphQLErrorV9PathEntryO5indexyAESicAEmF",
+    "externalID" : "s:6Apollo21CacheWriteInterceptorV0bC5ErrorO07missingB7RecordsyA2EmF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -32,20 +26,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "index"
-      },
-      {
-        "kind" : "text",
-        "text" : "("
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:Si",
-        "text" : "Int"
-      },
-      {
-        "kind" : "text",
-        "text" : ")"
+        "text" : "missingCacheRecords"
       }
     ],
     "modules" : [
@@ -56,7 +37,7 @@
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",
-    "title" : "GraphQLError.PathEntry.index(_:)"
+    "title" : "CacheWriteInterceptor.CacheWriteError.missingCacheRecords"
   },
   "primaryContentSections" : [
     {
@@ -79,20 +60,7 @@
             },
             {
               "kind" : "identifier",
-              "text" : "index"
-            },
-            {
-              "kind" : "text",
-              "text" : "("
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:Si",
-              "text" : "Int"
-            },
-            {
-              "kind" : "text",
-              "text" : ")"
+              "text" : "missingCacheRecords"
             }
           ]
         }
@@ -111,7 +79,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/graphqlerror\/pathentry\/index(_:)"
+        "\/documentation\/apollo\/cachewriteinterceptor\/cachewriteerror\/missingcacherecords"
       ],
       "traits" : [
         {
@@ -136,10 +104,26 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/GraphQLError": {
+"doc://Apollo/documentation/Apollo/CacheWriteInterceptor": {
   "abstract" : [
     {
-      "text" : "Represents an error encountered during the execution of a GraphQL operation.",
+      "text" : "An interceptor which writes data to the cache, following the ",
+      "type" : "text"
+    },
+    {
+      "code" : "HTTPRequest",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : "’s ",
+      "type" : "text"
+    },
+    {
+      "code" : "cachePolicy",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
       "type" : "text"
     }
   ],
@@ -154,28 +138,25 @@
     },
     {
       "kind" : "identifier",
-      "text" : "GraphQLError"
+      "text" : "CacheWriteInterceptor"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheWriteInterceptor",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "GraphQLError"
+      "text" : "CacheWriteInterceptor"
     }
   ],
   "role" : "symbol",
-  "title" : "GraphQLError",
+  "title" : "CacheWriteInterceptor",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror"
+  "url" : "\/documentation\/apollo\/cachewriteinterceptor"
 },
-"doc://Apollo/documentation/Apollo/GraphQLError/PathEntry": {
+"doc://Apollo/documentation/Apollo/CacheWriteInterceptor/CacheWriteError": {
   "abstract" : [
-    {
-      "text" : "Represents a path in a GraphQL query.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
@@ -188,28 +169,25 @@
     },
     {
       "kind" : "identifier",
-      "text" : "PathEntry"
+      "text" : "CacheWriteError"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheWriteInterceptor\/CacheWriteError",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "PathEntry"
+      "text" : "CacheWriteError"
     }
   ],
   "role" : "symbol",
-  "title" : "GraphQLError.PathEntry",
+  "title" : "CacheWriteInterceptor.CacheWriteError",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror\/pathentry"
+  "url" : "\/documentation\/apollo\/cachewriteinterceptor\/cachewriteerror"
 },
-"doc://Apollo/documentation/Apollo/GraphQLError/PathEntry/index(_:)": {
+"doc://Apollo/documentation/Apollo/CacheWriteInterceptor/CacheWriteError/missingCacheRecords": {
   "abstract" : [
-    {
-      "text" : "An Int value for an index in a GraphQL List",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
@@ -222,28 +200,15 @@
     },
     {
       "kind" : "identifier",
-      "text" : "index"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Si",
-      "text" : "Int"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
+      "text" : "missingCacheRecords"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry\/index(_:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheWriteInterceptor\/CacheWriteError\/missingCacheRecords",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "GraphQLError.PathEntry.index(_:)",
+  "title" : "CacheWriteInterceptor.CacheWriteError.missingCacheRecords",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror\/pathentry\/index(_:)"
+  "url" : "\/documentation\/apollo\/cachewriteinterceptor\/cachewriteerror\/missingcacherecords"
 }
 }
 }

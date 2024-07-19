@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo12GraphQLErrorV4pathSayAC9PathEntryOGSgvp",
+    "externalID" : "s:6Apollo12GraphQLErrorV4pathSayAA13PathComponentOGSgvp",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -48,7 +48,7 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo12GraphQLErrorV9PathEntryO",
+        "preciseIdentifier" : "s:6Apollo12GraphQLErrorV9PathEntrya",
         "text" : "PathEntry"
       },
       {
@@ -106,7 +106,7 @@
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo12GraphQLErrorV9PathEntryO",
+              "preciseIdentifier" : "s:6Apollo12GraphQLErrorV9PathEntrya",
               "text" : "PathEntry"
             },
             {
@@ -199,15 +199,12 @@
 },
 "doc://Apollo/documentation/Apollo/GraphQLError/PathEntry": {
   "abstract" : [
-    {
-      "text" : "Represents a path in a GraphQL query.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "enum"
+      "text" : "typealias"
     },
     {
       "kind" : "text",
@@ -266,7 +263,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV9PathEntryO",
+      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV9PathEntrya",
       "text" : "PathEntry"
     },
     {

@@ -99,6 +99,7 @@
     {
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/cannotParseResponse",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/cannotParseResponseData",
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/noResponseToParse"
       ],
       "title" : "Enumeration Cases"
@@ -284,6 +285,31 @@
   "title" : "MultipartResponseParsingInterceptor.ParsingError.cannotParseResponse",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/cannotparseresponse"
+},
+"doc://Apollo/documentation/Apollo/MultipartResponseParsingInterceptor/ParsingError/cannotParseResponseData": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "cannotParseResponseData"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/cannotParseResponseData",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "MultipartResponseParsingInterceptor.ParsingError.cannotParseResponseData",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/cannotparseresponsedata"
 },
 "doc://Apollo/documentation/Apollo/MultipartResponseParsingInterceptor/ParsingError/errorDescription": {
   "abstract" : [

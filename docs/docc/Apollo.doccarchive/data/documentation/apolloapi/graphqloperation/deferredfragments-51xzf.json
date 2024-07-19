@@ -2,7 +2,7 @@
   "defaultImplementationsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/hasDeferredFragments-5sx8d"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredFragments-6928x"
       ],
       "title" : "GraphQLOperation Implementations"
     }
@@ -17,11 +17,11 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/hasDeferredFragments-78tn2"
+    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredFragments-51xzf"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI16GraphQLOperationP20hasDeferredFragmentsSbvpZ",
+    "externalID" : "s:9ApolloAPI16GraphQLOperationP17deferredFragmentsSDyAA26DeferredFragmentIdentifierVAA12SelectionSet_pXpGSgvpZ",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -41,16 +41,29 @@
       },
       {
         "kind" : "identifier",
-        "text" : "hasDeferredFragments"
+        "text" : "deferredFragments"
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : ": ["
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:Sb",
-        "text" : "Bool"
+        "preciseIdentifier" : "s:9ApolloAPI26DeferredFragmentIdentifierV",
+        "text" : "DeferredFragmentIdentifier"
+      },
+      {
+        "kind" : "text",
+        "text" : " : any "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP",
+        "text" : "SelectionSet"
+      },
+      {
+        "kind" : "text",
+        "text" : ".Type]?"
       }
     ],
     "modules" : [
@@ -62,7 +75,7 @@
     "role" : "symbol",
     "roleHeading" : "Type Property",
     "symbolKind" : "property",
-    "title" : "hasDeferredFragments"
+    "title" : "deferredFragments"
   },
   "primaryContentSections" : [
     {
@@ -93,20 +106,31 @@
             },
             {
               "kind" : "identifier",
-              "text" : "hasDeferredFragments"
+              "text" : "deferredFragments"
             },
             {
               "kind" : "text",
-              "text" : ": "
+              "text" : ": ["
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DeferredFragmentIdentifier",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:Sb",
-              "text" : "Bool"
+              "preciseIdentifier" : "s:9ApolloAPI26DeferredFragmentIdentifierV",
+              "text" : "DeferredFragmentIdentifier"
             },
             {
               "kind" : "text",
-              "text" : " { "
+              "text" : " : any "
+            },
+            {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP",
+              "text" : "SelectionSet"
+            },
+            {
+              "kind" : "text",
+              "text" : ".Type]? { "
             },
             {
               "kind" : "keyword",
@@ -133,7 +157,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apolloapi\/graphqloperation\/hasdeferredfragments-78tn2"
+        "\/documentation\/apolloapi\/graphqloperation\/deferredfragments-51xzf"
       ],
       "traits" : [
         {
@@ -196,6 +220,48 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi"
 },
+"doc://ApolloAPI/documentation/ApolloAPI/DeferredFragmentIdentifier": {
+  "abstract" : [
+    {
+      "text" : "A unique identifier used as a key to map a deferred selection set type to an incremental",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "response label and path.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "DeferredFragmentIdentifier"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DeferredFragmentIdentifier",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "DeferredFragmentIdentifier"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "DeferredFragmentIdentifier",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/deferredfragmentidentifier"
+},
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation": {
   "abstract" : [
 
@@ -227,72 +293,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqloperation"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/hasDeferredFragments-5sx8d": {
-  "abstract" : [
-    {
-      "code" : "True",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " if any selection set, or nested selection set, within the operation contains any",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "fragment marked with the ",
-      "type" : "text"
-    },
-    {
-      "code" : "@defer",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " directive.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "hasDeferredFragments"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/hasDeferredFragments-5sx8d",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "hasDeferredFragments",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqloperation\/hasdeferredfragments-5sx8d"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/hasDeferredFragments-78tn2": {
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/deferredFragments-51xzf": {
   "abstract" : [
 
   ],
@@ -316,25 +317,124 @@
     },
     {
       "kind" : "identifier",
-      "text" : "hasDeferredFragments"
+      "text" : "deferredFragments"
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": ["
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
+      "preciseIdentifier" : "s:9ApolloAPI26DeferredFragmentIdentifierV",
+      "text" : "DeferredFragmentIdentifier"
+    },
+    {
+      "kind" : "text",
+      "text" : " : any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP",
+      "text" : "SelectionSet"
+    },
+    {
+      "kind" : "text",
+      "text" : ".Type]?"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/hasDeferredFragments-78tn2",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredFragments-51xzf",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
-  "title" : "hasDeferredFragments",
+  "title" : "deferredFragments",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqloperation\/hasdeferredfragments-78tn2"
+  "url" : "\/documentation\/apolloapi\/graphqloperation\/deferredfragments-51xzf"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/deferredFragments-6928x": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "deferredFragments"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI26DeferredFragmentIdentifierV",
+      "text" : "DeferredFragmentIdentifier"
+    },
+    {
+      "kind" : "text",
+      "text" : " : any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP",
+      "text" : "SelectionSet"
+    },
+    {
+      "kind" : "text",
+      "text" : ".Type]?"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredFragments-6928x",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "deferredFragments",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqloperation\/deferredfragments-6928x"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/SelectionSet": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "SelectionSet"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "SelectionSet"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "SelectionSet",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/selectionset"
 }
 }
 }

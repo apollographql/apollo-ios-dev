@@ -125,15 +125,22 @@
     },
     {
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredFragments-51xzf",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/definition",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/document",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/hasDeferredFragments-78tn2",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/hasDeferredFragments",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationDocument",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationIdentifier",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationName",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-14lsi"
       ],
       "title" : "Type Properties"
+    },
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredSelectionSetType(for:withLabel:atFieldPath:)"
+      ],
+      "title" : "Type Methods"
     },
     {
       "generated" : true,
@@ -370,6 +377,167 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqloperation\/variables"
 },
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/deferredFragments-51xzf": {
+  "abstract" : [
+
+  ],
+  "defaultImplementations" : 1,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "deferredFragments"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI26DeferredFragmentIdentifierV",
+      "text" : "DeferredFragmentIdentifier"
+    },
+    {
+      "kind" : "text",
+      "text" : " : any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP",
+      "text" : "SelectionSet"
+    },
+    {
+      "kind" : "text",
+      "text" : ".Type]?"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredFragments-51xzf",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "deferredFragments",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqloperation\/deferredfragments-51xzf"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/deferredSelectionSetType(for:withLabel:atFieldPath:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "deferredSelectionSetType"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "for"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ".Type, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "withLabel"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "atFieldPath"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : "]) -> (any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP",
+      "text" : "SelectionSet"
+    },
+    {
+      "kind" : "text",
+      "text" : ".Type)?"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredSelectionSetType(for:withLabel:atFieldPath:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "deferredSelectionSetType(for:withLabel:atFieldPath:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqloperation\/deferredselectionsettype(for:withlabel:atfieldpath:)"
+},
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/definition": {
   "abstract" : [
 
@@ -459,11 +627,10 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqloperation\/document"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/hasDeferredFragments-78tn2": {
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/hasDeferredFragments": {
   "abstract" : [
 
   ],
-  "defaultImplementations" : 1,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -495,13 +662,12 @@
       "text" : "Bool"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/hasDeferredFragments-78tn2",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/hasDeferredFragments",
   "kind" : "symbol",
-  "required" : true,
   "role" : "symbol",
   "title" : "hasDeferredFragments",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqloperation\/hasdeferredfragments-78tn2"
+  "url" : "\/documentation\/apolloapi\/graphqloperation\/hasdeferredfragments"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/operationDocument": {
   "abstract" : [

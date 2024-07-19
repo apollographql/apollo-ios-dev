@@ -29,7 +29,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": ("
+        "text" : ": (any "
       },
       {
         "kind" : "typeIdentifier",
@@ -76,7 +76,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": ("
+              "text" : ": (any "
             },
             {
               "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SSLTrustValidator",
@@ -232,7 +232,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
