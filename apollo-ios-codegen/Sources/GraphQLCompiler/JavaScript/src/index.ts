@@ -17,6 +17,7 @@ import { assertValidSchema, assertValidSDL } from "./utilities/graphql";
 import {
   addApolloCodegenSchemaExtensionToDocument,
 } from "./utilities/apolloCodegenSchemaExtension";
+import { addExperimentalDeferDirectiveToDocument } from "./utilities/experimentalDeferDirective";
 
 // We need to export all the classes we want to map to native objects,
 // so we have access to the constructor functions for type checks.
@@ -51,6 +52,7 @@ export function loadSchemaFromSources(sources: Source[]): GraphQLSchema {
   }
 
   var document = addApolloCodegenSchemaExtensionToDocument(concatAST(documents))
+  document = addExperimentalDeferDirectiveToDocument(document)
 
   if (!introspectionJSONResult) { assertValidSDL(document) }
 

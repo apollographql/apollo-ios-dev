@@ -98,4 +98,30 @@ final class MultipartResponseParsingInterceptorTests: XCTestCase {
 
     wait(for: [expectation], timeout: defaultTimeout)
   }
+
+  func test__error__givenResponse_withInvalidData_shouldReturnError() throws {
+    let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
+
+    let expectation = expectation(description: "Received callback")
+
+    subject.intercept(
+      request: .mock(operation: MockSubscription.mock()),
+      response: .mock(
+        headerFields: ["Content-Type": "multipart/mixed;boundary=\"graphql\";deferSpec=20220824"],
+        data: "🙃".data(using: .unicode)!
+      )
+    ) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      expect(result).to(beFailure { error in
+        expect(error).to(
+          matchError(MultipartResponseParsingInterceptor.ParsingError.cannotParseResponseData)
+        )
+      })
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
 }
