@@ -72,6 +72,15 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s28CustomDebugStringConvertibleP",
+              "text" : "CustomDebugStringConvertible"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:SH",
               "text" : "Hashable"
             }
@@ -84,6 +93,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/SH"
       ],
@@ -132,6 +142,7 @@
     {
       "generated" : true,
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/CustomDebugStringConvertible-Implementations",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Equatable-Implementations",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Hashable-Implementations"
       ],
@@ -565,6 +576,17 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset"
 },
+"doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/CustomDebugStringConvertible-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/CustomDebugStringConvertible-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "CustomDebugStringConvertible Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/selectionset\/customdebugstringconvertible-implementations"
+},
 "doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/Equatable-Implementations": {
   "abstract" : [
 
@@ -779,6 +801,11 @@
   "title" : "fragments",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset\/fragments-swift.property"
+},
+"doc://ApolloAPI/s28CustomDebugStringConvertibleP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
+  "title" : "Swift.CustomDebugStringConvertible",
+  "type" : "unresolvable"
 }
 }
 }
