@@ -288,8 +288,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
     fetchType: FetchType,
     cachePolicy: CachePolicy,
     result: Result<GraphQLResult<DataType>, any Error>,
-    publisher: CurrentValueSubject<Void, Never>,
-    onNoDataResponse: (() -> Void)? = nil
+    publisher: CurrentValueSubject<Void, Never>
   ) {
     switch result {
     case .failure(let error):
