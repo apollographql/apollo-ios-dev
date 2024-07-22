@@ -157,6 +157,23 @@ extension Mocks.Hero.FriendsQuery {
       ]
     }
   }
+
+  static func expectationForSecondPageErrorsOnly(server: MockGraphQLServer) -> XCTestExpectation {
+    let query = MockQuery<Mocks.Hero.FriendsQuery>()
+    query.__variables = ["id": "2001", "first": 2, "after": "Y3Vyc29yMg=="]
+    return server.expect(query) { _ in
+      return [
+        "errors": [
+          [
+            "message": "uh oh!",
+          ],
+          [
+            "message": "Some error",
+          ]
+        ]
+      ]
+    }
+  }
 }
 
 extension Mocks.Hero.ReverseFriendsQuery {

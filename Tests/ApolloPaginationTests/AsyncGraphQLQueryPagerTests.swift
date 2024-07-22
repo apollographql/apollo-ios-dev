@@ -439,6 +439,27 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     subscription.cancel()
   }
 
+  func test_errors_noDataOnSecondPage_loadAll() async throws {
+    let pager = createPager()
+    var expectedResults: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
+
+    let firstPageExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    let lastPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPageErrorsOnly(server: server)
+    let loadAllExpectation = expectation(description: "Load all pages")
+    let subscriber = await pager.subscribe { output in
+      expectedResults.append(output)
+      loadAllExpectation.fulfill()
+    }
+    try await pager.loadAll()
+    await fulfillment(of: [firstPageExpectation, lastPageExpectation, loadAllExpectation], timeout: 5)
+    let result = try XCTUnwrap(expectedResults.first)
+    let successValue = try result.get().0
+    XCTAssertFalse(successValue.errors.isEmpty)
+    XCTAssertNotNil(successValue.initialPage)
+    XCTAssertTrue(successValue.nextPages.isEmpty)
+    subscriber.cancel()
+  }
+
   // MARK: - Test helpers
 
   private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {

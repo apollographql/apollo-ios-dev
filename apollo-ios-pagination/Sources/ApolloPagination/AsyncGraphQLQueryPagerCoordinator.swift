@@ -136,7 +136,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
       // We only have one job in the group per execution.
       // Calling `next()` will either throw or give the next result (irrespective of order added into the queue).
       // Upon cancellation, the error is propogated to the task group and all remaining child tasks in the group are cancelled.
-      while try await group.next() != nil {
+      while try await group.next() != nil && isLoadingAll {
         appendJobs()
       }
 
