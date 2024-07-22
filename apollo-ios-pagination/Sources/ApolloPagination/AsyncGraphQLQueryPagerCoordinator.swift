@@ -288,7 +288,8 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
     fetchType: FetchType,
     cachePolicy: CachePolicy,
     result: Result<GraphQLResult<DataType>, any Error>,
-    publisher: CurrentValueSubject<Void, Never>
+    publisher: CurrentValueSubject<Void, Never>,
+    onNoDataResponse: (() -> Void)? = nil
   ) {
     switch result {
     case .failure(let error):
@@ -308,6 +309,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
 
       var value: Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), any Error>?
       var output: PaginationOutput<InitialQuery, PaginatedQuery>?
+      var didFail = false
       switch fetchType {
       case .initial:
         initialPageResult = data.data as? InitialQuery.Data
@@ -326,13 +328,17 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
             errors: data.errors ?? []
           )
         }
+        if initialPageResult == nil {
+          didFail = true
+        }
       case .paginated(let direction, let query):
         let variables = Set(query.__variables?.underlyingJson ?? [])
+        let underlyingData = data.data as? PaginatedQuery.Data
         switch direction {
         case .next:
-          nextPageVarMap[variables] = data.data as? PaginatedQuery.Data
+          nextPageVarMap[variables] = underlyingData
         case .previous:
-          previousPageVarMap[variables] = data.data as? PaginatedQuery.Data
+          previousPageVarMap[variables] = underlyingData
         }
 
         let allErrors = (try? queuedValue?.get().0.errors) ?? (try? currentValue?.get().0.errors) ?? []
@@ -343,6 +349,9 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
             nextPages: latest.next,
             errors: isLoadingAll ? allErrors + (data.errors ?? []) : data.errors ?? []
           )
+        }
+        if underlyingData == nil {
+          didFail = true
         }
       }
 
@@ -359,6 +368,10 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
         } else {
           currentValue = value
         }
+      }
+      if didFail, isLoadingAll {
+        isLoadingAll = false
+        publisher.send(completion: .finished)
       }
       if shouldUpdate {
         publisher.send(completion: .finished)
