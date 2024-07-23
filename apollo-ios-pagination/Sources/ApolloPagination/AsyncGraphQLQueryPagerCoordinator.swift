@@ -171,13 +171,18 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
     onUpdate: @escaping (Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), any Error>) -> Void
   ) -> AnyCancellable {
     $currentValue.compactMap({ $0 })
-      .sink { [weak self] result in
-        Task { [weak self] in
-          guard let self else { return }
-          let isLoadingAll = await self.isLoadingAll
-          guard !isLoadingAll else { return }
-          onUpdate(result)
+      .flatMap { [weak self] result in
+        Future<Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), any Error>?, Never> { [weak self] promise in
+          Task { [weak self] in
+            guard let self else { return }
+            let isLoadingAll = await self.isLoadingAll
+            guard !isLoadingAll else { return promise(.success(nil)) }
+            promise(.success(result))
+          }
         }
+      }
+      .sink { (result: Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), any Error>?)  in
+        result.flatMap(onUpdate)
       }
   }
 
