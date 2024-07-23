@@ -92,7 +92,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     let pager = createPager()
     let serverExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(server: server)
 
-    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
+    var results: [Result<(PaginationOutput<Query, Query>), any Error>] = []
     let firstPageExpectation = expectation(description: "First page")
     var subscription = await pager.subscribe(onUpdate: { _ in
       firstPageExpectation.fulfill()
@@ -102,11 +102,11 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     subscription.cancel()
     var result = try await XCTUnwrapping(await pager.currentValue)
     results.append(result)
-    XCTAssertSuccessResult(result) { (output, source) in
+    XCTAssertSuccessResult(result) { (output) in 
       XCTAssertTrue(output.nextPages.isEmpty)
       XCTAssertEqual(output.initialPage?.hero.friendsConnection.friends.count, 1)
       XCTAssertEqual(output.initialPage?.hero.friendsConnection.totalCount, 3)
-      XCTAssertEqual(source, .fetch)
+      XCTAssertEqual(output.source, .fetch)
     }
 
     let secondPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
@@ -123,9 +123,9 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     result = try await XCTUnwrapping(await pager.currentValue)
     results.append(result)
 
-    try XCTAssertSuccessResult(result) { (output, source) in
+    try XCTAssertSuccessResult(result) { (output) in 
       // Assert first page is unchanged
-      XCTAssertEqual(try? results.first?.get().0.initialPage, try? results.last?.get().0.initialPage)
+      XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
       XCTAssertFalse(output.nextPages.isEmpty)
       XCTAssertEqual(output.nextPages.count, 1)
@@ -133,7 +133,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertEqual(output.previousPages.count, 0)
       let page = try XCTUnwrap(output.nextPages.first)
       XCTAssertEqual(page.hero.friendsConnection.friends.count, 1)
-      XCTAssertEqual(source, .fetch)
+      XCTAssertEqual(output.source, .fetch)
     }
     var previousCount = await pager.previousPageVarMap.values.count
     XCTAssertEqual(previousCount, 0)
@@ -155,9 +155,9 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     result = try await XCTUnwrapping(await pager.currentValue)
     results.append(result)
 
-    try XCTAssertSuccessResult(result) { (output, source) in
+    try XCTAssertSuccessResult(result) { (output) in 
       // Assert first page is unchanged
-      XCTAssertEqual(try? results.first?.get().0.initialPage, try? results.last?.get().0.initialPage)
+      XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
       XCTAssertFalse(output.nextPages.isEmpty)
       XCTAssertEqual(output.nextPages.count, 1)
@@ -165,7 +165,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertEqual(output.previousPages.count, 1)
       let page = try XCTUnwrap(output.previousPages.first)
       XCTAssertEqual(page.hero.friendsConnection.friends.count, 1)
-      XCTAssertEqual(source, .fetch)
+      XCTAssertEqual(output.source, .fetch)
     }
     previousCount = await pager.previousPageVarMap.values.count
     XCTAssertEqual(previousCount, 1)
@@ -190,12 +190,11 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
       timeout: 5
     )
 
-    let (result, _) = try await XCTUnwrapping(try await pager.currentValue?.get())
+    let result = try await XCTUnwrapping(try await pager.currentValue?.get())
     XCTAssertFalse(result.previousPages.isEmpty)
     XCTAssertEqual(result.initialPage?.hero.friendsConnection.friends.count, 1)
     XCTAssertFalse(result.nextPages.isEmpty)
-
-    let friends = result.previousPages.flatMap(\.hero.friendsConnection.friends) 
+    let friends = result.previousPages.flatMap(\.hero.friendsConnection.friends)
       + (result.initialPage?.hero.friendsConnection.friends ?? [])
       + result.nextPages.flatMap(\.hero.friendsConnection.friends)
 
@@ -208,7 +207,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     let pager = GraphQLQueryPagerCoordinator(pager: createPager())
     let serverExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(server: server)
 
-    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
+    var results: [Result<(PaginationOutput<Query, Query>), any Error>] = []
     let firstPageExpectation = expectation(description: "First page")
     var subscription = await pager.publisher.sink { _ in
       firstPageExpectation.fulfill()
@@ -218,11 +217,11 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     subscription.cancel()
     var result = try await XCTUnwrapping(await pager.pager.currentValue)
     results.append(result)
-    XCTAssertSuccessResult(result) { (output, source) in
+    XCTAssertSuccessResult(result) { (output) in 
       XCTAssertTrue(output.nextPages.isEmpty)
       XCTAssertEqual(output.initialPage?.hero.friendsConnection.friends.count, 1)
       XCTAssertEqual(output.initialPage?.hero.friendsConnection.totalCount, 3)
-      XCTAssertEqual(source, .fetch)
+      XCTAssertEqual(output.source, .fetch)
     }
 
     let secondPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
@@ -239,9 +238,9 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     result = try await XCTUnwrapping(await pager.pager.currentValue)
     results.append(result)
 
-    try XCTAssertSuccessResult(result) { (output, source) in
+    try XCTAssertSuccessResult(result) { (output) in 
       // Assert first page is unchanged
-      XCTAssertEqual(try? results.first?.get().0.initialPage, try? results.last?.get().0.initialPage)
+      XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
       XCTAssertFalse(output.nextPages.isEmpty)
       XCTAssertEqual(output.nextPages.count, 1)
@@ -249,7 +248,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertEqual(output.previousPages.count, 0)
       let page = try XCTUnwrap(output.nextPages.first)
       XCTAssertEqual(page.hero.friendsConnection.friends.count, 1)
-      XCTAssertEqual(source, .fetch)
+      XCTAssertEqual(output.source, .fetch)
     }
 
     let previousPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
@@ -267,9 +266,9 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     result = try await XCTUnwrapping(await pager.pager.currentValue)
     results.append(result)
 
-    try XCTAssertSuccessResult(result) { (output, source) in
+    try XCTAssertSuccessResult(result) { (output) in 
       // Assert first page is unchanged
-      XCTAssertEqual(try? results.first?.get().0.initialPage, try? results.last?.get().0.initialPage)
+      XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
       XCTAssertFalse(output.nextPages.isEmpty)
       XCTAssertEqual(output.nextPages.count, 1)
@@ -277,7 +276,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertEqual(output.previousPages.count, 1)
       let page = try XCTUnwrap(output.previousPages.first)
       XCTAssertEqual(page.hero.friendsConnection.friends.count, 1)
-      XCTAssertEqual(source, .fetch)
+      XCTAssertEqual(output.source, .fetch)
     }
   }
 
@@ -298,7 +297,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
       timeout: 5
     )
 
-    let result = try await XCTUnwrapping(try await pager.pager.currentValue?.get().0)
+    let result = try await XCTUnwrapping(try await pager.pager.currentValue?.get())
     XCTAssertFalse(result.previousPages.isEmpty)
     XCTAssertEqual(result.initialPage?.hero.friendsConnection.friends.count, 1)
     XCTAssertFalse(result.nextPages.isEmpty)

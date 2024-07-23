@@ -4,9 +4,9 @@ import Combine
 import Foundation
 
 /// Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.
-public class AsyncGraphQLQueryPager<Model>: Publisher {
+public class AsyncGraphQLQueryPager<Model: Hashable>: Publisher {
   public typealias Failure = Never
-  public typealias Output = Result<(Model, UpdateSource), any Error>
+  public typealias Output = Result<Model, any Error>
   let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
   var publisher: AnyPublisher<Output, Never> { _subject.compactMap({ $0 }).eraseToAnyPublisher() }
   @Atomic public var cancellables: Set<AnyCancellable> = []
@@ -25,8 +25,8 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
         let returnValue: Output
 
         switch result {
-        case let .success((output, source)):
-          returnValue = .success((output, source))
+        case let .success(output):
+          returnValue = .success(output)
         case let .failure(error):
           returnValue = .failure(error)
         }
@@ -115,7 +115,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
 
   public func receive<S>(
     subscriber: S
-  ) where S: Subscriber, Never == S.Failure, Result<(Model, UpdateSource), any Error> == S.Input {
+  ) where S: Subscriber, Never == S.Failure, Result<Model, any Error> == S.Input {
     publisher.subscribe(subscriber)
   }
 }
@@ -126,8 +126,8 @@ extension AsyncGraphQLQueryPager: Equatable where Model: Equatable {
     let right = rhs._subject.value
 
     switch (left, right) {
-    case (.success((let leftValue, let leftSource)), .success((let rightValue, let rightSource))):
-      return leftValue == rightValue && leftSource == rightSource
+    case (.success(let leftValue), .success(let rightValue)):
+      return leftValue == rightValue
     case (.failure(let leftError), .failure(let rightError)):
       return leftError.localizedDescription == rightError.localizedDescription
     case (.none, .none):

@@ -93,7 +93,7 @@ final class OffsetTests: XCTestCase {
     var results: [ViewModel]?
     let cancellable = pager.map { value in
       switch value {
-      case .success((let output, _)):
+      case .success(let output):
         let friends = output.allPages.flatMap { data in
           data.hero.friends.map { friend in
             ViewModel(name: friend.name)

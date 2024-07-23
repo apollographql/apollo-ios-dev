@@ -138,7 +138,7 @@ final class GraphQLQueryPagerTests: XCTestCase {
     var expectedViewModels: [ViewModel]?
     let subscription = anyPager.compactMap { result in
       switch result {
-      case .success((let data, _)):
+      case .success(let data):
         return data.allPages.flatMap { data in
           data.hero.friendsConnection.friends.map {
             ViewModel(name: $0.name)
@@ -171,7 +171,7 @@ final class GraphQLQueryPagerTests: XCTestCase {
     var expectedViewModels: [PaginationOutput<Query, Query>] = []
     pager.sink { result in
       switch result {
-      case .success((let value, _)):
+      case .success(let value):
         expectedViewModels.append(value)
         fetchExpectation.fulfill()
       default:
@@ -194,7 +194,7 @@ final class GraphQLQueryPagerTests: XCTestCase {
     anyPager
       .map { result in
         switch result {
-        case .success((let output, _)):
+        case .success(let output):
           return output.allPages.last.flatMap(\.hero.friendsConnection.friends.last?.name)
         case .failure(let error):
           XCTFail(error.localizedDescription)
@@ -234,7 +234,7 @@ final class GraphQLQueryPagerTests: XCTestCase {
     let subscriber = anyPager
       .compactMap { result in
         switch result {
-        case .success((let output, _)):
+        case .success(let output):
           if let latestPage = output.previousPages.last {
             return latestPage.hero.friendsConnection.friends.first?.name
           }

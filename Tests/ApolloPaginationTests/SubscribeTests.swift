@@ -45,8 +45,8 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     let initialFetchExpectation = expectation(description: "Results")
     initialFetchExpectation.assertForOverFulfill = false
 
-    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
-    var otherResults: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
+    var results: [Result<PaginationOutput<Query, Query>, any Error>] = []
+    var otherResults: [Result<PaginationOutput<Query, Query>, any Error>] = []
     await pager.$currentValue.compactMap({ $0 }).sink { result in
       results.append(result)
       initialFetchExpectation.fulfill()
@@ -62,11 +62,11 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [serverExpectation, initialFetchExpectation], timeout: 1.0)
     XCTAssertFalse(results.isEmpty)
     let result = try XCTUnwrap(results.first)
-    XCTAssertSuccessResult(result) { (output, source) in
+    XCTAssertSuccessResult(result) { output in
       XCTAssertTrue(output.nextPages.isEmpty)
       XCTAssertEqual(output.initialPage?.hero.friendsConnection.friends.count, 2)
       XCTAssertEqual(output.initialPage?.hero.friendsConnection.totalCount, 3)
-      XCTAssertEqual(source, .fetch)
+      XCTAssertEqual(output.source, .fetch)
       XCTAssertEqual(results.count, otherResults.count)
     }
   }

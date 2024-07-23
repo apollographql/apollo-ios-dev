@@ -6,7 +6,7 @@ import Foundation
 /// Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.
 public class GraphQLQueryPager<Model>: Publisher {
   public typealias Failure = Never
-  public typealias Output = Result<(Model, UpdateSource), any Error>
+  public typealias Output = Result<Model, any Error>
   let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
   var publisher: AnyPublisher<Output, Never> { _subject.compactMap { $0 }.eraseToAnyPublisher() }
   public var cancellables: Set<AnyCancellable> = []
@@ -128,7 +128,7 @@ public class GraphQLQueryPager<Model>: Publisher {
 
   public func receive<S>(
     subscriber: S
-  ) where S: Subscriber, Never == S.Failure, Result<(Model, UpdateSource), any Error> == S.Input {
+  ) where S: Subscriber, Never == S.Failure, Result<Model, any Error> == S.Input {
     publisher.subscribe(subscriber)
   }
 }
@@ -139,8 +139,8 @@ extension GraphQLQueryPager: Equatable where Model: Equatable {
     let right = rhs._subject.value
 
     switch (left, right) {
-    case (.success((let leftValue, let leftSource)), .success((let rightValue, let rightSource))):
-      return leftValue == rightValue && leftSource == rightSource
+    case (.success(let leftValue), .success(let rightValue)):
+      return leftValue == rightValue
     case (.failure(let leftError), .failure(let rightError)):
       return leftError.localizedDescription == rightError.localizedDescription
     case (.none, .none):

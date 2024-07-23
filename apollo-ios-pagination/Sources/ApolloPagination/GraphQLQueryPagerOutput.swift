@@ -16,16 +16,20 @@ public struct PaginationOutput<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 
   public let errors: [GraphQLError]
 
+  public let source: UpdateSource
+
   public init(
     previousPages: [PaginatedQuery.Data],
     initialPage: InitialQuery.Data?,
     nextPages: [PaginatedQuery.Data],
-    errors: [GraphQLError]
+    errors: [GraphQLError],
+    source: UpdateSource
   ) {
     self.previousPages = previousPages
     self.initialPage = initialPage
     self.nextPages = nextPages
     self.errors = errors
+    self.source = source
   }
 }
 
