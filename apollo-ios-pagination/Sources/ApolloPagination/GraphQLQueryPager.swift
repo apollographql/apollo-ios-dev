@@ -52,6 +52,7 @@ public class GraphQLQueryPager<Model: Hashable>: Publisher {
 
   /// Subscribe to the results of the pager, with the management of the subscriber being stored internally to the `AnyGraphQLQueryPager`.
   /// - Parameter completion: The closure to trigger when new values come in. Guaranteed to run on the main thread.
+  @available(*, deprecated, message: "Will be removed in a future version of ApolloPagination. Use the `Combine` publishers instead. If you need to dispatch to the main thread, make sure to use a `.receive(on: RunLoop.main)` as part of your `Combine` operation.")
   public func subscribe(completion: @escaping @MainActor (Output) -> Void) {
     publisher.sink { result in
       Task { await completion(result) }
