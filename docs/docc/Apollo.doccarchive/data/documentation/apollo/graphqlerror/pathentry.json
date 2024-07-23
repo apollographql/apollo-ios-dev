@@ -1,10 +1,4 @@
 {
-  "abstract" : [
-    {
-      "text" : "Represents a path in a GraphQL query.",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -19,11 +13,11 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo12GraphQLErrorV9PathEntryO",
+    "externalID" : "s:6Apollo12GraphQLErrorV9PathEntrya",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "enum"
+        "text" : "typealias"
       },
       {
         "kind" : "text",
@@ -46,8 +40,8 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Enumeration",
-    "symbolKind" : "enum",
+    "roleHeading" : "Type Alias",
+    "symbolKind" : "typealias",
     "title" : "GraphQLError.PathEntry"
   },
   "primaryContentSections" : [
@@ -63,7 +57,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "enum"
+              "text" : "typealias"
             },
             {
               "kind" : "text",
@@ -72,21 +66,21 @@
             {
               "kind" : "identifier",
               "text" : "PathEntry"
+            },
+            {
+              "kind" : "text",
+              "text" : " = "
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo13PathComponentO",
+              "text" : "PathComponent"
             }
           ]
         }
       ],
       "kind" : "declarations"
-    }
-  ],
-  "relationshipsSections" : [
-    {
-      "identifiers" : [
-        "doc:\/\/Apollo\/SQ"
-      ],
-      "kind" : "relationships",
-      "title" : "Conforms To",
-      "type" : "conformsTo"
     }
   ],
   "schemaVersion" : {
@@ -96,22 +90,6 @@
   },
   "sections" : [
 
-  ],
-  "topicSections" : [
-    {
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry\/field(_:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry\/index(_:)"
-      ],
-      "title" : "Enumeration Cases"
-    },
-    {
-      "generated" : true,
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry\/Equatable-Implementations"
-      ],
-      "title" : "Default Implementations"
-    }
   ],
   "variants" : [
     {
@@ -127,11 +105,6 @@
   ]
 , 
 "references": {
-"doc://Apollo/SQ": {
-  "identifier" : "doc:\/\/Apollo\/SQ",
-  "title" : "Swift.Equatable",
-  "type" : "unresolvable"
-},
 "doc://Apollo/documentation/Apollo": {
   "abstract" : [
     {
@@ -182,15 +155,12 @@
 },
 "doc://Apollo/documentation/Apollo/GraphQLError/PathEntry": {
   "abstract" : [
-    {
-      "text" : "Represents a path in a GraphQL query.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "enum"
+      "text" : "typealias"
     },
     {
       "kind" : "text",
@@ -214,28 +184,17 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlerror\/pathentry"
 },
-"doc://Apollo/documentation/Apollo/GraphQLError/PathEntry/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror\/pathentry\/equatable-implementations"
-},
-"doc://Apollo/documentation/Apollo/GraphQLError/PathEntry/field(_:)": {
+"doc://Apollo/documentation/Apollo/PathComponent": {
   "abstract" : [
     {
-      "text" : "A String value for a field in a GraphQL query",
+      "text" : "Represents a path in a GraphQL query.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "case"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -243,69 +202,21 @@
     },
     {
       "kind" : "identifier",
-      "text" : "field"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
+      "text" : "PathComponent"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry\/field(_:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent",
   "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "GraphQLError.PathEntry.field(_:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror\/pathentry\/field(_:)"
-},
-"doc://Apollo/documentation/Apollo/GraphQLError/PathEntry/index(_:)": {
-  "abstract" : [
-    {
-      "text" : "An Int value for an index in a GraphQL List",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "case"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
+  "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "index"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Si",
-      "text" : "Int"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
+      "text" : "PathComponent"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry\/index(_:)",
-  "kind" : "symbol",
   "role" : "symbol",
-  "title" : "GraphQLError.PathEntry.index(_:)",
+  "title" : "PathComponent",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror\/pathentry\/index(_:)"
+  "url" : "\/documentation\/apollo\/pathcomponent"
 }
 }
 }

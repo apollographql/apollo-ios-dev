@@ -19,6 +19,7 @@
       }
     ],
     "role" : "collectionGroup",
+    "roleHeading" : "API Collection",
     "title" : "WebSocketClientDelegate Implementations"
   },
   "schemaVersion" : {
@@ -151,7 +152,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": any "
     },
     {
       "kind" : "typeIdentifier",
@@ -197,7 +198,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": any "
     },
     {
       "kind" : "typeIdentifier",
@@ -214,7 +215,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -260,7 +261,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": any "
     },
     {
       "kind" : "typeIdentifier",
@@ -323,7 +324,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": any "
     },
     {
       "kind" : "typeIdentifier",

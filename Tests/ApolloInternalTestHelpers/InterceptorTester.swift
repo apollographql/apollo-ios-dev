@@ -1,4 +1,5 @@
 import Apollo
+import ApolloAPI
 import Foundation
 
 /// Use this interceptor tester to isolate a single `ApolloInterceptor` vs. having to create an
@@ -14,9 +15,9 @@ public class InterceptorTester {
   public func intercept<Operation>(
     request: Apollo.HTTPRequest<Operation>,
     response: Apollo.HTTPResponse<Operation>? = nil,
-    completion: @escaping (Result<Data?, any Error>) -> Void
+    completion: @escaping (Result<HTTPResponse<Operation>?, any Error>) -> Void
   ) {
-    let requestChain = ResponseCaptureRequestChain({ result in
+    let requestChain = ResponseCaptureRequestChain<Operation>({ result in
       completion(result)
     })
 
@@ -27,11 +28,11 @@ public class InterceptorTester {
   }
 }
 
-fileprivate class ResponseCaptureRequestChain: RequestChain {
+fileprivate class ResponseCaptureRequestChain<T: GraphQLOperation>: RequestChain {
   var isCancelled: Bool = false
-  let completion: (Result<Data?, any Error>) -> Void
+  let completion: (Result<HTTPResponse<T>?, any Error>) -> Void
 
-  init(_ completion: @escaping (Result<Data?, any Error>) -> Void) {
+  init(_ completion: @escaping (Result<HTTPResponse<T>?, any Error>) -> Void) {
     self.completion = completion
   }
 
@@ -45,7 +46,7 @@ fileprivate class ResponseCaptureRequestChain: RequestChain {
     response: Apollo.HTTPResponse<Operation>?,
     completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
   ) {
-    self.completion(.success(response?.rawData))
+    self.completion(.success(response as? HTTPResponse<T>))
   }
 
   func proceedAsync<Operation>(
@@ -54,7 +55,7 @@ fileprivate class ResponseCaptureRequestChain: RequestChain {
     interceptor: any ApolloInterceptor,
     completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
   ) {
-    self.completion(.success(response?.rawData))
+    self.completion(.success(response as? HTTPResponse<T>))
   }
 
   func cancel() {}

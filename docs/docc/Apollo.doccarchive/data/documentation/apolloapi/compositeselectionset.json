@@ -152,6 +152,7 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet",
+        "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/SH"
       ],
@@ -366,6 +367,11 @@
   "title" : "SelectionSet",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset"
+},
+"doc://ApolloAPI/s28CustomDebugStringConvertibleP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
+  "title" : "Swift.CustomDebugStringConvertible",
+  "type" : "unresolvable"
 }
 }
 }

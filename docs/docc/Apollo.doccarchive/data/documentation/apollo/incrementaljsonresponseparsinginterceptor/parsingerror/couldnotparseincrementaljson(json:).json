@@ -1,0 +1,281 @@
+{
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/Apollo\/documentation\/Apollo",
+        "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor",
+        "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError\/couldNotParseIncrementalJSON(json:)"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:6Apollo41IncrementalJSONResponseParsingInterceptorV0D5ErrorO013couldNotParseB4JSONyAEs11AnyHashableV_tcAEmF",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "case"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "couldNotParseIncrementalJSON"
+      },
+      {
+        "kind" : "text",
+        "text" : "("
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "json"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:9ApolloAPI9JSONValuea",
+        "text" : "JSONValue"
+      },
+      {
+        "kind" : "text",
+        "text" : ")"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "Apollo"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Case",
+    "symbolKind" : "case",
+    "title" : "IncrementalJSONResponseParsingInterceptor.ParsingError.couldNotParseIncrementalJSON(json:)"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "case"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "couldNotParseIncrementalJSON"
+            },
+            {
+              "kind" : "text",
+              "text" : "("
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "json"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI9JSONValuea",
+              "text" : "JSONValue"
+            },
+            {
+              "kind" : "text",
+              "text" : ")"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/couldnotparseincrementaljson(json:)"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://Apollo/documentation/Apollo": {
+  "abstract" : [
+    {
+      "text" : "A Strongly typed, Swift-first, GraphQL client.",
+      "type" : "text"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "Apollo",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo"
+},
+"doc://Apollo/documentation/Apollo/IncrementalJSONResponseParsingInterceptor": {
+  "abstract" : [
+    {
+      "text" : "An interceptor which parses JSON response data into a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLResult",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " and attaches it to the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "code" : "HTTPResponse",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "IncrementalJSONResponseParsingInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "IncrementalJSONResponseParsingInterceptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "IncrementalJSONResponseParsingInterceptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor"
+},
+"doc://Apollo/documentation/Apollo/IncrementalJSONResponseParsingInterceptor/ParsingError": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ParsingError"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ParsingError"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "IncrementalJSONResponseParsingInterceptor.ParsingError",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror"
+},
+"doc://Apollo/documentation/Apollo/IncrementalJSONResponseParsingInterceptor/ParsingError/couldNotParseIncrementalJSON(json:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "couldNotParseIncrementalJSON"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "json"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9JSONValuea",
+      "text" : "JSONValue"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError\/couldNotParseIncrementalJSON(json:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "IncrementalJSONResponseParsingInterceptor.ParsingError.couldNotParseIncrementalJSON(json:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/couldnotparseincrementaljson(json:)"
+}
+}
+}

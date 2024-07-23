@@ -6,14 +6,24 @@ import JavaScriptCore
 /// You can get error details if you need them, or call `error.logLines` to get errors in a format
 /// that lets Xcode show inline errors.
 public final class GraphQLError: JavaScriptError {
-  private let source: GraphQLSource
+  private let source: GraphQLSource?
   /// The source locations associated with this error.
   public let sourceLocations: [GraphQLSourceLocation]?
 
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
-    let source = GraphQLSource.fromJSValue(jsValue["source"], bridge: bridge)
-    self.source = source
-    self.sourceLocations = Self.computeSourceLocations(for: source, from: jsValue, bridge: bridge)
+    // When the error is a “Too many validation errors” error, there is no `source` in the error
+    // object. This was causing a crash. Check for this to be undefined to avoid this edge case.
+    let sourceValue = jsValue["source"]
+    if !sourceValue.isUndefined {
+      let source = GraphQLSource.fromJSValue(sourceValue, bridge: bridge)
+      self.source = source
+      self.sourceLocations = Self.computeSourceLocations(for: source, from: jsValue, bridge: bridge)
+
+    } else {
+      self.source = nil
+      self.sourceLocations = nil
+    }
+
     super.init(jsValue, bridge: bridge)
   }
 

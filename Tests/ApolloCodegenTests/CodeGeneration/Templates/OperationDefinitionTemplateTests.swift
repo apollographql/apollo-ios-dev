@@ -306,134 +306,6 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  // MARK: - Defer Properties
-
-  func test__generate__givenQueryWithDeferredInlineFragment_generatesDeferredPropertyTrue() async throws {
-    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
-
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      species: String!
-    }
-
-    type Dog implements Animal {
-      species: String!
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        ... on Dog @defer(label: "root") {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public static let hasDeferredFragments: Bool = true
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let actual = renderSubject()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
-  }
-
-  func test__generate__givenQueryWithDeferredNamedFragment_generatesDeferredPropertyTrue() async throws {
-    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
-
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      species: String!
-    }
-
-    type Dog implements Animal {
-      species: String!
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        ... DogFragment @defer(label: "root")
-      }
-    }
-
-    fragment DogFragment on Dog {
-      species
-    }
-    """
-
-    let expected = """
-      public static let hasDeferredFragments: Bool = true
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let actual = renderSubject()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
-  }
-
-  func test__generate__givenQueryWithNamedFragment_withDeferredTypeCase_generatesDeferredPropertyTrue() async throws {
-    throw XCTSkip("Skipped in PR #235 - must be reverted when the feature/defer-execution-networking branch is merged into main!")
-    
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      species: String!
-    }
-
-    type Dog implements Animal {
-      species: String!
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        ... DogFragment
-      }
-    }
-
-    fragment DogFragment on Animal {
-      ... on Dog @defer(label: "root") {
-        species
-      }
-    }
-    """
-
-    let expected = """
-      public static let hasDeferredFragments: Bool = true
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let actual = renderSubject()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
-  }
-
   // MARK: - Selection Set Declaration
 
   func test__generate__givenOperationSelectionSet_rendersDeclaration() async throws {
@@ -1196,5 +1068,109 @@ class OperationDefinitionTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expectedOne, atLine: 8, ignoringExtraLines: true))
     expect(actual).to(equalLineByLine(expectedTwo, atLine: 10, ignoringExtraLines: true))
+  }
+  
+  // MARK: - Defer Metadata
+  
+  func test__generateMetadata__whenContainsDeferredFragment_rendersDeferMetadata() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let actual = renderSubject()
+    
+    // then
+    expect(self.operation.containsDeferredFragment).to(beTrue())
+    
+    expect(actual).to(equalLineByLine(
+      """
+      }
+      
+      // MARK: Deferred Fragment Metadata
+      
+      extension TestOperationQuery {
+      """,
+      atLine: 61,
+      ignoringExtraLines: true
+    ))
+    
+    expect(actual).to(equalLineByLine(
+      """
+      }
+      """,
+      atLine: 73,
+      ignoringExtraLines: false
+    ))
+  }
+  
+  func test__generateMetadata__whenDoesNotContainDeferredFragment_doesNotRenderDeferMetadata() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        species
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let actual = renderSubject()
+    
+    // then
+    expect(self.operation.containsDeferredFragment).to(beFalse())
+    
+    expect(actual).to(equalLineByLine(
+      """
+      }
+      """,
+      atLine: 37,
+      ignoringExtraLines: false
+    ))
   }
 }

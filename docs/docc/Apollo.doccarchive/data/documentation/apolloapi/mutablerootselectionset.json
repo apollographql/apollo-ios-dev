@@ -100,6 +100,7 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/RootSelectionSet",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSetEntityValue",
+        "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/SH"
       ],
@@ -404,6 +405,11 @@
   "title" : "SelectionSetEntityValue",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionsetentityvalue"
+},
+"doc://ApolloAPI/s28CustomDebugStringConvertibleP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
+  "title" : "Swift.CustomDebugStringConvertible",
+  "type" : "unresolvable"
 }
 }
 }

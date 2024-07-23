@@ -43,7 +43,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": ("
+        "text" : ": (any "
       },
       {
         "kind" : "typeIdentifier",
@@ -98,7 +98,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": ("
+              "text" : ": (any "
             },
             {
               "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketClientDelegate",
@@ -234,7 +234,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",

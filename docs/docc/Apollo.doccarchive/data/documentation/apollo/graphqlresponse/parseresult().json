@@ -17,7 +17,7 @@
       "type" : "codeVoice"
     },
     {
-      "text" : ".",
+      "text" : ". The result can be sent to a completion block for a",
       "type" : "text"
     },
     {
@@ -25,15 +25,7 @@
       "type" : "text"
     },
     {
-      "text" : "The result can be sent to a completion block for a request.",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "The ",
+      "text" : "request and the ",
       "type" : "text"
     },
     {
@@ -266,7 +258,7 @@
 "doc://Apollo/documentation/Apollo/GraphQLResponse": {
   "abstract" : [
     {
-      "text" : "Represents a GraphQL response received from a server.",
+      "text" : "Represents a complete GraphQL response received from a server.",
       "type" : "text"
     }
   ],
@@ -316,7 +308,7 @@
       "type" : "codeVoice"
     },
     {
-      "text" : ".",
+      "text" : ". The result can be sent to a completion block for a",
       "type" : "text"
     },
     {
@@ -324,15 +316,7 @@
       "type" : "text"
     },
     {
-      "text" : "The result can be sent to a completion block for a request.",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "The ",
+      "text" : "request and the ",
       "type" : "text"
     },
     {

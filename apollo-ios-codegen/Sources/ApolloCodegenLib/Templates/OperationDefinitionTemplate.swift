@@ -26,8 +26,6 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
     \(OperationDeclaration())
       \(DocumentType())
 
-      \(section: DeferredProperties(operation.containsDeferredFragment))
-
       \(section: VariableProperties(operation.definition.variables))
 
       \(Initializer(operation.definition.variables))
@@ -44,7 +42,11 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
         ).renderBody())
       }
     }
-
+    \(section: DeferredFragmentsMetadataTemplate(
+      operation: operation,
+      config: config,
+      renderAccessControl: { accessControlModifier(for: .parent) }()
+    ).render())
     """)
   }
     

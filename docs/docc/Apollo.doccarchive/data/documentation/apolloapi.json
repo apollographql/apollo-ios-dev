@@ -172,6 +172,7 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DeferredFragmentIdentifier",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ListData",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ObjectData",
@@ -765,6 +766,48 @@
   "title" : "Deferred",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/deferred"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/DeferredFragmentIdentifier": {
+  "abstract" : [
+    {
+      "text" : "A unique identifier used as a key to map a deferred selection set type to an incremental",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "response label and path.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "DeferredFragmentIdentifier"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DeferredFragmentIdentifier",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "DeferredFragmentIdentifier"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "DeferredFragmentIdentifier",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/deferredfragmentidentifier"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/DocumentType": {
   "abstract" : [

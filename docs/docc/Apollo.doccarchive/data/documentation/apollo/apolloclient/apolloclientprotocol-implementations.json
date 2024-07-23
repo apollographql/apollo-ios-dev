@@ -19,6 +19,7 @@
       }
     ],
     "role" : "collectionGroup",
+    "roleHeading" : "API Collection",
     "title" : "ApolloClientProtocol Implementations"
   },
   "schemaVersion" : {
@@ -173,7 +174,7 @@
     },
     {
       "kind" : "text",
-      "text" : ", "
+      "text" : ", any "
     },
     {
       "kind" : "typeIdentifier",
@@ -272,7 +273,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -327,11 +328,12 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">?) -> ("
+      "text" : ">?) -> (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -435,7 +437,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -490,11 +492,12 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">?) -> ("
+      "text" : ">?) -> (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -584,7 +587,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -639,11 +642,12 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">?) -> ("
+      "text" : ">?) -> (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -747,7 +751,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -802,11 +806,12 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">?) -> ("
+      "text" : ">?) -> (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -876,7 +881,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -931,11 +936,12 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">) -> "
+      "text" : ">) -> any "
     },
     {
       "kind" : "typeIdentifier",
@@ -1018,7 +1024,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -1073,11 +1079,12 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">?) -> ("
+      "text" : ">?) -> (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -1165,7 +1172,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -1220,6 +1227,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {

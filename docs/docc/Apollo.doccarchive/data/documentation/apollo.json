@@ -113,6 +113,7 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLFile",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLGETTransformer",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult",
+        "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParsingInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/Record",
@@ -143,6 +144,7 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/Constants",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLHTTPRequestError",
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONConverter",
+        "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent",
         "doc:\/\/Apollo\/documentation\/Apollo\/RootSelectionSetInitializeError"
       ],
       "title" : "Enumerations"
@@ -1106,7 +1108,7 @@
 "doc://Apollo/documentation/Apollo/GraphQLResponse": {
   "abstract" : [
     {
-      "text" : "Represents a GraphQL response received from a server.",
+      "text" : "Represents a complete GraphQL response received from a server.",
       "type" : "text"
     }
   ],
@@ -1303,6 +1305,60 @@
   "title" : "InMemoryNormalizedCache",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/inmemorynormalizedcache"
+},
+"doc://Apollo/documentation/Apollo/IncrementalJSONResponseParsingInterceptor": {
+  "abstract" : [
+    {
+      "text" : "An interceptor which parses JSON response data into a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLResult",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " and attaches it to the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "code" : "HTTPResponse",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "IncrementalJSONResponseParsingInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "IncrementalJSONResponseParsingInterceptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "IncrementalJSONResponseParsingInterceptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor"
 },
 "doc://Apollo/documentation/Apollo/InterceptorProvider": {
   "abstract" : [
@@ -1722,6 +1778,40 @@
   "title" : "NormalizedCache",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/normalizedcache"
+},
+"doc://Apollo/documentation/Apollo/PathComponent": {
+  "abstract" : [
+    {
+      "text" : "Represents a path in a GraphQL query.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "PathComponent"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "PathComponent"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PathComponent",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/pathcomponent"
 },
 "doc://Apollo/documentation/Apollo/Record": {
   "abstract" : [
