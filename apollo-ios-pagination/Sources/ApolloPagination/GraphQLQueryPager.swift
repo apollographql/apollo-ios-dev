@@ -4,7 +4,7 @@ import Combine
 import Foundation
 
 /// Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.
-public class GraphQLQueryPager<Model>: Publisher {
+public class GraphQLQueryPager<Model: Hashable>: Publisher {
   public typealias Failure = Never
   public typealias Output = Result<Model, any Error>
   let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
@@ -129,7 +129,12 @@ public class GraphQLQueryPager<Model>: Publisher {
   public func receive<S>(
     subscriber: S
   ) where S: Subscriber, Never == S.Failure, Result<Model, any Error> == S.Input {
-    publisher.subscribe(subscriber)
+    publisher
+      .removeDuplicates(by: { _lhs, _rhs in
+        guard let lhs = try? _lhs.get(), let rhs = try? _rhs.get() else { return false }
+        return lhs == rhs
+      })
+      .subscribe(subscriber)
   }
 }
 
@@ -150,3 +155,4 @@ extension GraphQLQueryPager: Equatable where Model: Equatable {
     }
   }
 }
+

@@ -69,7 +69,6 @@ final class OffsetTests: XCTestCase {
     }
   }
 
-
   private func fetchFirstPage<T>(pager: AsyncGraphQLQueryPager<T>) async {
     let serverExpectation = Mocks.Hero.OffsetFriendsQuery.expectationForFirstPage(server: server)
     await pager.fetch()

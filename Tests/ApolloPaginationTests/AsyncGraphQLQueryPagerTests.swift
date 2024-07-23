@@ -36,7 +36,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
           hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
           endCursor: data.hero.friendsConnection.pageInfo.endCursor
         )
-      }, 
+      },
       pageResolver: { page, direction in
         switch direction {
         case .next:
@@ -63,7 +63,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
-    let subscription = pager.sink { value in
+    let subscription = pager.sink { _ in
       secondPageFetch.fulfill()
     }
     try await pager.loadNext()
@@ -180,7 +180,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
-    let subscription = pager.sink { value in
+    let subscription = pager.sink { _ in
       secondPageFetch.fulfill()
     }
     try await pager.loadNext()
@@ -247,7 +247,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
           XCTFail("Unexpected failure: \(error)")
           return nil
         }
-      }.sink { value in
+      }.sink { _ in
         secondPageFetch.fulfill()
       }
     try await pager.loadNext()
@@ -354,7 +354,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
 
   func test_errors_partialSuccess() async throws {
     let pager = createPager()
-    var expectedResults: [Result<(PaginationOutput<Query, Query>), any Error>] = []
+    var expectedResults: [Result<PaginationOutput<Query, Query>, any Error>] = []
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPageWithErrors(server: server)
     let fetchExpectation = expectation(description: "Fetch")
     await pager.fetch()
@@ -373,7 +373,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
 
   func test_errors_noData() async throws {
     let pager = createPager()
-    var expectedResults: [Result<(PaginationOutput<Query, Query>), any Error>] = []
+    var expectedResults: [Result<PaginationOutput<Query, Query>, any Error>] = []
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPageErrorsOnly(server: server)
     let fetchExpectation = expectation(description: "Fetch")
     await pager.fetch()
@@ -392,7 +392,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
 
   func test_errors_noData_loadAll() async throws {
     let pager = createPager()
-    var expectedResults: [Result<(PaginationOutput<Query, Query>), any Error>] = []
+    var expectedResults: [Result<PaginationOutput<Query, Query>, any Error>] = []
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPageErrorsOnly(server: server)
     let fetchExpectation = expectation(description: "Fetch")
     try await pager.loadAll(fetchFromInitialPage: true)
@@ -415,7 +415,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
 
   func test_errors_noDataOnSecondPage_loadAll() async throws {
     let pager = createPager()
-    var expectedResults: [Result<(PaginationOutput<Query, Query>), any Error>] = []
+    var expectedResults: [Result<PaginationOutput<Query, Query>, any Error>] = []
 
     let firstPageExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     let lastPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPageErrorsOnly(server: server)
@@ -458,7 +458,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "after": pageInfo.endCursor,
+          "after": pageInfo.endCursor
         ]
         return nextQuery
       }

@@ -116,7 +116,12 @@ public class AsyncGraphQLQueryPager<Model: Hashable>: Publisher {
   public func receive<S>(
     subscriber: S
   ) where S: Subscriber, Never == S.Failure, Result<Model, any Error> == S.Input {
-    publisher.subscribe(subscriber)
+    publisher
+      .removeDuplicates(by: { _lhs, _rhs in
+        guard let lhs = try? _lhs.get(), let rhs = try? _rhs.get() else { return false }
+        return lhs == rhs
+      })
+      .subscribe(subscriber)
   }
 }
 

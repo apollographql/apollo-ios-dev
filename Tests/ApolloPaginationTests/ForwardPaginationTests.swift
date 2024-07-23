@@ -120,7 +120,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     nextQuery.__variables = [
       "id": "2001",
       "first": 2,
-      "after": "Y3Vyc29yMg==",
+      "after": "Y3Vyc29yMg=="
     ]
 
     let expectedVariables = Set(nextQuery.__variables?.values.compactMap { $0._jsonEncodableValue?._jsonValue } ?? [])
@@ -268,7 +268,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "after": pageInfo.endCursor,
+          "after": pageInfo.endCursor
         ]
         return nextQuery
       }
@@ -305,7 +305,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "after": pageInfo.endCursor,
+          "after": pageInfo.endCursor
         ]
         return nextQuery
       }
@@ -321,32 +321,32 @@ private extension Mocks.Hero.FriendsQuery {
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "endCursor": "Y3Vyc29yMg==",
-        "hasNextPage": true,
+        "hasNextPage": true
       ]
       let friends: [[String: AnyHashable]] = [
         [
           "__typename": "Human",
           "name": "Luke Skywalker",
-          "id": "1000",
+          "id": "1000"
         ],
         [
           "__typename": "Human",
           "name": "Han Solo",
-          "id": "1002",
-        ],
+          "id": "1002"
+        ]
       ]
       let friendsConnection: [String: AnyHashable] = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
         "friends": friends,
-        "pageInfo": pageInfo,
+        "pageInfo": pageInfo
       ]
 
       let hero: [String: AnyHashable] = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection,
+        "friendsConnection": friendsConnection
       ]
 
       let data: [String: AnyHashable] = [
