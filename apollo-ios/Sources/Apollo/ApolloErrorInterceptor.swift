@@ -18,5 +18,5 @@ public protocol ApolloErrorInterceptor {
     request: HTTPRequest<Operation>,
     response: HTTPResponse<Operation>?
   ) async throws -> GraphQLResult<Operation.Data>
-
+  #warning("TODO: make this return a NextAction and handle proceeding with that action.")
 }

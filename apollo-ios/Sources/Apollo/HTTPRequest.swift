@@ -23,7 +23,8 @@ open class HTTPRequest<Operation: GraphQLOperation>: Hashable {
 
   /// [optional] A context that is being passed through the request chain.
   public let context: (any RequestContext)?
-  
+  #warning("TODO: look into replacing this with Task local values?")
+
   /// Designated Initializer
   ///
   /// - Parameters:

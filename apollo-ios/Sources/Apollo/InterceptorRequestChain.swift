@@ -18,7 +18,7 @@ public struct RequestChain {
       response: HTTPResponse<Operation>?
     )
 
-    case multiProceed(AsyncThrowingStream<Self, any Error>)
+    case multiProceed(AsyncThrowingStream<NextAction<Operation>, any Error>)
 
     case exitEarlyAndEmit(
       result: GraphQLResult<Operation.Data>,
