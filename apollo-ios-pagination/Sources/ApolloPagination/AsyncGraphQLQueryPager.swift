@@ -86,6 +86,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     self.init(pager: pager)
   }
 
+  @available(*, deprecated, message: "Will be removed in a future version of ApolloPagination. Use `Combine`'s `.map` function to map outputs to your preferred type.")
   public convenience init<
     P: PaginationInfo,
     InitialQuery: GraphQLQuery,
