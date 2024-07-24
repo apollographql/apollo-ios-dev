@@ -310,9 +310,9 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
         switch result {
         case .success(let output):
           if let latestPage = output.nextPages.last {
-            return latestPage.hero.friendsConnection.friends.last?.name
+            return latestPage.data?.hero.friendsConnection.friends.last?.name
           }
-          return output.initialPage?.hero.friendsConnection.friends.last?.name
+          return output.initialPage?.data?.hero.friendsConnection.friends.last?.name
         case .failure(let error):
           XCTFail(error.localizedDescription)
           return nil
@@ -366,8 +366,8 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     XCTAssertEqual(expectedResults.count, 1)
     let result = try XCTUnwrap(expectedResults.first)
     let successValue = try result.get()
-    XCTAssertFalse(successValue.errors.isEmpty)
-    XCTAssertEqual(successValue.initialPage?.hero.name, "R2-D2")
+    XCTAssertFalse(successValue.allErrors.isEmpty)
+    XCTAssertEqual(successValue.initialPage?.data?.hero.name, "R2-D2")
     let canLoadNext = await pager.canLoadNext
     XCTAssertTrue(canLoadNext)
     subscription.cancel()
@@ -387,8 +387,8 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     XCTAssertEqual(expectedResults.count, 1)
     let result = try XCTUnwrap(expectedResults.first)
     let successValue = try result.get()
-    XCTAssertFalse(successValue.errors.isEmpty)
-    XCTAssertNil(successValue.initialPage)
+    XCTAssertFalse(successValue.allErrors.isEmpty)
+    XCTAssertNil(successValue.initialPage?.data)
     subscription.cancel()
   }
 
@@ -403,8 +403,8 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       do {
         let result = try XCTUnwrap(expectedResults.first)
         let successValue = try result.get()
-        XCTAssertFalse(successValue.errors.isEmpty)
-        XCTAssertNil(successValue.initialPage)
+        XCTAssertFalse(successValue.allErrors.isEmpty)
+        XCTAssertNil(successValue.initialPage?.data)
       } catch {
         XCTFail(error.localizedDescription)
       }
@@ -430,9 +430,9 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     await fulfillment(of: [firstPageExpectation, lastPageExpectation, loadAllExpectation], timeout: 5)
     let result = try XCTUnwrap(expectedResults.first)
     let successValue = try result.get()
-    XCTAssertFalse(successValue.errors.isEmpty)
+    XCTAssertFalse(successValue.allErrors.isEmpty)
     XCTAssertNotNil(successValue.initialPage)
-    XCTAssertTrue(successValue.nextPages.isEmpty)
+    XCTAssertNil(successValue.nextPages[0].data)
     subscriber.cancel()
   }
 

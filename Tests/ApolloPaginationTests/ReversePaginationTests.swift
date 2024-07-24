@@ -59,9 +59,9 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
     results.append(result)
     XCTAssertSuccessResult(result) { output in
       XCTAssertTrue(output.nextPages.isEmpty)
-      XCTAssertEqual(output.initialPage?.hero.friendsConnection.friends.count, 2)
-      XCTAssertEqual(output.initialPage?.hero.friendsConnection.totalCount, 3)
-      XCTAssertEqual(output.source, .fetch)
+      XCTAssertEqual(output.initialPage?.data?.hero.friendsConnection.friends.count, 2)
+      XCTAssertEqual(output.initialPage?.data?.hero.friendsConnection.totalCount, 3)
+      XCTAssertEqual(output.initialPage?.source, .server)
     }
 
     let secondPageExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForPreviousItem(server: server)
@@ -87,8 +87,8 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertTrue(output.nextPages.isEmpty)
       XCTAssertEqual(output.nextPages.count, 0)
       let page = try XCTUnwrap(output.previousPages.first)
-      XCTAssertEqual(page.hero.friendsConnection.friends.count, 1)
-      XCTAssertEqual(output.source, .fetch)
+      XCTAssertEqual(page.data?.hero.friendsConnection.friends.count, 1)
+      XCTAssertEqual(page.source, .server)
     }
     let previousCount = await pager.previousPageVarMap.values.count
     XCTAssertEqual(previousCount, 1)

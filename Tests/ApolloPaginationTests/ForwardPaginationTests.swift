@@ -59,9 +59,9 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     results.append(result)
     XCTAssertSuccessResult(result) { output in
       XCTAssertTrue(output.nextPages.isEmpty)
-      XCTAssertEqual(output.initialPage?.hero.friendsConnection.friends.count, 2)
-      XCTAssertEqual(output.initialPage?.hero.friendsConnection.totalCount, 3)
-      XCTAssertEqual(output.source, .fetch)
+      XCTAssertEqual(output.initialPage?.data?.hero.friendsConnection.friends.count, 2)
+      XCTAssertEqual(output.initialPage?.data?.hero.friendsConnection.totalCount, 3)
+      XCTAssertEqual(output.initialPage?.source, .server)
     }
 
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
@@ -87,8 +87,8 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertTrue(output.previousPages.isEmpty)
       XCTAssertEqual(output.previousPages.count, 0)
       let page = try XCTUnwrap(output.nextPages.first)
-      XCTAssertEqual(page.hero.friendsConnection.friends.count, 1)
-      XCTAssertEqual(output.source, .fetch)
+      XCTAssertEqual(page.data?.hero.friendsConnection.friends.count, 1)
+      XCTAssertEqual(page.source, .server)
     }
     let previousCount = await pager.previousPageVarMap.values.count
     XCTAssertEqual(previousCount, 0)
@@ -185,9 +185,9 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     let result = try await XCTUnwrapping(await pager.currentValue)
     XCTAssertSuccessResult(result) { output in
       XCTAssertTrue(output.nextPages.isEmpty)
-      XCTAssertEqual(output.initialPage?.hero.friendsConnection.friends.count, 2)
-      XCTAssertEqual(output.initialPage?.hero.friendsConnection.totalCount, 3)
-      XCTAssertEqual(output.source, .fetch)
+      XCTAssertEqual(output.initialPage?.data?.hero.friendsConnection.friends.count, 2)
+      XCTAssertEqual(output.initialPage?.data?.hero.friendsConnection.totalCount, 3)
+      XCTAssertEqual(output.initialPage?.source, .server)
     }
 
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
@@ -207,8 +207,8 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertFalse(output.nextPages.isEmpty)
       XCTAssertEqual(output.nextPages.count, 1)
       let page = try XCTUnwrap(output.nextPages.first)
-      XCTAssertEqual(page.hero.friendsConnection.friends.count, 1)
-      XCTAssertEqual(output.source, .fetch)
+      XCTAssertEqual(page.data?.hero.friendsConnection.friends.count, 1)
+      XCTAssertEqual(page.source, .server)
     }
     let count = await pager.nextPageVarMap.values.count
     XCTAssertEqual(count, 1)
@@ -228,9 +228,9 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [transactionExpectation, mutationExpectation])
     let finalResult = try await XCTUnwrapping(await pager.currentValue)
     XCTAssertSuccessResult(finalResult) { output in
-      XCTAssertEqual(output.initialPage?.hero.name, "C3PO")
+      XCTAssertEqual(output.initialPage?.data?.hero.name, "C3PO")
       XCTAssertEqual(output.nextPages.count, 1)
-      XCTAssertEqual(output.nextPages.first?.hero.name, "C3PO")
+      XCTAssertEqual(output.nextPages.first?.data?.hero.name, "C3PO")
     }
   }
 

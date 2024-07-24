@@ -35,9 +35,9 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   }
 
   var publishers: (
-    previousPageVarMap: Published<OrderedDictionary<Set<JSONValue>, PaginatedQuery.Data>>.Publisher,
-    initialPageResult: Published<InitialQuery.Data?>.Publisher,
-    nextPageVarMap: Published<OrderedDictionary<Set<JSONValue>, PaginatedQuery.Data>>.Publisher
+    previousPageVarMap: Published<OrderedDictionary<Set<JSONValue>, GraphQLResult<PaginatedQuery.Data>>>.Publisher,
+    initialPageResult: Published<GraphQLResult<InitialQuery.Data>?>.Publisher,
+    nextPageVarMap: Published<OrderedDictionary<Set<JSONValue>, GraphQLResult<PaginatedQuery.Data>>>.Publisher
   ) {
     return ($previousPageVarMap, $initialPageResult, $nextPageVarMap)
   }
@@ -47,8 +47,8 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   @Published var currentValue: ResultType?
   private var queuedValue: ResultType?
 
-  @Published var initialPageResult: InitialQuery.Data?
-  var latest: (previous: [PaginatedQuery.Data], initial: InitialQuery.Data, next: [PaginatedQuery.Data])? {
+  @Published var initialPageResult: GraphQLResult<InitialQuery.Data>?
+  var latest: (previous: [GraphQLResult<PaginatedQuery.Data>], initial: GraphQLResult<InitialQuery.Data>, next: [GraphQLResult<PaginatedQuery.Data>])? {
     guard let initialPageResult else { return nil }
     return (
       Array(previousPageVarMap.values).reversed(),
@@ -58,8 +58,8 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   }
 
   /// Maps each query variable set to latest results from internal watchers.
-  @Published var nextPageVarMap: OrderedDictionary<Set<JSONValue>, PaginatedQuery.Data> = [:]
-  @Published var previousPageVarMap: OrderedDictionary<Set<JSONValue>, PaginatedQuery.Data> = [:]
+  @Published var nextPageVarMap: OrderedDictionary<Set<JSONValue>, GraphQLResult<PaginatedQuery.Data>> = [:]
+  @Published var previousPageVarMap: OrderedDictionary<Set<JSONValue>, GraphQLResult<PaginatedQuery.Data>> = [:]
   private var tasks: Set<Task<Void, any Error>> = []
   private var taskGroup: ThrowingTaskGroup<Void, any Error>?
   private var watcherCallbackQueue: DispatchQueue
@@ -316,25 +316,21 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
       var didFail = false
       switch fetchType {
       case .initial:
-        initialPageResult = data.data as? InitialQuery.Data
+        initialPageResult = data as? GraphQLResult<InitialQuery.Data>
         if let latest {
           output = .init(
             previousPages: latest.previous,
             initialPage: latest.initial,
-            nextPages: latest.next,
-            errors: data.errors ?? [],
-            source: data.source == .cache ? .cache : .fetch
+            nextPages: latest.next
           )
         } else {
           output = .init(
             previousPages: [],
             initialPage: nil,
-            nextPages: [],
-            errors: data.errors ?? [],
-            source: data.source == .cache ? .cache : .fetch
+            nextPages: []
           )
         }
-        if initialPageResult == nil {
+        if initialPageResult?.data == nil {
           didFail = true
         }
       case .paginated(let direction, let query):
@@ -342,19 +338,16 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
         let underlyingData = data.data as? PaginatedQuery.Data
         switch direction {
         case .next:
-          nextPageVarMap[variables] = underlyingData
+          nextPageVarMap[variables] = data as? GraphQLResult<PaginatedQuery.Data>
         case .previous:
-          previousPageVarMap[variables] = underlyingData
+          previousPageVarMap[variables] = data as? GraphQLResult<PaginatedQuery.Data>
         }
 
-        let allErrors = (try? queuedValue?.get().errors) ?? (try? currentValue?.get().errors) ?? []
         if let latest {
           output = .init(
             previousPages: latest.previous,
             initialPage: latest.initial,
-            nextPages: latest.next,
-            errors: isLoadingAll ? allErrors + (data.errors ?? []) : data.errors ?? [],
-            source: data.source == .cache ? .cache : .fetch
+            nextPages: latest.next
           )
         }
         if underlyingData == nil {
@@ -384,16 +377,16 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
 
   private func nextPageTransformation() -> (any PaginationInfo)? {
     let currentValue = try? currentValue?.get()
-    guard let last = nextPageVarMap.values.last else {
-      return initialPageResult.flatMap { extractPageInfo(.initial($0, currentValue)) }
+    guard let last = nextPageVarMap.values.last?.data else {
+      return initialPageResult?.data.flatMap { extractPageInfo(.initial($0, currentValue)) }
     }
     return extractPageInfo(.paginated(last, currentValue))
   }
 
   private func previousPageTransformation() -> (any PaginationInfo)? {
     let currentValue = try? currentValue?.get()
-    guard let first = previousPageVarMap.values.last else {
-      return initialPageResult.flatMap { extractPageInfo(.initial($0, currentValue)) }
+    guard let first = previousPageVarMap.values.last?.data else {
+      return initialPageResult?.data.flatMap { extractPageInfo(.initial($0, currentValue)) }
     }
     return extractPageInfo(.paginated(first, currentValue))
   }

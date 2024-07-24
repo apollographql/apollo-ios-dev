@@ -236,9 +236,9 @@ final class GraphQLQueryPagerTests: XCTestCase {
         switch result {
         case .success(let output):
           if let latestPage = output.previousPages.last {
-            return latestPage.hero.friendsConnection.friends.first?.name
+            return latestPage.data?.hero.friendsConnection.friends.first?.name
           }
-          return output.initialPage?.hero.friendsConnection.friends.first?.name
+          return output.initialPage?.data?.hero.friendsConnection.friends.first?.name
         case .failure(let error):
           XCTFail(error.localizedDescription)
           return nil
