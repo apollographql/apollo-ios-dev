@@ -9,7 +9,8 @@ import Foundation
 /// and handled within your app, particularly in regards to what needs to be called
 /// when for background sessions.
 open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDelegate {
-  
+  #warning("TODO: This is only open for test mocking. Can we get rid of that mock and make this: (final, private, actor)?")
+
   public enum URLSessionClientError: Error, LocalizedError {
     case noHTTPResponse(request: URLRequest?)
     case sessionBecameInvalidWithoutUnderlyingError
@@ -38,10 +39,7 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
       }
     }
   }
-  
-  /// A completion block to be called when the raw task has completed, with the raw information from the session
-  public typealias RawCompletion = @Sendable (Data?, HTTPURLResponse?, (any Error)?) -> Void
-  
+
   /// A completion block returning a result. On `.success` it will contain a tuple with non-nil `Data` and its corresponding `HTTPURLResponse`. On `.failure` it will contain an error.
   public typealias Completion = @Sendable (Result<(Data, HTTPURLResponse), any Error>) -> Void
   
@@ -77,6 +75,7 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
   /// Cleans up and invalidates everything related to this session client.
   ///
   /// NOTE: This must be called from the `deinit` of anything holding onto this client in order to break a retain cycle with the delegate.
+  #warning("TODO: tasks must be cancelled on invalidation and all removals from client!! This is to make sure the continuation is called!")
   public func invalidate() {
     self.$hasBeenInvalidated.mutate { $0 = true }
     func cleanup() {
@@ -118,43 +117,39 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
   /// - Parameters:
   ///   - request: The request to perform.
   ///   - taskDescription: [optional] A description to add to the `URLSessionTask` for debugging purposes.
-  ///   - rawTaskCompletionHandler: [optional] A completion handler to call once the raw task is done, so if an Error requires access to the headers, the user can still access these.
-  ///   - completion: A completion handler to call when the task has either completed successfully or failed.
   ///
-  /// - Returns: The created URLSession task, already resumed, because nobody ever remembers to call `resume()`.
+  /// - Returns: The data and response for the request.
   @discardableResult
-  open func sendRequest(_ request: URLRequest,
-                        taskDescription: String? = nil,
-                        rawTaskCompletionHandler: RawCompletion? = nil,
-                        completion: @escaping Completion) -> URLSessionTask {
+  open func send(
+    _ request: URLRequest,
+    taskDescription: String? = nil    
+  ) async throws -> (Data, HTTPURLResponse) {
     guard self.hasNotBeenInvalidated else {
-      completion(.failure(URLSessionClientError.sessionInvalidated))
-      return URLSessionTask()
+      throw URLSessionClientError.sessionInvalidated
     }
-    
+
     let task = self.session.dataTask(with: request)
     task.taskDescription = taskDescription
-      
-    let taskData = TaskData(rawCompletion: rawTaskCompletionHandler,
-                            completionBlock: completion)
-    
-    self.$tasks.mutate { $0[task.taskIdentifier] = taskData }
-    
-    task.resume()
-    
-    return task
-  }
 
-  @discardableResult
-  open func sendRequest(_ request: URLRequest,
-                        rawTaskCompletionHandler: RawCompletion? = nil,
-                        completion: @escaping Completion) -> URLSessionTask {
-    sendRequest(
-      request,
-      taskDescription: nil,
-      rawTaskCompletionHandler: rawTaskCompletionHandler,
-      completion: completion
-    )
+    return try await withTaskCancellationHandler {
+      return try await withCheckedThrowingContinuation { continuation in
+        let taskData = TaskData() {
+          switch ($0) {
+          case let .success(response):
+            continuation.resume(returning: response)
+
+          case let .failure(error):
+            continuation.resume(throwing: error)
+          }
+        }
+
+        self.$tasks.mutate { $0[task.taskIdentifier] = taskData }
+        task.resume()
+      }
+
+    } onCancel: {
+      task.cancel()
+    }
   }
 
   /// Cancels a given task and clears out its underlying data.
@@ -224,11 +219,7 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     
     let data = taskData.data
     let response = taskData.response
-    
-    if let rawCompletion = taskData.rawCompletion {
-      rawCompletion(data, response, error)
-    }
-    
+
     let completion = taskData.completionBlock
     
     if let finalError = error {
@@ -310,10 +301,6 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
 
       let remainingData = dataString.suffix(from: lastBoundaryIndex).data(using: .utf8)
       taskData.reset(data: remainingData)
-
-      if let rawCompletion = taskData.rawCompletion {
-        rawCompletion(boundaryData, httpResponse, nil)
-      }
 
       taskData.completionBlock(.success((boundaryData, httpResponse)))
     }

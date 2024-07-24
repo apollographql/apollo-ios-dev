@@ -4,9 +4,8 @@ import ApolloAPI
 #endif
 
 /// An interceptor which actually fetches data from the network.
-public class NetworkFetchInterceptor: ApolloInterceptor, Cancellable {
+public class NetworkFetchInterceptor: ApolloInterceptor {
   let client: URLSessionClient
-  @Atomic private var currentTask: URLSessionTask?
 
   public var id: String = UUID().uuidString
   
@@ -17,75 +16,28 @@ public class NetworkFetchInterceptor: ApolloInterceptor, Cancellable {
     self.client = client
   }
   
-  public func interceptAsync<Operation: GraphQLOperation>(
-    chain: any RequestChain,
+  public func intercept<Operation: GraphQLOperation>(
     request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
-  ) {
-
-    let urlRequest: URLRequest
-    do {
-      urlRequest = try request.toURLRequest()
-    } catch {
-      chain.handleErrorAsync(
-        error,
-        request: request,
-        response: response,
-        completion: completion
-      )
-      return
-    }
-    
+    response: HTTPResponse<Operation>?
+  ) async throws -> RequestChain.NextAction<Operation> {
+    let urlRequest = try request.toURLRequest()
     let taskDescription = "\(Operation.operationType) \(Operation.operationName)"
-    let task = self.client.sendRequest(urlRequest, taskDescription: taskDescription) { [weak self] result in
-      guard let self = self else {
-        return
-      }
-      
-      defer {
-        if Operation.operationType != .subscription {
-          self.$currentTask.mutate { $0 = nil }
-        }
-      }
-      
-      guard !chain.isCancelled else {
-        return
-      }
-      
-      switch result {
-      case .failure(let error):
-        chain.handleErrorAsync(
-          error,
-          request: request,
-          response: response,
-          completion: completion
-        )
 
-      case .success(let (data, httpResponse)):
-        let response = HTTPResponse<Operation>(
-          response: httpResponse,
-          rawData: data,
-          parsedResponse: nil
-        )
+    let (data, httpResponse) = try await self.client.send(
+      urlRequest,
+      taskDescription: taskDescription
+    )
 
-        chain.proceedAsync(
-          request: request,
-          response: response,
-          interceptor: self,
-          completion: completion
-        )
-      }
-    }
-    
-    self.$currentTask.mutate { $0 = task }
+    try Task.checkCancellation()
+
+    let response = HTTPResponse<Operation>(
+      response: httpResponse,
+      rawData: data,
+      parsedResult: nil,
+      cacheRecords: nil
+    )
+
+    return .proceed(request: request, response: response)
   }
-  
-  public func cancel() {
-    guard let task = self.currentTask else {
-      return
-    }
-    
-    task.cancel()
-  }
+
 }

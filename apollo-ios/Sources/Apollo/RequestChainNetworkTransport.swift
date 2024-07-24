@@ -144,7 +144,7 @@ open class RequestChainNetworkTransport: NetworkTransport {
   private func makeChain<Operation: GraphQLOperation>(
     operation: Operation,
     callbackQueue: DispatchQueue = .main
-  ) -> any RequestChain {
+  ) -> RequestChain {
     let interceptors = self.interceptorProvider.interceptors(for: operation)
     let chain = InterceptorRequestChain(interceptors: interceptors, callbackQueue: callbackQueue)
     chain.additionalErrorHandler = self.interceptorProvider.additionalErrorInterceptor(for: operation)
