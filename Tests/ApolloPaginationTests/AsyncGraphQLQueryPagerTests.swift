@@ -357,11 +357,11 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     var expectedResults: [Result<PaginationOutput<Query, Query>, any Error>] = []
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPageWithErrors(server: server)
     let fetchExpectation = expectation(description: "Fetch")
-    await pager.fetch()
     let subscription = pager.sink { output in
       expectedResults.append(output)
       fetchExpectation.fulfill()
     }
+    await pager.fetch()
     await fulfillment(of: [serverExpectation, fetchExpectation], timeout: 3)
     XCTAssertEqual(expectedResults.count, 1)
     let result = try XCTUnwrap(expectedResults.first)
@@ -378,11 +378,11 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     var expectedResults: [Result<PaginationOutput<Query, Query>, any Error>] = []
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPageErrorsOnly(server: server)
     let fetchExpectation = expectation(description: "Fetch")
-    await pager.fetch()
     let subscription = pager.sink { output in
       expectedResults.append(output)
       fetchExpectation.fulfill()
     }
+    await pager.fetch()
     await fulfillment(of: [serverExpectation, fetchExpectation], timeout: 3)
     XCTAssertEqual(expectedResults.count, 1)
     let result = try XCTUnwrap(expectedResults.first)
@@ -397,7 +397,6 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     var expectedResults: [Result<PaginationOutput<Query, Query>, any Error>] = []
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPageErrorsOnly(server: server)
     let fetchExpectation = expectation(description: "Fetch")
-    try await pager.loadAll(fetchFromInitialPage: true)
     let subscription = pager.sink { output in
       expectedResults.append(output)
       XCTAssertEqual(expectedResults.count, 1)
@@ -411,6 +410,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       }
       fetchExpectation.fulfill()
     }
+    try await pager.loadAll(fetchFromInitialPage: true)
     await fulfillment(of: [serverExpectation, fetchExpectation], timeout: 3)
     subscription.cancel()
   }
