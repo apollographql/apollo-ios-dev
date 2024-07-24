@@ -10,32 +10,32 @@ extension Mocks.Hero.FriendsQuery {
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "endCursor": "Y3Vyc29yMg==",
-        "hasNextPage": true
+        "hasNextPage": true,
       ]
       let friends: [[String: AnyHashable]] = [
         [
           "__typename": "Human",
           "name": "Luke Skywalker",
-          "id": "1000"
+          "id": "1000",
         ],
         [
           "__typename": "Human",
           "name": "Han Solo",
-          "id": "1002"
-        ]
+          "id": "1002",
+        ],
       ]
       let friendsConnection: [String: AnyHashable] = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
         "friends": friends,
-        "pageInfo": pageInfo
+        "pageInfo": pageInfo,
       ]
 
       let hero: [String: AnyHashable] = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection
+        "friendsConnection": friendsConnection,
       ]
 
       let data: [String: AnyHashable] = [
@@ -55,27 +55,27 @@ extension Mocks.Hero.FriendsQuery {
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "endCursor": "Y3Vyc29yMw==",
-        "hasNextPage": false
+        "hasNextPage": false,
       ]
       let friends: [[String: AnyHashable]] = [
         [
           "__typename": "Human",
           "name": "Leia Organa",
-          "id": "1003"
-        ]
+          "id": "1003",
+        ],
       ]
       let friendsConnection: [String: AnyHashable] = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
         "friends": friends,
-        "pageInfo": pageInfo
+        "pageInfo": pageInfo,
       ]
 
       let hero: [String: AnyHashable] = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection
+        "friendsConnection": friendsConnection,
       ]
 
       let data: [String: AnyHashable] = [
@@ -95,32 +95,32 @@ extension Mocks.Hero.FriendsQuery {
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "endCursor": "Y3Vyc29yMg==",
-        "hasNextPage": true
+        "hasNextPage": true,
       ]
       let friends: [[String: AnyHashable]] = [
         [
           "__typename": "Human",
           "name": "Luke Skywalker",
-          "id": "1000"
+          "id": "1000",
         ],
         [
           "__typename": "Human",
           "name": "Han Solo",
-          "id": "1002"
-        ]
+          "id": "1002",
+        ],
       ]
       let friendsConnection: [String: AnyHashable] = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
         "friends": friends,
-        "pageInfo": pageInfo
+        "pageInfo": pageInfo,
       ]
 
       let hero: [String: AnyHashable] = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection
+        "friendsConnection": friendsConnection,
       ]
 
       let data: [String: AnyHashable] = [
@@ -135,8 +135,8 @@ extension Mocks.Hero.FriendsQuery {
           ],
           [
             "message": "Some error"
-          ]
-        ]
+          ],
+        ],
       ]
     }
   }
@@ -152,8 +152,8 @@ extension Mocks.Hero.FriendsQuery {
           ],
           [
             "message": "Some error"
-          ]
-        ]
+          ],
+        ],
       ]
     }
   }
@@ -169,8 +169,8 @@ extension Mocks.Hero.FriendsQuery {
           ],
           [
             "message": "Some error"
-          ]
-        ]
+          ],
+        ],
       ]
     }
   }
@@ -184,27 +184,27 @@ extension Mocks.Hero.ReverseFriendsQuery {
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "startCursor": "Y3Vyc29yZg==",
-        "hasPreviousPage": false
+        "hasPreviousPage": false,
       ]
       let friends: [[String: AnyHashable]] = [
         [
           "__typename": "Human",
           "name": "Luke Skywalker",
-          "id": "1000"
-        ]
+          "id": "1000",
+        ],
       ]
       let friendsConnection: [String: AnyHashable] = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
         "friends": friends,
-        "pageInfo": pageInfo
+        "pageInfo": pageInfo,
       ]
 
       let hero: [String: AnyHashable] = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection
+        "friendsConnection": friendsConnection,
       ]
 
       let data: [String: AnyHashable] = [
@@ -223,32 +223,32 @@ extension Mocks.Hero.ReverseFriendsQuery {
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "startCursor": "Y3Vyc29yMg==",
-        "hasPreviousPage": true
+        "hasPreviousPage": true,
       ]
       let friends: [[String: AnyHashable]] = [
         [
           "__typename": "Human",
           "name": "Han Solo",
-          "id": "1002"
+          "id": "1002",
         ],
         [
           "__typename": "Human",
           "name": "Leia Organa",
-          "id": "1003"
-        ]
+          "id": "1003",
+        ],
       ]
       let friendsConnection: [String: AnyHashable] = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
         "friends": friends,
-        "pageInfo": pageInfo
+        "pageInfo": pageInfo,
       ]
 
       let hero: [String: AnyHashable] = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection
+        "friendsConnection": friendsConnection,
       ]
 
       let data: [String: AnyHashable] = [
@@ -272,27 +272,27 @@ extension Mocks.Hero.BidirectionalFriendsQuery {
         "startCursor": "Y3Vyc29yMw==",
         "hasPreviousPage": true,
         "endCursor": "Y3Vyc29yMg==",
-        "hasNextPage": true
+        "hasNextPage": true,
       ]
       let friends: [[String: AnyHashable]] = [
         [
           "__typename": "Human",
           "name": "Leia Organa",
-          "id": "1003"
-        ]
+          "id": "1003",
+        ],
       ]
       let friendsConnection: [String: AnyHashable] = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
         "friends": friends,
-        "pageInfo": pageInfo
+        "pageInfo": pageInfo,
       ]
 
       let hero: [String: AnyHashable] = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection
+        "friendsConnection": friendsConnection,
       ]
 
       let data: [String: AnyHashable] = [
@@ -314,27 +314,27 @@ extension Mocks.Hero.BidirectionalFriendsQuery {
         "startCursor": "Y3Vyc29yMg==",
         "hasPreviousPage": true,
         "endCursor": "Y3Vyc29yMa==",
-        "hasNextPage": false
+        "hasNextPage": false,
       ]
       let friends: [[String: AnyHashable]] = [
         [
           "__typename": "Human",
           "name": "Han Solo",
-          "id": "1002"
-        ]
+          "id": "1002",
+        ],
       ]
       let friendsConnection: [String: AnyHashable] = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
         "friends": friends,
-        "pageInfo": pageInfo
+        "pageInfo": pageInfo,
       ]
 
       let hero: [String: AnyHashable] = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection
+        "friendsConnection": friendsConnection,
       ]
 
       let data: [String: AnyHashable] = [
@@ -356,27 +356,27 @@ extension Mocks.Hero.BidirectionalFriendsQuery {
         "startCursor": "Y3Vyc29yMq==",
         "hasPreviousPage": false,
         "endCursor": "Y3Vyc29yMw==",
-        "hasNextPage": true
+        "hasNextPage": true,
       ]
       let friends: [[String: AnyHashable]] = [
         [
           "__typename": "Human",
           "name": "Luke Skywalker",
-          "id": "1000"
-        ]
+          "id": "1000",
+        ],
       ]
       let friendsConnection: [String: AnyHashable] = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
         "friends": friends,
-        "pageInfo": pageInfo
+        "pageInfo": pageInfo,
       ]
 
       let hero: [String: AnyHashable] = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection
+        "friendsConnection": friendsConnection,
       ]
 
       let data: [String: AnyHashable] = [
@@ -399,20 +399,20 @@ extension Mocks.Hero.OffsetFriendsQuery {
         [
           "__typename": "Human",
           "name": "Luke Skywalker",
-          "id": "1000"
+          "id": "1000",
         ],
         [
           "__typename": "Human",
           "name": "Han Solo",
-          "id": "1002"
-        ]
+          "id": "1002",
+        ],
       ]
 
       let hero: [String: AnyHashable] = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friends": friends
+        "friends": friends,
       ]
 
       let data: [String: AnyHashable] = [
@@ -433,15 +433,15 @@ extension Mocks.Hero.OffsetFriendsQuery {
         [
           "__typename": "Human",
           "name": "Leia Organa",
-          "id": "1003"
-        ]
+          "id": "1003",
+        ],
       ]
 
       let hero: [String: AnyHashable] = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friends": friends
+        "friends": friends,
       ]
 
       let data: [String: AnyHashable] = [

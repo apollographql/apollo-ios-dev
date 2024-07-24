@@ -93,7 +93,7 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "after": pageInfo.endCursor
+          "after": pageInfo.endCursor,
         ]
         return nextQuery
       }

@@ -26,7 +26,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     initialQuery.__variables = [
       "id": "2001",
       "first": 2,
-      "after": GraphQLNullable<String>.null
+      "after": GraphQLNullable<String>.null,
     ]
     let pager = AsyncGraphQLQueryPager(
       client: client,
@@ -44,7 +44,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
           nextQuery.__variables = [
             "id": "2001",
             "first": 2,
-            "after": page.endCursor
+            "after": page.endCursor,
           ]
           return nextQuery
         case .previous:
@@ -82,7 +82,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     initialQuery.__variables = [
       "id": "2001",
       "first": 2,
-      "after": GraphQLNullable<String>.null
+      "after": GraphQLNullable<String>.null,
     ]
     let pager = AsyncGraphQLQueryPager(
       client: client,
@@ -100,7 +100,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
           nextQuery.__variables = [
             "id": "2001",
             "first": 2,
-            "after": page.endCursor
+            "after": page.endCursor,
           ]
           return nextQuery
         case .previous:
@@ -143,7 +143,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     initialQuery.__variables = [
       "id": "2001",
       "first": 2,
-      "after": GraphQLNullable<String>.null
+      "after": GraphQLNullable<String>.null,
     ]
     let pager = AsyncGraphQLQueryPager(
       client: client,
@@ -161,7 +161,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
           nextQuery.__variables = [
             "id": "2001",
             "first": 2,
-            "after": page.endCursor
+            "after": page.endCursor,
           ]
           return nextQuery
         case .previous:
@@ -199,7 +199,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     initialQuery.__variables = [
       "id": "2001",
       "first": 2,
-      "after": GraphQLNullable<String>.null
+      "after": GraphQLNullable<String>.null,
     ]
     let pager = AsyncGraphQLQueryPager(
       client: client,
@@ -217,7 +217,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
           nextQuery.__variables = [
             "id": "2001",
             "first": 2,
-            "after": page.endCursor
+            "after": page.endCursor,
           ]
           return nextQuery
         case .previous:
@@ -368,6 +368,8 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     let successValue = try result.get()
     XCTAssertFalse(successValue.errors.isEmpty)
     XCTAssertEqual(successValue.initialPage?.hero.name, "R2-D2")
+    let canLoadNext = await pager.canLoadNext
+    XCTAssertTrue(canLoadNext)
     subscription.cancel()
   }
 
@@ -458,7 +460,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "after": pageInfo.endCursor
+          "after": pageInfo.endCursor,
         ]
         return nextQuery
       }

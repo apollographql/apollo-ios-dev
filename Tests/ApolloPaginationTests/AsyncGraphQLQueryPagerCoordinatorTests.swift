@@ -185,7 +185,7 @@ final class AsyncGraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTe
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "before": pageInfo.startCursor
+          "before": pageInfo.startCursor,
         ]
         return nextQuery
       }
@@ -214,7 +214,7 @@ final class AsyncGraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTe
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "after": pageInfo.endCursor
+          "after": pageInfo.endCursor,
         ]
         return nextQuery
       }

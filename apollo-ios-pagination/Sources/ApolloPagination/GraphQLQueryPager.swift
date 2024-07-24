@@ -4,7 +4,7 @@ import Combine
 import Foundation
 
 /// Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.
-public class GraphQLQueryPager<Model: Hashable>: Publisher {
+public class GraphQLQueryPager<Model>: Publisher {
   public typealias Failure = Never
   public typealias Output = Result<Model, any Error>
   let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
@@ -14,6 +14,31 @@ public class GraphQLQueryPager<Model: Hashable>: Publisher {
 
   public var canLoadNext: Bool { pager.canLoadNext }
   public var canLoadPrevious: Bool { pager.canLoadPrevious }
+
+  init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
+    pager: Pager,
+    transform: @escaping (PaginationOutput<InitialQuery, PaginatedQuery>) throws -> Model
+  ) {
+    self.pager = pager
+    pager.subscribe { [weak self] result in
+      guard let self else { return }
+      let returnValue: Output
+
+      switch result {
+      case let .success(output):
+        do {
+          let transformedModels = try transform(output)
+          returnValue = .success(transformedModels)
+        } catch {
+          returnValue = .failure(error)
+        }
+      case let .failure(error):
+        returnValue = .failure(error)
+      }
+
+      _subject.send(returnValue)
+    }
+  }
 
   init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager
@@ -44,6 +69,28 @@ public class GraphQLQueryPager<Model: Hashable>: Publisher {
       pageResolver: pageResolver
     )
     self.init(pager: pager)
+  }
+
+  public convenience init<
+    P: PaginationInfo,
+    InitialQuery: GraphQLQuery,
+    PaginatedQuery: GraphQLQuery
+  >(
+    client: any ApolloClientProtocol,
+    watcherDispatchQueue: DispatchQueue = .main,
+    initialQuery: InitialQuery,
+    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
+    pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
+    transform: @escaping (PaginationOutput<InitialQuery, PaginatedQuery>) throws -> Model
+  ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
+    let pager = GraphQLQueryPagerCoordinator(
+      client: client,
+      initialQuery: initialQuery,
+      watcherDispatchQueue: watcherDispatchQueue,
+      extractPageInfo: extractPageInfo,
+      pageResolver: pageResolver
+    )
+    self.init(pager: pager, transform: transform)
   }
 
   deinit {
@@ -130,11 +177,6 @@ public class GraphQLQueryPager<Model: Hashable>: Publisher {
   public func receive<S>(
     subscriber: S
   ) where S: Subscriber, Never == S.Failure, Result<Model, any Error> == S.Input {
-    publisher
-      .removeDuplicates(by: { _lhs, _rhs in
-        guard let lhs = try? _lhs.get(), let rhs = try? _rhs.get() else { return false }
-        return lhs == rhs
-      })
-      .subscribe(subscriber)
+    publisher.subscribe(subscriber)
   }
 }

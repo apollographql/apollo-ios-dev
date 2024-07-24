@@ -52,7 +52,7 @@ final class OffsetTests: XCTestCase {
         nextQuery.__variables = [
           "id": "2001",
           "offset": pageInfo.offset,
-          "limit": pageSize
+          "limit": pageSize,
         ]
         return nextQuery
       }

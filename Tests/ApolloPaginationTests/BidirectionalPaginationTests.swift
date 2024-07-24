@@ -69,7 +69,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
             "id": "2001",
             "first": 1,
             "after": pageInfo.endCursor,
-            "before": GraphQLNullable<String>.null
+            "before": GraphQLNullable<String>.null,
           ]
           return nextQuery
         case .previous:
@@ -78,7 +78,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
             "id": "2001",
             "first": 1,
             "before": pageInfo.startCursor,
-            "after": GraphQLNullable<String>.null
+            "after": GraphQLNullable<String>.null,
           ]
           return previousQuery
         }
@@ -102,7 +102,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     subscription.cancel()
     var result = try await XCTUnwrapping(await pager.currentValue)
     results.append(result)
-    XCTAssertSuccessResult(result) { (output) in
+    XCTAssertSuccessResult(result) { output in
       XCTAssertTrue(output.nextPages.isEmpty)
       XCTAssertEqual(output.initialPage?.hero.friendsConnection.friends.count, 1)
       XCTAssertEqual(output.initialPage?.hero.friendsConnection.totalCount, 3)
@@ -123,7 +123,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     result = try await XCTUnwrapping(await pager.currentValue)
     results.append(result)
 
-    try XCTAssertSuccessResult(result) { (output) in
+    try XCTAssertSuccessResult(result) { output in
       // Assert first page is unchanged
       XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
@@ -155,7 +155,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     result = try await XCTUnwrapping(await pager.currentValue)
     results.append(result)
 
-    try XCTAssertSuccessResult(result) { (output) in
+    try XCTAssertSuccessResult(result) { output in
       // Assert first page is unchanged
       XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
@@ -217,7 +217,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     subscription.cancel()
     var result = try await XCTUnwrapping(await pager.pager.currentValue)
     results.append(result)
-    XCTAssertSuccessResult(result) { (output) in
+    XCTAssertSuccessResult(result) { output in
       XCTAssertTrue(output.nextPages.isEmpty)
       XCTAssertEqual(output.initialPage?.hero.friendsConnection.friends.count, 1)
       XCTAssertEqual(output.initialPage?.hero.friendsConnection.totalCount, 3)
@@ -238,7 +238,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     result = try await XCTUnwrapping(await pager.pager.currentValue)
     results.append(result)
 
-    try XCTAssertSuccessResult(result) { (output) in
+    try XCTAssertSuccessResult(result) { output in
       // Assert first page is unchanged
       XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
@@ -266,7 +266,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     result = try await XCTUnwrapping(await pager.pager.currentValue)
     results.append(result)
 
-    try XCTAssertSuccessResult(result) { (output) in
+    try XCTAssertSuccessResult(result) { output in
       // Assert first page is unchanged
       XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 

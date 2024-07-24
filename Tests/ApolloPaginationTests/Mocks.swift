@@ -20,8 +20,8 @@ enum Mocks {
           .field("friendsConnection", FriendsConnection.self, arguments: [
             "first": .variable("first"),
             "before": .variable("before"),
-            "after": .variable("after")
-          ])
+            "after": .variable("after"),
+          ]),
         ]}
 
         var name: String { __data["name"] }
@@ -33,7 +33,7 @@ enum Mocks {
             .field("__typename", String.self),
             .field("totalCount", Int.self),
             .field("friends", [Character].self),
-            .field("pageInfo", PageInfo.self)
+            .field("pageInfo", PageInfo.self),
           ]}
 
           var totalCount: Int { __data["totalCount"] }
@@ -44,7 +44,7 @@ enum Mocks {
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
               .field("name", String.self),
-              .field("id", String.self)
+              .field("id", String.self),
             ]}
 
             var name: String { __data["name"] }
@@ -57,7 +57,7 @@ enum Mocks {
               .field("startCursor", Optional<String>.self),
               .field("hasPreviousPage", Bool.self),
               .field("endCursor", Optional<String>.self),
-              .field("hasNextPage", Bool.self)
+              .field("hasNextPage", Bool.self),
             ]}
 
             var endCursor: String? { __data["endCursor"] }
@@ -82,8 +82,8 @@ enum Mocks {
           .field("name", String.self),
           .field("friendsConnection", FriendsConnection.self, arguments: [
             "first": .variable("first"),
-            "before": .variable("before")
-          ])
+            "before": .variable("before"),
+          ]),
         ]}
 
         var name: String { __data["name"] }
@@ -95,7 +95,7 @@ enum Mocks {
             .field("__typename", String.self),
             .field("totalCount", Int.self),
             .field("friends", [Character].self),
-            .field("pageInfo", PageInfo.self)
+            .field("pageInfo", PageInfo.self),
           ]}
 
           var totalCount: Int { __data["totalCount"] }
@@ -106,7 +106,7 @@ enum Mocks {
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
               .field("name", String.self),
-              .field("id", String.self)
+              .field("id", String.self),
             ]}
 
             var name: String { __data["name"] }
@@ -117,7 +117,7 @@ enum Mocks {
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
               .field("startCursor", Optional<String>.self),
-              .field("hasPreviousPage", Bool.self)
+              .field("hasPreviousPage", Bool.self),
             ]}
 
             var startCursor: String? { __data["startCursor"] }
@@ -140,8 +140,8 @@ enum Mocks {
           .field("name", String.self),
           .field("friendsConnection", FriendsConnection.self, arguments: [
             "first": .variable("first"),
-            "after": .variable("after")
-          ])
+            "after": .variable("after"),
+          ]),
         ]}
 
         var name: String { __data["name"] }
@@ -153,7 +153,7 @@ enum Mocks {
             .field("__typename", String.self),
             .field("totalCount", Int.self),
             .field("friends", [Character].self),
-            .field("pageInfo", PageInfo.self)
+            .field("pageInfo", PageInfo.self),
           ]}
 
           var totalCount: Int { __data["totalCount"] }
@@ -164,7 +164,7 @@ enum Mocks {
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
               .field("name", String.self),
-              .field("id", String.self)
+              .field("id", String.self),
             ]}
 
             var name: String { __data["name"] }
@@ -175,7 +175,7 @@ enum Mocks {
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
               .field("endCursor", Optional<String>.self),
-              .field("hasNextPage", Bool.self)
+              .field("hasNextPage", Bool.self),
             ]}
 
             var endCursor: String? { __data["endCursor"] }
@@ -199,8 +199,8 @@ enum Mocks {
           .field("name", String.self),
           .field("friends", [Character].self, arguments: [
             "offset": .variable("offset"),
-            "limit": .variable("limit")
-          ])
+            "limit": .variable("limit"),
+          ]),
         ]}
 
         var name: String { __data["name"] }
@@ -211,7 +211,7 @@ enum Mocks {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
             .field("name", String.self),
-            .field("id", String.self)
+            .field("id", String.self),
           ]}
 
           var name: String { __data["name"] }
@@ -238,7 +238,7 @@ enum Mocks {
         static var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("id", String.self),
-          .field("name", String.self)
+          .field("name", String.self),
         ]}
 
         var id: String {
