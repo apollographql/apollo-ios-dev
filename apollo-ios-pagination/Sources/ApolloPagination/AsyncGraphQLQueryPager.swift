@@ -50,16 +50,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     Task {
       let cancellable = await pager.subscribe { [weak self] result in
         guard let self else { return }
-        let returnValue: Output
-
-        switch result {
-        case let .success(output):
-          returnValue = .success(output)
-        case let .failure(error):
-          returnValue = .failure(error)
-        }
-
-        _subject.send(returnValue)
+        _subject.send(result)
       }
       _ = $cancellables.mutate { $0.insert(cancellable) }
     }
