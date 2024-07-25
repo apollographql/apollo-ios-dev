@@ -30,7 +30,11 @@ public struct PaginationOutput<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 }
 
 extension PaginationOutput where InitialQuery == PaginatedQuery {
-  public var allPages: [InitialQuery.Data] {
+  public var allData: [InitialQuery.Data] {
     previousPages.compactMap(\.data) + [initialPage?.data].compactMap { $0 } + nextPages.compactMap(\.data)
+  }
+
+  public var allPages: [GraphQLResult<InitialQuery.Data>] {
+    previousPages + [initialPage].compactMap { $0 } + nextPages
   }
 }
