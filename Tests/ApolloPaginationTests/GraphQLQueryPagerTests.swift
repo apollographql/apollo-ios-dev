@@ -139,7 +139,7 @@ final class GraphQLQueryPagerTests: XCTestCase {
     let subscription = anyPager.compactMap { result in
       switch result {
       case .success(let data):
-        return data.allPages.flatMap { data in
+        return data.allData.flatMap { data in
           data.hero.friendsConnection.friends.map {
             ViewModel(name: $0.name)
           }
@@ -195,7 +195,7 @@ final class GraphQLQueryPagerTests: XCTestCase {
       .map { result in
         switch result {
         case .success(let output):
-          return output.allPages.last.flatMap(\.hero.friendsConnection.friends.last?.name)
+          return output.allData.last.flatMap(\.hero.friendsConnection.friends.last?.name)
         case .failure(let error):
           XCTFail(error.localizedDescription)
           return nil

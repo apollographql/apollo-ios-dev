@@ -122,7 +122,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     let subscription = pager
       .compactMap { output -> [ViewModel]? in
         guard case .success(let output) = output else { return nil }
-        let models = output.allPages.flatMap { data in
+        let models = output.allData.flatMap { data in
           data.hero.friendsConnection.friends.map { friend in ViewModel(name: friend.name) }
         }
         return models
@@ -240,7 +240,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       .compactMap { result in
         switch result {
         case .success(let output):
-          return output.allPages.flatMap { data in
+          return output.allData.flatMap { data in
             data.hero.friendsConnection.friends.map { friend in friend.name }
           }.map(ViewModel.init(name:))
         case .failure(let error):
@@ -273,7 +273,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       .compactMap { result in
         switch result {
         case .success(let data):
-          return data.allPages.flatMap { data in
+          return data.allData.flatMap { data in
             data.hero.friendsConnection.friends.map {
               ViewModel(name: $0.name)
             }

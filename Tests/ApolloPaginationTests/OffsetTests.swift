@@ -36,7 +36,7 @@ final class OffsetTests: XCTestCase {
         case .initial(let data, let output), .paginated(let data, let output):
           var totalOffset: Int = 0
           if let output {
-            output.allPages.forEach { page in
+            output.allData.forEach { page in
               totalOffset += page.hero.friends.count
             }
           }
@@ -93,7 +93,7 @@ final class OffsetTests: XCTestCase {
     let cancellable = pager.map { value in
       switch value {
       case .success(let output):
-        let friends = output.allPages.flatMap { data in
+        let friends = output.allData.flatMap { data in
           data.hero.friends.map { friend in
             ViewModel(name: friend.name)
           }
