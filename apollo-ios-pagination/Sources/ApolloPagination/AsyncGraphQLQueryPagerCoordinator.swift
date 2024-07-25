@@ -476,7 +476,7 @@ private extension GraphQLOperation.Variables {
   }
 }
 
-private extension GraphQLResult {
+internal extension GraphQLResult {
   var updateSource: UpdateSource {
     source == .cache ? .cache : .server
   }

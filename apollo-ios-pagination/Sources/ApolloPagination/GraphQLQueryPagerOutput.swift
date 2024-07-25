@@ -40,6 +40,37 @@ extension PaginationOutput {
   }
 }
 
+extension PaginationOutput.QueryWrapper {
+  public var errors: [GraphQLError]? {
+    switch self {
+    case .initial(let result):
+      result.errors
+    case .paginated(let result):
+      result.errors
+    }
+  }
+
+  public var source: UpdateSource {
+    switch self {
+    case .initial(let result):
+      result.updateSource
+    case .paginated(let result):
+      result.updateSource
+    }
+  }
+}
+
+extension PaginationOutput.QueryWrapper where InitialQuery == PaginatedQuery {
+  public var data: InitialQuery.Data? {
+    switch self {
+    case .initial(let result):
+      result.data
+    case .paginated(let result):
+      result.data
+    }
+  }
+}
+
 extension PaginationOutput where InitialQuery == PaginatedQuery {
   public var allData: [InitialQuery.Data] {
     previousPages.compactMap(\.data) + [initialPage?.data].compactMap { $0 } + nextPages.compactMap(\.data)
