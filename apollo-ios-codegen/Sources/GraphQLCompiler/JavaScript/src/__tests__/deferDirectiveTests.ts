@@ -549,7 +549,7 @@ describe("given introspection JSON with unsupported defer directive", () => {
 
       const deferDirective = schema.getDirective(GraphQLDeferDirective.name)
 
-      expect(deferDirective?.locations.toString()).toEqual("FIELD")
+      expect(deferDirective?.locations.toString()).toEqual("FIELD") // unsupported location
     });
 
     it("should pass validation as introspection source", () => {
