@@ -321,13 +321,15 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
           output = .init(
             previousPages: latest.previous,
             initialPage: latest.initial,
-            nextPages: latest.next
+            nextPages: latest.next,
+            mostRecentSource: data.updateSource
           )
         } else {
           output = .init(
             previousPages: [],
             initialPage: nil,
-            nextPages: []
+            nextPages: [],
+            mostRecentSource: data.updateSource
           )
         }
         if initialPageResult?.data == nil {
@@ -347,7 +349,8 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
           output = .init(
             previousPages: latest.previous,
             initialPage: latest.initial,
-            nextPages: latest.next
+            nextPages: latest.next,
+            mostRecentSource: data.updateSource
           )
         }
         if underlyingData == nil {
@@ -470,5 +473,11 @@ private extension AsyncGraphQLQueryPagerCoordinator {
 private extension GraphQLOperation.Variables {
   var underlyingJson: [JSONValue] {
     values.compactMap { $0._jsonEncodableValue?._jsonValue }
+  }
+}
+
+private extension GraphQLResult {
+  var updateSource: UpdateSource {
+    source == .cache ? .cache : .server
   }
 }
