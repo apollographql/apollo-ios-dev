@@ -317,19 +317,19 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
       switch fetchType {
       case .initial:
         initialPageResult = data as? GraphQLResult<InitialQuery.Data>
-        if let latest {
+        if let latest, let initialPageResult {
           output = .init(
             previousPages: latest.previous,
             initialPage: latest.initial,
             nextPages: latest.next,
-            mostRecentSource: data.updateSource
+            mostRecentPage: .initial(initialPageResult)
           )
-        } else {
+        } else if let initialPageResult {
           output = .init(
             previousPages: [],
             initialPage: nil,
             nextPages: [],
-            mostRecentSource: data.updateSource
+            mostRecentPage: .initial(initialPageResult)
           )
         }
         if initialPageResult?.data == nil {
@@ -345,12 +345,12 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
           previousPageVarMap[variables] = data as? GraphQLResult<PaginatedQuery.Data>
         }
 
-        if let latest {
+        if let latest, let paginatedResult = data as? GraphQLResult<PaginatedQuery.Data> {
           output = .init(
             previousPages: latest.previous,
             initialPage: latest.initial,
             nextPages: latest.next,
-            mostRecentSource: data.updateSource
+            mostRecentPage: .paginated(paginatedResult)
           )
         }
         if underlyingData == nil {
