@@ -495,7 +495,7 @@ describe("given introspection JSON without defer directive", () => {
       const directives = schema.getDirectives()
 
       expect(directives.length).toEqual(5)
-      expect(directives.map((value) => value.name).toString()).toEqual("include,skip,deprecated,specifiedBy,oneOf")
+      expect(directives.map((value) => value.name).toString()).toEqual("include,skip,deprecated,specifiedBy,oneOf") // intentionally no defer directive here
     });
 
     it("should pass validation as introspection source", () => {
@@ -545,7 +545,7 @@ describe("given introspection JSON with unsupported defer directive", () => {
       const directives = schema.getDirectives()
 
       expect(directives.length).toEqual(6)
-      expect(directives.map((value) => value.name).toString()).toEqual("defer,include,skip,deprecated,specifiedBy,oneOf")
+      expect(directives.map((value) => value.name).toString()).toEqual("defer,include,skip,deprecated,specifiedBy,oneOf") // defer directive included here with unsupported location below
 
       const deferDirective = schema.getDirective(GraphQLDeferDirective.name)
 
@@ -599,11 +599,11 @@ describe("given introspection JSON with valid defer directive", () => {
       const directives = schema.getDirectives()
 
       expect(directives.length).toEqual(6)
-      expect(directives.map((value) => value.name).toString()).toEqual("defer,include,skip,deprecated,specifiedBy,oneOf")
+      expect(directives.map((value) => value.name).toString()).toEqual("defer,include,skip,deprecated,specifiedBy,oneOf") // defer directive included here with valid location below
 
       const deferDirective = schema.getDirective(GraphQLDeferDirective.name)
 
-      expect(deferDirective?.locations.toString()).toEqual("FRAGMENT_SPREAD,INLINE_FRAGMENT")
+      expect(deferDirective?.locations.toString()).toEqual("FRAGMENT_SPREAD,INLINE_FRAGMENT") // valid locations
     });
 
     it("should pass validation as introspection source", () => {
