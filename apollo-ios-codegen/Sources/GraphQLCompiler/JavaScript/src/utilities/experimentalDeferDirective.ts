@@ -41,14 +41,15 @@ export function addExperimentalDeferDirectiveToSDLDocument(document: DocumentNod
   return document
 }
 
+// NOTE: This function is used for adding the experimental defer directive to a document after
+// validating the existing of the defer directive in a schema built from an introspection result.
+//
 // While @defer is experimental the directive needs to be manually added to the list of directives
 // available to operations. If the directive is already in the document it must be validated to 
 // ensure it matches the @defer directive definition supported by Apollo iOS.
 //
 // Once defer is part of the GraphQL spec and the directive is no longer considered experimental
 // this function can be removed.
-//
-// NOTE: This function is used for validating an 
 export function addExperimentalDeferDirectiveToIntrospectionSchema(schema: GraphQLSchema, document: DocumentNode): DocumentNode {
   const directive = schema.getDirective(GraphQLDeferDirective.name)
 
