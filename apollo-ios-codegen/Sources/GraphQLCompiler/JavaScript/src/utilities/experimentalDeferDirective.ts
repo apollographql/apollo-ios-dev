@@ -50,6 +50,8 @@ export function addExperimentalDeferDirectiveInspectingSchema(document: Document
 
   if (!matchDirective(directive, GraphQLDeferDirective)) {
     console.warn(`Unsupported ${directive.name} directive found. It will be replaced with a supported definition instead.`)
+
+    return concatAST([document, experimentalDeferDirectiveDocumentNode()])
   }
 
   return document
