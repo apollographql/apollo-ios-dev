@@ -80,10 +80,10 @@ public class GraphQLQueryPager<Model>: Publisher {
     client: any ApolloClientProtocol,
     watcherDispatchQueue: DispatchQueue = .main,
     initialQuery: InitialQuery,
-    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
+    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, PaginationOutput<InitialQuery, PaginatedQuery>?>) -> P,
     pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
     transform: @escaping (PaginationOutput<InitialQuery, PaginatedQuery>) throws -> Model
-  ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
+  ) {
     let pager = GraphQLQueryPagerCoordinator(
       client: client,
       initialQuery: initialQuery,
