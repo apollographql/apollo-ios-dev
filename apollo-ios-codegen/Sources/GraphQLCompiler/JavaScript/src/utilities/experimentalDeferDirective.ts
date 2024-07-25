@@ -11,12 +11,12 @@ import {
 import { definitionNode } from "./nodeHelpers";
 
 // While @defer is experimental the directive needs to be manually added to the list of directives
-// available to operations. If the directive is already in the schema it must be validated to 
+// available to operations. If the directive is already in the document it must be validated to 
 // ensure it matches the @defer directive definition supported by Apollo iOS.
 //
 // Once defer is part of the GraphQL spec and the directive is no longer considered experimental
 // this function can be removed.
-export function addExperimentalDeferDirectiveInspectingDocument(document: DocumentNode): DocumentNode {
+export function addExperimentalDeferDirectiveToSDLDocument(document: DocumentNode): DocumentNode {
   const definition = document.definitions.find(isDeferDirectiveDefinitionNodePredicate)
 
   if (!definition) {
@@ -41,7 +41,15 @@ export function addExperimentalDeferDirectiveInspectingDocument(document: Docume
   return document
 }
 
-export function addExperimentalDeferDirectiveInspectingSchema(document: DocumentNode, schema: GraphQLSchema): DocumentNode {
+// While @defer is experimental the directive needs to be manually added to the list of directives
+// available to operations. If the directive is already in the document it must be validated to 
+// ensure it matches the @defer directive definition supported by Apollo iOS.
+//
+// Once defer is part of the GraphQL spec and the directive is no longer considered experimental
+// this function can be removed.
+//
+// NOTE: This function is used for validating an 
+export function addExperimentalDeferDirectiveToIntrospectionSchema(schema: GraphQLSchema, document: DocumentNode): DocumentNode {
   const directive = schema.getDirective(GraphQLDeferDirective.name)
 
   if (!directive) {

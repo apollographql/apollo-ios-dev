@@ -18,8 +18,8 @@ import {
   addApolloCodegenSchemaExtensionToDocument,
 } from "./utilities/apolloCodegenSchemaExtension";
 import { 
-  addExperimentalDeferDirectiveInspectingDocument,
-  addExperimentalDeferDirectiveInspectingSchema
+  addExperimentalDeferDirectiveToSDLDocument,
+  addExperimentalDeferDirectiveToIntrospectionSchema
 } from "./utilities/experimentalDeferDirective";
 
 // We need to export all the classes we want to map to native objects,
@@ -57,7 +57,7 @@ export function loadSchemaFromSources(sources: Source[]): GraphQLSchema {
   var document = addApolloCodegenSchemaExtensionToDocument(concatAST(documents))
 
   if (!introspectionJSONResult) {
-    document = addExperimentalDeferDirectiveInspectingDocument(document)
+    document = addExperimentalDeferDirectiveToSDLDocument(document)
     assertValidSDL(document)
 
     const schema = buildASTSchema(document, { assumeValid: true, assumeValidSDL: true })
@@ -67,7 +67,7 @@ export function loadSchemaFromSources(sources: Source[]): GraphQLSchema {
 
   } else {
     var schema = loadSchemaFromIntrospectionResult(introspectionJSONResult.body)
-    document = addExperimentalDeferDirectiveInspectingSchema(document, schema)
+    document = addExperimentalDeferDirectiveToIntrospectionSchema(schema, document)
     schema = extendSchema(schema, document, { assumeValid: true, assumeValidSDL: true })
 
     assertValidSchema(schema)
