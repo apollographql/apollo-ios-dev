@@ -56,6 +56,13 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     }
   }
 
+  /// Initialize an `AsyncGraphQLQueryPager` that outputs a `PaginationOutput<InitialQuery, PaginatedQuery>`.
+  /// - Parameters:
+  ///   - client: Apollo client type
+  ///   - initialQuery: The query to call for the first page of pagination. May be a separate type of query than the pagination query.
+  ///   - watcherDispatchQueue: The queue that the underlying `GraphQLQueryWatcher`s respond on. Defaults to `main`.
+  ///   - extractPageInfo: A user-input closure that instructs the pager on how to extract `P`, a `PaginationInfo` type, from the `Data` of either the `InitialQuery` or `PaginatedQuery`.
+  ///   - pageResolver: A user-input closure that instructs the pager on how to create a new `PaginatedQuery` given a `PaginationInfo` and a `PaginationDirection`.
   public convenience init<
     P: PaginationInfo,
     InitialQuery: GraphQLQuery,
@@ -77,6 +84,14 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     self.init(pager: pager)
   }
 
+  /// Initialize an `AsyncGraphQLQueryPager` that outputs a user-defined `Model`, the result of the `transform` argument.
+  /// - Parameters:
+  ///   - client: Apollo client type
+  ///   - initialQuery: The query to call for the first page of pagination. May be a separate type of query than the pagination query.
+  ///   - watcherDispatchQueue: The queue that the underlying `GraphQLQueryWatcher`s respond on. Defaults to `main`.
+  ///   - extractPageInfo: A user-input closure that instructs the pager on how to extract `P`, a `PaginationInfo` type, from the `Data` of either the `InitialQuery` or `PaginatedQuery`.
+  ///   - pageResolver: A user-input closure that instructs the pager on how to create a new `PaginatedQuery` given a `PaginationInfo` and a `PaginationDirection`.
+  ///   - transform: Transforms the `PaginationOutput` into a `Model` type.
   public convenience init<
     P: PaginationInfo,
     InitialQuery: GraphQLQuery,
@@ -127,7 +142,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     try await pager.loadPrevious(cachePolicy: cachePolicy)
   }
 
-  /// Loads all pages.
+  /// Loads all pages. Does not output a value until all pages have loaded.
   /// - Parameters:
   ///   - fetchFromInitialPage: Pass true to begin loading from the initial page; otherwise pass false.  Defaults to `true`.  **NOTE**: Loading all pages with this value set to `false` requires that the initial page has already been loaded previously.
   public func loadAll(
