@@ -167,7 +167,7 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
     callbackQueue: DispatchQueue = .main,
     completion: (() -> Void)? = nil
   ) {
-    execute(callbackQueue: callbackQueue, completion: { _ in completion?() }) { [weak self] in
+    execute(callbackQueue: callbackQueue) { _ in completion?() } operation: { [weak self] in
       guard let self else { return }
       for completion in await self.completionManager.completions {
         completion.execute(error: PaginationError.cancellation)
@@ -184,7 +184,7 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
     callbackQueue: DispatchQueue = .main,
     completion: (() -> Void)? = nil
   ) {
-    execute(callbackQueue: callbackQueue, completion: { _ in completion?() }) { [weak self] in
+    execute(callbackQueue: callbackQueue) { _ in completion?() } operation: { [weak self] in
       await self?.pager.fetch()
     }
   }
