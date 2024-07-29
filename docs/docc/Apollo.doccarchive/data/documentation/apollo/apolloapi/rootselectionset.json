@@ -90,7 +90,8 @@
   "topicSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/RootSelectionSet\/init(data:variables:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/RootSelectionSet\/init(data:variables:)-5dodp",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/RootSelectionSet\/init(data:variables:)-7xsfq"
       ],
       "title" : "Initializers"
     }
@@ -166,7 +167,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloapi\/rootselectionset"
 },
-"doc://Apollo/documentation/Apollo/ApolloAPI/RootSelectionSet/init(data:variables:)": {
+"doc://Apollo/documentation/Apollo/ApolloAPI/RootSelectionSet/init(data:variables:)-5dodp": {
   "abstract" : [
     {
       "text" : "Initializes a ",
@@ -222,7 +223,7 @@
     },
     {
       "kind" : "text",
-      "text" : " : "
+      "text" : " : any "
     },
     {
       "kind" : "typeIdentifier",
@@ -238,12 +239,99 @@
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/RootSelectionSet\/init(data:variables:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/RootSelectionSet\/init(data:variables:)-5dodp",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "init(data:variables:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloapi\/rootselectionset\/init(data:variables:)"
+  "url" : "\/documentation\/apollo\/apolloapi\/rootselectionset\/init(data:variables:)-5dodp"
+},
+"doc://Apollo/documentation/Apollo/ApolloAPI/RootSelectionSet/init(data:variables:)-7xsfq": {
+  "abstract" : [
+    {
+      "text" : "Initializes a ",
+      "type" : "text"
+    },
+    {
+      "code" : "SelectionSet",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " with a raw JSON response object.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "data"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "Any"
+    },
+    {
+      "kind" : "text",
+      "text" : "], "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "variables"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : " : any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI29GraphQLOperationVariableValueP",
+      "text" : "GraphQLOperationVariableValue"
+    },
+    {
+      "kind" : "text",
+      "text" : "]?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/RootSelectionSet\/init(data:variables:)-7xsfq",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(data:variables:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloapi\/rootselectionset\/init(data:variables:)-7xsfq"
 }
 }
 }

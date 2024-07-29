@@ -33,7 +33,7 @@ class SchemaRegistryApolloSchemaDownloaderTests: XCTestCase {
     let source = try await frontend.makeSource(from: URL(fileURLWithPath: configuration.outputPath))
     let schema = try await frontend.loadSchema(from: [source])
     let rocketType = try await schema.getType(named: "Rocket")
-    XCTAssertEqual(rocketType?.name, "Rocket")
+    XCTAssertEqual(rocketType?.name.schemaName, "Rocket")
   }
 }
 #endif

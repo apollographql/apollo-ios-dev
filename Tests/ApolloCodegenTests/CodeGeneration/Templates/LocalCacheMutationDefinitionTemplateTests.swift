@@ -9,8 +9,8 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IRBuilder!
-  var operation: IR.Operation!
+  var ir: IRBuilderTestWrapper!
+  var operation: IRTestWrapper<IR.Operation>!
   var config: ApolloCodegenConfiguration!
   var subject: LocalCacheMutationDefinitionTemplate!
 
@@ -50,17 +50,41 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   // MARK: - Helpers
 
   private func buildSubjectAndOperation(named operationName: String = "TestOperation") async throws {
-    ir = try await .mock(schema: schemaSDL, document: document)
+    ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
     operation = await ir.build(operation: operationDefinition)
     subject = LocalCacheMutationDefinitionTemplate(
-      operation: operation,
+      operation: operation.irObject,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
 
   private func renderSubject() -> String {
-    subject.template.description
+    subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
+  }
+
+  // MARK: - Target Configuration Tests
+
+  func test__target__givenModuleImports_targetHasModuleImports() async throws {
+    // given
+    document = """
+    query TestOperation @apollo_client_ios_localCacheMutation @import(module: "ModuleA") {
+      allAnimals {
+        species
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    guard case let .operationFile(actual) = subject.target else {
+      fail("expected operationFile target")
+      return
+    }
+
+    // then
+    expect(actual).to(equal(["ModuleA"]))
   }
 
   // MARK: - Access Level Tests

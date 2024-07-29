@@ -9,7 +9,15 @@
       "type" : "codeVoice"
     },
     {
-      "text" : ", which can eventually be returned to the UI. Will be nil if not yet parsed.",
+      "text" : ", which can eventually be returned to the UI. Will be nil",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "if not yet parsed.",
       "type" : "text"
     }
   ],
@@ -64,6 +72,7 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
         "text" : "Data"
       },
       {
@@ -128,6 +137,7 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
               "text" : "Data"
             },
             {
@@ -255,7 +265,15 @@
       "type" : "codeVoice"
     },
     {
-      "text" : ", which can eventually be returned to the UI. Will be nil if not yet parsed.",
+      "text" : ", which can eventually be returned to the UI. Will be nil",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "if not yet parsed.",
       "type" : "text"
     }
   ],
@@ -295,6 +313,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {

@@ -4,11 +4,11 @@ import ApolloAPI
 import ApolloInternalTestHelpers
 
 class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting {
-  var cacheType: TestCacheProvider.Type {
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
   
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var store: ApolloStore!
   
   override func setUpWithError() throws {
@@ -48,14 +48,14 @@ class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting {
     
     /// This interceptor will reroute anything that fails with a response code error to retry hitting only the cache
     class RerouteToCacheErrorInterceptor: ApolloErrorInterceptor {
-      var handledError: Error?
+      var handledError: (any Error)?
       
       func handleErrorAsync<Operation: GraphQLOperation>(
-        error: Error,
-        chain: RequestChain,
+        error: any Error,
+        chain: any RequestChain,
         request: HTTPRequest<Operation>,
         response: HTTPResponse<Operation>?,
-        completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void) {
+        completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
         
         self.handledError = error
         
@@ -88,7 +88,7 @@ class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting {
       
       let additionalInterceptor = RerouteToCacheErrorInterceptor()
 
-      override func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> ApolloErrorInterceptor? {
+      override func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
         self.additionalInterceptor
       }
     }

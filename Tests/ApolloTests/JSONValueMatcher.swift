@@ -2,16 +2,16 @@ import Nimble
 import Apollo
 import ApolloAPI
 
-public func equalJSONValue(_ expectedValue: JSONEncodable?) -> Predicate<JSONEncodable> {
-  return Predicate { actual in
+public func equalJSONValue(_ expectedValue: (any JSONEncodable)?) -> Matcher<any JSONEncodable> {
+  return Matcher { actual in
     let msg = ExpectationMessage.expectedActualValueTo("equal <\(stringify(expectedValue))>")
     if let actualValue = try actual.evaluate(), let expectedValue = expectedValue {
-        return PredicateResult(
+      return MatcherResult(
           bool: actualValue._jsonValue == expectedValue._jsonValue,
           message: msg
         )
     } else {
-      return PredicateResult(
+      return MatcherResult(
         status: .fail,
         message: msg.appendedBeNilHint()
       )

@@ -77,7 +77,7 @@ class CompilationTests: XCTestCase {
     let operation = try XCTUnwrap(compilationResult.operations.first)
     XCTAssertEqual(operation.name, "HeroAndFriendsNames")
     XCTAssertEqual(operation.operationType, .query)
-    XCTAssertEqual(operation.rootType.name, "Query")
+    XCTAssertEqual(operation.rootType.name.schemaName, "Query")
     
     XCTAssertEqual(operation.variables[0].name, "episode")
     XCTAssertEqual(operation.variables[0].type.typeReference, "Episode")
@@ -94,7 +94,7 @@ class CompilationTests: XCTestCase {
     XCTAssertEqual(friendsField.name, "friends")
     XCTAssertEqual(friendsField.type.typeReference, "[Character]")
     
-    XCTAssertEqualUnordered(compilationResult.referencedTypes.map(\.name),
+    XCTAssertEqualUnordered(compilationResult.referencedTypes.map(\.name.schemaName),
                             ["Human", "Droid", "Query", "Episode", "Character", "String"])
   }
 
@@ -121,64 +121,6 @@ class CompilationTests: XCTestCase {
 
     let expectedDirectives: [CompilationResult.Directive] = [
       .mock("testDirective")
-    ]
-
-    let compilationResult = try await compileFrontend()
-
-
-    let operation = try XCTUnwrap(compilationResult.operations.first)
-    expect(operation.directives).to(equal(expectedDirectives))
-  }
-
-  /// Tests that we automatically add the local cache mutation directive to the schema
-  /// during codegen.
-  func test__compile__givenSchemaSDL_queryWithLocalCacheMutationDirective_notInSchema_hasDirective() async throws {
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      species: String!
-    }
-    """
-
-    document = """
-    query Test @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        species
-      }
-    }
-    """
-
-    let expectedDirectives: [CompilationResult.Directive] = [
-      .mock("apollo_client_ios_localCacheMutation")
-    ]
-
-    let compilationResult = try await compileFrontend()
-
-
-    let operation = try XCTUnwrap(compilationResult.operations.first)
-    expect(operation.directives).to(equal(expectedDirectives))
-  }
-
-  /// Tests that we automatically add the local cache mutation directive to the schema
-  /// during codegen.
-  func test__compile__givenSchemaJSON_queryWithLocalCacheMutationDirective_notInSchema_hasDirective() async throws {
-    try useStarWarsSchema()
-
-    document = """
-      query HeroAndFriendsNames($id: ID) @apollo_client_ios_localCacheMutation {
-        human(id: $id) {
-          name
-          mass
-          appearsIn
-        }
-      }
-      """
-
-    let expectedDirectives: [CompilationResult.Directive] = [
-      .mock("apollo_client_ios_localCacheMutation")
     ]
 
     let compilationResult = try await compileFrontend()
@@ -216,7 +158,7 @@ class CompilationTests: XCTestCase {
     let compilationResult = try await compileFrontend()
 
     let inputObject = try XCTUnwrap(
-      compilationResult.referencedTypes.first { $0.name == "TestInput"} as? GraphQLInputObjectType
+      compilationResult.referencedTypes.first { $0.name.schemaName == "TestInput"} as? GraphQLInputObjectType
     )
     let listField = try XCTUnwrap(inputObject.fields["listField"])
     let defaultValue = try XCTUnwrap(listField.defaultValue)

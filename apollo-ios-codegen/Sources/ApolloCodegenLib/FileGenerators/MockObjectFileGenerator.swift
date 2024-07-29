@@ -13,7 +13,7 @@ struct MockObjectFileGenerator: FileGenerator {
 
   let config: ApolloCodegen.ConfigurationContext
 
-  var template: TemplateRenderer {
+  var template: any TemplateRenderer {
     MockObjectTemplate(
       graphqlObject: graphqlObject,
       fields: fields,
@@ -23,5 +23,5 @@ struct MockObjectFileGenerator: FileGenerator {
   }
 
   var target: FileTarget { .testMock }
-  var fileName: String { "\(graphqlObject.name)+Mock" }
+  var fileName: String { "\(graphqlObject.render(as: .filename))+Mock" }
 }

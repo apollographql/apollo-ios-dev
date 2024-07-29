@@ -9,10 +9,10 @@ struct ObjectFileGenerator: FileGenerator {
   /// Shared codegen configuration.
   let config: ApolloCodegen.ConfigurationContext
   
-  var template: TemplateRenderer {
+  var template: any TemplateRenderer {
     ObjectTemplate(graphqlObject: graphqlObject, config: config)
   }
 
   var target: FileTarget { .object }
-  var fileName: String { graphqlObject.name }
+  var fileName: String { graphqlObject.render(as: .filename) }
 }

@@ -24,8 +24,10 @@ struct MockObjectTemplate: TemplateRenderer {
     deprecationReason: String?
   )
 
-  var template: TemplateString {
-    let objectName = graphqlObject.formattedName
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
+    let objectName = graphqlObject.render(as: .typename)
     let fields: [TemplateField] = fields
       .sorted { $0.0 < $1.0 }
       .map {
@@ -124,9 +126,9 @@ struct MockObjectTemplate: TemplateRenderer {
         let mockType: String
         switch graphQLCompositeType {
         case is GraphQLInterfaceType, is GraphQLUnionType:
-          mockType = "AnyMock"
+          mockType = "(any AnyMock)"
         default:
-          mockType = "Mock<\(graphQLCompositeType.formattedName)>"
+          mockType = "Mock<\(graphQLCompositeType.render(as: .typename))>"
         }
         return TemplateString("\(mockType)\(if: !forceNonNull, "?")").description
       case .scalar,

@@ -5,7 +5,9 @@ import ApolloAPI
 
 public typealias DidChangeKeysFunc = (Set<CacheKey>, UUID?) -> Void
 
-protocol ApolloStoreSubscriber: AnyObject {
+/// The `ApolloStoreSubscriber` provides a means to observe changes to items in the ApolloStore.
+/// This protocol is available for advanced use cases only. Most users will prefer using `ApolloClient.watch(query:)`.
+public protocol ApolloStoreSubscriber: AnyObject {
   
   /// A callback that can be received by subscribers when keys are changed within the database
   ///
@@ -20,16 +22,16 @@ protocol ApolloStoreSubscriber: AnyObject {
 
 /// The `ApolloStore` class acts as a local cache for normalized GraphQL results.
 public class ApolloStore {
-  private let cache: NormalizedCache
+  private let cache: any NormalizedCache
   private let queue: DispatchQueue
 
-  private var subscribers: [ApolloStoreSubscriber] = []
+  internal var subscribers: [any ApolloStoreSubscriber] = []
 
   /// Designated initializer
   /// - Parameters:
   ///   - cache: An instance of `normalizedCache` to use to cache results.
   ///            Defaults to an `InMemoryNormalizedCache`.
-  public init(cache: NormalizedCache = InMemoryNormalizedCache()) {
+  public init(cache: any NormalizedCache = InMemoryNormalizedCache()) {
     self.cache = cache
     self.queue = DispatchQueue(label: "com.apollographql.ApolloStore", attributes: .concurrent)
   }
@@ -45,7 +47,7 @@ public class ApolloStore {
   /// - Parameters:
   ///   - callbackQueue: The queue to call the completion block on. Defaults to `DispatchQueue.main`.
   ///   - completion: [optional] A completion block to be called after records are merged into the cache.
-  public func clearCache(callbackQueue: DispatchQueue = .main, completion: ((Result<Void, Swift.Error>) -> Void)? = nil) {
+  public func clearCache(callbackQueue: DispatchQueue = .main, completion: ((Result<Void, any Swift.Error>) -> Void)? = nil) {
     queue.async(flags: .barrier) {
       let result = Result { try self.cache.clear() }
       DispatchQueue.returnResultAsyncIfNeeded(
@@ -63,7 +65,7 @@ public class ApolloStore {
   ///                 to assist in de-duping cache hits for watchers.
   ///   - callbackQueue: The queue to call the completion block on. Defaults to `DispatchQueue.main`.
   ///   - completion: [optional] A completion block to be called after records are merged into the cache.
-  public func publish(records: RecordSet, identifier: UUID? = nil, callbackQueue: DispatchQueue = .main, completion: ((Result<Void, Swift.Error>) -> Void)? = nil) {
+  public func publish(records: RecordSet, identifier: UUID? = nil, callbackQueue: DispatchQueue = .main, completion: ((Result<Void, any Swift.Error>) -> Void)? = nil) {
     queue.async(flags: .barrier) {
       do {
         let changedKeys = try self.cache.merge(records: records)
@@ -83,13 +85,23 @@ public class ApolloStore {
     }
   }
 
-  func subscribe(_ subscriber: ApolloStoreSubscriber) {
+  /// Subscribes to notifications of ApolloStore content changes
+  ///
+  /// - Parameters:
+  ///    - subscriber: A subscriber to receive content change notificatons. To avoid a retain cycle,
+  ///                  ensure you call `unsubscribe` on this subscriber before it goes out of scope.
+  public func subscribe(_ subscriber: any ApolloStoreSubscriber) {
     queue.async(flags: .barrier) {
       self.subscribers.append(subscriber)
     }
   }
 
-  func unsubscribe(_ subscriber: ApolloStoreSubscriber) {
+  /// Unsubscribes from notifications of ApolloStore content changes
+  ///
+  /// - Parameters:
+  ///    - subscriber: A subscribe that has previously been added via `subscribe`. To avoid retain cycles,
+  ///                  call `unsubscribe` on all active subscribers before they go out of scope.
+  public func unsubscribe(_ subscriber: any ApolloStoreSubscriber) {
     queue.async(flags: .barrier) {
       self.subscribers = self.subscribers.filter({ $0 !== subscriber })
     }
@@ -104,7 +116,7 @@ public class ApolloStore {
   public func withinReadTransaction<T>(
     _ body: @escaping (ReadTransaction) throws -> T,
     callbackQueue: DispatchQueue? = nil,
-    completion: ((Result<T, Swift.Error>) -> Void)? = nil
+    completion: ((Result<T, any Swift.Error>) -> Void)? = nil
   ) {
     self.queue.async {
       do {
@@ -134,7 +146,7 @@ public class ApolloStore {
   public func withinReadWriteTransaction<T>(
     _ body: @escaping (ReadWriteTransaction) throws -> T,
     callbackQueue: DispatchQueue? = nil,
-    completion: ((Result<T, Swift.Error>) -> Void)? = nil
+    completion: ((Result<T, any Swift.Error>) -> Void)? = nil
   ) {
     self.queue.async(flags: .barrier) {
       do {
@@ -189,7 +201,7 @@ public class ApolloStore {
   }
 
   public class ReadTransaction {
-    fileprivate let cache: NormalizedCache
+    fileprivate let cache: any NormalizedCache
 
     fileprivate lazy var loader: DataLoader<CacheKey, Record> = DataLoader(self.cache.loadRecords)
     fileprivate lazy var executor = GraphQLExecutor(

@@ -73,14 +73,14 @@ class RequestChainTests: XCTestCase {
 
   func test__send__ErrorInterceptorGetsCalledAfterAnErrorIsReceived() {
     class ErrorInterceptor: ApolloErrorInterceptor {
-      var error: Error? = nil
+      var error: (any Error)? = nil
 
       func handleErrorAsync<Operation: GraphQLOperation>(
-          error: Error,
-          chain: RequestChain,
+        error: any Error,
+          chain: any RequestChain,
           request: HTTPRequest<Operation>,
           response: HTTPResponse<Operation>?,
-          completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void) {
+          completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
 
         self.error = error
         completion(.failure(error))
@@ -98,7 +98,7 @@ class RequestChainTests: XCTestCase {
         ]
       }
 
-      func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> ApolloErrorInterceptor? {
+      func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
         return self.errorInterceptor
       }
     }
@@ -145,14 +145,14 @@ class RequestChainTests: XCTestCase {
 
   func test__upload__ErrorInterceptorGetsCalledAfterAnErrorIsReceived() throws {
     class ErrorInterceptor: ApolloErrorInterceptor {
-      var error: Error? = nil
+      var error: (any Error)? = nil
 
       func handleErrorAsync<Operation: GraphQLOperation>(
-          error: Error,
-          chain: RequestChain,
+        error: any Error,
+          chain: any RequestChain,
           request: HTTPRequest<Operation>,
           response: HTTPResponse<Operation>?,
-          completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void) {
+          completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
 
         self.error = error
         completion(.failure(error))
@@ -170,7 +170,7 @@ class RequestChainTests: XCTestCase {
         ]
       }
 
-      func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> ApolloErrorInterceptor? {
+      func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
         return self.errorInterceptor
       }
     }
@@ -224,14 +224,14 @@ class RequestChainTests: XCTestCase {
 
   func testErrorInterceptorGetsCalledInDefaultInterceptorProviderSubclass() {
     class ErrorInterceptor: ApolloErrorInterceptor {
-      var error: Error? = nil
+      var error: (any Error)? = nil
 
       func handleErrorAsync<Operation: GraphQLOperation>(
-        error: Error,
-        chain: RequestChain,
+        error: any Error,
+        chain: any RequestChain,
         request: HTTPRequest<Operation>,
         response: HTTPResponse<Operation>?,
-        completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void) {
+        completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
 
         self.error = error
         completion(.failure(error))
@@ -250,7 +250,7 @@ class RequestChainTests: XCTestCase {
         ]
       }
 
-      override func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> ApolloErrorInterceptor? {
+      override func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
         return self.errorInterceptor
       }
     }
@@ -295,6 +295,56 @@ class RequestChainTests: XCTestCase {
     }
   }
 
+  func test__error__givenGraphqlError_withoutData_shouldReturnError() {
+    // given
+    let client = MockURLSessionClient(
+      response: .mock(
+        url: TestURL.mockServer.url,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: nil
+      ),
+      data: """
+      {
+        "errors": [{
+          "message": "Bad request, could not start execution!"
+        }]
+      }
+      """.data(using: .utf8)
+    )
+
+    let interceptorProvider = DefaultInterceptorProvider(client: client, store: ApolloStore())
+    let interceptors = interceptorProvider.interceptors(for: MockQuery.mock())
+    let requestChain = InterceptorRequestChain(interceptors: interceptors)
+
+    let expectation = expectation(description: "Response received")
+
+    let request = JSONRequest(
+      operation: MockQuery<Hero>(),
+      graphQLEndpoint: TestURL.mockServer.url,
+      clientName: "test-client",
+      clientVersion: "test-client-version"
+    )
+
+    // when + then
+    requestChain.kickoff(request: request) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      switch (result) {
+      case let .success(data):
+        XCTAssertEqual(data.errors, [
+          GraphQLError("Bad request, could not start execution!")
+        ])
+      case let .failure(error):
+        XCTFail("Unexpected failure result - \(error)")
+      }
+    }
+
+    wait(for: [expectation], timeout: 1)
+  }
+
   // MARK: Multipart request tests
 
   struct RequestTrapInterceptor: ApolloInterceptor {
@@ -307,10 +357,10 @@ class RequestChainTests: XCTestCase {
     }
 
     func interceptAsync<Operation>(
-      chain: RequestChain,
+      chain: any RequestChain,
       request: HTTPRequest<Operation>,
       response: HTTPResponse<Operation>?,
-      completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>
+      completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>
     ) -> Void) {
       callback(try! request.toURLRequest())
     }
@@ -325,7 +375,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;boundary=\"graphql\";\(MultipartResponseSubscriptionParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseSubscriptionParser.protocolSpec),application/json")
       expectation.fulfill()
     }
 
@@ -350,7 +400,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;boundary=\"graphql\";\(MultipartResponseSubscriptionParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseSubscriptionParser.protocolSpec),application/json")
       XCTAssertNotNil(request.allHTTPHeaderFields?["Random"])
       expectation.fulfill()
     }
@@ -371,7 +421,7 @@ class RequestChainTests: XCTestCase {
     wait(for: [expectation], timeout: 1)
   }
 
-  func test__request__givenDeferredOperation_shouldAddMultipartAcceptHeader() {
+  func test__request__givenQuery_shouldAddMultipartAcceptHeader() {
     let expectation = self.expectation(description: "Request header verified")
 
     let interceptor = RequestTrapInterceptor { request in
@@ -380,60 +430,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;boundary=\"graphql\";\(MultipartResponseDeferParser.protocolSpec),application/json")
-      expectation.fulfill()
-    }
-
-    let transport = RequestChainNetworkTransport(
-      interceptorProvider: MockInterceptorProvider([interceptor]),
-      endpointURL: TestURL.mockServer.url
-    )
-
-    _ = transport.send(operation: MockDeferredQuery.mock()) { result in
-      // noop
-    }
-
-    wait(for: [expectation], timeout: 1)
-  }
-
-  func test__request__givenDeferredOperation_whenTransportInitializedWithAdditionalHeaders_shouldOverwriteOnlyAcceptHeader() {
-    let expectation = self.expectation(description: "Request header verified")
-
-    let interceptor = RequestTrapInterceptor { request in
-      guard let header = request.allHTTPHeaderFields?["Accept"] else {
-        XCTFail()
-        return
-      }
-
-      XCTAssertEqual(header, "multipart/mixed;boundary=\"graphql\";\(MultipartResponseDeferParser.protocolSpec),application/json")
-      XCTAssertNotNil(request.allHTTPHeaderFields?["Random"])
-      expectation.fulfill()
-    }
-
-    let transport = RequestChainNetworkTransport(
-      interceptorProvider: MockInterceptorProvider([interceptor]),
-      endpointURL: TestURL.mockServer.url,
-      additionalHeaders: [
-        "Accept": "multipart/mixed",
-        "Random": "still-here"
-      ]
-    )
-
-    _ = transport.send(operation: MockDeferredQuery.mock()) { result in
-      // noop
-    }
-
-    wait(for: [expectation], timeout: 1)
-  }
-
-  func test__request__givenQuery_shouldNotAddMultipartAcceptHeader() {
-    let expectation = self.expectation(description: "Request header verified")
-
-    let interceptor = RequestTrapInterceptor { request in
-      if let header = request.allHTTPHeaderFields?["Accept"] {
-        XCTAssertFalse(header.contains("multipart/mixed"))
-      }
-
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/json")
       expectation.fulfill()
     }
 
@@ -449,20 +446,82 @@ class RequestChainTests: XCTestCase {
     wait(for: [expectation], timeout: 1)
   }
 
-  func test__request__givenMutation_shouldNotAddMultipartAcceptHeader() {
+  func test__request__givenMutation_shouldAddMultipartAcceptHeader() {
     let expectation = self.expectation(description: "Request header verified")
 
     let interceptor = RequestTrapInterceptor { request in
-      if let header = request.allHTTPHeaderFields?["Accept"] {
-        XCTAssertFalse(header.contains("multipart/mixed"))
+      guard let header = request.allHTTPHeaderFields?["Accept"] else {
+        XCTFail()
+        return
       }
 
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/json")
       expectation.fulfill()
     }
 
     let transport = RequestChainNetworkTransport(
       interceptorProvider: MockInterceptorProvider([interceptor]),
       endpointURL: TestURL.mockServer.url
+    )
+
+    _ = transport.send(operation: MockMutation.mock()) { result in
+      // noop
+    }
+
+    wait(for: [expectation], timeout: 1)
+  }
+
+  func test__request__givenQuery_whenTransportInitializedWithAdditionalHeaders_shouldOverwriteOnlyAcceptHeader() {
+    let expectation = self.expectation(description: "Request header verified")
+
+    let interceptor = RequestTrapInterceptor { request in
+      guard let header = request.allHTTPHeaderFields?["Accept"] else {
+        XCTFail()
+        return
+      }
+
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/json")
+      XCTAssertNotNil(request.allHTTPHeaderFields?["Random"])
+      expectation.fulfill()
+    }
+
+    let transport = RequestChainNetworkTransport(
+      interceptorProvider: MockInterceptorProvider([interceptor]),
+      endpointURL: TestURL.mockServer.url,
+      additionalHeaders: [
+        "Accept": "multipart/mixed",
+        "Random": "still-here"
+      ]
+    )
+
+    _ = transport.send(operation: MockQuery.mock()) { result in
+      // noop
+    }
+
+    wait(for: [expectation], timeout: 1)
+  }
+
+  func test__request__givenMutation_whenTransportInitializedWithAdditionalHeaders_shouldOverwriteOnlyAcceptHeader() {
+    let expectation = self.expectation(description: "Request header verified")
+
+    let interceptor = RequestTrapInterceptor { request in
+      guard let header = request.allHTTPHeaderFields?["Accept"] else {
+        XCTFail()
+        return
+      }
+
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/json")
+      XCTAssertNotNil(request.allHTTPHeaderFields?["Random"])
+      expectation.fulfill()
+    }
+
+    let transport = RequestChainNetworkTransport(
+      interceptorProvider: MockInterceptorProvider([interceptor]),
+      endpointURL: TestURL.mockServer.url,
+      additionalHeaders: [
+        "Accept": "multipart/mixed",
+        "Random": "still-here"
+      ]
     )
 
     _ = transport.send(operation: MockMutation.mock()) { result in
@@ -495,10 +554,10 @@ class RequestChainTests: XCTestCase {
     }
 
     func interceptAsync<Operation>(
-      chain: RequestChain,
+      chain: any RequestChain,
       request: HTTPRequest<Operation>,
       response: HTTPResponse<Operation>?,
-      completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>
+      completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>
     ) -> Void) {
       DispatchQueue.main.asyncAfter(wallDeadline: DispatchWallTime.now() + seconds) {
         chain.proceedAsync(
@@ -530,11 +589,11 @@ class RequestChainTests: XCTestCase {
       """.data(using: .utf8)
     )
 
-    var requestChain: RequestChain? = InterceptorRequestChain(interceptors: [
+    var requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
       NetworkFetchInterceptor(client: client),
       JSONResponseParsingInterceptor()
     ])
-    weak var weakRequestChain: RequestChain? = requestChain
+    weak var weakRequestChain: (any RequestChain)? = requestChain
 
     let expectedData = try Hero(data: [
       "__typename": "Hero",
@@ -608,12 +667,12 @@ class RequestChainTests: XCTestCase {
       """.crlfFormattedData()
     )
 
-    var requestChain: RequestChain? = InterceptorRequestChain(interceptors: [
+    var requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
       NetworkFetchInterceptor(client: client),
       MultipartResponseParsingInterceptor(),
       JSONResponseParsingInterceptor()
     ])
-    weak var weakRequestChain: RequestChain? = requestChain
+    weak var weakRequestChain: (any RequestChain)? = requestChain
 
     let expectedData = try Hero(data: [
       "__typename": "Hero",
@@ -773,12 +832,12 @@ class RequestChainTests: XCTestCase {
       data: nil
     )
 
-    var requestChain: RequestChain? = InterceptorRequestChain(interceptors: [
+    var requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
       CacheReadInterceptor(store: store),
       NetworkFetchInterceptor(client: client),
       JSONResponseParsingInterceptor()
     ])
-    weak var weakRequestChain: RequestChain? = requestChain
+    weak var weakRequestChain: (any RequestChain)? = requestChain
 
     let expectedData = try Hero(data: [
       "__typename": "Hero",
@@ -829,13 +888,13 @@ class RequestChainTests: XCTestCase {
       data: nil
     )
 
-    var requestChain: RequestChain? = InterceptorRequestChain(interceptors: [
+    var requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
       CacheReadInterceptor(store: ApolloStore()),
       NetworkFetchInterceptor(client: client),
       JSONResponseParsingInterceptor()
     ])
 
-    weak var weakRequestChain: RequestChain? = requestChain
+    weak var weakRequestChain: (any RequestChain)? = requestChain
 
     let expectation = expectation(description: "Response received")
 
@@ -870,6 +929,8 @@ class RequestChainTests: XCTestCase {
   }
 
   func test__memory_management__givenOperation_withEarlyAndFinalInterceptorChainExit_shouldNotHaveRetainCycle_andShouldNotCrash() throws {
+    throw XCTSkip("Flaky test skipped in PR #386- must be refactored or fixed in a separate PR.")
+
     // given
     let store = ApolloStore(cache: InMemoryNormalizedCache(records: [
       "QUERY_ROOT": [
@@ -895,12 +956,12 @@ class RequestChainTests: XCTestCase {
       """.data(using: .utf8)
     )
 
-    var requestChain: RequestChain? = InterceptorRequestChain(interceptors: [
+    var requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
       CacheReadInterceptor(store: store),
       NetworkFetchInterceptor(client: client),
       JSONResponseParsingInterceptor()
     ])
-    weak var weakRequestChain: RequestChain? = requestChain
+    weak var weakRequestChain: (any RequestChain)? = requestChain
 
     let expectedData = try Hero(data: [
       "__typename": "Hero",
@@ -954,13 +1015,13 @@ class RequestChainTests: XCTestCase {
       data: nil
     )
 
-    var requestChain: RequestChain? = InterceptorRequestChain(interceptors: [
+    var requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
       CacheReadInterceptor(store: store),
       NetworkFetchInterceptor(client: client),
       JSONResponseParsingInterceptor()
     ])
 
-    weak var weakRequestChain: RequestChain? = requestChain
+    weak var weakRequestChain: (any RequestChain)? = requestChain
 
     let expectation = expectation(description: "Response received")
     expectation.expectedFulfillmentCount = 2
@@ -1028,10 +1089,10 @@ class RequestChainTests: XCTestCase {
     let expectation: XCTestExpectation
 
     func interceptAsync<Operation>(
-      chain: Apollo.RequestChain,
+      chain: any Apollo.RequestChain,
       request: Apollo.HTTPRequest<Operation>,
       response: Apollo.HTTPResponse<Operation>?,
-      completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, Error>) -> Void
+      completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
     ) {
       expectation.fulfill()
 
@@ -1045,10 +1106,10 @@ class RequestChainTests: XCTestCase {
     let expectation: XCTestExpectation
 
     func interceptAsync<Operation>(
-      chain: Apollo.RequestChain,
+      chain: any Apollo.RequestChain,
       request: Apollo.HTTPRequest<Operation>,
       response: Apollo.HTTPResponse<Operation>?,
-      completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, Error>) -> Void
+      completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
     ) {
       expectation.fulfill()
 

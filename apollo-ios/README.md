@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/146856/124335690-fc7ecd80-db4f-11eb-93fa-dcf4469bb07b.png" alt="Apollo GraphQL"/>
+  <img src="https://raw.githubusercontent.com/apollographql/apollo-client-devtools/main/assets/apollo-wordmark.svg" alt="Apollo GraphQL"/>
 </p>
 
 <p align="center">
@@ -25,6 +25,10 @@
     <img src="https://img.shields.io/cocoapods/v/Apollo.svg" alt="CocoaPods compatible">
   </a>
 </p>
+
+| ☑️  Apollo Clients User Survey |
+| :----- |
+| What do you like best about Apollo iOS? What needs to be improved? Please tell us by taking a [one-minute survey](https://docs.google.com/forms/d/e/1FAIpQLSczNDXfJne3ZUOXjk9Ursm9JYvhTh1_nFTDfdq3XBAFWCzplQ/viewform?usp=pp_url&entry.1170701325=Apollo+iOS&entry.204965213=Readme). Your responses will help us understand Apollo iOS usage and allow us to serve you better. |
 
 ### Apollo iOS is a strongly-typed, caching GraphQL client, written in Swift
 

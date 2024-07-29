@@ -17,7 +17,7 @@ extension GraphQLInputField {
   }
 
   private var hasSwiftNilDefault: Bool {
-    isNullable && !hasDefaultValue
+    isNullable || hasDefaultValue
   }
 
   var isNullable: Bool {

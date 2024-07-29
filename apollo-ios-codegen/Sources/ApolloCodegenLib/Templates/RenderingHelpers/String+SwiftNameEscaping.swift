@@ -31,26 +31,60 @@ extension String {
     SwiftKeywords.TestMockConflictingFieldNames.contains(self)
   }
 
-  private func escapeIf(in set: Set<String>) -> String {
+  func escapeIf(in set: Set<String>) -> String {
     set.contains(self) ? "`\(self)`" : self
   }
-  
-  /// Renders the string as the property name for a field accessor on a generated `SelectionSet`.
-  /// This escapes the names of properties that would conflict with Swift reserved keywords.
-  func renderAsFieldPropertyName(
-    config: ApolloCodegenConfiguration
-  ) -> String {
+
+  private func aliasIf(in set: Set<String>) -> String {
+    set.contains(self) ? "_\(self)" : self
+  }
+
+  private func escapeWithAliasIf(in set: Set<String>) -> String {
+    set.contains(self) ? "`\(self)` _\(self)" : self
+  }
+
+  private func renderedAsPropertyName(config: ApolloCodegenConfiguration) -> String {
     var propertyName = self
-    
+
     switch config.options.conversionStrategies.fieldAccessors {
     case .camelCase:
       propertyName = propertyName.convertToCamelCase()
     case .idiomatic:
       break
     }
-    
+
     propertyName = propertyName.isAllUppercased ? propertyName.lowercased() : propertyName.firstLowercased
-    return propertyName.escapeIf(in: SwiftKeywords.FieldAccessorNamesToEscape)
+    return propertyName
+  }
+
+  /// Renders the string as the property name for a field accessor on a generated `SelectionSet`.
+  /// This escapes the names of properties that would conflict with Swift reserved keywords.
+  func renderAsFieldPropertyName(config: ApolloCodegenConfiguration) -> String {
+    let propertyName = renderedAsPropertyName(config: config)
+      .escapeIf(in: SwiftKeywords.FieldAccessorNamesToEscape)
+
+    return propertyName
+  }
+
+  /// Renders the string as the parameter name for an initializer on a generated `SelectionSet`.
+  /// This escapes the names of parameters that would conflict with Swift reserved keywords and
+  /// makes them available under a parameter name alias to avoid further conflicts; see issue #3330
+  /// as an example.
+  func renderAsInitializerParameterName(config: ApolloCodegenConfiguration) -> String {
+    let propertyName = renderedAsPropertyName(config: config)
+      .escapeWithAliasIf(in: SwiftKeywords.FieldAccessorNamesToEscape)
+
+    return propertyName
+  }
+
+  /// Renders the string as the parameter name for an initializer on a generated `SelectionSet`.
+  /// This underscores the names of initializer parameters that would conflict with Swift reserved
+  /// keywords; see issue #3330 as an example.
+  func renderAsInitializerParameterAccessorName(config: ApolloCodegenConfiguration) -> String {
+    let propertyName = renderedAsPropertyName(config: config)
+      .aliasIf(in: SwiftKeywords.FieldAccessorNamesToEscape)
+
+    return propertyName
   }
   
   /// Convert to `camelCase` from a number of different `snake_case` variants.
@@ -131,7 +165,7 @@ enum SwiftKeywords {
     "hash"
   ]
 
-  fileprivate static let FieldAccessorNamesToEscape: Set<String> = [
+  static let FieldAccessorNamesToEscape: Set<String> = [
     "associatedtype",
     "class",
     "deinit",

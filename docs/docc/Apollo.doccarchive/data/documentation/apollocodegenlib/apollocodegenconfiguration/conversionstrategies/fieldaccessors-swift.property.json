@@ -21,8 +21,9 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloCodegenConfiguration\/CaseConversionStrategy\/camelCase",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/FieldAccessors-swift.enum\/idiomatic",
+      "isActive" : true,
+      "type" : "reference"
     }
   ],
   "hierarchy" : {
@@ -323,6 +324,34 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/conversionstrategies\/fieldaccessors-swift.enum"
 },
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ConversionStrategies/FieldAccessors-swift.enum/idiomatic": {
+  "abstract" : [
+    {
+      "text" : "This conversion strategy will:",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "idiomatic"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/FieldAccessors-swift.enum\/idiomatic",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "ApolloCodegenConfiguration.ConversionStrategies.FieldAccessors.idiomatic",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/conversionstrategies\/fieldaccessors-swift.enum\/idiomatic"
+},
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ConversionStrategies/fieldAccessors-swift.property": {
   "abstract" : [
     {
@@ -346,8 +375,9 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloCodegenConfiguration\/CaseConversionStrategy\/camelCase",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/FieldAccessors-swift.enum\/idiomatic",
+      "isActive" : true,
+      "type" : "reference"
     }
   ],
   "fragments" : [

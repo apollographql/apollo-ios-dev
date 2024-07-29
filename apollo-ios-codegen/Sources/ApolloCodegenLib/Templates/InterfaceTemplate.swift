@@ -12,10 +12,13 @@ struct InterfaceTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .schemaFile(type: .interface)
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     """
     \(documentation: graphqlInterface.documentation, config: config)
-    static let \(graphqlInterface.formattedName) = Interface(name: "\(graphqlInterface.name)")
+    \(graphqlInterface.name.typeNameDocumentation)
+    static let \(graphqlInterface.render(as: .typename)) = \(config.ApolloAPITargetName).Interface(name: "\(graphqlInterface.name.schemaName)")
     """
   }
 }

@@ -19,6 +19,7 @@
       }
     ],
     "role" : "collectionGroup",
+    "roleHeading" : "API Collection",
     "title" : "InterceptorProvider Implementations"
   },
   "schemaVersion" : {
@@ -131,7 +132,7 @@
     },
     {
       "kind" : "text",
-      "text" : ") -> "
+      "text" : ") -> (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -140,7 +141,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?"
+      "text" : ")?"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/additionalErrorInterceptor(for:)-5ff01",

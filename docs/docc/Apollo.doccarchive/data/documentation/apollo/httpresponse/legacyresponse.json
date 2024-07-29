@@ -9,7 +9,11 @@
       "type" : "codeVoice"
     },
     {
-      "text" : " for legacy caching purposes. If you’re not using the ",
+      "text" : " for legacy caching purposes. If you’re not using the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
       "type" : "text"
     },
     {
@@ -19,23 +23,17 @@
     {
       "text" : ", you probably shouldn’t be using this property.",
       "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
+    }
+  ],
+  "deprecationSummary" : [
     {
       "inlineContent" : [
         {
-          "text" : "NOTE:",
+          "text" : "Do not use. This property will be removed in a future version.",
           "type" : "text"
         }
       ],
-      "type" : "strong"
-    },
-    {
-      "text" : " This property will be removed when the transition to the Swift Codegen is complete.",
-      "type" : "text"
+      "type" : "paragraph"
     }
   ],
   "hierarchy" : {
@@ -89,6 +87,7 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
         "text" : "Data"
       },
       {
@@ -100,6 +99,9 @@
       {
         "name" : "Apollo"
       }
+    ],
+    "platforms" : [
+
     ],
     "role" : "symbol",
     "roleHeading" : "Instance Property",
@@ -153,6 +155,7 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
               "text" : "Data"
             },
             {
@@ -204,7 +207,7 @@
 "doc://Apollo/documentation/Apollo/GraphQLResponse": {
   "abstract" : [
     {
-      "text" : "Represents a GraphQL response received from a server.",
+      "text" : "Represents a complete GraphQL response received from a server.",
       "type" : "text"
     }
   ],
@@ -280,7 +283,11 @@
       "type" : "codeVoice"
     },
     {
-      "text" : " for legacy caching purposes. If you’re not using the ",
+      "text" : " for legacy caching purposes. If you’re not using the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
       "type" : "text"
     },
     {
@@ -290,25 +297,9 @@
     {
       "text" : ", you probably shouldn’t be using this property.",
       "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "inlineContent" : [
-        {
-          "text" : "NOTE:",
-          "type" : "text"
-        }
-      ],
-      "type" : "strong"
-    },
-    {
-      "text" : " This property will be removed when the transition to the Swift Codegen is complete.",
-      "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -345,6 +336,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {

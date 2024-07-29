@@ -26,7 +26,7 @@ public protocol MockMutableRootSelectionSet: MutableRootSelectionSet
 where Schema == MockSchemaMetadata {}
 
 public extension MockMutableRootSelectionSet {
-  static var __parentType: ParentType { Object.mock }
+  static var __parentType: any ParentType { Object.mock }
 
   init() {
     self.init(_dataDict: DataDict(

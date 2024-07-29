@@ -10,10 +10,10 @@ class BlindRetryingTestInterceptor: ApolloInterceptor {
   public var id: String = UUID().uuidString
 
   func interceptAsync<Operation: GraphQLOperation>(
-    chain: RequestChain,
+    chain: any RequestChain,
     request: HTTPRequest<Operation>,
     response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void) {
+    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
     self.hitCount += 1
     chain.retry(request: request,
                 completion: completion)

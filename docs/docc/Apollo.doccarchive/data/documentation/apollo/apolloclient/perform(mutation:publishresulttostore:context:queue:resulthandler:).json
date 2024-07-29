@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloClientProtocol.perform(mutation:publishResultToStore:context:queue:resultHandler:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Performs a mutation by sending it to the server.",
       "type" : "text"
     }
   ],
@@ -29,7 +21,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "Apollo",
-    "externalID" : "s:6Apollo0A6ClientC7perform8mutation20publishResultToStore7context5queue13resultHandlerAA11Cancellable_px_SbAA14RequestContext_pSgSo012OS_dispatch_J0Cys0F0OyAA13GraphQLResultVy4DataQzGs5Error_pGcSgt0A3API0R10QLMutationRzlF",
+    "externalID" : "s:6Apollo0A14ClientProtocolPAAE7perform8mutation20publishResultToStore7context5queue13resultHandlerAA11Cancellable_pqd___SbAA14RequestContext_pSgSo012OS_dispatch_K0Cys0G0OyAA13GraphQLResultVy4DataQyd__Gs5Error_pGcSgt0A3API0S10QLMutationRd__lF::SYNTHESIZED::s:6Apollo0A6ClientC",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -94,7 +86,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : ": (any "
       },
       {
         "kind" : "typeIdentifier",
@@ -103,7 +95,7 @@
       },
       {
         "kind" : "text",
-        "text" : "?, "
+        "text" : ")?, "
       },
       {
         "kind" : "externalParam",
@@ -149,16 +141,21 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
         "text" : "Data"
       },
       {
         "kind" : "text",
-        "text" : ">?) -> "
+        "text" : ">?) -> (any "
       },
       {
         "kind" : "typeIdentifier",
         "preciseIdentifier" : "s:6Apollo11CancellableP",
         "text" : "Cancellable"
+      },
+      {
+        "kind" : "text",
+        "text" : ")"
       }
     ],
     "modules" : [
@@ -182,14 +179,6 @@
             "macOS"
           ],
           "tokens" : [
-            {
-              "kind" : "attribute",
-              "text" : "@discardableResult"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
             {
               "kind" : "keyword",
               "text" : "func"
@@ -245,7 +234,7 @@
             },
             {
               "kind" : "text",
-              "text" : " = true, "
+              "text" : ", "
             },
             {
               "kind" : "externalParam",
@@ -253,7 +242,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": "
+              "text" : ": (any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestContext",
@@ -263,7 +252,7 @@
             },
             {
               "kind" : "text",
-              "text" : "? = nil, "
+              "text" : ")?, "
             },
             {
               "kind" : "externalParam",
@@ -280,7 +269,7 @@
             },
             {
               "kind" : "text",
-              "text" : " = .main, "
+              "text" : ", "
             },
             {
               "kind" : "externalParam",
@@ -310,11 +299,12 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
               "text" : "Data"
             },
             {
               "kind" : "text",
-              "text" : ">? = nil) -> "
+              "text" : ">?) -> (any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable",
@@ -324,7 +314,7 @@
             },
             {
               "kind" : "text",
-              "text" : " "
+              "text" : ") "
             },
             {
               "kind" : "keyword",
@@ -351,6 +341,125 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The mutation to perform.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "mutation"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "If ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "true",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ", this will publish the result returned from the operation to the cache store. Default is ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "true",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "publishResultToStore"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "[optional] A context that is being passed through the request chain. Should default to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "nil",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "context"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A dispatch queue on which the result handler will be called. Should default to the main queue.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "queue"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "An optional closure that is called when mutation results are available or when an error occurs.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "resultHandler"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "An object that can be used to cancel an in progress mutation.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -452,7 +561,10 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/perform(mutation:publishResultToStore:context:queue:resultHandler:)": {
   "abstract" : [
-
+    {
+      "text" : "Performs a mutation by sending it to the server.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -518,7 +630,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -527,7 +639,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?, "
+      "text" : ")?, "
     },
     {
       "kind" : "externalParam",
@@ -573,16 +685,21 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">?) -> "
+      "text" : ">?) -> (any "
     },
     {
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "s:6Apollo11CancellableP",
       "text" : "Cancellable"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:publishResultToStore:context:queue:resultHandler:)",

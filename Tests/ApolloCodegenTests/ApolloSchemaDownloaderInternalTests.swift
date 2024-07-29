@@ -48,10 +48,10 @@ class ApolloSchemaDownloaderInternalTests: XCTestCase {
     let schema = try await frontend.loadSchema(from: [source])
 
     let authorType = try await schema.getType(named: "Author")
-    XCTAssertEqual(authorType?.name, "Author")
+    XCTAssertEqual(authorType?.name.schemaName, "Author")
 
     let postType = try await schema.getType(named: "Post")
-    XCTAssertEqual(postType?.name, "Post")
+    XCTAssertEqual(postType?.name.schemaName, "Post")
   }
 
   // MARK: Request Tests

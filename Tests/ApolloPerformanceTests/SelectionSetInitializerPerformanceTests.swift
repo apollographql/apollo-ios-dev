@@ -12,6 +12,7 @@ class SelectionSetInitializerPerformanceTests: XCTestCase {
       for _ in 0..<1_000 {
         let animal = AllAnimalsQuery.Data.AllAnimal.AsDog(
           favoriteToy: "Milk Bone",
+          id: "1",
           height: .init(feet: 3, meters: 1, relativeSize: .case(.small), centimeters: 100),
           species: "Canine",
           predators: [],

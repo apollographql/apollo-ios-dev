@@ -371,6 +371,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
@@ -396,7 +397,11 @@
       "type" : "codeVoice"
     },
     {
-      "text" : " for legacy caching purposes. If you’re not using the ",
+      "text" : " for legacy caching purposes. If you’re not using the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
       "type" : "text"
     },
     {
@@ -406,25 +411,9 @@
     {
       "text" : ", you probably shouldn’t be using this property.",
       "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "inlineContent" : [
-        {
-          "text" : "NOTE:",
-          "type" : "text"
-        }
-      ],
-      "type" : "strong"
-    },
-    {
-      "text" : " This property will be removed when the transition to the Swift Codegen is complete.",
-      "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -461,6 +450,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
@@ -486,7 +476,15 @@
       "type" : "codeVoice"
     },
     {
-      "text" : ", which can eventually be returned to the UI. Will be nil if not yet parsed.",
+      "text" : ", which can eventually be returned to the UI. Will be nil",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "if not yet parsed.",
       "type" : "text"
     }
   ],
@@ -526,6 +524,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {

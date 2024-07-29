@@ -29,7 +29,7 @@ public struct Glob {
   private let flags = GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_TILDE | GLOB_BRACE
 
   /// An error object that indicates why pattern matching failed.
-  public enum MatchError: Error, LocalizedError, Equatable {
+  public enum MatchError: Swift.Error, LocalizedError, Equatable {
     case noSpace // GLOB_NOSPACE
     case aborted // GLOB_ABORTED
     case cannotEnumerate(path: String)
@@ -151,9 +151,9 @@ public struct Glob {
 
     do {
       let resourceKeys: [URLResourceKey] = [.isDirectoryKey]
-      var enumeratorError: Error?
+      var enumeratorError: (any Error)?
 
-      let errorHandler: ((URL, Error) -> Bool) = { url, error in
+      let errorHandler: ((URL, any Error) -> Bool) = { url, error in
         enumeratorError = error
         return false // aborts enumeration
       }

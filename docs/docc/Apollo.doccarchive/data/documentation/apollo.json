@@ -90,6 +90,7 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloErrorInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber",
         "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable",
         "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider",
         "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport",
@@ -112,6 +113,7 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLFile",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLGETTransformer",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult",
+        "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParsingInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/Record",
@@ -140,7 +142,10 @@
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
         "doc:\/\/Apollo\/documentation\/Apollo\/Constants",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLHTTPRequestError"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLHTTPRequestError",
+        "doc:\/\/Apollo\/documentation\/Apollo\/JSONConverter",
+        "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RootSelectionSetInitializeError"
       ],
       "title" : "Enumerations"
     },
@@ -423,6 +428,64 @@
   "title" : "ApolloStore",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore"
+},
+"doc://Apollo/documentation/Apollo/ApolloStoreSubscriber": {
+  "abstract" : [
+    {
+      "text" : "The ",
+      "type" : "text"
+    },
+    {
+      "code" : "ApolloStoreSubscriber",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " provides a means to observe changes to items in the ApolloStore.",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "This protocol is available for advanced use cases only. Most users will prefer using ",
+      "type" : "text"
+    },
+    {
+      "code" : "ApolloClient.watch(query:)",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ApolloStoreSubscriber"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ApolloStoreSubscriber"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloStoreSubscriber",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostoresubscriber"
 },
 "doc://Apollo/documentation/Apollo/Atomic": {
   "abstract" : [
@@ -1045,7 +1108,7 @@
 "doc://Apollo/documentation/Apollo/GraphQLResponse": {
   "abstract" : [
     {
-      "text" : "Represents a GraphQL response received from a server.",
+      "text" : "Represents a complete GraphQL response received from a server.",
       "type" : "text"
     }
   ],
@@ -1243,6 +1306,60 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/inmemorynormalizedcache"
 },
+"doc://Apollo/documentation/Apollo/IncrementalJSONResponseParsingInterceptor": {
+  "abstract" : [
+    {
+      "text" : "An interceptor which parses JSON response data into a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLResult",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " and attaches it to the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "code" : "HTTPResponse",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "IncrementalJSONResponseParsingInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "IncrementalJSONResponseParsingInterceptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "IncrementalJSONResponseParsingInterceptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor"
+},
 "doc://Apollo/documentation/Apollo/InterceptorProvider": {
   "abstract" : [
     {
@@ -1310,6 +1427,37 @@
   "title" : "InterceptorRequestChain",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/interceptorrequestchain"
+},
+"doc://Apollo/documentation/Apollo/JSONConverter": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "JSONConverter"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONConverter",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "JSONConverter"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "JSONConverter",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/jsonconverter"
 },
 "doc://Apollo/documentation/Apollo/JSONRequest": {
   "abstract" : [
@@ -1631,6 +1779,40 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/normalizedcache"
 },
+"doc://Apollo/documentation/Apollo/PathComponent": {
+  "abstract" : [
+    {
+      "text" : "Represents a path in a GraphQL query.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "PathComponent"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "PathComponent"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PathComponent",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/pathcomponent"
+},
 "doc://Apollo/documentation/Apollo/Record": {
   "abstract" : [
     {
@@ -1920,6 +2102,37 @@
   "title" : "ResponsePath",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/responsepath"
+},
+"doc://Apollo/documentation/Apollo/RootSelectionSetInitializeError": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "RootSelectionSetInitializeError"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RootSelectionSetInitializeError",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "RootSelectionSetInitializeError"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "RootSelectionSetInitializeError",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/rootselectionsetinitializeerror"
 },
 "doc://Apollo/documentation/Apollo/Swift": {
   "abstract" : [

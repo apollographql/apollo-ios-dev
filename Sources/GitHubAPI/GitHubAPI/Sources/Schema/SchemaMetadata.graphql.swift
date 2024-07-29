@@ -3,8 +3,6 @@
 
 import ApolloAPI
 
-public typealias ID = String
-
 public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet
 where Schema == GitHubAPI.SchemaMetadata {}
 
@@ -18,7 +16,7 @@ public protocol MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI
 where Schema == GitHubAPI.SchemaMetadata {}
 
 public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
-  public static let configuration: ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
+  public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
 
   public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
     switch typename {

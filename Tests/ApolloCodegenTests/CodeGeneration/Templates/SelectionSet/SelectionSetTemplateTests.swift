@@ -8,8 +8,8 @@ class SelectionSetTemplateTests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IRBuilder!
-  var operation: IR.Operation!
+  var ir: IRBuilderTestWrapper!
+  var operation: IRTestWrapper<IR.Operation>!
   var subject: SelectionSetTemplate!
 
   override func setUp() {
@@ -26,7 +26,7 @@ class SelectionSetTemplateTests: XCTestCase {
   }
 
   // MARK: - Helpers
-
+  
   func buildSubjectAndOperation(
     named operationName: String = "TestOperation",
     configOutput: ApolloCodegenConfiguration.FileOutput = .mock(),
@@ -36,7 +36,7 @@ class SelectionSetTemplateTests: XCTestCase {
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = .init(),
     cocoapodsImportStatements: Bool = false
   ) async throws {
-    ir = try await .mock(schema: schemaSDL, document: document)
+    ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
     operation = await ir.build(operation: operationDefinition)
     let config = ApolloCodegen.ConfigurationContext(config: .mock(
@@ -51,16 +51,44 @@ class SelectionSetTemplateTests: XCTestCase {
       )
     ))
     let mockTemplateRenderer = MockTemplateRenderer(
-      target: .operationFile,
+      target: .operationFile(),
       template: "",
       config: config
     )
     subject = SelectionSetTemplate(
-      definition: .operation(self.operation),
+      definition: self.operation.irObject,
       generateInitializers: false,
       config: config,
+      nonFatalErrorRecorder: .init(),
       renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
     )
+  }
+  
+  func buildFragment(
+    named fragmentName: String,
+    in ir: IRBuilderTestWrapper,
+    configOutput: ApolloCodegenConfiguration.FileOutput = .mock(),
+    inflectionRules: [ApolloCodegenLib.InflectionRule] = [],
+    schemaDocumentation: ApolloCodegenConfiguration.Composition = .exclude,
+    warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude,
+    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = .init(),
+    cocoapodsImportStatements: Bool = false
+  ) async throws -> FragmentTemplate {
+    let fragmentDefinition = try XCTUnwrap(ir.compilationResult[fragment: fragmentName])
+    let fragment = await ir.build(fragment: fragmentDefinition)
+    let config = ApolloCodegen.ConfigurationContext(config: .mock(
+      schemaNamespace: "TestSchema",
+      output: configOutput,
+      options: .init(
+        additionalInflectionRules: inflectionRules,
+        schemaDocumentation: schemaDocumentation,
+        cocoapodsCompatibleImportStatements: cocoapodsImportStatements,
+        warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
+        conversionStrategies: conversionStrategies
+      )
+    ))
+    
+    return FragmentTemplate(fragment: fragment.irObject, config: config)
   }
 
   // MARK: - Tests
@@ -89,10 +117,10 @@ class SelectionSetTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = try XCTUnwrap(subject.test_render(childEntity: allAnimals.computed))
 
     // then
     expect(String(actual.reversed())).to(equalLineByLine("}", ignoringExtraLines: true))
@@ -121,17 +149,17 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Animal }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
     """
 
     // when
     try await buildSubjectAndOperation()
 
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -158,16 +186,16 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
     """
 
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -198,16 +226,16 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Unions.Animal }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Unions.Animal }
     """
 
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -238,16 +266,16 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: Apollo.ParentType { TestSchema.Unions.Animal }
+      public static var __parentType: any Apollo.ParentType { TestSchema.Unions.Animal }
     """
 
     // when
     try await buildSubjectAndOperation(cocoapodsImportStatements: true)
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -285,24 +313,28 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(cocoapodsImportStatements: true)
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
-  func test__render_selections__givenNilDirectSelections_doesNotRenderSelections() async throws {
+  func test__render_selections__givenNilDirectSelections_mergedFromMultipleSources_doesNotRenderSelections() async throws {
     // given
     schemaSDL = """
     type Query {
       allAnimals: [Animal!]
     }
 
-    type Dog {
+    type Dog implements Pet {
       species: String!
+      nested: Nested!
+    }
+
+    interface Pet {
       nested: Nested!
     }
 
@@ -325,22 +357,28 @@ class SelectionSetTemplateTests: XCTestCase {
         ... on Dog {
           species
         }
+        ... on Pet {
+          nested {
+            b
+          }
+        }
       }
     }
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Nested }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Nested }
 
+      public var a: Int { __data["a"] }
     """
 
     // when
     try await buildSubjectAndOperation()
     let asDog_Nested = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "nested"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "nested"]?.selectionSet
     )
 
-    let actual = subject.render(field: asDog_Nested)
+    let actual = subject.test_render(childEntity: asDog_Nested.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -384,10 +422,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"] as? IR.EntityField
+      operation[field: "query"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -496,10 +534,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -535,10 +573,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -602,10 +640,10 @@ class SelectionSetTemplateTests: XCTestCase {
       // when
       try await buildSubjectAndOperation(configOutput: test)
       let allAnimals = try XCTUnwrap(
-        operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+        operation[field: "query"]?[field: "allAnimals"]?.selectionSet
       )
 
-      let actual = subject.render(field: allAnimals)
+      let actual = subject.test_render(childEntity: allAnimals.computed)
 
       // then
       expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -673,14 +711,53 @@ class SelectionSetTemplateTests: XCTestCase {
       // when
       try await buildSubjectAndOperation(configOutput: test)
       let allAnimals = try XCTUnwrap(
-        operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+        operation[field: "query"]?[field: "allAnimals"]?.selectionSet
       )
 
-      let actual = subject.render(field: allAnimals)
+      let actual = subject.test_render(childEntity: allAnimals.computed)
 
       // then
       expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
     }
+  }
+
+  func test__render_selections__givenCustomScalar_ID_rendersFieldSelectionWithoutSuffix() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    type Animal {
+      id: ID!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        id
+      }
+    }
+    """
+
+    let expected = """
+      public static var __selections: [ApolloAPI.Selection] { [
+        .field("__typename", String.self),
+        .field("id", TestSchema.ID.self),
+      ] }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
 
   func test__render_selections__givenFieldWithUppercasedName_rendersFieldSelections() async throws {
@@ -713,10 +790,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -752,10 +829,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -803,10 +880,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1003,10 +1080,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1050,10 +1127,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1172,10 +1249,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1213,10 +1290,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1252,10 +1329,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1291,10 +1368,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1372,10 +1449,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1427,13 +1504,64 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
+  }
+
+  // Related to https://github.com/apollographql/apollo-ios/issues/3326
+  func test__render_selections__givenTypeCaseWithOnlyReservedField_doesNotRenderSelections() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal]
+    }
+
+    union Animal = AnimalObject | AnimalError
+
+    type AnimalObject {
+      species: String!
+    }
+
+    type AnimalError {
+      code: Int!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... on AnimalObject {
+          __typename
+        }
+      }
+    }
+    """
+
+    let expected = """
+    public struct AsAnimalObject: TestSchema.InlineFragment {
+      public let __data: DataDict
+      public init(_dataDict: DataDict) { __data = _dataDict }
+
+      public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.AnimalObject }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals_asAnimalObject = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "AnimalObject"]
+    )
+
+    let actual = subject.test_render(inlineFragment: allAnimals_asAnimalObject.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 2, ignoringExtraLines: true))
   }
 
   // MARK: Selections - Fragments
@@ -1479,10 +1607,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1490,7 +1618,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Selections - Deferred Inline Fragment
 
-  func test__render_selections__givenDeferredInlineFragmentWithoutTypeCase_rendersDeferredFragmentSelectionAndFieldSelectionInDeferredFragment() async throws {
+  func test__render_selections__givenDeferredInlineFragmentWithoutTypeCase_rendersDeferredSelection() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1501,7 +1629,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -1519,17 +1647,11 @@ class SelectionSetTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     // then
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
-    )
-    let allAnimals_deferredAsRoot = try XCTUnwrap(
-      allAnimals[as: "Animal", deferred: .init(label: "root")]
-    )
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_deferredAsRoot = try XCTUnwrap(allAnimals[deferred: .init(label: "root")])
 
-    let rendered_allAnimals = subject.render(field: allAnimals)
-    let rendered_allAnimals_deferredAsRoot = subject.render(
-      inlineFragment: allAnimals_deferredAsRoot
-    )
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_deferredAsRoot = subject.test_render(inlineFragment: allAnimals_deferredAsRoot.computed)
 
     expect(rendered_allAnimals).to(equalLineByLine(
       """
@@ -1554,7 +1676,7 @@ class SelectionSetTemplateTests: XCTestCase {
     ))
   }
 
-  func test__render_selections__givenDeferredInlineFragmentOnSameTypeCase_rendersDeferredFragmentSelectionAndFieldSelectionInDeferredFragment() async throws {
+  func test__render_selections__givenDeferredInlineFragmentOnSameTypeCase_rendersDeferredSelection() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1565,7 +1687,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -1583,17 +1705,11 @@ class SelectionSetTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     // then
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
-    )
-    let allAnimals_deferredAsRoot = try XCTUnwrap(
-      allAnimals[as: "Animal", deferred: .init(label: "root")]
-    )
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_deferredAsRoot = try XCTUnwrap(allAnimals[deferred: .init(label: "root")])
 
-    let rendered_allAnimals = subject.render(field: allAnimals)
-    let rendered_allAnimals_deferredAsRoot = subject.render(
-      inlineFragment: allAnimals_deferredAsRoot
-    )
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_deferredAsRoot = subject.test_render(inlineFragment: allAnimals_deferredAsRoot.computed)
 
     expect(rendered_allAnimals).to(equalLineByLine(
       """
@@ -1618,7 +1734,7 @@ class SelectionSetTemplateTests: XCTestCase {
     ))
   }
 
-  func test__render_selections__givenDeferredInlineFragmentOnDifferentTypeCase_rendersTypeCaseSelectionAndDeferredFragmentSelectionAndFieldSelectionInDeferredFragment() async throws {
+  func test__render_selections__givenDeferredInlineFragmentOnDifferentTypeCase_rendersDeferredSelection() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1634,7 +1750,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -1652,18 +1768,14 @@ class SelectionSetTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     // then
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
-    )
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
     let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
-    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(
-      allAnimals_asDog[as: "Dog", deferred: .init(label: "root")]
-    )
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "root")])
 
-    let rendered_allAnimals = subject.render(field: allAnimals)
-    let rendered_allAnimals_asDog = subject.render(inlineFragment: allAnimals_asDog)
-    let rendered_allAnimals_asDog_deferredAsRoot = subject.render(
-      inlineFragment: allAnimals_asDog_deferredAsRoot
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot.computed
     )
 
     expect(rendered_allAnimals).to(equalLineByLine(
@@ -1698,12 +1810,2054 @@ class SelectionSetTemplateTests: XCTestCase {
       ignoringExtraLines: true
     ))
   }
+  
+  func test__render_selections__givenDeferredInlineFragmentWithVariableCondition_rendersDeferredSelectionWithVariable() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
 
-  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: "a", label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "root", variable: "a")])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(if: "a", Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenDeferredInlineFragmentWithTrueCondition_rendersDeferredSelection() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: true, label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "root")])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenDeferredInlineFragmentWithFalseCondition_doesNotRenderDeferredSelection() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: false, label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+
+    expect(allAnimals_asDog.containsDeferredChildFragment).to(beFalse())
+  }
+  
+  func test__render_selections__givenSiblingDeferredInlineFragmentOnSameTypeCase_rendersDeferredSelections() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "one") {
+          species
+        }
+        ... on Dog @defer(label: "two") {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsOne = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "one")])
+    let allAnimals_asDog_deferredAsTwo = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "two")])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsOne = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOne.computed
+    )
+    let rendered_allAnimals_asDog_deferredAsTwo = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsTwo.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(One.self, label: "one"),
+          .deferred(Two.self, label: "two"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog_deferredAsOne).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsTwo).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("genus", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenSiblingDeferredInlineFragmentOnDifferentTypeCase_rendersDeferredSelections() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Cat implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "one") {
+          species
+        }
+        ... on Cat @defer(label: "two") {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asCat = try XCTUnwrap(allAnimals[as: "Cat"])
+    let allAnimals_asDog_deferredAsOne = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "one")])
+    let allAnimals_asCat_deferredAsTwo = try XCTUnwrap(allAnimals_asCat[deferred: .init(label: "two")])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asCat = subject.test_render(inlineFragment: allAnimals_asCat.computed)
+    let rendered_allAnimals_asDog_deferredAsOne = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOne.computed
+    )
+    let rendered_allAnimals_asCat_deferredAsTwo = subject.test_render(
+      inlineFragment: allAnimals_asCat_deferredAsTwo.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+          .inlineFragment(AsCat.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(One.self, label: "one"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asCat).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Two.self, label: "two"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog_deferredAsOne).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asCat_deferredAsTwo).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("genus", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenNonDeferredSiblingOnSameTypeCase_doesNotMergeSiblings_rendersDeferredSelection() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "one") {
+          species
+        }
+        ... on Dog {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsOne = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "one")])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsOne = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOne.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("genus", String.self),
+          .deferred(One.self, label: "one"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog_deferredAsOne).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenNonDeferredSiblingOnDifferentTypeCase_rendersDeferredSelection() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Cat implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "one") {
+          species
+        }
+        ... on Cat {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asCat = try XCTUnwrap(allAnimals[as: "Cat"])
+    let allAnimals_asDog_deferredAsOne = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "one")])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asCat = subject.test_render(inlineFragment: allAnimals_asCat.computed)
+    let rendered_allAnimals_asDog_deferredAsOne = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOne.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+          .inlineFragment(AsCat.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(One.self, label: "one"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asCat).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("genus", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog_deferredAsOne).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenNestedDeferredInlineFragmentsOnSameTypeCase_doesNotMergeDeferredFragments() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "outer") {
+          species
+          ... on Dog @defer(label: "inner") {
+            genus
+          }
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsOuter = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "outer")])
+    let allAnimals_asDog_deferredAsOuter_deferredAsInner = try XCTUnwrap(
+      allAnimals_asDog_deferredAsOuter[deferred: .init(label: "inner")]
+    )
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsOuter = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOuter.computed
+    )
+    let rendered_allAnimals_asDog_deferredAsOuter_deferredAsInner = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOuter_deferredAsInner.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Outer.self, label: "outer"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsOuter).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+          .deferred(Inner.self, label: "inner"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsOuter_deferredAsInner).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("genus", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenNestedDeferredInlineFragmentsOnDifferentTypeCase_rendersNestedDeferredFragments() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+      friend: Animal!
+    }
+    
+    type Cat implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "outer") {
+          species
+          friend {
+            ... on Cat @defer(label: "inner") {
+              genus
+            }
+          }
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsOuter = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "outer")])
+    let allAnimals_asDog_deferredAsOuter_friend = try XCTUnwrap(allAnimals_asDog_deferredAsOuter[field: "friend"])
+    let allAnimals_asDog_deferredAsOuter_friend_asCat = try XCTUnwrap(
+      allAnimals_asDog_deferredAsOuter_friend[as: "Cat"]
+    )
+    let allAnimals_asDog_deferredAsOuter_friend_asCat_deferredAsInner = try XCTUnwrap(
+      allAnimals_asDog_deferredAsOuter_friend_asCat[deferred: .init(label: "inner")]
+    )
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsOuter = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOuter.computed
+    )
+    let rendered_allAnimals_asDog_deferredAsOuter_friend = subject.test_render(
+      childEntity: allAnimals_asDog_deferredAsOuter_friend.selectionSet!.computed
+    )
+    let rendered_allAnimals_asDog_deferredAsOuter_friend_asCat = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOuter_friend_asCat.computed
+    )
+    let rendered_allAnimals_asDog_deferredAsOuter_friend_asCat_deferredAsInner = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOuter_friend_asCat_deferredAsInner.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Outer.self, label: "outer"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsOuter).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+          .field("friend", Friend.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsOuter_friend).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .inlineFragment(AsCat.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsOuter_friend_asCat).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Inner.self, label: "inner"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsOuter_friend_asCat_deferredAsInner).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("genus", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  // MARK: Selections - Deferred Inline Fragment (with @include/@skip)
+
+  func test__render_selections__givenBothDeferAndIncludeDirectives_onSameTypeCase_rendersDeferredFragment() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @include(if: $a) @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_ifA = try XCTUnwrap(allAnimals[if: "a"])
+    let allAnimals_ifA_deferredAsRoot = try XCTUnwrap(allAnimals_ifA[deferred: .init(label: "root")])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_ifA = subject.test_render(inlineFragment: allAnimals_ifA.computed)
+    let rendered_allAnimals_ifA_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_ifA_deferredAsRoot.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .include(if: "a", .inlineFragment(IfA.self)),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_ifA).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_ifA_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenBothDeferAndIncludeDirectives_directivesOrderShouldNotAffectGeneratedFragments_rendersDeferredFragmentWithinConditional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @defer(label: "root") @include(if: $a) {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_ifA = try XCTUnwrap(allAnimals[if: "a"])
+    let allAnimals_ifA_deferredAsRoot = try XCTUnwrap(allAnimals_ifA[deferred: .init(label: "root")])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_ifA = subject.test_render(inlineFragment: allAnimals_ifA.computed)
+    let rendered_allAnimals_ifA_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_ifA_deferredAsRoot.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .include(if: "a", .inlineFragment(IfA.self)),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_ifA).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_ifA_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenBothDeferAndIncludeDirectives_onDifferentTypeCases_rendersDeferredSelections() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @include(if: $a) {
+          species
+        }
+        ... on Dog @defer(label: "root") {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_ifA = try XCTUnwrap(allAnimals[if: "a"])
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "root")])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_ifA = subject.test_render(inlineFragment: allAnimals_ifA.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+          .include(if: "a", .inlineFragment(IfA.self)),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_ifA).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("genus", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenBothDeferAndSkipDirectives_onSameTypeCase_rendersDeferredSelections() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @skip(if: $a) @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_skipIfA = try XCTUnwrap(allAnimals[if: !"a"])
+    let allAnimals_skipIfA_deferredAsRoot = try XCTUnwrap(allAnimals_skipIfA[deferred: .init(label: "root")])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_skipIfA = subject.test_render(inlineFragment: allAnimals_skipIfA.computed)
+    let rendered_allAnimals_skipIfA_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_skipIfA_deferredAsRoot.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .include(if: !"a", .inlineFragment(IfNotA.self)),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_skipIfA).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_skipIfA_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenBothDeferAndSkipDirectives_directivesOrderShouldNotAffectGeneratedFragments_rendersDeferredSelections() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @defer(label: "root") @skip(if: $a) {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_skipIfA = try XCTUnwrap(allAnimals[if: !"a"])
+    let allAnimals_skipIfA_deferredAsRoot = try XCTUnwrap(allAnimals_skipIfA[deferred: .init(label: "root")])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_skipIfA = subject.test_render(inlineFragment: allAnimals_skipIfA.computed)
+    let rendered_allAnimals_skipIfA_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_skipIfA_deferredAsRoot.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .include(if: !"a", .inlineFragment(IfNotA.self)),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_skipIfA).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_skipIfA_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenBothDeferAndSkipDirectives_onDifferentTypeCases_rendersDeferredSelections() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation($a: Boolean) {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @skip(if: $a) {
+          species
+        }
+        ... on Dog @defer(label: "root") {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_skipIfA = try XCTUnwrap(allAnimals[if: !"a"])
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "root")])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_skipIfA = subject.test_render(inlineFragment: allAnimals_skipIfA.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+          .include(if: !"a", .inlineFragment(IfNotA.self)),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_skipIfA).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("genus", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
 
   // MARK: Selections - Deferred Named Fragment
 
-  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
+  func test__render_selections__givenDeferredNamedFragmentOnSameTypeCase_rendersDeferredSelection() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...AnimalFragment @defer(label: "root")
+        }
+      }
+
+      fragment AnimalFragment on Animal {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_animalFragment = try XCTUnwrap(allAnimals[fragment: "AnimalFragment"])
+    
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    
+    let fragmentSubject = SelectionSetTemplate(
+      definition: allAnimals_animalFragment.fragment,
+      generateInitializers: false,
+      config: self.subject.config,
+      nonFatalErrorRecorder: .init(),
+      renderAccessControl: self.subject.renderAccessControl()
+    )
+    let rendered_allAnimals_animalFragment = fragmentSubject.test_render(
+      childEntity: try XCTUnwrap(allAnimals_animalFragment.rootField.selectionSet?.computed)
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .deferred(AnimalFragment.self, label: "root"),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_animalFragment).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+  }
+
+  func test__render_selections__givenDeferredNamedFragmentOnDifferentTypeCase_rendersDeferredSelection() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+
+      type Dog implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...AnimalFragment @defer(label: "root")
+        }
+      }
+
+      fragment AnimalFragment on Dog {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+    let allAnimals_asDog_animalFragment = try XCTUnwrap(allAnimals_asDog[fragment: "AnimalFragment"])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    
+    let fragmentSubject = SelectionSetTemplate(
+      definition: allAnimals_asDog_animalFragment.fragment,
+      generateInitializers: false,
+      config: self.subject.config,
+      nonFatalErrorRecorder: .init(),
+      renderAccessControl: self.subject.renderAccessControl()
+    )
+    let rendered_allAnimals_asDog_animalFragment = fragmentSubject.test_render(
+      childEntity: try XCTUnwrap(allAnimals_asDog_animalFragment.rootField.selectionSet?.computed)
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(AnimalFragment.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_animalFragment).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenDeferredNamedFragmentWithVariableCondition_rendersDeferredSelectionWithVariable() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+
+      type Dog implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...AnimalFragment @defer(if: "a", label: "root")
+        }
+      }
+
+      fragment AnimalFragment on Dog {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+    let allAnimals_asDog_animalFragment = try XCTUnwrap(allAnimals_asDog[fragment: "AnimalFragment"])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    
+    let fragmentSubject = SelectionSetTemplate(
+      definition: allAnimals_asDog_animalFragment.fragment,
+      generateInitializers: false,
+      config: self.subject.config,
+      nonFatalErrorRecorder: .init(),
+      renderAccessControl: self.subject.renderAccessControl()
+    )
+    let rendered_allAnimals_asDog_animalFragment = fragmentSubject.test_render(
+      childEntity: try XCTUnwrap(allAnimals_asDog_animalFragment.rootField.selectionSet?.computed)
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(if: "a", AnimalFragment.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_animalFragment).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenDeferredNamedFragmentWithTrueCondition_rendersDeferredSelection() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+
+      type Dog implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...AnimalFragment @defer(if: true, label: "root")
+        }
+      }
+
+      fragment AnimalFragment on Dog {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+    let allAnimals_asDog_animalFragment = try XCTUnwrap(allAnimals_asDog[fragment: "AnimalFragment"])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    
+    let fragmentSubject = SelectionSetTemplate(
+      definition: allAnimals_asDog_animalFragment.fragment,
+      generateInitializers: false,
+      config: self.subject.config,
+      nonFatalErrorRecorder: .init(),
+      renderAccessControl: self.subject.renderAccessControl()
+    )
+    let rendered_allAnimals_asDog_animalFragment = fragmentSubject.test_render(
+      childEntity: try XCTUnwrap(allAnimals_asDog_animalFragment.rootField.selectionSet?.computed)
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(AnimalFragment.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_animalFragment).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenDeferredNamedFragmentWithFalseCondition_doesNotRenderDeferredSelection() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+
+      type Dog implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...AnimalFragment @defer(if: false, label: "root")
+        }
+      }
+
+      fragment AnimalFragment on Dog {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+    let allAnimals_asDog_animalFragment = try XCTUnwrap(allAnimals_asDog[fragment: "AnimalFragment"])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    
+    let fragmentSubject = SelectionSetTemplate(
+      definition: allAnimals_asDog_animalFragment.fragment,
+      generateInitializers: false,
+      config: self.subject.config,
+      nonFatalErrorRecorder: .init(),
+      renderAccessControl: self.subject.renderAccessControl()
+    )
+    let rendered_allAnimals_asDog_animalFragment = fragmentSubject.test_render(
+      childEntity: try XCTUnwrap(allAnimals_asDog_animalFragment.rootField.selectionSet?.computed)
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .fragment(AnimalFragment.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_animalFragment).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenDeferredInlineFragment_insideNamedFragment_rendersDeferredSelection() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+
+      type Dog implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...AnimalFragment
+        }
+      }
+
+      fragment AnimalFragment on Dog {
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+    let allAnimals_asDog_animalFragment = try XCTUnwrap(allAnimals_asDog[fragment: "AnimalFragment"])
+    let allAnimals_asDog_animalFragment_deferredAsRoot = try XCTUnwrap(
+      allAnimals_asDog_animalFragment.rootField[deferred: .init(label: "root")]
+    )
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+
+    let fragmentSubject = SelectionSetTemplate(
+      definition: allAnimals_asDog_animalFragment.fragment,
+      generateInitializers: false,
+      config: self.subject.config,
+      nonFatalErrorRecorder: .init(),
+      renderAccessControl: self.subject.renderAccessControl()
+    )
+    let rendered_allAnimals_asDog_animalFragment = fragmentSubject.test_render(
+      childEntity: try XCTUnwrap(allAnimals_asDog_animalFragment.rootField.selectionSet?.computed)
+    )
+    let rendered_allAnimals_asDog_animalFragment_deferredAsRoot = fragmentSubject.test_render(
+      childEntity: allAnimals_asDog_animalFragment_deferredAsRoot.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .inlineFragment(AsDog.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .fragment(AnimalFragment.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_animalFragment).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_animalFragment_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenDeferredInlineFragmentOnDifferentTypeCase_insideNamedFragment_rendersDeferredFragmentSelection() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+
+      type Dog implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...AnimalFragment
+        }
+      }
+
+      fragment AnimalFragment on Animal {
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_animalFragment = try XCTUnwrap(allAnimals[fragment: "AnimalFragment"])
+    let allAnimals_animalFragment_asDog = try XCTUnwrap(allAnimals_animalFragment.rootField[as: "Dog"])
+    let allAnimals_animalFragment_asDog_deferredAsRoot = try XCTUnwrap(
+      allAnimals_animalFragment_asDog[deferred: .init(label: "root")]
+    )
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+
+    let fragmentSubject = SelectionSetTemplate(
+      definition: allAnimals_animalFragment.fragment,
+      generateInitializers: false,
+      config: self.subject.config,
+      nonFatalErrorRecorder: .init(),
+      renderAccessControl: self.subject.renderAccessControl()
+    )
+    let rendered_allAnimals_animalFragment_asDog = fragmentSubject.test_render(
+      childEntity: try XCTUnwrap(allAnimals_animalFragment_asDog.computed)
+    )
+    let rendered_allAnimals_animalFragment_asDog_deferredAsRoot = fragmentSubject.test_render(
+      childEntity: allAnimals_animalFragment_asDog_deferredAsRoot.computed
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .fragment(AnimalFragment.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_animalFragment_asDog).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .deferred(Root.self, label: "root"),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_animalFragment_asDog_deferredAsRoot).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_selections__givenDeferredNamedFragmentWithMatchingSiblingTypeCase_rendersDeferredSelection() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+
+      type Pet implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          ...AnimalFragment @defer(label: "root")
+          ... on Pet {
+            id
+          }
+        }
+      }
+
+      fragment AnimalFragment on Animal {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asPet = try XCTUnwrap(allAnimals[as: "Pet"])
+    let allAnimals_animalFragment = try XCTUnwrap(allAnimals[fragment: "AnimalFragment"])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+    let rendered_allAnimals_asPet = subject.test_render(childEntity: allAnimals_asPet.computed)
+
+    let fragmentSubject = SelectionSetTemplate(
+      definition: allAnimals_animalFragment.fragment,
+      generateInitializers: false,
+      config: self.subject.config,
+      nonFatalErrorRecorder: .init(),
+      renderAccessControl: self.subject.renderAccessControl()
+    )
+    let rendered_allAnimals_animalFragment = fragmentSubject.test_render(
+      childEntity: try XCTUnwrap(allAnimals_animalFragment.rootField.selectionSet?.computed)
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .inlineFragment(AsPet.self),
+          .deferred(AnimalFragment.self, label: "root"),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_asPet).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("id", String.self),
+        ] }
+      """,
+      atLine: 8,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_animalFragment).to(equalLineByLine(
+      """
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("species", String.self),
+        ] }
+      """,
+      atLine: 7,
+      ignoringExtraLines: true
+    ))
+  }
 
   // MARK: Selections - Include/Skip
 
@@ -1737,10 +3891,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1776,10 +3930,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1815,10 +3969,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1857,10 +4011,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1915,10 +4069,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -1964,10 +4118,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -2009,10 +4163,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -2060,7 +4214,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Pet", if: "a"]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_asPet)
+    let actual = subject.test_render(inlineFragment: allAnimals_asPet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
@@ -2098,10 +4252,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -2145,7 +4299,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Pet"]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_asPet)
+    let actual = subject.test_render(inlineFragment: allAnimals_asPet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
@@ -2180,10 +4334,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let queryRoot = try XCTUnwrap(
-      operation[field: "query"] as? IR.EntityField
+      operation[field: "query"]?.selectionSet
     )
 
-    let actual = subject.render(field: queryRoot)
+    let actual = subject.test_render(childEntity: queryRoot.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -2248,7 +4402,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"]?[as: "Pet"]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_asDog_predator_asPet)
+    let actual = subject.test_render(inlineFragment: allAnimals_asDog_predator_asPet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
@@ -2311,7 +4465,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?[as: "Pet"]
     )
 
-    let actual = subject.render(inlineFragment: predator_asPet)
+    let actual = subject.test_render(inlineFragment: predator_asPet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
@@ -2385,7 +4539,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "predators"]?[as: "Dog"]?[field: "predator"]?[as: "Pet"]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_asDog_predator_asPet)
+    let actual = subject.test_render(inlineFragment: allAnimals_asDog_predator_asPet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
@@ -2491,10 +4645,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 35, ignoringExtraLines: true))
@@ -2555,10 +4709,10 @@ class SelectionSetTemplateTests: XCTestCase {
       // when
       try await buildSubjectAndOperation(configOutput: test)
       let allAnimals = try XCTUnwrap(
-        operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+        operation[field: "query"]?[field: "allAnimals"]?.selectionSet
       )
 
-      let actual = subject.render(field: allAnimals)
+      let actual = subject.test_render(childEntity: allAnimals.computed)
 
       // then
       expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
@@ -2623,14 +4777,50 @@ class SelectionSetTemplateTests: XCTestCase {
       // when
       try await buildSubjectAndOperation(configOutput: test)
       let allAnimals = try XCTUnwrap(
-        operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+        operation[field: "query"]?[field: "allAnimals"]?.selectionSet
       )
 
-      let actual = subject.render(field: allAnimals)
+      let actual = subject.test_render(childEntity: allAnimals.computed)
 
       // then
       expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
     }
+  }
+
+  func test__render_fieldAccessors__givenCustomScalar_ID_rendersFieldAccessorWithTypeNameWithoutSuffix() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      AllAnimals: [Animal!]
+    }
+
+    type Animal {
+      id: ID!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      AllAnimals {
+        id
+      }
+    }
+    """
+
+    let expected = """
+      public var id: TestSchema.ID { __data["id"] }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "AllAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
   func test__render_fieldAccessors__givenFieldWithUpperCaseName_rendersFieldAccessorWithLowercaseName() async throws {
@@ -2662,10 +4852,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "AllAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "AllAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -2698,10 +4888,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "AllAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "AllAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -2736,10 +4926,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -2783,7 +4973,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
     )
 
-    let actual = subject.render(inlineFragment: dog)
+    let actual = subject.test_render(inlineFragment: dog.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -2816,10 +5006,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(conversionStrategies: .init(fieldAccessors: .camelCase))
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "AllAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "AllAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -2852,10 +5042,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(conversionStrategies: .init(fieldAccessors: .camelCase))
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "AllAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "AllAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -3047,15 +5237,15 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(
       expected,
-      atLine: 11 + allAnimals.selectionSet.selections.direct!.fields.count,
+      atLine: 11 + allAnimals.selections!.fields.count,
       ignoringExtraLines: true)
     )
   }
@@ -3095,15 +5285,15 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(
       expected,
-      atLine: 11 + allAnimals.selectionSet.selections.direct!.fields.count,
+      atLine: 11 + allAnimals.selections!.fields.count,
       ignoringExtraLines: true)
     )
   }
@@ -3208,15 +5398,15 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(
       expected,
-      atLine: 11 + allAnimals.selectionSet.selections.direct!.fields.count,
+      atLine: 11 + allAnimals.selections!.fields.count,
       ignoringExtraLines: true)
     )
   }
@@ -3262,10 +5452,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
@@ -3301,10 +5491,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -3340,10 +5530,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -3379,10 +5569,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -3426,10 +5616,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
@@ -3465,16 +5655,16 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public var predator: PredatorDetails.Predator { __data["predator"] }
+      public var predator: Predator { __data["predator"] }
     """
 
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -3519,16 +5709,16 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expected = """
       public var species: String { __data["species"] }
-      public var height: PredatorDetails.Predator.Height { __data["height"] }
+      public var height: Height { __data["height"] }
     """
 
     // when
     try await buildSubjectAndOperation()
     let allAnimals_predator = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals_predator)
+    let actual = subject.test_render(childEntity: allAnimals_predator.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -3576,16 +5766,16 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public var height: PredatorDetails.Predator.Height { __data["height"] }
+      public var height: Height { __data["height"] }
     """
 
     // when
     try await buildSubjectAndOperation()
     let allAnimals_asPet_predator = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Pet"]?[field: "predator"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Pet"]?[field: "predator"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals_asPet_predator)
+    let actual = subject.test_render(childEntity: allAnimals_asPet_predator.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
@@ -3639,19 +5829,21 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let predator_asPet_expected = """
       public var species: String { __data["species"] }
-      public var height: PredatorDetails.AsPet.Height { __data["height"] }
+      public var height: Height { __data["height"] }
     """
 
     // when
     try await buildSubjectAndOperation()
     let allAnimals_predator = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?.selectionSet
     )
 
     let allAnimals_predator_asPet = try XCTUnwrap(allAnimals_predator[as: "Pet"])
 
-    let allAnimals_predator_actual = subject.render(field: allAnimals_predator)
-    let allAnimals_predator_asPet_actual = subject.render(inlineFragment: allAnimals_predator_asPet)
+    let allAnimals_predator_actual = subject.test_render(childEntity: allAnimals_predator.computed)
+    let allAnimals_predator_asPet_actual = subject.test_render(
+      inlineFragment: allAnimals_predator_asPet.computed
+    )
 
     // then
     expect(allAnimals_predator_actual).to(equalLineByLine(predator_expected, atLine: 13, ignoringExtraLines: true))
@@ -3708,19 +5900,21 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let predator_asPet_expected = """
       public var species: String { __data["species"] }
-      public var height: PredatorDetails.Predator.AsPet.Height { __data["height"] }
+      public var height: Height { __data["height"] }
     """
 
     // when
     try await buildSubjectAndOperation()
     let allAnimals_predator = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?.selectionSet
     )
 
     let allAnimals_predator_asPet = try XCTUnwrap(allAnimals_predator[as: "Pet"])
 
-    let allAnimals_predator_actual = subject.render(field: allAnimals_predator)
-    let allAnimals_predator_asPet_actual = subject.render(inlineFragment: allAnimals_predator_asPet)
+    let allAnimals_predator_actual = subject.test_render(childEntity: allAnimals_predator.computed)
+    let allAnimals_predator_asPet_actual = subject.test_render(
+      inlineFragment: allAnimals_predator_asPet.computed
+    )
 
     // then
     expect(allAnimals_predator_actual).to(equalLineByLine(predator_expected, atLine: 12, ignoringExtraLines: true))
@@ -3778,10 +5972,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let predator = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?.selectionSet
     )
 
-    let predator_actual = subject.render(field: predator)
+    let predator_actual = subject.test_render(childEntity: predator.computed)
 
     // then
     expect(predator_actual)
@@ -3838,10 +6032,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let predator = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?.selectionSet
     )
 
-    let predator_actual = subject.render(field: predator)
+    let predator_actual = subject.test_render(childEntity: predator.computed)
 
     // then
     expect(predator_actual)
@@ -3901,7 +6095,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?[as: "Pet"]
     )
 
-    let predator_asPet_actual = subject.render(inlineFragment: predator_asPet)
+    let predator_asPet_actual = subject.test_render(inlineFragment: predator_asPet.computed)
 
     // then
     expect(predator_asPet_actual)
@@ -3953,7 +6147,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
+    let actual = subject.test_render(inlineFragment: allAnimals_asDog.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -3988,7 +6182,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expected = """
       public var name: String { __data["name"] }
-      public var allAnimals: [TestOperationQuery.Data.AllAnimal]? { __data["allAnimals"] }
+      public var allAnimals: [AllAnimal]? { __data["allAnimals"] }
     """
 
     // when
@@ -3997,7 +6191,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[as: "AdminQuery"]
     )
 
-    let actual = subject.render(inlineFragment: query_asAdminQuery)
+    let actual = subject.test_render(inlineFragment: query_asAdminQuery.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4044,7 +6238,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expected = """
       public var name: String { __data["name"] }
-      public var predator: AsPet.Predator { __data["predator"] }
+      public var predator: Predator { __data["predator"] }
     """
 
     // when
@@ -4053,58 +6247,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
-  }
-
-  func test__render_fieldAccessors__givenEntityFieldMergedFromSiblingTypeCase_atOperationRoot_rendersFieldAccessorWithFullyQualifiedName() async throws {
-    // given
-    schemaSDL = """
-    type Query {
-      role: String!
-    }
-
-    type AdminQuery implements ModeratorQuery {
-      name: String!
-      allAnimals: [Animal!]
-    }
-
-    interface ModeratorQuery {
-      allAnimals: [Animal!]
-    }
-
-    interface Animal {
-      species: String!
-    }
-    """
-
-    document = """
-    query TestOperation {
-      ... on ModeratorQuery {
-        allAnimals {
-          species
-        }
-      }
-      ... on AdminQuery {
-        name
-      }
-    }
-    """
-
-    let expected = """
-      public var name: String { __data["name"] }
-      public var allAnimals: [TestOperationQuery.Data.AsModeratorQuery.AllAnimal]? { __data["allAnimals"] }
-    """
-
-    // when
-    try await buildSubjectAndOperation()
-    let query_asAdminQuery = try XCTUnwrap(
-      operation[field: "query"]?[as: "AdminQuery"]
-    )
-
-    let actual = subject.render(inlineFragment: query_asAdminQuery)
+    let actual = subject.test_render(inlineFragment: allAnimals_asDog.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4154,16 +6297,16 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expected = """
       public var species: String { __data["species"] }
-      public var height: AllAnimal.Predator.Height { __data["height"] }
+      public var height: Height { __data["height"] }
     """
 
     // when
     try await buildSubjectAndOperation()
     let allAnimals_asDog_predator = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals_asDog_predator)
+    let actual = subject.test_render(childEntity: allAnimals_asDog_predator.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4221,16 +6364,16 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expected = """
       public var species: String { __data["species"] }
-      public var height: AllAnimal.AsPet.Predator.Height { __data["height"] }
+      public var height: Height { __data["height"] }
     """
 
     // when
     try await buildSubjectAndOperation()
     let allAnimals_asDog_predator = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals_asDog_predator)
+    let actual = subject.test_render(childEntity: allAnimals_asDog_predator.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4265,10 +6408,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4301,10 +6444,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4353,7 +6496,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_asDog)
+    let actual = subject.test_render(inlineFragment: allAnimals_asDog.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4394,7 +6537,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[if: "a"]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_ifA)
+    let actual = subject.test_render(inlineFragment: allAnimals_ifA.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4427,10 +6570,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4477,10 +6620,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals_child = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[field: "child"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[field: "child"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals_child)
+    let actual = subject.test_render(childEntity: allAnimals_child.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4528,10 +6671,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals_child = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[if: "a"]?[field: "child"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[if: "a"]?[field: "child"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals_child)
+    let actual = subject.test_render(childEntity: allAnimals_child.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
@@ -4539,7 +6682,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
   // MARK: Field Accessors - Deferred Inline Fragment
 
-  func test__render_fieldAccessor__givenDeferredInlineFragmentWithoutTypeCase_rendersFieldsWithinDeferredTypeCase() async throws {
+  func test__render_fieldAccessor__givenDeferredInlineFragmentWithoutTypeCase_rendersDeferredField() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4550,7 +6693,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4568,14 +6711,23 @@ class SelectionSetTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     // then
-    let allAnimals_deferredAsRoot = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Animal", deferred: .init(label: "root")]
-    )
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_deferredAsRoot = try XCTUnwrap(allAnimals[deferred: .init(label: "root")])
 
-    let rendered = subject.render(inlineFragment: allAnimals_deferredAsRoot)
+    let rendered_allAnimals = subject.test_render(inlineFragment: allAnimals.computed)
+    let rendered_allAnimals_deferredAsRoot = subject.test_render(inlineFragment: allAnimals_deferredAsRoot.computed)
 
-    // AllAnimal
-    expect(rendered).to(equalLineByLine(
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
       """
 
         public var species: String { __data["species"] }
@@ -4587,7 +6739,7 @@ class SelectionSetTemplateTests: XCTestCase {
     ))
   }
 
-  func test__render_fieldAccessor__givenDeferredInlineFragmentOnSameTypeCase_rendersFieldsWithinDeferredTypeCase() async throws {
+  func test__render_fieldAccessor__givenDeferredInlineFragmentOnSameTypeCase_rendersDeferredField() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4598,7 +6750,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4616,14 +6768,23 @@ class SelectionSetTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     // then
-    let allAnimals_deferredAsRoot = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Animal", deferred: .init(label: "root")]
-    )
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_deferredAsRoot = try XCTUnwrap(allAnimals[deferred: .init(label: "root")])
 
-    let rendered = subject.render(inlineFragment: allAnimals_deferredAsRoot)
+    let rendered_allAnimals = subject.test_render(inlineFragment: allAnimals.computed)
+    let rendered_allAnimals_deferredAsRoot = subject.test_render(inlineFragment: allAnimals_deferredAsRoot.computed)
 
-    // AllAnimal
-    expect(rendered).to(equalLineByLine(
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
       """
 
         public var species: String { __data["species"] }
@@ -4635,7 +6796,7 @@ class SelectionSetTemplateTests: XCTestCase {
     ))
   }
 
-  func test__render_fieldAccessor__givenDeferredInlineFragmentOnDifferentTypeCase_rendersFieldsWithinDeferredTypeCase() async throws {
+  func test__render_fieldAccessor__givenDeferredInlineFragmentOnDifferentTypeCase_rendersDeferredField() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4651,7 +6812,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4669,14 +6830,38 @@ class SelectionSetTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     // then
-    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[as: "Dog", deferred: .init(label: "root")]
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "root")])
+
+    let rendered_allAnimals = subject.test_render(inlineFragment: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot.computed
     )
 
-    let rendered = subject.render(inlineFragment: allAnimals_asDog_deferredAsRoot)
-
     // AllAnimal
-    expect(rendered).to(equalLineByLine(
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
       """
 
         public var species: String { __data["species"] }
@@ -4687,12 +6872,733 @@ class SelectionSetTemplateTests: XCTestCase {
       ignoringExtraLines: true
     ))
   }
+  
+  func test__render_fieldAccessor__givenDeferredInlineFragmentWithVariableCondition_rendersDeferredField() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
 
-  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
+    interface Animal {
+      id: String!
+      species: String!
+    }
 
-  // MARK: Field Accessors - Deferred Named Fragments
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
 
-  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: "a", label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(
+      allAnimals_asDog[deferred: .init(label: "root", variable: "a")]
+    )
+
+    let rendered_allAnimals = subject.test_render(inlineFragment: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot.computed
+    )
+
+    // AllAnimal
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fieldAccessor__givenDeferredInlineFragmentWithTrueCondition_rendersDeferredField() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: true, label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "root")])
+
+    let rendered_allAnimals = subject.test_render(inlineFragment: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot.computed
+    )
+
+    // AllAnimal
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fieldAccessor__givenDeferredInlineFragmentWithFalseCondition_doesNotRenderDeferredField() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: false, label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+
+    let rendered_allAnimals = subject.test_render(inlineFragment: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+
+    // AllAnimal
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fieldAccessor__givenSiblingDeferredInlineFragmentsOnSameTypeCase_doesNotMergeDeferredFields() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "one") {
+          species
+        }
+        ... on Dog @defer(label: "two") {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsOne = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "one")])
+    let allAnimals_asDog_deferredAsTwo = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "two")])
+
+    let rendered_allAnimals = subject.test_render(inlineFragment: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsOne = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOne.computed
+    )
+    let rendered_allAnimals_asDog_deferredAsTwo = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsTwo.computed
+    )
+
+    // AllAnimal
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsOne).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsTwo).to(equalLineByLine(
+      """
+
+        public var genus: String { __data["genus"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fieldAccessor__givenSiblingDeferredInlineFragmentsOnDifferentTypeCase_doesNotMergeDeferredFields() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Cat implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "one") {
+          species
+        }
+        ... on Cat @defer(label: "two") {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asCat = try XCTUnwrap(allAnimals[as: "Cat"])
+    let allAnimals_asDog_deferredAsOne = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "one")])
+    let allAnimals_asCat_deferredAsTwo = try XCTUnwrap(allAnimals_asCat[deferred: .init(label: "two")])
+
+    let rendered_allAnimals = subject.test_render(inlineFragment: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asCat = subject.test_render(inlineFragment: allAnimals_asCat.computed)
+    let rendered_allAnimals_asDog_deferredAsOne = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOne.computed
+    )
+    let rendered_allAnimals_asCat_deferredAsTwo = subject.test_render(
+      inlineFragment: allAnimals_asCat_deferredAsTwo.computed
+    )
+
+    // AllAnimal
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 13,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asCat).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsOne).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asCat_deferredAsTwo).to(equalLineByLine(
+      """
+
+        public var genus: String { __data["genus"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fieldAccessor__givenDeferredInlineFragmentWithSiblingOnSameTypeCase_doesNotMergeDeferredFields() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "root") {
+          species
+        }
+        ... on Dog {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "root")])
+
+    let rendered_allAnimals = subject.test_render(inlineFragment: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot.computed
+    )
+
+    // AllAnimal
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+
+        public var genus: String { __data["genus"] }
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
+        public var genus: String { __data["genus"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fieldAccessor__givenDeferredInlineFragmentWithSiblingOnDifferentTypeCase_doesNotMergeDeferredFields() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Cat implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "root") {
+          species
+        }
+        ... on Cat {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asCat = try XCTUnwrap(allAnimals[as: "Cat"])
+    let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "root")])
+
+    let rendered_allAnimals = subject.test_render(inlineFragment: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asCat = subject.test_render(inlineFragment: allAnimals_asCat.computed)
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot.computed
+    )
+
+    // AllAnimal
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 13,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asCat).to(equalLineByLine(
+      """
+
+        public var genus: String { __data["genus"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var id: String { __data["id"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fieldAccessor__givenNestedDeferredInlineFragments_doesNotMergeDeferredFields() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+      friend: Animal!
+    }
+    
+    type Cat implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "outer") {
+          species
+          friend {
+            ... on Cat @defer(label: "inner") {
+              genus
+            }
+          }
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_asDog = try XCTUnwrap(allAnimals[as: "Dog"])
+    let allAnimals_asDog_deferredAsOuter = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "outer")])
+    let allAnimals_asDog_deferredAsOuter_asCat = try XCTUnwrap(
+      allAnimals_asDog_deferredAsOuter[field: "friend"]?[as: "Cat"]
+    )
+    let allAnimals_asDog_deferredAsOuter_asCat_deferredAsInner = try XCTUnwrap(
+      allAnimals_asDog_deferredAsOuter_asCat[deferred: .init(label: "inner")]
+    )
+
+    let rendered_allAnimals = subject.test_render(inlineFragment: allAnimals.computed)
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+    let rendered_allAnimals_asDog_deferredAsOuter = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOuter.computed
+    )
+    let rendered_allAnimals_asDog_deferredAsOuter_asCat_deferredAsInner = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOuter_asCat_deferredAsInner.computed
+    )
+
+    // AllAnimal
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsOuter).to(equalLineByLine(
+      """
+
+        public var species: String { __data["species"] }
+        public var friend: Friend { __data["friend"] }
+        public var id: String { __data["id"] }
+
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsOuter_asCat_deferredAsInner).to(equalLineByLine(
+      """
+
+        public var genus: String { __data["genus"] }
+      }
+      """,
+      atLine: 11,
+      ignoringExtraLines: true
+    ))
+  }
 
   // MARK: - Inline Fragment Accessors
 
@@ -4743,10 +7649,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
@@ -4803,10 +7709,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals_asDog_predator = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals_asDog_predator)
+    let actual = subject.test_render(childEntity: allAnimals_asDog_predator.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -4847,10 +7753,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4889,10 +7795,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4931,10 +7837,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -4973,10 +7879,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5014,10 +7920,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5064,10 +7970,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
@@ -5118,10 +8024,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
@@ -5179,7 +8085,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Cat"]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_asCat)
+    let actual = subject.test_render(inlineFragment: allAnimals_asCat.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
@@ -5230,10 +8136,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
@@ -5276,10 +8182,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5322,10 +8228,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -5371,7 +8277,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[if: "a"]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_ifA)
+    let actual = subject.test_render(inlineFragment: allAnimals_ifA.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -5390,7 +8296,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5408,11 +8314,9 @@ class SelectionSetTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     // then
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
-    )
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
 
-    let rendered = subject.render(field: allAnimals)
+    let rendered = subject.test_render(childEntity: allAnimals.computed)
 
     expect(rendered).to(equalLineByLine(
       """
@@ -5442,7 +8346,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5460,11 +8364,9 @@ class SelectionSetTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     // then
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
-    )
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
 
-    let rendered = subject.render(field: allAnimals)
+    let rendered = subject.test_render(childEntity: allAnimals.computed)
 
     expect(rendered).to(equalLineByLine(
       """
@@ -5499,7 +8401,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5517,11 +8419,9 @@ class SelectionSetTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     // then
-    let allAnimals_asDog = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
-    )
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
 
-    let rendered = subject.render(inlineFragment: allAnimals_asDog)
+    let rendered = subject.test_render(inlineFragment: allAnimals_asDog.computed)
 
     expect(rendered).to(equalLineByLine(
       """
@@ -5539,12 +8439,1198 @@ class SelectionSetTemplateTests: XCTestCase {
       ignoringExtraLines: true
     ))
   }
+  
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithVariableCondition_rendersDeferredFragmentAccessorAsOptional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
 
-  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: "a", label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+
+    let rendered = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _root = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var root: Root?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithTrueCondition_rendersDeferredFragmentAccessorAsOptional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: true, label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+
+    let rendered = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _root = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var root: Root?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithFalseCondition_doesNotRenderDeferredFragmentAccessor() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(if: false, label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+
+    let rendered = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+
+    expect(rendered).to(equalLineByLine(
+      """
+      }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenSiblingDeferredInlineFragmentOnSameTypeCase_rendersDeferredFragmentAccessorsAsOptional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "one") {
+          species
+        }
+        ... on Dog @defer(label: "two") {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+
+    let rendered = subject.test_render(childEntity: allAnimals_asDog.computed)
+    
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _one = Deferred(_dataDict: _dataDict)
+            _two = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var one: One?
+          @Deferred public var two: Two?
+        }
+      """,
+      atLine: 15,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenSiblingDeferredInlineFragmentOnDifferentTypeCase_rendersDeferredFragmentAccessorsAsOptional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Cat implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "one") {
+          species
+        }
+        ... on Cat @defer(label: "two") {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+    let allAnimals_asCat = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Cat"])
+
+    let rendered_allAnimals_asDog = subject.test_render(childEntity: allAnimals_asDog.computed)
+    let rendered_allAnimals_asCat = subject.test_render(childEntity: allAnimals_asCat.computed)
+    
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _one = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var one: One?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asCat).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _two = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var two: Two?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithSiblingOnSameTypeCase_rendersDeferredFragmentAccessorsAsOptional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "root") {
+          species
+        }
+        ... on Dog {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+
+    let rendered = subject.test_render(childEntity: allAnimals_asDog.computed)
+    
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _root = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var root: Root?
+        }
+      """,
+      atLine: 16,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentWithSiblingOnDifferentTypeCase_rendersDeferredFragmentAccessorsAsOptional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Cat implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "root") {
+          species
+        }
+        ... on Cat {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+
+    let rendered = subject.test_render(childEntity: allAnimals_asDog.computed)
+    
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _root = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var root: Root?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenNestedDeferredInlineFragments_rendersNestedDeferredFragmentAccessorsAsOptional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+      friend: Animal!
+    }
+    
+    type Cat implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "outer") {
+          species
+          friend {
+            ... on Cat @defer(label: "inner") {
+              genus
+            }
+          }
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+    let allAnimals_asDog_deferredAsOuter = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "outer")])
+    let allAnimals_asDog_deferredAsOuter_asCat = try XCTUnwrap(
+      allAnimals_asDog_deferredAsOuter[field: "friend"]?[as: "Cat"]
+    )
+
+    let rendered_asDog = subject.test_render(childEntity: allAnimals_asDog.computed)
+    let rendered_asDog_deferredAsOuter_asCat = subject.test_render(
+      childEntity: allAnimals_asDog_deferredAsOuter_asCat.computed
+    )
+    
+    expect(rendered_asDog).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _outer = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var outer: Outer?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_asDog_deferredAsOuter_asCat).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _inner = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var inner: Inner?
+        }
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenBothDeferAndIncludeDirectivesOnSameTypeCase_rendersDeferredFragmentAccessorsAsOptional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @include(if: $a) @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_ifA = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[if: "a"])
+
+    let rendered = subject.test_render(childEntity: allAnimals_ifA.computed)
+    
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _root = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var root: Root?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenBothDeferAndSkipDirectivesOnSameTypeCase_rendersDeferredFragmentAccessorsAsOptional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @skip(if: $a) @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_skipIfA = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[if: !"a"])
+
+    let rendered = subject.test_render(childEntity: allAnimals_skipIfA.computed)
+    
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _root = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var root: Root?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenBothDeferAndIncludeDirectivesOnDifferentTypeCase_rendersDeferredFragmentAccessorsAsOptional() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    interface Dog {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Animal @include(if: $a) {
+          species
+        }
+        ... on Dog @defer(label: "root") {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+
+    let rendered = subject.test_render(childEntity: allAnimals_asDog.computed)
+    
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _root = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var root: Root?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+  }
 
   // MARK: Fragment Accessors - Deferred Named Fragment
 
-  #warning("need more tests here - same test cases as IRRootFieldBuilderTests")
+  func test__render_fragmentAccessor__givenDeferredNamedFragmentOnSameTypeCase_rendersDeferredFragmentAccessorAsOptional() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...AnimalFragment @defer(label: "root")
+        }
+      }
+
+      fragment AnimalFragment on Animal {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let rendered = subject.test_render(childEntity: allAnimals.computed)
+
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _animalFragment = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var animalFragment: AnimalFragment?
+        }
+      """,
+      atLine: 15,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenDeferredNamedFragmentOnDifferentTypeCase_rendersDeferredFragmentAccessorAsOptional() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+      
+      type Dog implements Animal {
+        id: String
+        species: String
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...DogFragment @defer(label: "root")
+        }
+      }
+
+      fragment DogFragment on Dog {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+
+    let rendered = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _dogFragment = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var dogFragment: DogFragment?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenDeferredNamedFragmentWithVariableCondition_rendersDeferredFragmentAccessorAsOptional() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+      
+      type Dog implements Animal {
+        id: String
+        species: String
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...DogFragment @defer(if: "a", label: "root")
+        }
+      }
+
+      fragment DogFragment on Dog {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+
+    let rendered = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _dogFragment = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var dogFragment: DogFragment?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenDeferredNamedFragmentWithTrueCondition_rendersDeferredFragmentAccessorAsOptional() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+      
+      type Dog implements Animal {
+        id: String
+        species: String
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...DogFragment @defer(if: true, label: "root")
+        }
+      }
+
+      fragment DogFragment on Dog {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+
+    let rendered = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _dogFragment = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var dogFragment: DogFragment?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenDeferredNamedFragmentWithFalseCondition_doesNotRenderDeferredFragmentAccessor() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+      
+      type Dog implements Animal {
+        id: String
+        species: String
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...DogFragment @defer(if: false, label: "root")
+        }
+      }
+
+      fragment DogFragment on Dog {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+
+    let rendered = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+
+    expect(rendered).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) { __data = _dataDict }
+      
+          public var dogFragment: DogFragment { _toFragment() }
+        }
+      """,
+      atLine: 15,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenDeferredInlineFragment_insideNamedFragment_rendersDeferredFragmentAccessorAsOptional() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+
+      type Dog implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...AnimalFragment
+        }
+      }
+
+      fragment AnimalFragment on Dog {
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+    let allAnimals_asDog_animalFragment = try XCTUnwrap(allAnimals_asDog[fragment: "AnimalFragment"])
+
+    let rendered_allAnimals_asDog = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+
+    let fragmentSubject = SelectionSetTemplate(
+      definition: allAnimals_asDog_animalFragment.fragment,
+      generateInitializers: false,
+      config: self.subject.config,
+      nonFatalErrorRecorder: .init(),
+      renderAccessControl: self.subject.renderAccessControl()
+    )
+    let rendered_allAnimals_asDog_animalFragment = fragmentSubject.test_render(
+      childEntity: try XCTUnwrap(allAnimals_asDog_animalFragment.rootField.selectionSet?.computed)
+    )
+
+    expect(rendered_allAnimals_asDog).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) { __data = _dataDict }
+
+          public var animalFragment: AnimalFragment { _toFragment() }
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_animalFragment).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _root = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var root: Root?
+        }
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenDeferredInlineFragmentOnDifferentTypeCase_insideNamedFragment_rendersDeferredFragmentAccessorAsOptional() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+
+      type Dog implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...AnimalFragment
+        }
+      }
+
+      fragment AnimalFragment on Animal {
+        ... on Dog @defer(label: "root") {
+          species
+        }
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_animalFragment = try XCTUnwrap(allAnimals[fragment: "AnimalFragment"])
+    let allAnimals_animalFragment_asDog = try XCTUnwrap(allAnimals_animalFragment.rootField[as: "Dog"])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+
+    let fragmentSubject = SelectionSetTemplate(
+      definition: allAnimals_animalFragment.fragment,
+      generateInitializers: false,
+      config: self.subject.config,
+      nonFatalErrorRecorder: .init(),
+      renderAccessControl: self.subject.renderAccessControl()
+    )
+    let rendered_allAnimals_animalFragment_asDog = fragmentSubject.test_render(
+      childEntity: try XCTUnwrap(allAnimals_animalFragment_asDog.computed)
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) { __data = _dataDict }
+
+          public var animalFragment: AnimalFragment { _toFragment() }
+        }
+      """,
+      atLine: 15,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_animalFragment_asDog).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _root = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var root: Root?
+        }
+      """,
+      atLine: 12,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_fragmentAccessor__givenDeferredNamedFragmentWithMatchingSiblingTypeCase_rendersDeferredFragmentAccessorAsOptional() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+
+      type Pet implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          ...AnimalFragment @defer(label: "root")
+          ... on Pet {
+            id
+          }
+        }
+      }
+
+      fragment AnimalFragment on Animal {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _animalFragment = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var animalFragment: AnimalFragment?
+        }
+      """,
+      atLine: 15,
+      ignoringExtraLines: true
+    ))
+  }
 
   // MARK: - Nested Selection Sets
 
@@ -5581,10 +9667,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5623,10 +9709,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5665,10 +9751,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5710,10 +9796,10 @@ class SelectionSetTemplateTests: XCTestCase {
     ])
 
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5758,7 +9844,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Badge }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Badge }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("a", String?.self),
@@ -5772,7 +9858,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.ProductBadge }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.ProductBadge }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("b", String?.self),
@@ -5786,10 +9872,10 @@ class SelectionSetTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     let query = try XCTUnwrap(
-      operation[field: "query"] as? IR.EntityField
+      operation[field: "query"]?.selectionSet
     )
 
-    let actual = subject.render(field: query)
+    let actual = subject.test_render(childEntity: query.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5834,7 +9920,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Badge }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Badge }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("a", String?.self),
@@ -5848,7 +9934,7 @@ class SelectionSetTemplateTests: XCTestCase {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.ProductBadge }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.ProductBadge }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("b", String?.self),
@@ -5862,10 +9948,10 @@ class SelectionSetTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     let query = try XCTUnwrap(
-      operation[field: "query"] as? IR.EntityField
+      operation[field: "query"]?.selectionSet
     )
 
-    let actual = subject.render(field: query)
+    let actual = subject.test_render(childEntity: query.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -5946,16 +10032,16 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals_asDog_predator = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals_asDog_predator)
+    let actual = subject.test_render(childEntity: allAnimals_asDog_predator.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSet__givenEntityFieldMergedFromFragment_doesNotRendersSelectionSet() async throws {
+  func test__render_nestedSelectionSet__givenEntityFieldMergedFromFragment_rendersSelectionSetAsTypeAlias() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -5983,7 +10069,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public var predator: PredatorDetails.Predator { __data["predator"] }
+      public var predator: Predator { __data["predator"] }
 
       public struct Fragments: FragmentContainer {
         public let __data: DataDict
@@ -5991,22 +10077,24 @@ class SelectionSetTemplateTests: XCTestCase {
 
         public var predatorDetails: PredatorDetails { _toFragment() }
       }
+
+      public typealias Predator = PredatorDetails.Predator
     }
     """
 
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSet__givenEntityFieldMergedFromFragmentWithLowercaseName_rendersFragmentNestedSelctionSetNameCorrectlyCased() async throws {
+  func test__render_nestedSelectionSet__givenEntityFieldMergedFromFragmentWithLowercaseName_rendersFragmentNestedSelectionSetName_asTypeAlias_correctlyCased() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -6034,7 +10122,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public var predator: PredatorDetails.Predator { __data["predator"] }
+      public var predator: Predator { __data["predator"] }
 
       public struct Fragments: FragmentContainer {
         public let __data: DataDict
@@ -6042,22 +10130,24 @@ class SelectionSetTemplateTests: XCTestCase {
 
         public var predatorDetails: PredatorDetails { _toFragment() }
       }
+
+      public typealias Predator = PredatorDetails.Predator
     }
     """
 
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_nestedSelectionSet__givenEntityFieldMergedFromNestedFragmentInTypeCase_withNoOtherMergedFields_doesNotRendersSelectionSet() async throws {
+  func test__render_nestedSelectionSet__givenEntityFieldMergedFromNestedFragmentInTypeCase_withNoOtherMergedFields_rendersSelectionSetAsTypeAlias() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -6118,7 +10208,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let allAnimals_predator_asWarmBlooded_expected = """
       public var species: String { __data["species"] }
-      public var height: HeightInMeters.Height { __data["height"] }
+      public var height: Height { __data["height"] }
 
       public struct Fragments: FragmentContainer {
         public let __data: DataDict
@@ -6127,25 +10217,29 @@ class SelectionSetTemplateTests: XCTestCase {
         public var warmBloodedDetails: WarmBloodedDetails { _toFragment() }
         public var heightInMeters: HeightInMeters { _toFragment() }
       }
+
+      public typealias Height = HeightInMeters.Height
     }
     """
 
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
     let allAnimals_predator = try XCTUnwrap(
-      allAnimals[field: "predator"] as? IR.EntityField
+      allAnimals[field: "predator"]
     )
     let allAnimals_predator_asWarmBlooded = try XCTUnwrap(
       allAnimals_predator[as: "WarmBlooded"]
     )
 
-    let allAnimals_actual = subject.render(field: allAnimals)
-    let allAnimals_predator_actual = subject.render(field: allAnimals_predator)
+    let allAnimals_actual = subject.test_render(childEntity: allAnimals.computed)
+    let allAnimals_predator_actual = subject.test_render(
+      childEntity: allAnimals_predator.selectionSet!.computed
+    )
     let allAnimals_predator_asWarmBlooded_actual = subject
-      .render(inlineFragment: allAnimals_predator_asWarmBlooded)
+      .test_render(inlineFragment: allAnimals_predator_asWarmBlooded.computed)
 
     // then
     expect(allAnimals_actual)
@@ -6154,6 +10248,484 @@ class SelectionSetTemplateTests: XCTestCase {
       .to(equalLineByLine(allAnimals_predator_expected, atLine: 12, ignoringExtraLines: true))
     expect(allAnimals_predator_asWarmBlooded_actual)
       .to(equalLineByLine(allAnimals_predator_asWarmBlooded_expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_nestedSelectionSet__givenEntityFieldMergedFromTypeCaseInFragment_rendersSelectionSetAsTypeAlias() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+      predator: Animal!
+      height: Height!
+    }
+
+    interface Pet {
+      height: Height!
+    }
+
+    type Height {
+      feet: Int!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        predator {
+          species
+          ...PredatorDetails
+        }
+      }
+    }
+
+    fragment PredatorDetails on Animal {
+      ... on Pet {
+        height {
+          feet
+        }
+      }
+    }
+    """
+
+    let predator_asPet_expected = """
+      public var species: String { __data["species"] }
+      public var height: Height { __data["height"] }
+
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public var predatorDetails: PredatorDetails { _toFragment() }
+      }
+
+      public typealias Height = PredatorDetails.AsPet.Height
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals_predator = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?.selectionSet
+    )
+
+    let allAnimals_predator_asPet = try XCTUnwrap(allAnimals_predator[as: "Pet"])
+
+    let allAnimals_predator_asPet_actual = subject.test_render(
+      inlineFragment: allAnimals_predator_asPet.computed
+    )
+
+    // then
+    expect(allAnimals_predator_asPet_actual).to(equalLineByLine(predator_asPet_expected, atLine: 13, ignoringExtraLines: true))
+  }
+
+  func test__render_nestedSelectionSet__givenEntityFieldMergedFromFragmentEntityNestedInEntity_rendersSelectionSetAsTypeAlias() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+      predator: Animal!
+      height: Height!
+    }
+
+    type Height {
+      feet: Int!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        predator {
+          species
+        }
+        ...PredatorDetails
+      }
+    }
+
+    fragment PredatorDetails on Animal {
+      predator {
+        height {
+          feet
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public var species: String { __data["species"] }
+      public var height: Height { __data["height"] }
+
+      public typealias Height = PredatorDetails.Predator.Height
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals_predator = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_predator.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_nestedSelectionSet__givenEntityFieldNestedInEntityFieldInMatchingTypeCaseMergedFromParent_rendersSelectionSetAsTypeAlias() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+      predator: Animal!
+      height: Height!
+    }
+
+    interface Pet implements Animal {
+      species: String!
+      predator: Animal!
+      height: Height!
+    }
+
+    type Dog implements Animal & Pet {
+      name: String!
+      species: String!
+      predator: Animal!
+      height: Height!
+    }
+
+    type Height {
+      feet: Int!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... on Pet {
+          predator {
+            height {
+              feet
+            }
+          }
+        }
+        ... on Dog {
+          predator {
+            species
+          }
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public var species: String { __data["species"] }
+      public var height: Height { __data["height"] }
+
+      public typealias Height = AllAnimal.AsPet.Predator.Height
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals_asDog_predator = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_asDog_predator.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_fieldAccessors__givenEntityFieldMergedFromSiblingTypeCase_atOperationRoot_rendersSelectionSetAsTypeAlias_withFullyQualifiedName() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      role: String!
+    }
+
+    type AdminQuery implements ModeratorQuery {
+      name: String!
+      allAnimals: [Animal!]
+    }
+
+    interface ModeratorQuery {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      ... on ModeratorQuery {
+        allAnimals {
+          species
+        }
+      }
+      ... on AdminQuery {
+        name
+      }
+    }
+    """
+
+    let expected = """
+      public var name: String { __data["name"] }
+      public var allAnimals: [AllAnimal]? { __data["allAnimals"] }
+
+      public typealias AllAnimal = TestOperationQuery.Data.AsModeratorQuery.AllAnimal
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let query_asAdminQuery = try XCTUnwrap(
+      operation[field: "query"]?[as: "AdminQuery"]
+    )
+
+    let actual = subject.test_render(inlineFragment: query_asAdminQuery.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_nestedSelectionSet__givenEntityFieldMergedFromParent_atOperationRoot_rendersSelectionSetAsTypeAlias_withFullyQualifiedName() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    type AdminQuery {
+      name: String!
+    }
+
+    interface Animal {
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        species
+      }
+      ... on AdminQuery {
+        name
+      }
+    }
+    """
+
+    let expected = """
+      public var name: String { __data["name"] }
+      public var allAnimals: [AllAnimal]? { __data["allAnimals"] }
+
+      public typealias AllAnimal = TestOperationQuery.Data.AllAnimal
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let query_asAdminQuery = try XCTUnwrap(
+      operation[field: "query"]?[as: "AdminQuery"]
+    )
+
+    let actual = subject.test_render(inlineFragment: query_asAdminQuery.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_nestedSelectionSet__givenEntityFieldMergedFromParent_notOperationRoot_doesNotRendersTypeAliasForSelectionSet() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+      predator: Animal!
+    }
+
+    interface Pet implements Animal {
+      species: String!
+      predator: Animal!
+    }
+
+    type Dog implements Animal & Pet {
+      species: String!
+      predator: Animal!
+      name: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        predator {
+          species
+        }
+        ... on Dog {
+          name
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public var name: String { __data["name"] }
+      public var predator: Predator { __data["predator"] }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_nestedSelectionSet__givenMultipleEntityFields_oneMergedFromParent_rendersChildSelectionSetForOnlyNeededSelectionSet() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+      predator: Animal!
+    }
+
+    interface Pet implements Animal {
+      species: String!
+      predator: Animal!
+      friend: Animal!
+    }
+
+    type Dog implements Animal & Pet {
+      species: String!
+      predator: Animal!
+      friend: Animal!
+      name: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        predator {
+          species
+        }
+        ... on Pet {
+          friend {
+            species
+          }
+        }
+      }
+    }
+    """
+
+    let expected = """
+      /// AllAnimal.AsPet.Friend
+      public struct Friend: TestSchema.SelectionSet {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("species", String.self),
+        ] }
+
+        public var species: String { __data["species"] }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals_asPet = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Pet"]
+    )
+
+    let actual = subject.test_render(inlineFragment: allAnimals_asPet.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: false))
+  }
+
+  func test__render_nestedSelectionSet__givenEntityFieldMergedFromSiblingTypeCase_notOperationRoot_rendersSelectionSetAsTypeAlias_withNameNotIncludingSharedParent() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+      predator: Animal!
+    }
+
+    interface Pet implements Animal {
+      species: String!
+      predator: Animal!
+    }
+
+    type Dog implements Animal & Pet {
+      species: String!
+      predator: Animal!
+      name: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... on Pet {
+          predator {
+            species
+          }
+        }
+        ... on Dog {
+          name
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public var name: String { __data["name"] }
+      public var predator: Predator { __data["predator"] }
+
+      public typealias Predator = AsPet.Predator
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(inlineFragment: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
   func test__render_nestedSelectionSets__givenDirectSelection_typeCase_rendersNestedSelectionSet() async throws {
@@ -6202,10 +10774,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
@@ -6265,10 +10837,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals_asDog_predator = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[field: "predator"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals_asDog_predator)
+    let actual = subject.test_render(childEntity: allAnimals_asDog_predator.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -6310,10 +10882,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -6352,10 +10924,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 21, ignoringExtraLines: true))
@@ -6413,10 +10985,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let predator = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?.selectionSet
     )
 
-    let predator_actual = subject.render(field: predator)
+    let predator_actual = subject.test_render(childEntity: predator.computed)
 
     // then
     expect(predator_actual)
@@ -6474,14 +11046,62 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let predator = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?.selectionSet
     )
 
-    let predator_actual = subject.render(field: predator)
+    let predator_actual = subject.test_render(childEntity: predator.computed)
 
     // then
     expect(predator_actual)
       .to(equalLineByLine(predator_expected, atLine: 21, ignoringExtraLines: true))
+  }
+
+// Related to https://github.com/apollographql/apollo-ios/issues/3326
+  func test__render_nestedSelectionSet__givenInlineFragmentWithOnlyReservedField_doesNotRenderAsCompositeInlineFragment() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal]
+    }
+
+    union Animal = AnimalObject | AnimalError
+
+    type AnimalObject {
+      species: String!
+    }
+
+    type AnimalError {
+      code: Int!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ... on AnimalObject {
+          __typename
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public var asAnimalObject: AsAnimalObject? { _asInlineFragment() }
+
+      /// AllAnimal.AsAnimalObject
+      public struct AsAnimalObject: TestSchema.InlineFragment {
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
   // MARK: Nested Selection Sets - Reserved Keywords + Special Names
@@ -6519,10 +11139,10 @@ class SelectionSetTemplateTests: XCTestCase {
       // when
       try await buildSubjectAndOperation()
       let allAnimals = try XCTUnwrap(
-        operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+        operation[field: "query"]?[field: "allAnimals"]?.selectionSet
       )
 
-      let predator_actual = subject.render(field: allAnimals)
+      let predator_actual = subject.test_render(childEntity: allAnimals.computed)
 
       // then
       expect(predator_actual)
@@ -6530,7 +11150,7 @@ class SelectionSetTemplateTests: XCTestCase {
     }
   }
 
-  // MARK: - InlineFragment RootEntityType Tests
+  // MARK: - RootEntityType - Inline Fragment
 
   func test__render_nestedTypeCase__rendersRootEntityType() async throws {
     // given
@@ -6574,7 +11194,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "Pet"]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_AsPet)
+    let actual = subject.test_render(inlineFragment: allAnimals_AsPet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
@@ -6628,7 +11248,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[as: "WarmBlooded"]?[as: "Pet"]
     )
 
-    let actual = subject.render(inlineFragment: allAnimals_AsPet)
+    let actual = subject.test_render(inlineFragment: allAnimals_AsPet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
@@ -6681,7 +11301,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "allAnimals"]?[field: "predators"]?[as: "Pet"]
     )
 
-    let actual = subject.render(inlineFragment: predators_asPet)
+    let actual = subject.test_render(inlineFragment: predators_asPet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
@@ -6742,7 +11362,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[field: "predators"]?[field: "predators"]?[as: "Pet"]
     )
 
-    let actual = subject.render(inlineFragment: predators_asPet)
+    let actual = subject.test_render(inlineFragment: predators_asPet.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
@@ -6781,7 +11401,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[if: "a"]
     )
 
-    let actual = subject.render(inlineFragment: query_ifA)
+    let actual = subject.test_render(inlineFragment: query_ifA.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
@@ -6824,7 +11444,7 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[field: "query"]?[as: "AdminQuery", if: "a"]
     )
 
-    let actual = subject.render(inlineFragment: query_ifA)
+    let actual = subject.test_render(inlineFragment: query_ifA.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
@@ -6878,22 +11498,26 @@ class SelectionSetTemplateTests: XCTestCase {
       operation[fragment: "Details"]
     )
     let detailsFragment_predators_predators_asPet = try XCTUnwrap(
-      detailsFragment.fragment.rootField
-        .selectionSet[field: "predators"]?[field: "predators"]?[as: "Pet"]
+      detailsFragment.rootField[field: "predators"]?[field: "predators"]?[as: "Pet"]
     )
 
     let fragmentTemplate = SelectionSetTemplate(
-      definition: .namedFragment(detailsFragment.fragment),
+      definition: detailsFragment.fragment,
       generateInitializers: false,
       config: self.subject.config,
+      nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()
     )
 
-    let actual = fragmentTemplate.render(inlineFragment: detailsFragment_predators_predators_asPet)
+    let actual = fragmentTemplate.test_render(
+      inlineFragment: detailsFragment_predators_predators_asPet.computed
+    )
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
   }
+  
+  // MARK: RootEntityType - Deferred Inline Fragment
 
   func test__render_deferredTypeCase__givenDeferredInlineFragmentWithoutTypeCase_rendersRootEntityType() async throws {
     // given
@@ -6906,7 +11530,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -6925,22 +11549,22 @@ class SelectionSetTemplateTests: XCTestCase {
 
     // then
     let allAnimals_deferredAsRoot = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Animal", deferred: .init(label: "root")]
+      operation[field: "query"]?[field: "allAnimals"]?[deferred: .init(label: "root")]
     )
 
-    let rendered_allAnimals_deferredAsRoot = subject.render(
-      inlineFragment: allAnimals_deferredAsRoot
+    let rendered_allAnimals_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_deferredAsRoot.computed
     )
 
     expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
       """
       /// AllAnimal.Root
-      public struct Root: TestSchema.InlineFragment, ApolloAPI.Deferrable {
+      public struct Root: TestSchema.InlineFragment {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
       """,
       atLine: 1,
       ignoringExtraLines: true
@@ -6958,7 +11582,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -6977,22 +11601,22 @@ class SelectionSetTemplateTests: XCTestCase {
 
     // then
     let allAnimals_deferredAsRoot = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Animal", deferred: .init(label: "root")]
+      operation[field: "query"]?[field: "allAnimals"]?[deferred: .init(label: "root")]
     )
 
-    let rendered_allAnimals_deferredAsRoot = subject.render(
-      inlineFragment: allAnimals_deferredAsRoot
+    let rendered_allAnimals_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_deferredAsRoot.computed
     )
 
     expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
       """
       /// AllAnimal.Root
-      public struct Root: TestSchema.InlineFragment, ApolloAPI.Deferrable {
+      public struct Root: TestSchema.InlineFragment {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
       """,
       atLine: 1,
       ignoringExtraLines: true
@@ -7015,7 +11639,7 @@ class SelectionSetTemplateTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -7034,29 +11658,285 @@ class SelectionSetTemplateTests: XCTestCase {
 
     // then
     let allAnimals_asDog_deferredAsRoot = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[as: "Dog", deferred: .init(label: "root")]
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]?[deferred: .init(label: "root")]
     )
 
-    let rendered_allAnimals_asDog_deferredAsRoot = subject.render(
-      inlineFragment: allAnimals_asDog_deferredAsRoot
+    let rendered_allAnimals_asDog_deferredAsRoot = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsRoot.computed
     )
 
     expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
       """
       /// AllAnimal.AsDog.Root
-      public struct Root: TestSchema.InlineFragment, ApolloAPI.Deferrable {
+      public struct Root: TestSchema.InlineFragment {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
-        public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Dog }
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
       """,
       atLine: 1,
       ignoringExtraLines: true
     ))
   }
+  
+  func test__render_deferredTypeCase__givenSiblingDeferredInlineFragmentOnSameTypeCase_rendersSeparateRootEntityTypes() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
 
-  #warning("need more tests here - same test cases as IRRootFieldBuilderTests (inline fragment only")
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "one") {
+          species
+        }
+        ... on Dog @defer(label: "two") {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+    let allAnimals_asDog_deferredAsOne = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "one")])
+    let allAnimals_asDog_deferredAsTwo = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "two")])
+
+    let rendered_allAnimals_asDog_deferredAsOne = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOne.computed
+    )
+    let rendered_allAnimals_asDog_deferredAsTwo = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsTwo.computed
+    )
+
+    expect(rendered_allAnimals_asDog_deferredAsOne).to(equalLineByLine(
+      """
+      /// AllAnimal.AsDog.One
+      public struct One: TestSchema.InlineFragment {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
+      """,
+      atLine: 1,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsTwo).to(equalLineByLine(
+      """
+      /// AllAnimal.AsDog.Two
+      public struct Two: TestSchema.InlineFragment {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
+      """,
+      atLine: 1,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_deferredTypeCase__givenSiblingDeferredInlineFragmentOnDifferentTypeCase_rendersSeparateRootEntityTypes() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+
+    type Cat implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "one") {
+          species
+        }
+        ... on Cat @defer(label: "two") {
+          genus
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+    let allAnimals_asDog_deferredAsOne = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "one")])
+    let allAnimals_asCat = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Cat"])
+    let allAnimals_asCat_deferredAsTwo = try XCTUnwrap(allAnimals_asCat[deferred: .init(label: "two")])
+
+    let rendered_allAnimals_asDog_deferredAsOne = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOne.computed
+    )
+    let rendered_allAnimals_asCat_deferredAsTwo = subject.test_render(
+      inlineFragment: allAnimals_asCat_deferredAsTwo.computed
+    )
+
+    expect(rendered_allAnimals_asDog_deferredAsOne).to(equalLineByLine(
+      """
+      /// AllAnimal.AsDog.One
+      public struct One: TestSchema.InlineFragment {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
+      """,
+      atLine: 1,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asCat_deferredAsTwo).to(equalLineByLine(
+      """
+      /// AllAnimal.AsCat.Two
+      public struct Two: TestSchema.InlineFragment {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Cat }
+      """,
+      atLine: 1,
+      ignoringExtraLines: true
+    ))
+  }
+  
+  func test__render_deferredTypeCase__givenNestedDeferredInlineFragments_rendersNestedRootEntityTypes() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    
+    type Dog implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+      friend: Animal!
+    }
+
+    type Cat implements Animal {
+      id: String!
+      species: String!
+      genus: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... on Dog @defer(label: "outer") {
+          species
+          friend {
+            ... on Cat @defer(label: "inner") {
+              genus
+            }
+          }
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals_asDog = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"])
+    let allAnimals_asDog_deferredAsOuter = try XCTUnwrap(allAnimals_asDog[deferred: .init(label: "outer")])
+    let allAnimals_asDog_deferredAsOuter_asCat = try XCTUnwrap(
+      allAnimals_asDog_deferredAsOuter[field: "friend"]?[as: "Cat"]
+    )
+    let allAnimals_asDog_deferredAsOuter_asCat_deferredAsInner = try XCTUnwrap(
+      allAnimals_asDog_deferredAsOuter_asCat[deferred: .init(label: "inner")]
+    )
+
+    let rendered_allAnimals_asDog_deferredAsOuter = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOuter.computed
+    )
+    let rendered_allAnimals_asDog_deferredAsOuter_asCat_deferredAsInner = subject.test_render(
+      inlineFragment: allAnimals_asDog_deferredAsOuter_asCat_deferredAsInner.computed
+    )
+
+    expect(rendered_allAnimals_asDog_deferredAsOuter).to(equalLineByLine(
+      """
+      /// AllAnimal.AsDog.Outer
+      public struct Outer: TestSchema.InlineFragment {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
+      """,
+      atLine: 1,
+      ignoringExtraLines: true
+    ))
+    
+    expect(rendered_allAnimals_asDog_deferredAsOuter_asCat_deferredAsInner).to(equalLineByLine(
+      """
+      /// AllAnimal.AsDog.Outer.Friend.AsCat.Inner
+      public struct Inner: TestSchema.InlineFragment {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public typealias RootEntityType = TestOperationQuery.Data.AllAnimal.AsDog.Outer.Friend
+        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Cat }
+      """,
+      atLine: 1,
+      ignoringExtraLines: true
+    ))
+  }
 
   // MARK: - Documentation Tests
 
@@ -7095,10 +11975,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(schemaDocumentation: .include)
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -7137,10 +12017,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(schemaDocumentation: .exclude)
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -7177,10 +12057,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(schemaDocumentation: .include)
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -7216,10 +12096,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(schemaDocumentation: .exclude)
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -7260,10 +12140,10 @@ class SelectionSetTemplateTests: XCTestCase {
       warningsOnDeprecatedUsage: .include
     )
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
@@ -7296,10 +12176,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation(warningsOnDeprecatedUsage: .exclude)
     let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"] as? IR.EntityField
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
 
-    let actual = subject.render(field: allAnimals)
+    let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
@@ -7344,10 +12224,10 @@ class SelectionSetTemplateTests: XCTestCase {
       warningsOnDeprecatedUsage: .include
     )
     let animal = try XCTUnwrap(
-      operation[field: "query"]?[field: "animal"] as? IR.EntityField
+      operation[field: "query"]?[field: "animal"]?.selectionSet
     )
 
-    let actual = subject.render(field: animal)
+    let actual = subject.test_render(childEntity: animal.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -7391,10 +12271,10 @@ class SelectionSetTemplateTests: XCTestCase {
       warningsOnDeprecatedUsage: .exclude
     )
     let animal = try XCTUnwrap(
-      operation[field: "query"]?[field: "animal"] as? IR.EntityField
+      operation[field: "query"]?[field: "animal"]?.selectionSet
     )
 
-    let actual = subject.render(field: animal)
+    let actual = subject.test_render(childEntity: animal.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -7443,10 +12323,10 @@ class SelectionSetTemplateTests: XCTestCase {
       warningsOnDeprecatedUsage: .include
     )
     let animal = try XCTUnwrap(
-      operation[field: "query"]?[field: "animal"] as? IR.EntityField
+      operation[field: "query"]?[field: "animal"]?.selectionSet
     )
 
-    let actual = subject.render(field: animal)
+    let actual = subject.test_render(childEntity: animal.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -7491,10 +12371,10 @@ class SelectionSetTemplateTests: XCTestCase {
       warningsOnDeprecatedUsage: .include
     )
     let animal = try XCTUnwrap(
-      operation[field: "query"]?[field: "animal"] as? IR.EntityField
+      operation[field: "query"]?[field: "animal"]?.selectionSet
     )
 
-    let actual = subject.render(field: animal)
+    let actual = subject.test_render(childEntity: animal.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
@@ -7540,10 +12420,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let user = try XCTUnwrap(
-      operation[field: "query"]?[field: "getUser"] as? IR.EntityField
+      operation[field: "query"]?[field: "getUser"]?.selectionSet
     )
 
-    let actual = subject.render(field: user)
+    let actual = subject.test_render(childEntity: user.computed)
 
     // then
     expect(actual).to(equalLineByLine(expectedOne, atLine: 9, ignoringExtraLines: true))
@@ -7593,10 +12473,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let user = try XCTUnwrap(
-      operation[field: "query"]?[field: "getUser"] as? IR.EntityField
+      operation[field: "query"]?[field: "getUser"]?.selectionSet
     )
 
-    let actual = subject.render(field: user)
+    let actual = subject.test_render(childEntity: user.computed)
 
     // then
     expect(actual).to(equalLineByLine(expectedOne, atLine: 9, ignoringExtraLines: true))
@@ -7638,10 +12518,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndOperation()
     let user = try XCTUnwrap(
-      operation[field: "query"]?[field: "getUser"] as? IR.EntityField
+      operation[field: "query"]?[field: "getUser"]?.selectionSet
     )
 
-    let actual = subject.render(field: user)
+    let actual = subject.test_render(childEntity: user.computed)
 
     // then
     expect(actual).to(equalLineByLine(expectedOne, atLine: 9, ignoringExtraLines: true))
@@ -7673,16 +12553,16 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Interfaces.Type_Interface }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Type_Interface }
     """
 
     // when
     try await buildSubjectAndOperation()
     let user = try XCTUnwrap(
-      operation[field: "query"]?[field: "getUser"] as? IR.EntityField
+      operation[field: "query"]?[field: "getUser"]?.selectionSet
     )
 
-    let actual = subject.render(field: user)
+    let actual = subject.test_render(childEntity: user.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -7723,16 +12603,16 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Unions.Type_Union }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Unions.Type_Union }
     """
 
     // when
     try await buildSubjectAndOperation()
     let user = try XCTUnwrap(
-      operation[field: "query"]?[field: "getUser"] as? IR.EntityField
+      operation[field: "query"]?[field: "getUser"]?.selectionSet
     )
 
-    let actual = subject.render(field: user)
+    let actual = subject.test_render(childEntity: user.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -7760,16 +12640,16 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      public static var __parentType: ApolloAPI.ParentType { TestSchema.Objects.Type_Object }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Type_Object }
     """
 
     // when
     try await buildSubjectAndOperation()
     let user = try XCTUnwrap(
-      operation[field: "query"]?[field: "getType"] as? IR.EntityField
+      operation[field: "query"]?[field: "getType"]?.selectionSet
     )
 
-    let actual = subject.render(field: user)
+    let actual = subject.test_render(childEntity: user.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))

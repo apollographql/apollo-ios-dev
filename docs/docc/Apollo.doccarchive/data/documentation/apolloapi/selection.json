@@ -94,7 +94,6 @@
   "topicSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field"
       ],
@@ -103,6 +102,7 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/conditional(_:_:)",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/deferred(if:_:label:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/field(_:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/fragment(_:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/inlineFragment(_:)"
@@ -112,16 +112,22 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/field(_:alias:_:arguments:)",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-1azho",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-1mgoh",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-2i1vt",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-2l05r",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-3p4my",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-8113z",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-9kbqy",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-8eyjn",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-9w8ok",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-viy1"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-jeck",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-r1a4"
       ],
       "title" : "Type Methods"
+    },
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition"
+      ],
+      "title" : "Enumerations"
     },
     {
       "generated" : true,
@@ -246,7 +252,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "struct"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -432,6 +438,98 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/conditional(_:_:)"
 },
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/deferred(if:_:label:)": {
+  "abstract" : [
+    {
+      "text" : "A fragment spread or inline fragment marked with the ",
+      "type" : "text"
+    },
+    {
+      "code" : "@defer",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " directive.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "deferred"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "if"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO",
+      "text" : "Selection"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
+      "text" : "Condition"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI10DeferrableP",
+      "text" : "Deferrable"
+    },
+    {
+      "kind" : "text",
+      "text" : ".Type, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "label"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/deferred(if:_:label:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "Selection.deferred(if:_:label:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/selection\/deferred(if:_:label:)"
+},
 "doc://ApolloAPI/documentation/ApolloAPI/Selection/field(_:)": {
   "abstract" : [
     {
@@ -535,7 +633,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?, "
+      "text" : "?, any "
     },
     {
       "kind" : "typeIdentifier",
@@ -607,7 +705,7 @@
     },
     {
       "kind" : "text",
-      "text" : "("
+      "text" : "(any "
     },
     {
       "kind" : "typeIdentifier",
@@ -626,7 +724,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/fragment(_:)"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/include(if:_:)-1azho": {
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/include(if:_:)-1mgoh": {
   "abstract" : [
 
   ],
@@ -674,12 +772,12 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
       "text" : "Condition"
     },
     {
       "kind" : "text",
-      "text" : "], "
+      "text" : "], ["
     },
     {
       "kind" : "typeIdentifier",
@@ -688,7 +786,7 @@
     },
     {
       "kind" : "text",
-      "text" : ") -> "
+      "text" : "]) -> "
     },
     {
       "kind" : "typeIdentifier",
@@ -696,12 +794,12 @@
       "text" : "Selection"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-1azho",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-1mgoh",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "include(if:_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/include(if:_:)-1azho"
+  "url" : "\/documentation\/apolloapi\/selection\/include(if:_:)-1mgoh"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Selection/include(if:_:)-2i1vt": {
   "abstract" : [
@@ -925,7 +1023,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/include(if:_:)-3p4my"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/include(if:_:)-8113z": {
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/include(if:_:)-8eyjn": {
   "abstract" : [
 
   ],
@@ -973,89 +1071,12 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
       "text" : "Condition"
     },
     {
       "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO",
-      "text" : "Selection"
-    },
-    {
-      "kind" : "text",
-      "text" : ") -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO",
-      "text" : "Selection"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-8113z",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "include(if:_:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/include(if:_:)-8113z"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/include(if:_:)-9kbqy": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "include"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "if"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ["
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO",
-      "text" : "Selection"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
-      "text" : "Condition"
-    },
-    {
-      "kind" : "text",
-      "text" : "], ["
+      "text" : ", ["
     },
     {
       "kind" : "typeIdentifier",
@@ -1072,12 +1093,12 @@
       "text" : "Selection"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-9kbqy",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-8eyjn",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "include(if:_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/include(if:_:)-9kbqy"
+  "url" : "\/documentation\/apolloapi\/selection\/include(if:_:)-8eyjn"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Selection/include(if:_:)-9w8ok": {
   "abstract" : [
@@ -1147,7 +1168,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/include(if:_:)-9w8ok"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/include(if:_:)-viy1": {
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/include(if:_:)-jeck": {
   "abstract" : [
 
   ],
@@ -1195,12 +1216,12 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
       "text" : "Condition"
     },
     {
       "kind" : "text",
-      "text" : ", ["
+      "text" : ", "
     },
     {
       "kind" : "typeIdentifier",
@@ -1209,7 +1230,7 @@
     },
     {
       "kind" : "text",
-      "text" : "]) -> "
+      "text" : ") -> "
     },
     {
       "kind" : "typeIdentifier",
@@ -1217,12 +1238,89 @@
       "text" : "Selection"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-viy1",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-jeck",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "include(if:_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/include(if:_:)-viy1"
+  "url" : "\/documentation\/apolloapi\/selection\/include(if:_:)-jeck"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/include(if:_:)-r1a4": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "include"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "if"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO",
+      "text" : "Selection"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
+      "text" : "Condition"
+    },
+    {
+      "kind" : "text",
+      "text" : "], "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO",
+      "text" : "Selection"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO",
+      "text" : "Selection"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-r1a4",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "include(if:_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/selection\/include(if:_:)-r1a4"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Selection/inlineFragment(_:)": {
   "abstract" : [
@@ -1246,7 +1344,7 @@
     },
     {
       "kind" : "text",
-      "text" : "("
+      "text" : "(any "
     },
     {
       "kind" : "typeIdentifier",

@@ -154,16 +154,16 @@
   "topicSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/__(_:_:)-hgiy",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/__(_:_:)-zhqx"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/__(_:_:)-4nx93",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/__(_:_:)-9xr9k"
       ],
       "title" : "Operators"
     },
     {
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-1zuhd",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-3r2o7",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-zqgr"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-4lshs",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-8brl3",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-9ido7"
       ],
       "title" : "Initializers"
     },
@@ -347,7 +347,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/conditions\/equatable-implementations"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/Conditions/__(_:_:)-hgiy": {
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/Conditions/__(_:_:)-4nx93": {
   "abstract" : [
 
   ],
@@ -409,7 +409,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
       "text" : "Condition"
     },
     {
@@ -431,14 +431,14 @@
       "text" : "Conditions"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/__(_:_:)-hgiy",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/__(_:_:)-4nx93",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "||(_:_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/conditions\/__(_:_:)-hgiy"
+  "url" : "\/documentation\/apolloapi\/selection\/conditions\/__(_:_:)-4nx93"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/Conditions/__(_:_:)-zhqx": {
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/Conditions/__(_:_:)-9xr9k": {
   "abstract" : [
 
   ],
@@ -500,7 +500,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
       "text" : "Condition"
     },
     {
@@ -522,12 +522,12 @@
       "text" : "Conditions"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/__(_:_:)-zhqx",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/__(_:_:)-9xr9k",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "||(_:_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/conditions\/__(_:_:)-zhqx"
+  "url" : "\/documentation\/apolloapi\/selection\/conditions\/__(_:_:)-9xr9k"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Selection/Conditions/evaluate(with:)": {
   "abstract" : [
@@ -565,7 +565,7 @@
     },
     {
       "kind" : "text",
-      "text" : " : "
+      "text" : " : any "
     },
     {
       "kind" : "typeIdentifier",
@@ -589,85 +589,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/conditions\/evaluate(with:)"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/Conditions/init(_:)-1zuhd": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "identifier",
-      "text" : "init"
-    },
-    {
-      "kind" : "text",
-      "text" : "([["
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO",
-      "text" : "Selection"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
-      "text" : "Condition"
-    },
-    {
-      "kind" : "text",
-      "text" : "]])"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-1zuhd",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "init(_:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/conditions\/init(_:)-1zuhd"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/Conditions/init(_:)-3r2o7": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "identifier",
-      "text" : "init"
-    },
-    {
-      "kind" : "text",
-      "text" : "(["
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO",
-      "text" : "Selection"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
-      "text" : "Condition"
-    },
-    {
-      "kind" : "text",
-      "text" : "]...)"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-3r2o7",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "init(_:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/conditions\/init(_:)-3r2o7"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/Conditions/init(_:)-zqgr": {
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/Conditions/init(_:)-4lshs": {
   "abstract" : [
 
   ],
@@ -691,7 +613,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
       "text" : "Condition"
     },
     {
@@ -699,12 +621,90 @@
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-zqgr",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-4lshs",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "init(_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/conditions\/init(_:)-zqgr"
+  "url" : "\/documentation\/apolloapi\/selection\/conditions\/init(_:)-4lshs"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/Conditions/init(_:)-8brl3": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "([["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO",
+      "text" : "Selection"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
+      "text" : "Condition"
+    },
+    {
+      "kind" : "text",
+      "text" : "]])"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-8brl3",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/selection\/conditions\/init(_:)-8brl3"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/Conditions/init(_:)-9ido7": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "(["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO",
+      "text" : "Selection"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
+      "text" : "Condition"
+    },
+    {
+      "kind" : "text",
+      "text" : "]...)"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-9ido7",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/selection\/conditions\/init(_:)-9ido7"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Selection/Conditions/value": {
   "abstract" : [
@@ -738,7 +738,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
       "text" : "Condition"
     },
     {

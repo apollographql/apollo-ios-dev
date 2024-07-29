@@ -6,7 +6,8 @@ import ApolloAPI
 import GraphQLCompiler
 
 class CustomScalarTemplateTests: XCTestCase {
-  var subject: CustomScalarTemplate!
+  // Since the base protocol is actually used, Use TemplateRenderer. This can be confirmed that no unintended implementation is using.
+  var subject: (any TemplateRenderer)!
 
   // MARK: Helpers
 
@@ -18,10 +19,14 @@ class CustomScalarTemplateTests: XCTestCase {
 
   private func buildSubject(
     name: String = "MyCustomScalar",
+    customName: String? = nil,
     config: ApolloCodegenConfiguration = .mock()
   ) {
+    let scalarType = GraphQLScalarType.mock(name: name)
+    scalarType.name.customName = customName
+    
     subject = CustomScalarTemplate(
-      graphqlScalar: GraphQLScalarType.mock(name: name),
+      graphqlScalar: scalarType,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
@@ -37,7 +42,7 @@ class CustomScalarTemplateTests: XCTestCase {
   }
 
   private func renderSubject() -> String {
-    subject.template.description
+    subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
   // MARK: Casing Tests
@@ -57,7 +62,21 @@ class CustomScalarTemplateTests: XCTestCase {
     // then
     expect(rendered).to(equalLineByLine(expected))
   }
+  
+  // MARK: Header Tests
+  
+  func test__contain_can_edited_header_description() throws {
+    // given
+    buildSubject()
+    
+    // when
+    let rendered = subject.renderHeaderTemplate(nonFatalErrorRecorder: .init())
 
+    // then
+    expect(rendered?.description).toNot(contain("should not be edited"))
+    expect(rendered?.description).to(contain("can be edited"))
+  }
+  
   // MARK: Typealias Definition Tests
 
   func test__render__givenCustomScalar_shouldGenerateStringTypealias() throws {
@@ -236,6 +255,28 @@ class CustomScalarTemplateTests: XCTestCase {
       // then
       expect(rendered).to(equalLineByLine(expected))
     }
+  }
+  
+  // MARK: - Schema Customization Tests
+  
+  func test__render__givenCustomScalar_withCustomName_shouldRenderWithCustomName() throws {
+    // given
+    buildSubject(
+      name: "MyScalar",
+      customName: "MyCustomScalar"
+    )
+
+    let expected = """
+    // Renamed from GraphQL schema value: 'MyScalar'
+    typealias MyCustomScalar = String
+
+    """
+
+    // when
+    let rendered = renderSubject()
+
+    // then
+    expect(rendered).to(equalLineByLine(expected))
   }
   
 }

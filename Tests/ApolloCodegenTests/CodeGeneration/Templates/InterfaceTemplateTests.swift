@@ -17,22 +17,26 @@ class InterfaceTemplateTests: XCTestCase {
 
   private func buildSubject(
     name: String = "Dog",
+    customName: String? = nil,
     documentation: String? = nil,
     config: ApolloCodegenConfiguration = .mock()
   ) {
+    let interfaceType = GraphQLInterfaceType.mock(
+      name,
+      fields: [:],
+      interfaces: [],
+      documentation: documentation
+    )
+    interfaceType.name.customName = customName
+    
     subject = InterfaceTemplate(
-      graphqlInterface: GraphQLInterfaceType.mock(
-        name,
-        fields: [:],
-        interfaces: [],
-        documentation: documentation
-      ),
+      graphqlInterface: interfaceType,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
 
   private func renderSubject() -> String {
-    subject.template.description
+    subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
   // MARK: Casing Tests
@@ -42,7 +46,7 @@ class InterfaceTemplateTests: XCTestCase {
     buildSubject(name: "aDog")
 
     let expected = """
-    static let ADog = Interface(name: "aDog")
+    static let ADog = ApolloAPI.Interface(name: "aDog")
     """
 
     // when
@@ -64,7 +68,7 @@ class InterfaceTemplateTests: XCTestCase {
 
     let expected = """
     /// \(documentation)
-    static let Dog = Interface(name: "Dog")
+    static let Dog = ApolloAPI.Interface(name: "Dog")
     """
 
     // when
@@ -84,7 +88,7 @@ class InterfaceTemplateTests: XCTestCase {
     )
 
     let expected = """
-    static let Dog = Interface(name: "Dog")
+    static let Dog = ApolloAPI.Interface(name: "Dog")
     """
 
     // when
@@ -94,6 +98,26 @@ class InterfaceTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
   
+  // MARK: Namespacing Tests
+
+  func test_render_givenCocoapodsCompatibleImportStatements_generatesWithApolloNamespace() throws {
+    // given
+    buildSubject(
+      name: "Dog",
+      config: .mock(.other, options: .init(cocoapodsCompatibleImportStatements: true))
+    )
+
+    let expected = """
+    static let Dog = Apollo.Interface(name: "Dog")
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+
   // MARK: - Reserved Keyword Tests
   
   func test_render_givenSchemaInterfaceUsingReservedKeyword_generatesWithEscapedType() throws {
@@ -104,7 +128,7 @@ class InterfaceTemplateTests: XCTestCase {
       buildSubject(name: keyword)
 
       let expected = """
-      static let \(keyword.firstUppercased)_Interface = Interface(name: "\(keyword)")
+      static let \(keyword.firstUppercased)_Interface = ApolloAPI.Interface(name: "\(keyword)")
       """
 
       // when
@@ -113,6 +137,27 @@ class InterfaceTemplateTests: XCTestCase {
       // then
       expect(actual).to(equalLineByLine(expected))
     }
+  }
+  
+  // MARK: Schema Customization Tests
+  
+  func test__render__givenInterface_withCustomName_shouldRenderWithCustomName() throws {
+    // given
+    buildSubject(
+      name: "MyInterface",
+      customName: "MyCustomInterface"
+    )
+    
+    let expected = """
+    // Renamed from GraphQL schema value: 'MyInterface'
+    static let MyCustomInterface = ApolloAPI.Interface(name: "MyInterface")
+    """
+    
+    // when
+    let actual = renderSubject()
+    
+    // then
+    expect(actual).to(equalLineByLine(expected))
   }
   
 }

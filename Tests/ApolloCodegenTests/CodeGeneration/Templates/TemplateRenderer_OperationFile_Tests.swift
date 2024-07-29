@@ -2,6 +2,7 @@ import XCTest
 @testable import ApolloCodegenLib
 @testable import ApolloCodegenInternalTestHelpers
 import Nimble
+import OrderedCollections
 
 class TemplateRenderer_OperationFile_Tests: XCTestCase {
 
@@ -21,8 +22,13 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
     )
   }
 
-  private func buildSubject(config: ApolloCodegenConfiguration = .mock()) -> MockFileTemplate {
-    MockFileTemplate(target: .operationFile, config: ApolloCodegen.ConfigurationContext(config: config))
+  private func buildSubject(
+    config: ApolloCodegenConfiguration = .mock(),
+    moduleImports: OrderedSet<String>? = nil
+  ) -> MockFileTemplate {
+    MockFileTemplate(
+      target: .operationFile(moduleImports: moduleImports),
+      config: ApolloCodegen.ConfigurationContext(config: config))
   }
 
   // MARK: Render Target .operationFile Tests
@@ -55,7 +61,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
       let subject = buildSubject(config: config)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
@@ -138,7 +144,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
       let subject = buildSubject(config: config)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: 4, ignoringExtraLines: true))
@@ -225,7 +231,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
       let subject = buildSubject(config: config)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: 4, ignoringExtraLines: true))
@@ -329,7 +335,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
       let subject = buildSubject(config: config)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: test.atLine))
@@ -353,10 +359,36 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
     """
 
     // when
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
+  }
+
+  func test__moduleImports__givenValues_shouldGenerateImportStatements() {
+    // given
+    let config = buildConfig(
+      moduleType: 
+          .embeddedInTarget(
+            name: "MockApplication",
+            accessModifier: .public),
+      operations: .inSchemaModule
+    )
+
+    let moduleImports = OrderedSet(["TestA", "TestB"])
+
+    let subject = buildSubject(config: config, moduleImports: moduleImports)
+
+    let expected = """
+    import TestA
+    import TestB
+    """
+
+    // when
+    let (actual, _) = subject.render()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 5, ignoringExtraLines: true))
   }
 
   func test__casing__givenUppercasedSchemaName_shouldGenerateUppercasedNamespace() {
@@ -374,7 +406,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
     """
 
     // when
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
@@ -395,7 +427,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
     """
 
     // when
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))

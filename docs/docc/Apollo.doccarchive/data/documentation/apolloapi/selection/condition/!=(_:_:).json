@@ -30,7 +30,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "Swift",
-    "externalID" : "s:SQsE2neoiySbx_xtFZ::SYNTHESIZED::s:9ApolloAPI9SelectionO9ConditionV",
+    "externalID" : "s:SQsE2neoiySbx_xtFZ::SYNTHESIZED::s:9ApolloAPI9SelectionO9ConditionO",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -289,7 +289,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "struct"
+      "text" : "enum"
     },
     {
       "kind" : "text",

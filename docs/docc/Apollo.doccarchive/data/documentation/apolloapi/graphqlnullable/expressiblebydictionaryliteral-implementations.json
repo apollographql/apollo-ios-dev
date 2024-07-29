@@ -19,6 +19,7 @@
       }
     ],
     "role" : "collectionGroup",
+    "roleHeading" : "API Collection",
     "title" : "ExpressibleByDictionaryLiteral Implementations"
   },
   "schemaVersion" : {
@@ -217,6 +218,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s30ExpressibleByDictionaryLiteralP3KeyQa",
       "text" : "Key"
     },
     {
@@ -233,6 +235,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s30ExpressibleByDictionaryLiteralP5ValueQa",
       "text" : "Value"
     },
     {

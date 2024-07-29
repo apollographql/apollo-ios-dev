@@ -62,41 +62,43 @@ public struct OperationDescriptor: Sendable {
   }
 
   func sourceText(withFormat format: SourceFormat) -> String {
-    format.formatted(underlyingDefinition)
+    format.formatted(self)
   }
-  
+
+  fileprivate var allReferencedFragments: [CompilationResult.FragmentDefinition] {
+    func insertAllFragments(
+      from fragment: CompilationResult.FragmentDefinition,
+      into set: inout Set<CompilationResult.FragmentDefinition>
+    ) {
+      set.insert(fragment)
+      for referencedFragment in fragment.referencedFragments {
+        insertAllFragments(from: referencedFragment, into: &set)
+      }
+    }
+
+    var fragmentSet = Set<CompilationResult.FragmentDefinition>()
+    for fragment in underlyingDefinition.referencedFragments {
+      insertAllFragments(from: fragment, into: &fragmentSet)
+    }
+    return fragmentSet.sorted { $0.name < $1.name }
+  }
+
 }
 
 // MARK: - Formatting
 
 fileprivate extension OperationDescriptor.SourceFormat {
-  func formatted(_ operation: CompilationResult.OperationDefinition) -> String {
-    var source = operation.source.convertedToSingleLine()
-    var set = Set<String>()
-    append(
-      to: &source,
-      set: &set,
-      fragments: operation.referencedFragments
-    )
+  func formatted(_ operation: OperationDescriptor) -> String {
+    var source = operation.underlyingDefinition.source.convertedToSingleLine()
+    for fragment in operation.allReferencedFragments {
+      source += formatted(fragment)
+    }
+
     switch self {
     case .rawSource:
       return source
     case .manifestJSONBody:
       return source.replacingOccurrences(of: #"""#, with: #"\""#)
-    }
-  }
-
-  private func append(
-    to source: inout String,
-    set: inout Set<String>,
-    fragments: [CompilationResult.FragmentDefinition]
-  ) {
-    for fragment in fragments {
-      if !set.contains(fragment.name) {
-        set.insert(fragment.name)
-        source += formatted(fragment)
-        append(to: &source, set: &set, fragments: fragment.referencedFragments)
-      }
     }
   }
 

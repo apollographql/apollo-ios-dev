@@ -20,7 +20,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
     }
 
     class GivenFragment: MockFragment {
-      override class var __parentType: ParentType { Types.Human }
+      override class var __parentType: any ParentType { Types.Human }
       override class var __selections: [Selection] {[
         .field("height", Float.self)
       ]}
@@ -30,7 +30,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
     class Hero: AbstractMockSelectionSet<Hero.Fragments, MockSchemaMetadata> {
       typealias Schema = MockSchemaMetadata
 
-      override class var __parentType: ParentType { Types.Human }
+      override class var __parentType: any ParentType { Types.Human }
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .field("name", String?.self),
@@ -72,7 +72,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
-      override class var __parentType: ParentType { Types.Human }
+      override class var __parentType: any ParentType { Types.Human }
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .include(if: "includeName", .field("name", String.self)),
@@ -107,7 +107,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
-      override class var __parentType: ParentType { Types.Human }
+      override class var __parentType: any ParentType { Types.Human }
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .include(if: "includeName", .field("name", String.self)),
@@ -144,7 +144,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
     class Character: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
-      override class var __parentType: ParentType { Types.Character }
+      override class var __parentType: any ParentType { Types.Character }
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .field("friend", Friend.self),
@@ -159,7 +159,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       class Friend: MockSelectionSet {
         typealias Schema = MockSchemaMetadata
 
-        override class var __parentType: ParentType { Types.Character }
+        override class var __parentType: any ParentType { Types.Character }
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .inlineFragment(AsHuman.self),
@@ -170,7 +170,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
         class AsHuman: ConcreteMockTypeCase<Character.Friend> {
           typealias Schema = MockSchemaMetadata
 
-          override class var __parentType: ParentType { Types.Human }
+          override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("name", String.self),
           ]}
@@ -182,7 +182,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       class AsHero: ConcreteMockTypeCase<Character> {
         typealias Schema = MockSchemaMetadata
 
-        override class var __parentType: ParentType { Types.Hero }
+        override class var __parentType: any ParentType { Types.Hero }
         override class var __selections: [Selection] {[
           .field("friend", Friend.self),
         ]}
@@ -192,7 +192,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
         class Friend: MockSelectionSet {
           typealias Schema = MockSchemaMetadata
 
-          override class var __parentType: ParentType { Types.Character }
+          override class var __parentType: any ParentType { Types.Character }
           override class var __selections: [Selection] {[
             .field("heroName", String.self),
           ]}
@@ -204,7 +204,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       class AsHuman: MockTypeCase {
         typealias Schema = MockSchemaMetadata
 
-        override class var __parentType: ParentType { Types.Human }
+        override class var __parentType: any ParentType { Types.Human }
         override class var __selections: [Selection] {[
           .field("name", String.self),
         ]}
@@ -215,7 +215,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
         class Friend: MockSelectionSet {
           typealias Schema = MockSchemaMetadata
 
-          override class var __parentType: ParentType { Types.Character }
+          override class var __parentType: any ParentType { Types.Character }
 
           var heroName: String? { __data["heroName"] }
           var asHuman: AsHuman? { _asInlineFragment() }
@@ -223,7 +223,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
           class AsHuman: ConcreteMockTypeCase<Character.AsHuman.Friend>, CompositeInlineFragment {
             typealias Schema = MockSchemaMetadata
 
-            override class var __parentType: ParentType { Types.Human }
+            override class var __parentType: any ParentType { Types.Human }
             class var __mergedSources: [any SelectionSet.Type] { [
               Character.Friend.AsHuman.self,
               Character.AsHero.Friend.self

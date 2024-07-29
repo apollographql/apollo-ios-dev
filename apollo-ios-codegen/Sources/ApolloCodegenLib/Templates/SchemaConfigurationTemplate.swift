@@ -8,7 +8,9 @@ struct SchemaConfigurationTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .schemaFile(type: .schemaConfiguration)
 
-  var headerTemplate: TemplateString? {
+  func renderHeaderTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString? {
     HeaderCommentTemplate.editableFileHeader(
       fileCanBeEditedTo: """
       provide custom configuration for a generated GraphQL schema.
@@ -16,12 +18,14 @@ struct SchemaConfigurationTemplate: TemplateRenderer {
     )
   }
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     return """
     \(accessControlModifier(for: .parent))enum SchemaConfiguration: \
     \(config.ApolloAPITargetName).SchemaConfiguration {
       \(accessControlModifier(for: .member))\
-    static func cacheKeyInfo(for type: \(config.ApolloAPITargetName).Object, object: ObjectData) -> CacheKeyInfo? {
+    static func cacheKeyInfo(for type: \(config.ApolloAPITargetName).Object, object: \(config.ApolloAPITargetName).ObjectData) -> CacheKeyInfo? {
         // Implement this function to configure cache key resolution for your schema types.
         return nil
       }

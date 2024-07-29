@@ -10,8 +10,6 @@ import {
   buildASTSchema,
   printSchema,
   extendSchema,
-  Kind,
-  GraphQLDeferDirective,
 } from "graphql";
 import { defaultValidationRules, ValidationOptions } from "./validationRules";
 import { compileToIR, CompilationResult } from "./compiler";
@@ -19,7 +17,7 @@ import { assertValidSchema, assertValidSDL } from "./utilities/graphql";
 import {
   addApolloCodegenSchemaExtensionToDocument,
 } from "./utilities/apolloCodegenSchemaExtension";
-import { definitionNode } from "./utilities";
+import { addExperimentalDeferDirectiveToDocument } from "./utilities/experimentalDeferDirective";
 
 // We need to export all the classes we want to map to native objects,
 // so we have access to the constructor functions for type checks.
@@ -54,7 +52,7 @@ export function loadSchemaFromSources(sources: Source[]): GraphQLSchema {
   }
 
   var document = addApolloCodegenSchemaExtensionToDocument(concatAST(documents))
-  document = addExperimentalDirectivesToDocument(document)
+  document = addExperimentalDeferDirectiveToDocument(document)
 
   if (!introspectionJSONResult) { assertValidSDL(document) }
 
@@ -65,24 +63,6 @@ export function loadSchemaFromSources(sources: Source[]): GraphQLSchema {
   assertValidSchema(schema)
 
   return schema
-}
-
-function addExperimentalDirectivesToDocument(document: DocumentNode): DocumentNode {
-  // While @defer is experimental the directive needs to be manually added to the
-  // list of available directives for the schema document.
-  return document.definitions.some(definition => 
-    definition.kind == Kind.DIRECTIVE_DEFINITION && 
-    definition.name.value == GraphQLDeferDirective.name
-  ) ?
-    document :
-    concatAST([document, experimentalDeferDirectiveDocumentNode()])
-}
-
-function experimentalDeferDirectiveDocumentNode(): DocumentNode {
-  return {
-    kind: Kind.DOCUMENT,
-    definitions: [definitionNode(GraphQLDeferDirective)]
-  }
 }
 
 function loadSchemaFromIntrospectionResult(

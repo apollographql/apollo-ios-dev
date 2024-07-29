@@ -7,11 +7,11 @@ import XCTest
 @testable import ApolloPagination
 
 final class SubscribeTest: XCTestCase, CacheDependentTesting {
-  var cacheType: TestCacheProvider.Type {
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
 
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var server: MockGraphQLServer!
   var client: ApolloClient!
   var cancellables: [AnyCancellable] = []
@@ -45,8 +45,8 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     let initialFetchExpectation = expectation(description: "Results")
     initialFetchExpectation.assertForOverFulfill = false
 
-    var results: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
-    var otherResults: [Result<GraphQLQueryPager<Query, Query>.Output, Error>] = []
+    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
+    var otherResults: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
     await pager.$currentValue.compactMap({ $0 }).sink { result in
       results.append(result)
       initialFetchExpectation.fulfill()
@@ -62,32 +62,33 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [serverExpectation, initialFetchExpectation], timeout: 1.0)
     XCTAssertFalse(results.isEmpty)
     let result = try XCTUnwrap(results.first)
-    XCTAssertSuccessResult(result) { value in
-      let (first, next, source) = value
-      XCTAssertTrue(next.isEmpty)
-      XCTAssertEqual(first.hero.friendsConnection.friends.count, 2)
-      XCTAssertEqual(first.hero.friendsConnection.totalCount, 3)
+    XCTAssertSuccessResult(result) { (output, source) in
+      XCTAssertTrue(output.nextPages.isEmpty)
+      XCTAssertEqual(output.initialPage.hero.friendsConnection.friends.count, 2)
+      XCTAssertEqual(output.initialPage.hero.friendsConnection.totalCount, 3)
       XCTAssertEqual(source, .fetch)
       XCTAssertEqual(results.count, otherResults.count)
     }
   }
 
-  private func createPager() -> GraphQLQueryPager<Query, Query>.Actor {
+  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return GraphQLQueryPager<Query, Query>.Actor(
+    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
+      watcherDispatchQueue: .main,
       extractPageInfo: { data in
         switch data {
-        case .initial(let data), .paginated(let data):
-          return CursorBasedPagination.ForwardPagination(
+        case .initial(let data, _), .paginated(let data, _):
+          return CursorBasedPagination.Forward(
             hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
             endCursor: data.hero.friendsConnection.pageInfo.endCursor
           )
         }
       },
-      nextPageResolver: { pageInfo in
+      pageResolver: { pageInfo, direction in
+        guard direction == .next else { return nil }
         let nextQuery = Query()
         nextQuery.__variables = [
           "id": "2001",

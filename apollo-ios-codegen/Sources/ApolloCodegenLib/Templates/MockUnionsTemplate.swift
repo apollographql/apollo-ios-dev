@@ -5,17 +5,19 @@ import TemplateString
 
 struct MockUnionsTemplate: TemplateRenderer {
 
-  let graphQLUnions: OrderedSet<GraphQLUnionType>
+  let graphqlUnions: OrderedSet<GraphQLUnionType>
 
   let config: ApolloCodegen.ConfigurationContext
 
   let target: TemplateTarget = .testMockFile
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     TemplateString("""
     \(accessControlModifier(for: .parent))extension MockObject {
-      \(graphQLUnions.map {
-        "typealias \($0.formattedName) = Union"
+      \(graphqlUnions.map {
+      "typealias \($0.render(as: .typename)) = Union"
       }, separator: "\n")
     }
     

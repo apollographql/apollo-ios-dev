@@ -3,7 +3,7 @@ import ApolloAPI
 
 extension ApolloStore {
 
-  public static func mock(cache: NormalizedCache = NoCache()) -> ApolloStore {
+  public static func mock(cache: any NormalizedCache = NoCache()) -> ApolloStore {
     ApolloStore(cache: cache)
   }
   

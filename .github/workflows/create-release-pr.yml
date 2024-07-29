@@ -1,0 +1,70 @@
+name: "Create Release PR"
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionNumber:
+        description: 'Version Number'
+        required: true
+
+env:
+  BRANCH_NAME: "release/${{ github.event.inputs.versionNumber }}"
+  VERSION_NUMBER: ${{ github.event.inputs.versionNumber }}
+
+jobs:
+  create-release-pr:
+    runs-on: macos-latest
+    timeout-minutes: 5
+    name: "Create Release PR"
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+    - name: Setup SSH Keys
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: |
+          ${{ secrets.APOLLO_IOS_DEV_DEPLOY_KEY }}
+    - name: Configure Git
+      uses: ./.github/actions/configure-git
+    - name: Get Previous Version
+      shell: bash
+      run: |
+        previousVersion=$(sh apollo-ios/scripts/get-version.sh)
+        echo "PREVIOUS_VERSION=$previousVersion" >> ${GITHUB_ENV}
+    - name: Set New Version
+      shell: bash
+      run: |
+        sh ./scripts/set-version.sh "${{ env.VERSION_NUMBER }}"
+    - name: Generate Documentation
+      shell: bash
+      run: |
+        cd SwiftScripts
+        swift run DocumentationGenerator
+    - name: Archive CLI
+      shell: bash
+      run: |
+        make archive-cli-to-apollo-package
+    - name: Commit and Push Branch
+      shell: bash
+      run: |
+        git checkout -b ${{ env.BRANCH_NAME }}
+        git add -A
+        git commit -m "Setting up Release ${{ env.VERSION_NUMBER }}"
+        git push -u origin ${{ env.BRANCH_NAME }}
+    - name: Create Pull Request
+      uses: ./.github/actions/create-pr
+      with:
+        access-token: ${{ secrets.APOLLO_IOS_PAT }}
+        repo: "apollographql/apollo-ios-dev"
+        head-branch: "${{ env.BRANCH_NAME }}"
+        reviewers: AnthonyMDev,calvincestari,bobafetters
+        title: Release ${{ env.VERSION_NUMBER }}
+        body: |
+          #### Diff
+          [See diff since last version](https://github.com/apollographql/apollo-ios-dev/compare/${{ env.PREVIOUS_VERSION }}...${{ github.sha }}).
+
+          #### Things to do in this PR
+          - [ ] Update [CHANGELOG.md](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) with all relevant changes since the prior version. _Please include PR numbers and mention contributors for external PR submissions._
+
+          #### Things to do as part of releasing
+          - [ ] Update and publish the draft release created by CI using the latest [CHANGELOG.md](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) contents

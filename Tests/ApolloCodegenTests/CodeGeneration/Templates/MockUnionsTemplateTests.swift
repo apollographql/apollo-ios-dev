@@ -25,13 +25,13 @@ class MockUnionsTemplateTests: XCTestCase {
     let config = ApolloCodegenConfiguration.mock(output: .mock(testMocks: testMocks))
 
     subject = MockUnionsTemplate(
-      graphQLUnions: unions,
+      graphqlUnions: unions,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
 
   private func renderSubject() -> String {
-    subject.template.description
+    subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
   // MARK: Boilerplate tests
@@ -158,6 +158,28 @@ class MockUnionsTemplateTests: XCTestCase {
       // then
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     }
+  }
+  
+  // Schema Customization Tests
+  
+  func test__render__givenUnion_withCustomName_shouldRenderWithCustomName() throws {
+    // given
+    let myUnion = GraphQLUnionType.mock("MyUnion")
+    myUnion.name.customName = "MyCustomUnion"
+    buildSubject(unions: [myUnion])
+
+    let expected = """
+    public extension MockObject {
+      typealias MyCustomUnion = Union
+    }
+
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
   }
   
 }

@@ -14,7 +14,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI9SelectionO9ConditionV1nopyA2EFZ",
+    "externalID" : "s:9ApolloAPI9SelectionO9ConditionO1nopyA2EFZ",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -55,7 +55,7 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+        "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
         "text" : "Condition"
       },
       {
@@ -73,7 +73,7 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+        "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
         "text" : "Condition"
       }
     ],
@@ -128,7 +128,7 @@
             },
             {
               "kind" : "internalParam",
-              "text" : "value"
+              "text" : "condition"
             },
             {
               "kind" : "text",
@@ -147,7 +147,7 @@
             {
               "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+              "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
               "text" : "Condition"
             },
             {
@@ -167,7 +167,7 @@
             {
               "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+              "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
               "text" : "Condition"
             }
           ]
@@ -288,7 +288,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "struct"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -356,7 +356,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
       "text" : "Condition"
     },
     {
@@ -374,7 +374,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionV",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO9ConditionO",
       "text" : "Condition"
     }
   ],

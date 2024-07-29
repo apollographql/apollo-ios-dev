@@ -84,6 +84,7 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/AutomaticPersistedQueryInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/CacheReadInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/CacheWriteInterceptor",
+        "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParsingInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor",
@@ -255,7 +256,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": any "
     },
     {
       "kind" : "typeIdentifier",
@@ -352,11 +353,12 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">, "
+      "text" : ">, any "
     },
     {
       "kind" : "typeIdentifier",
@@ -515,6 +517,60 @@
   "title" : "CacheWriteInterceptor",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/cachewriteinterceptor"
+},
+"doc://Apollo/documentation/Apollo/IncrementalJSONResponseParsingInterceptor": {
+  "abstract" : [
+    {
+      "text" : "An interceptor which parses JSON response data into a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLResult",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " and attaches it to the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "code" : "HTTPResponse",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "IncrementalJSONResponseParsingInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "IncrementalJSONResponseParsingInterceptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "IncrementalJSONResponseParsingInterceptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor"
 },
 "doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor": {
   "abstract" : [

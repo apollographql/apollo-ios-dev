@@ -15,7 +15,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/apolloclient\/init(networktransport:store:)",
-                "title" : "init(networkTransport: NetworkTransport, store: ApolloStore)",
+                "title" : "init(networkTransport: any NetworkTransport, store: ApolloStore)",
                 "type" : "init"
               },
               {
@@ -31,6 +31,15 @@
                 "path" : "\/documentation\/apollo\/apolloclient\/store",
                 "title" : "let store: ApolloStore",
                 "type" : "property"
+              },
+              {
+                "title" : "Instance Methods",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/apolloclient\/watch(query:cachepolicy:refetchonfailedupdates:context:callbackqueue:resulthandler:)",
+                "title" : "func watch<Query>(query: Query, cachePolicy: CachePolicy, refetchOnFailedUpdates: Bool, context: (any RequestContext)?, callbackQueue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>) -> GraphQLQueryWatcher<Query>",
+                "type" : "method"
               },
               {
                 "title" : "Enumerations",
@@ -135,32 +144,42 @@
                   },
                   {
                     "path" : "\/documentation\/apollo\/apolloclient\/clearcache(callbackqueue:completion:)",
-                    "title" : "func clearCache(callbackQueue: DispatchQueue, completion: ((Result<Void, Error>) -> Void)?)",
+                    "title" : "func clearCache(callbackQueue: DispatchQueue, completion: ((Result<Void, any Error>) -> Void)?)",
+                    "type" : "method"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:context:queue:resulthandler:)",
+                    "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> (any Cancellable)",
                     "type" : "method"
                   },
                   {
                     "path" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:contextidentifier:context:queue:resulthandler:)",
-                    "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: RequestContext?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> Cancellable",
+                    "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> (any Cancellable)",
                     "type" : "method"
                   },
                   {
                     "path" : "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:context:queue:resulthandler:)",
-                    "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, context: RequestContext?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> Cancellable",
+                    "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> (any Cancellable)",
+                    "type" : "method"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:contextidentifier:context:queue:resulthandler:)",
+                    "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> (any Cancellable)",
                     "type" : "method"
                   },
                   {
                     "path" : "\/documentation\/apollo\/apolloclient\/subscribe(subscription:context:queue:resulthandler:)",
-                    "title" : "func subscribe<Subscription>(subscription: Subscription, context: RequestContext?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Subscription.Data>) -> Cancellable",
+                    "title" : "func subscribe<Subscription>(subscription: Subscription, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Subscription.Data>) -> any Cancellable",
                     "type" : "method"
                   },
                   {
                     "path" : "\/documentation\/apollo\/apolloclient\/upload(operation:files:context:queue:resulthandler:)",
-                    "title" : "func upload<Operation>(operation: Operation, files: [GraphQLFile], context: RequestContext?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Operation.Data>?) -> Cancellable",
+                    "title" : "func upload<Operation>(operation: Operation, files: [GraphQLFile], context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Operation.Data>?) -> (any Cancellable)",
                     "type" : "method"
                   },
                   {
                     "path" : "\/documentation\/apollo\/apolloclient\/watch(query:cachepolicy:context:callbackqueue:resulthandler:)",
-                    "title" : "func watch<Query>(query: Query, cachePolicy: CachePolicy, context: RequestContext?, callbackQueue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>) -> GraphQLQueryWatcher<Query>",
+                    "title" : "func watch<Query>(query: Query, cachePolicy: CachePolicy, context: (any RequestContext)?, callbackQueue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>) -> GraphQLQueryWatcher<Query>",
                     "type" : "method"
                   }
                 ],
@@ -192,7 +211,7 @@
                   },
                   {
                     "path" : "\/documentation\/apollo\/apollostore\/readtransaction\/readobject(oftype:withkey:variables:)",
-                    "title" : "func readObject<SelectionSet>(ofType: SelectionSet.Type, withKey: CacheKey, variables: [String : GraphQLOperationVariableValue]?) throws -> SelectionSet",
+                    "title" : "func readObject<SelectionSet>(ofType: SelectionSet.Type, withKey: CacheKey, variables: [String : any GraphQLOperationVariableValue]?) throws -> SelectionSet",
                     "type" : "method"
                   }
                 ],
@@ -223,7 +242,7 @@
                   },
                   {
                     "path" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/updateobject(oftype:withkey:variables:_:)",
-                    "title" : "func updateObject<SelectionSet>(ofType: SelectionSet.Type, withKey: CacheKey, variables: [String : GraphQLOperationVariableValue]?, (inout SelectionSet) throws -> Void) throws",
+                    "title" : "func updateObject<SelectionSet>(ofType: SelectionSet.Type, withKey: CacheKey, variables: [String : any GraphQLOperationVariableValue]?, (inout SelectionSet) throws -> Void) throws",
                     "type" : "method"
                   },
                   {
@@ -238,7 +257,7 @@
                   },
                   {
                     "path" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/write(selectionset:withkey:variables:)",
-                    "title" : "func write<SelectionSet>(selectionSet: SelectionSet, withKey: CacheKey, variables: [String : GraphQLOperationVariableValue]?) throws",
+                    "title" : "func write<SelectionSet>(selectionSet: SelectionSet, withKey: CacheKey, variables: [String : any GraphQLOperationVariableValue]?) throws",
                     "type" : "method"
                   }
                 ],
@@ -252,7 +271,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/apollostore\/init(cache:)",
-                "title" : "init(cache: NormalizedCache)",
+                "title" : "init(cache: any NormalizedCache)",
                 "type" : "init"
               },
               {
@@ -261,7 +280,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/apollostore\/clearcache(callbackqueue:completion:)",
-                "title" : "func clearCache(callbackQueue: DispatchQueue, completion: ((Result<Void, Error>) -> Void)?)",
+                "title" : "func clearCache(callbackQueue: DispatchQueue, completion: ((Result<Void, any Error>) -> Void)?)",
                 "type" : "method"
               },
               {
@@ -271,17 +290,27 @@
               },
               {
                 "path" : "\/documentation\/apollo\/apollostore\/publish(records:identifier:callbackqueue:completion:)",
-                "title" : "func publish(records: RecordSet, identifier: UUID?, callbackQueue: DispatchQueue, completion: ((Result<Void, Error>) -> Void)?)",
+                "title" : "func publish(records: RecordSet, identifier: UUID?, callbackQueue: DispatchQueue, completion: ((Result<Void, any Error>) -> Void)?)",
+                "type" : "method"
+              },
+              {
+                "path" : "\/documentation\/apollo\/apollostore\/subscribe(_:)",
+                "title" : "func subscribe(any ApolloStoreSubscriber)",
+                "type" : "method"
+              },
+              {
+                "path" : "\/documentation\/apollo\/apollostore\/unsubscribe(_:)",
+                "title" : "func unsubscribe(any ApolloStoreSubscriber)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/apollostore\/withinreadtransaction(_:callbackqueue:completion:)",
-                "title" : "func withinReadTransaction<T>((ApolloStore.ReadTransaction) throws -> T, callbackQueue: DispatchQueue?, completion: ((Result<T, Error>) -> Void)?)",
+                "title" : "func withinReadTransaction<T>((ApolloStore.ReadTransaction) throws -> T, callbackQueue: DispatchQueue?, completion: ((Result<T, any Error>) -> Void)?)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/apollostore\/withinreadwritetransaction(_:callbackqueue:completion:)",
-                "title" : "func withinReadWriteTransaction<T>((ApolloStore.ReadWriteTransaction) throws -> T, callbackQueue: DispatchQueue?, completion: ((Result<T, Error>) -> Void)?)",
+                "title" : "func withinReadWriteTransaction<T>((ApolloStore.ReadWriteTransaction) throws -> T, callbackQueue: DispatchQueue?, completion: ((Result<T, any Error>) -> Void)?)",
                 "type" : "method"
               },
               {
@@ -406,12 +435,12 @@
               },
               {
                 "path" : "\/documentation\/apollo\/defaultinterceptorprovider\/additionalerrorinterceptor(for:)-5e08v",
-                "title" : "func additionalErrorInterceptor<Operation>(for: Operation) -> ApolloErrorInterceptor?",
+                "title" : "func additionalErrorInterceptor<Operation>(for: Operation) -> (any ApolloErrorInterceptor)?",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/defaultinterceptorprovider\/interceptors(for:)",
-                "title" : "func interceptors<Operation>(for: Operation) -> [ApolloInterceptor]",
+                "title" : "func interceptors<Operation>(for: Operation) -> [any ApolloInterceptor]",
                 "type" : "method"
               },
               {
@@ -426,7 +455,7 @@
                   },
                   {
                     "path" : "\/documentation\/apollo\/defaultinterceptorprovider\/additionalerrorinterceptor(for:)-5ff01",
-                    "title" : "func additionalErrorInterceptor<Operation>(for: Operation) -> ApolloErrorInterceptor?",
+                    "title" : "func additionalErrorInterceptor<Operation>(for: Operation) -> (any ApolloErrorInterceptor)?",
                     "type" : "method"
                   }
                 ],
@@ -471,8 +500,8 @@
                 "type" : "groupMarker"
               },
               {
-                "path" : "\/documentation\/apollo\/graphqlquerywatcher\/init(client:query:context:callbackqueue:resulthandler:)",
-                "title" : "init(client: ApolloClientProtocol, query: Query, context: RequestContext?, callbackQueue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>)",
+                "path" : "\/documentation\/apollo\/graphqlquerywatcher\/init(client:query:refetchonfailedupdates:context:callbackqueue:resulthandler:)",
+                "title" : "init(client: any ApolloClientProtocol, query: Query, refetchOnFailedUpdates: Bool, context: (any RequestContext)?, callbackQueue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>)",
                 "type" : "init"
               },
               {
@@ -482,6 +511,11 @@
               {
                 "path" : "\/documentation\/apollo\/graphqlquerywatcher\/query",
                 "title" : "let query: Query",
+                "type" : "property"
+              },
+              {
+                "path" : "\/documentation\/apollo\/graphqlquerywatcher\/refetchonfailedupdates",
+                "title" : "let refetchOnFailedUpdates: Bool",
                 "type" : "property"
               },
               {
@@ -496,6 +530,11 @@
               {
                 "path" : "\/documentation\/apollo\/graphqlquerywatcher\/refetch(cachepolicy:)",
                 "title" : "func refetch(cachePolicy: CachePolicy)",
+                "type" : "method"
+              },
+              {
+                "path" : "\/documentation\/apollo\/graphqlquerywatcher\/store(_:didchangekeys:contextidentifier:)",
+                "title" : "func store(ApolloStore, didChangeKeys: Set<CacheKey>, contextIdentifier: UUID?)",
                 "type" : "method"
               }
             ],
@@ -515,21 +554,17 @@
                 "type" : "init"
               },
               {
-                "title" : "Instance Properties",
-                "type" : "groupMarker"
-              },
-              {
-                "path" : "\/documentation\/apollo\/graphqlresponse\/body",
-                "title" : "let body: JSONObject",
-                "type" : "property"
-              },
-              {
                 "title" : "Instance Methods",
                 "type" : "groupMarker"
               },
               {
                 "path" : "\/documentation\/apollo\/graphqlresponse\/parseresult()",
                 "title" : "func parseResult() throws -> (GraphQLResult<Data>, RecordSet?)",
+                "type" : "method"
+              },
+              {
+                "path" : "\/documentation\/apollo\/graphqlresponse\/parseresult(withcachepolicy:)",
+                "title" : "func parseResult(withCachePolicy: CachePolicy) throws -> (GraphQLResult<Data>, RecordSet?)",
                 "type" : "method"
               },
               {
@@ -600,7 +635,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/httprequest\/init(graphqlendpoint:operation:contextidentifier:contenttype:clientname:clientversion:additionalheaders:cachepolicy:context:)",
-                "title" : "init(graphQLEndpoint: URL, operation: Operation, contextIdentifier: UUID?, contentType: String, clientName: String, clientVersion: String, additionalHeaders: [String : String], cachePolicy: CachePolicy, context: RequestContext?)",
+                "title" : "init(graphQLEndpoint: URL, operation: Operation, contextIdentifier: UUID?, contentType: String, clientName: String, clientVersion: String, additionalHeaders: [String : String], cachePolicy: CachePolicy, context: (any RequestContext)?)",
                 "type" : "init"
               },
               {
@@ -619,7 +654,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/httprequest\/context",
-                "title" : "let context: RequestContext?",
+                "title" : "let context: (any RequestContext)?",
                 "type" : "property"
               },
               {
@@ -836,7 +871,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/interceptorrequestchain\/init(interceptors:callbackqueue:)",
-                "title" : "init(interceptors: [ApolloInterceptor], callbackQueue: DispatchQueue)",
+                "title" : "init(interceptors: [any ApolloInterceptor], callbackQueue: DispatchQueue)",
                 "type" : "init"
               },
               {
@@ -845,7 +880,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/interceptorrequestchain\/additionalerrorhandler",
-                "title" : "var additionalErrorHandler: ApolloErrorInterceptor?",
+                "title" : "var additionalErrorHandler: (any ApolloErrorInterceptor)?",
                 "type" : "property"
               },
               {
@@ -864,32 +899,32 @@
               },
               {
                 "path" : "\/documentation\/apollo\/interceptorrequestchain\/handleerrorasync(_:request:response:completion:)",
-                "title" : "func handleErrorAsync<Operation>(Error, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func handleErrorAsync<Operation>(any Error, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/interceptorrequestchain\/kickoff(request:completion:)",
-                "title" : "func kickoff<Operation>(request: HTTPRequest<Operation>, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func kickoff<Operation>(request: HTTPRequest<Operation>, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/interceptorrequestchain\/proceedasync(request:response:completion:)",
-                "title" : "func proceedAsync<Operation>(request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func proceedAsync<Operation>(request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/interceptorrequestchain\/proceedasync(request:response:interceptor:completion:)",
-                "title" : "func proceedAsync<Operation>(request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, interceptor: ApolloInterceptor, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func proceedAsync<Operation>(request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, interceptor: any ApolloInterceptor, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/interceptorrequestchain\/retry(request:completion:)",
-                "title" : "func retry<Operation>(request: HTTPRequest<Operation>, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func retry<Operation>(request: HTTPRequest<Operation>, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/interceptorrequestchain\/returnvalueasync(for:value:completion:)",
-                "title" : "func returnValueAsync<Operation>(for: HTTPRequest<Operation>, value: GraphQLResult<Operation.Data>, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func returnValueAsync<Operation>(for: HTTPRequest<Operation>, value: GraphQLResult<Operation.Data>, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
@@ -904,7 +939,7 @@
                   },
                   {
                     "path" : "\/documentation\/apollo\/interceptorrequestchain\/chainerror\/invalidindex(chain:index:)",
-                    "title" : "case invalidIndex(chain: RequestChain, index: Int)",
+                    "title" : "case invalidIndex(chain: any RequestChain, index: Int)",
                     "type" : "case"
                   },
                   {
@@ -999,7 +1034,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/jsonrequest\/init(operation:graphqlendpoint:contextidentifier:clientname:clientversion:additionalheaders:cachepolicy:context:autopersistqueries:usegetforqueries:usegetforpersistedqueryretry:requestbodycreator:)",
-                "title" : "init(operation: Operation, graphQLEndpoint: URL, contextIdentifier: UUID?, clientName: String, clientVersion: String, additionalHeaders: [String : String], cachePolicy: CachePolicy, context: RequestContext?, autoPersistQueries: Bool, useGETForQueries: Bool, useGETForPersistedQueryRetry: Bool, requestBodyCreator: RequestBodyCreator)",
+                "title" : "init(operation: Operation, graphQLEndpoint: URL, contextIdentifier: UUID?, clientName: String, clientVersion: String, additionalHeaders: [String : String], cachePolicy: CachePolicy, context: (any RequestContext)?, autoPersistQueries: Bool, useGETForQueries: Bool, useGETForPersistedQueryRetry: Bool, requestBodyCreator: any RequestBodyCreator)",
                 "type" : "init"
               },
               {
@@ -1023,7 +1058,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/jsonrequest\/requestbodycreator",
-                "title" : "let requestBodyCreator: RequestBodyCreator",
+                "title" : "let requestBodyCreator: any RequestBodyCreator",
                 "type" : "property"
               },
               {
@@ -1073,7 +1108,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/jsonserializationformat\/serialize(value:)-5ftc9",
-                "title" : "class func serialize(value: JSONEncodable) throws -> Data",
+                "title" : "class func serialize(value: any JSONEncodable) throws -> Data",
                 "type" : "method"
               },
               {
@@ -1112,7 +1147,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/maxretryinterceptor\/interceptasync(chain:request:response:completion:)",
-                "title" : "func interceptAsync<Operation>(chain: RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func interceptAsync<Operation>(chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
@@ -1321,7 +1356,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/networkfetchinterceptor\/interceptasync(chain:request:response:completion:)",
-                "title" : "func interceptAsync<Operation>(chain: RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func interceptAsync<Operation>(chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               }
             ],
@@ -1337,7 +1372,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/requestchainnetworktransport\/init(interceptorprovider:endpointurl:additionalheaders:autopersistqueries:requestbodycreator:usegetforqueries:usegetforpersistedqueryretry:)",
-                "title" : "init(interceptorProvider: InterceptorProvider, endpointURL: URL, additionalHeaders: [String : String], autoPersistQueries: Bool, requestBodyCreator: RequestBodyCreator, useGETForQueries: Bool, useGETForPersistedQueryRetry: Bool)",
+                "title" : "init(interceptorProvider: any InterceptorProvider, endpointURL: URL, additionalHeaders: [String : String], autoPersistQueries: Bool, requestBodyCreator: any RequestBodyCreator, useGETForQueries: Bool, useGETForPersistedQueryRetry: Bool)",
                 "type" : "init"
               },
               {
@@ -1371,7 +1406,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/requestchainnetworktransport\/requestbodycreator",
-                "title" : "var requestBodyCreator: RequestBodyCreator",
+                "title" : "var requestBodyCreator: any RequestBodyCreator",
                 "type" : "property"
               },
               {
@@ -1390,17 +1425,17 @@
               },
               {
                 "path" : "\/documentation\/apollo\/requestchainnetworktransport\/constructrequest(for:cachepolicy:contextidentifier:context:)",
-                "title" : "func constructRequest<Operation>(for: Operation, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: RequestContext?) -> HTTPRequest<Operation>",
+                "title" : "func constructRequest<Operation>(for: Operation, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: (any RequestContext)?) -> HTTPRequest<Operation>",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/requestchainnetworktransport\/constructuploadrequest(for:with:context:manualboundary:)",
-                "title" : "func constructUploadRequest<Operation>(for: Operation, with: [GraphQLFile], context: RequestContext?, manualBoundary: String?) -> HTTPRequest<Operation>",
+                "title" : "func constructUploadRequest<Operation>(for: Operation, with: [GraphQLFile], context: (any RequestContext)?, manualBoundary: String?) -> HTTPRequest<Operation>",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/requestchainnetworktransport\/send(operation:cachepolicy:contextidentifier:context:callbackqueue:completionhandler:)",
-                "title" : "func send<Operation>(operation: Operation, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: RequestContext?, callbackQueue: DispatchQueue, completionHandler: (Result<GraphQLResult<Operation.Data>, Error>) -> Void) -> Cancellable",
+                "title" : "func send<Operation>(operation: Operation, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: (any RequestContext)?, callbackQueue: DispatchQueue, completionHandler: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Cancellable",
                 "type" : "method"
               },
               {
@@ -1455,7 +1490,7 @@
                   },
                   {
                     "path" : "\/documentation\/apollo\/requestchainnetworktransport\/upload(operation:files:context:callbackqueue:completionhandler:)",
-                    "title" : "func upload<Operation>(operation: Operation, files: [GraphQLFile], context: RequestContext?, callbackQueue: DispatchQueue, completionHandler: (Result<GraphQLResult<Operation.Data>, Error>) -> Void) -> Cancellable",
+                    "title" : "func upload<Operation>(operation: Operation, files: [GraphQLFile], context: (any RequestContext)?, callbackQueue: DispatchQueue, completionHandler: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Cancellable",
                     "type" : "method"
                   }
                 ],
@@ -1496,8 +1531,8 @@
                 "type" : "groupMarker"
               },
               {
-                "path" : "\/documentation\/apollo\/urlsessionclient\/init(sessionconfiguration:callbackqueue:)",
-                "title" : "init(sessionConfiguration: URLSessionConfiguration, callbackQueue: OperationQueue?)",
+                "path" : "\/documentation\/apollo\/urlsessionclient\/init(sessionconfiguration:callbackqueue:sessiondescription:)",
+                "title" : "init(sessionConfiguration: URLSessionConfiguration, callbackQueue: OperationQueue?, sessionDescription: String?)",
                 "type" : "init"
               },
               {
@@ -1539,6 +1574,11 @@
                 "type" : "method"
               },
               {
+                "path" : "\/documentation\/apollo\/urlsessionclient\/sendrequest(_:taskdescription:rawtaskcompletionhandler:completion:)",
+                "title" : "func sendRequest(URLRequest, taskDescription: String?, rawTaskCompletionHandler: URLSessionClient.RawCompletion?, completion: URLSessionClient.Completion) -> URLSessionTask",
+                "type" : "method"
+              },
+              {
                 "path" : "\/documentation\/apollo\/urlsessionclient\/urlsession(_:datatask:didbecome:)-17qvj",
                 "title" : "func urlSession(URLSession, dataTask: URLSessionDataTask, didBecome: URLSessionDownloadTask)",
                 "type" : "method"
@@ -1565,7 +1605,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/urlsessionclient\/urlsession(_:didbecomeinvalidwitherror:)",
-                "title" : "func urlSession(URLSession, didBecomeInvalidWithError: Error?)",
+                "title" : "func urlSession(URLSession, didBecomeInvalidWithError: (any Error)?)",
                 "type" : "method"
               },
               {
@@ -1575,7 +1615,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/urlsessionclient\/urlsession(_:task:didcompletewitherror:)",
-                "title" : "func urlSession(URLSession, task: URLSessionTask, didCompleteWithError: Error?)",
+                "title" : "func urlSession(URLSession, task: URLSessionTask, didCompleteWithError: (any Error)?)",
                 "type" : "method"
               },
               {
@@ -1654,7 +1694,7 @@
                   },
                   {
                     "path" : "\/documentation\/apollo\/urlsessionclient\/urlsessionclienterror\/networkerror(data:response:underlying:)",
-                    "title" : "case networkError(data: Data, response: HTTPURLResponse?, underlying: Error)",
+                    "title" : "case networkError(data: Data, response: HTTPURLResponse?, underlying: any Error)",
                     "type" : "case"
                   },
                   {
@@ -1754,7 +1794,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/uploadrequest\/init(graphqlendpoint:operation:clientname:clientversion:additionalheaders:files:manualboundary:context:requestbodycreator:)",
-                "title" : "init(graphQLEndpoint: URL, operation: Operation, clientName: String, clientVersion: String, additionalHeaders: [String : String], files: [GraphQLFile], manualBoundary: String?, context: RequestContext?, requestBodyCreator: RequestBodyCreator)",
+                "title" : "init(graphQLEndpoint: URL, operation: Operation, clientName: String, clientVersion: String, additionalHeaders: [String : String], files: [GraphQLFile], manualBoundary: String?, context: (any RequestContext)?, requestBodyCreator: any RequestBodyCreator)",
                 "type" : "init"
               },
               {
@@ -1773,7 +1813,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/uploadrequest\/requestbodycreator",
-                "title" : "let requestBodyCreator: RequestBodyCreator",
+                "title" : "let requestBodyCreator: any RequestBodyCreator",
                 "type" : "property"
               },
               {
@@ -1826,32 +1866,42 @@
               },
               {
                 "path" : "\/documentation\/apollo\/apolloclientprotocol\/clearcache(callbackqueue:completion:)",
-                "title" : "func clearCache(callbackQueue: DispatchQueue, completion: ((Result<Void, Error>) -> Void)?)",
+                "title" : "func clearCache(callbackQueue: DispatchQueue, completion: ((Result<Void, any Error>) -> Void)?)",
+                "type" : "method"
+              },
+              {
+                "path" : "\/documentation\/apollo\/apolloclientprotocol\/fetch(query:cachepolicy:context:queue:resulthandler:)",
+                "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> (any Cancellable)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/apolloclientprotocol\/fetch(query:cachepolicy:contextidentifier:context:queue:resulthandler:)",
-                "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: RequestContext?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> Cancellable",
+                "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> (any Cancellable)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/apolloclientprotocol\/perform(mutation:publishresulttostore:context:queue:resulthandler:)",
-                "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, context: RequestContext?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> Cancellable",
+                "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> (any Cancellable)",
+                "type" : "method"
+              },
+              {
+                "path" : "\/documentation\/apollo\/apolloclientprotocol\/perform(mutation:publishresulttostore:contextidentifier:context:queue:resulthandler:)",
+                "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> (any Cancellable)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/apolloclientprotocol\/subscribe(subscription:context:queue:resulthandler:)",
-                "title" : "func subscribe<Subscription>(subscription: Subscription, context: RequestContext?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Subscription.Data>) -> Cancellable",
+                "title" : "func subscribe<Subscription>(subscription: Subscription, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Subscription.Data>) -> any Cancellable",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/apolloclientprotocol\/upload(operation:files:context:queue:resulthandler:)",
-                "title" : "func upload<Operation>(operation: Operation, files: [GraphQLFile], context: RequestContext?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Operation.Data>?) -> Cancellable",
+                "title" : "func upload<Operation>(operation: Operation, files: [GraphQLFile], context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Operation.Data>?) -> (any Cancellable)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/apolloclientprotocol\/watch(query:cachepolicy:context:callbackqueue:resulthandler:)",
-                "title" : "func watch<Query>(query: Query, cachePolicy: CachePolicy, context: RequestContext?, callbackQueue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>) -> GraphQLQueryWatcher<Query>",
+                "title" : "func watch<Query>(query: Query, cachePolicy: CachePolicy, context: (any RequestContext)?, callbackQueue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>) -> GraphQLQueryWatcher<Query>",
                 "type" : "method"
               }
             ],
@@ -1867,7 +1917,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/apolloerrorinterceptor\/handleerrorasync(error:chain:request:response:completion:)",
-                "title" : "func handleErrorAsync<Operation>(error: Error, chain: RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func handleErrorAsync<Operation>(error: any Error, chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               }
             ],
@@ -1892,12 +1942,28 @@
               },
               {
                 "path" : "\/documentation\/apollo\/apollointerceptor\/interceptasync(chain:request:response:completion:)",
-                "title" : "func interceptAsync<Operation>(chain: RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func interceptAsync<Operation>(chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               }
             ],
             "path" : "\/documentation\/apollo\/apollointerceptor",
             "title" : "ApolloInterceptor",
+            "type" : "protocol"
+          },
+          {
+            "children" : [
+              {
+                "title" : "Instance Methods",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/apollostoresubscriber\/store(_:didchangekeys:contextidentifier:)",
+                "title" : "func store(ApolloStore, didChangeKeys: Set<CacheKey>, contextIdentifier: UUID?)",
+                "type" : "method"
+              }
+            ],
+            "path" : "\/documentation\/apollo\/apollostoresubscriber",
+            "title" : "ApolloStoreSubscriber",
             "type" : "protocol"
           },
           {
@@ -1928,7 +1994,7 @@
                     "children" : [
                       {
                         "path" : "\/documentation\/apollo\/interceptorprovider\/additionalerrorinterceptor(for:)-5p7fr",
-                        "title" : "func additionalErrorInterceptor<Operation>(for: Operation) -> ApolloErrorInterceptor?",
+                        "title" : "func additionalErrorInterceptor<Operation>(for: Operation) -> (any ApolloErrorInterceptor)?",
                         "type" : "method"
                       }
                     ],
@@ -1937,12 +2003,12 @@
                   }
                 ],
                 "path" : "\/documentation\/apollo\/interceptorprovider\/additionalerrorinterceptor(for:)-4nida",
-                "title" : "func additionalErrorInterceptor<Operation>(for: Operation) -> ApolloErrorInterceptor?",
+                "title" : "func additionalErrorInterceptor<Operation>(for: Operation) -> (any ApolloErrorInterceptor)?",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/interceptorprovider\/interceptors(for:)",
-                "title" : "func interceptors<Operation>(for: Operation) -> [ApolloInterceptor]",
+                "title" : "func interceptors<Operation>(for: Operation) -> [any ApolloInterceptor]",
                 "type" : "method"
               }
             ],
@@ -2003,7 +2069,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/networktransport\/send(operation:cachepolicy:contextidentifier:context:callbackqueue:completionhandler:)",
-                "title" : "func send<Operation>(operation: Operation, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: RequestContext?, callbackQueue: DispatchQueue, completionHandler: (Result<GraphQLResult<Operation.Data>, Error>) -> Void) -> Cancellable",
+                "title" : "func send<Operation>(operation: Operation, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: (any RequestContext)?, callbackQueue: DispatchQueue, completionHandler: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Cancellable",
                 "type" : "method"
               },
               {
@@ -2122,32 +2188,32 @@
               },
               {
                 "path" : "\/documentation\/apollo\/requestchain\/handleerrorasync(_:request:response:completion:)",
-                "title" : "func handleErrorAsync<Operation>(Error, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func handleErrorAsync<Operation>(any Error, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/requestchain\/kickoff(request:completion:)",
-                "title" : "func kickoff<Operation>(request: HTTPRequest<Operation>, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func kickoff<Operation>(request: HTTPRequest<Operation>, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/requestchain\/proceedasync(request:response:completion:)",
-                "title" : "func proceedAsync<Operation>(request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func proceedAsync<Operation>(request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/requestchain\/proceedasync(request:response:interceptor:completion:)",
-                "title" : "func proceedAsync<Operation>(request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, interceptor: ApolloInterceptor, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func proceedAsync<Operation>(request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, interceptor: any ApolloInterceptor, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/requestchain\/retry(request:completion:)",
-                "title" : "func retry<Operation>(request: HTTPRequest<Operation>, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func retry<Operation>(request: HTTPRequest<Operation>, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/requestchain\/returnvalueasync(for:value:completion:)",
-                "title" : "func returnValueAsync<Operation>(for: HTTPRequest<Operation>, value: GraphQLResult<Operation.Data>, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func returnValueAsync<Operation>(for: HTTPRequest<Operation>, value: GraphQLResult<Operation.Data>, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               }
             ],
@@ -2168,7 +2234,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/uploadingnetworktransport\/upload(operation:files:context:callbackqueue:completionhandler:)",
-                "title" : "func upload<Operation>(operation: Operation, files: [GraphQLFile], context: RequestContext?, callbackQueue: DispatchQueue, completionHandler: (Result<GraphQLResult<Operation.Data>, Error>) -> Void) -> Cancellable",
+                "title" : "func upload<Operation>(operation: Operation, files: [GraphQLFile], context: (any RequestContext)?, callbackQueue: DispatchQueue, completionHandler: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Cancellable",
                 "type" : "method"
               }
             ],
@@ -2242,7 +2308,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/automaticpersistedqueryinterceptor\/interceptasync(chain:request:response:completion:)",
-                "title" : "func interceptAsync<Operation>(chain: RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func interceptAsync<Operation>(chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
@@ -2377,7 +2443,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/cachereadinterceptor\/interceptasync(chain:request:response:completion:)",
-                "title" : "func interceptAsync<Operation>(chain: RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func interceptAsync<Operation>(chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               }
             ],
@@ -2416,7 +2482,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/cachewriteinterceptor\/interceptasync(chain:request:response:completion:)",
-                "title" : "func interceptAsync<Operation>(chain: RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func interceptAsync<Operation>(chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
@@ -2428,6 +2494,11 @@
                   {
                     "title" : "Enumeration Cases",
                     "type" : "groupMarker"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/cachewriteinterceptor\/cachewriteerror\/missingcacherecords",
+                    "title" : "case missingCacheRecords",
+                    "type" : "case"
                   },
                   {
                     "path" : "\/documentation\/apollo\/cachewriteinterceptor\/cachewriteerror\/noresponsetoparse",
@@ -2585,49 +2656,13 @@
                 "type" : "subscript"
               },
               {
-                "title" : "Enumerations",
+                "title" : "Type Aliases",
                 "type" : "groupMarker"
               },
               {
-                "children" : [
-                  {
-                    "title" : "Enumeration Cases",
-                    "type" : "groupMarker"
-                  },
-                  {
-                    "path" : "\/documentation\/apollo\/graphqlerror\/pathentry\/field(_:)",
-                    "title" : "case field(String)",
-                    "type" : "case"
-                  },
-                  {
-                    "path" : "\/documentation\/apollo\/graphqlerror\/pathentry\/index(_:)",
-                    "title" : "case index(Int)",
-                    "type" : "case"
-                  },
-                  {
-                    "title" : "Default Implementations",
-                    "type" : "groupMarker"
-                  },
-                  {
-                    "children" : [
-                      {
-                        "title" : "Operators",
-                        "type" : "groupMarker"
-                      },
-                      {
-                        "path" : "\/documentation\/apollo\/graphqlerror\/pathentry\/!=(_:_:)",
-                        "title" : "static func != (Self, Self) -> Bool",
-                        "type" : "op"
-                      }
-                    ],
-                    "path" : "\/documentation\/apollo\/graphqlerror\/pathentry\/equatable-implementations",
-                    "title" : "Equatable Implementations",
-                    "type" : "symbol"
-                  }
-                ],
                 "path" : "\/documentation\/apollo\/graphqlerror\/pathentry",
                 "title" : "GraphQLError.PathEntry",
-                "type" : "enum"
+                "type" : "typealias"
               },
               {
                 "title" : "Default Implementations",
@@ -2735,7 +2770,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/graphqlexecutionerror\/underlying",
-                "title" : "let underlying: Error",
+                "title" : "let underlying: any Error",
                 "type" : "property"
               },
               {
@@ -3064,6 +3099,15 @@
                 "type" : "property"
               },
               {
+                "title" : "Instance Methods",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/graphqlresult\/asjsondictionary()",
+                "title" : "func asJSONDictionary() -> [String : Any]",
+                "type" : "method"
+              },
+              {
                 "title" : "Enumerations",
                 "type" : "groupMarker"
               },
@@ -3145,6 +3189,130 @@
                 "type" : "groupMarker"
               },
               {
+                "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/init()",
+                "title" : "init()",
+                "type" : "init"
+              },
+              {
+                "title" : "Instance Properties",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/id",
+                "title" : "var id: String",
+                "type" : "property"
+              },
+              {
+                "title" : "Instance Methods",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/interceptasync(chain:request:response:completion:)",
+                "title" : "func interceptAsync<Operation>(chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
+                "type" : "method"
+              },
+              {
+                "title" : "Enumerations",
+                "type" : "groupMarker"
+              },
+              {
+                "children" : [
+                  {
+                    "title" : "Enumeration Cases",
+                    "type" : "groupMarker"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/couldnotparseincrementaljson(json:)",
+                    "title" : "case couldNotParseIncrementalJSON(json: JSONValue)",
+                    "type" : "case"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/couldnotparsetojson(data:)",
+                    "title" : "case couldNotParseToJSON(data: Data)",
+                    "type" : "case"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/mismatchedcurrentresulttype",
+                    "title" : "case mismatchedCurrentResultType",
+                    "type" : "case"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/noresponsetoparse",
+                    "title" : "case noResponseToParse",
+                    "type" : "case"
+                  },
+                  {
+                    "title" : "Instance Properties",
+                    "type" : "groupMarker"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/errordescription",
+                    "title" : "var errorDescription: String?",
+                    "type" : "property"
+                  },
+                  {
+                    "title" : "Default Implementations",
+                    "type" : "groupMarker"
+                  },
+                  {
+                    "children" : [
+                      {
+                        "title" : "Instance Properties",
+                        "type" : "groupMarker"
+                      },
+                      {
+                        "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/localizeddescription",
+                        "title" : "var localizedDescription: String",
+                        "type" : "property"
+                      }
+                    ],
+                    "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/error-implementations",
+                    "title" : "Error Implementations",
+                    "type" : "symbol"
+                  },
+                  {
+                    "children" : [
+                      {
+                        "title" : "Instance Properties",
+                        "type" : "groupMarker"
+                      },
+                      {
+                        "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/failurereason",
+                        "title" : "var failureReason: String?",
+                        "type" : "property"
+                      },
+                      {
+                        "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/helpanchor",
+                        "title" : "var helpAnchor: String?",
+                        "type" : "property"
+                      },
+                      {
+                        "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/recoverysuggestion",
+                        "title" : "var recoverySuggestion: String?",
+                        "type" : "property"
+                      }
+                    ],
+                    "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/localizederror-implementations",
+                    "title" : "LocalizedError Implementations",
+                    "type" : "symbol"
+                  }
+                ],
+                "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror",
+                "title" : "IncrementalJSONResponseParsingInterceptor.ParsingError",
+                "type" : "enum"
+              }
+            ],
+            "path" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor",
+            "title" : "IncrementalJSONResponseParsingInterceptor",
+            "type" : "struct"
+          },
+          {
+            "children" : [
+              {
+                "title" : "Initializers",
+                "type" : "groupMarker"
+              },
+              {
                 "path" : "\/documentation\/apollo\/jsonresponseparsinginterceptor\/init()",
                 "title" : "init()",
                 "type" : "init"
@@ -3164,7 +3332,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/jsonresponseparsinginterceptor\/interceptasync(chain:request:response:completion:)",
-                "title" : "func interceptAsync<Operation>(chain: RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func interceptAsync<Operation>(chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
@@ -3278,7 +3446,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/interceptasync(chain:request:response:completion:)",
-                "title" : "func interceptAsync<Operation>(chain: RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func interceptAsync<Operation>(chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
@@ -3292,33 +3460,18 @@
                     "type" : "groupMarker"
                   },
                   {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/cannotparsechunkdata",
-                    "title" : "case cannotParseChunkData",
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/cannotparseresponse",
+                    "title" : "case cannotParseResponse",
                     "type" : "case"
                   },
                   {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/cannotparsepayloaddata",
-                    "title" : "case cannotParsePayloadData",
-                    "type" : "case"
-                  },
-                  {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/cannotparseresponsedata",
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/cannotparseresponsedata",
                     "title" : "case cannotParseResponseData",
                     "type" : "case"
                   },
                   {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/irrecoverableerror(message:)",
-                    "title" : "case irrecoverableError(message: String?)",
-                    "type" : "case"
-                  },
-                  {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/noresponsetoparse",
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/noresponsetoparse",
                     "title" : "case noResponseToParse",
-                    "type" : "case"
-                  },
-                  {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/unsupportedcontenttype(type:)",
-                    "title" : "case unsupportedContentType(type: String)",
                     "type" : "case"
                   },
                   {
@@ -3326,7 +3479,7 @@
                     "type" : "groupMarker"
                   },
                   {
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/errordescription",
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/errordescription",
                     "title" : "var errorDescription: String?",
                     "type" : "property"
                   },
@@ -3341,12 +3494,12 @@
                         "type" : "groupMarker"
                       },
                       {
-                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/!=(_:_:)",
+                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/!=(_:_:)",
                         "title" : "static func != (Self, Self) -> Bool",
                         "type" : "op"
                       }
                     ],
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/equatable-implementations",
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/equatable-implementations",
                     "title" : "Equatable Implementations",
                     "type" : "symbol"
                   },
@@ -3357,12 +3510,12 @@
                         "type" : "groupMarker"
                       },
                       {
-                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/localizeddescription",
+                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/localizeddescription",
                         "title" : "var localizedDescription: String",
                         "type" : "property"
                       }
                     ],
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/error-implementations",
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/error-implementations",
                     "title" : "Error Implementations",
                     "type" : "symbol"
                   },
@@ -3373,28 +3526,28 @@
                         "type" : "groupMarker"
                       },
                       {
-                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/failurereason",
+                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/failurereason",
                         "title" : "var failureReason: String?",
                         "type" : "property"
                       },
                       {
-                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/helpanchor",
+                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/helpanchor",
                         "title" : "var helpAnchor: String?",
                         "type" : "property"
                       },
                       {
-                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/recoverysuggestion",
+                        "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/recoverysuggestion",
                         "title" : "var recoverySuggestion: String?",
                         "type" : "property"
                       }
                     ],
-                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror\/localizederror-implementations",
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/localizederror-implementations",
                     "title" : "LocalizedError Implementations",
                     "type" : "symbol"
                   }
                 ],
-                "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror",
-                "title" : "MultipartResponseParsingInterceptor.MultipartResponseParsingError",
+                "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror",
+                "title" : "MultipartResponseParsingInterceptor.ParsingError",
                 "type" : "enum"
               }
             ],
@@ -3684,7 +3837,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/responsecodeinterceptor\/interceptasync(chain:request:response:completion:)",
-                "title" : "func interceptAsync<Operation>(chain: RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, Error>) -> Void)",
+                "title" : "func interceptAsync<Operation>(chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)",
                 "type" : "method"
               },
               {
@@ -4111,6 +4264,125 @@
             "type" : "enum"
           },
           {
+            "children" : [
+              {
+                "title" : "Type Methods",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/jsonconverter\/convert(_:)-29ctk",
+                "title" : "static func convert(GraphQLError) -> [String : Any]",
+                "type" : "method"
+              },
+              {
+                "path" : "\/documentation\/apollo\/jsonconverter\/convert(_:)-4jdtv",
+                "title" : "static func convert(some SelectionSet) -> [String : Any]",
+                "type" : "method"
+              },
+              {
+                "path" : "\/documentation\/apollo\/jsonconverter\/convert(_:)-8r01k",
+                "title" : "static func convert<T>(GraphQLResult<T>) -> [String : Any]",
+                "type" : "method"
+              }
+            ],
+            "path" : "\/documentation\/apollo\/jsonconverter",
+            "title" : "JSONConverter",
+            "type" : "enum"
+          },
+          {
+            "children" : [
+              {
+                "title" : "Enumeration Cases",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/pathcomponent\/field(_:)",
+                "title" : "case field(String)",
+                "type" : "case"
+              },
+              {
+                "path" : "\/documentation\/apollo\/pathcomponent\/index(_:)",
+                "title" : "case index(Int)",
+                "type" : "case"
+              },
+              {
+                "title" : "Default Implementations",
+                "type" : "groupMarker"
+              },
+              {
+                "children" : [
+                  {
+                    "title" : "Operators",
+                    "type" : "groupMarker"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/pathcomponent\/!=(_:_:)",
+                    "title" : "static func != (Self, Self) -> Bool",
+                    "type" : "op"
+                  }
+                ],
+                "path" : "\/documentation\/apollo\/pathcomponent\/equatable-implementations",
+                "title" : "Equatable Implementations",
+                "type" : "symbol"
+              }
+            ],
+            "path" : "\/documentation\/apollo\/pathcomponent",
+            "title" : "PathComponent",
+            "type" : "enum"
+          },
+          {
+            "children" : [
+              {
+                "title" : "Enumeration Cases",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/rootselectionsetinitializeerror\/hasnonhashablevalue",
+                "title" : "case hasNonHashableValue",
+                "type" : "case"
+              },
+              {
+                "title" : "Default Implementations",
+                "type" : "groupMarker"
+              },
+              {
+                "children" : [
+                  {
+                    "title" : "Operators",
+                    "type" : "groupMarker"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/rootselectionsetinitializeerror\/!=(_:_:)",
+                    "title" : "static func != (Self, Self) -> Bool",
+                    "type" : "op"
+                  }
+                ],
+                "path" : "\/documentation\/apollo\/rootselectionsetinitializeerror\/equatable-implementations",
+                "title" : "Equatable Implementations",
+                "type" : "symbol"
+              },
+              {
+                "children" : [
+                  {
+                    "title" : "Instance Properties",
+                    "type" : "groupMarker"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/rootselectionsetinitializeerror\/localizeddescription",
+                    "title" : "var localizedDescription: String",
+                    "type" : "property"
+                  }
+                ],
+                "path" : "\/documentation\/apollo\/rootselectionsetinitializeerror\/error-implementations",
+                "title" : "Error Implementations",
+                "type" : "symbol"
+              }
+            ],
+            "path" : "\/documentation\/apollo\/rootselectionsetinitializeerror",
+            "title" : "RootSelectionSetInitializeError",
+            "type" : "enum"
+          },
+          {
             "title" : "Extended Modules",
             "type" : "groupMarker"
           },
@@ -4127,8 +4399,13 @@
                     "type" : "groupMarker"
                   },
                   {
-                    "path" : "\/documentation\/apollo\/apolloapi\/rootselectionset\/init(data:variables:)",
-                    "title" : "init(data: JSONObject, variables: [String : GraphQLOperationVariableValue]?) throws",
+                    "path" : "\/documentation\/apollo\/apolloapi\/rootselectionset\/init(data:variables:)-5dodp",
+                    "title" : "init(data: JSONObject, variables: [String : any GraphQLOperationVariableValue]?) throws",
+                    "type" : "init"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/apolloapi\/rootselectionset\/init(data:variables:)-7xsfq",
+                    "title" : "init(data: [String : Any], variables: [String : any GraphQLOperationVariableValue]?) throws",
                     "type" : "init"
                   }
                 ],
@@ -4154,7 +4431,7 @@
                       },
                       {
                         "path" : "\/documentation\/apollo\/apolloapi\/selection\/field\/cachekey(with:)",
-                        "title" : "func cacheKey(with: [String : GraphQLOperationVariableValue]?) throws -> String",
+                        "title" : "func cacheKey(with: [String : any GraphQLOperationVariableValue]?) throws -> String",
                         "type" : "method"
                       }
                     ],

@@ -5,8 +5,6 @@ open class MockOperation<SelectionSet: RootSelectionSet>: GraphQLOperation {
 
   open class var operationType: GraphQLOperationType { .query }
 
-  open class var hasDeferredFragments: Bool { false }
-
   open class var operationName: String { "MockOperationName" }
 
   open class var operationDocument: OperationDocument {
@@ -16,6 +14,8 @@ open class MockOperation<SelectionSet: RootSelectionSet>: GraphQLOperation {
   open var __variables: Variables?
 
   public init() {}
+
+  open class var deferredFragments: [DeferredFragmentIdentifier : any ApolloAPI.SelectionSet.Type]? { return nil }
 
 }
 
@@ -43,16 +43,6 @@ open class MockSubscription<SelectionSet: RootSelectionSet>: MockOperation<Selec
   }
 }
 
-open class MockDeferredQuery<SelectionSet: RootSelectionSet>: MockOperation<SelectionSet>, GraphQLQuery {
-
-  public override class var operationType: GraphQLOperationType { .query }
-  public override class var hasDeferredFragments: Bool { true }
-
-  public static func mock() -> MockDeferredQuery<MockSelectionSet> where SelectionSet == MockSelectionSet {
-    MockDeferredQuery<MockSelectionSet>()
-  }
-}
-
 // MARK: - MockSelectionSets
 
 @dynamicMemberLookup
@@ -61,7 +51,7 @@ open class AbstractMockSelectionSet<F, S: SchemaMetadata>: RootSelectionSet, Has
   public typealias Fragments = F
 
   open class var __selections: [Selection] { [] }
-  open class var __parentType: ParentType { Object.mock }
+  open class var __parentType: any ParentType { Object.mock }
 
   public var __data: DataDict = .empty()
 

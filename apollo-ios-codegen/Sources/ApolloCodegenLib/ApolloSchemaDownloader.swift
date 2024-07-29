@@ -7,14 +7,14 @@ import GraphQLCompiler
 /// A wrapper to facilitate downloading a GraphQL schema.
 public struct ApolloSchemaDownloader {
   
-  public enum SchemaDownloadError: Error, LocalizedError {
-    case downloadedRegistryJSONFileNotFound(underlying: Error)
-    case downloadedIntrospectionJSONFileNotFound(underlying: Error)
-    case couldNotParseRegistryJSON(underlying: Error)
+  public enum SchemaDownloadError: Swift.Error, LocalizedError {
+    case downloadedRegistryJSONFileNotFound(underlying: any Error)
+    case downloadedIntrospectionJSONFileNotFound(underlying: any Error)
+    case couldNotParseRegistryJSON(underlying: any Error)
     case unexpectedRegistryJSONType
     case couldNotExtractSDLFromRegistryJSON
     case couldNotCreateSDLDataToWrite(schema: String)
-    case couldNotConvertIntrospectionJSONToSDL(underlying: Error)
+    case couldNotConvertIntrospectionJSONToSDL(underlying: any Error)
     case couldNotCreateURLComponentsFromEndpointURL(url: URL)
     case couldNotGetURLFromURLComponents(components: URLComponents)
 
@@ -54,7 +54,7 @@ public struct ApolloSchemaDownloader {
   public static func fetch(
     configuration: ApolloSchemaDownloadConfiguration,
     withRootURL rootURL: URL? = nil,
-    session: NetworkSession? = nil
+    session: (any NetworkSession)? = nil
   ) async throws {
     try ApolloFileManager.default.createContainingDirectoryIfNeeded(
       forPath: configuration.outputPath
@@ -143,7 +143,7 @@ public struct ApolloSchemaDownloader {
     registry: ApolloSchemaDownloadConfiguration.DownloadMethod.ApolloRegistrySettings,
     configuration: ApolloSchemaDownloadConfiguration,
     withRootURL rootURL: URL?,
-    session: NetworkSession? = nil
+    session: (any NetworkSession)? = nil
   ) async throws {
     CodegenLogger.log("Downloading schema from registry", logLevel: .debug)
 
@@ -347,7 +347,7 @@ public struct ApolloSchemaDownloader {
     includeDeprecatedInputValues: Bool,
     configuration: ApolloSchemaDownloadConfiguration,
     withRootURL: URL?,
-    session: NetworkSession? = nil
+    session: (any NetworkSession)? = nil
   ) async throws {
 
     CodegenLogger.log("Downloading schema via introspection from \(endpoint)", logLevel: .debug)

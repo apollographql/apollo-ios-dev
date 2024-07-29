@@ -14,7 +14,7 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     case noHTTPResponse(request: URLRequest?)
     case sessionBecameInvalidWithoutUnderlyingError
     case dataForRequestNotFound(request: URLRequest?)
-    case networkError(data: Data, response: HTTPURLResponse?, underlying: Error)
+    case networkError(data: Data, response: HTTPURLResponse?, underlying: any Error)
     case sessionInvalidated
     case missingMultipartBoundary
     case cannotParseBoundaryData
@@ -40,10 +40,10 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
   }
   
   /// A completion block to be called when the raw task has completed, with the raw information from the session
-  public typealias RawCompletion = (Data?, HTTPURLResponse?, Error?) -> Void
+  public typealias RawCompletion = (Data?, HTTPURLResponse?, (any Error)?) -> Void
   
   /// A completion block returning a result. On `.success` it will contain a tuple with non-nil `Data` and its corresponding `HTTPURLResponse`. On `.failure` it will contain an error.
-  public typealias Completion = (Result<(Data, HTTPURLResponse), Error>) -> Void
+  public typealias Completion = (Result<(Data, HTTPURLResponse), any Error>) -> Void
   
   @Atomic private var tasks: [Int: TaskData] = [:]
   
@@ -61,12 +61,17 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
   /// - Parameters:
   ///   - sessionConfiguration: The `URLSessionConfiguration` to use to set up the URL session.
   ///   - callbackQueue: [optional] The `OperationQueue` to tell the URL session to call back to this class on, which will in turn call back to your class. Defaults to `.main`.
+  ///   - sessionDescription: [optional] A human-readable string that you can use for debugging purposes.
   public init(sessionConfiguration: URLSessionConfiguration = .default,
-              callbackQueue: OperationQueue? = .main) {
+              callbackQueue: OperationQueue? = .main,
+              sessionDescription: String? = nil) {
     super.init()
-    self.session = URLSession(configuration: sessionConfiguration,
-                              delegate: self,
-                              delegateQueue: callbackQueue)
+      
+    let session = URLSession(configuration: sessionConfiguration, 
+                             delegate: self,
+                             delegateQueue: callbackQueue)
+    session.sessionDescription = sessionDescription
+    self.session = session
   }
   
   /// Cleans up and invalidates everything related to this session client.
@@ -112,12 +117,14 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
   ///
   /// - Parameters:
   ///   - request: The request to perform.
+  ///   - taskDescription: [optional] A description to add to the `URLSessionTask` for debugging purposes.
   ///   - rawTaskCompletionHandler: [optional] A completion handler to call once the raw task is done, so if an Error requires access to the headers, the user can still access these.
   ///   - completion: A completion handler to call when the task has either completed successfully or failed.
   ///
   /// - Returns: The created URLSession task, already resumed, because nobody ever remembers to call `resume()`.
   @discardableResult
   open func sendRequest(_ request: URLRequest,
+                        taskDescription: String? = nil,
                         rawTaskCompletionHandler: RawCompletion? = nil,
                         completion: @escaping Completion) -> URLSessionTask {
     guard self.hasNotBeenInvalidated else {
@@ -126,6 +133,8 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     }
     
     let task = self.session.dataTask(with: request)
+    task.taskDescription = taskDescription
+      
     let taskData = TaskData(rawCompletion: rawTaskCompletionHandler,
                             completionBlock: completion)
     
@@ -135,7 +144,19 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     
     return task
   }
-  
+
+  @discardableResult
+  open func sendRequest(_ request: URLRequest,
+                        rawTaskCompletionHandler: RawCompletion? = nil,
+                        completion: @escaping Completion) -> URLSessionTask {
+    sendRequest(
+      request,
+      taskDescription: nil,
+      rawTaskCompletionHandler: rawTaskCompletionHandler,
+      completion: completion
+    )
+  }
+
   /// Cancels a given task and clears out its underlying data.
   ///
   /// NOTE: You will not receive any kind of "This was cancelled" error when this is called.
@@ -148,7 +169,7 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
   
   // MARK: - URLSessionDelegate
   
-  open func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+  open func urlSession(_ session: URLSession, didBecomeInvalidWithError error: (any Error)?) {
     let finalError = error ?? URLSessionClientError.sessionBecameInvalidWithoutUnderlyingError
     for task in self.tasks.values {
       task.completionBlock(.failure(finalError))
@@ -191,7 +212,7 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
   
   open func urlSession(_ session: URLSession,
                        task: URLSessionTask,
-                       didCompleteWithError error: Error?) {
+                       didCompleteWithError error: (any Error)?) {
     defer {
       self.clear(task: task.taskIdentifier)
     }

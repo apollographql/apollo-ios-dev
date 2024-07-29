@@ -52,7 +52,7 @@ extension SubscriptionTests: WebSocketTransportDelegate {
     connectionState = .connected
   }
 
-  func webSocketTransport(_ webSocketTransport: WebSocketTransport, didDisconnectWithError error:Error?) {
+  func webSocketTransport(_ webSocketTransport: WebSocketTransport, didDisconnectWithError error: (any Error)?) {
     connectionState = .disconnected
   }
 }

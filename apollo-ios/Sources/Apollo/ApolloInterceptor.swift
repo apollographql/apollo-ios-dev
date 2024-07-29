@@ -10,7 +10,7 @@ public protocol ApolloInterceptor {
   /// Each operation request has it's own interceptor request chain so the interceptors do not
   /// need to be uniquely identifiable between each and every request, only unique between the
   /// list of interceptors in a single request.
-  var id: String { get set }
+  var id: String { get }
   
   /// Called when this interceptor should do its work.
   ///
@@ -20,8 +20,8 @@ public protocol ApolloInterceptor {
   ///   - response: [optional] The response, if received
   ///   - completion: The completion block to fire when data needs to be returned to the UI.
   func interceptAsync<Operation: GraphQLOperation>(
-    chain: RequestChain,
+    chain: any RequestChain,
     request: HTTPRequest<Operation>,
     response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void)
+    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void)
 }

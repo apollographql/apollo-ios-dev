@@ -19,33 +19,33 @@ class StarWarsServerAPQsTests: StarWarsServerTests {
 }
 
 class SQLiteStarWarsServerAPQsGetMethodTests: StarWarsServerAPQsGetMethodTests {
-  override var cacheType: TestCacheProvider.Type {
+  override var cacheType: any TestCacheProvider.Type {
     SQLiteTestCacheProvider.self
   }
 }
 
 class SQLiteStarWarsServerAPQsTests: StarWarsServerAPQsTests {
-  override var cacheType: TestCacheProvider.Type {
+  override var cacheType: any TestCacheProvider.Type {
     SQLiteTestCacheProvider.self
   }
 }
 
 class SQLiteStarWarsServerTests: StarWarsServerTests {
-  override var cacheType: TestCacheProvider.Type {
+  override var cacheType: any TestCacheProvider.Type {
     SQLiteTestCacheProvider.self
   }
 }
 
 class StarWarsServerTests: XCTestCase, CacheDependentTesting {
-  var config: TestConfig!
-  
-  var cacheType: TestCacheProvider.Type {
+  var config: (any TestConfig)!
+
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
   
   static let defaultWaitTimeout: TimeInterval = 5
   
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var client: ApolloClient!
   
   override func setUpWithError() throws {

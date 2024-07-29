@@ -13,12 +13,12 @@ public final class MockNetworkTransport: RequestChainNetworkTransport {
                endpointURL: TestURL.mockServer.url)
     self.clientName = clientName
     self.clientVersion = clientVersion
-  }  
-  
+  }
+
   struct TestInterceptorProvider: InterceptorProvider {
     let store: ApolloStore
     let server: MockGraphQLServer
-    
+
     func interceptors<Operation>(
       for operation: Operation
     ) -> [any ApolloInterceptor] where Operation: GraphQLOperation {
@@ -45,18 +45,18 @@ private class MockGraphQLServerInterceptor: ApolloInterceptor {
   let server: MockGraphQLServer
 
   public var id: String = UUID().uuidString
-  
+
   init(server: MockGraphQLServer) {
     self.server = server
   }
-  
-  public func interceptAsync<Operation>(chain: RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void) where Operation: GraphQLOperation {
+
+  public func interceptAsync<Operation>(chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) where Operation: GraphQLOperation {
     server.serve(request: request) { result in
       let httpResponse = HTTPURLResponse(url: TestURL.mockServer.url,
                                          statusCode: 200,
                                          httpVersion: nil,
                                          headerFields: nil)!
-      
+
       switch result {
       case .failure(let error):
         chain.handleErrorAsync(error,
@@ -68,6 +68,7 @@ private class MockGraphQLServerInterceptor: ApolloInterceptor {
         let response = HTTPResponse<Operation>(response: httpResponse,
                                                rawData: data,
                                                parsedResponse: nil)
+        guard !chain.isCancelled else { return }
         chain.proceedAsync(request: request,
                            response: response,
                            interceptor: self,
@@ -89,10 +90,10 @@ public class MockWebSocketTransport: NetworkTransport {
     operation: Operation,
     cachePolicy: CachePolicy,
     contextIdentifier: UUID?,
-    context: RequestContext?,
+    context: (any RequestContext)?,
     callbackQueue: DispatchQueue,
-    completionHandler: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
-  ) -> Cancellable where Operation : GraphQLOperation {
+    completionHandler: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
+  ) -> any Cancellable where Operation : GraphQLOperation {
     return MockTask()
   }
 }

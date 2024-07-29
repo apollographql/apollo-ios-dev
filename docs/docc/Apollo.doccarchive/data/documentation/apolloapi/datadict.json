@@ -115,7 +115,7 @@
     },
     {
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/init(data:fulfilledFragments:)"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/init(data:fulfilledFragments:deferredFragments:)"
       ],
       "title" : "Initializers"
     },
@@ -388,7 +388,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/datadict\/hash(into:)"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/DataDict/init(data:fulfilledFragments:)": {
+"doc://ApolloAPI/documentation/ApolloAPI/DataDict/init(data:fulfilledFragments:deferredFragments:)": {
   "abstract" : [
 
   ],
@@ -451,15 +451,41 @@
     },
     {
       "kind" : "text",
+      "text" : ">, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "deferredFragments"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sh",
+      "text" : "Set"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SO",
+      "text" : "ObjectIdentifier"
+    },
+    {
+      "kind" : "text",
       "text" : ">)"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/init(data:fulfilledFragments:)",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/init(data:fulfilledFragments:deferredFragments:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(data:fulfilledFragments:)",
+  "title" : "init(data:fulfilledFragments:deferredFragments:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/datadict\/init(data:fulfilledfragments:)"
+  "url" : "\/documentation\/apolloapi\/datadict\/init(data:fulfilledfragments:deferredfragments:)"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/DataDict/subscript(_:)-5tqti": {
   "abstract" : [

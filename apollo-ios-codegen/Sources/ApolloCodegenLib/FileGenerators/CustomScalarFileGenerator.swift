@@ -8,11 +8,11 @@ struct CustomScalarFileGenerator: FileGenerator {
   /// Shared codegen configuration.
   let config: ApolloCodegen.ConfigurationContext
 
-  var template: TemplateRenderer {
+  var template: any TemplateRenderer {
     CustomScalarTemplate(graphqlScalar: graphqlScalar, config: config)
   }
 
   var target: FileTarget { .customScalar }
-  var fileName: String { graphqlScalar.name }
+  var fileName: String { graphqlScalar.render(as: .filename) }
   var overwrite: Bool { false }
 }

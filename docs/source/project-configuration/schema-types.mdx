@@ -1,0 +1,77 @@
+---
+title: Schema Types Configuration
+description: Configuring schema generation for your projects needs
+---
+
+When setting up codegen for the first time, you'll need to specify a `schemaNamespace` for your generated schema types along with the [`moduleType`](./../code-generation/codegen-configuration#module-type) to use. These values comprise the [`output.schemaTypes`](./../code-generation/codegen-configuration#schema-types) property in your codegen configuration.
+
+The `moduleType` property tells the code generation engine how you plan to link the generated schema types to your project. The code generation engine uses this information to ensure that it generates properly formed models and `import` statements.
+
+In this section, we will consider a number of factors of your project to answer the question:
+
+**Which schema `moduleType` should you use?**
+
+The types in your GraphQL schema will be translated into generated Swift types that must be included in your project. The generated schema types can be included in your project by creating a separate "schema module" for them or by embedding them directly in one of your own targets.
+
+The key difference between these approaches is how they are namespaced.
+- When using a schema module, your schema types will be `public` top-level symbols in a module using the provided `schemaNamespace` as the module name.
+- When embedded in a target, the schema types are enclosed in a caseless `enum` using the provided `schemaNamespace` as the `enum` name.
+
+<Note>
+
+Wherever you place your schema types, they will need to be linked to by any modules that contain generated operation models or use your schema's custom scalar, enum, or input object types.
+
+</Note>
+
+## Schema module
+
+For most projects, we recommend creating a "schema module" to contain your schema types. This enables you to share your generated models across modules as your project grows. You can use either the [`.swiftPackageManager`](#swiftpackagemanager) or [`.other`](#other-module) options to create a schema module.
+
+With this approach your schema types will be `public` top-level symbols in a module using the provided `schemaNamespace` as the module name.
+
+For a **single target project configuration**, link this package to your project target.
+For a **multi-module project configuration**, you will need to link this package to any modules that contain generated operation models or use the schema types directly.
+
+<Tip>
+
+Most dependency managers (e.g., SPM and Cocoapods) can automatically include your generated files in the module's directory. _This means that when generated files are added or removed from the generated module, they are linked to your project automatically._
+
+</Tip>
+
+### `.swiftPackageManager`
+
+The [`.swiftPackageManager`](./../code-generation/codegen-configuration#swift-package-manager) option is the quickest and most convenient way to generate your schema types if your project uses SPM.
+
+Using this `moduleType`, the code generation engine can automate the creation of a schema module as an SPM package. A `Package.swift` file will be generated using the provided `schemaNamespace` as the package name.
+
+In addition to the generated types, you can include other Swift files in the `Sources` folder of the generated SPM package and they will automatically be included in the schema module.
+
+### `.other`
+
+The [`.other`](./../code-generation/codegen-configuration#other-schema-module-types) option allows you to generate schema types to be included in a module you define yourself. This can be used with any package manager or build system that your project is using. You can also include these files in a manually created Xcode target for your module.
+
+<Note>
+
+When using the `.other` option, the name of the user-defined module files are included in must be identical to the `schemaNamespace` provided.
+
+</Note>
+
+## Embed schema types in your target
+
+You can also include schema types directly in an existing target in your project. While we still recommend using a seperate schema module for most projects, this allows the flexibility to use Apollo in advanced, custom use cases.
+
+With this approach, the schema types are enclosed in a caseless `enum` using the provided `schemaNamespace` as the `enum` name. This functions as a namespace to prevent any possible naming conflicts between generated types and other types within the target they are embedded in.
+
+For a **multi-module project configuration**, you will need to link the target containing the embedded schema types to any modules that contain generated operation models or use the schema types directly.
+
+### `.embeddedInTarget(name: String)`
+
+To embed the schema types in your own target, use [`.embeddedInTarget(name: String)`](./../code-generation/codegen-configuration#embedded-in-target) option as the value of the [`output.schemaTypes.moduleType`](./../code-generation/codegen-configuration#module-type) property.
+
+<Tip>
+
+Using this option makes you responsible for adding generated files to your chosen target or module.
+
+If your target is an Xcode target, you'll need to **manually** add or remove them from the project navigator when the code generation engine creates or removes files.
+
+</Tip>

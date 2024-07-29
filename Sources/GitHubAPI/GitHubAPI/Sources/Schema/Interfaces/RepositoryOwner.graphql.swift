@@ -5,5 +5,5 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Represents an owner of a Repository.
-  static let RepositoryOwner = Interface(name: "RepositoryOwner")
+  static let RepositoryOwner = ApolloAPI.Interface(name: "RepositoryOwner")
 }

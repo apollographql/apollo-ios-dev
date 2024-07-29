@@ -1,6 +1,6 @@
 # 🔮 Apollo iOS Roadmap
 
-**Last updated: 2023-11-02**
+**Last updated: 2024-07-16**
 
 For up to date release notes, refer to the project's [Changelog](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md).
 
@@ -21,22 +21,15 @@ Please see our [patch releases milestone](https://github.com/apollographql/apoll
 
 As we identify feature sets that we intend to ship, we'll add to and update the subheadings in this section. We intend to keep this section in chronological order.  In order to enable rapid and continuous feature delivery, we'll avoid assigning minor version numbers to these feature groups in the roadmap.
 
-### [Paginated watchers for GraphQL queries](https://github.com/apollographql/apollo-ios/pull/3007)
+### `@defer` support - Available in release [1.14.0](https://github.com/apollographql/apollo-ios/releases/tag/1.14.0)
 
-_Approximate Date: TBD - PR from an external contributor is in review_
+The `@defer` directive enables your queries to receive data for specific fields asynchronously. This is helpful whenever some fields in a query take much longer to resolve than others.  [Apollo Kotlin](https://www.apollographql.com/docs/kotlin/fetching/defer/) and [Apollo Client (web)](https://www.apollographql.com/docs/react/data/defer/) currently support this syntax, so if you're interested in learning more check out their documentation.  Apollo iOS has released a preview version of this feature in the `preview-defer.1` branch.  This will be released as an experimental feature in an upcoming `1.x` minor version.
 
-- Support for Relay-style (cursor-based), offset-based, and arbitrary pagination patterns
-- `@connection` directive support
-- This feature will be considered experimental, meaning that the public API could change in backwards-incompatible ways until it is declared stable in a future release
-- This package will be versioned independently from Apollo iOS, beginning with `0.1.0`
-
-### [`@defer` support](https://github.com/apollographql/apollo-ios/issues/2395)
-
-_Approximate Date: 2023-11-10_
-
-The `@defer` directive enables your queries to receive data for specific fields asynchronously. This is helpful whenever some fields in a query take much longer to resolve than others.  [Apollo Kotlin](https://www.apollographql.com/docs/kotlin/fetching/defer/) and [Apollo Client (web)](https://www.apollographql.com/docs/react/data/defer/) currently support this syntax, so if you're interested in learning more check out their documentation.  Apollo iOS will release support for this directive in a `1.x` minor version.  This will be released as an experimental feature.
-
-We plan to release `@defer` support in a feature branch first, then will move it into our regular release pipeline behind an experimental flag later on.
+* ✅ Code generation
+* ✅ Partial incremental execution
+* ✅ Partial and incremental caching
+* ✅ Local cache mutations
+* 🔲 Selection Set Initializers (_next_)
 
 ### [Improvements to code generation configuration and performance](https://github.com/apollographql/apollo-ios/milestone/67)
 
@@ -44,15 +37,39 @@ _Approximate Date: to be released incrementally_
 
 - This effort encompasses several smaller features:
     - ✅ Make codegen support Swift concurrency (`async`/`await`): available in v1.7.0
-    - Add configuration for disabling merging of fragment fields
-    - Fix retain cycles and memory issues causing code generation to take very long on certain large, complex schemas with deeply nested fragment composition
+    - (in progress) [Add configuration for disabling merging of fragment fields](https://github.com/apollographql/apollo-ios/issues/2560)
+    - (in progress) Fix retain cycles and memory issues causing code generation to take very long on certain large, complex schemas with deeply nested fragment composition
+
+### [2.0 Release] - Swift 6 compatibility
+
+To support the breaking language changes in Swift 6, a major version 2.0 of Apollo iOS will be released. This version will include support for the new Swift Concurrency Model and improve upon networking and caching APIs.
+
+_Approximate Date: Beta release in September alongside Xcode 16 & Swift 6 stable release
+
+- ✅ [`ExistentialAny` upcoming feature](https://github.com/apollographql/apollo-ios/issues/3205)
+- (in progress) [`Sendable` types and `async/await` APIs](https://github.com/apollographql/apollo-ios/issues/3291)
 
 ### [Reduce generated schema types](https://github.com/apollographql/apollo-ios/milestone/71)
 
-_Approximate Date: February 2024_
+_Approximate Date: TBD_
 
 - Right now we are naively generating schema types that we don't always need. A smarter algorithm can reduce generated code for certain large schemas that are currently having every type in their schema generated
 - Create configuration for manually indicating schema types you would like to have schema types and TestMocks generated for
+
+### [Mutable generated reponse models](https://github.com/apollographql/apollo-ios/issues/3246)
+
+_Approximate Date: TBD_
+
+- Provide a mechanism for making generated reponse models mutable.
+- This will allow mutability on an opt-in basis per selection set or definition.
+
+### [Support codegen of operations without response models](https://github.com/apollographql/apollo-ios/issues/3165)
+
+_Approximate Date: TBD_
+
+- Support generating models that expose only the minimal necessary data for operation execution (networking and caching).
+  - This would remove the generated response models, exposing response data as a simple `JSONObject` (ie. [String: AnyHashable]).
+- This feature is useful for projects that want to use their own custom data models or have binary size constraints.
 
 ### Declarative caching
 
@@ -61,21 +78,17 @@ _Approximate Date: TBD_
 - Similar to Apollo Kotlin [declarative caching](https://www.apollographql.com/docs/kotlin/caching/declarative-ids) via the `@typePolicy` directive
 - Provide ability to configure cache keys using directives on schema types as an alternative to programmatic cache key configuration
 
-## [2.0](https://github.com/apollographql/apollo-ios/milestone/60)
+## [Apollo iOS Pagination](https://github.com/apollographql/apollo-ios-pagination)
 
-_Approximate Date: TBD_
+Version 0.1 of this module was released in March 2024.  We are iterating quickly based on user feedback - please see the project's Issues and PRs for up-to-date information.  We expect the API to become more stable over time and will consider a v1 release when appropriate.
 
-These are the major initiatives planned for 2.0/2.x:
+# [Future Major Releases](https://github.com/apollographql/apollo-ios/milestone/60)
 
-- **Networking Stack Improvements**: The goal is to simplify and stabilise the networking stack.
-  - The [updated network stack](https://github.com/apollographql/apollo-ios/issues/1340) solved a number of long standing issues with the old barebones NetworkTransport but still has limitations and is complicated to use. Adopting patterns that have proven useful for the web client, such as Apollo Link, will provide more flexibility and give developers full control over the steps that are invoked to satisfy requests.
-  - We will support some of the new Swift concurrency features, such as async/await, in Apollo iOS. It may involve Apollo iOS dropping support for macOS 10.14 and iOS 12.
+Major release items are still in pre-planning, and are subject to change. More details will come in the future.
 
-## 3.0
+These are the initiatives planned for future major version releases:
 
-_Approximate Date: TBD_
-
-These are the major initiatives planned for 3.0/3.x:
+## Caching
 
 - **Cache Improvements**: Here we are looking at bringing across some features inspired by Apollo Client 3 and Apollo Kotlin
   - Better pagination support. Better support for caching and updating paginated lists of objects.
@@ -83,5 +96,4 @@ These are the major initiatives planned for 3.0/3.x:
   - Reducing over-normalization. Only separating out results into individual records when something that can identify them is present
   - Real cache eviction & dangling reference collection. There's presently a way to manually remove objects for a given key or pattern, but Apollo Client 3 has given us a roadmap for how to handle some of this stuff much more thoroughly and safely.
   - Cache metadata. Ability to add per-field metadata if needed, to allow for TTL and time-based invalidation, etc.
-
-This major release is still in pre-planning, more details will come in the future.
+  - Querying/sorting cached data by field values.

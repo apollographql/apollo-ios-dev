@@ -12,15 +12,18 @@ struct InputObjectTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .schemaFile(type: .inputObject)
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     let (validFields, deprecatedFields) = filterFields(graphqlInputObject.fields)
     let memberAccessControl = accessControlModifier(for: .member)
 
     return TemplateString(
     """
     \(documentation: graphqlInputObject.documentation, config: config)
+    \(graphqlInputObject.name.typeNameDocumentation)
     \(accessControlModifier(for: .parent))\
-    struct \(graphqlInputObject.formattedName): InputObject {
+    struct \(graphqlInputObject.render(as: .typename)): InputObject {
       \(memberAccessControl)private(set) var __data: InputDict
     
       \(memberAccessControl)init(_ data: InputDict) {
@@ -80,7 +83,7 @@ struct InputObjectTemplate: TemplateRenderer {
   private func deprecatedMessage(for fields: GraphQLInputFieldDictionary) -> String {
     guard !fields.isEmpty else { return "" }
 
-    let names: String = fields.values.map({ $0.name }).joined(separator: ", ")
+    let names: String = fields.values.map({ $0.render(config: config) }).joined(separator: ", ")
 
     if fields.count > 1 {
       return "Arguments '\(names)' are deprecated."
@@ -94,7 +97,7 @@ struct InputObjectTemplate: TemplateRenderer {
   ) -> TemplateString {
     TemplateString("""
     \(fields.map({
-      "\($1.name.renderAsFieldPropertyName(config: config.config)): \($1.renderInputValueType(includeDefault: true, config: config.config))"
+      "\($1.render(config: config)): \($1.renderInputValueType(includeDefault: true, config: config.config))"
     }), separator: ",\n")
     """)
   }
@@ -103,7 +106,7 @@ struct InputObjectTemplate: TemplateRenderer {
     _ fields: GraphQLInputFieldDictionary
   ) -> TemplateString {
     TemplateString("""
-    \(fields.map({ "\"\($1.name)\": \($1.name.renderAsFieldPropertyName(config: config.config))" }), separator: ",\n")
+    \(fields.map({ "\"\($1.name.schemaName)\": \($1.render(config: config))" }), separator: ",\n")
     """)
   }
 
@@ -111,10 +114,11 @@ struct InputObjectTemplate: TemplateRenderer {
     """
     \(documentation: field.documentation, config: config)
     \(deprecationReason: field.deprecationReason, config: config)
+    \(field.name.typeNameDocumentation)
     \(accessControlModifier(for: .member))\
-    var \(field.name.renderAsFieldPropertyName(config: config.config)): \(field.renderInputValueType(config: config.config)) {
-      get { __data["\(field.name)"] }
-      set { __data["\(field.name)"] = newValue }
+    var \(field.render(config: config)): \(field.renderInputValueType(config: config.config)) {
+      get { __data["\(field.name.schemaName)"] }
+      set { __data["\(field.name.schemaName)"] = newValue }
     }
     """
   }

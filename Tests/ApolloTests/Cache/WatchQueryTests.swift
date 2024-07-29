@@ -6,13 +6,13 @@ import ApolloInternalTestHelpers
 
 class WatchQueryTests: XCTestCase, CacheDependentTesting {
   
-  var cacheType: TestCacheProvider.Type {
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
   
   static let defaultWaitTimeout: TimeInterval = 1
   
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var server: MockGraphQLServer!
   var client: ApolloClient!
   
@@ -823,6 +823,146 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
       
       wait(for: [serverRequestExpectation, otherFetchCompletedExpectation, refetchServerRequestExpectation, updatedWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
+    }
+  }
+
+  func testWatchedQuery_givenRefetchOnFailedUpdates_false_doesNotRefetchFromServerAfterOtherQueryUpdatesListWithIncompleteObject() throws {
+    class HeroAndFriendsIDsSelectionSet: MockSelectionSet {
+      override class var __selections: [Selection] {[
+        .field("hero", Hero?.self)
+      ]}
+
+      var hero: Hero? { __data["hero"] }
+
+      class Hero: MockSelectionSet {
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .field("friends", [Friend]?.self),
+        ]}
+
+        var friends: [Friend]? { __data["friends"] }
+
+        class Friend: MockSelectionSet {
+          override class var __selections: [Selection] {[
+            .field("__typename", String.self),
+            .field("id", String.self),
+          ]}
+        }
+      }
+    }
+
+    class HeroAndFriendsNameWithIDsSelectionSet: MockSelectionSet {
+      override class var __selections: [Selection] {[
+        .field("hero", Hero?.self)
+      ]}
+
+      var hero: Hero? { __data["hero"] }
+
+      class Hero: MockSelectionSet {
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .field("name", String.self),
+          .field("friends", [Friend]?.self),
+        ]}
+
+        var friends: [Friend]? { __data["friends"] }
+
+        class Friend: MockSelectionSet {
+          override class var __selections: [Selection] {[
+            .field("__typename", String.self),
+            .field("id", String.self),
+            .field("name", String.self),
+          ]}
+
+          var name: String { __data["name"] }
+        }
+      }
+    }
+
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
+
+    let watchedQuery = MockQuery<HeroAndFriendsNameWithIDsSelectionSet>()
+
+    let resultObserver = makeResultObserver(for: watchedQuery)
+
+    let watcher = GraphQLQueryWatcher(client: client,
+                                      query: watchedQuery,
+                                      refetchOnFailedUpdates: false,
+                                      resultHandler: resultObserver.handler)
+
+    addTeardownBlock { watcher.cancel() }
+
+    runActivity("Initial fetch from server") { _ in
+      let serverRequestExpectation =
+        server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
+        [
+          "data": [
+            "hero": [
+              "id": "2001",
+              "name": "R2-D2",
+              "__typename": "Droid",
+              "friends": [
+                ["__typename": "Human", "id": "1000", "name": "Luke Skywalker"],
+                ["__typename": "Human", "id": "1002", "name": "Han Solo"],
+                ["__typename": "Human", "id": "1003", "name": "Leia Organa"],
+              ]
+            ]
+          ]
+        ]
+      }
+
+      let initialWatcherResultExpectation = resultObserver.expectation(description: "Watcher received initial result from server") { result in
+        try XCTAssertSuccessResult(result) { graphQLResult in
+          XCTAssertEqual(graphQLResult.source, .server)
+          XCTAssertNil(graphQLResult.errors)
+
+          let data = try XCTUnwrap(graphQLResult.data)
+          XCTAssertEqual(data.hero?.name, "R2-D2")
+          let friendsNames = data.hero?.friends?.compactMap { $0.name }
+          XCTAssertEqual(friendsNames, ["Luke Skywalker", "Han Solo", "Leia Organa"])
+        }
+      }
+
+      watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+
+      wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
+    }
+
+    runActivity("Fetch other query with list of updated keys from server") { _ in
+      let serverRequestExpectation =
+        server.expect(MockQuery<HeroAndFriendsIDsSelectionSet>.self) { request in
+        [
+          "data": [
+            "hero": [
+              "id": "2001",
+              "name": "Artoo",
+              "__typename": "Droid",
+              "friends": [
+                ["__typename": "Human", "id": "1003"],
+                ["__typename": "Human", "id": "1004"],
+                ["__typename": "Human", "id": "1000"],
+              ]
+            ]
+          ]
+        ]
+      }
+
+      let updatedWatcherResultExpectation = resultObserver.expectation(
+        description: "Watcher received updated result from cache"
+      ) { _ in }
+      updatedWatcherResultExpectation.isInverted = true
+
+      let otherFetchCompletedExpectation = expectation(description: "Other fetch completed")
+
+      client.fetch(query: MockQuery<HeroAndFriendsIDsSelectionSet>(),
+                   cachePolicy: .fetchIgnoringCacheData) { result in
+        defer { otherFetchCompletedExpectation.fulfill() }
+        XCTAssertSuccessResult(result)
+      }
+
+      wait(for: [serverRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
     }
   }
 

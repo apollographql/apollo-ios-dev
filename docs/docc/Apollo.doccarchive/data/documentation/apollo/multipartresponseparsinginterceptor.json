@@ -117,7 +117,7 @@
     },
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/MultipartResponseParsingError"
+        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError"
       ],
       "title" : "Enumerations"
     }
@@ -218,7 +218,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/multipartresponseparsinginterceptor"
 },
-"doc://Apollo/documentation/Apollo/MultipartResponseParsingInterceptor/MultipartResponseParsingError": {
+"doc://Apollo/documentation/Apollo/MultipartResponseParsingInterceptor/ParsingError": {
   "abstract" : [
 
   ],
@@ -233,21 +233,21 @@
     },
     {
       "kind" : "identifier",
-      "text" : "MultipartResponseParsingError"
+      "text" : "ParsingError"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/MultipartResponseParsingError",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "MultipartResponseParsingError"
+      "text" : "ParsingError"
     }
   ],
   "role" : "symbol",
-  "title" : "MultipartResponseParsingInterceptor.MultipartResponseParsingError",
+  "title" : "MultipartResponseParsingInterceptor.ParsingError",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/multipartresponseparsingerror"
+  "url" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror"
 },
 "doc://Apollo/documentation/Apollo/MultipartResponseParsingInterceptor/id": {
   "abstract" : [
@@ -339,7 +339,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": any "
     },
     {
       "kind" : "typeIdentifier",
@@ -436,11 +436,12 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">, "
+      "text" : ">, any "
     },
     {
       "kind" : "typeIdentifier",

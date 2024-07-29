@@ -12,12 +12,15 @@ struct UnionTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .schemaFile(type: .union)
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     TemplateString(
     """
     \(documentation: graphqlUnion.documentation, config: config)
-    static let \(graphqlUnion.formattedName) = Union(
-      name: "\(graphqlUnion.name)",
+    \(graphqlUnion.name.typeNameDocumentation)
+    static let \(graphqlUnion.render(as: .typename)) = Union(
+      name: "\(graphqlUnion.name.schemaName)",
       possibleTypes: \(PossibleTypesTemplate())
     )
     """
@@ -33,7 +36,7 @@ struct UnionTemplate: TemplateRenderer {
   ) -> TemplateString {
     """
     \(if: !config.output.schemaTypes.isInModule, "\(config.schemaNamespace.firstUppercased).")\
-    Objects.\(type.formattedName).self
+    Objects.\(type.render(as: .typename)).self
     """
   }
 

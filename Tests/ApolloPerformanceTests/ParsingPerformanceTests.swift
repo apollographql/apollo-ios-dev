@@ -79,7 +79,7 @@ class ParsingPerformanceTests: XCTestCase {
     measure {
       subject.intercept(request: request, response: response) { result in
         XCTAssertSuccessResult(result)
-        XCTAssertEqual(try! result.get(), expectedData)
+        XCTAssertEqual(try! result.get()?.rawData, expectedData)
       }
     }
   }

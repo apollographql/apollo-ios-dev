@@ -3,7 +3,7 @@ import CodegenCLI
 import ApolloCodegenLib
 
 extension LogLevelSetter {
-  static var mock: LogLevelSetter.Type {
+  static var mock: any LogLevelSetter.Type {
     MockLogLevelSetter.self
   }
 }

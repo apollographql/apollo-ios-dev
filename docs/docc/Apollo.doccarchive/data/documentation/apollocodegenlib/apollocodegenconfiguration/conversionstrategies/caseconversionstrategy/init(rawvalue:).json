@@ -17,7 +17,7 @@
     {
       "inlineContent" : [
         {
-          "text" : "Use EnumCaseConversionStrategy instead.",
+          "text" : "Use EnumCases instead.",
           "type" : "text"
         }
       ],

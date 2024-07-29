@@ -28,78 +28,14 @@ class SchemaMetadataTemplateTests: XCTestCase {
   }
 
   private func renderTemplate() -> String {
-    subject.template.description
+    subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
   private func renderDetachedTemplate() -> String? {
-    subject.detachedTemplate?.description
+    subject.renderDetachedTemplate(nonFatalErrorRecorder: .init())?.description
   }
 
   // MARK: Typealias & Protocol Tests
-
-  func test__render__givenModuleEmbeddedInTarget_withInternalAccessModifier_shouldGenerateIDTypealias_withInternalAccess() {
-    // given
-    buildSubject(config: .mock(.embeddedInTarget(name: "CustomTarget", accessModifier: .internal)))
-
-    let expected = """
-    typealias ID = String
-
-    """
-
-    // when
-    let actual = renderTemplate()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
-  }
-
-  func test__render__givenModuleEmbeddedInTarget_withPublicAccessModifier_shouldGenerateIDTypealias_withPublicAccess() {
-    // given
-    buildSubject(config: .mock(.embeddedInTarget(name: "CustomTarget", accessModifier: .public)))
-
-    let expected = """
-    typealias ID = String
-
-    """
-
-    // when
-    let actual = renderTemplate()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
-  }
-
-  func test__render__givenModuleSwiftPackageManager_shouldGenerateIDTypealias_withPublicAccess() {
-    // given
-    buildSubject(config: .mock(.swiftPackageManager))
-
-    let expected = """
-    public typealias ID = String
-
-    """
-
-    // when
-    let actual = renderTemplate()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
-  }
-
-  func test__render__givenModuleOther_shouldGenerateIDTypealias_withPublicAccess() {
-    // given
-    buildSubject(config: .mock(.other))
-
-    let expected = """
-    public typealias ID = String
-
-    """
-
-    // when
-    let actual = renderTemplate()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
-  }
 
   func test__render__givenModuleEmbeddedInTarget_withInternalAccessModifier_shouldGenerateDetachedProtocols_withTypealias_withCorrectCasing_withInternalAccess() {
     // given
@@ -141,7 +77,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
 
     // then
     expect(actualTemplate)
-      .to(equalLineByLine(expectedTemplate, atLine: 3, ignoringExtraLines: true))
+      .to(equalLineByLine(expectedTemplate, ignoringExtraLines: true))
     expect(actualDetached)
       .to(equalLineByLine(expectedDetached))
   }
@@ -186,7 +122,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
 
     // then
     expect(actualTemplate)
-      .to(equalLineByLine(expectedTemplate, atLine: 3, ignoringExtraLines: true))
+      .to(equalLineByLine(expectedTemplate, ignoringExtraLines: true))
     expect(actualDetached)
       .to(equalLineByLine(expectedDetached))
   }
@@ -220,7 +156,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
 
     // then
     expect(actualTemplate)
-      .to(equalLineByLine(expectedTemplate, atLine: 3, ignoringExtraLines: true))
+      .to(equalLineByLine(expectedTemplate, ignoringExtraLines: true))
     expect(actualDetached)
       .to(beNil())
   }
@@ -254,7 +190,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
 
     // then
     expect(actualTemplate)
-      .to(equalLineByLine(expectedTemplate, atLine: 3, ignoringExtraLines: true))
+      .to(equalLineByLine(expectedTemplate, ignoringExtraLines: true))
     expect(actualDetached)
       .to(beNil())
   }
@@ -289,7 +225,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
 
     // then
     expect(actualTemplate)
-      .to(equalLineByLine(expectedTemplate, atLine: 3, ignoringExtraLines: true))
+      .to(equalLineByLine(expectedTemplate, ignoringExtraLines: true))
     expect(actualDetached)
       .to(beNil())
   }
@@ -302,14 +238,14 @@ class SchemaMetadataTemplateTests: XCTestCase {
 
     let expected = """
     enum SchemaMetadata: ApolloAPI.SchemaMetadata {
-      static let configuration: ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
+      static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
     """
 
     // when
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 11, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }
 
   func test__render__givenModuleEmbeddedInTarget_withPublicAccessModifier_shouldGenerateEnumDefinition_withPublicAccess() {
@@ -318,14 +254,14 @@ class SchemaMetadataTemplateTests: XCTestCase {
 
     let expected = """
     enum SchemaMetadata: ApolloAPI.SchemaMetadata {
-      public static let configuration: ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
+      public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
     """
 
     // when
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 11, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }
 
   func test__render__givenModuleSwiftPackageManager_shouldGenerateEnumDefinition_withPublicModifier() {
@@ -334,14 +270,14 @@ class SchemaMetadataTemplateTests: XCTestCase {
 
     let expected = """
     public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
-      public static let configuration: ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
+      public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
     """
 
     // when
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
   }
 
   func test__render__givenModuleOther_shouldGenerateEnumDefinition_withPublicModifier() {
@@ -350,14 +286,14 @@ class SchemaMetadataTemplateTests: XCTestCase {
 
     let expected = """
     public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
-      public static let configuration: ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
+      public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
     """
 
     // when
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
   }
 
   func test__render__givenCocoapodsCompatibleImportStatements_true_shouldGenerateEnumDefinition_withApolloTargetName() {
@@ -366,14 +302,14 @@ class SchemaMetadataTemplateTests: XCTestCase {
 
     let expected = """
     enum SchemaMetadata: Apollo.SchemaMetadata {
-      static let configuration: Apollo.SchemaConfiguration.Type = SchemaConfiguration.self
+      static let configuration: any Apollo.SchemaConfiguration.Type = SchemaConfiguration.self
     """
 
     // when
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 11, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }
 
   func test__render__givenWithReferencedObjects_generatesObjectTypeFunctionCorrectlyCased() {
@@ -404,7 +340,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
   func test__render__givenWithReferencedOtherTypes_generatesObjectTypeNotIncludingNonObjectTypesFunction() {
@@ -436,7 +372,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
   func test__render__givenModuleEmbeddedInTarget_withInternalAccessModifier_rendersTypeNamespaceEnums_withInternalAccess() {
@@ -467,7 +403,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 22))
+    expect(actual).to(equalLineByLine(expected, atLine: 20))
   }
 
   func test__render__givenModuleEmbeddedInTarget_withPublicAccessModifier_rendersTypeNamespaceEnums_withPublicAccess() {
@@ -498,7 +434,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 22))
+    expect(actual).to(equalLineByLine(expected, atLine: 20))
   }
 
   func test__render__givenModuleSwiftPackageManager_rendersTypeNamespaceEnums_withPublicAccess() {
@@ -529,7 +465,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 26))
+    expect(actual).to(equalLineByLine(expected, atLine: 24))
   }
 
   func test__render__givenModuleOther_rendersTypeNamespaceEnums_withPublicAccess() {
@@ -560,7 +496,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 26))
+    expect(actual).to(equalLineByLine(expected, atLine: 24))
   }
 
   // MARK: Documentation Tests
@@ -582,7 +518,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     let rendered = renderTemplate()
 
     // then
-    expect(rendered).to(equalLineByLine(expected, atLine: 11, ignoringExtraLines: true))
+    expect(rendered).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }
 
   func test__render__givenSchemaDocumentation_exclude_hasDocumentation_shouldNotGenerateDocumentationComment() throws {
@@ -602,7 +538,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     let rendered = renderTemplate()
 
     // then
-    expect(rendered).to(equalLineByLine(expected, atLine: 11, ignoringExtraLines: true))
+    expect(rendered).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }
 
 }

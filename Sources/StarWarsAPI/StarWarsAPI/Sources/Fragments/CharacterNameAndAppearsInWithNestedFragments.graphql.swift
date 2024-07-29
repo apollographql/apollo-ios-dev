@@ -11,16 +11,16 @@ public struct CharacterNameAndAppearsInWithNestedFragments: StarWarsAPI.Selectio
   public let __data: DataDict
   public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+  public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
   public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .fragment(CharacterNameWithNestedAppearsInFragment.self),
   ] }
 
-  /// The movies this character appears in
-  public var appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?] { __data["appearsIn"] }
   /// The name of the character
   public var name: String { __data["name"] }
+  /// The movies this character appears in
+  public var appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?] { __data["appearsIn"] }
 
   public struct Fragments: FragmentContainer {
     public let __data: DataDict
@@ -32,19 +32,19 @@ public struct CharacterNameAndAppearsInWithNestedFragments: StarWarsAPI.Selectio
 
   public init(
     __typename: String,
-    appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?],
-    name: String
+    name: String,
+    appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?]
   ) {
     self.init(_dataDict: DataDict(
       data: [
         "__typename": __typename,
-        "appearsIn": appearsIn,
         "name": name,
+        "appearsIn": appearsIn,
       ],
       fulfilledFragments: [
         ObjectIdentifier(CharacterNameAndAppearsInWithNestedFragments.self),
-        ObjectIdentifier(CharacterAppearsIn.self),
-        ObjectIdentifier(CharacterNameWithNestedAppearsInFragment.self)
+        ObjectIdentifier(CharacterNameWithNestedAppearsInFragment.self),
+        ObjectIdentifier(CharacterAppearsIn.self)
       ]
     ))
   }

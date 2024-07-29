@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/146856/124335690-fc7ecd80-db4f-11eb-93fa-dcf4469bb07b.png" alt="Apollo GraphQL"/>
+  <img src="https://raw.githubusercontent.com/apollographql/apollo-client-devtools/main/assets/apollo-wordmark.svg" alt="Apollo GraphQL"/>
 </p>
 
 <p align="center">
@@ -14,12 +14,17 @@
   </a>
 </p>
 
+| ☑️  Apollo Clients User Survey |
+| :----- |
+| What do you like best about Apollo iOS? What needs to be improved? Please tell us by taking a [one-minute survey](https://docs.google.com/forms/d/e/1FAIpQLSczNDXfJne3ZUOXjk9Ursm9JYvhTh1_nFTDfdq3XBAFWCzplQ/viewform?usp=pp_url&entry.1170701325=Apollo+iOS&entry.204965213=Readme). Your responses will help us understand Apollo iOS usage and allow us to serve you better. |
+
 ### Apollo iOS Dev
 
 This repo contains the development environment for working on and contributing to the Apollo iOS ecosystem. This repo uses a git subtree setup to include the following repos for development:
 
 - [apollo-ios](https://github.com/apollographql/apollo-ios)
 - [apollo-ios-codegen](https://github.com/apollographql/apollo-ios-codegen)
+- [apollo-ios-pagination](https://github.com/apollographql/apollo-ios-pagination)
 
 All code changes are pushed out to their respective repos whenever a PR is merged. This allows us to provide a cohesive development environment while also providing packages to users that contain less overall files and dependencies, such as things only really used for development and testing.
 
@@ -29,10 +34,10 @@ To get started contributing to Apollo iOS, the first step you need to take is to
 
 ### Tuist
 
-This project uses [Tuist](https://tuist.io/) to handle generation of the Xcode workspace for development. In order to use Tuist run the following command in terminal to ensure you have it installed:
+This project uses [Tuist](https://tuist.io/) to handle generation of the Xcode workspace for development. In order to use Tuist run the following local script in terminal to ensure you have it installed:
 
 ```
-curl -Ls https://install.tuist.io | bash
+./scripts/install-tuist.sh
 ```
 
 In order to generate the project/workspace you will need to run the [tuist generate](https://docs.tuist.io/commands/generate) command from the project root.
@@ -55,7 +60,7 @@ After working and making changes in the `ApolloDev.xcworkspace` you can commit y
 
 ## Issues
 
-To report an issue, bug, or feature request ou can do so in the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repo.
+To report an issue, bug, or feature request, you can do so in the [apollo-ios](https://github.com/apollographql/apollo-ios/issues) repo.
 
 ## Roadmap
 
@@ -78,11 +83,11 @@ For further information on contributing, reporting issues, suggesting features, 
 
 ## Who is Apollo?
 
-[Apollo](https://apollographql.com/) builds open-source software and a graph platform to unify GraphQL across your apps and services. We help you ship faster with:
+[Apollo](https://apollographql.com/) builds open-source tools and commercial services to make application development easier, better, and accessible to more people. We help you ship faster with:
 
-- [Apollo Studio](https://www.apollographql.com/studio/develop/) – A free, end-to-end platform for managing your GraphQL lifecycle. Track your GraphQL schemas in a hosted registry to create a source of truth for everything in your graph. Studio provides an IDE (Apollo Explorer) so you can explore data, collaborate on queries, observe usage, and safely make schema changes.
-- [Apollo Federation](https://www.apollographql.com/apollo-federation) – The industry-standard open architecture for building a distributed graph. Use Apollo’s gateway to compose a unified graph from multiple subgraphs, determine a query plan, and route requests across your services.
-- [Apollo Client](https://www.apollographql.com/apollo-client/) – The most popular GraphQL client for the web. Apollo also builds and maintains [Apollo iOS](https://github.com/apollographql/apollo-ios) and [Apollo Kotlin](https://github.com/apollographql/apollo-kotlin).
+- [GraphOS](https://www.apollographql.com/graphos) - The platform for building, managing, and scaling a supergraph: a unified network of your organization's microservices and their data sources—all composed into a single distributed API.
+- [Apollo Federation](https://www.apollographql.com/federation) – The industry-standard open architecture for building a distributed graph. Use Apollo’s gateway to compose a unified graph from multiple subgraphs, determine a query plan, and route requests across your services.
+- [Apollo Client](https://github.com/apollographql/apollo-client) – The most popular GraphQL client for the web. Apollo also builds and maintains [Apollo iOS](https://github.com/apollographql/apollo-ios) and [Apollo Kotlin](https://github.com/apollographql/apollo-kotlin).
 - [Apollo Server](https://www.apollographql.com/docs/apollo-server/) – A production-ready JavaScript GraphQL server that connects to any microservice, API, or database. Compatible with all popular JavaScript frameworks and deployable in serverless environments.
 
 ## Learn how to build with Apollo

@@ -2,13 +2,13 @@
 title: Using the @defer directive in Apollo iOS
 ---
 
-> ⚠️ **The `@defer` directive is currently [experimental](https://www.apollographql.com/docs/resources/release-stages/#experimental-features) in Apollo iOS and is available for use in the `TBD` release.** If you have feedback on the feature, please let us know via [GitHub issues](https://github.com/apollographql/apollo-ios/issues/new?assignees=&labels=bug%2Cneeds+investigation&projects=&template=bug_report.yaml).
+> ⚠️ **The `@defer` directive is currently an [experimental feature](https://www.apollographql.com/docs/resources/release-stages/#experimental-features) in Apollo iOS and is available for use from version 1.14.0.** If you have feedback on the feature, please let us know via a new [GitHub issue](https://github.com/apollographql/apollo-ios/issues/new?assignees=&labels=bug%2Cneeds+investigation&projects=&template=bug_report.yaml) or search through any [existing `@defer`-related issues](https://github.com/apollographql/apollo-ios/issues?q=is%3Aissue+is%3Aopen+%22defer%22).
 
-Beginning with version `TBD`, Apollo iOS provides experimental support of [the `@defer` directive](https://github.com/graphql/graphql-wg/blob/main/rfcs/DeferStream.md), which enables your queries to receive data for specific fields asynchronously. This is helpful whenever some fields in a query take much longer to resolve than the others.
+The [`@defer` directive](https://github.com/graphql/graphql-wg/blob/main/rfcs/DeferStream.md) enables your queries to receive data for specific fields asynchronously. This is helpful whenever some fields in a query take much longer to resolve than the others.
 
-For example, let's say we're building a social media application that can quickly fetch a user's basic profile information, but retrieving that user's friends takes longer. If we include _all_ of those fields in a single query, we want to be able to display the profile information as soon as it's available, instead of waiting for the friend fields to resolve.
+For example, let's say we're building a social media application that can quickly fetch a user's basic profile information, but retrieving that user's friends takes longer. If we include all of those fields in a single query we want to be able to display the basic profile information as soon as it's available instead of waiting for the `friends` field to resolve.
 
-To achieve this, we can apply the `@defer` directive to an in-line fragment that contains all slow-resolving fields related to friend data:
+To achieve this, we can apply the `@defer` directive to an in-line fragment that contains all slow-resolving fields related to `friend` data:
 
 ```graphql
 query PersonQuery($personId: ID!) {
@@ -20,7 +20,7 @@ query PersonQuery($personId: ID!) {
 
     # highlight-start
     # Friend fields (slower)
-    ... on User @defer {
+    ... on User @defer(label: "deferredFriends") {
       friends {
         id
       }
@@ -30,18 +30,18 @@ query PersonQuery($personId: ID!) {
 }
 ```
 
-In the generated code for this query, the `asUser` field for the fragment will be optional. That is because when the initial payload is received from the server, the fields of the fragment are not yet present. A `Person` will be returned with only the basic fields filled in.
+In the generated code for this query the `asUser` type case will be optional, it will also have a `fragments` container in which there will be an optional fragment with the same name as the `label` property value used in the query. The deferred fragment is optional because it will not be returned with the basic fields, it will be returned in a separate response instead.
 
-When the fields of the fragment are available, a new `Person` will be returned, this time with the `asUser` field present and filled with the fields of the fragment.
+All deferred fragments are annotated with the `@Deferred` property wrapper. This allows you to check the state of any deferred fragment through it's projected value. When the fields of the deferred fragment are received, another response will be returned with all basic fields and `friends` fields too.
 
 ```swift
 client.fetch(query: ExampleQuery()) { result in
   switch (result) {
   case let .success(data):
-    if let item = data.data?.person.asUser {
-      print("Query Success! Received all fields")
+    if case .fulfilled = data.data?.person.asUser?.fragments.$deferredFriends {
+      print("Query Success! Received all fields.")
     } else {
-      print("Query Success! Received basic fields")
+      print("Query Success! Received basic fields only.")
     }
   case let .failure(error):
     print("Query Failure! \(error)")
@@ -52,9 +52,20 @@ client.fetch(query: ExampleQuery()) { result in
 Will print something like this:
 
 ```
-Query Success! Received basic fields
-Query Success! Received all fields
+Query Success! Received basic fields only.
+Query Success! Received all fields.
 ```
 
-### Limitations and Known issues
-* The Client Controlled Nullability experimental feature has been removed for the preview release of the Defer feature. We are hoping to be able to reintroduce it before a GA release of Defer.
+#### Requirements
+* The @defer directive must be used on a type case.
+* The @defer directive must have a `label` property.
+
+### Caching
+
+#### Reading cache data
+
+Typical caching behaviour and functionality is supported for operations with the `@defer` directive too. Cache reads behave slightly differently to network requests in that _all_ cached data, including any cached deferred fragments, will be returned in the first response. In other words, if the entire query has been cached then there will only be one response with all basic and deferred fragments. If you manually added only the basic data to the cache then you would receive only the basic data in the first response and depending on the cache policy used may get the deferred fragments returned from the network separately.
+
+#### Writing cache data
+
+We're still building [Selection Set Initializer](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/selectionsetinitializers) compatibility for deferred fragments. Until that is complete, writing to the cache requires that the local cache mutation, or named fragment selection set, be initialized using the private `.init(_dataDict: DataDict)` function.

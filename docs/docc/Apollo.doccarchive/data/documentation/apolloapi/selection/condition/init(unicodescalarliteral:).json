@@ -62,7 +62,7 @@
       ]
     },
     "extendedModule" : "Swift",
-    "externalID" : "s:s43ExpressibleByExtendedGraphemeClusterLiteralPs013UnicodeScalarF4TypeQz0cdefI0RtzrlE07unicodehF0xAF_tcfc::SYNTHESIZED::s:9ApolloAPI9SelectionO9ConditionV",
+    "externalID" : "s:s43ExpressibleByExtendedGraphemeClusterLiteralPs013UnicodeScalarF4TypeQz0cdefI0RtzrlE07unicodehF0xAF_tcfc::SYNTHESIZED::s:9ApolloAPI9SelectionO9ConditionO",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -90,6 +90,7 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:s43ExpressibleByExtendedGraphemeClusterLiteralP0cdeF4TypeQa",
         "text" : "ExtendedGraphemeClusterLiteralType"
       },
       {
@@ -155,6 +156,7 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s43ExpressibleByExtendedGraphemeClusterLiteralP0cdeF4TypeQa",
               "text" : "ExtendedGraphemeClusterLiteralType"
             },
             {
@@ -279,7 +281,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "struct"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -377,6 +379,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s43ExpressibleByExtendedGraphemeClusterLiteralP0cdeF4TypeQa",
       "text" : "ExtendedGraphemeClusterLiteralType"
     },
     {

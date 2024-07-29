@@ -18,7 +18,7 @@ class TestMockUsageTests: XCTestCase {
     let mockHeight = Mock<Height>(feet: 2, inches: 7)
     let mockHuman = Mock<Human>(firstName: "Human")
       
-    let mockCrocodile = Mock<Crocodile>(id: "Crocodile", skinCovering: .case(.scales))
+    let mockCrocodile = Mock<CustomCrocodile>(id: "Crocodile", skinCovering: .case(.scales))
     let mockBird = Mock<Bird>(id: "Bird", skinCovering: .case(.feathers))
       
     // when

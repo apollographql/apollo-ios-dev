@@ -72,6 +72,15 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s28CustomDebugStringConvertibleP",
+              "text" : "CustomDebugStringConvertible"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:SH",
               "text" : "Hashable"
             }
@@ -84,6 +93,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/SH"
       ],
@@ -95,6 +105,7 @@
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CompositeInlineFragment",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CompositeSelectionSet",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferrable",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Fragment",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InlineFragment",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableRootSelectionSet",
@@ -131,6 +142,7 @@
     {
       "generated" : true,
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/CustomDebugStringConvertible-Implementations",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Equatable-Implementations",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Hashable-Implementations"
       ],
@@ -296,6 +308,37 @@
   "title" : "CompositeSelectionSet",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/compositeselectionset"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/Deferrable": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Deferrable"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferrable",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Deferrable"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "Deferrable",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/deferrable"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Fragment": {
   "abstract" : [
@@ -533,6 +576,17 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset"
 },
+"doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/CustomDebugStringConvertible-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/CustomDebugStringConvertible-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "CustomDebugStringConvertible Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/selectionset\/customdebugstringconvertible-implementations"
+},
 "doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/Equatable-Implementations": {
   "abstract" : [
 
@@ -738,6 +792,7 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP9FragmentsQa",
       "text" : "Fragments"
     }
   ],
@@ -747,6 +802,11 @@
   "title" : "fragments",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset\/fragments-swift.property"
+},
+"doc://ApolloAPI/s28CustomDebugStringConvertibleP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
+  "title" : "Swift.CustomDebugStringConvertible",
+  "type" : "unresolvable"
 }
 }
 }

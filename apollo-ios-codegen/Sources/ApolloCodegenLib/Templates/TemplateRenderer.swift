@@ -1,4 +1,5 @@
 import TemplateString
+import OrderedCollections
 
 // MARK: TemplateRenderer
 
@@ -7,7 +8,7 @@ enum TemplateTarget: Equatable {
   /// Used in schema types files; enum, input object, union, etc.
   case schemaFile(type: SchemaFileType)
   /// Used in operation files; query, mutation, fragment, etc.
-  case operationFile
+  case operationFile(moduleImports: OrderedSet<String>? = nil)
   /// Used in files that define a module; Swift Package Manager, etc.
   case moduleFile
   /// Used in test mock files; schema object `Mockable` extensions
@@ -23,7 +24,7 @@ enum TemplateTarget: Equatable {
     case customScalar
     case inputObject
 
-    var namespaceComponent: String? {      
+    var namespaceComponent: String? {
       switch self {
       case .schemaMetadata, .enum, .customScalar, .inputObject, .schemaConfiguration:
         return nil
@@ -44,43 +45,85 @@ enum TemplateTarget: Equatable {
 /// All templates that output to a file should conform to this protocol, this does not include
 /// templates that are used by others such as `HeaderCommentTemplate` or `ImportStatementTemplate`.
 protocol TemplateRenderer {
-  /// File target of the template.
-  var target: TemplateTarget { get }
-  /// The template for the header to render.
-  var headerTemplate: TemplateString? { get }
-  /// A template that must be rendered outside of any namespace wrapping.
-  var detachedTemplate: TemplateString? { get }
-  /// A template that can be rendered within any namespace wrapping.
-  var template: TemplateString { get }
   /// Shared codegen configuration.
   var config: ApolloCodegen.ConfigurationContext { get }
+
+  /// File target of the template.
+  var target: TemplateTarget { get }
+
+  /// Renders the header of the template.
+  func renderHeaderTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString?
+
+  /// Renders a template section that must be outside of any namespace wrapping.
+  ///
+  /// This section is rendered below the header and import statements and above the body and any
+  /// namespace wrapper used in the template.
+  func renderDetachedTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString?
+
+  /// Renders the body of the template. This body can be rendered within any namespace wrapping.
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString
 }
 
 // MARK: Extension - File rendering
 
 extension TemplateRenderer {
 
-  var headerTemplate: TemplateString? {
+  func renderHeaderTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString? {
     TemplateString(HeaderCommentTemplate.template.description)
   }
 
-  var detachedTemplate: TemplateString? { nil }
+  func renderDetachedTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString? {
+    nil
+  }
+
+  /// A tuple of the `String` for the `body` of a rendered template and an array of
+  /// non-fatal `errors` that occured during rendering.
+  ///
+  /// If there are no non-fatal errors during rendering, the `errors` array will be empty.
+  /// Any fatal errors should be thrown during rendering.
+  typealias RenderResult = (body: String, errors: [ApolloCodegen.NonFatalError])
 
   /// Renders the template converting all input values and generating a final String
   /// representation of the template.
   ///
   /// - Parameter config: Shared codegen configuration.
   /// - Returns: Swift code derived from the template format.
-  func render() -> String {
-    switch target {
-    case let .schemaFile(type): return renderSchemaFile(type)
-    case .operationFile: return renderOperationFile()
-    case .moduleFile: return renderModuleFile()
-    case .testMockFile: return renderTestMockFile()
-    }
+  func render() -> RenderResult {
+    let errorRecorder = ApolloCodegen.NonFatalError.Recorder()
+
+    let body = {
+      switch target {
+      case let .schemaFile(type): 
+        return renderSchemaFile(type, errorRecorder)
+
+      case let .operationFile(moduleImports):
+        return renderOperationFile(moduleImports, errorRecorder)
+
+      case .moduleFile:
+        return renderModuleFile(errorRecorder)
+
+      case .testMockFile:
+        return renderTestMockFile(errorRecorder)
+      }
+    }()
+
+    return (body, errorRecorder.recordedErrors)
   }
 
-  private func renderSchemaFile(_ type: TemplateTarget.SchemaFileType) -> String {
+  private func renderSchemaFile(
+    _ type: TemplateTarget.SchemaFileType,
+    _ errorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> String {
     let namespace: String? = {
       if case .schemaConfiguration = type {
         return nil
@@ -101,47 +144,63 @@ extension TemplateRenderer {
 
     return TemplateString(
     """
-    \(ifLet: headerTemplate, { "\($0)\n" })
+    \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
     \(ImportStatementTemplate.SchemaType.template(for: config))
 
-    \(ifLet: detachedTemplate, { "\($0)\n" })
-    \(ifLet: namespace, { template.wrappedInNamespace($0, accessModifier: accessControlModifier(for: .namespace)) }, else: template)
+    \(ifLet: renderDetachedTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
+    \(ifLet: namespace, {
+      renderBodyTemplate(nonFatalErrorRecorder: errorRecorder)
+        .wrappedInNamespace(
+          $0,
+          accessModifier: accessControlModifier(for: .namespace)
+        )
+      },
+      else: renderBodyTemplate(nonFatalErrorRecorder: errorRecorder))
     """
     ).description
   }
 
-  private func renderOperationFile() -> String {
+  private func renderOperationFile(
+    _ moduleImports: OrderedSet<String>?,
+    _ errorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> String {
     TemplateString(
     """
-    \(ifLet: headerTemplate, { "\($0)\n" })
+    \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
     \(ImportStatementTemplate.Operation.template(for: config))
+    \(ifLet: moduleImports, { "\(ModuleImportStatementTemplate.template(moduleImports: $0))" })
 
     \(if: config.output.operations.isInModule && !config.output.schemaTypes.isInModule,
-      template.wrappedInNamespace(
-        config.schemaNamespace.firstUppercased,
-        accessModifier: accessControlModifier(for: .namespace)
-    ), else:
-      template)
+      renderBodyTemplate(nonFatalErrorRecorder: errorRecorder)
+        .wrappedInNamespace(
+          config.schemaNamespace.firstUppercased,
+          accessModifier: accessControlModifier(for: .namespace)
+      ),
+      else: renderBodyTemplate(nonFatalErrorRecorder: errorRecorder))
     """
     ).description
   }
 
-  private func renderModuleFile() -> String {
+  private func renderModuleFile(
+    _ errorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> String {
     TemplateString(
     """
-    \(ifLet: headerTemplate, { "\($0)\n" })
-    \(template)
+    \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
+    \(renderBodyTemplate(nonFatalErrorRecorder: errorRecorder))
     """
     ).description
   }
 
-  private func renderTestMockFile() -> String {
+  private func renderTestMockFile(
+    _ errorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> String {
     TemplateString(
     """
-    \(ifLet: headerTemplate, { "\($0)\n" })
+    \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
     \(ImportStatementTemplate.TestMock.template(for: config))
 
-    \(template)
+    \(renderBodyTemplate(nonFatalErrorRecorder: errorRecorder))
     """
     ).description
   }
@@ -299,6 +358,20 @@ struct ImportStatementTemplate {
       """
     }
   }
+}
+
+/// Provides the format to import additional Swift modules required by the template type.
+/// These are custom import statements defined using the `@import(module:)` directive.
+struct ModuleImportStatementTemplate {
+
+  static func template(
+    moduleImports: OrderedSet<String>
+  ) -> TemplateString {
+    return """
+    \(moduleImports.map { "import \($0)" }.joined(separator: "\n"))
+    """
+  }
+    
 }
 
 fileprivate extension ApolloCodegenConfiguration {

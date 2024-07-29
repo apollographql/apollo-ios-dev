@@ -111,7 +111,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : ": (any "
       },
       {
         "kind" : "typeIdentifier",
@@ -120,7 +120,7 @@
       },
       {
         "kind" : "text",
-        "text" : "?, "
+        "text" : ")?, "
       },
       {
         "kind" : "externalParam",
@@ -166,16 +166,21 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
         "text" : "Data"
       },
       {
         "kind" : "text",
-        "text" : ">?) -> "
+        "text" : ">?) -> (any "
       },
       {
         "kind" : "typeIdentifier",
         "preciseIdentifier" : "s:6Apollo11CancellableP",
         "text" : "Cancellable"
+      },
+      {
+        "kind" : "text",
+        "text" : ")"
       }
     ],
     "modules" : [
@@ -288,7 +293,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": "
+              "text" : ": (any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestContext",
@@ -298,7 +303,7 @@
             },
             {
               "kind" : "text",
-              "text" : "? = nil, "
+              "text" : ")? = nil, "
             },
             {
               "kind" : "externalParam",
@@ -345,11 +350,12 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
               "text" : "Data"
             },
             {
               "kind" : "text",
-              "text" : ">? = nil) -> "
+              "text" : ">? = nil) -> (any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable",
@@ -359,7 +365,7 @@
             },
             {
               "kind" : "text",
-              "text" : " "
+              "text" : ") "
             },
             {
               "kind" : "keyword",
@@ -570,7 +576,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": (any "
     },
     {
       "kind" : "typeIdentifier",
@@ -579,7 +585,7 @@
     },
     {
       "kind" : "text",
-      "text" : "?, "
+      "text" : ")?, "
     },
     {
       "kind" : "externalParam",
@@ -625,16 +631,21 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
     },
     {
       "kind" : "text",
-      "text" : ">?) -> "
+      "text" : ">?) -> (any "
     },
     {
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "s:6Apollo11CancellableP",
       "text" : "Cancellable"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:contextIdentifier:context:queue:resultHandler:)",

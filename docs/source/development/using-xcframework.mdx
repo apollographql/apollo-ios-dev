@@ -1,0 +1,25 @@
+---
+title: Using Apollo as an XCFramework
+---
+
+If you need to use Apollo iOS and the code generation output as an XCFramework, this page will give a high level overview of how to do so, as well as collect some tips on things you may encounter that have been reported by the community.
+
+## Creating the XCFramework
+
+### Apollo iOS
+
+In order to use Apollo iOS as an XCFramework, we provide a [apollo-ios-xcframework](https://github.com/apollographql/apollo-ios-xcframework) repository that can generate XCFrameworks from the Apollo iOS code including the necessary commands. This can be used as is or as a starting point for you to customize further for your needs.
+
+### Code Generation Output
+
+You can also use the output from code generation as an XCFramework, you will need to configure this setup yourself. You can use the [code generation test](https://github.com/apollographql/apollo-ios-dev/tree/main/Tests/TestCodeGenConfigurations/CodegenXCFramework) project as an example/starting point for this.
+
+## Tips
+
+### Enum `@unknown` case
+
+For enums in Apollo iOS and code generation output, you should implement the `@unknown` case anywhere you are using the enumerations. For more information on `@unknown` see the [Swift Docs](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/statements#Switching-Over-Future-Enumeration-Cases).
+
+### Custom Scalars
+
+If you have custom scalars that are typealiasing `Foundation` types, you will need to do an `@_exported import Foundation` in order to prevent a Swift warning which will become an error in Swift 6.

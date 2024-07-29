@@ -7,21 +7,20 @@ extension Target {
 
         return Target(
             name: target.name,
-            platform: .macOS,
+            destinations: target.destinations,
             product: .unitTests,
             bundleId: "com.apollographql.\(target.name.lowercased())",
-            deploymentTarget: target.deploymentTarget,
+            deploymentTargets: target.deploymentTargets,
             sources: [
                 "Tests/\(target.name)/**",
             ],
             dependencies: [
                 .target(name: ApolloTarget.apolloInternalTestHelpers.name),
-                .target(name: ApolloTarget.starWarsAPI.name),
                 .package(product: "Apollo"),
                 .package(product: "ApolloAPI"),
                 .package(product: "ApolloTestSupport"),
-                .package(product: "Nimble"),
-                .package(product: "ApolloPagination")
+                .package(product: "ApolloPagination"),
+                .package(product: "Nimble")
             ],
             settings: .forTarget(target)
         )

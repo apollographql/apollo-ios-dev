@@ -25,10 +25,11 @@ class OperationIdentifierFactoryTests: XCTestCase {
     schemaSDL = nil
     document = nil
     operation = nil
+    ir = nil
     super.tearDown()
   }
 
-  // MARK: = Helpers
+  // MARK: - Helpers
 
   func getOperation(
     named operationName: String? = nil,
@@ -47,43 +48,44 @@ class OperationIdentifierFactoryTests: XCTestCase {
 
   // MARK: - Default Operation Identifier Computation Tests
 
-    func test__buildOperation__givenOperationWithNoFragments__hasCorrectOperationIdentifier() async throws {
-      // given
-      document = try String(
-        contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroAndFriendsNames")
-      )
+  func test__identifierForOperation__givenOperationWithNoFragments__hasCorrectOperationIdentifier() async throws {
+    // given
+    document = try String(
+      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroAndFriendsNames")
+    )
 
-      schemaSDL = try String(
-        contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema)
+    schemaSDL = try String(
+      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema)
 
-      let expected = "1e36c3331171b74c012b86caa04fbb01062f37c61227655d9c0729a62c6f7285"
-      try await getOperation(named: "HeroAndFriendsNames", fromJSONSchema: true)
+    let expected = "1e36c3331171b74c012b86caa04fbb01062f37c61227655d9c0729a62c6f7285"
+    try await getOperation(named: "HeroAndFriendsNames", fromJSONSchema: true)
 
-      // when
-      let actual = try await subject.identifier(for: operation)
+    // when
+    let actual = try await subject.identifier(for: operation)
 
-      // then
-      expect(actual).to(equal(expected))
-    }
+    // then
+    expect(actual).to(equal(expected))
+  }
 
-    func test__buildOperation__givenOperationWithFragment__hasCorrectOperationIdentifier() async throws {
-      // given
-      document = try String(
-        contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroAndFriendsNamesWithFragment")
-      ) + "\n" + String(
-        contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroName")
-      )
+  func test__identifierForOperation__givenOperationWithFragment__hasCorrectOperationIdentifier() async throws {
+    // given
+    document = try String(
+      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroAndFriendsNamesWithFragment")
+    ) + "\n" + String(
+      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.GraphQLOperation(named: "HeroName")
+    )
 
-      schemaSDL = try String(
-        contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema)
+    schemaSDL = try String(
+      contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema)
 
-      let expected = "599cd7d91ede7a5508cdb26b424e3b8e99e6c2c5575b799f6090695289ff8e99"
-      try await getOperation(named: "HeroAndFriendsNamesWithFragment", fromJSONSchema: true)
+    let expected = "599cd7d91ede7a5508cdb26b424e3b8e99e6c2c5575b799f6090695289ff8e99"
+    try await getOperation(named: "HeroAndFriendsNamesWithFragment", fromJSONSchema: true)
 
-      // when
-      let actual = try await subject.identifier(for: operation)
+    // when
+    let actual = try await subject.identifier(for: operation)
 
-      // then
-      expect(actual).to(equal(expected))
-    }
+    // then
+    expect(actual).to(equal(expected))
+  }
+
 }

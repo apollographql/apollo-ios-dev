@@ -12,8 +12,10 @@ on:
 jobs:
   split-subtrees:
     if: ${{ github.event.pull_request.merged }}
-    runs-on: macos-13
+    runs-on: macos-latest
     name: Split and Push Subtrees
+    outputs:
+      releaseVersion: ${{ steps.getVersion.outputs.RELEASE_VERSION }}
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
@@ -32,8 +34,10 @@ jobs:
       uses: ./.github/actions/configure-git
     - name: Update Merge Commit Message
       shell: bash
+      env:
+        PR_TITLE: ${{ github.event.pull_request.title }}
       run: |
-        git commit --allow-empty --amend -m "${{ github.event.pull_request.title }} (apollographql/apollo-ios-dev#${{ github.event.pull_request.number }})"
+        git commit --allow-empty --amend -m "$PR_TITLE (apollographql/apollo-ios-dev#${{ github.event.pull_request.number }})"
         git push --force-with-lease
     - name: Subtree - Apollo iOS
       uses: ./.github/actions/subtree-split-push
@@ -65,4 +69,22 @@ jobs:
       if: always()
       shell: bash
       run: |
+        git fetch
         git push
+
+  publish-release:
+    if: success('split-subtrees') && startsWith(github.ref, 'refs/heads/release/')
+    needs: split-subtrees
+    runs-on: macos-latest
+    name: Publish Release
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Configure Git
+        uses: ./.github/actions/configure-git
+      - name: Trigger publish-release workflow
+        shell: bash
+        run: |
+          gh workflow run publish-release.yml
+        env:
+          GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}

@@ -144,6 +144,7 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/AnyHashableConvertible",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CompositeInlineFragment",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CompositeSelectionSet",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferrable",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Fragment",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/FragmentContainer",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLMutation",
@@ -170,6 +171,8 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheKeyInfo",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DeferredFragmentIdentifier",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ListData",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ObjectData",
@@ -690,6 +693,121 @@
   "title" : "DataDict",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/datadict"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/Deferrable": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Deferrable"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferrable",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Deferrable"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "Deferrable",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/deferrable"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/Deferred": {
+  "abstract" : [
+    {
+      "text" : "Wraps a deferred selection set (either an inline fragment or fragment spread) to expose the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "fulfilled value as well as the fulfilled state through the projected value.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Deferred"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Deferred"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "Deferred",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/deferred"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/DeferredFragmentIdentifier": {
+  "abstract" : [
+    {
+      "text" : "A unique identifier used as a key to map a deferred selection set type to an incremental",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "response label and path.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "DeferredFragmentIdentifier"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DeferredFragmentIdentifier",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "DeferredFragmentIdentifier"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "DeferredFragmentIdentifier",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/deferredfragmentidentifier"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/DocumentType": {
   "abstract" : [

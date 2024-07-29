@@ -9,7 +9,7 @@ public class MockSchemaMetadata: SchemaMetadata {
   public init() { }
 
   public static var _configuration: SchemaConfiguration.Type = SchemaConfiguration.self
-  public static var configuration: ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
+  public static var configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
 
   private static let testObserver = TestObserver() { _ in
     stub_objectTypeForTypeName = nil
@@ -83,7 +83,7 @@ public struct MockCacheKeyProvider {
 // MARK: - Custom Mock Schemas
 
 public enum MockSchema1: SchemaMetadata {
-  public static var configuration: SchemaConfiguration.Type = MockSchema1Configuration.self
+  public static var configuration: any SchemaConfiguration.Type = MockSchema1Configuration.self
 
   public static func objectType(forTypename __typename: String) -> Object? {
     Object(typename: __typename, implementedInterfaces: [])
@@ -97,7 +97,7 @@ public enum MockSchema1Configuration: SchemaConfiguration {
 }
 
 public enum MockSchema2: SchemaMetadata {
-  public static var configuration: SchemaConfiguration.Type = MockSchema2Configuration.self
+  public static var configuration: any SchemaConfiguration.Type = MockSchema2Configuration.self
 
   public static func objectType(forTypename __typename: String) -> Object? {
     Object(typename: __typename, implementedInterfaces: [])

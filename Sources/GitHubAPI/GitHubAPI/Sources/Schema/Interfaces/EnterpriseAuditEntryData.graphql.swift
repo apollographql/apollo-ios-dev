@@ -5,5 +5,5 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Metadata for an audit entry containing enterprise account information.
-  static let EnterpriseAuditEntryData = Interface(name: "EnterpriseAuditEntryData")
+  static let EnterpriseAuditEntryData = ApolloAPI.Interface(name: "EnterpriseAuditEntryData")
 }

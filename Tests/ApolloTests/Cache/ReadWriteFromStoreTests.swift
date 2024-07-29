@@ -6,13 +6,13 @@ import ApolloInternalTestHelpers
 
 class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
-  var cacheType: TestCacheProvider.Type {
+  var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
 
   static let defaultWaitTimeout: TimeInterval = 5.0
 
-  var cache: NormalizedCache!
+  var cache: (any NormalizedCache)!
   var store: ApolloStore!
 
   override func setUpWithError() throws {
@@ -276,7 +276,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
       class AsDroid: MockTypeCase {
         typealias Schema = MockSchemaMetadata
-        override class var __parentType: ParentType { Types.Droid }
+        override class var __parentType: any ParentType { Types.Droid }
 
         override class var __selections: [Selection] { [
           .field("primaryFunction", String.self),
@@ -332,7 +332,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
       class AsDroid: MockTypeCase {
         typealias Schema = MockSchemaMetadata
-        override class var __parentType: ParentType { Types.Droid }
+        override class var __parentType: any ParentType { Types.Droid }
 
         override class var __selections: [Selection] { [
           .field("primaryFunction", String.self),
@@ -913,7 +913,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
           public var __data: DataDict = .empty()
 
           public typealias RootEntityType = Hero
-          static let __parentType: ParentType = Types.Droid
+          static let __parentType: any ParentType = Types.Droid
           init(_dataDict: DataDict) { __data = _dataDict }
 
           static var __selections: [Selection] { [
@@ -1002,7 +1002,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       struct AsDroid: MockMutableInlineFragment {
         public var __data: DataDict = .empty()
         public typealias RootEntityType = GivenFragment
-        static let __parentType: ParentType = Types.Droid
+        static let __parentType: any ParentType = Types.Droid
         init(_dataDict: DataDict) { __data = _dataDict }
 
         static var __selections: [Selection] { [
@@ -1051,8 +1051,6 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
           var givenFragment: GivenFragment {
             get { _toFragment() }
             _modify { var f = givenFragment; yield &f; __data = f.__data }
-            @available(*, unavailable, message: "mutate properties of the fragment instead.")
-            set { preconditionFailure() }
           }
         }
       }
@@ -1134,7 +1132,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       struct AsDroid: MockMutableInlineFragment {
         public var __data: DataDict = .empty()
         public typealias RootEntityType = GivenFragment
-        static let __parentType: ParentType = Types.Droid
+        static let __parentType: any ParentType = Types.Droid
         init(_dataDict: DataDict) { __data = _dataDict }
 
         static var __selections: [Selection] { [
@@ -1184,7 +1182,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
         struct AsDroid: MockMutableInlineFragment {
           public var __data: DataDict = .empty()
           public typealias RootEntityType = GivenFragment
-          static let __parentType: ParentType = Types.Droid
+          static let __parentType: any ParentType = Types.Droid
           init(_dataDict: DataDict) { __data = _dataDict }
 
           static var __selections: [Selection] { [
@@ -1204,8 +1202,6 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
           var givenFragment: GivenFragment? {
             get { _toFragment() }
             _modify { var f = givenFragment; yield &f; if let newData = f?.__data { __data = newData } }
-            @available(*, unavailable, message: "mutate properties of the fragment instead.")
-            set { preconditionFailure() }
           }
         }
       }
@@ -1715,7 +1711,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     class Data: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
-      override class var __parentType: ParentType { Types.Query }
+      override class var __parentType: any ParentType { Types.Query }
       override class var __selections: [Selection] {[
         .field("name", String?.self)
       ]}
@@ -1781,7 +1777,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     class Data: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
-      override class var __parentType: ParentType { Types.Query }
+      override class var __parentType: any ParentType { Types.Query }
       override class var __selections: [Selection] {[
         .field("hero", Hero.self)
       ]}
@@ -1800,7 +1796,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       class Hero: MockSelectionSet {
         typealias Schema = MockSchemaMetadata
 
-        override class var __parentType: ParentType { Types.Human }
+        override class var __parentType: any ParentType { Types.Human }
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .include(if: "a", .inlineFragment(IfA.self)),
@@ -1812,7 +1808,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
         class IfA: ConcreteMockTypeCase<Hero> {
           typealias Schema = MockSchemaMetadata
-          override class var __parentType: ParentType { Types.Human }
+          override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("name", String.self),
             .include(if: !"c", .field("friend", Friend.self)),
@@ -1841,7 +1837,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
           class Friend: MockSelectionSet {
             typealias Schema = MockSchemaMetadata
 
-            override class var __parentType: ParentType { Types.Human }
+            override class var __parentType: any ParentType { Types.Human }
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
               .field("name", String.self)
@@ -1863,7 +1859,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
         class IfB: ConcreteMockTypeCase<Hero> {
           typealias Schema = MockSchemaMetadata
-          override class var __parentType: ParentType { Types.Human }
+          override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
           ]}
           convenience init() {
@@ -1936,7 +1932,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     class GivenQuery: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
-      override class var __parentType: ParentType { Types.Query }
+      override class var __parentType: any ParentType { Types.Query }
       override class var __selections: [Selection] {[
         .field("hero", Hero.self)
       ]}
@@ -1955,7 +1951,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       class Hero: MockSelectionSet {
         typealias Schema = MockSchemaMetadata
 
-        override class var __parentType: ParentType { Types.Human }
+        override class var __parentType: any ParentType { Types.Human }
         override class var __selections: [Selection] {[
           .inlineFragment(AsCharacter.self)
         ]}
@@ -1964,7 +1960,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
         class AsCharacter: ConcreteMockTypeCase<Hero> {
           typealias Schema = MockSchemaMetadata
-          override class var __parentType: ParentType { Types.Character }
+          override class var __parentType: any ParentType { Types.Character }
           override class var __selections: [Selection] {[
             .field("name", String.self)
           ]}
@@ -2034,7 +2030,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       public var __data: DataDict = .empty()
       init(_dataDict: DataDict) { __data = _dataDict }
 
-      static var __parentType: ParentType { Types.Query }
+      static var __parentType: any ParentType { Types.Query }
       static var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
@@ -2057,7 +2053,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
         public var __data: DataDict = .empty()
         init(_dataDict: DataDict) { __data = _dataDict }
 
-        static var __parentType: ParentType { Types.Human }
+        static var __parentType: any ParentType { Types.Human }
         static var __selections: [Selection] { [
           .field("name", String.self)
         ]}
@@ -2081,7 +2077,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     class GivenQuery: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
-      override class var __parentType: ParentType { Types.Query }
+      override class var __parentType: any ParentType { Types.Query }
       override class var __selections: [Selection] {[
         .include(if: "a", [.inlineFragment(IfA.self)])
       ]}
@@ -2096,7 +2092,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
       class IfA: ConcreteMockTypeCase<GivenQuery> {
         typealias Schema = MockSchemaMetadata
-        override class var __parentType: ParentType { Types.Query }
+        override class var __parentType: any ParentType { Types.Query }
         override class var __selections: [Selection] {[
           .fragment(GivenFragment.self)
         ]}
@@ -2218,7 +2214,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     class GivenQuery: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
-      override class var __parentType: ParentType { Types.Query }
+      override class var __parentType: any ParentType { Types.Query }
       override class var __selections: [Selection] {[
         .include(if: "a", [.inlineFragment(IfA.self)])
       ]}
@@ -2233,7 +2229,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
       class IfA: ConcreteMockTypeCase<GivenQuery> {
         typealias Schema = MockSchemaMetadata
-        override class var __parentType: ParentType { Types.Query }
+        override class var __parentType: any ParentType { Types.Query }
         override class var __selections: [Selection] {[
           .fragment(GivenFragment.self)
         ]}
@@ -2832,7 +2828,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 // MARK: Helpers
 
 fileprivate func expectJSONMissingValueError<T>(
-  _ result: Result<T, Error>,
+  _ result: Result<T, any Error>,
   atPath path: ResponsePath,
   file: Nimble.FileString = #file, line: UInt = #line
 ) {

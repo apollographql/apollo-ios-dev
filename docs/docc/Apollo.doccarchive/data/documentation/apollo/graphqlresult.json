@@ -148,6 +148,12 @@
     },
     {
       "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/asJSONDictionary()"
+      ],
+      "title" : "Instance Methods"
+    },
+    {
+      "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/Source-swift.enum"
       ],
       "title" : "Enumerations"
@@ -276,6 +282,96 @@
   "title" : "GraphQLResult.Source",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlresult\/source-swift.enum"
+},
+"doc://Apollo/documentation/Apollo/GraphQLResult/asJSONDictionary()": {
+  "abstract" : [
+    {
+      "text" : "Converts a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " into a basic JSON dictionary for use.",
+      "type" : "text"
+    }
+  ],
+  "conformance" : {
+    "availabilityPrefix" : [
+      {
+        "text" : "Available when",
+        "type" : "text"
+      }
+    ],
+    "conformancePrefix" : [
+      {
+        "text" : "Conforms when",
+        "type" : "text"
+      }
+    ],
+    "constraints" : [
+      {
+        "code" : "Data",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "RootSelectionSet",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ".",
+        "type" : "text"
+      }
+    ]
+  },
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "asJSONDictionary"
+    },
+    {
+      "kind" : "text",
+      "text" : "() -> ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "Any"
+    },
+    {
+      "kind" : "text",
+      "text" : "]"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/asJSONDictionary()",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "asJSONDictionary()",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlresult\/asjsondictionary()"
 },
 "doc://Apollo/documentation/Apollo/GraphQLResult/data": {
   "abstract" : [

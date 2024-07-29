@@ -21,6 +21,7 @@ class MockObjectTemplateTests: XCTestCase {
 
   private func buildSubject(
     name: String = "Dog",
+    customName: String? = nil,
     interfaces: [GraphQLInterfaceType] = [],
     fields: [String : GraphQLField] = [:],
     schemaNamespace: String = "TestSchema",
@@ -35,12 +36,14 @@ class MockObjectTemplateTests: XCTestCase {
     )
     ir = IRBuilder.mock(compilationResult: .mock())
 
+    let objectType = GraphQLObjectType.mock(
+      name,
+      interfaces: interfaces
+    )
+    objectType.name.customName = customName
     subject = MockObjectTemplate(
-      graphqlObject: GraphQLObjectType.mock(
-        name,
-        interfaces: interfaces
-      ),
-      fields: fields        
+      graphqlObject: objectType,
+      fields: fields
         .map { ($0.key, $0.value.type, $0.value.deprecationReason) },
       config: ApolloCodegen.ConfigurationContext(config: config),
       ir: ir
@@ -48,7 +51,7 @@ class MockObjectTemplateTests: XCTestCase {
   }
 
   private func renderSubject() -> String {
-    subject.template.description
+    subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
   // MARK: Boilerplate tests
@@ -485,10 +488,10 @@ class MockObjectTemplateTests: XCTestCase {
         enumList: [GraphQLEnum<TestSchema.EnumType>]? = nil,
         enumOptionalList: [GraphQLEnum<TestSchema.EnumType>]? = nil,
         enumType: GraphQLEnum<TestSchema.EnumType>? = nil,
-        interface: AnyMock? = nil,
-        interfaceList: [AnyMock]? = nil,
-        interfaceNestedList: [[AnyMock]]? = nil,
-        interfaceOptionalList: [AnyMock?]? = nil,
+        interface: (any AnyMock)? = nil,
+        interfaceList: [(any AnyMock)]? = nil,
+        interfaceNestedList: [[(any AnyMock)]]? = nil,
+        interfaceOptionalList: [(any AnyMock)?]? = nil,
         object: Mock<Cat>? = nil,
         objectList: [Mock<Cat>]? = nil,
         objectNestedList: [[Mock<Cat>]]? = nil,
@@ -498,10 +501,10 @@ class MockObjectTemplateTests: XCTestCase {
         stringList: [String]? = nil,
         stringNestedList: [[String]]? = nil,
         stringOptionalList: [String]? = nil,
-        union: AnyMock? = nil,
-        unionList: [AnyMock]? = nil,
-        unionNestedList: [[AnyMock]]? = nil,
-        unionOptionalList: [AnyMock?]? = nil
+        union: (any AnyMock)? = nil,
+        unionList: [(any AnyMock)]? = nil,
+        unionNestedList: [[(any AnyMock)]]? = nil,
+        unionOptionalList: [(any AnyMock)?]? = nil
       ) {
         self.init()
         _setScalar(customScalar, for: \\.customScalar)
@@ -940,6 +943,29 @@ class MockObjectTemplateTests: XCTestCase {
       // then
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     }
+  }
+  
+  // MARK: - Schema Customization Tests
+  
+  func test__render__givenMockObject_withCustomName_shouldRenderWithCustomName() throws {
+    // given
+    buildSubject(
+      name: "MyObject",
+      customName: "MyCustomObject"
+    )
+    
+    let expected = """
+    public class MyCustomObject: MockObject {
+      public static let objectType: ApolloAPI.Object = TestSchema.Objects.MyCustomObject
+      public static let _mockFields = MockFields()
+      public typealias MockValueCollectionType = Array<Mock<MyCustomObject>>
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
 }

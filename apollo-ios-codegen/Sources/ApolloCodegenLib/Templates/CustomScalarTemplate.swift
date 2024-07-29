@@ -12,18 +12,23 @@ struct CustomScalarTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .schemaFile(type: .customScalar)
 
-  var headerTemplate: TemplateString? {
+  func renderHeaderTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString? {
     HeaderCommentTemplate.editableFileHeader(
       fileCanBeEditedTo: "implement advanced custom scalar functionality."
     )    
   }
 
-  var template: TemplateString {
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     TemplateString(
     """
     \(documentation: documentationTemplate, config: config)
+    \(graphqlScalar.name.typeNameDocumentation)
     \(accessControlModifier(for: .parent))\
-    typealias \(graphqlScalar.formattedName) = String
+    typealias \(graphqlScalar.render(as: .typename)) = String
     
     """
     )

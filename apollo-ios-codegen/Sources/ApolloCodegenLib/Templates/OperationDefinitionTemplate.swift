@@ -14,17 +14,17 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
 
   let config: ApolloCodegen.ConfigurationContext
 
-  let target: TemplateTarget = .operationFile
+  var target: TemplateTarget {
+    .operationFile(moduleImports: operation.definition.moduleImports)
+  }
 
-  var template: TemplateString {
-    let definition = IR.Definition.operation(operation)
-
+  func renderBodyTemplate(
+    nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
+  ) -> TemplateString {
     return TemplateString(
     """
     \(OperationDeclaration())
       \(DocumentType())
-
-      \(section: DeferredProperties(operation.containsDeferredFragment))
 
       \(section: VariableProperties(operation.definition.variables))
 
@@ -32,19 +32,24 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
 
       \(section: VariableAccessors(operation.definition.variables))
 
-      \(accessControlModifier(for: .member))struct Data: \(definition.renderedSelectionSetType(config)) {
+      \(accessControlModifier(for: .member))struct Data: \(operation.renderedSelectionSetType(config)) {
         \(SelectionSetTemplate(
-            definition: definition,
+            definition: operation,
             generateInitializers: config.options.shouldGenerateSelectionSetInitializers(for: operation),
             config: config,
+            nonFatalErrorRecorder: nonFatalErrorRecorder,
             renderAccessControl: { accessControlModifier(for: .member) }()
         ).renderBody())
       }
     }
-
+    \(section: DeferredFragmentsMetadataTemplate(
+      operation: operation,
+      config: config,
+      renderAccessControl: { accessControlModifier(for: .parent) }()
+    ).render())
     """)
   }
-
+    
   private func OperationDeclaration() -> TemplateString {
     return """
     \(accessControlModifier(for: .parent))\

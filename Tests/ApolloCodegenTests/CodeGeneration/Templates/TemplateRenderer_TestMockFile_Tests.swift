@@ -55,7 +55,7 @@ class TemplateRenderer_TestMockFile_Tests: XCTestCase {
       let subject = buildSubject(config: config)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
@@ -126,7 +126,7 @@ class TemplateRenderer_TestMockFile_Tests: XCTestCase {
       let subject = buildSubject(config: config)
 
       // when
-      let actual = subject.render()
+      let (actual, _) = subject.render()
 
       // then
       expect(actual).to(equalLineByLine(expected, atLine: 4, ignoringExtraLines: true))
@@ -148,7 +148,7 @@ class TemplateRenderer_TestMockFile_Tests: XCTestCase {
     let subject = buildSubject(config: config)
 
     // when
-    let actual = subject.render()
+    let (actual, _) = subject.render()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 4, ignoringExtraLines: true))

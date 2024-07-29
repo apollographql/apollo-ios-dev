@@ -103,7 +103,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : ": any "
       },
       {
         "kind" : "typeIdentifier",
@@ -173,7 +173,7 @@
             },
             {
               "kind" : "text",
-              "text" : ": "
+              "text" : ": any "
             },
             {
               "kind" : "typeIdentifier",
@@ -314,8 +314,9 @@
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ConversionStrategies/EnumCases-swift.enum": {
   "abstract" : [
     {
-      "code" : "ApolloCodegenConfiguration\/ConversionStrategies\/EnumCase",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/EnumCases-swift.enum",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
       "text" : " is used to specify the strategy",
@@ -443,7 +444,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ": any "
     },
     {
       "kind" : "typeIdentifier",

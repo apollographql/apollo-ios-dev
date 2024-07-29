@@ -118,8 +118,10 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CompositeSelectionSet",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferrable",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InlineFragment",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet",
+        "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/SH"
       ],
@@ -296,6 +298,37 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/compositeselectionset"
 },
+"doc://ApolloAPI/documentation/ApolloAPI/Deferrable": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Deferrable"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferrable",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Deferrable"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "Deferrable",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/deferrable"
+},
 "doc://ApolloAPI/documentation/ApolloAPI/InlineFragment": {
   "abstract" : [
     {
@@ -368,6 +401,11 @@
   "title" : "SelectionSet",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset"
+},
+"doc://ApolloAPI/s28CustomDebugStringConvertibleP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
+  "title" : "Swift.CustomDebugStringConvertible",
+  "type" : "unresolvable"
 }
 }
 }

@@ -20,6 +20,7 @@
       }
     ],
     "role" : "collectionGroup",
+    "roleHeading" : "API Collection",
     "title" : "Error Implementations"
   },
   "schemaVersion" : {
@@ -104,7 +105,15 @@
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/Error": {
   "abstract" : [
     {
-      "text" : "Errors that can occur during code generation.",
+      "text" : "Errors that can occur during code generation. These are fatal errors that prevent the code",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "generation from continuing execution.",
       "type" : "text"
     }
   ],

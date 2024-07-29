@@ -9,9 +9,9 @@ struct InputObjectFileGenerator: FileGenerator {
   /// Shared codegen configuration.
   let config: ApolloCodegen.ConfigurationContext
 
-  var template: TemplateRenderer {
+  var template: any TemplateRenderer {
     InputObjectTemplate(graphqlInputObject: graphqlInputObject, config: config)
   }
   var target: FileTarget { .inputObject }
-  var fileName: String { graphqlInputObject.name }
+  var fileName: String { graphqlInputObject.render(as: .filename) }
 }

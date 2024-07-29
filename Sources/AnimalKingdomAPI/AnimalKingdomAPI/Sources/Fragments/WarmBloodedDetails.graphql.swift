@@ -11,7 +11,7 @@ public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   public let __data: DataDict
   public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
+  public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
   public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("bodyTemperature", Int.self),
@@ -19,7 +19,7 @@ public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   ] }
 
   public var bodyTemperature: Int { __data["bodyTemperature"] }
-  public var height: HeightInMeters.Height { __data["height"] }
+  public var height: Height { __data["height"] }
 
   public struct Fragments: FragmentContainer {
     public let __data: DataDict
@@ -31,7 +31,7 @@ public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   public init(
     __typename: String,
     bodyTemperature: Int,
-    height: HeightInMeters.Height
+    height: Height
   ) {
     self.init(_dataDict: DataDict(
       data: [
@@ -45,4 +45,6 @@ public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
       ]
     ))
   }
+
+  public typealias Height = HeightInMeters.Height
 }

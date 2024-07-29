@@ -18,22 +18,25 @@ class ObjectTemplateTests: XCTestCase {
 
   private func buildSubject(
     name: String = "Dog",
+    customName: String? = nil,
     interfaces: [GraphQLInterfaceType] = [],
     documentation: String? = nil,
     config: ApolloCodegenConfiguration = .mock()
   ) {
+    let objectType = GraphQLObjectType.mock(
+      name,
+      interfaces: interfaces,
+      documentation: documentation
+    )
+    objectType.name.customName = customName
     subject = ObjectTemplate(
-      graphqlObject: GraphQLObjectType.mock(
-        name,
-        interfaces: interfaces,
-        documentation: documentation
-      ),
+      graphqlObject: objectType,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
 
   private func renderSubject() -> String {
-    subject.template.description
+    subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
   // MARK: Boilerplate tests
@@ -190,6 +193,35 @@ class ObjectTemplateTests: XCTestCase {
       // then
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     }
+  }
+  
+  // MARK: - Schema Customization
+  
+  func test__render__giveObjectTypeAndInterface_withCustomNames_shouldRenderWithCustomNames() throws {
+    // given
+    let implementedInterface = GraphQLInterfaceType.mock("MyInterface", fields: ["myField": GraphQLField.mock("myField", type: .scalar(.string()))])
+    implementedInterface.name.customName = "MyCustomInterface"
+    buildSubject(
+      name: "MyObject",
+      customName: "MyCustomObject",
+      interfaces: [
+        implementedInterface
+      ]
+    )
+
+    let expected = """
+    // Renamed from GraphQL schema value: 'MyObject'
+    static let MyCustomObject = ApolloAPI.Object(
+      typename: "MyObject",
+      implementedInterfaces: [TestSchema.Interfaces.MyCustomInterface.self]
+    )
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
   
 }

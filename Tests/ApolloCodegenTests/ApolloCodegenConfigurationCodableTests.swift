@@ -43,11 +43,24 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ],
           deprecatedEnumCases: .exclude,
           schemaDocumentation: .exclude,
+          schemaCustomization: .init(
+            customTypeNames: [
+              "MyEnum": .enum(
+                name: "CustomEnum",
+                cases: [
+                  "CaseOne": "CustomCaseOne"
+                ]
+              ),
+              "MyInterface": .type(name: "CustomInterface"),
+              "MyObject": .type(name: "CustomObject")
+            ]
+          ), 
           cocoapodsCompatibleImportStatements: true,
           warningsOnDeprecatedUsage: .exclude,
           conversionStrategies:.init(
             enumCases: .none,
-            fieldAccessors: .camelCase
+            fieldAccessors: .camelCase,
+            inputObjects: .none
           ),
           pruneGeneratedFiles: false,
           markOperationDefinitionsAsFinal: true
@@ -94,7 +107,8 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "cocoapodsCompatibleImportStatements" : true,
           "conversionStrategies" : {
             "enumCases" : "none",
-            "fieldAccessors" : "camelCase"
+            "fieldAccessors" : "camelCase",
+            "inputObjects" : "none"
           },
           "deprecatedEnumCases" : "exclude",
           "markOperationDefinitionsAsFinal" : true,
@@ -102,6 +116,20 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "definition"
           ],
           "pruneGeneratedFiles" : false,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+              "MyEnum" : {
+                "enum" : {
+                  "cases" : {
+                    "CaseOne" : "CustomCaseOne"
+                  },
+                  "name" : "CustomEnum"
+                }
+              },
+              "MyInterface" : "CustomInterface",
+              "MyObject" : "CustomObject"
+            }
+          },
           "schemaDocumentation" : "exclude",
           "selectionSetInitializers" : {
             "localCacheMutations" : true

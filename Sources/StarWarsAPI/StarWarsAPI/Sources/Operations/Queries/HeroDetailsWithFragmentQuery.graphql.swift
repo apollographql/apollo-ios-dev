@@ -24,7 +24,7 @@ public class HeroDetailsWithFragmentQuery: GraphQLQuery {
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
@@ -52,7 +52,7 @@ public class HeroDetailsWithFragmentQuery: GraphQLQuery {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .fragment(HeroDetails.self),
@@ -95,10 +95,10 @@ public class HeroDetailsWithFragmentQuery: GraphQLQuery {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = HeroDetailsWithFragmentQuery.Data.Hero
-        public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
+        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
         public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
-          HeroDetails.self,
           HeroDetailsWithFragmentQuery.Data.Hero.self,
+          HeroDetails.self,
           HeroDetails.AsHuman.self
         ] }
 
@@ -142,10 +142,10 @@ public class HeroDetailsWithFragmentQuery: GraphQLQuery {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = HeroDetailsWithFragmentQuery.Data.Hero
-        public static var __parentType: ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
+        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
         public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
-          HeroDetails.self,
           HeroDetailsWithFragmentQuery.Data.Hero.self,
+          HeroDetails.self,
           HeroDetails.AsDroid.self
         ] }
 

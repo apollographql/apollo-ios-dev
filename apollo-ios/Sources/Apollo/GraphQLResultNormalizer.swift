@@ -3,8 +3,7 @@ import Foundation
 import ApolloAPI
 #endif
 
-struct ResultNormalizerFactory {
-  private init() {}
+enum ResultNormalizerFactory {
 
   static func selectionSetDataNormalizer() -> SelectionSetDataResultNormalizer {
     SelectionSetDataResultNormalizer()
@@ -73,7 +72,7 @@ final class RawJSONResultNormalizer: BaseGraphQLResultNormalizer {}
 
 final class SelectionSetDataResultNormalizer: BaseGraphQLResultNormalizer {
   override final func accept(customScalar: JSONValue, info: FieldExecutionInfo) -> JSONValue? {
-    if let customScalar = customScalar as? JSONEncodable {
+    if let customScalar = customScalar as? (any JSONEncodable) {
       return customScalar._jsonValue
     }
     return customScalar

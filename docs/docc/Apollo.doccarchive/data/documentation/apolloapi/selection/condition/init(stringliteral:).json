@@ -28,7 +28,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI9SelectionO9ConditionV13stringLiteralAESS_tcfc",
+    "externalID" : "s:9ApolloAPI9SelectionO9ConditionO13stringLiteralAESS_tcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -228,7 +228,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "struct"
+      "text" : "enum"
     },
     {
       "kind" : "text",

@@ -10,6 +10,7 @@ class TypeCaseConversionPerformanceTests: XCTestCase {
   func testPerformance_typeConversion_checkTypeConformsToInterface() {
     let animal = AllAnimalsQuery.Data.AllAnimal.AsDog(
       favoriteToy: "Milk Bone",
+      id: "1",
       height: .init(feet: 3, meters: 1, relativeSize: .case(.small), centimeters: 100),
       species: "Canine",
       predators: [],

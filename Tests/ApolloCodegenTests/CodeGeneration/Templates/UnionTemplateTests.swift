@@ -17,26 +17,30 @@ class UnionTemplateTests: XCTestCase {
 
   private func buildSubject(
     name: String = "ClassroomPet",
+    customName: String? = nil,
+    types: [GraphQLObjectType] = [
+      GraphQLObjectType.mock("cat"),
+      GraphQLObjectType.mock("bird"),
+      GraphQLObjectType.mock("rat"),
+      GraphQLObjectType.mock("petRock")
+    ],
     documentation: String? = nil,
     config: ApolloCodegenConfiguration = .mock()
   ) {
+    let unionType = GraphQLUnionType.mock(
+      name,
+      types: types,
+      documentation: documentation
+    )
+    unionType.name.customName = customName
     subject = UnionTemplate(
-      graphqlUnion: GraphQLUnionType.mock(
-        name,
-        types: [
-          GraphQLObjectType.mock("cat"),
-          GraphQLObjectType.mock("bird"),
-          GraphQLObjectType.mock("rat"),
-          GraphQLObjectType.mock("petRock")
-        ],
-        documentation: documentation
-      ),
+      graphqlUnion: unionType,
       config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
 
   private func renderSubject() -> String {
-    subject.template.description
+    subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
   // MARK: Boilerplate tests
@@ -279,6 +283,40 @@ class UnionTemplateTests: XCTestCase {
       // then
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     }
+  }
+  
+  // MARK: - Schema Customization Tests
+  
+  func test__render__givenUnion_withCustomName_shouldRenderWithCustomName() throws {
+    // given
+    let customObjectType = GraphQLObjectType.mock("MyObject")
+    customObjectType.name.customName = "MyCustomObject"
+    
+    buildSubject(
+      name: "MyUnion",
+      customName: "MyCustomUnion",
+      types: [
+        GraphQLObjectType.mock("cat"),
+        customObjectType
+      ]
+    )
+    
+    
+    let expected = """
+    // Renamed from GraphQL schema value: 'MyUnion'
+    static let MyCustomUnion = Union(
+      name: "MyUnion",
+      possibleTypes: [
+        TestSchema.Objects.Cat.self,
+        TestSchema.Objects.MyCustomObject.self
+      ]
+    """
+    
+    // when
+    let actual = renderSubject()
+    
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
   
 }

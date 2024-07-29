@@ -6,11 +6,11 @@ on:
     - cron: "0 7 * * *"
 
 env:
-  XCODE_VERSION: "15.0.1"
+  XCODE_VERSION: "15.4"
 
 jobs:
   tuist-generation:
-    runs-on: macos-13
+    runs-on: macos-latest
     timeout-minutes: 8
     name: Run Tuist Generation
     steps:
@@ -20,10 +20,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Run Tuist Generation
-      uses: tuist/tuist-action@0.13.0
-      with:
-          command: 'generate'
-          arguments: ''
+      uses: ./.github/actions/run-tuist-generation
     - name: Cache Build Dependencies
       uses: actions/cache@v3
       with:
@@ -34,7 +31,7 @@ jobs:
         key: ${{ github.run_id }}-dependencies
 
   run-swift-builds:
-    runs-on: macos-13
+    runs-on: macos-latest
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -56,7 +53,7 @@ jobs:
         cd ${{ matrix.package }} && swift build
 
   build-and-unit-test:
-    runs-on: macos-13
+    runs-on: macos-latest
     needs: tuist-generation
     timeout-minutes: 20
     strategy:
@@ -221,7 +218,7 @@ jobs:
   #         TestResults/ResultBundle.zip
 
   run-codegen-test-configurations:
-    runs-on: macos-13
+    runs-on: macos-latest
     timeout-minutes: 20
     name: Codegen Test Configurations - macOS
     steps:
@@ -230,17 +227,13 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Install XCBeautify
-      shell: bash
-      run: |
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install xcbeautify
     - name: Test Codegen Configurations
       shell: bash
       run: |
         ./scripts/run-test-codegen-configurations.sh -t
 
   run-cocoapods-integration-tests:
-    runs-on: macos-13
+    runs-on: macos-latest
     timeout-minutes: 20
     name: Cocoapods Integration Tests - macOS
     steps:
@@ -267,7 +260,7 @@ jobs:
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: ${{ env.XCODE_VERSION }}
+        xcode-version: 15.2
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Setup Node 12.22.10

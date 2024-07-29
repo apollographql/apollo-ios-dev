@@ -8,7 +8,7 @@ protocol FileGenerator {
   var fileName: String { get }
   var fileExtension: String { get }
   var overwrite: Bool { get }
-  var template: TemplateRenderer { get }
+  var template: any TemplateRenderer { get }
   var target: FileTarget { get }
 }
 
@@ -24,7 +24,7 @@ extension FileGenerator {
   func generate(
     forConfig config: ApolloCodegen.ConfigurationContext,
     fileManager: ApolloFileManager = .default
-  ) async throws {
+  ) async throws -> [ApolloCodegen.NonFatalError] {
     let directoryPath = target.resolvePath(forConfig: config)
     let filePath = URL(fileURLWithPath: directoryPath)
       .resolvingSymlinksInPath()
@@ -32,13 +32,15 @@ extension FileGenerator {
       .appendingPathExtension(fileExtension)
       .path
 
-    let rendered: String = template.render()
+    let (rendered, errors) = template.render()
 
     try await fileManager.createFile(
       atPath: filePath,
       data: rendered.data(using: .utf8),
       overwrite: self.overwrite
     )
+
+    return errors
   }
 }
 

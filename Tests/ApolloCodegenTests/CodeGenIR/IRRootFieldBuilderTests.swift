@@ -13,13 +13,11 @@ class IRRootFieldBuilderTests: XCTestCase {
 
   var schemaSDL: String!
   var document: String!
-  var ir: IRBuilder!
+  var ir: IRBuilderTestWrapper!
   var operation: CompilationResult.OperationDefinition!
-  var result: IR.RootFieldBuilder.Result!
+  var result: IRTestWrapper<IR.Operation>!
+  var subject: IRTestWrapper<IR.Field>!
 
-  var subject: IR.EntityField! {
-    result.rootField
-  }
   var computedReferencedFragments: IR.RootFieldBuilder.ReferencedFragments! {
     result.referencedFragments
   }
@@ -34,25 +32,24 @@ class IRRootFieldBuilderTests: XCTestCase {
     schemaSDL = nil
     document = nil
     operation = nil
+    subject = nil
     result = nil
     super.tearDown()
   }
 
   // MARK: - Helpers
 
-  func buildSubjectRootField() async throws {
-    ir = try await .mock(schema: schemaSDL, document: document)
-    operation = try XCTUnwrap(ir.compilationResult.operations.first)
-
-    result = await IR.RootFieldBuilder.buildRootEntityField(
-      forRootField: .mock(
-        "query",
-        type: .nonNull(.entity(operation.rootType)),
-        selectionSet: operation.selectionSet
-      ),
-      onRootEntity: IR.Entity(source: .operation(operation)),
-      inIR: ir
-    )
+  func buildSubjectRootField(operationName: String? = nil) async throws {
+    ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
+    if let operationName {
+      operation = try XCTUnwrap(ir.compilationResult.operations.first(
+        where: { $0.name == operationName }
+      ))
+    } else {
+      operation = try XCTUnwrap(ir.compilationResult.operations.first)
+    }
+    result = await ir.build(operation: operation)
+    subject = result.rootField
   }
 
   // MARK: - Children Computation
@@ -89,7 +86,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]?.selectionSet
 
     // then
-    expect(allAnimals?.selections.direct?.inlineFragments).to(beEmpty())
+    expect(allAnimals?.computed.direct?.inlineFragments).to(beEmpty())
   }
 
   func test__children__initWithNamedFragmentOnMoreSpecificType_hasChildTypeCase() async throws {
@@ -129,11 +126,11 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]?.selectionSet
 
     // then
-    expect(allAnimals?.selections.direct?.inlineFragments.count).to(equal(1))
+    expect(allAnimals?.computed.direct?.inlineFragments.count).to(equal(1))
 
     let child = allAnimals?[as: "Bird"]
     expect(child?.parentType).to(equal(Object_Bird))
-    expect(child?.selections.direct?.namedFragments.values).to(shallowlyMatch([Fragment_BirdDetails]))
+    expect(child?.computed.direct?.namedFragments.values).to(shallowlyMatch([Fragment_BirdDetails]))
   }
 
   func test__children__isObjectType_initWithNamedFragmentOnLessSpecificMatchingType_hasNoChildTypeCase() async throws {
@@ -170,7 +167,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let birds = self.subject[field: "birds"]?.selectionSet
 
     // then
-    expect(birds?.selections.direct?.inlineFragments).to(beEmpty())
+    expect(birds?.computed.direct?.inlineFragments).to(beEmpty())
   }
 
   func test__children__isInterfaceType_initWithNamedFragmentOnLessSpecificMatchingType_hasNoChildTypeCase() async throws {
@@ -207,7 +204,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let flyingAnimals = self.subject[field: "flyingAnimals"]?.selectionSet
 
     // then
-    expect(flyingAnimals?.selections.direct?.inlineFragments).to(beEmpty())
+    expect(flyingAnimals?.computed.direct?.inlineFragments).to(beEmpty())
   }
 
   func test__children__initWithNamedFragmentOnUnrelatedType_hasChildTypeCase() async throws {
@@ -247,12 +244,12 @@ class IRRootFieldBuilderTests: XCTestCase {
     let rocks = self.subject[field: "rocks"]?.selectionSet
 
     // then
-    expect(rocks?.selections.direct?.inlineFragments.count).to(equal(1))
+    expect(rocks?.computed.direct?.inlineFragments.count).to(equal(1))
 
     let child = rocks?[as: "Animal"]
     expect(child?.parentType).to(equal(Interface_Animal))
-    expect(child?.selections.direct?.namedFragments.count).to(equal(1))
-    expect(child?.selections.direct?.namedFragments.values[0].definition).to(equal(Fragment_AnimalDetails))
+    expect(child?.computed.direct?.namedFragments.count).to(equal(1))
+    expect(child?.computed.direct?.namedFragments.values[0].definition).to(equal(Fragment_AnimalDetails))
   }
 
   // MARK: Children Computation - Union Type
@@ -303,10 +300,10 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     // then
     expect(onClassroomPet?.parentType).to(beIdenticalTo(Union_ClassroomPet))
-    expect(onClassroomPet?.selections.direct?.inlineFragments.count).to(equal(1))
+    expect(onClassroomPet?.computed.direct?.inlineFragments.count).to(equal(1))
 
     expect(onClassroomPet_onBird?.parentType).to(beIdenticalTo(Object_Bird))
-    expect(onClassroomPet_onBird?.selections.direct?.fields.values).to(shallowlyMatch([Field_Species]))
+    expect(onClassroomPet_onBird?.computed.direct?.fields.values).to(shallowlyMatch([Field_Species]))
   }
 
   // MARK: Children - Type Cases
@@ -341,7 +338,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let aField = subject[field: "aField"]
 
     // then
-    expect(aField?.selectionSet?.selections.direct?.inlineFragments).to(beEmpty())
+    expect(aField?.selectionSet?.computed.direct?.inlineFragments).to(beEmpty())
   }
 
   func test__children__givenInlineFragment_onMatchingType_mergesTypeCaseIn_doesNotHaveTypeCaseChild() async throws {
@@ -429,7 +426,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Object_B = try XCTUnwrap(schema[object: "B"])
     let Scalar_String = try XCTUnwrap(schema[scalar: "String"])
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
 
     let expected = SelectionSetMatcher(
       parentType: Interface_A,
@@ -490,7 +487,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Interface_A = try XCTUnwrap(schema[interface: "InterfaceA"])
     let Scalar_String = try XCTUnwrap(schema[scalar: "String"])
 
-    let bField = subject[field: "bField"] as? IR.EntityField
+    let bField = subject[field: "bField"]
     let bField_asInterfaceA = bField?[as: "InterfaceA"]
 
     let bField_expected = SelectionSetMatcher(
@@ -553,18 +550,18 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Field_A: ShallowSelectionMatcher = .field("A", type: .scalar(Scalar_String))
     let Field_B: ShallowSelectionMatcher = .field("B", type: .scalar(Scalar_String))
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
     let aField_asInterfaceA = aField?[as: "InterfaceA"]
     let aField_asInterfaceB = aField?[as: "InterfaceB"]
 
     // then
-    expect(aField?.selectionSet.selections.direct?.inlineFragments.count).to(equal(2))
+    expect(aField?.selectionSet?.computed.direct?.inlineFragments.count).to(equal(2))
 
     expect(aField_asInterfaceA?.parentType).to(equal(GraphQLInterfaceType.mock("InterfaceA")))
-    expect(aField_asInterfaceA?.selections.direct).to(shallowlyMatch([Field_A]))
+    expect(aField_asInterfaceA?.computed.direct).to(shallowlyMatch([Field_A]))
 
     expect(aField_asInterfaceB?.parentType).to(equal(GraphQLInterfaceType.mock("InterfaceB")))
-    expect(aField_asInterfaceB?.selections.direct).to(shallowlyMatch([Field_B]))
+    expect(aField_asInterfaceB?.computed.direct).to(shallowlyMatch([Field_B]))
   }
 
   // MARK: Children - Group Duplicate Fragments
@@ -603,14 +600,14 @@ class IRRootFieldBuilderTests: XCTestCase {
     let InterfaceB = try XCTUnwrap(schema[interface: "InterfaceB"])
     let FragmentB = try XCTUnwrap(ir.compilationResult[fragment: "FragmentB"])
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
     let aField_asInterfaceB = aField?[as: "InterfaceB"]
 
     // then
-    expect(aField?.selectionSet.selections.direct?.inlineFragments.count).to(equal(1))
+    expect(aField?.selectionSet?.computed.direct?.inlineFragments.count).to(equal(1))
 
     expect(aField_asInterfaceB?.parentType).to(equal(InterfaceB))
-    expect(aField_asInterfaceB?.selections.direct).to(shallowlyMatch([.fragmentSpread(FragmentB)]))
+    expect(aField_asInterfaceB?.computed.direct).to(shallowlyMatch([.fragmentSpread(FragmentB)]))
   }
 
   func test__children__givenTwoNamedFragments_onSameNonMatchingParentType_hasDeduplicatedTypeCaseWithBothChildFragments() async throws {
@@ -654,14 +651,14 @@ class IRRootFieldBuilderTests: XCTestCase {
     let FragmentB1 = try XCTUnwrap(ir.compilationResult[fragment: "FragmentB1"])
     let FragmentB2 = try XCTUnwrap(ir.compilationResult[fragment: "FragmentB2"])
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
     let aField_asInterfaceB = aField?[as: "InterfaceB"]
 
     // then
-    expect(aField?.selectionSet.selections.direct?.inlineFragments.count).to(equal(1))
+    expect(aField?.selectionSet?.computed.direct?.inlineFragments.count).to(equal(1))
 
     expect(aField_asInterfaceB?.parentType).to(equal(InterfaceB))
-    expect(aField_asInterfaceB?.selections.direct).to(shallowlyMatch([
+    expect(aField_asInterfaceB?.computed.direct).to(shallowlyMatch([
       .fragmentSpread(FragmentB1),
       .fragmentSpread(FragmentB2)
     ]))
@@ -699,10 +696,10 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     try await buildSubjectRootField()
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
 
     // then
-    expect(aField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
+    expect(aField?.selectionSet?.computed.direct).to(shallowlyMatch(expected))
   }
 
   func test__selections__givenFieldSelectionsWithSameNameDifferentAlias_scalarType_doesNotDeduplicateSelection() async throws {
@@ -734,10 +731,10 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     try await buildSubjectRootField()
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
 
     // then
-    expect(aField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
+    expect(aField?.selectionSet?.computed.direct).to(shallowlyMatch(expected))
   }
 
   func test__selections__givenFieldSelectionsWithSameResponseKey_onObjectWithDifferentChildSelections_mergesChildSelectionsIntoOneField() async throws {
@@ -777,14 +774,14 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let Object_A = try XCTUnwrap(schema[object: "A"])
 
-    let aField = subject[field: "aField"] as? IR.EntityField
-    let aField_a = aField?[field: "a"] as? IR.EntityField
+    let aField = subject[field: "aField"]
+    let aField_a = aField?[field: "a"]
 
     // then
-    expect(aField?.selectionSet.selections.direct?.fields.count).to(equal(1))
-    expect(aField?.selectionSet.parentType).to(equal(Object_A))
-    expect(aField_a?.selectionSet.parentType).to(equal(Object_A))
-    expect(aField_a?.selectionSet.selections.direct).to(shallowlyMatch(expectedAFields))
+    expect(aField?.selectionSet?.computed.direct?.fields.count).to(equal(1))
+    expect(aField?.selectionSet?.parentType).to(equal(Object_A))
+    expect(aField_a?.selectionSet?.parentType).to(equal(Object_A))
+    expect(aField_a?.selectionSet?.computed.direct).to(shallowlyMatch(expectedAFields))
   }
 
   func test__selections__givenFieldSelectionsWithSameResponseKey_onObjectWithSameAndDifferentChildSelections_mergesChildSelectionsAndDoesNotDuplicateFields() async throws {
@@ -828,14 +825,14 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let Object_A = try XCTUnwrap(schema[object: "A"])
 
-    let aField = subject[field: "aField"] as? IR.EntityField
-    let aField_a = aField?[field: "a"] as? IR.EntityField
+    let aField = subject[field: "aField"]
+    let aField_a = aField?[field: "a"]
 
     // then
-    expect(aField?.selectionSet.selections.direct?.fields.count).to(equal(1))
-    expect(aField?.selectionSet.parentType).to(equal(Object_A))
-    expect(aField_a?.selectionSet.parentType).to(equal(Object_A))
-    expect(aField_a?.selectionSet.selections.direct).to(shallowlyMatch(expectedAFields))
+    expect(aField?.selectionSet?.computed.direct?.fields.count).to(equal(1))
+    expect(aField?.selectionSet?.parentType).to(equal(Object_A))
+    expect(aField_a?.selectionSet?.parentType).to(equal(Object_A))
+    expect(aField_a?.selectionSet?.computed.direct).to(shallowlyMatch(expectedAFields))
   }
 
   // MARK: Selections - Type Cases
@@ -872,10 +869,10 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     try await buildSubjectRootField()
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
 
     // then
-    expect(aField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
+    expect(aField?.selectionSet?.computed.direct).to(shallowlyMatch(expected))
   }
 
   func test__selections__givenInlineFragment_onMatchingType_mergesTypeCaseIn() async throws {
@@ -914,10 +911,10 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     try await buildSubjectRootField()
 
-    let bField = subject[field: "bField"] as? IR.EntityField
+    let bField = subject[field: "bField"]
 
     // then
-    expect(bField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
+    expect(bField?.selectionSet?.computed.direct).to(shallowlyMatch(expected))
   }
 
   func test__selections__givenInlineFragment_onNonMatchingType_doesNotMergeTypeCaseIn() async throws {
@@ -951,16 +948,16 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     try await buildSubjectRootField()
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
     let aField_asB = aField?[as: "B"]
 
     // then
-    expect(aField?.selectionSet.selections.direct?.fields.values).to(shallowlyMatch([
+    expect(aField?.selectionSet?.computed.direct?.fields.values).to(shallowlyMatch([
       .field("a", type: .string())
     ]))
-    expect(aField?.selectionSet.selections.direct?.inlineFragments.count).to(equal(1))
+    expect(aField?.selectionSet?.computed.direct?.inlineFragments.count).to(equal(1))
 
-    expect(aField_asB?.selections.direct).to(shallowlyMatch([
+    expect(aField_asB?.computed.direct).to(shallowlyMatch([
       .field("b", type: .integer())
     ]))
   }
@@ -1001,10 +998,10 @@ class IRRootFieldBuilderTests: XCTestCase {
       .inlineFragment(parentType: Interface_A)
     ]
 
-    let bField = subject[field: "bField"] as? IR.EntityField
+    let bField = subject[field: "bField"]
 
     // then
-    expect(bField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
+    expect(bField?.selectionSet?.computed.direct).to(shallowlyMatch(expected))
   }
 
   func test__selections__givenInlineFragmentsWithSameInterfaceType_deduplicatesTypeCaseMergesSelections() async throws {
@@ -1044,7 +1041,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let actual = subject[field: "bField"]?[as: "A"]
 
     // then
-    expect(actual?.selections.direct).to(shallowlyMatch(expected))
+    expect(actual?.computed.direct).to(shallowlyMatch(expected))
   }
 
   func test__selections__givenInlineFragmentsWithSameObjectType_deduplicatesSelection() async throws {
@@ -1081,10 +1078,10 @@ class IRRootFieldBuilderTests: XCTestCase {
       .inlineFragment(parentType: Object_A)
     ]
 
-    let bField = subject[field: "bField"] as? IR.EntityField
+    let bField = subject[field: "bField"]
 
     // then
-    expect(bField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
+    expect(bField?.selectionSet?.computed.direct).to(shallowlyMatch(expected))
   }
 
   func test__selections__givenInlineFragmentsWithSameUnionType_deduplicatesSelection() async throws {
@@ -1124,10 +1121,10 @@ class IRRootFieldBuilderTests: XCTestCase {
       .inlineFragment(parentType: Union_A)
     ]
 
-    let bField = subject[field: "bField"] as? IR.EntityField
+    let bField = subject[field: "bField"]
 
     // then
-    expect(bField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
+    expect(bField?.selectionSet?.computed.direct).to(shallowlyMatch(expected))
   }
 
   func test__selections__givenInlineFragmentsWithDifferentType_doesNotDeduplicateSelection() async throws {
@@ -1169,10 +1166,10 @@ class IRRootFieldBuilderTests: XCTestCase {
       .inlineFragment(parentType: Interface_B),
     ]
 
-    let objField = subject[field: "objField"] as? IR.EntityField
+    let objField = subject[field: "objField"]
 
     // then
-    expect(objField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
+    expect(objField?.selectionSet?.computed.direct).to(shallowlyMatch(expected))
   }
 
   func test__selections__givenInlineFragmentsWithSameType_withSameAndDifferentChildSelections_mergesChildSelectionsIntoOneTypeCaseAndDeduplicatesChildSelections() async throws {
@@ -1219,12 +1216,12 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let Interface_B = try XCTUnwrap(schema[interface:"B"])
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
     let aField_asB = aField?[as: "B"]
 
     // then
     expect(aField_asB?.parentType).to(equal(Interface_B))
-    expect(aField_asB?.selections.direct).to(shallowlyMatch(expected))
+    expect(aField_asB?.computed.direct).to(shallowlyMatch(expected))
   }
 
   // MARK: Selections - Fragments
@@ -1262,10 +1259,10 @@ class IRRootFieldBuilderTests: XCTestCase {
       .fragmentSpread("FragmentA", type: Object_A),
     ]
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
 
     // then
-    expect(aField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
+    expect(aField?.selectionSet?.computed.direct).to(shallowlyMatch(expected))
   }
 
   // MARK: Selections - Group Duplicate Fragments
@@ -1304,10 +1301,10 @@ class IRRootFieldBuilderTests: XCTestCase {
       .fragmentSpread("FragmentA", type: Object_A),
     ]
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
 
     // then
-    expect(aField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
+    expect(aField?.selectionSet?.computed.direct).to(shallowlyMatch(expected))
   }
 
   func test__selections__givenNamedFragmentsWithDifferentNames_onMatchingParentType_doesNotDeduplicateSelection() async throws {
@@ -1350,10 +1347,10 @@ class IRRootFieldBuilderTests: XCTestCase {
       .fragmentSpread("FragmentA2", type: Object_A),
     ]
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
 
     // then
-    expect(aField?.selectionSet.selections.direct).to(shallowlyMatch(expected))
+    expect(aField?.selectionSet?.computed.direct).to(shallowlyMatch(expected))
   }
 
   func test__selections__givenNamedFragmentsWithSameName_onNonMatchingParentType_deduplicatesSelectionIntoSingleTypeCase() async throws {
@@ -1395,12 +1392,12 @@ class IRRootFieldBuilderTests: XCTestCase {
       .fragmentSpread("FragmentB", type: Interface_B)
     ]
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
 
     // then
-    expect(aField?.selectionSet.selections.direct?.fields.count).to(equal(0))
-    expect(aField?.selectionSet.selections.direct?.inlineFragments.count).to(equal(1))
-    expect(aField?[as: "B"]?.selections.direct).to(shallowlyMatch(expected))
+    expect(aField?.selectionSet?.computed.direct?.fields.count).to(equal(0))
+    expect(aField?.selectionSet?.computed.direct?.inlineFragments.count).to(equal(1))
+    expect(aField?[as: "B"]?.computed.direct).to(shallowlyMatch(expected))
   }
 
   func test__selections__givenNamedFragmentsWithDifferentNamesAndSameParentType_onNonMatchingParentType_deduplicatesSelectionIntoSingleTypeCaseWithBothFragments() async throws {
@@ -1448,12 +1445,12 @@ class IRRootFieldBuilderTests: XCTestCase {
       .fragmentSpread(Fragment_B2),
     ]
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
 
     // then
-    expect(aField?.selectionSet.selections.direct?.fields.count).to(equal(0))
-    expect(aField?.selectionSet.selections.direct?.inlineFragments.count).to(equal(1))
-    expect(aField?[as: "B"]?.selections.direct).to(shallowlyMatch(expected))
+    expect(aField?.selectionSet?.computed.direct?.fields.count).to(equal(0))
+    expect(aField?.selectionSet?.computed.direct?.inlineFragments.count).to(equal(1))
+    expect(aField?[as: "B"]?.computed.direct).to(shallowlyMatch(expected))
   }
 
   func test__selections__givenNamedFragmentsWithDifferentNamesAndDifferentParentType_onNonMatchingParentType_doesNotDeduplicate_hasTypeCaseForEachFragment() async throws {
@@ -1499,13 +1496,13 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Fragment_B = try XCTUnwrap(ir.compilationResult[fragment: "FragmentB"])
     let Fragment_C = try XCTUnwrap(ir.compilationResult[fragment: "FragmentC"])
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
 
     // then
-    expect(aField?.selectionSet.selections.direct?.fields.count).to(equal(0))
-    expect(aField?.selectionSet.selections.direct?.inlineFragments.count).to(equal(2))
-    expect(aField?[as: "B"]?.selections.direct).to(shallowlyMatch([.fragmentSpread(Fragment_B)]))
-    expect(aField?[as: "C"]?.selections.direct).to(shallowlyMatch([.fragmentSpread(Fragment_C)]))
+    expect(aField?.selectionSet?.computed.direct?.fields.count).to(equal(0))
+    expect(aField?.selectionSet?.computed.direct?.inlineFragments.count).to(equal(2))
+    expect(aField?[as: "B"]?.computed.direct).to(shallowlyMatch([.fragmentSpread(Fragment_B)]))
+    expect(aField?[as: "C"]?.computed.direct).to(shallowlyMatch([.fragmentSpread(Fragment_C)]))
   }
 
   // MARK: Selections - Nested Objects
@@ -1553,10 +1550,10 @@ class IRRootFieldBuilderTests: XCTestCase {
       .field("b", type: .integer())
     ]
 
-    let asRoot_child = subject[field: "childContainer"]?[as: "Root"]?[field: "child"] as? IR.EntityField
+    let asRoot_child = subject[field: "childContainer"]?[as: "Root"]?[field: "child"]
 
     // then
-    expect(asRoot_child?.selectionSet.selections.direct).to(shallowlyMatch(expected))
+    expect(asRoot_child?.selectionSet?.computed.direct).to(shallowlyMatch(expected))
   }
 
   // MARK: - Merged Selections
@@ -1590,11 +1587,11 @@ class IRRootFieldBuilderTests: XCTestCase {
     let expected_merged: [ShallowSelectionMatcher] = [
     ]
 
-    let aField = subject[field: "aField"] as? IR.EntityField
+    let aField = subject[field: "aField"]
 
     // then
-    expect(aField?.selectionSet.selections.direct).to(shallowlyMatch(expected_direct))
-    expect(aField?.selectionSet.selections.merged).to(shallowlyMatch(expected_merged))
+    expect(aField?.selectionSet?.computed.direct).to(shallowlyMatch(expected_direct))
+    expect(aField?.selectionSet?.computed.merged).to(shallowlyMatch(expected_merged))
   }
 
   func test__mergedSelections__givenSelectionSetWithSelectionsAndParentFields_returnsSelfAndParentFields() async throws {
@@ -1694,14 +1691,14 @@ class IRRootFieldBuilderTests: XCTestCase {
     ]
 
     let allAnimals = subject[field: "allAnimals"]
-    let asBird = allAnimals?[as: "Bird"]
-    let asCat = allAnimals?[as: "Cat"]
+    let asBird = allAnimals?[as: "Bird"]?.computed
+    let asCat = allAnimals?[as: "Cat"]?.computed
 
     // then
-    expect(asBird?.selections.merged).to(beEmpty())
-    expect(asBird?.selections.direct).to(shallowlyMatch(asBirdExpected))
-    expect(asCat?.selections.merged).to(beEmpty())
-    expect(asCat?.selections.direct).to(shallowlyMatch(asCatExpected))
+    expect(asBird?.merged).to(beEmpty())
+    expect(asBird?.direct).to(shallowlyMatch(asBirdExpected))
+    expect(asCat?.merged).to(beEmpty())
+    expect(asCat?.direct).to(shallowlyMatch(asCatExpected))
   }
 
   // MARK: Merged Selections - Siblings - Object Type -> Interface Type
@@ -2947,7 +2944,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     // then
     expect(actual).to(shallowlyMatch(expected))
-    expect(actual?[as: "Bird"]?.selections.direct)
+    expect(actual?[as: "Bird"]?.computed.direct)
       .to(shallowlyMatch([.fragmentSpread(Fragment_BirdDetails)]))
   }
 
@@ -3019,12 +3016,12 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Interface_BInterface = try XCTUnwrap(schema[interface: "BInterface"])
     let Interface_SomeInterface2 = try XCTUnwrap(schema[interface: "SomeInterface2"])
 
-    let aField = subject[field: "aField"] as? IR.EntityField
-    let someInterfaceField = aField![field: "someInterface"] as? IR.EntityField
+    let aField = subject[field: "aField"]
+    let someInterfaceField = aField![field: "someInterface"]
     let someInterfaceField_asBInterface = someInterfaceField![as: "BInterface"]
 
     let FragmentSpread_FragmentA = aField?[fragment: "FragmentA"]
-    let FragmentA_someInterface = FragmentSpread_FragmentA?.fragment[field: "someInterface"]
+    let FragmentA_someInterface = FragmentSpread_FragmentA?[field: "someInterface"]
     let FragmentA_someInterface_asBInterface = try XCTUnwrap(FragmentA_someInterface?[as: "BInterface"])
 
     let someInterfaceFieldExpected = SelectionsMatcher(
@@ -3783,7 +3780,7 @@ class IRRootFieldBuilderTests: XCTestCase {
               breed
             }
           }
-        }        
+        }
         ... on Cat {
           breed
         }
@@ -3902,17 +3899,17 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Object_Height = try XCTUnwrap(schema[object: "Height"])
 
     let allAnimals = try XCTUnwrap(
-      subject?[field: "allAnimals"] as? IR.EntityField
+      subject?[field: "allAnimals"]
     )
     let allAnimals_predator = try XCTUnwrap(
-      allAnimals[field: "predator"] as? IR.EntityField
+      allAnimals[field: "predator"]
     )
 
     let Fragment_PredatorDetails = try XCTUnwrap(
       subject?[field: "allAnimals"]?[fragment: "PredatorDetails"]
     )
     let PredatorDetails_Predator = try XCTUnwrap(
-      Fragment_PredatorDetails.fragment[field: "predator"]
+      Fragment_PredatorDetails[field: "predator"]
     )
     let PredatorDetails_Predator_Height = try XCTUnwrap(
       PredatorDetails_Predator[field: "height"]
@@ -3949,13 +3946,19 @@ class IRRootFieldBuilderTests: XCTestCase {
       parentType: Object_Height,
       directSelections: nil,
       mergedSelections: [
-        .field("meters", type: .integer()),
         .field("feet", type: .integer()),
+        .field("meters", type: .integer()),
         .fragmentSpread(Fragment_PredatorDetails_HeightInMeters.definition),
       ],
       mergedSources: [
-        try .mock(for: Fragment_PredatorDetails_HeightInMeters.fragment.rootField, from: Fragment_PredatorDetails_HeightInMeters),
-        try .mock(for: PredatorDetails_Predator_Height, from: Fragment_PredatorDetails),
+        try .mock(
+          for: PredatorDetails_Predator_Height,
+          from: Fragment_PredatorDetails
+        ),
+        try .mock(
+          for: Fragment_PredatorDetails_HeightInMeters.rootField,
+          from: Fragment_PredatorDetails_HeightInMeters
+        ),
       ]
     )
 
@@ -4020,10 +4023,10 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Object_Height = try XCTUnwrap(schema[object: "Height"])
 
     let allAnimals = try XCTUnwrap(
-      subject?[field: "allAnimals"] as? IR.EntityField
+      subject?[field: "allAnimals"]
     )
     let allAnimals_predator = try XCTUnwrap(
-      allAnimals[field: "predator"] as? IR.EntityField
+      allAnimals[field: "predator"]
     )
     let allAnimals_predator_asWarmBlooded = try XCTUnwrap(
       allAnimals_predator[as: "WarmBlooded"]
@@ -4034,11 +4037,11 @@ class IRRootFieldBuilderTests: XCTestCase {
     )
 
     let WarmBloodedDetails_HeightInMeters = try XCTUnwrap(
-      Fragment_WarmBloodedDetails.fragment[fragment: "HeightInMeters"]
+      Fragment_WarmBloodedDetails[fragment: "HeightInMeters"]
     )
 
     let HeightInMeters_Height = try XCTUnwrap(
-      WarmBloodedDetails_HeightInMeters.fragment[field: "height"] as? IR.EntityField
+      WarmBloodedDetails_HeightInMeters[field: "height"]
     )
 
     let predator_expected = SelectionSetMatcher(
@@ -4122,26 +4125,26 @@ class IRRootFieldBuilderTests: XCTestCase {
         }
       }
     }
-    """    
+    """
 
     // when
     try await buildSubjectRootField()
 
     let allAnimals_predator = try XCTUnwrap(
-      subject?[field: "allAnimals"]?[field: "predator"] as? IR.EntityField
+      subject?[field: "allAnimals"]?[field: "predator"]
     )
 
     let Fragment_PredatorDetails = subject?[field: "allAnimals"]?[fragment: "PredatorDetails"]
     let PredatorDetails_predator = try XCTUnwrap(
-      Fragment_PredatorDetails?.fragment[field: "predator"] as? IR.EntityField
+      Fragment_PredatorDetails?[field: "predator"]
     )
 
-    let expected: IR.MergedSelections.MergedSources = [
+    let expected: OrderedSet<IR.MergedSelections.MergedSource> = [
       try .mock(for: PredatorDetails_predator, from: Fragment_PredatorDetails)
     ]
 
     // then
-    expect(allAnimals_predator.selectionSet.selections.merged.mergedSources).to(equal(expected))
+    expect(allAnimals_predator.selectionSet?.computed.merged.mergedSources).to(equal(expected))
   }
 
   // MARK: - Referenced Fragments
@@ -4200,12 +4203,12 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     try await buildSubjectRootField()
 
-    let expected: OrderedSet = await [
+    let expected = await [
       try ir.builtFragmentStorage.getFragmentIfBuilt(named: "QueryDetails").xctUnwrapped()
-    ]
+    ].map(\.irObject)
 
     // then
-    expect(self.computedReferencedFragments).to(equal(expected))
+    expect(Array(self.computedReferencedFragments)).to(equal(expected))
   }
 
   func test__referencedFragments__givenUsesFragmentOnEntityField_includesFragment() async throws {
@@ -4235,12 +4238,12 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     try await buildSubjectRootField()
 
-    let expected: OrderedSet = await [
+    let expected = await [
       try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalDetails").xctUnwrapped()
-    ]
+    ].map(\.irObject)
 
     // then
-    expect(self.computedReferencedFragments).to(equal(expected))
+    expect(Array(self.computedReferencedFragments)).to(equal(expected))
   }
 
   func test__referencedFragments__givenUsesMultipleFragmentsOnEntityField_includesFragments() async throws {
@@ -4276,13 +4279,13 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     try await buildSubjectRootField()
 
-    let expected: OrderedSet = await [
+    let expected = await [
       try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalDetails").xctUnwrapped(),
       try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalName").xctUnwrapped(),
-    ]
+    ].map(\.irObject)
 
     // then
-    expect(self.computedReferencedFragments).to(equal(expected))
+    expect(Array(self.computedReferencedFragments)).to(equal(expected))
   }
 
   func test__referencedFragments__givenUsesFragmentsReferencingOtherFragment_includesBothFragments() async throws {
@@ -4318,18 +4321,72 @@ class IRRootFieldBuilderTests: XCTestCase {
     // when
     try await buildSubjectRootField()
 
-    let expected: OrderedSet = await [
+    let expected = await [
       try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalDetails").xctUnwrapped(),
       try ir.builtFragmentStorage.getFragmentIfBuilt(named: "AnimalName").xctUnwrapped(),
-    ]
+    ].map(\.irObject)
 
     // then
-    expect(self.computedReferencedFragments).to(equal(expected))
+    expect(Array(self.computedReferencedFragments)).to(equal(expected))
   }
 
-  // MARK: - Deferred Fragments - hasDeferredFragments property
+  func test__referencedFragments__givenMultipleFragments_hasFragmentsInAlphbeticalOrder() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      name: String!
+    }
+    """
 
-  func test__deferredFragments__givenNoDeferredFragment_hasDeferredFragmentsFalse() async throws {
+    document =
+    """
+    query NameQuery {
+      ...Fragment4
+      ...Fragment1
+    }
+
+    fragment Fragment4 on Query {
+      name
+      ...Fragment3
+    }
+
+    fragment Fragment3 on Query {
+      name
+      ...Fragment2
+    }
+
+    fragment Fragment2 on Query {
+      name
+    }
+
+    fragment Fragment1 on Query {
+      name
+      ...Fragment5
+    }
+
+    fragment Fragment5 on Query {
+      name
+    }
+    """
+
+    // when
+    try await buildSubjectRootField()
+
+    let expected = await [
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "Fragment1").xctUnwrapped(),
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "Fragment2").xctUnwrapped(),
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "Fragment3").xctUnwrapped(),
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "Fragment4").xctUnwrapped(),
+      try ir.builtFragmentStorage.getFragmentIfBuilt(named: "Fragment5").xctUnwrapped(),
+    ].map(\.irObject)
+
+    // then
+    expect(Array(self.computedReferencedFragments)).to(equal(expected))
+  }
+
+  // MARK: - Deferred Fragments - containsDeferredFragment property
+
+  func test__deferredFragments__givenNoDeferredFragment_containsDeferredFragmentFalse() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4369,7 +4426,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.containsDeferredFragment).to(beFalse())
   }
 
-  func test__deferredFragments__givenDeferredInlineFragment_hasDeferredFragmentsTrue() async throws {
+  func test__deferredFragments__givenDeferredInlineFragment_containsDeferredFragmentTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4388,7 +4445,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String
       name: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4409,7 +4466,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentWithCondition_hasDeferredFragmentsTrue() async throws {
+  func test__deferredFragments__givenDeferredInlineFragmentWithCondition_containsDeferredFragmentTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4428,7 +4485,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String
       name: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4449,7 +4506,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
-  func test__deferredFragments__givenDeferredInlineFragmentWithConditionFalse_hasDeferredFragmentsFalse() async throws {
+  func test__deferredFragments__givenDeferredInlineFragmentWithConditionFalse_containsDeferredFragmentFalse() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4468,7 +4525,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String
       name: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4489,7 +4546,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.containsDeferredFragment).to(beFalse())
   }
 
-  func test__deferredFragments__givenDeferredNamedFragment_onDifferentTypeCase_hasDeferredFragmentsTrue() async throws {
+  func test__deferredFragments__givenDeferredNamedFragment_onDifferentTypeCase_containsDeferredFragmentTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4505,7 +4562,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String
       species: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4528,7 +4585,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
-  func test__deferredFragments__givenDeferredInlineFragment_withinNamedFragment_hasDeferredFragmentsTrue() async throws {
+  func test__deferredFragments__givenDeferredInlineFragment_withinNamedFragment_containsDeferredFragmentTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4547,7 +4604,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String
       name: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4572,7 +4629,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     expect(self.result.containsDeferredFragment).to(beTrue())
   }
 
-  func test__deferredFragments__givenDeferredNamedFragment_withSelectionOnDifferentTypeCase_hasDeferredFragmentsTrue() async throws {
+  func test__deferredFragments__givenDeferredNamedFragment_withSelectionOnDifferentTypeCase_containsDeferredFragmentTrue() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -4596,7 +4653,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       species: String
       friends: [Pet]
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4641,7 +4698,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4663,7 +4720,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let allAnimals_deferredAsRoot = allAnimals?[as: "Animal", deferred: .init(label: "root")]
+    let allAnimals_deferredAsRoot = allAnimals?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -4702,7 +4759,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String!
       species: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4724,7 +4781,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let allAnimals_deferredAsRoot = allAnimals?[as: "Animal", deferred: .init(label: "root")]
+    let allAnimals_deferredAsRoot = allAnimals?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -4771,7 +4828,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String!
       name: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4795,7 +4852,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferredAs: "root"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -4857,7 +4914,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String!
       name: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4881,7 +4938,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferredAs: "root", withVariable: "a"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferred: .init(label: "root", variable: "a")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -4943,7 +5000,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String!
       name: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -4967,7 +5024,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferredAs: "root"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5029,7 +5086,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String!
       name: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5053,7 +5110,6 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferredAs: "root"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5080,7 +5136,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       )
     ))
 
-    expect(allAnimals_asDog_deferredAsRoot).to(beNil())
+    expect(allAnimals_asDog?.containsDeferredChildFragment).to(beFalse())
   }
 
   func test__deferredFragments__givenSiblingDeferredInlineFragmentsOnSameTypeCase_doesNotMergeDeferredFragments() async throws {
@@ -5102,7 +5158,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       genus: String!
       name: String!
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5129,8 +5185,8 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsOne = allAnimals_asDog?[deferredAs: "one"]
-    let allAnimals_asDog_deferredAsTwo = allAnimals_asDog?[deferredAs: "two"]
+    let allAnimals_asDog_deferredAsOne = allAnimals_asDog?[deferred: .init(label: "one")]
+    let allAnimals_asDog_deferredAsTwo = allAnimals_asDog?[deferred: .init(label: "two")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5208,7 +5264,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     type Cat implements Animal {
       species: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query Test {
@@ -5234,8 +5290,8 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asBird = allAnimals?[as: "Bird"]
     let allAnimals_asCat = allAnimals?[as: "Cat"]
-    let allAnimals_asBird_deferredAsBird = allAnimals_asBird?[deferredAs: "bird"]
-    let allAnimals_asCat_deferredAsCat = allAnimals_asCat?[deferredAs: "cat"]
+    let allAnimals_asBird_deferredAsBird = allAnimals_asBird?[deferred: .init(label: "bird")]
+    let allAnimals_asCat_deferredAsCat = allAnimals_asCat?[deferred: .init(label: "cat")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5301,7 +5357,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       species: String
       name: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5327,7 +5383,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferredAs: "root"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5397,7 +5453,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       species: String
       name: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5425,7 +5481,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asPet = allAnimals?[as: "Pet"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferredAs: "root"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals_asDog?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5509,7 +5565,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       species: String
       genus: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation {
@@ -5536,9 +5592,10 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsOuter = allAnimals_asDog?[deferredAs: "outer"]
+    let allAnimals_asDog_deferredAsOuter = allAnimals_asDog?[deferred: .init(label: "outer")]
     let allAnimals_asDog_deferredAsOuter_asCat = allAnimals_asDog_deferredAsOuter?[field: "friend"]?[as: "Cat"]
-    let allAnimals_asDog_deferredAsOuter_asCat_deferredAsInner = allAnimals_asDog_deferredAsOuter_asCat?[deferredAs: "inner"]
+    let allAnimals_asDog_deferredAsOuter_asCat_deferredAsInner =
+    allAnimals_asDog_deferredAsOuter_asCat?[deferred: .init(label: "inner")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5612,7 +5669,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String
       species: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -5633,7 +5690,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let allAnimals_ifA = allAnimals?[as: "Animal", if: "a"]
+    let allAnimals_ifA = allAnimals?[if: "a"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5673,7 +5730,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String
       species: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query IncludeFirst($a: Boolean) {
@@ -5698,30 +5755,14 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    let operations = ["IncludeFirst", "DeferFirst"]
-
-    ir = try await .mock(schema: schemaSDL, document: document)
-
-    for operationName in operations {
-      operation = try XCTUnwrap(ir.compilationResult.operations.first(
-        where: { $0.name == operationName }
-      ))
-
-      result = await IR.RootFieldBuilder.buildRootEntityField(
-        forRootField: .mock(
-          "query",
-          type: .nonNull(.entity(operation.rootType)),
-          selectionSet: operation.selectionSet
-        ),
-        onRootEntity: IR.Entity(source: .operation(operation)),
-        inIR: ir
-      )
+    for operationName in ["IncludeFirst", "DeferFirst"] {
+      try await buildSubjectRootField(operationName: operationName)
 
       // then
       let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
       let allAnimals = self.subject[field: "allAnimals"]
-      let allAnimals_ifA = allAnimals?[as: "Animal", if: "a"]
+      let allAnimals_ifA = allAnimals?[if: "a"]
 
       let expectedInclusion = SelectionSetMatcher(
         parentType: Interface_Animal,
@@ -5768,7 +5809,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       species: String
       genus: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -5795,7 +5836,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_ifA = allAnimals?[if: "a"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals?[as: "Dog"]?[deferredAs: "root"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals?[as: "Dog"]?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5866,7 +5907,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String
       species: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -5887,7 +5928,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let allAnimals_skipIfA = allAnimals?[as: "Animal", if: !"a"]
+    let allAnimals_skipIfA = allAnimals?[if: !"a"]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -5927,7 +5968,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       id: String
       species: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query IncludeFirst($a: Boolean) {
@@ -5952,30 +5993,14 @@ class IRRootFieldBuilderTests: XCTestCase {
     """
 
     // when
-    let operations = ["IncludeFirst", "DeferFirst"]
-
-    ir = try await .mock(schema: schemaSDL, document: document)
-
-    for operationName in operations {
-      operation = try XCTUnwrap(ir.compilationResult.operations.first(
-        where: { $0.name == operationName }
-      ))
-
-      result = await IR.RootFieldBuilder.buildRootEntityField(
-        forRootField: .mock(
-          "query",
-          type: .nonNull(.entity(operation.rootType)),
-          selectionSet: operation.selectionSet
-        ),
-        onRootEntity: IR.Entity(source: .operation(operation)),
-        inIR: ir
-      )
-
+    for operationName in ["IncludeFirst", "DeferFirst"] {
+      try await buildSubjectRootField(operationName: operationName)
+      
       // then
       let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
 
       let allAnimals = self.subject[field: "allAnimals"]
-      let allAnimals_skipIfA = allAnimals?[as: "Animal", if: !"a"]
+      let allAnimals_skipIfA = allAnimals?[if: !"a"]
 
       let expectedInclusion = SelectionSetMatcher(
         parentType: Interface_Animal,
@@ -6022,7 +6047,7 @@ class IRRootFieldBuilderTests: XCTestCase {
       species: String
       genus: String
     }
-    """
+    """.appendingDeferDirective()
 
     document = """
     query TestOperation($a: Boolean) {
@@ -6049,7 +6074,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals = self.subject[field: "allAnimals"]
     let allAnimals_skipIfA = allAnimals?[if: !"a"]
     let allAnimals_asDog = allAnimals?[as: "Dog"]
-    let allAnimals_asDog_deferredAsRoot = allAnimals?[as: "Dog"]?[deferredAs: "root"]
+    let allAnimals_asDog_deferredAsRoot = allAnimals?[as: "Dog"]?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6122,7 +6147,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6185,7 +6210,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6265,7 +6290,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6346,7 +6371,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6426,7 +6451,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6479,6 +6504,9 @@ class IRRootFieldBuilderTests: XCTestCase {
         ]
       )
     ))
+    
+    expect(allAnimals_asDog?.containsDeferredChildFragment).to(beFalse())
+    expect(allAnimals_asDog_DogFragment?.rootField.selectionSet?.containsDeferredChildFragment).to(beFalse())
   }
 
   func test__deferredFragments__givenDeferredInlineFragment_insideNamedFragment_buildsDeferredInlineFragment_insideNamedFragment() async throws {
@@ -6497,7 +6525,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6526,7 +6554,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let allAnimals_asDog = allAnimals?[as: "Dog"]
     let dogFragment = try await ir.builtFragmentStorage
       .getFragmentIfBuilt(named: "DogFragment").xctUnwrapped()
-    let dogFragment_asDog_deferredAsRoot = dogFragment[as: "Dog", deferred: .init(label: "root")]
+    let dogFragment_asDog_deferredAsRoot = dogFragment[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6588,7 +6616,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation {
@@ -6617,7 +6645,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let dogFragment = try await ir.builtFragmentStorage
       .getFragmentIfBuilt(named: "DogFragment").xctUnwrapped()
     let dogFragment_asDog = dogFragment[as: "Dog"]
-    let dogFragment_asDog_deferredAsRoot = dogFragment_asDog?[as: "Dog", deferred: .init(label: "root")]
+    let dogFragment_asDog_deferredAsRoot = dogFragment_asDog?[deferred: .init(label: "root")]
 
     expect(allAnimals?.selectionSet).to(shallowlyMatch(
       SelectionSetMatcher(
@@ -6648,6 +6676,88 @@ class IRRootFieldBuilderTests: XCTestCase {
     ))
   }
 
+  func test__deferredFragments__givenDeferredNamedFragmentWithMatchingSiblingTypeCase_buildsSiblingInlineFragmentWithMergedDeferredFragmentSelection() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String
+        species: String
+      }
+
+      type Pet implements Animal {
+        id: String
+        species: String
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation($a: Boolean) {
+        allAnimals {
+          __typename
+          ...AnimalFragment @defer(label: "root")
+          ... on Pet {
+            id
+          }
+        }
+      }
+
+      fragment AnimalFragment on Animal {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectRootField()
+
+    // then
+    let Interface_Animal = try XCTUnwrap(schema[interface: "Animal"])
+    let Fragment_AnimalFragment = try XCTUnwrap(ir.compilationResult[fragment: "AnimalFragment"])
+    let Object_Pet = try XCTUnwrap(schema[object: "Pet"])
+
+    let allAnimals = self.subject[field: "allAnimals"]
+    let animalFragment = try await ir.builtFragmentStorage
+      .getFragmentIfBuilt(named: "AnimalFragment").xctUnwrapped()
+    let allAnimals_asPet = allAnimals?[as: "Pet"]
+
+    expect(allAnimals?.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .inlineFragment(parentType: Object_Pet),
+          .deferred(Fragment_AnimalFragment, label: "root"),
+        ]
+      )
+    ))
+
+    expect(animalFragment.rootField.selectionSet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Interface_Animal,
+        directSelections: [
+          .field("species", type: .string()),
+        ]
+      )
+    ))
+
+    expect(allAnimals_asPet).to(shallowlyMatch(
+      SelectionSetMatcher(
+        parentType: Object_Pet,
+        directSelections: [
+          .field("id", type: .string()),
+        ],
+        mergedSelections: [
+          .deferred(Fragment_AnimalFragment, label: "root"),
+        ],
+        mergedSources: [
+          try .mock(allAnimals),
+        ]
+      )
+    ))
+  }
+
   // MARK: Deferred Fragments - Named Fragments (with @include/@skip)
 
   func test__deferredFragments__givenBothDeferAndIncludeDirectives_onSameNamedFragment_buildsNestedDeferredNamedFragment() async throws {
@@ -6661,7 +6771,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation($a: Boolean) {
@@ -6685,7 +6795,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Fragment_AnimalFragment = try XCTUnwrap(ir.compilationResult[fragment: "AnimalFragment"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let allAnimals_ifA = allAnimals?[as: "Animal", if: "a"]
+    let allAnimals_ifA = allAnimals?[if: "a"]
     let animalFragment = try await ir.builtFragmentStorage
       .getFragmentIfBuilt(named: "AnimalFragment").xctUnwrapped()
 
@@ -6695,7 +6805,8 @@ class IRRootFieldBuilderTests: XCTestCase {
         directSelections: [
           .field("id", type: .string()),
           .inlineFragment(parentType: Interface_Animal, inclusionConditions: [.include(if: "a")]),
-        ]
+        ],
+        mergedSelections: []
       )
     ))
 
@@ -6743,7 +6854,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         species: String
         genus: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation($a: Boolean) {
@@ -6864,7 +6975,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         id: String
         species: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation($a: Boolean) {
@@ -6888,7 +6999,7 @@ class IRRootFieldBuilderTests: XCTestCase {
     let Fragment_AnimalFragment = try XCTUnwrap(ir.compilationResult[fragment: "AnimalFragment"])
 
     let allAnimals = self.subject[field: "allAnimals"]
-    let allAnimals_ifA = allAnimals?[as: "Animal", if: !"a"]
+    let allAnimals_ifA = allAnimals?[if: !"a"]
     let animalFragment = try await ir.builtFragmentStorage
       .getFragmentIfBuilt(named: "AnimalFragment").xctUnwrapped()
 
@@ -6946,7 +7057,7 @@ class IRRootFieldBuilderTests: XCTestCase {
         species: String
         genus: String
       }
-      """
+      """.appendingDeferDirective()
 
     document = """
       query TestOperation($a: Boolean) {
