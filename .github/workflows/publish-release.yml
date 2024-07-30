@@ -62,10 +62,17 @@ jobs:
           git push --tags
 
       # Create Draft Release on GitHub with tag of version
-      - name: Create Draft Release
+      - name: Create Draft Release (`apollo-ios`)
         shell: bash
         run: |
           gh release create ${{ env.RELEASE_VERSION }} 'apollo-ios/CLI/apollo-ios-cli.tar.gz#apollo-ios-cli.tar.gz' -d --repo "apollographql/apollo-ios" -t "${{ env.RELEASE_VERSION }}"
+        env:
+          GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
+      
+      - name: Create Draft Release (`apollo-ios-codegen`)
+        shell: bash
+        run: |
+          gh release create ${{ env.RELEASE_VERSION }} -d --repo "apollographql/apollo-ios-codegen" -t "${{ env.RELEASE_VERSION }}"
         env:
           GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
 

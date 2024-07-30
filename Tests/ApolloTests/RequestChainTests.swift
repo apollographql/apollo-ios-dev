@@ -295,6 +295,56 @@ class RequestChainTests: XCTestCase {
     }
   }
 
+  func test__error__givenGraphqlError_withoutData_shouldReturnError() {
+    // given
+    let client = MockURLSessionClient(
+      response: .mock(
+        url: TestURL.mockServer.url,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: nil
+      ),
+      data: """
+      {
+        "errors": [{
+          "message": "Bad request, could not start execution!"
+        }]
+      }
+      """.data(using: .utf8)
+    )
+
+    let interceptorProvider = DefaultInterceptorProvider(client: client, store: ApolloStore())
+    let interceptors = interceptorProvider.interceptors(for: MockQuery.mock())
+    let requestChain = InterceptorRequestChain(interceptors: interceptors)
+
+    let expectation = expectation(description: "Response received")
+
+    let request = JSONRequest(
+      operation: MockQuery<Hero>(),
+      graphQLEndpoint: TestURL.mockServer.url,
+      clientName: "test-client",
+      clientVersion: "test-client-version"
+    )
+
+    // when + then
+    requestChain.kickoff(request: request) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      switch (result) {
+      case let .success(data):
+        XCTAssertEqual(data.errors, [
+          GraphQLError("Bad request, could not start execution!")
+        ])
+      case let .failure(error):
+        XCTFail("Unexpected failure result - \(error)")
+      }
+    }
+
+    wait(for: [expectation], timeout: 1)
+  }
+
   // MARK: Multipart request tests
 
   struct RequestTrapInterceptor: ApolloInterceptor {
