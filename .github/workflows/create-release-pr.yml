@@ -67,6 +67,5 @@ jobs:
           - [ ] Update [CHANGELOG.md](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) with all relevant changes since the prior version. _Please include PR numbers and mention contributors for external PR submissions._
 
           #### Things to do as part of releasing
-          - [ ] Run the []'Publish Release' workflow](https://github.com/apollographql/apollo-ios-dev/actions/workflows/publish-release.yml) in apollo-ios-dev
           - [ ] Update and publish the [draft release in apollo-ios](https://github.com/apollographql/apollo-ios/releases) created by CI using the latest [CHANGELOG.md](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md) contents
           - [ ] Update and publish the [draft release in apollo-ios-codegen](https://github.com/apollographql/apollo-ios-codegen/releases) created by CI (copy and paste the previous release contents and update the version number and link)
