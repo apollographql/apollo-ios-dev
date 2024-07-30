@@ -54,6 +54,38 @@ class ApolloSchemaDownloaderInternalTests: XCTestCase {
     XCTAssertEqual(postType?.name.schemaName, "Post")
   }
 
+  func testFormatConversion_givenIntrospectionJSON_withExperimentalDeferDirective_shouldOutputValidSDL() async throws {
+    let testFilePathBuilder = TestFilePathBuilder(test: self)
+
+    let bundle = Bundle(for: type(of: self))
+    guard let jsonURL = bundle.url(
+      forResource: "introspection_response_with_defer_directive",
+      withExtension: "json"
+    ) else {
+      throw XCTFailure("Missing resource file!", file: #file, line: #line)
+    }
+
+    let configuration = ApolloSchemaDownloadConfiguration(
+      using: .introspection(endpointURL: TestURL.mockPort8080.url),
+      outputPath: testFilePathBuilder.schemaOutputURL.path
+    )
+
+    try await ApolloSchemaDownloader.convertFromIntrospectionJSONToSDLFile(
+      jsonFileURL: jsonURL,
+      configuration: configuration,
+      withRootURL: nil
+    )
+
+    XCTAssertTrue(ApolloFileManager.default.doesFileExist(atPath: configuration.outputPath))
+
+    let frontend = try await GraphQLJSFrontend()
+    let source = try await frontend.makeSource(from: URL(fileURLWithPath: configuration.outputPath))
+    let schema = try await frontend.loadSchema(from: [source])
+
+    let bookType = try await schema.getType(named: "Book")
+    XCTAssertEqual(bookType?.name.schemaName, "Book")
+  }
+
   // MARK: Request Tests
 
   func testRequest_givenIntrospectionGETDownload_shouldOutputGETRequest() throws {
