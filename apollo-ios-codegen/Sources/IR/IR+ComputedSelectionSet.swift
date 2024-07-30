@@ -112,14 +112,9 @@ extension ComputedSelectionSet {
       if self.mergingStrategy.contains(sourceMergeStrategy) { return true }
 
       for source in sources {
-        let parentTypePath = source.typeInfo.scopePath
-        let parentSource = (parentTypePath[0..<parentTypePath.count - 1], source.fragment)
-
         if self.typeInfo.derivedFromMergedSources.contains(where: {
-          let slice = $0.typeInfo.scopePath[0..<($0.typeInfo.scopePath.count)]
-
-          return slice.elementsEqual(parentSource.0) &&
-          $0.fragment == parentSource.1
+          return  $0.typeInfo.scopePath == source.typeInfo.scopePath &&
+          $0.fragment == source.fragment
         }) {
           return true
         }
@@ -143,7 +138,11 @@ extension ComputedSelectionSet {
         }
 
         let newEntityField = createOrFindShallowlyMergedNestedEntityField(from: entityField)
-        newEntityField.selectionSet.typeInfo.derivedFromMergedSources.insert(mergedSource)
+        let fieldMergedSource = MergedSelections.MergedSource(
+          typeInfo: entityField.selectionSet.typeInfo,
+          fragment: mergedSource.fragment
+        )
+        newEntityField.selectionSet.typeInfo.derivedFromMergedSources.insert(fieldMergedSource)
         return newEntityField
       }()
 

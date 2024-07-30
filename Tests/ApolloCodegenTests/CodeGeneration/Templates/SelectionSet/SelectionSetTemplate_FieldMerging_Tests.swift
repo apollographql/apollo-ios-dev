@@ -1501,6 +1501,69 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
+  // MARK: - Child Entity Selection Set - From Union In Named Fragment
+
+  func test__render_childEntitySelectionSet__givenFieldMerging_all__givenEntityFieldMergedFromNamedFragment_rendersFieldAsTypealiasToEntityInFragment() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    interface Pet implements Animal {
+      species: String
+      predator: Animal
+    }
+
+    type Dog implements Animal & Pet {
+      species: String
+      predator: Carnivore
+      name: String
+    }
+
+    union Carnivore = Dog
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ...PredatorDetails
+        species
+      }
+    }
+
+    fragment PredatorDetails on Animal {
+      predator {
+        ... on Dog {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = "public typealias Predator = PredatorDetails.Predator"
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: .all
+    )
+
+    let allAnimals_predator = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_predator.selectionSet!.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+
   // MARK: - Named Fragment Accessors
 
   func test__render_fragmentAccessors__givenFieldMerging_ancestors__givenEntityFieldMergedFromNamedFragmentInAncestor_rendersFragmentAccessor() async throws {

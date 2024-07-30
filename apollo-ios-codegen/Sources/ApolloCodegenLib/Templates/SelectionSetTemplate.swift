@@ -98,8 +98,6 @@ struct SelectionSetTemplate {
         "\(renderAccessControl())typealias \(fieldSelectionSetName) = \(referencedSelectionSetName)"
     }
 
-    guard selectionSet.shouldBeRendered else { return nil }
-
     return TemplateString(
       """
       \(SelectionSetNameDocumentation(selectionSet))
@@ -800,10 +798,6 @@ extension IR.ComputedSelectionSet {
     return !self.isEntityRoot && !self.isUserDefined && (direct?.isEmpty ?? true)
   }
 
-  fileprivate var shouldBeRendered: Bool {
-    return direct != nil || merged.mergedSources.count > 1
-  }
-
   /// If the SelectionSet is a reference to another rendered SelectionSet, returns the qualified
   /// name of the referenced SelectionSet.
   ///
@@ -814,11 +808,11 @@ extension IR.ComputedSelectionSet {
   fileprivate func nameForReferencedSelectionSet(
     config: ApolloCodegen.ConfigurationContext
   ) -> String? {
-    guard direct == nil && merged.mergedSources.count == 1 else {
+    guard direct == nil && self.typeInfo.derivedFromMergedSources.count == 1 else {
       return nil
     }
 
-    return merged.mergedSources
+    return self.typeInfo.derivedFromMergedSources
       .first.unsafelyUnwrapped
       .generatedSelectionSetNamePath(
         from: typeInfo,
