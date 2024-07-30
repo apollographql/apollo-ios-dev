@@ -690,7 +690,72 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_childEntitySelectionSet__givenFieldMerging_siblings__givenEntityFieldMergedFromAncestorAndSibling_rendersMergedChildSelectionSet() async throws {
+  func test__render_childEntitySelectionSet__givenFieldMerging_siblings__givenEntityFieldMergedFromAncestorAndSibling_rendersTypealiasToEntityInSibling() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    interface Pet implements Animal {
+      species: String
+      predator: Animal
+    }
+
+    type Dog implements Animal & Pet {
+      species: String
+      predator: Animal
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        predator {
+          species
+        }
+        ... on Pet {
+          predator {
+            name
+          }
+        }
+        ... on Dog {
+          species
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public var species: String? { __data["species"] }
+      public var predator: Predator? { __data["predator"] }
+
+      public typealias Predator = AsPet.Predator
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: .siblings
+    )
+
+    let allAnimals_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_childEntitySelectionSet__givenFieldMerging_ancestorsAndSiblings__givenEntityFieldMergedFromAncestorAndSibling_rendersMergedChildSelectionSet() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -743,7 +808,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
 
     // when
     try await buildSubjectAndOperation(
-      fieldMerging: .siblings
+      fieldMerging: [.ancestors, .siblings]
     )
 
     let allAnimals_asDog = try XCTUnwrap(
@@ -751,6 +816,74 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     )
 
     let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  // MARK: - Child Entity Selection Sets - In Union
+
+  func test__render_childEntitySelectionSet_inUnion__givenFieldMerging_siblings__givenEntityFieldMergedFromSibling_rendersMergedChildSelectionSet() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      housePets: [HousePet!]
+    }
+
+    interface Animal {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    interface Pet implements Animal {
+      species: String
+      predator: Animal
+    }
+
+    type Dog implements Animal & Pet {
+      species: String
+      predator: Animal
+      name: String
+    }
+
+    union HousePet = Dog
+    """
+
+    document = """
+    query TestOperation {
+      housePets {
+        ... on Animal {
+          predator {
+            name
+          }
+        }
+        ... on Dog {
+          predator {
+            species
+          }
+        }
+      }
+    }
+    """
+
+    let expected = """
+      public var predator: Predator? { __data["predator"] }
+
+      /// HousePet.AsDog.Predator
+      public struct Predator: TestSchema.SelectionSet {
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      fieldMerging: [.siblings]
+    )
+
+    let housePets_asDog = try XCTUnwrap(
+      operation[field: "query"]?[field: "housePets"]?[as: "Dog"]
+    )
+
+    let actual = subject.test_render(childEntity: housePets_asDog.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
