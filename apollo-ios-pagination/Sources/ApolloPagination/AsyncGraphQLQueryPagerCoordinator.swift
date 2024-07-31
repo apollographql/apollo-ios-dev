@@ -14,7 +14,7 @@ public protocol AsyncPagerType {
   func loadNext(cachePolicy: CachePolicy) async throws
   func loadAll(fetchFromInitialPage: Bool) async throws
   func refetch(cachePolicy: CachePolicy) async
-  func fetch(cachePolicy: CachePolicy) async
+  func fetch() async
 }
 
 actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: AsyncPagerType {
@@ -123,7 +123,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
         reset()
         isLoadingAll = true
         group.addTask { [weak self] in
-          await self?.privateFetch(cachePolicy: .fetchIgnoringCacheData)
+          await self?.fetch(cachePolicy: .fetchIgnoringCacheData)
         }
       } else if initialPageResult == nil {
         // Otherwise, we have to make sure that we have an `initialPageResult`
@@ -186,12 +186,12 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) async {
     assert(firstPageWatcher != nil, "To create consistent product behaviors, calling `fetch` before calling `refetch` will use cached data while still refreshing.")
     reset()
-    await privateFetch(cachePolicy: cachePolicy)
+    await fetch(cachePolicy: cachePolicy)
   }
 
-  func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) async {
+  func fetch() async {
     reset()
-    await privateFetch(cachePolicy: cachePolicy)
+    await fetch(cachePolicy: .returnCacheDataAndFetch)
   }
 
   /// Cancels any in-flight fetching operations and unsubscribes from the store.
@@ -223,7 +223,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
 
   // MARK: - Private
 
-  private func privateFetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) async {
+  private func fetch(cachePolicy: CachePolicy = .returnCacheDataAndFetch) async {
     await execute { [weak self] publisher in
       guard let self else { return }
       if await self.firstPageWatcher == nil {

@@ -237,12 +237,8 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
   }
 
   /// Fetches the first page.
-  /// - Parameters:
-  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
-  public func fetch(
-    cachePolicy: CachePolicy = .returnCacheDataAndFetch
-  ) async {
-    await pager.fetch(cachePolicy: cachePolicy)
+  public func fetch() async {
+    await pager.fetch()
   }
 
   /// Resets pagination state and cancels in-flight updates from the pager.
