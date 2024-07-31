@@ -94,20 +94,20 @@ class EntitySelectionTree {
     withConditionScopePath selectionsScopePath: LinkedList<ScopeCondition>.Node,
     from node: EntityNode
   ) -> EntityNode {
-    guard let nextConditionInScopePath = selectionsScopePath.next else {
-      // Last condition in field scope path
-      let selectionsCondition = selectionsScopePath.value
+    var nextNode = node
 
-      return selectionsCondition == node.scope ?
-      node : node.scopeConditionNode(for: selectionsCondition)
+    if selectionsScopePath.value != node.scope {
+      nextNode = node.scopeConditionNode(for: selectionsScopePath.value)
     }
 
-    let nextCondition = nextConditionInScopePath.value
-    let nextConditionNode = node.scopeConditionNode(for: nextCondition)
+    guard let nextConditionInScopePath = selectionsScopePath.next else {
+      // Last condition in field scope path
+      return nextNode
+    }
 
     return findOrCreateNode(
       withConditionScopePath: nextConditionInScopePath,
-      from: nextConditionNode
+      from: nextNode
     )
   }
 
