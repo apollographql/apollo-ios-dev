@@ -184,7 +184,6 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   /// Reloads all data, starting at the first query, resetting pagination state.
   /// - Parameter cachePolicy: Preferred cache policy for first-page fetches. Defaults to `returnCacheDataAndFetch`
   func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) async {
-    assert(firstPageWatcher != nil, "To create consistent product behaviors, calling `fetch` before calling `refetch` will use cached data while still refreshing.")
     reset()
     await fetch(cachePolicy: cachePolicy)
   }
