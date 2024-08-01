@@ -16,7 +16,7 @@ public class Mutation: MockObject {
 
 public extension Mock where O == Mutation {
   convenience init(
-    adoptPet: AnyMock? = nil
+    adoptPet: (any AnyMock)? = nil
   ) {
     self.init()
     _setEntity(adoptPet, for: \.adoptPet)
