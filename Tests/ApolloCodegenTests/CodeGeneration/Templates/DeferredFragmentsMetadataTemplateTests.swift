@@ -49,8 +49,8 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     )
   }
   
-  private func renderSubject() -> String {
-    subject.render().description
+  private func renderSubject() -> String? {
+    subject.render()?.description
   }
   
   // MARK: - Deferred Inline Fragments
