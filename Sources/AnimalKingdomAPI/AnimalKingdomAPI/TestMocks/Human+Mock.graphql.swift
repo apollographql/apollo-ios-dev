@@ -28,7 +28,7 @@ public extension Mock where O == Human {
     height: Mock<Height>? = nil,
     id: AnimalKingdomAPI.ID? = nil,
     laysEggs: Bool? = nil,
-    predators: [AnyMock]? = nil,
+    predators: [(any AnyMock)]? = nil,
     skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
     species: String? = nil
   ) {

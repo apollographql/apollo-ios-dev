@@ -28,7 +28,7 @@ public extension Mock where O == Fish {
     humanName: String? = nil,
     id: AnimalKingdomAPI.ID? = nil,
     owner: Mock<Human>? = nil,
-    predators: [AnyMock]? = nil,
+    predators: [(any AnyMock)]? = nil,
     skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
     species: String? = nil
   ) {

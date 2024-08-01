@@ -25,7 +25,7 @@ public extension Mock where O == Crocodile {
     age: Int? = nil,
     height: Mock<Height>? = nil,
     id: AnimalKingdomAPI.ID? = nil,
-    predators: [AnyMock]? = nil,
+    predators: [(any AnyMock)]? = nil,
     skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
     species: String? = nil,
     tag: String? = nil

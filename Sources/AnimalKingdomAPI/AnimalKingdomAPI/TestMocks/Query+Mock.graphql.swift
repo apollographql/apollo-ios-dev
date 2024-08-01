@@ -18,9 +18,9 @@ public class Query: MockObject {
 
 public extension Mock where O == Query {
   convenience init(
-    allAnimals: [AnyMock]? = nil,
-    classroomPets: [AnyMock?]? = nil,
-    pets: [AnyMock]? = nil
+    allAnimals: [(any AnyMock)]? = nil,
+    classroomPets: [(any AnyMock)?]? = nil,
+    pets: [(any AnyMock)]? = nil
   ) {
     self.init()
     _setList(allAnimals, for: \.allAnimals)

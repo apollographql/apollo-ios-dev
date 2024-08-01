@@ -33,7 +33,7 @@ public extension Mock where O == Bird {
     id: AnimalKingdomAPI.ID? = nil,
     laysEggs: Bool? = nil,
     owner: Mock<Human>? = nil,
-    predators: [AnyMock]? = nil,
+    predators: [(any AnyMock)]? = nil,
     skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
     species: String? = nil,
     wingspan: Double? = nil
