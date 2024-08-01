@@ -107,20 +107,14 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
 
   private func merge(field newField: EntityField, intoInclusionWrapperField wrapperField: EntityField) {
     if let newFieldConditions = newField.selectionSet.inclusionConditions {
-      let typeInfo = SelectionSet.TypeInfo(
-        entity: newField.entity,
-        scopePath: wrapperField.selectionSet.scopePath.mutatingLast {
-          $0.appending(newFieldConditions)
-        }
-      )
+      let newScopePath = wrapperField.selectionSet.scopePath.mutatingLast {
+        $0.appending(newFieldConditions)
+      }
 
-      let newFieldSelectionSet = SelectionSet(
-        typeInfo: typeInfo,
-        selections: newField.selectionSet.selections.unsafelyUnwrapped
-      )
+      newField.selectionSet.updateScopePath(to: newScopePath)
 
       let newFieldInlineFragment = InlineFragmentSpread(
-        selectionSet: newFieldSelectionSet
+        selectionSet: newField.selectionSet
       )
       wrapperField.selectionSet.selections?.mergeIn(newFieldInlineFragment)
 
@@ -165,6 +159,30 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
     fragments.forEach { mergeIn($0) }
   }
 
+  // MARK: -
+
+  func updateParentScopePath(to newParentScopePath: LinkedList<ScopeDescriptor>) {
+    for case let field as IR.EntityField in fields.values {
+      field.selectionSet.updateScopePath(
+        to: newParentScopePath.appending(field.selectionSet.typeInfo.scope)
+      )
+    }
+
+    for inlineFragment in inlineFragments.values {
+      inlineFragment.selectionSet.updateScopePath(
+        to: newParentScopePath.mutatingLast {
+          $0.appending(inlineFragment.typeInfo.scope.scopePath.last.value)
+        }
+      )
+    }
+
+    for namedFragment in namedFragments.values {
+      namedFragment.typeInfo.scopePath = newParentScopePath
+    }
+  }
+
+  // MARK: - Helpers
+
   public var isEmpty: Bool {
     fields.isEmpty && inlineFragments.isEmpty && namedFragments.isEmpty
   }
@@ -182,6 +200,8 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
       Fragments: \(namedFragments.values.elements.map(\.debugDescription))
       """
   }
+
+  // MARK: - Read only view
 
   var readOnlyView: ReadOnly {
     ReadOnly(value: self)

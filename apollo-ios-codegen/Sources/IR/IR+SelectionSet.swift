@@ -13,7 +13,7 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
     /// A list of the scopes for the `SelectionSet` and its enclosing entities.
     ///
     /// The selection set's `scope` is the last element in the list.
-    public let scopePath: LinkedList<ScopeDescriptor>
+    public internal(set) var scopePath: LinkedList<ScopeDescriptor>
 
     /// Indicates if the `SelectionSet` was created directly due to a selection set in the user defined `.graphql` definition file.
     ///
@@ -84,6 +84,11 @@ public class SelectionSet: Hashable, CustomDebugStringConvertible {
   ) {
     self.typeInfo = typeInfo
     self.selections = selections
+  }
+
+  func updateScopePath(to newScopePath: LinkedList<ScopeDescriptor>) {
+    typeInfo.scopePath = newScopePath
+    selections?.updateParentScopePath(to: newScopePath)
   }
 
   public var debugDescription: String {
