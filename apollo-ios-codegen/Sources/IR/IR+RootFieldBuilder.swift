@@ -68,7 +68,7 @@ class RootFieldBuilder {
   }
 
   private func buildSelectionSet(
-    fromCompiledSelectionSet compiledSelectionSet: CompilationResult.SelectionSet?,
+    fromCompiledSelectionSet compiledSelectionSet: CompilationResult.SelectionSet,
     entity: Entity,
     scopePath: LinkedList<ScopeDescriptor>
   ) async -> SelectionSet {
@@ -77,17 +77,13 @@ class RootFieldBuilder {
       scopePath: scopePath
     )
 
-    var directSelections: DirectSelections? = nil
+    let directSelections = DirectSelections()
 
-    if let compiledSelectionSet {
-      directSelections = DirectSelections()
-
-      await buildDirectSelections(
-        into: directSelections.unsafelyUnwrapped,
-        atTypePath: typeInfo,
-        from: compiledSelectionSet
-      )
-    }
+    await buildDirectSelections(
+      into: directSelections,
+      atTypePath: typeInfo,
+      from: compiledSelectionSet
+    )
 
     return SelectionSet(
       typeInfo: typeInfo,
@@ -350,7 +346,7 @@ class RootFieldBuilder {
   }
 
   private func buildInlineFragmentSpread(
-    fromCompiledSelectionSet compiledSelectionSet: CompilationResult.SelectionSet?,
+    fromCompiledSelectionSet compiledSelectionSet: CompilationResult.SelectionSet,
     with scopeCondition: ScopeCondition,
     inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo,
     deferCondition: CompilationResult.DeferCondition? = nil
