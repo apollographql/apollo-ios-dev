@@ -1076,6 +1076,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(
       """
       }
+
       """,
       atLine: 73,
       ignoringExtraLines: false
@@ -1120,6 +1121,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(
       """
       }
+      
       """,
       atLine: 37,
       ignoringExtraLines: false
