@@ -113,7 +113,8 @@
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/createRecordsTableIfNeeded()",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/deleteRecord(for:)",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/deleteRecords(matching:)",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/selectRawRows(forKeys:)"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/selectRawRows(forKeys:)",
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/setJournalMode(mode:)"
       ],
       "title" : "Instance Methods"
     },
@@ -648,6 +649,59 @@
   "title" : "selectRawRows(forKeys:)",
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/selectrawrows(forkeys:)"
+},
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/setJournalMode(mode:)": {
+  "abstract" : [
+    {
+      "text" : "Sets the journal mode for the current database.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "setJournalMode"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "mode"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:12ApolloSQLite11JournalModeO",
+      "text" : "JournalMode"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/setJournalMode(mode:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "setJournalMode(mode:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/setjournalmode(mode:)"
 }
 }
 }

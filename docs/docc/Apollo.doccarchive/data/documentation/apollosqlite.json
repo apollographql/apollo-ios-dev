@@ -103,6 +103,7 @@
     },
     {
       "identifiers" : [
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/JournalMode",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError"
       ],
       "title" : "Enumerations"
@@ -195,6 +196,37 @@
   "title" : "DatabaseRow",
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/databaserow"
+},
+"doc://ApolloSQLite/documentation/ApolloSQLite/JournalMode": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "JournalMode"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/JournalMode",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "JournalMode"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "JournalMode",
+  "type" : "topic",
+  "url" : "\/documentation\/apollosqlite\/journalmode"
 },
 "doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDatabase": {
   "abstract" : [

@@ -1,15 +1,4 @@
 {
-  "deprecationSummary" : [
-    {
-      "inlineContent" : [
-        {
-          "text" : "Will be removed in a future version.",
-          "type" : "text"
-        }
-      ],
-      "type" : "paragraph"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -44,9 +33,6 @@
       {
         "name" : "Apollo"
       }
-    ],
-    "platforms" : [
-
     ],
     "role" : "symbol",
     "roleHeading" : "Case",
@@ -203,7 +189,6 @@
   "abstract" : [
 
   ],
-  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",

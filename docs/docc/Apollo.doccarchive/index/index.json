@@ -2496,11 +2496,6 @@
                     "type" : "groupMarker"
                   },
                   {
-                    "path" : "\/documentation\/apollo\/cachewriteinterceptor\/cachewriteerror\/missingcacherecords",
-                    "title" : "case missingCacheRecords",
-                    "type" : "case"
-                  },
-                  {
                     "path" : "\/documentation\/apollo\/cachewriteinterceptor\/cachewriteerror\/noresponsetoparse",
                     "title" : "case noResponseToParse",
                     "type" : "case"
