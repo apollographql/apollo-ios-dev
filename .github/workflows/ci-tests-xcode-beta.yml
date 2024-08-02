@@ -85,109 +85,109 @@ jobs:
       run: |
         cd ${{ matrix.package }} && swift build
 
-  # build-and-unit-test:
-  #   runs-on: macos-latest
-  #   needs: [tuist-generation, changes]
-  #   timeout-minutes: 20
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       include:
-  #         # macOS_current
-  #         - destination: platform=macOS,arch=x86_64
-  #           scheme: ApolloTests
-  #           test-plan: Apollo-CITestPlan
-  #           name: Apollo Unit Tests - macOS
-  #           run-js-tests: false
-  #           should-run: ${{ needs.changes.outputs.ios }}
-  #         # Codegen CLI Test
-  #         - destination: platform=macOS,arch=x86_64
-  #           scheme: CodegenCLITests
-  #           test-plan: CodegenCLITestPlan
-  #           name: Codegen CLI Unit Tests - macOS
-  #           run-js-tests: false
-  #           should-run: ${{ needs.changes.outputs.codegen }}
-  #         # CodegenLib Test
-  #         - destination: platform=macOS,arch=x86_64
-  #           scheme: ApolloCodegenTests
-  #           test-plan: Apollo-Codegen-CITestPlan
-  #           name: Codegen Lib Unit Tests - macOS
-  #           run-js-tests: true
-  #           should-run: ${{ needs.changes.outputs.codegen }}
-  #         # ApolloPagination Tests
-  #         - destination: platform=macOS,arch=x86_64
-  #           scheme: ApolloPaginationTests
-  #           test-plan: Apollo-PaginationTestPlan
-  #           name: ApolloPagination Unit Tests - macOS
-  #           run-js-tests: false
-  #           should-run: ${{ needs.changes.outputs.pagination }}
-  #   name: ${{ matrix.name }}
-  #   steps:
-  #   - uses: maxim-lobanov/setup-xcode@v1
-  #     with:
-  #       xcode-version: ${{ env.XCODE_VERSION }}
-  #   - name: Checkout Repo
-  #     uses: actions/checkout@v3
-  #   - name: Retrieve Build Cache
-  #     uses: actions/cache@v3
-  #     with:
-  #       path: |
-  #         ./ApolloDev.xcodeproj
-  #         ./ApolloDev.xcworkspace
-  #         ./Derived/*
-  #       key: ${{ github.run_id }}-dependencies
-  #       fail-on-cache-miss: true
-  #   # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
-  #   # - uses: actions/cache@v3
-  #   #   with:
-  #   #     path: ./DerivedData/SourcePackages
-  #   #     key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
-  #   # - name: Run Tuist Generation
-  #   #   uses: tuist/tuist-action@0.13.0
-  #   #   with:
-  #   #       command: 'generate'
-  #   #       arguments: ''
-  #   - name: Build and Test
-  #     if: ${{ matrix.should-run == true || matrix.should-run == 'true' }}
-  #     id: build-and-test
-  #     uses: ./.github/actions/build-and-run-unit-tests
-  #     with:
-  #       destination: ${{ matrix.destination }}
-  #       scheme: ${{ matrix.scheme }}
-  #       test-plan: ${{ matrix.test-plan }}
-  #   - name: Run-JS-Tests
-  #     if: ${{ matrix.run-js-tests == true }}
-  #     shell: bash
-  #     working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript/
-  #     run: |
-  #       npm install && npm test
-  #   - name: Save xcodebuild logs
-  #     if: ${{ steps.build-and-test.outcome != 'skipped' }}
-  #     uses: actions/upload-artifact@v3
-  #     with:
-  #       name: ${{ matrix.name }}-logs
-  #       path: |
-  #         DerivedData/Logs/Build
-  #   - name: Save crash logs
-  #     if: ${{ steps.build-and-test.outcome != 'skipped' }}
-  #     uses: actions/upload-artifact@v3
-  #     with:
-  #       name: ${{ matrix.name }}-crashes
-  #       path: |
-  #         ~/Library/Logs/DiagnosticReports
-  #   - name: Zip Result Bundle
-  #     if: ${{ steps.build-and-test.outcome != 'skipped' }}
-  #     shell: bash
-  #     working-directory: TestResults
-  #     run: |
-  #       zip -r ResultBundle.zip ResultBundle.xcresult
-  #   - name: Save test results
-  #     if: ${{ steps.build-and-test.outcome != 'skipped' }}
-  #     uses: actions/upload-artifact@v3
-  #     with:
-  #       name: ${{ matrix.name }}-results
-  #       path: |
-  #         TestResults/ResultBundle.zip
+  build-and-unit-test:
+    runs-on: macos-latest
+    needs: [tuist-generation, changes]
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS_current
+          - destination: platform=macOS,arch=x86_64
+            scheme: ApolloTests
+            test-plan: Apollo-CITestPlan
+            name: Apollo Unit Tests - macOS
+            run-js-tests: false
+            should-run: ${{ needs.changes.outputs.ios }}
+          # Codegen CLI Test
+          - destination: platform=macOS,arch=x86_64
+            scheme: CodegenCLITests
+            test-plan: CodegenCLITestPlan
+            name: Codegen CLI Unit Tests - macOS
+            run-js-tests: false
+            should-run: ${{ needs.changes.outputs.codegen }}
+          # CodegenLib Test
+          - destination: platform=macOS,arch=x86_64
+            scheme: ApolloCodegenTests
+            test-plan: Apollo-Codegen-CITestPlan
+            name: Codegen Lib Unit Tests - macOS
+            run-js-tests: true
+            should-run: ${{ needs.changes.outputs.codegen }}
+          # ApolloPagination Tests
+          - destination: platform=macOS,arch=x86_64
+            scheme: ApolloPaginationTests
+            test-plan: Apollo-PaginationTestPlan
+            name: ApolloPagination Unit Tests - macOS
+            run-js-tests: false
+            should-run: ${{ needs.changes.outputs.pagination }}
+    name: ${{ matrix.name }}
+    steps:
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: ${{ env.XCODE_VERSION }}
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Retrieve Build Cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ./ApolloDev.xcodeproj
+          ./ApolloDev.xcworkspace
+          ./Derived/*
+        key: ${{ github.run_id }}-dependencies
+        fail-on-cache-miss: true
+    # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
+    # - uses: actions/cache@v3
+    #   with:
+    #     path: ./DerivedData/SourcePackages
+    #     key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
+    # - name: Run Tuist Generation
+    #   uses: tuist/tuist-action@0.13.0
+    #   with:
+    #       command: 'generate'
+    #       arguments: ''
+    - name: Build and Test
+      if: ${{ matrix.should-run == true || matrix.should-run == 'true' }}
+      id: build-and-test
+      uses: ./.github/actions/build-and-run-unit-tests
+      with:
+        destination: ${{ matrix.destination }}
+        scheme: ${{ matrix.scheme }}
+        test-plan: ${{ matrix.test-plan }}
+    - name: Run-JS-Tests
+      if: ${{ matrix.run-js-tests == true }}
+      shell: bash
+      working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript/
+      run: |
+        npm install && npm test
+    - name: Save xcodebuild logs
+      if: ${{ steps.build-and-test.outcome != 'skipped' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.name }}-logs
+        path: |
+          DerivedData/Logs/Build
+    - name: Save crash logs
+      if: ${{ steps.build-and-test.outcome != 'skipped' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.name }}-crashes
+        path: |
+          ~/Library/Logs/DiagnosticReports
+    - name: Zip Result Bundle
+      if: ${{ steps.build-and-test.outcome != 'skipped' }}
+      shell: bash
+      working-directory: TestResults
+      run: |
+        zip -r ResultBundle.zip ResultBundle.xcresult
+    - name: Save test results
+      if: ${{ steps.build-and-test.outcome != 'skipped' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.name }}-results
+        path: |
+          TestResults/ResultBundle.zip
 
   # CodegenTestConfigurations removed because source is not compatible with Sendable yet.
   
