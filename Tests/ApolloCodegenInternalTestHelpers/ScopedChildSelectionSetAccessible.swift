@@ -50,8 +50,13 @@ extension ComputedSelectionSet: ScopedChildSelectionSetAccessible {
     with conditions: IR.ScopeCondition,
     computedSelectionSetCache: ComputedSelectionSetCache
   ) -> SelectionSetTestWrapper? {
-    let selectionSet = direct?.inlineFragments[conditions]?.selectionSet ??
-    merged.inlineFragments[conditions]?.selectionSet
+    let selectionSet = 
+    direct?
+      .inlineFragments[conditions]?
+      .selectionSet ??
+    merged
+      .inlineFragments[conditions]?
+      .selectionSet
 
     return SelectionSetTestWrapper(
       irObject: selectionSet,

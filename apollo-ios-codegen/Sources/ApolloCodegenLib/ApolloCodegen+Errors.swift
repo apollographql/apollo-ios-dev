@@ -17,6 +17,7 @@ extension ApolloCodegen {
     case invalidConfiguration(message: String)
     case invalidSchemaName(_ name: String, message: String)
     case targetNameConflict(name: String)
+    case fieldMergingIncompatibility
 
     public var errorDescription: String? {
       switch self {
@@ -51,6 +52,13 @@ extension ApolloCodegen {
         return """
           Target name '\(name)' conflicts with a reserved library name. Please choose a different \
           target name.
+          """
+      case .fieldMergingIncompatibility:
+        return """
+          Options for disabling 'fieldMerging' and enabling 'selectionSetInitializers' are
+          incompatible.
+
+          Please set either 'fieldMerging' to 'all' or 'selectionSetInitializers' to be empty.
           """
       }
     }

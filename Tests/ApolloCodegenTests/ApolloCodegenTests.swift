@@ -2415,6 +2415,45 @@ class ApolloCodegenTests: XCTestCase {
     })
   }
 
+  func test__validation__givenFieldMerging_notAll_andSelectionSetInitializers_enabled_shouldThrowError() throws {
+    // given
+    let fieldMergingOptions: [ApolloCodegenConfiguration.FieldMerging] = [
+      .none,
+      .ancestors,
+      .namedFragments,
+      .siblings,
+      [.ancestors, .namedFragments],
+      [.siblings, .ancestors],
+      [.siblings, .namedFragments]
+    ]
+    let initializerOptions: [ApolloCodegenConfiguration.SelectionSetInitializers] = [
+      .all,      
+      .operations,
+      .namedFragments,
+      .fragment(named: "TestFragment"),
+      [.operations, .namedFragments]
+    ]
+
+    for fieldMergingOption in fieldMergingOptions {
+      for initializerOption in initializerOptions {
+
+        let config = ApolloCodegenConfiguration.mock(
+          .other,
+          options: .init(
+            selectionSetInitializers: initializerOption
+          ),
+          experimentalFeatures: .init(
+            fieldMerging: fieldMergingOption
+          )
+        )
+
+        // then
+        expect(try ApolloCodegen._validate(config: config))
+          .to(throwError(ApolloCodegen.Error.fieldMergingIncompatibility))
+      }
+    }
+  }
+
   // MARK: Path Match Exclusion Tests
 
   func test__match__givenFilesInSpecialExcludedPaths_shouldNotReturnExcludedPaths() throws {

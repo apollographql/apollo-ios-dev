@@ -85,8 +85,7 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
 
     let typeInfo = SelectionSet.TypeInfo(
       entity: existingField.entity,
-      scopePath: wrapperScope,
-      isUserDefined: true
+      scopePath: wrapperScope      
     )
 
     let selectionSet = SelectionSet(
@@ -112,8 +111,7 @@ public class DirectSelections: Equatable, CustomDebugStringConvertible {
         entity: newField.entity,
         scopePath: wrapperField.selectionSet.scopePath.mutatingLast {
           $0.appending(newFieldConditions)
-        },
-        isUserDefined: true
+        }
       )
 
       let newFieldSelectionSet = SelectionSet(

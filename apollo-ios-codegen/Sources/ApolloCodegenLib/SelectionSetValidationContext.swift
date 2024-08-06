@@ -30,7 +30,7 @@ struct SelectionSetValidationContext {
     // Check for type conflicts resulting from singularization/pluralization of fields
     var typeNamesForEntityFields = [String: String]()
 
-    let entityFields = selections.makeFieldIterator { field in
+    let entityFields = selections.makeFieldIterator() { field in
       field is IR.EntityField
     }
 
