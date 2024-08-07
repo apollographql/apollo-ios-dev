@@ -14,18 +14,18 @@ public struct PaginationOutput<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   /// An array of pages after the initial page.
   public let nextPages: [GraphQLResult<PaginatedQuery.Data>]
 
-  public let mostRecentPage: QueryWrapper
+  public let lastUpdatedPage: QueryWrapper
 
   public init(
     previousPages: [GraphQLResult<PaginatedQuery.Data>],
     initialPage: GraphQLResult<InitialQuery.Data>?,
     nextPages: [GraphQLResult<PaginatedQuery.Data>],
-    mostRecentPage: QueryWrapper
+    lastUpdatedPage: QueryWrapper
   ) {
     self.previousPages = previousPages
     self.initialPage = initialPage
     self.nextPages = nextPages
-    self.mostRecentPage = mostRecentPage
+    self.lastUpdatedPage = lastUpdatedPage
   }
 
   public var allErrors: [GraphQLError] {

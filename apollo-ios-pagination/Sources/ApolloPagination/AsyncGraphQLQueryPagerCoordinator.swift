@@ -323,7 +323,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
             previousPages: latest?.previous ?? [],
             initialPage: latest?.initial,
             nextPages: latest?.next ?? [],
-            mostRecentPage: .initial(result)
+            lastUpdatedPage: .initial(result)
           )
         }
         if initialPageResult?.data == nil {
@@ -344,7 +344,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
             previousPages: latest.previous,
             initialPage: latest.initial,
             nextPages: latest.next,
-            mostRecentPage: .paginated(paginatedResult)
+            lastUpdatedPage: .paginated(paginatedResult)
           )
         }
         if underlyingData == nil {
