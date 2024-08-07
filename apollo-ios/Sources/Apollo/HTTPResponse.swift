@@ -22,8 +22,8 @@ public class HTTPResponse<Operation: GraphQLOperation> {
   public var legacyResponse: GraphQLResponse<Operation.Data>? = nil
   
   /// A set of cache records from the response
-  var cacheRecords: RecordSet?
-  
+  public var cacheRecords: RecordSet?
+
   /// Designated initializer
   ///
   /// - Parameters:
