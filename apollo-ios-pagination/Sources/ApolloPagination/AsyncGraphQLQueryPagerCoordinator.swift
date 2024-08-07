@@ -317,7 +317,6 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
       switch fetchType {
       case .initial:
         initialPageResult = data as? GraphQLResult<InitialQuery.Data>
-        initialPageResult = data as? GraphQLResult<InitialQuery.Data>
         output = initialPageResult.flatMap { result in
           .init(
             previousPages: latest?.previous ?? [],
