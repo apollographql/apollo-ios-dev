@@ -87,6 +87,93 @@ extension Mocks.Hero.FriendsQuery {
       ]
     }
   }
+
+  static func expectationForFirstPageWithErrors(server: MockGraphQLServer) -> XCTestExpectation {
+    let query = MockQuery<Mocks.Hero.FriendsQuery>()
+    query.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
+    return server.expect(query) { _ in
+      let pageInfo: [AnyHashable: AnyHashable] = [
+        "__typename": "PageInfo",
+        "endCursor": "Y3Vyc29yMg==",
+        "hasNextPage": true,
+      ]
+      let friends: [[String: AnyHashable]] = [
+        [
+          "__typename": "Human",
+          "name": "Luke Skywalker",
+          "id": "1000",
+        ],
+        [
+          "__typename": "Human",
+          "name": "Han Solo",
+          "id": "1002",
+        ],
+      ]
+      let friendsConnection: [String: AnyHashable] = [
+        "__typename": "FriendsConnection",
+        "totalCount": 3,
+        "friends": friends,
+        "pageInfo": pageInfo,
+      ]
+
+      let hero: [String: AnyHashable] = [
+        "__typename": "Droid",
+        "id": "2001",
+        "name": "R2-D2",
+        "friendsConnection": friendsConnection,
+      ]
+
+      let data: [String: AnyHashable] = [
+        "hero": hero
+      ]
+
+      return [
+        "data": data,
+        "errors": [
+          [
+            "message": "uh oh!"
+          ],
+          [
+            "message": "Some error"
+          ],
+        ],
+      ]
+    }
+  }
+
+  static func expectationForFirstPageErrorsOnly(server: MockGraphQLServer) -> XCTestExpectation {
+    let query = MockQuery<Mocks.Hero.FriendsQuery>()
+    query.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
+    return server.expect(query) { _ in
+      return [
+        "errors": [
+          [
+            "message": "uh oh!"
+          ],
+          [
+            "message": "Some error"
+          ],
+        ],
+      ]
+    }
+  }
+
+  static func expectationForSecondPageErrorsOnly(server: MockGraphQLServer) -> XCTestExpectation {
+    let query = MockQuery<Mocks.Hero.FriendsQuery>()
+    query.__variables = ["id": "2001", "first": 2, "after": "Y3Vyc29yMg=="]
+    return server.expect(query) { _ in
+      return [
+        "errors": [
+          [
+            "message": "uh oh!"
+          ],
+          [
+            "message": "Some error"
+          ],
+        ],
+      ]
+    }
+  }
 }
 
 extension Mocks.Hero.ReverseFriendsQuery {

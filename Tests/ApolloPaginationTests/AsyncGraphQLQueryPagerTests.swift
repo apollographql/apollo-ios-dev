@@ -26,7 +26,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     initialQuery.__variables = [
       "id": "2001",
       "first": 2,
-      "after": GraphQLNullable<String>.null
+      "after": GraphQLNullable<String>.null,
     ]
     let pager = AsyncGraphQLQueryPager(
       client: client,
@@ -36,7 +36,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
           hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
           endCursor: data.hero.friendsConnection.pageInfo.endCursor
         )
-      }, 
+      },
       pageResolver: { page, direction in
         switch direction {
         case .next:
@@ -44,7 +44,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
           nextQuery.__variables = [
             "id": "2001",
             "first": 2,
-            "after": page.endCursor
+            "after": page.endCursor,
           ]
           return nextQuery
         case .previous:
@@ -63,7 +63,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
-    let subscription = pager.sink { value in
+    let subscription = pager.sink { _ in
       secondPageFetch.fulfill()
     }
     try await pager.loadNext()
@@ -82,7 +82,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     initialQuery.__variables = [
       "id": "2001",
       "first": 2,
-      "after": GraphQLNullable<String>.null
+      "after": GraphQLNullable<String>.null,
     ]
     let pager = AsyncGraphQLQueryPager(
       client: client,
@@ -100,7 +100,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
           nextQuery.__variables = [
             "id": "2001",
             "first": 2,
-            "after": page.endCursor
+            "after": page.endCursor,
           ]
           return nextQuery
         case .previous:
@@ -121,9 +121,8 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     secondPageFetch.expectedFulfillmentCount = 2
     let subscription = pager
       .compactMap { output -> [ViewModel]? in
-        guard case .success((let output, _)) = output else { return nil }
-        let inOrderData = output.previousPages + [output.initialPage] + output.nextPages
-        let models = inOrderData.flatMap { data in
+        guard case .success(let output) = output else { return nil }
+        let models = output.allData.flatMap { data in
           data.hero.friendsConnection.friends.map { friend in ViewModel(name: friend.name) }
         }
         return models
@@ -144,7 +143,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     initialQuery.__variables = [
       "id": "2001",
       "first": 2,
-      "after": GraphQLNullable<String>.null
+      "after": GraphQLNullable<String>.null,
     ]
     let pager = AsyncGraphQLQueryPager(
       client: client,
@@ -162,17 +161,11 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
           nextQuery.__variables = [
             "id": "2001",
             "first": 2,
-            "after": page.endCursor
+            "after": page.endCursor,
           ]
           return nextQuery
         case .previous:
           return nil
-        }
-      } ,
-      transform: { previous, first, next in
-        let inOrderData = previous + [first] + next
-        return inOrderData.flatMap { data in
-          data.hero.friendsConnection.friends.map { friend in friend.name }
         }
       }
     )
@@ -187,7 +180,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
-    let subscription = pager.sink { value in
+    let subscription = pager.sink { _ in
       secondPageFetch.fulfill()
     }
     try await pager.loadNext()
@@ -206,7 +199,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     initialQuery.__variables = [
       "id": "2001",
       "first": 2,
-      "after": GraphQLNullable<String>.null
+      "after": GraphQLNullable<String>.null,
     ]
     let pager = AsyncGraphQLQueryPager(
       client: client,
@@ -224,17 +217,11 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
           nextQuery.__variables = [
             "id": "2001",
             "first": 2,
-            "after": page.endCursor
+            "after": page.endCursor,
           ]
           return nextQuery
         case .previous:
           return nil
-        }
-      },
-      transform: { previous, first, next in
-        let inOrderData = previous + [first] + next
-        return inOrderData.flatMap { data in
-          data.hero.friendsConnection.friends.map { friend in friend.name }
         }
       }
     )
@@ -252,13 +239,15 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     let subscription = pager
       .compactMap { result in
         switch result {
-        case .success((let strings, _)):
-          return strings.map(ViewModel.init(name:))
+        case .success(let output):
+          return output.allData.flatMap { data in
+            data.hero.friendsConnection.friends.map { friend in friend.name }
+          }.map(ViewModel.init(name:))
         case .failure(let error):
           XCTFail("Unexpected failure: \(error)")
           return nil
         }
-      }.sink { value in
+      }.sink { _ in
         secondPageFetch.fulfill()
       }
     try await pager.loadNext()
@@ -273,52 +262,63 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
       let name: String
     }
 
-    let anyPager = createPager().eraseToAnyPager { data in
-      data.hero.friendsConnection.friends.map {
-        ViewModel(name: $0.name)
-      }
-    }
+    let anyPager = createPager()
 
     let fetchExpectation = expectation(description: "Initial Fetch")
     fetchExpectation.assertForOverFulfill = false
     let subscriptionExpectation = expectation(description: "Subscription")
     subscriptionExpectation.expectedFulfillmentCount = 2
     var expectedViewModels: [ViewModel]?
-    anyPager.subscribe { (result: Result<([ViewModel], UpdateSource), Error>) in
-      switch result {
-      case .success((let viewModels, _)):
+    let subscriber = anyPager
+      .compactMap { result in
+        switch result {
+        case .success(let data):
+          return data.allData.flatMap { data in
+            data.hero.friendsConnection.friends.map {
+              ViewModel(name: $0.name)
+            }
+          }
+        case .failure(let error):
+          XCTFail(error.localizedDescription)
+          return nil
+        }
+      }.sink { viewModels in
         expectedViewModels = viewModels
         fetchExpectation.fulfill()
         subscriptionExpectation.fulfill()
-      default:
-        XCTFail("Failed to get view models from pager.")
       }
-    }
 
     await fetchFirstPage(pager: anyPager)
     await fulfillment(of: [fetchExpectation], timeout: 1)
     try await fetchSecondPage(pager: anyPager)
 
-    await fulfillment(of: [subscriptionExpectation], timeout: 1.0)
+    await fulfillment(of: [subscriptionExpectation], timeout: 1)
     let results = try XCTUnwrap(expectedViewModels)
     XCTAssertEqual(results.count, 3)
     XCTAssertEqual(results.map(\.name), ["Luke Skywalker", "Han Solo", "Leia Organa"])
+    subscriber.cancel()
   }
 
   func test_passesBackSeparateData() async throws {
-    let anyPager = createPager().eraseToAnyPager { _, initial, next in
-      if let latestPage = next.last {
-        return latestPage.hero.friendsConnection.friends.last?.name
-      }
-      return initial.hero.friendsConnection.friends.last?.name
-    }
+    let anyPager = createPager()
 
     let initialExpectation = expectation(description: "Initial")
     let secondExpectation = expectation(description: "Second")
     var expectedViewModel: String?
-    anyPager.subscribe { (result: Result<(String?, UpdateSource), Error>) in
-      switch result {
-      case .success((let viewModel, _)):
+    let subscriber = anyPager
+      .compactMap { result in
+        switch result {
+        case .success(let output):
+          if let latestPage = output.nextPages.last {
+            return latestPage.data?.hero.friendsConnection.friends.last?.name
+          }
+          return output.initialPage?.data?.hero.friendsConnection.friends.last?.name
+        case .failure(let error):
+          XCTFail(error.localizedDescription)
+          return nil
+        }
+      }
+      .sink { viewModel in
         let oldValue = expectedViewModel
         expectedViewModel = viewModel
         if oldValue == nil {
@@ -326,18 +326,16 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
         } else {
           secondExpectation.fulfill()
         }
-      default:
-        XCTFail("Failed to get view models from pager.")
       }
-    }
 
     await fetchFirstPage(pager: anyPager)
-    await fulfillment(of: [initialExpectation], timeout: 1.0)
+    await fulfillment(of: [initialExpectation], timeout: 1)
     XCTAssertEqual(expectedViewModel, "Han Solo")
 
     try await fetchSecondPage(pager: anyPager)
-    await fulfillment(of: [secondExpectation], timeout: 1.0)
+    await fulfillment(of: [secondExpectation], timeout: 1)
     XCTAssertEqual(expectedViewModel, "Leia Organa")
+    subscriber.cancel()
   }
 
   func test_loadAll() async throws {
@@ -346,7 +344,7 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     let firstPageExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     let lastPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let loadAllExpectation = expectation(description: "Load all pages")
-    let subscriber = await pager.subscribe { _ in
+    let subscriber = pager.sink { _ in
       loadAllExpectation.fulfill()
     }
     try await pager.loadAll()
@@ -354,43 +352,96 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
     subscriber.cancel()
   }
 
-  func test_equatable() async {
-    let pagerA = AsyncGraphQLQueryPager(pager: createPager(), transform: { previous, initial, next in
-      let allPages = previous + [initial] + next
-      return allPages.flatMap { data in
-        data.hero.friendsConnection.friends.map { $0.name }
+  func test_errors_partialSuccess() async throws {
+    let pager = createPager()
+    var expectedResults: [Result<PaginationOutput<Query, Query>, any Error>] = []
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPageWithErrors(server: server)
+    let fetchExpectation = expectation(description: "Fetch")
+    let subscription = pager.sink { output in
+      expectedResults.append(output)
+      fetchExpectation.fulfill()
+    }
+    await pager.fetch()
+    await fulfillment(of: [serverExpectation, fetchExpectation], timeout: 3)
+    XCTAssertEqual(expectedResults.count, 1)
+    let result = try XCTUnwrap(expectedResults.first)
+    let successValue = try result.get()
+    XCTAssertFalse(successValue.allErrors.isEmpty)
+    XCTAssertEqual(successValue.initialPage?.data?.hero.name, "R2-D2")
+    let canLoadNext = await pager.canLoadNext
+    XCTAssertTrue(canLoadNext)
+    subscription.cancel()
+  }
+
+  func test_errors_noData() async throws {
+    let pager = createPager()
+    var expectedResults: [Result<PaginationOutput<Query, Query>, any Error>] = []
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPageErrorsOnly(server: server)
+    let fetchExpectation = expectation(description: "Fetch")
+    let subscription = pager.sink { output in
+      expectedResults.append(output)
+      fetchExpectation.fulfill()
+    }
+    await pager.fetch()
+    await fulfillment(of: [serverExpectation, fetchExpectation], timeout: 3)
+    XCTAssertEqual(expectedResults.count, 1)
+    let result = try XCTUnwrap(expectedResults.first)
+    let successValue = try result.get()
+    XCTAssertFalse(successValue.allErrors.isEmpty)
+    XCTAssertNil(successValue.initialPage?.data)
+    subscription.cancel()
+  }
+
+  func test_errors_noData_loadAll() async throws {
+    let pager = createPager()
+    var expectedResults: [Result<PaginationOutput<Query, Query>, any Error>] = []
+    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPageErrorsOnly(server: server)
+    let fetchExpectation = expectation(description: "Fetch")
+    let subscription = pager.sink { output in
+      expectedResults.append(output)
+      XCTAssertEqual(expectedResults.count, 1)
+      do {
+        let result = try XCTUnwrap(expectedResults.first)
+        let successValue = try result.get()
+        XCTAssertFalse(successValue.allErrors.isEmpty)
+        XCTAssertNil(successValue.initialPage?.data)
+      } catch {
+        XCTFail(error.localizedDescription)
       }
-    })
+      fetchExpectation.fulfill()
+    }
+    try await pager.loadAll(fetchFromInitialPage: true)
+    await fulfillment(of: [serverExpectation, fetchExpectation], timeout: 3)
+    subscription.cancel()
+  }
 
-    let pagerB = AsyncGraphQLQueryPager(pager: createPager(), transform: { previous, initial, next in
-      let allPages = previous + [initial] + next
-      return allPages.flatMap { data in
-        data.hero.friendsConnection.friends.map { $0.name }
-      }
-    })
+  func test_errors_noDataOnSecondPage_loadAll() async throws {
+    let pager = createPager()
+    var expectedResults: [Result<PaginationOutput<Query, Query>, any Error>] = []
 
-    XCTAssertEqual(pagerA, pagerB)
-
-    pagerA._subject.send(.success((["Al-Khwarizmi", "Al-Jaziri", "Charles Babbage", "Ada Lovelace"], .cache)))
-    XCTAssertNotEqual(pagerA, pagerB)
-
-    pagerB._subject.send(.success((["Al-Khwarizmi", "Al-Jaziri", "Charles Babbage", "Ada Lovelace"], .cache)))
-    XCTAssertEqual(pagerA, pagerB)
-
-    pagerA._subject.send(.success((["Al-Khwarizmi", "Al-Jaziri", "Charles Babbage", "Ada Lovelace"], .fetch)))
-    XCTAssertNotEqual(pagerA, pagerB)
-
-    pagerB._subject.send(.success((["Al-Khwarizmi", "Al-Jaziri", "Charles Babbage", "Ada Lovelace"], .fetch)))
-    await pagerA.reset()
-    XCTAssertEqual(pagerA, pagerB)
+    let firstPageExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    let lastPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPageErrorsOnly(server: server)
+    let loadAllExpectation = expectation(description: "Load all pages")
+    let subscriber = pager.sink { output in
+      expectedResults.append(output)
+      loadAllExpectation.fulfill()
+    }
+    try await pager.loadAll()
+    await fulfillment(of: [firstPageExpectation, lastPageExpectation, loadAllExpectation], timeout: 5)
+    let result = try XCTUnwrap(expectedResults.first)
+    let successValue = try result.get()
+    XCTAssertFalse(successValue.allErrors.isEmpty)
+    XCTAssertNotNil(successValue.initialPage)
+    XCTAssertNil(successValue.nextPages[0].data)
+    subscriber.cancel()
   }
 
   // MARK: - Test helpers
 
-  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
+  private func createPager() -> AsyncGraphQLQueryPager<PaginationOutput<Query, Query>> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
+    return .init(pager: AsyncGraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       watcherDispatchQueue: .main,
@@ -413,18 +464,18 @@ final class AsyncGraphQLQueryPagerTests: XCTestCase {
         ]
         return nextQuery
       }
-    )
+    ))
   }
 
   private func fetchFirstPage<T>(pager: AsyncGraphQLQueryPager<T>) async {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     await pager.fetch()
-    await fulfillment(of: [serverExpectation], timeout: 1.0)
+    await fulfillment(of: [serverExpectation], timeout: 1)
   }
 
   private func fetchSecondPage<T>(pager: AsyncGraphQLQueryPager<T>) async throws {
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     try await pager.loadNext()
-    await fulfillment(of: [serverExpectation], timeout: 1.0)
+    await fulfillment(of: [serverExpectation], timeout: 1)
   }
 }
