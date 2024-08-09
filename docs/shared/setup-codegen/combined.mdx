@@ -8,17 +8,14 @@ import SetupCodegenPanel from "./single-panel.mdx"
   title: "SPM with Package.swift",
   cliPath: "./apollo-ios-cli",
   moduleTypeOption: "`.swiftPackageManager`",
-  installComponent: <SPMInstallCLI />,
 }, {
   title: "SPM with Xcode Project",
   cliPath: "./apollo-ios-cli",
   moduleTypeOption: "`.swiftPackageManager`",
-  installComponent: <SPMXcodeInstallCLI />,
 }, {
   title: "Cocoapods",
   cliPath: "./Pods/Apollo/apollo-ios-cli",
   moduleTypeOption: "`.other`",
-  installComponent: <PodsInstallCLI />,
 }]} as="installType">
   <a name={`spm-${installType.title.toLowerCase().replace(/ /g, "-")}`} />
 
@@ -83,7 +80,7 @@ import SetupCodegenPanel from "./single-panel.mdx"
       From your project's root directory, run the following command with your customized values:
 
       <CodeBlock
-        code={props.cliPath + " init --schema-namespace ${MySchemaName} --module-type ${ModuleType}"}
+        code={installType.cliPath + " init --schema-namespace ${MySchemaName} --module-type ${ModuleType}"}
         language="bash"
       />
 
@@ -118,7 +115,7 @@ import SetupCodegenPanel from "./single-panel.mdx"
       From your project's root directory, run:
 
       <CodeBlock
-        code={props.cliPath + " generate"}
+        code={installType.cliPath + " generate"}
         language="bash"
       />
 
