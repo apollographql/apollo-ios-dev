@@ -11,6 +11,9 @@ public struct ObjectData {
   public let _transformer: any _ObjectData_Transformer
   public let _rawData: [String: AnyHashable]
 
+  public static let _boolTrue = AnyHashable(true)
+  public static let _boolFalse = AnyHashable(false)
+
   public init(
     _transformer: any _ObjectData_Transformer,
     _rawData: [String: AnyHashable]
@@ -26,7 +29,7 @@ public struct ObjectData {
     // This check is based on AnyHashable using a canonical representation of the type-erased value so
     // instances wrapping the same value of any type compare as equal. Therefore while Int(1) and Int(0)
     // might be representable as Bool they will never equal Bool(true) nor Bool(false).
-    if let boolVal = value as? Bool, (value == AnyHashable(true) || value == AnyHashable(false)) {
+    if let boolVal = value as? Bool, (value == Self._boolTrue || value == Self._boolFalse) {
       value = boolVal
 
     // Cast to `Int` to ensure we always use `Int` vs `Int32` or `Int64` for consistency and ScalarType casting
