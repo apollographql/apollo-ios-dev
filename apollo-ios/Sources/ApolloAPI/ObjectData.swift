@@ -11,9 +11,6 @@ public struct ObjectData {
   public let _transformer: any _ObjectData_Transformer
   public let _rawData: [String: AnyHashable]
 
-  private static let boolTrue = AnyHashable(true)
-  private static let boolFalse = AnyHashable(false)
-
   public init(
     _transformer: any _ObjectData_Transformer,
     _rawData: [String: AnyHashable]
