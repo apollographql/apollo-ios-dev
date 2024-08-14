@@ -68,27 +68,22 @@ class RootFieldBuilder {
   }
 
   private func buildSelectionSet(
-    fromCompiledSelectionSet compiledSelectionSet: CompilationResult.SelectionSet?,
+    fromCompiledSelectionSet compiledSelectionSet: CompilationResult.SelectionSet,
     entity: Entity,
     scopePath: LinkedList<ScopeDescriptor>
   ) async -> SelectionSet {
     let typeInfo = SelectionSet.TypeInfo(
       entity: entity,
-      scopePath: scopePath,
-      isUserDefined: true
+      scopePath: scopePath
     )
 
-    var directSelections: DirectSelections? = nil
+    let directSelections = DirectSelections()
 
-    if let compiledSelectionSet {
-      directSelections = DirectSelections()
-
-      await buildDirectSelections(
-        into: directSelections.unsafelyUnwrapped,
-        atTypePath: typeInfo,
-        from: compiledSelectionSet
-      )
-    }
+    await buildDirectSelections(
+      into: directSelections,
+      atTypePath: typeInfo,
+      from: compiledSelectionSet
+    )
 
     return SelectionSet(
       typeInfo: typeInfo,
@@ -279,7 +274,7 @@ class RootFieldBuilder {
       return nil
     }
 
-    let type = (parentTypePath.parentType == conditionalSelectionSet.parentType)
+    let type = (parentTypePath.scope.matches(conditionalSelectionSet.parentType))
     ? nil
     : conditionalSelectionSet.parentType
 
@@ -351,7 +346,7 @@ class RootFieldBuilder {
   }
 
   private func buildInlineFragmentSpread(
-    fromCompiledSelectionSet compiledSelectionSet: CompilationResult.SelectionSet?,
+    fromCompiledSelectionSet compiledSelectionSet: CompilationResult.SelectionSet,
     with scopeCondition: ScopeCondition,
     inParentTypePath enclosingTypeInfo: SelectionSet.TypeInfo,
     deferCondition: CompilationResult.DeferCondition? = nil
@@ -421,8 +416,7 @@ class RootFieldBuilder {
 
     let typeInfo = SelectionSet.TypeInfo(
       entity: parentTypeInfo.entity,
-      scopePath: scopePath,
-      isUserDefined: true
+      scopePath: scopePath
     )
 
     let fragmentSpread = NamedFragmentSpread(

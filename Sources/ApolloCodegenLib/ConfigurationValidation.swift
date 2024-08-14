@@ -21,6 +21,12 @@ extension ApolloCodegen.ConfigurationContext {
         """)
     }
 
+    guard self.experimentalFeatures.fieldMerging == .all ||
+            self.options.selectionSetInitializers == []
+    else {
+      throw ApolloCodegen.Error.fieldMergingIncompatibility
+    }
+
     guard
       !SwiftKeywords.DisallowedSchemaNamespaceNames.contains(self.schemaNamespace.lowercased())
     else {
