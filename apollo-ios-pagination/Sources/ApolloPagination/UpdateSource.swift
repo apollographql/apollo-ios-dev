@@ -1,3 +1,3 @@
 public enum UpdateSource: Hashable {
-  case fetch, cache
+  case server, cache
 }

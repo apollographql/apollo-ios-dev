@@ -96,7 +96,7 @@ final class GraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTesting
     server.customDelay = .milliseconds(1)
     let pager = GraphQLQueryPagerCoordinator(pager: createForwardPager())
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-    var results: [Result<(PaginationOutput<ForwardQuery, ForwardQuery>, UpdateSource), any Error>] = []
+    var results: [Result<PaginationOutput<ForwardQuery, ForwardQuery>, any Error>] = []
     var errors: [PaginationError?] = []
 
     pager.fetch()
@@ -127,7 +127,7 @@ final class GraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTesting
     server.customDelay = .milliseconds(1)
     var pager: GraphQLQueryPagerCoordinator! = GraphQLQueryPagerCoordinator(pager: createForwardPager())
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-    var results: [Result<(PaginationOutput<ForwardQuery, ForwardQuery>, UpdateSource), any Error>] = []
+    var results: [Result<PaginationOutput<ForwardQuery, ForwardQuery>, any Error>] = []
     var errors: [PaginationError?] = []
 
     pager.fetch()

@@ -36,8 +36,7 @@ final class OffsetTests: XCTestCase {
         case .initial(let data, let output), .paginated(let data, let output):
           var totalOffset: Int = 0
           if let output {
-            let pages = (output.previousPages + [output.initialPage] + output.nextPages)
-            pages.forEach { page in
+            output.allData.forEach { page in
               totalOffset += page.hero.friends.count
             }
           }
@@ -53,7 +52,7 @@ final class OffsetTests: XCTestCase {
         nextQuery.__variables = [
           "id": "2001",
           "offset": pageInfo.offset,
-          "limit": pageSize
+          "limit": pageSize,
         ]
         return nextQuery
       }
@@ -69,7 +68,6 @@ final class OffsetTests: XCTestCase {
       XCTAssertNil(error)
     }
   }
-
 
   private func fetchFirstPage<T>(pager: AsyncGraphQLQueryPager<T>) async {
     let serverExpectation = Mocks.Hero.OffsetFriendsQuery.expectationForFirstPage(server: server)
@@ -94,10 +92,8 @@ final class OffsetTests: XCTestCase {
     var results: [ViewModel]?
     let cancellable = pager.map { value in
       switch value {
-      case .success((let output, _)):
-        let pages = output.previousPages + [output.initialPage] + output.nextPages
-
-        let friends = pages.flatMap { data in
+      case .success(let output):
+        let friends = output.allData.flatMap { data in
           data.hero.friends.map { friend in
             ViewModel(name: friend.name)
           }
