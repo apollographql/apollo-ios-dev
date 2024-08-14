@@ -574,7 +574,7 @@ class FragmentTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
   }
 
-  func test__render_givenNamedFragments_asLocalCacheMutation_configIncludeLocalCacheMutations_rendersInitializer() async throws {
+  func test__render_givenNamedFragments_asLocalCacheMutation_rendersInitializer() async throws {
     // given
     schemaSDL = """
       type Query {
@@ -612,13 +612,57 @@ class FragmentTemplateTests: XCTestCase {
     // when
     try await buildSubjectAndFragment(
       config: .mock(options: .init(
-        selectionSetInitializers: [.localCacheMutations]
+        selectionSetInitializers: []
       )))
 
     let actual = renderSubject()
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 20, ignoringExtraLines: true))
+  }
+
+  func test__render_givenOperationSelectionSet_initializerConfig_all_fieldMergingConfig_notAll_doesNotRenderInitializer() async throws {
+    let tests: [ApolloCodegenConfiguration.FieldMerging] = [
+      .none,
+      .ancestors,
+      .namedFragments,
+      .siblings,
+      [.ancestors, .namedFragments],
+      [.siblings, .ancestors],
+      [.siblings, .namedFragments]
+    ]
+
+    for test in tests {
+      // given
+      schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      type Animal {
+        species: String!
+      }
+      """
+
+      document = """
+      fragment TestFragment on Animal {
+        species
+      }
+      """
+
+      // when
+      try await buildSubjectAndFragment(config: .mock(
+        options: .init(
+          selectionSetInitializers: [.all]
+        ),
+        experimentalFeatures: .init(fieldMerging: test)
+      ))
+
+      let actual = renderSubject()
+
+      // then
+      expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
+    }
   }
 
   // MARK: Local Cache Mutation Tests

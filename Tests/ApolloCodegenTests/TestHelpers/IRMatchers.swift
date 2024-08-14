@@ -78,17 +78,20 @@ struct SelectionsMatcher {
   let merged: [ShallowSelectionMatcher]
   let mergedSources: OrderedSet<IR.MergedSelections.MergedSource>
 
+  let mergingStrategy: IR.MergedSelections.MergingStrategy
   let ignoreMergedSelections: Bool
 
   public init(
     direct: [ShallowSelectionMatcher]?,
     merged: [ShallowSelectionMatcher] = [],
     mergedSources: OrderedSet<IR.MergedSelections.MergedSource> = [],
+    mergingStrategy: IR.MergedSelections.MergingStrategy = .all,
     ignoreMergedSelections: Bool = false
   ) {
     self.direct = direct
     self.merged = merged
     self.mergedSources = mergedSources
+    self.mergingStrategy = mergingStrategy
     self.ignoreMergedSelections = ignoreMergedSelections
   }
 
@@ -107,8 +110,12 @@ func shallowlyMatch(
 
   if !expectedValue.ignoreMergedSelections {
     matchers.append(contentsOf: [
-      shallowlyMatch(expectedValue.merged).mappingActualTo { $0?.computed.merged },
-      equal(expectedValue.mergedSources).mappingActualTo { $0?.computed.merged.mergedSources }
+      shallowlyMatch(expectedValue.merged)
+        .mappingActualTo { $0?.computed.merged },
+      equal(expectedValue.mergedSources)
+        .mappingActualTo { $0?.computed.merged.mergedSources },
+      equal(expectedValue.mergingStrategy)
+        .mappingActualTo { $0?.mergingStrategy }
     ])
   }
 
@@ -128,6 +135,7 @@ struct SelectionSetMatcher {
     directSelections: [ShallowSelectionMatcher]?,
     mergedSelections: [ShallowSelectionMatcher],
     mergedSources: OrderedSet<IR.MergedSelections.MergedSource>,
+    mergingStrategy: IR.MergedSelections.MergingStrategy,
     ignoreMergedSelections: Bool
   ) {
     self.parentType = parentType
@@ -136,6 +144,7 @@ struct SelectionSetMatcher {
       direct: directSelections,
       merged: mergedSelections,
       mergedSources: mergedSources,
+      mergingStrategy: mergingStrategy,
       ignoreMergedSelections: ignoreMergedSelections
     )
   }
@@ -145,7 +154,8 @@ struct SelectionSetMatcher {
     inclusionConditions: [CompilationResult.InclusionCondition]? = nil,
     directSelections: [ShallowSelectionMatcher]? = [],
     mergedSelections: [ShallowSelectionMatcher] = [],
-    mergedSources: OrderedSet<IR.MergedSelections.MergedSource> = []
+    mergedSources: OrderedSet<IR.MergedSelections.MergedSource> = [],
+    mergingStrategy: IR.MergedSelections.MergingStrategy = .all
   ) {
     self.init(
       parentType: parentType,
@@ -153,6 +163,7 @@ struct SelectionSetMatcher {
       directSelections: directSelections,
       mergedSelections: mergedSelections,
       mergedSources: mergedSources,
+      mergingStrategy: mergingStrategy,
       ignoreMergedSelections: false
     )
   }
@@ -168,6 +179,7 @@ struct SelectionSetMatcher {
       directSelections: directSelections,
       mergedSelections: [],
       mergedSources: [],
+      mergingStrategy: .all,
       ignoreMergedSelections: true
     )
   }

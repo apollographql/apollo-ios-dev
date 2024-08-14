@@ -21,22 +21,30 @@ public class IRBuilderTestWrapper {
   }
 
   public func build(
-    operation operationDefinition: CompilationResult.OperationDefinition
+    operation operationDefinition: CompilationResult.OperationDefinition,
+    mergingStrategy: MergedSelections.MergingStrategy = .all
   ) async -> IRTestWrapper<IR.Operation> {
     let operation = await irBuilder.build(operation: operationDefinition)
     return IRTestWrapper(
       irObject: operation,
-      computedSelectionSetCache: .init(entityStorage: operation.entityStorage)
+      computedSelectionSetCache: .init(
+        mergingStrategy: mergingStrategy,
+        entityStorage: operation.entityStorage
+      )
     )
   }
 
   public func build(
-    fragment fragmentDefinition: CompilationResult.FragmentDefinition
+    fragment fragmentDefinition: CompilationResult.FragmentDefinition,
+    mergingStrategy: MergedSelections.MergingStrategy = .all
   ) async -> IRTestWrapper<IR.NamedFragment> {
     let fragment = await irBuilder.build(fragment: fragmentDefinition)
     return IRTestWrapper(
       irObject: fragment,
-      computedSelectionSetCache: .init(entityStorage: fragment.entityStorage)
+      computedSelectionSetCache: .init(
+        mergingStrategy: mergingStrategy,
+        entityStorage: fragment.entityStorage
+      )
     )
   }
 
@@ -58,7 +66,10 @@ public class IRBuilderTestWrapper {
 
       return IRTestWrapper(
         irObject: fragment,
-        computedSelectionSetCache: .init(entityStorage: fragment.entityStorage)
+        computedSelectionSetCache: .init(
+          mergingStrategy: .all,
+          entityStorage: fragment.entityStorage
+        )
       )
     }
   }

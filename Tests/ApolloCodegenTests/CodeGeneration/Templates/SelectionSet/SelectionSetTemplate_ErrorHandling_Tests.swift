@@ -31,14 +31,22 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
 
   // MARK: - Helpers
 
-  func buildSubjectAndOperation(named operationName: String = "ConflictingQuery") async throws {
+  func buildSubjectAndOperation(
+    named operationName: String = "ConflictingQuery",
+    fieldMerging: ApolloCodegenConfiguration.FieldMerging = .all
+  ) async throws {
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
-    operation = await ir.build(operation: operationDefinition)
+    operation = await ir.build(
+      operation: operationDefinition,
+      mergingStrategy: fieldMerging.options
+    )
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: "TestSchema",
       output: .mock(moduleType: .swiftPackageManager, operations: .inSchemaModule),
-      options: .init()
+      experimentalFeatures: .init(
+        fieldMerging: fieldMerging
+      )
     )
     let mockTemplateRenderer = MockTemplateRenderer(
       target: .operationFile(),
@@ -252,6 +260,61 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
   }
 
   func
+    test__validation__selectionSet_typeConflicts_withDirectInlineFragment_withFieldMerging_notIncludingAncestors_shouldNotReturnError()
+    async throws
+  {
+    schemaSDL = """
+      type Query {
+        user: User
+      }
+      type User {
+        containers: [ContainerInterface]
+      }
+      interface ContainerInterface {
+        value: Value
+      }
+      type Container implements ContainerInterface{
+        value: Value
+        values: [Value]
+      }
+      type Value {
+        propertyA: String!
+        propertyB: String!
+        propertyC: String!
+        propertyD: String!
+      }
+      """
+
+    document = """
+      query ConflictingQuery {
+        user {
+          containers {
+            value {
+              propertyA
+              propertyB
+              propertyC
+              propertyD
+            }
+            ... on Container {
+              values {
+                propertyA
+                propertyC
+              }
+            }
+          }
+        }
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation(fieldMerging: .siblings)
+    _ = subject.renderBody()
+
+    // then
+    expect(self.errorRecorder.recordedErrors).to(beEmpty())
+  }
+
+  func
     test__validation__selectionSet_typeConflicts_withMergedInlineFragment_shouldReturnNonFatalError()
     async throws
   {
@@ -380,6 +443,61 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
     // then
     expect(self.errorRecorder.recordedErrors.count).to(equal(1))
     expect(self.errorRecorder.recordedErrors.first).to(equal(expectedError))
+  }
+
+  func
+    test__validation__selectionSet_typeConflicts_withDirectNamedFragment_givenFieldMerging_notIncludingNamedFragments_shouldNotReturnError()
+    async throws
+  {
+    schemaSDL = """
+      type Query {
+        user: User
+      }
+      type User {
+        containers: [Container]
+      }
+
+      type Container {
+        value: Value
+        values: [Value]
+      }
+      type Value {
+        propertyA: String!
+        propertyB: String!
+        propertyC: String!
+        propertyD: String!
+      }
+      """
+
+    document = """
+      query ConflictingQuery {
+        user {
+          containers {
+            value {
+              propertyA
+              propertyB
+              propertyC
+              propertyD
+            }
+            ...ContainerFields
+          }
+        }
+      }
+
+      fragment ContainerFields on Container {
+        values {
+          propertyA
+          propertyC
+        }
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation(fieldMerging: [.ancestors, .siblings])
+    _ = subject.renderBody()
+
+    // then
+    expect(self.errorRecorder.recordedErrors).to(beEmpty())    
   }
 
   func test__validation__selectionSet_typeConflicts_withNamedFragment_shouldReturnNonFatalError()
