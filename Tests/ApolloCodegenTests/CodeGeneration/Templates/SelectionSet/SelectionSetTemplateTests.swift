@@ -10635,6 +10635,118 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actualTypeAlias).to(equalLineByLine(expectedTypeAlias, atLine: 13, ignoringExtraLines: true))
   }
 
+  func test__render_nestedSelectionSet__givenEntityFieldMerged_fromTypeCase_withInclusionCondition_siblingTypeCaseSameFieldSameCondition_rendersSelectionSetAsTypeAlias_withFullyQualifiedName() async throws {
+  // given
+  schemaSDL = """
+  type Query {
+    allThings: [Thing!]
+  }
+
+  type Thing {
+    name: String
+    postsInfoByIds: [PostInfo!]
+  }
+
+  interface PostInfo {
+    awardings: [AwardingTotal!]
+  }
+
+  type Awarding {
+    id: String!
+  }
+
+  type AwardingTotal {
+    id: String!
+    awardingByCurrentUser: [Awarding!]
+    total: Int!
+    name: String!
+  }
+
+  type Post implements PostInfo {
+    id: String!
+    awardings: [AwardingTotal!]
+  }
+  """
+
+  document = """
+  query TestOperation($includeCurrentUserAwards: Boolean = false) {
+    allThings {
+      name
+      postsInfoByIds {
+        ... on Post {
+          awardings {
+            total
+          }
+          ... on PostInfo {
+            awardings @include(if: $includeCurrentUserAwards) {
+              name
+            }
+          }
+        }
+        awardings @include(if: $includeCurrentUserAwards) {
+          awardingByCurrentUser {
+            id
+          }
+        }
+      }
+    }
+  }
+  """
+
+  let expectedType = """
+    public var awardingByCurrentUser: [AwardingByCurrentUser]? { __data["awardingByCurrentUser"] }
+
+    /// AllThing.PostsInfoById.Awarding.AwardingByCurrentUser
+    public struct AwardingByCurrentUser: TestSchema.SelectionSet {
+      public let __data: DataDict
+      public init(_dataDict: DataDict) { __data = _dataDict }
+
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Awarding }
+      public static var __selections: [ApolloAPI.Selection] { [
+        .field("__typename", String.self),
+        .field("id", String.self),
+      ] }
+
+      public var id: String { __data["id"] }
+    }
+  """
+
+  let expectedTypeAlias = """
+    public static var __selections: [ApolloAPI.Selection] { [
+      .field("name", String.self),
+    ] }
+
+    public var name: String { __data["name"] }
+    public var awardingByCurrentUser: [AwardingByCurrentUser]? { __data["awardingByCurrentUser"] }
+    public var total: Int { __data["total"] }
+
+    public typealias AwardingByCurrentUser = PostsInfoById.Awarding.AwardingByCurrentUser
+  """
+
+  // when
+  try await buildSubjectAndOperation()
+  let allThings_postsInfoByIds = try XCTUnwrap(
+    operation[field: "query"]?[field: "allThings"]?[field: "postsInfoByIds"]?.selectionSet
+  )
+  let allThings_postsInfoByIds_awardings = try XCTUnwrap(
+    allThings_postsInfoByIds[field: "awardings"]?.selectionSet
+  )
+  let allThings_postsInfoByIds_asPost_awardings_ifIncludeCurrentUserAwards = try XCTUnwrap(
+    allThings_postsInfoByIds[as: "Post"]?[field: "awardings"]?[if: "includeCurrentUserAwards"]
+  )
+
+  let actualType = subject.test_render(
+    inlineFragment: allThings_postsInfoByIds_awardings.computed
+  )
+  let actualTypeAlias = subject.test_render(
+    inlineFragment: allThings_postsInfoByIds_asPost_awardings_ifIncludeCurrentUserAwards.computed
+  )
+
+  // then
+  expect(actualType).to(equalLineByLine(expectedType, atLine: 12, ignoringExtraLines: true))
+  expect(actualTypeAlias).to(equalLineByLine(expectedTypeAlias, atLine: 8, ignoringExtraLines: true))
+}
+
   func test__render_nestedSelectionSet__givenEntityFieldMergedFromParent_notOperationRoot_doesNotRendersTypeAliasForSelectionSet() async throws {
     // given
     schemaSDL = """
