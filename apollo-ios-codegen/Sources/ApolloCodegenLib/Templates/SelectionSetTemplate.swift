@@ -847,7 +847,10 @@ extension IR.MergedSelections.MergedSource {
     var sourceTypePathCurrentNode = typeInfo.scopePath.last
     var nodesToSharedRoot = 0
 
-    while targetTypePathCurrentNode.value == sourceTypePathCurrentNode.value {
+    while representsSameScope(
+      target: targetTypePathCurrentNode.value,
+      source: sourceTypePathCurrentNode.value
+    ) {
       guard let previousFieldNode = targetTypePathCurrentNode.previous,
         let previousSourceNode = sourceTypePathCurrentNode.previous
       else {
@@ -893,6 +896,34 @@ extension IR.MergedSelections.MergedSource {
     )
 
     return selectionSetName
+  }
+
+  /// Checks whether the target and source scope descriptors represent the same scope.
+  ///
+  /// There is the obvious comparison when the two scope descriptors are equal but there
+  /// is also a more nuanced edge case that must be considered too.
+  ///
+  /// This edge case occurs when the target merged source has an inclusion condition that
+  /// gets broken out into the next node due to the same field existing without an inclusion
+  /// condition at the target scope. In this case the comparison considers two contiguous
+  /// nodes with a type condition and an inclusion condition at the root of the entity to 
+  /// match a single node with a matching type condition and inclusion condition.
+  fileprivate func representsSameScope(target: ScopeDescriptor, source: ScopeDescriptor) -> Bool {
+    guard target != source else { return true }
+
+    if target.scopePath.head.value.type == source.scopePath.head.value.type {
+      guard 
+        let sourceConditions = source.scopePath.head.value.conditions,
+        target.scopePath[1].type == nil,
+        let targetNextNodeConditions = target.scopePath[1].conditions
+      else {
+        return false
+      }
+
+      return sourceConditions == targetNextNodeConditions
+    }
+
+    return false
   }
 
   private func generatedSelectionSetNameForMergedEntity(
