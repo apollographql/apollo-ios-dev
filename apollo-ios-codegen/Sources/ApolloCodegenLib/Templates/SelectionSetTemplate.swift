@@ -908,6 +908,9 @@ extension IR.MergedSelections.MergedSource {
   /// condition at the target scope. In this case the comparison considers two contiguous
   /// nodes with a type condition and an inclusion condition at the root of the entity to 
   /// match a single node with a matching type condition and inclusion condition.
+  ///
+  /// See the test named `test__render_nestedSelectionSet__givenEntityFieldMerged_fromTypeCase_withInclusionCondition_rendersSelectionSetAsTypeAlias_withFullyQualifiedName`
+  /// for a specific test related to this behaviour.
   fileprivate func representsSameScope(target: ScopeDescriptor, source: ScopeDescriptor) -> Bool {
     guard target != source else { return true }
 
