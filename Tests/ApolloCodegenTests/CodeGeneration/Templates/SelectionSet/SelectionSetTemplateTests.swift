@@ -10549,10 +10549,10 @@ class SelectionSetTemplateTests: XCTestCase {
     // given
     schemaSDL = """
     type Query {
-      allThings: [Thing!]
+      allAuthors: [Author!]
     }
 
-    type Thing {
+    type Author {
       name: String
       postsInfoByIds: [PostInfo!]
     }
@@ -10561,14 +10561,14 @@ class SelectionSetTemplateTests: XCTestCase {
       awardings: [AwardingTotal!]
     }
 
-    type Awarding {
-      id: String!
-    }
-
     type AwardingTotal {
       id: String!
-      awardingByCurrentUser: [Awarding!]
+      comments: [Comment!]
       total: Int!
+    }
+
+    type Comment {
+      id: String!
     }
 
     type Post implements PostInfo {
@@ -10578,8 +10578,8 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     document = """
-    query TestOperation($includeCurrentUserAwards: Boolean = false) {
-      allThings {
+    query TestOperation($a: Boolean = false) {
+      allAuthors {
         name
         postsInfoByIds {
           ... on Post {
@@ -10587,8 +10587,8 @@ class SelectionSetTemplateTests: XCTestCase {
               total
             }
           }
-          awardings @include(if: $includeCurrentUserAwards) {
-            awardingByCurrentUser {
+          awardings @include(if: $a) {
+            comments {
               id
             }
           }
@@ -10598,36 +10598,36 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expectedType = """
-      public var awardingByCurrentUser: [AwardingByCurrentUser]? { __data["awardingByCurrentUser"] }
+      public var comments: [Comment]? { __data["comments"] }
 
-      /// AllThing.PostsInfoById.Awarding.AwardingByCurrentUser
-      public struct AwardingByCurrentUser: TestSchema.SelectionSet {
+      /// AllAuthor.PostsInfoById.Awarding.Comment
+      public struct Comment: TestSchema.SelectionSet {
     """
 
     let expectedTypeAlias = """
-      public var awardingByCurrentUser: [AwardingByCurrentUser]? { __data["awardingByCurrentUser"] }
+      public var comments: [Comment]? { __data["comments"] }
       public var total: Int { __data["total"] }
 
-      public typealias AwardingByCurrentUser = PostsInfoById.Awarding.AwardingByCurrentUser
+      public typealias Comment = PostsInfoById.Awarding.Comment
     """
 
     // when
     try await buildSubjectAndOperation()
-    let allThings_postsInfoByIds = try XCTUnwrap(
-      operation[field: "query"]?[field: "allThings"]?[field: "postsInfoByIds"]?.selectionSet
+    let allAuthors_postsInfoByIds = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAuthors"]?[field: "postsInfoByIds"]?.selectionSet
     )
-    let allThings_postsInfoByIds_awardings = try XCTUnwrap(
-      allThings_postsInfoByIds[field: "awardings"]?.selectionSet
+    let allAuthors_postsInfoByIds_awardings = try XCTUnwrap(
+      allAuthors_postsInfoByIds[field: "awardings"]?.selectionSet
     )
-    let allThings_postsInfoByIds_asPost_awardings_ifIncludeCurrentUserAwards = try XCTUnwrap(
-      allThings_postsInfoByIds[as: "Post"]?[field: "awardings"]?[if: "includeCurrentUserAwards"]
+    let allAuthors_postsInfoByIds_asPost_awardings_ifA = try XCTUnwrap(
+      allAuthors_postsInfoByIds[as: "Post"]?[field: "awardings"]?[if: "a"]
     )
 
     let actualType = subject.test_render(
-      inlineFragment: allThings_postsInfoByIds_awardings.computed
+      inlineFragment: allAuthors_postsInfoByIds_awardings.computed
     )
     let actualTypeAlias = subject.test_render(
-      inlineFragment: allThings_postsInfoByIds_asPost_awardings_ifIncludeCurrentUserAwards.computed
+      inlineFragment: allAuthors_postsInfoByIds_asPost_awardings_ifA.computed
     )
 
     // then
@@ -10639,7 +10639,7 @@ class SelectionSetTemplateTests: XCTestCase {
   // given
   schemaSDL = """
   type Query {
-    allThings: [Thing!]
+    allAuthors: [Thing!]
   }
 
   type Thing {
@@ -10651,16 +10651,16 @@ class SelectionSetTemplateTests: XCTestCase {
     awardings: [AwardingTotal!]
   }
 
-  type Awarding {
-    id: String!
-  }
-
   type AwardingTotal {
     id: String!
-    awardingByCurrentUser: [Awarding!]
+    comments: [Comment!]
     total: Int!
     name: String!
   }
+
+    type Comment {
+      id: String!
+    }
 
   type Post implements PostInfo {
     id: String!
@@ -10669,8 +10669,8 @@ class SelectionSetTemplateTests: XCTestCase {
   """
 
   document = """
-  query TestOperation($includeCurrentUserAwards: Boolean = false) {
-    allThings {
+  query TestOperation($a: Boolean = false) {
+    allAuthors {
       name
       postsInfoByIds {
         ... on Post {
@@ -10678,13 +10678,13 @@ class SelectionSetTemplateTests: XCTestCase {
             total
           }
           ... on PostInfo {
-            awardings @include(if: $includeCurrentUserAwards) {
+            awardings @include(if: $a) {
               name
             }
           }
         }
-        awardings @include(if: $includeCurrentUserAwards) {
-          awardingByCurrentUser {
+        awardings @include(if: $a) {
+          comments {
             id
           }
         }
@@ -10694,14 +10694,14 @@ class SelectionSetTemplateTests: XCTestCase {
   """
 
   let expectedType = """
-    public var awardingByCurrentUser: [AwardingByCurrentUser]? { __data["awardingByCurrentUser"] }
+    public var comments: [Comment]? { __data["comments"] }
 
-    /// AllThing.PostsInfoById.Awarding.AwardingByCurrentUser
-    public struct AwardingByCurrentUser: TestSchema.SelectionSet {
+    /// AllAuthor.PostsInfoById.Awarding.Comment
+    public struct Comment: TestSchema.SelectionSet {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Awarding }
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Comment }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("id", String.self),
@@ -10717,29 +10717,29 @@ class SelectionSetTemplateTests: XCTestCase {
     ] }
 
     public var name: String { __data["name"] }
-    public var awardingByCurrentUser: [AwardingByCurrentUser]? { __data["awardingByCurrentUser"] }
+    public var comments: [Comment]? { __data["comments"] }
     public var total: Int { __data["total"] }
 
-    public typealias AwardingByCurrentUser = PostsInfoById.Awarding.AwardingByCurrentUser
+    public typealias Comment = PostsInfoById.Awarding.Comment
   """
 
   // when
   try await buildSubjectAndOperation()
-  let allThings_postsInfoByIds = try XCTUnwrap(
-    operation[field: "query"]?[field: "allThings"]?[field: "postsInfoByIds"]?.selectionSet
+  let allAuthors_postsInfoByIds = try XCTUnwrap(
+    operation[field: "query"]?[field: "allAuthors"]?[field: "postsInfoByIds"]?.selectionSet
   )
-  let allThings_postsInfoByIds_awardings = try XCTUnwrap(
-    allThings_postsInfoByIds[field: "awardings"]?.selectionSet
+  let allAuthors_postsInfoByIds_awardings = try XCTUnwrap(
+    allAuthors_postsInfoByIds[field: "awardings"]?.selectionSet
   )
-  let allThings_postsInfoByIds_asPost_awardings_ifIncludeCurrentUserAwards = try XCTUnwrap(
-    allThings_postsInfoByIds[as: "Post"]?[field: "awardings"]?[if: "includeCurrentUserAwards"]
+  let allAuthors_postsInfoByIds_asPost_awardings_ifA = try XCTUnwrap(
+    allAuthors_postsInfoByIds[as: "Post"]?[field: "awardings"]?[if: "a"]
   )
 
   let actualType = subject.test_render(
-    inlineFragment: allThings_postsInfoByIds_awardings.computed
+    inlineFragment: allAuthors_postsInfoByIds_awardings.computed
   )
   let actualTypeAlias = subject.test_render(
-    inlineFragment: allThings_postsInfoByIds_asPost_awardings_ifIncludeCurrentUserAwards.computed
+    inlineFragment: allAuthors_postsInfoByIds_asPost_awardings_ifA.computed
   )
 
   // then
