@@ -10545,6 +10545,208 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
+  func test__render_nestedSelectionSet__givenEntityFieldMerged_fromTypeCase_withInclusionCondition_rendersSelectionSetAsTypeAlias_withFullyQualifiedName() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAuthors: [Author!]
+    }
+
+    type Author {
+      name: String
+      postsInfoByIds: [PostInfo!]
+    }
+
+    interface PostInfo {
+      awardings: [AwardingTotal!]
+    }
+
+    type AwardingTotal {
+      id: String!
+      comments: [Comment!]
+      total: Int!
+    }
+
+    type Comment {
+      id: String!
+    }
+
+    type Post implements PostInfo {
+      id: String!
+      awardings: [AwardingTotal!]
+    }
+    """
+
+    document = """
+    query TestOperation($a: Boolean = false) {
+      allAuthors {
+        name
+        postsInfoByIds {
+          ... on Post {
+            awardings {
+              total
+            }
+          }
+          awardings @include(if: $a) {
+            comments {
+              id
+            }
+          }
+        }
+      }
+    }
+    """
+
+    let expectedType = """
+      public var comments: [Comment]? { __data["comments"] }
+
+      /// AllAuthor.PostsInfoById.Awarding.Comment
+      public struct Comment: TestSchema.SelectionSet {
+    """
+
+    let expectedTypeAlias = """
+      public var comments: [Comment]? { __data["comments"] }
+      public var total: Int { __data["total"] }
+
+      public typealias Comment = PostsInfoById.Awarding.Comment
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAuthors_postsInfoByIds = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAuthors"]?[field: "postsInfoByIds"]?.selectionSet
+    )
+    let allAuthors_postsInfoByIds_awardings = try XCTUnwrap(
+      allAuthors_postsInfoByIds[field: "awardings"]?.selectionSet
+    )
+    let allAuthors_postsInfoByIds_asPost_awardings_ifA = try XCTUnwrap(
+      allAuthors_postsInfoByIds[as: "Post"]?[field: "awardings"]?[if: "a"]
+    )
+
+    let actualType = subject.test_render(
+      inlineFragment: allAuthors_postsInfoByIds_awardings.computed
+    )
+    let actualTypeAlias = subject.test_render(
+      inlineFragment: allAuthors_postsInfoByIds_asPost_awardings_ifA.computed
+    )
+
+    // then
+    expect(actualType).to(equalLineByLine(expectedType, atLine: 12, ignoringExtraLines: true))
+    expect(actualTypeAlias).to(equalLineByLine(expectedTypeAlias, atLine: 13, ignoringExtraLines: true))
+  }
+
+  func test__render_nestedSelectionSet__givenEntityFieldMerged_fromTypeCase_withInclusionCondition_siblingTypeCaseSameFieldSameCondition_rendersSelectionSetAsTypeAlias_withFullyQualifiedName() async throws {
+  // given
+  schemaSDL = """
+  type Query {
+    allAuthors: [Thing!]
+  }
+
+  type Thing {
+    name: String
+    postsInfoByIds: [PostInfo!]
+  }
+
+  interface PostInfo {
+    awardings: [AwardingTotal!]
+  }
+
+  type AwardingTotal {
+    id: String!
+    comments: [Comment!]
+    total: Int!
+    name: String!
+  }
+
+    type Comment {
+      id: String!
+    }
+
+  type Post implements PostInfo {
+    id: String!
+    awardings: [AwardingTotal!]
+  }
+  """
+
+  document = """
+  query TestOperation($a: Boolean = false) {
+    allAuthors {
+      name
+      postsInfoByIds {
+        ... on Post {
+          awardings {
+            total
+          }
+          ... on PostInfo {
+            awardings @include(if: $a) {
+              name
+            }
+          }
+        }
+        awardings @include(if: $a) {
+          comments {
+            id
+          }
+        }
+      }
+    }
+  }
+  """
+
+  let expectedType = """
+    public var comments: [Comment]? { __data["comments"] }
+
+    /// AllAuthor.PostsInfoById.Awarding.Comment
+    public struct Comment: TestSchema.SelectionSet {
+      public let __data: DataDict
+      public init(_dataDict: DataDict) { __data = _dataDict }
+
+      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Comment }
+      public static var __selections: [ApolloAPI.Selection] { [
+        .field("__typename", String.self),
+        .field("id", String.self),
+      ] }
+
+      public var id: String { __data["id"] }
+    }
+  """
+
+  let expectedTypeAlias = """
+    public static var __selections: [ApolloAPI.Selection] { [
+      .field("name", String.self),
+    ] }
+
+    public var name: String { __data["name"] }
+    public var comments: [Comment]? { __data["comments"] }
+    public var total: Int { __data["total"] }
+
+    public typealias Comment = PostsInfoById.Awarding.Comment
+  """
+
+  // when
+  try await buildSubjectAndOperation()
+  let allAuthors_postsInfoByIds = try XCTUnwrap(
+    operation[field: "query"]?[field: "allAuthors"]?[field: "postsInfoByIds"]?.selectionSet
+  )
+  let allAuthors_postsInfoByIds_awardings = try XCTUnwrap(
+    allAuthors_postsInfoByIds[field: "awardings"]?.selectionSet
+  )
+  let allAuthors_postsInfoByIds_asPost_awardings_ifA = try XCTUnwrap(
+    allAuthors_postsInfoByIds[as: "Post"]?[field: "awardings"]?[if: "a"]
+  )
+
+  let actualType = subject.test_render(
+    inlineFragment: allAuthors_postsInfoByIds_awardings.computed
+  )
+  let actualTypeAlias = subject.test_render(
+    inlineFragment: allAuthors_postsInfoByIds_asPost_awardings_ifA.computed
+  )
+
+  // then
+  expect(actualType).to(equalLineByLine(expectedType, atLine: 12, ignoringExtraLines: true))
+  expect(actualTypeAlias).to(equalLineByLine(expectedTypeAlias, atLine: 8, ignoringExtraLines: true))
+}
+
   func test__render_nestedSelectionSet__givenEntityFieldMergedFromParent_notOperationRoot_doesNotRendersTypeAliasForSelectionSet() async throws {
     // given
     schemaSDL = """
