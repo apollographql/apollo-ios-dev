@@ -4,42 +4,30 @@
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/CodingKeys"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/init(legacySafelistingCompatibleOperations:)"
+    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/CodingKeys\/fieldMerging"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloCodegenLib0aB13ConfigurationV20ExperimentalFeaturesV37legacySafelistingCompatibleOperationsAESb_tcfc",
+    "externalID" : "s:16ApolloCodegenLib0aB13ConfigurationV20ExperimentalFeaturesV10CodingKeysO12fieldMergingyA2GmF",
     "fragments" : [
       {
+        "kind" : "keyword",
+        "text" : "case"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
         "kind" : "identifier",
-        "text" : "init"
-      },
-      {
-        "kind" : "text",
-        "text" : "("
-      },
-      {
-        "kind" : "externalParam",
-        "text" : "legacySafelistingCompatibleOperations"
-      },
-      {
-        "kind" : "text",
-        "text" : ": "
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:Sb",
-        "text" : "Bool"
-      },
-      {
-        "kind" : "text",
-        "text" : ")"
+        "text" : "fieldMerging"
       }
     ],
     "modules" : [
@@ -48,9 +36,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Initializer",
-    "symbolKind" : "init",
-    "title" : "init(legacySafelistingCompatibleOperations:)"
+    "roleHeading" : "Case",
+    "symbolKind" : "case",
+    "title" : "ApolloCodegenConfiguration.ExperimentalFeatures.CodingKeys.fieldMerging"
   },
   "primaryContentSections" : [
     {
@@ -65,28 +53,15 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "init"
+              "text" : "case"
             },
             {
               "kind" : "text",
-              "text" : "("
+              "text" : " "
             },
             {
-              "kind" : "externalParam",
-              "text" : "legacySafelistingCompatibleOperations"
-            },
-            {
-              "kind" : "text",
-              "text" : ": "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:Sb",
-              "text" : "Bool"
-            },
-            {
-              "kind" : "text",
-              "text" : " = Default.legacySafelistingCompatibleOperations)"
+              "kind" : "identifier",
+              "text" : "fieldMerging"
             }
           ]
         }
@@ -105,7 +80,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/experimentalfeatures-swift.struct\/init(legacysafelistingcompatibleoperations:)"
+        "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/experimentalfeatures-swift.struct\/codingkeys\/fieldmerging"
       ],
       "traits" : [
         {
@@ -195,43 +170,61 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/experimentalfeatures-swift.struct"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ExperimentalFeatures-swift.struct/init(legacySafelistingCompatibleOperations:)": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ExperimentalFeatures-swift.struct/CodingKeys": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
       "kind" : "identifier",
-      "text" : "init"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "legacySafelistingCompatibleOperations"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
+      "text" : "CodingKeys"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/init(legacySafelistingCompatibleOperations:)",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/CodingKeys",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "CodingKeys"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloCodegenConfiguration.ExperimentalFeatures.CodingKeys",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/experimentalfeatures-swift.struct\/codingkeys"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ExperimentalFeatures-swift.struct/CodingKeys/fieldMerging": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fieldMerging"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/CodingKeys\/fieldMerging",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(legacySafelistingCompatibleOperations:)",
+  "title" : "ApolloCodegenConfiguration.ExperimentalFeatures.CodingKeys.fieldMerging",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/experimentalfeatures-swift.struct\/init(legacysafelistingcompatibleoperations:)"
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/experimentalfeatures-swift.struct\/codingkeys\/fieldmerging"
 }
 }
 }

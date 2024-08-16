@@ -27,7 +27,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination22AsyncGraphQLQueryPagerC7receive10subscriberyqd___t7Combine10SubscriberRd__s5NeverO7FailureRtd__s6ResultOyx_AA12UpdateSourceOts5Error_pG5InputRtd__lF",
+    "externalID" : "s:16ApolloPagination22AsyncGraphQLQueryPagerC7receive10subscriberyqd___t7Combine10SubscriberRd__s5NeverO7FailureRtd__s6ResultOyxs5Error_pG5InputRtd__lF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -206,7 +206,7 @@
             },
             {
               "kind" : "text",
-              "text" : "<("
+              "text" : "<"
             },
             {
               "kind" : "typeIdentifier",
@@ -214,17 +214,7 @@
             },
             {
               "kind" : "text",
-              "text" : ", "
-            },
-            {
-              "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource",
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:16ApolloPagination12UpdateSourceO",
-              "text" : "UpdateSource"
-            },
-            {
-              "kind" : "text",
-              "text" : "), any "
+              "text" : ", any "
             },
             {
               "kind" : "typeIdentifier",
@@ -360,37 +350,6 @@
   "title" : "receive(subscriber:)",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager\/receive(subscriber:)"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/UpdateSource": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "enum"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "UpdateSource"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "UpdateSource"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "UpdateSource",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/updatesource"
 }
 }
 }

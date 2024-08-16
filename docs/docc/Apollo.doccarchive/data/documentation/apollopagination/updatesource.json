@@ -95,7 +95,7 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource\/cache",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource\/fetch"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource\/server"
       ],
       "title" : "Enumeration Cases"
     },
@@ -209,7 +209,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/updatesource\/cache"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/UpdateSource/fetch": {
+"doc://ApolloPagination/documentation/ApolloPagination/UpdateSource/server": {
   "abstract" : [
 
   ],
@@ -224,15 +224,15 @@
     },
     {
       "kind" : "identifier",
-      "text" : "fetch"
+      "text" : "server"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource\/fetch",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource\/server",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "UpdateSource.fetch",
+  "title" : "UpdateSource.server",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/updatesource\/fetch"
+  "url" : "\/documentation\/apollopagination\/updatesource\/server"
 }
 }
 }

@@ -16,20 +16,21 @@
   "hierarchy" : {
     "paths" : [
       [
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/Equatable-Implementations"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/FieldMerging",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/FieldMerging\/Equatable-Implementations"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/!=(_:_:)"
+    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/FieldMerging\/!=(_:_:)"
   },
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "Swift",
-    "externalID" : "s:SQsE2neoiySbx_xtFZ::SYNTHESIZED::s:16ApolloPagination22AsyncGraphQLQueryPagerC",
+    "externalID" : "s:SQsE2neoiySbx_xtFZ::SYNTHESIZED::s:16ApolloCodegenLib0aB13ConfigurationV12FieldMergingV",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -83,7 +84,7 @@
     ],
     "modules" : [
       {
-        "name" : "ApolloPagination",
+        "name" : "ApolloCodegenLib",
         "relatedModules" : [
           "Swift"
         ]
@@ -187,7 +188,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollopagination\/asyncgraphqlquerypager\/!=(_:_:)"
+        "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/fieldmerging\/!=(_:_:)"
       ],
       "traits" : [
         {
@@ -198,28 +199,31 @@
   ]
 , 
 "references": {
-"doc://ApolloPagination/documentation/ApolloPagination": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
-  "kind" : "symbol",
-  "role" : "collection",
-  "title" : "ApolloPagination",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib": {
   "abstract" : [
     {
-      "text" : "Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.",
+      "text" : "A robust code generation engine for GraphQL operations.",
+      "type" : "text"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "ApolloCodegenLib",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration": {
+  "abstract" : [
+    {
+      "text" : "A configuration object that defines behavior for code generation.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -227,23 +231,81 @@
     },
     {
       "kind" : "identifier",
-      "text" : "AsyncGraphQLQueryPager"
+      "text" : "ApolloCodegenConfiguration"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "AsyncGraphQLQueryPager"
+      "text" : "ApolloCodegenConfiguration"
     }
   ],
   "role" : "symbol",
-  "title" : "AsyncGraphQLQueryPager",
+  "title" : "ApolloCodegenConfiguration",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager"
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager/!=(_:_:)": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/FieldMerging": {
+  "abstract" : [
+    {
+      "text" : "The ",
+      "type" : "text"
+    },
+    {
+      "code" : "FieldMerging",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " configuration is used to determine what merged fields and named fragment",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "accessors are present on the generated selection set models. Field merging generates",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "selection set models that are easier to use, but more verbose.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "FieldMerging"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/FieldMerging",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "FieldMerging"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloCodegenConfiguration.FieldMerging",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/fieldmerging"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/FieldMerging/!=(_:_:)": {
   "abstract" : [
 
   ],
@@ -298,23 +360,23 @@
       "text" : "Bool"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/!=(_:_:)",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/FieldMerging\/!=(_:_:)",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "!=(_:_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager\/!=(_:_:)"
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/fieldmerging\/!=(_:_:)"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager/Equatable-Implementations": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/FieldMerging/Equatable-Implementations": {
   "abstract" : [
 
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/Equatable-Implementations",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/FieldMerging\/Equatable-Implementations",
   "kind" : "article",
   "role" : "collectionGroup",
   "title" : "Equatable Implementations",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager\/equatable-implementations"
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/fieldmerging\/equatable-implementations"
 }
 }
 }

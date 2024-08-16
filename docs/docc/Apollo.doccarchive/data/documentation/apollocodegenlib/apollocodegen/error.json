@@ -113,6 +113,7 @@
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error\/cannotLoadOperations",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error\/cannotLoadSchema",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error\/fieldMergingIncompatibility",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error\/graphQLSourceValidationFailure(atLines:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error\/inputSearchPathInvalid(path:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error\/invalidConfiguration(message:)",
@@ -356,6 +357,31 @@
   "title" : "errorDescription",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/error\/errordescription"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/Error/fieldMergingIncompatibility": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fieldMergingIncompatibility"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error\/fieldMergingIncompatibility",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "ApolloCodegen.Error.fieldMergingIncompatibility",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/error\/fieldmergingincompatibility"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/Error/graphQLSourceValidationFailure(atLines:)": {
   "abstract" : [

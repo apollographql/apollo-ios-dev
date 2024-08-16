@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Loads all pages.",
+      "text" : "Loads all pages. Does not output a value until all pages have loaded.",
       "type" : "text"
     }
   ],
@@ -388,7 +388,7 @@
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/loadAll(fetchFromInitialPage:callbackQueue:completion:)": {
   "abstract" : [
     {
-      "text" : "Loads all pages.",
+      "text" : "Loads all pages. Does not output a value until all pages have loaded.",
       "type" : "text"
     }
   ],

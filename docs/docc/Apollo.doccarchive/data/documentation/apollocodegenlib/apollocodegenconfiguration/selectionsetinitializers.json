@@ -106,60 +106,15 @@
         {
           "inlineContent" : [
             {
-              "text" : "There are three categories of selection set models that initializers can be generated for:",
+              "text" : "Initializers are always generated for local cache mutations.",
               "type" : "text"
-            }
-          ],
-          "type" : "paragraph"
-        },
-        {
-          "items" : [
-            {
-              "content" : [
-                {
-                  "inlineContent" : [
-                    {
-                      "text" : "Operations",
-                      "type" : "text"
-                    }
-                  ],
-                  "type" : "paragraph"
-                }
-              ]
             },
             {
-              "content" : [
-                {
-                  "inlineContent" : [
-                    {
-                      "text" : "Named fragments",
-                      "type" : "text"
-                    }
-                  ],
-                  "type" : "paragraph"
-                }
-              ]
+              "text" : " ",
+              "type" : "text"
             },
             {
-              "content" : [
-                {
-                  "inlineContent" : [
-                    {
-                      "text" : "Local cache mutations",
-                      "type" : "text"
-                    }
-                  ],
-                  "type" : "paragraph"
-                }
-              ]
-            }
-          ],
-          "type" : "unorderedList"
-        },
-        {
-          "inlineContent" : [
-            {
-              "text" : "By default, initializers are only generated for local cache mutations.",
+              "text" : "You can additionally configure initializers to be generated for operations and named fragments.",
               "type" : "text"
             }
           ],
@@ -684,6 +639,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
