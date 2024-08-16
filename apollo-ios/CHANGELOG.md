@@ -1,5 +1,16 @@
 # Change Log
 
+## v1.15.0
+
+### New
+- **Add ability to disable fragment field merging ([#431](https://github.com/apollographql/apollo-ios-dev/pull/431)):** Added `ApolloCodegenConfiguration` option to allow for disabling fragment field merging on generated models.
+
+### Fixed
+- **Fix `legacyResponse` property not being set on `HTTPResponse` ([#456](https://github.com/apollographql/apollo-ios-dev/pull/456)):** When the `legacyResponse` property of `HTTPResponse` was deprecated setting the value was also removed; this was incorrect as it created a hidden breaking change for interceptors that might have been using the value.
+- **Fix `ObjectData` type check ([#459](https://github.com/apollographql/apollo-ios-dev/pull/459)):** Fixed bool type check in `ObjectData`.
+- **Fix `SelectionSetTemplate` scope comparison ([#460](https://github.com/apollographql/apollo-ios-dev/pull/460)):** Refactored the selection set template scope comparison to account for an edge case in merged sources.
+- **Fix memory leak in DataLoader closure ([#457](https://github.com/apollographql/apollo-ios-dev/pull/457)):** Fixed a memory leak in the DataLoader closure in `ApolloStore` caused by implicit use of `self`. _Thank you to [@prabhuamol](https://github.com/prabhuamol) for finding and fixing this._
+
 ## v1.14.1
 
 ### New
