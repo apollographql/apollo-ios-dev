@@ -753,6 +753,11 @@
                 "type" : "groupMarker"
               },
               {
+                "path" : "\/documentation\/apollo\/httpresponse\/cacherecords",
+                "title" : "var cacheRecords: RecordSet?",
+                "type" : "property"
+              },
+              {
                 "path" : "\/documentation\/apollo\/httpresponse\/httpresponse",
                 "title" : "var httpResponse: HTTPURLResponse",
                 "type" : "property"

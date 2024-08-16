@@ -139,6 +139,7 @@
     },
     {
       "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/cacheRecords",
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/httpResponse",
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/legacyResponse",
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/parsedResponse",
@@ -248,6 +249,47 @@
   "title" : "Hashable Implementations",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/httpresponse\/hashable-implementations"
+},
+"doc://Apollo/documentation/Apollo/HTTPResponse/cacheRecords": {
+  "abstract" : [
+    {
+      "text" : "A set of cache records from the response",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "cacheRecords"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo9RecordSetV",
+      "text" : "RecordSet"
+    },
+    {
+      "kind" : "text",
+      "text" : "?"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/cacheRecords",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "cacheRecords",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/httpresponse\/cacherecords"
 },
 "doc://Apollo/documentation/Apollo/HTTPResponse/httpResponse": {
   "abstract" : [

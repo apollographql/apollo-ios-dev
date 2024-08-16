@@ -1,4 +1,26 @@
 {
+  "abstract" : [
+    {
+      "text" : "Initialize an ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLQueryPager",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " that outputs a ",
+      "type" : "text"
+    },
+    {
+      "code" : "PaginationOutput<InitialQuery, PaginatedQuery>",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -485,6 +507,161 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Apollo client type",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "client"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The query to call for the first page of pagination. May be a separate type of query than the pagination query.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "initialQuery"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The queue that the underlying ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "GraphQLQueryWatcher",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : "s respond on. Defaults to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "main",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "watcherDispatchQueue"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A user-input closure that instructs the pager on how to extract ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "P",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ", a ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "PaginationInfo",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " type, from the ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "Data",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " of either the ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "InitialQuery",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " or ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "PaginatedQuery",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "extractPageInfo"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A user-input closure that instructs the pager on how to create a new ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "PaginatedQuery",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " given a ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "PaginationInfo",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " and a ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "PaginationDirection",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "pageResolver"
+        }
+      ]
     }
   ],
   "schemaVersion" : {
@@ -556,7 +733,26 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/init(client:watcherDispatchQueue:initialQuery:extractPageInfo:pageResolver:)-1dfxm": {
   "abstract" : [
-
+    {
+      "text" : "Initialize an ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLQueryPager",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " that outputs a ",
+      "type" : "text"
+    },
+    {
+      "code" : "PaginationOutput<InitialQuery, PaginatedQuery>",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

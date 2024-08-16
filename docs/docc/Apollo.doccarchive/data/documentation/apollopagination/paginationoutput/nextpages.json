@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination0B6OutputV9nextPagesSay4DataQy_Gvp",
+    "externalID" : "s:16ApolloPagination0B6OutputV9nextPagesSay0A013GraphQLResultVy4DataQy_GGvp",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -39,6 +39,15 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
+        "text" : "GraphQLResult"
+      },
+      {
+        "kind" : "text",
+        "text" : "<"
+      },
+      {
+        "kind" : "typeIdentifier",
         "text" : "PaginatedQuery"
       },
       {
@@ -52,7 +61,7 @@
       },
       {
         "kind" : "text",
-        "text" : "]"
+        "text" : ">]"
       }
     ],
     "modules" : [
@@ -94,6 +103,15 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
+              "text" : "GraphQLResult"
+            },
+            {
+              "kind" : "text",
+              "text" : "<"
+            },
+            {
+              "kind" : "typeIdentifier",
               "text" : "PaginatedQuery"
             },
             {
@@ -107,7 +125,7 @@
             },
             {
               "kind" : "text",
-              "text" : "]"
+              "text" : ">]"
             }
           ]
         }
@@ -208,6 +226,15 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
+      "text" : "GraphQLResult"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
       "text" : "PaginatedQuery"
     },
     {
@@ -221,7 +248,7 @@
     },
     {
       "kind" : "text",
-      "text" : "]"
+      "text" : ">]"
     }
   ],
   "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput\/nextPages",

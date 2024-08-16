@@ -5,7 +5,7 @@
       "type" : "text"
     },
     {
-      "code" : "Equatable.==(_:_:)",
+      "code" : "Equatable.!=(_:_:)",
       "type" : "codeVoice"
     },
     {
@@ -17,51 +17,20 @@
     "paths" : [
       [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/Equatable-Implementations"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput\/QueryWrapper",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput\/QueryWrapper\/Equatable-Implementations"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/==(_:_:)"
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput\/QueryWrapper\/!=(_:_:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "conformance" : {
-      "availabilityPrefix" : [
-        {
-          "text" : "Available when",
-          "type" : "text"
-        }
-      ],
-      "conformancePrefix" : [
-        {
-          "text" : "Conforms when",
-          "type" : "text"
-        }
-      ],
-      "constraints" : [
-        {
-          "code" : "Model",
-          "type" : "codeVoice"
-        },
-        {
-          "text" : " conforms to ",
-          "type" : "text"
-        },
-        {
-          "code" : "Equatable",
-          "type" : "codeVoice"
-        },
-        {
-          "text" : ".",
-          "type" : "text"
-        }
-      ]
-    },
-    "extendedModule" : "ApolloPagination",
-    "externalID" : "s:16ApolloPagination17GraphQLQueryPagerCAASQRzlE2eeoiySbACyxG_AEtFZ",
+    "extendedModule" : "Swift",
+    "externalID" : "s:SQsE2neoiySbx_xtFZ::SYNTHESIZED::s:16ApolloPagination0B6OutputV12QueryWrapperO",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -81,7 +50,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "=="
+        "text" : "!="
       },
       {
         "kind" : "text",
@@ -93,37 +62,19 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:16ApolloPagination17GraphQLQueryPagerC",
-        "text" : "GraphQLQueryPager"
+        "text" : "Self"
       },
       {
         "kind" : "text",
-        "text" : "<"
+        "text" : ", "
       },
       {
         "kind" : "typeIdentifier",
-        "text" : "Model"
+        "text" : "Self"
       },
       {
         "kind" : "text",
-        "text" : ">, "
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:16ApolloPagination17GraphQLQueryPagerC",
-        "text" : "GraphQLQueryPager"
-      },
-      {
-        "kind" : "text",
-        "text" : "<"
-      },
-      {
-        "kind" : "typeIdentifier",
-        "text" : "Model"
-      },
-      {
-        "kind" : "text",
-        "text" : ">) -> "
+        "text" : ") -> "
       },
       {
         "kind" : "typeIdentifier",
@@ -133,13 +84,16 @@
     ],
     "modules" : [
       {
-        "name" : "ApolloPagination"
+        "name" : "ApolloPagination",
+        "relatedModules" : [
+          "Swift"
+        ]
       }
     ],
     "role" : "symbol",
     "roleHeading" : "Operator",
     "symbolKind" : "op",
-    "title" : "==(_:_:)"
+    "title" : "!=(_:_:)"
   },
   "primaryContentSections" : [
     {
@@ -170,7 +124,7 @@
             },
             {
               "kind" : "identifier",
-              "text" : "=="
+              "text" : "!="
             },
             {
               "kind" : "text",
@@ -189,22 +143,12 @@
               "text" : ": "
             },
             {
-              "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:16ApolloPagination17GraphQLQueryPagerC",
-              "text" : "GraphQLQueryPager"
+              "text" : "Self"
             },
             {
               "kind" : "text",
-              "text" : "<"
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Model"
-            },
-            {
-              "kind" : "text",
-              "text" : ">, "
+              "text" : ", "
             },
             {
               "kind" : "internalParam",
@@ -215,22 +159,12 @@
               "text" : ": "
             },
             {
-              "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:16ApolloPagination17GraphQLQueryPagerC",
-              "text" : "GraphQLQueryPager"
+              "text" : "Self"
             },
             {
               "kind" : "text",
-              "text" : "<"
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Model"
-            },
-            {
-              "kind" : "text",
-              "text" : ">) -> "
+              "text" : ") -> "
             },
             {
               "kind" : "typeIdentifier",
@@ -254,7 +188,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollopagination\/graphqlquerypager\/==(_:_:)"
+        "\/documentation\/apollopagination\/paginationoutput\/querywrapper\/!=(_:_:)"
       ],
       "traits" : [
         {
@@ -276,17 +210,17 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager": {
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationOutput": {
   "abstract" : [
     {
-      "text" : "Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.",
+      "text" : "A struct which contains the outputs of pagination",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -294,23 +228,23 @@
     },
     {
       "kind" : "identifier",
-      "text" : "GraphQLQueryPager"
+      "text" : "PaginationOutput"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "GraphQLQueryPager"
+      "text" : "PaginationOutput"
     }
   ],
   "role" : "symbol",
-  "title" : "GraphQLQueryPager",
+  "title" : "PaginationOutput",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager"
+  "url" : "\/documentation\/apollopagination\/paginationoutput"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/==(_:_:)": {
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationOutput/QueryWrapper": {
   "abstract" : [
 
   ],
@@ -329,7 +263,7 @@
     ],
     "constraints" : [
       {
-        "code" : "Model",
+        "code" : "InitialQuery",
         "type" : "codeVoice"
       },
       {
@@ -337,7 +271,23 @@
         "type" : "text"
       },
       {
-        "code" : "Equatable",
+        "code" : "GraphQLQuery",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " and ",
+        "type" : "text"
+      },
+      {
+        "code" : "PaginatedQuery",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "GraphQLQuery",
         "type" : "codeVoice"
       },
       {
@@ -346,6 +296,37 @@
       }
     ]
   },
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "QueryWrapper"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput\/QueryWrapper",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "QueryWrapper"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PaginationOutput.QueryWrapper",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/paginationoutput\/querywrapper"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationOutput/QueryWrapper/!=(_:_:)": {
+  "abstract" : [
+
+  ],
   "fragments" : [
     {
       "kind" : "keyword",
@@ -365,7 +346,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "=="
+      "text" : "!="
     },
     {
       "kind" : "text",
@@ -377,37 +358,19 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:16ApolloPagination17GraphQLQueryPagerC",
-      "text" : "GraphQLQueryPager"
+      "text" : "Self"
     },
     {
       "kind" : "text",
-      "text" : "<"
+      "text" : ", "
     },
     {
       "kind" : "typeIdentifier",
-      "text" : "Model"
+      "text" : "Self"
     },
     {
       "kind" : "text",
-      "text" : ">, "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:16ApolloPagination17GraphQLQueryPagerC",
-      "text" : "GraphQLQueryPager"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Model"
-    },
-    {
-      "kind" : "text",
-      "text" : ">) -> "
+      "text" : ") -> "
     },
     {
       "kind" : "typeIdentifier",
@@ -415,23 +378,23 @@
       "text" : "Bool"
     }
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/==(_:_:)",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput\/QueryWrapper\/!=(_:_:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "==(_:_:)",
+  "title" : "!=(_:_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/==(_:_:)"
+  "url" : "\/documentation\/apollopagination\/paginationoutput\/querywrapper\/!=(_:_:)"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/Equatable-Implementations": {
+"doc://ApolloPagination/documentation/ApolloPagination/PaginationOutput/QueryWrapper/Equatable-Implementations": {
   "abstract" : [
 
   ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/Equatable-Implementations",
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput\/QueryWrapper\/Equatable-Implementations",
   "kind" : "article",
   "role" : "collectionGroup",
   "title" : "Equatable Implementations",
   "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/equatable-implementations"
+  "url" : "\/documentation\/apollopagination\/paginationoutput\/querywrapper\/equatable-implementations"
 }
 }
 }
