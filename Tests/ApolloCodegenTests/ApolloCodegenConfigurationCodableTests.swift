@@ -38,6 +38,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           testMocks: .swiftPackage(targetName: "SchemaTestMocks")
         ),
         options: .init(
+          additionalCapitalizationRules: [
+            .uppercase(regex: "[Ii]d")
+          ],
           additionalInflectionRules: [
             .pluralization(singularRegex: "animal", replacementRegex: "animals")
           ],
@@ -100,6 +103,13 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "version" : "persistedQueries"
         },
         "options" : {
+          "additionalCapitalizationRules" : [
+            {
+              "uppercase" : {
+                "regex" : "[Ii]d"
+              }
+            }
+          ],
           "additionalInflectionRules" : [
             {
               "pluralization" : {

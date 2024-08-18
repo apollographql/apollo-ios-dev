@@ -458,6 +458,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
 
   // MARK: - Other Types
   public struct OutputOptions: Codable, Equatable {
+    /// Any non-default rules for capitalization you wish to include.
+    public let additionalCapitalizationRules: [CapitalizationRule]
     /// Any non-default rules for pluralization or singularization you wish to include.
     public let additionalInflectionRules: [InflectionRule]
     /// How deprecated enum cases from the schema should be handled.
@@ -511,6 +513,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
 
     /// Default property values
     public struct Default {
+      public static let additionalCapitalizationRules: [CapitalizationRule] = []
       public static let additionalInflectionRules: [InflectionRule] = []
       public static let deprecatedEnumCases: Composition = .include
       public static let schemaDocumentation: Composition = .include
@@ -528,6 +531,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     /// Designated initializer.
     ///
     /// - Parameters:
+    ///   - additionalCapitalizationRules: Any non-default rules for capitalization you wish to include.
     ///   - additionalInflectionRules: Any non-default rules for pluralization or singularization
     ///   you wish to include.
     ///   - deprecatedEnumCases: How deprecated enum cases from the schema should be handled.
@@ -545,6 +549,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     ///   - pruneGeneratedFiles: Whether unused generated files will be automatically deleted.
     ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation class types will be marked as `final`.
     public init(
+      additionalCapitalizationRules: [CapitalizationRule] = Default.additionalCapitalizationRules,
       additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
       deprecatedEnumCases: Composition = Default.deprecatedEnumCases,
       schemaDocumentation: Composition = Default.schemaDocumentation,
@@ -557,6 +562,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
       markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
     ) {
+      self.additionalCapitalizationRules = additionalCapitalizationRules
       self.additionalInflectionRules = additionalInflectionRules
       self.deprecatedEnumCases = deprecatedEnumCases
       self.schemaDocumentation = schemaDocumentation
@@ -573,6 +579,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     // MARK: Codable
 
     enum CodingKeys: CodingKey, CaseIterable {
+      case additionalCapitalizationRules
       case additionalInflectionRules
       case queryStringLiteralFormat
       case deprecatedEnumCases
@@ -591,6 +598,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public init(from decoder: any Decoder) throws {
       let values = try decoder.container(keyedBy: CodingKeys.self)
       try throwIfContainsUnexpectedKey(container: values, type: Self.self, decoder: decoder)
+
+      additionalCapitalizationRules = try values.decodeIfPresent(
+        [CapitalizationRule].self,
+        forKey: .additionalCapitalizationRules
+      ) ?? Default.additionalCapitalizationRules
 
       additionalInflectionRules = try values.decodeIfPresent(
         [InflectionRule].self,
@@ -656,6 +668,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public func encode(to encoder: any Encoder) throws {
       var container = encoder.container(keyedBy: CodingKeys.self)
 
+      try container.encode(self.additionalCapitalizationRules, forKey: .additionalCapitalizationRules)
       try container.encode(self.additionalInflectionRules, forKey: .additionalInflectionRules)
       try container.encode(self.deprecatedEnumCases, forKey: .deprecatedEnumCases)
       try container.encode(self.schemaDocumentation, forKey: .schemaDocumentation)
@@ -1483,6 +1496,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   /// Deprecated initializer.
   ///
   /// - Parameters:
+  ///   - additionalCapitalizationRules: Any non-default rules for capitalization you wish to include.
   ///   - additionalInflectionRules: Any non-default rules for pluralization or singularization
   ///   you wish to include.
   ///   - queryStringLiteralFormat: Formatting of the GraphQL query string literal that is
@@ -1502,9 +1516,10 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///   - pruneGeneratedFiles: Whether unused generated files will be automatically deleted.
   ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation class types will be marked as `final`.
   @available(*, deprecated,
-              renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:)"
+              renamed: "init(additionalCapitalizationRules:additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:)"
   )
   public init(
+    additionalCapitalizationRules: [CapitalizationRule] = Default.additionalCapitalizationRules,
     additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
     queryStringLiteralFormat: QueryStringLiteralFormat = .singleLine,
     deprecatedEnumCases: ApolloCodegenConfiguration.Composition = Default.deprecatedEnumCases,
@@ -1517,6 +1532,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
     markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
   ) {
+    self.additionalCapitalizationRules = additionalCapitalizationRules
     self.additionalInflectionRules = additionalInflectionRules
     self.deprecatedEnumCases = deprecatedEnumCases
     self.schemaDocumentation = schemaDocumentation
@@ -1533,6 +1549,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   /// Deprecated initializer.
   ///
   /// - Parameters:
+  ///   - additionalCapitalizationRules: Any non-default rules for capitalization you wish to include.
   ///   - additionalInflectionRules: Any non-default rules for pluralization or singularization
   ///   you wish to include.
   ///   - queryStringLiteralFormat: Formatting of the GraphQL query string literal that is
@@ -1552,9 +1569,10 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///   - pruneGeneratedFiles: Whether unused generated files will be automatically deleted.
   ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation class types will be marked as `final`.
   @available(*, deprecated,
-              renamed: "init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:)"
+              renamed: "init(additionalCapitalizationRules:additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:)"
   )
   public init(
+    additionalCapitalizationRules: [CapitalizationRule] = Default.additionalCapitalizationRules,
     additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
     queryStringLiteralFormat: QueryStringLiteralFormat,
     deprecatedEnumCases: ApolloCodegenConfiguration.Composition = Default.deprecatedEnumCases,
@@ -1567,6 +1585,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
     markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
   ) {
+    self.additionalCapitalizationRules = additionalCapitalizationRules
     self.additionalInflectionRules = additionalInflectionRules
     self.deprecatedEnumCases = deprecatedEnumCases
     self.schemaDocumentation = schemaDocumentation
