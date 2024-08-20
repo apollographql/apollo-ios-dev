@@ -89,8 +89,13 @@ final class OffsetTests: XCTestCase {
     }
 
     let pager = await createPager()
-    var results: [ViewModel]?
-    let cancellable = pager.map { value in
+
+    let fetchExpectation = expectation(description: "Initial Fetch")
+    fetchExpectation.assertForOverFulfill = false
+    let subscriptionExpectation = expectation(description: "Subscription")
+    subscriptionExpectation.expectedFulfillmentCount = 2
+    var expectedViewModels: [ViewModel] = []
+    let subscriber = pager.compactMap { value in
       switch value {
       case .success(let output):
         let friends = output.allData.flatMap { data in
@@ -98,29 +103,29 @@ final class OffsetTests: XCTestCase {
             ViewModel(name: friend.name)
           }
         }
-        return Result<[ViewModel], any Error>.success(friends)
+        return friends
       case .failure(let error):
-        return .failure(error)
+        XCTFail(error.localizedDescription)
+        return nil
       }
-    }.sink { result in
-      switch result {
-      case .success((let viewModels)):
-        results = viewModels
-      default:
-        XCTFail("Failed to get view models from pager.")
-      }
+    }.sink { viewModels in
+      expectedViewModels = viewModels
+      fetchExpectation.fulfill()
+      subscriptionExpectation.fulfill()
     }
 
     await fetchFirstPage(pager: pager)
-    XCTAssertEqual(results?.count, 2)
-    XCTAssertEqual(results?.map(\.name), ["Luke Skywalker", "Han Solo"])
+    await fulfillment(of: [fetchExpectation], timeout: 1)
+    XCTAssertEqual(expectedViewModels.count, 2)
+    XCTAssertEqual(expectedViewModels.map(\.name), ["Luke Skywalker", "Han Solo"])
     let canLoadNext = await pager.canLoadNext
     XCTAssertTrue(canLoadNext)
 
     try await fetchSecondPage(pager: pager)
-    XCTAssertEqual(results?.count, 3)
-    XCTAssertEqual(results?.map(\.name), ["Luke Skywalker", "Han Solo", "Leia Organa"])
-    cancellable.cancel()
+    await fulfillment(of: [subscriptionExpectation], timeout: 1)
+    XCTAssertEqual(expectedViewModels.count, 3)
+    XCTAssertEqual(expectedViewModels.map(\.name), ["Luke Skywalker", "Han Solo", "Leia Organa"])
+    subscriber.cancel()
   }
 
 }
