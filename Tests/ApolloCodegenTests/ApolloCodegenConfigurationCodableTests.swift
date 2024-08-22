@@ -602,6 +602,24 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
     expect(decoded).to(equal(expected))
   }
 
+  func test__decode_selectionSetInitializers__givenLocalCacheMutations_shouldReturnIgnoreOption() throws {
+    // given
+    let subject = """
+    {
+      "localCacheMutations": true
+    }
+    """.asData
+
+    // when
+    let decoded = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.SelectionSetInitializers.self,
+      from: subject
+    )
+
+    // then
+    expect(decoded).to(equal([]))
+  }
+
   // MARK: - OperationDocumentFormat Tests
 
   func encodedValue(_ case: ApolloCodegenConfiguration.OperationDocumentFormat) -> String {
