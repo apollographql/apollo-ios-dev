@@ -1263,6 +1263,10 @@ extension ApolloCodegenConfiguration.SelectionSetInitializers {
     case operations
     case namedFragments
     case definitionsNamed
+
+    /// Deprecated
+    /// Local Cache Mutations will now always have initializers generated.
+    case localCacheMutations
   }
 
   public init(from decoder: any Decoder) throws {
