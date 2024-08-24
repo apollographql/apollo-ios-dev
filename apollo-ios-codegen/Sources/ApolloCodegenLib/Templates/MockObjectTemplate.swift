@@ -66,7 +66,7 @@ struct MockObjectTemplate: TemplateRenderer {
         \(conflictingFieldNameProperties(fields))
         convenience init(
           \(fields.map { """
-            \($0.propertyName)\(ifLet: $0.initializerParameterName, {" \($0)"}): \($0.mockType)? = nil
+            \($0.propertyName)\(ifLet: $0.initializerParameterName, {" \($0)"}): \($0.mockType)\(if: $0.mockType.hasSuffix("?"), " = nil")
             """ }, separator: ",\n")
         ) {
           self.init()
@@ -120,7 +120,7 @@ struct MockObjectTemplate: TemplateRenderer {
   }
 
   private func mockTypeName(for type: GraphQLType) -> String {
-    func nameReplacement(for type: GraphQLType, forceNonNull: Bool) -> String {
+    func nameReplacement(for type: GraphQLType, optional: Bool) -> String {
       switch type {
       case .entity(let graphQLCompositeType):
         let mockType: String
@@ -130,19 +130,22 @@ struct MockObjectTemplate: TemplateRenderer {
         default:
           mockType = "Mock<\(graphQLCompositeType.render(as: .typename))>"
         }
-        return TemplateString("\(mockType)\(if: !forceNonNull, "?")").description
+        return TemplateString("\(mockType)\(if: optional, "?")").description
       case .scalar,
           .enum,
           .inputObject:
-        return type.rendered(as: .testMockField(forceNonNull: true), config: config.config)
+          return TemplateString(
+            "\(type.rendered(as: .testMockField(forceNonNull: true), config: config.config))\(if: optional, "?")"
+          ).description
       case .nonNull(let graphQLType):
-        return nameReplacement(for: graphQLType, forceNonNull: true)
+        return nameReplacement(for: graphQLType, optional: false)
       case .list(let graphQLType):
-        return "[\(nameReplacement(for: graphQLType, forceNonNull: false))]"
+          return TemplateString("[\(nameReplacement(for: graphQLType, optional: true))]\(if: optional, "?")")
+              .description
       }
     }
 
-    return nameReplacement(for: type, forceNonNull: true)
+    return nameReplacement(for: type, optional: true)
   }
   
 }
