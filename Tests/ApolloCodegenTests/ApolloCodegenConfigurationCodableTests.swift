@@ -39,7 +39,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
         ),
         options: .init(
           additionalCapitalizationRules: [
-            .uppercase(regex: "[Ii]d")
+            CapitalizationRule(term: .regex("[Ii]d"), strategy: .upper)
           ],
           additionalInflectionRules: [
             .pluralization(singularRegex: "animal", replacementRegex: "animals")
@@ -105,8 +105,11 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
         "options" : {
           "additionalCapitalizationRules" : [
             {
-              "uppercase" : {
-                "regex" : "[Ii]d"
+              "strategy" : "upper",
+              "term" : {
+                "regex" : {
+                  "_0" : "[Ii]d"
+                }
               }
             }
           ],

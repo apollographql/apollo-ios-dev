@@ -1,9 +1,23 @@
 import Foundation
 
-public enum CapitalizationRule: Codable, Equatable {
-  case uppercase(regex: String)
-  case lowercase(regex: String)
-  case titlecase(regex: String)
-  case camelcase(regex: String)
-  case pascalcase(regex: String)
+public struct CapitalizationRule: Codable, Equatable, Sendable {
+  public enum Term: Codable, Equatable, Sendable {
+    case string(String)
+    case regex(String)
+  }
+
+  public enum CaseStrategy: String, Codable, Equatable, Sendable {
+    case upper
+    case lower
+    case camel
+    case pascal
+  }
+
+  public let term: Term
+  public let strategy: CaseStrategy
+
+  public init(term: Term, strategy: CaseStrategy) {
+    self.term = term
+    self.strategy = strategy
+  }
 }
