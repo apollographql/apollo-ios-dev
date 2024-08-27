@@ -222,7 +222,7 @@ However, an important parameter to be aware of is the `cachePolicy`. By default,
 
 If the data *is* present, the default behavior is to return the local copy to prevent an unnecessary network fetch. However, this is sometimes not the desired behavior (especially after executing a mutation).
 
-There are [several different cache policies available to you](../caching/#specifying-a-cache-policy), but the easiest way to absolutely force a refresh from the network that still updates the cache is to use `fetchIgnoringCacheData`. This policy bypasses the cache when going to the network, but it also stores the results of the fetch in the cache for future use.
+There are [several different cache policies available to you](/ios/fetching/fetching-data#fetching-locally-cached-data), but the easiest way to absolutely force a refresh from the network that still updates the cache is to use `fetchIgnoringCacheData`. This policy bypasses the cache when going to the network, but it also stores the results of the fetch in the cache for future use.
 
 First, we need to add the following `import` to `DetailViewModel`:
 

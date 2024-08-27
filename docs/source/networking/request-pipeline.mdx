@@ -49,7 +49,7 @@ To generate a [request chain](#request-chains) for each GraphQL operation, Apoll
   - Reading/writing response data to the normalized cache.
   - Sending network requests using `URLSession`.
   - Parsing GraphQL response data in JSON format
-  - [Automatic Persisted Queries](./../fetching/apqs).
+  - [Automatic Persisted Queries](https://www.apollographql.com/docs/apollo-server/performance/apq).
 
 The `DefaultInterceptorProvider` is initialized with a `URLSessionClient` and an `ApolloStore` to pass into the interceptors it creates. By configuring these two objects the `DefaultInterceptorProvider` can support most common use cases.
 

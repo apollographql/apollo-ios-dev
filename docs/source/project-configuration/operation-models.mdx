@@ -53,12 +53,12 @@ You can also share your generated operation models across modules in your projec
 
 For most small projects, including your operation models within the shared schema type module is the most straightforward way to share them. With this structure, your operation models are in a sub-folder of the schema types module directory.
 
-You can do this using the [`.inSchemaModule`](./code-generation/codegen-configuration#operations-in-the-schema-module) option for the [`output.operations`](./code-generation/codegen-configuration#operations) property:
+You can do this using the [`.inSchemaModule`](/ios/code-generation/codegen-configuration#operations-in-the-schema-module) option for the [`output.operations`](/ios/code-generation/codegen-configuration#operations) property:
   - _If you have a schema module_, the codegen engine includes your operations in that module, which you can then import into your project's other modules.
   - _If you are embedding your schema in another target_, the codegen engine includes your operations in the generated schema namespace in your application target.
 
 ## Absolute path
 
-You can also generate your operation models into a single directory using the [`.absolute(path:)`](./code-generation/codegen-configuration#absolute-operations-output) option. Then, you can manually include this directory in your project however you see fit.
+You can also generate your operation models into a single directory using the [`.absolute(path:)`](/ios/code-generation/codegen-configuration#absolute-operations-output) option. Then, you can manually include this directory in your project however you see fit.
 
 If you choose to generate the operation models to an absolute path, you are responsible for linking the generated files to the rest of your project. You must ensure that any targets included by your operation models link to both your schema types module and the `ApolloAPI` library.
