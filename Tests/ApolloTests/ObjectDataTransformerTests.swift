@@ -14,18 +14,9 @@ class ObjectDataTransformerTests: XCTestCase {
       }
     }
 
-    func transform(_ value: AnyHashable) -> ObjectData? {
-      return nil
-    }
-
-    func transform(_ value: AnyHashable) -> ListData? {
-      switch value {
-      case let list as [AnyHashable]:
-        return ListData(_transformer: self, _rawData: list)
-      default:
-        return nil
-      }
-    }
+    // Empty until needed in tests
+    func transform(_ value: AnyHashable) -> ObjectData? { return nil }
+    func transform(_ value: AnyHashable) -> ListData? { return nil }
   }
 
   // MARK: ObjectData Tests
