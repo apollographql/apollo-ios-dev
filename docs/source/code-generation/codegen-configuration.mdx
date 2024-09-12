@@ -393,6 +393,8 @@ Specify the directory for your test mocks using the `path` parameter. This is re
 
 ## Output options
 
+**[`options: OutputOptions`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions)**
+
 The code generation engine supports a number of configuration options to change the behaviour of the generator and tailor the generated Swift code to your specific needs.
 
 The top-level properties are:
@@ -599,6 +601,8 @@ let configuration = ApolloCodegenConfiguration(
 
 ## Experimental features
 
+**[`experimentalFeatures: ExperimentalFeatures`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/experimentalfeatures-swift.struct)**
+
 The code generation engine supports some behaviors where the affect on the generated code is considered experimental. An example of this is a specification of the GraphQL schema that is not yet formalized and undergoing change as the proposal advances.
 
 > Note: These features could change at any time and are not guaranteed to always be available.
@@ -634,6 +638,8 @@ let configuration = ApolloCodegenConfiguration(
 </MultiCodeBlock>
 
 ## Schema download configuration
+
+**[`schemaDownload: ApolloSchemaDownloadConfiguration`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apolloschemadownloadconfiguration)**
 
 An optional step in the code generation process is to fetch a GraphQL schema from a remote server. This step ensures that you always have an up-to-date schema on which to base your operations and it eliminates the need to manually download the schema outside of the automated process.
 
@@ -755,6 +761,8 @@ let configuration = ApolloCodegenConfiguration(
 For more details, see the section on [downloading a schema](./downloading-schema).
 
 ## Operation Manifest Configuration
+
+**[`operationManifest: OperationManifestConfiguration`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/operationmanifestconfiguration)**
 
 Optional settings used to configure generation of the operation identifier manifest for use with [Persisted Queries](./../fetching/persisted-queries).
 
