@@ -55,22 +55,22 @@ The properties to configure `input` are:
 
 ```json title="CLI Configuration JSON"
 "input": {
-	"schemaSearchPaths": [
-		"**/*.graphqls"
-	],
-	"operationSearchPaths": [
-		"**/*.graphql"
-	]
+  "schemaSearchPaths": [
+    "**/*.graphqls"
+  ],
+  "operationSearchPaths": [
+    "**/*.graphql"
+  ]
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	input: ApolloCodegenConfiguration.FileInput(
-		schemaSearchPaths: ["**/*.graphqls"],
-		operationSearchPaths: ["**/*.graphql"]
-	),
+  // Other properties not shown
+  input: ApolloCodegenConfiguration.FileInput(
+    schemaSearchPaths: ["**/*.graphqls"],
+    operationSearchPaths: ["**/*.graphql"]
+  ),
 )
 ```
 
@@ -104,32 +104,32 @@ The properties to configure `output` are:
 
 ```json title="CLI Configuration JSON"
 "output": {
-	"schemaTypes": {
-		"moduleType": {
-			"swiftPackageManager": {}
-		},
-		"path": "./generated/schema/"
-	},
-	"operations": {
-		"inSchemaModule": {}
-	},
-	"testMocks": {
-		"none": {}
-	}
+  "schemaTypes": {
+    "moduleType": {
+      "swiftPackageManager": {}
+    },
+    "path": "./generated/schema/"
+  },
+  "operations": {
+    "inSchemaModule": {}
+  },
+  "testMocks": {
+    "none": {}
+  }
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	output: ApolloCodegenConfiguration.FileOutput(
-		schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
-			path: "./generated/schema/",
-			moduleType: .swiftPackageManager
-		)
-		operations: .inSchemaModule,
-		testMocks: .none
-	)
+  // Other properties not shown
+  output: ApolloCodegenConfiguration.FileOutput(
+    schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
+      path: "./generated/schema/",
+      moduleType: .swiftPackageManager
+    )
+    operations: .inSchemaModule,
+    testMocks: .none
+  )
 )
 ```
 
@@ -186,28 +186,28 @@ When creating a single target application, this option allows you to include Apo
 
 ```json title="CLI Configuration JSON"
 "output": {
-	"schemaTypes": {
-		"moduleType": {
-			"embeddedInTarget": {
-				"name": "MyApplicationTarget",
-				"accessModifier": "internal"
-			}
-		},
-		"path": "./generated/schema/"
-	}
+  "schemaTypes": {
+    "moduleType": {
+      "embeddedInTarget": {
+        "name": "MyApplicationTarget",
+        "accessModifier": "internal"
+      }
+    },
+    "path": "./generated/schema/"
+  }
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	output: ApolloCodegenConfiguration.FileOutput(
-		schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
-			path: "./generated/schema/",
-			moduleType: .embeddedInTarget(name: "MyApplicationTarget", accessModifier: .internal)
-		)
-		...
-	)
+  // Other properties not shown
+  output: ApolloCodegenConfiguration.FileOutput(
+    schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
+      path: "./generated/schema/",
+      moduleType: .embeddedInTarget(name: "MyApplicationTarget", accessModifier: .internal)
+    )
+    ...
+  )
 )
 ```
 
@@ -233,25 +233,25 @@ For multi-module projects using Swift Package Manager, this is the recommended c
 
 ```json title="CLI Configuration JSON"
 "output": {
-	"schemaTypes": {
-		"moduleType": {
-			"swiftPackageManager": {}
-		},
-		"path": "./generated/schema/"
-	}
+  "schemaTypes": {
+    "moduleType": {
+      "swiftPackageManager": {}
+    },
+    "path": "./generated/schema/"
+  }
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	output: ApolloCodegenConfiguration.FileOutput(
-		schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
-			path: "./generated/schema/",
-			moduleType: .swiftPackageManager
-		)
-		...
-	)
+  // Other properties not shown
+  output: ApolloCodegenConfiguration.FileOutput(
+    schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
+      path: "./generated/schema/",
+      moduleType: .swiftPackageManager
+    )
+    ...
+  )
 )
 ```
 
@@ -273,25 +273,25 @@ Using this option, you are required to create a target, or module, for your sche
 
 ```json title="CLI Configuration JSON"
 "output": {
-	"schemaTypes": {
-		"moduleType": {
-			"other": {}
-		},
-		"path": "./generated/schema/"
-	}
+  "schemaTypes": {
+    "moduleType": {
+      "other": {}
+    },
+    "path": "./generated/schema/"
+  }
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	output: ApolloCodegenConfiguration.FileOutput(
-		schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
-			path: "./generated/schema/",
-			moduleType: .other
-		)
-		...
-	)
+  // Other properties not shown
+  output: ApolloCodegenConfiguration.FileOutput(
+    schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
+      path: "./generated/schema/",
+      moduleType: .other
+    )
+    ...
+  )
 )
 ```
 
@@ -415,104 +415,104 @@ The top-level properties are:
 
 ```json title="CLI Configuration JSON"
 "options": {
-	"additionalInflectionRules": [{
-		"pluralization": {
-			"replacementRegex": "animals",
-			"singularRegex": "animal"
-		}
-	}],
-	"deprecatedEnumCases": "include",
-	"schemaDocumentation": "include",
-	"selectionSetInitializers" : {
-		"operations": false,
-		"namedFragments": false,
-		"localCacheMutations" : true,
-		"definitionsNamed": [
-			"MyOperation",
-			"MyFragment"
-		]
-	},
-	"operationDocumentFormat" : ["definition", "operationId"],
-	"cocoapodsCompatibleImportStatements": false,
-	"warningsOnDeprecatedUsage": "include",
-	"conversionStrategies": {
-		"enumCases": "camelCase",
-		"fieldAccessors": "default",
-		"inputObjects": "camelCase"
-	},
-	"pruneGeneratedFiles": true,
-	"markOperationDefinitionsAsFinal": true,
-	"schemaCustomization" : {
-		"customTypeNames" : {
-			"MyEnum" : {
-				"enum" : {
-					"cases" : {
-						"MyCase" : "CustomCase"
-					},
-					"name" : "CustomEnum"
-				}
-			},
-			"MyObject" : "CustomAnimal",
-			"MyInputObject" : {
-				"inputObject" : {
-					"fields" : {
-						"myField" : "customField"
-					},
-					"name" : "CustomInputObject"
-				}
-			}
-		}
-	}
+  "additionalInflectionRules": [{
+    "pluralization": {
+      "replacementRegex": "animals",
+      "singularRegex": "animal"
+    }
+  }],
+  "deprecatedEnumCases": "include",
+  "schemaDocumentation": "include",
+  "selectionSetInitializers" : {
+    "operations": false,
+    "namedFragments": false,
+    "localCacheMutations" : true,
+    "definitionsNamed": [
+      "MyOperation",
+      "MyFragment"
+    ]
+  },
+  "operationDocumentFormat" : ["definition", "operationId"],
+  "cocoapodsCompatibleImportStatements": false,
+  "warningsOnDeprecatedUsage": "include",
+  "conversionStrategies": {
+    "enumCases": "camelCase",
+    "fieldAccessors": "default",
+    "inputObjects": "camelCase"
+  },
+  "pruneGeneratedFiles": true,
+  "markOperationDefinitionsAsFinal": true,
+  "schemaCustomization" : {
+    "customTypeNames" : {
+      "MyEnum" : {
+        "enum" : {
+          "cases" : {
+            "MyCase" : "CustomCase"
+          },
+          "name" : "CustomEnum"
+        }
+      },
+      "MyObject" : "CustomAnimal",
+      "MyInputObject" : {
+        "inputObject" : {
+          "fields" : {
+            "myField" : "customField"
+          },
+          "name" : "CustomInputObject"
+        }
+      }
+    }
+  }
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	options: ApolloCodegenConfiguration.OutputOptions(
-		additionalInflectionRules: [
-			.pluralization(
-				singularRegex: "animal",
-				replacementRegex: "animals"
-			)
-		],
-		deprecatedEnumCases: .include,
-		schemaDocumentation: .include,
-		selectionSetInitializers: [
-			.localCacheMutations,
-			.operation(named: "MyOperation"),
-			.fragment(named: "MyFragment")
-		],
-		operationDocumentFormat: [.document, .operationId],
-		cocoapodsCompatibleImportStatements: false,
-		warningsOnDeprecatedUsage: .include,
-		conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies(
-			enumCases: .camelCase,
-			fieldAccessors: .default,
-			inputObjects: .camelCase
-		),
-		pruneGeneratedFiles: true,
-		markOperationDefinitionsAsFinal: true,
-		schemaCustomization: .init(
-			customTypeNames: [
-				"MyEnum" : .enum(
-					name: "CustomEnum",
-					cases: [
-						"MyCase" : "CustomCase"
-					]
-				),
-				"MyObject" : .type(
-					name: "CustomObject"
-				),
-				"MyInputObject" : .inputObject(
-					name: "CustomInputObject",
-					fields: [
-						"myField" : "customField"
-					]
-				)
-			]
-		)
-	)
+  // Other properties not shown
+  options: ApolloCodegenConfiguration.OutputOptions(
+    additionalInflectionRules: [
+      .pluralization(
+        singularRegex: "animal",
+        replacementRegex: "animals"
+      )
+    ],
+    deprecatedEnumCases: .include,
+    schemaDocumentation: .include,
+    selectionSetInitializers: [
+      .localCacheMutations,
+      .operation(named: "MyOperation"),
+      .fragment(named: "MyFragment")
+    ],
+    operationDocumentFormat: [.document, .operationId],
+    cocoapodsCompatibleImportStatements: false,
+    warningsOnDeprecatedUsage: .include,
+    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies(
+      enumCases: .camelCase,
+      fieldAccessors: .default,
+      inputObjects: .camelCase
+    ),
+    pruneGeneratedFiles: true,
+    markOperationDefinitionsAsFinal: true,
+    schemaCustomization: .init(
+      customTypeNames: [
+        "MyEnum" : .enum(
+          name: "CustomEnum",
+          cases: [
+            "MyCase" : "CustomCase"
+          ]
+        ),
+        "MyObject" : .type(
+          name: "CustomObject"
+        ),
+        "MyInputObject" : .inputObject(
+          name: "CustomInputObject",
+          fields: [
+            "myField" : "customField"
+          ]
+        )
+      ]
+    )
+  )
 )
 ```
 
@@ -544,54 +544,54 @@ The `CustomSchemaTypeName` enum contains the following possible cases:
 
 ```json title="CLI Configuration JSON"
 "options": {
-	"schemaCustomization" : {
-		"customTypeNames" : {
-			"MyEnum" : {
-				"enum" : {
-					"cases" : {
-						"MyCase" : "CustomCase"
-					},
-					"name" : "CustomEnum"
-				}
-			},
-			"MyObject" : "CustomAnimal",
-			"MyInputObject" : {
-				"inputObject" : {
-					"fields" : {
-						"myField" : "customField"
-					},
-					"name" : "CustomInputObject"
-				}
-			}
-		}
-	}
+  "schemaCustomization" : {
+    "customTypeNames" : {
+      "MyEnum" : {
+        "enum" : {
+          "cases" : {
+            "MyCase" : "CustomCase"
+          },
+          "name" : "CustomEnum"
+        }
+      },
+      "MyObject" : "CustomAnimal",
+      "MyInputObject" : {
+        "inputObject" : {
+          "fields" : {
+            "myField" : "customField"
+          },
+          "name" : "CustomInputObject"
+        }
+      }
+    }
+  }
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	options: ApolloCodegenConfiguration.OutputOptions(
-		schemaCustomization: .init(
-			customTypeNames: [
-				"MyEnum" : .enum(
-					name: "CustomEnum",
-					cases: [
-						"MyCase" : "CustomCase"
-					]
-				),
-				"MyObject" : .type(
-					name: "CustomObject"
-				),
-				"MyInputObject" : .inputObject(
-					name: "CustomInputObject",
-					fields: [
-						"myField" : "customField"
-					]
-				)
-			]
-		)
-	)
+  // Other properties not shown
+  options: ApolloCodegenConfiguration.OutputOptions(
+    schemaCustomization: .init(
+      customTypeNames: [
+        "MyEnum" : .enum(
+          name: "CustomEnum",
+          cases: [
+            "MyCase" : "CustomCase"
+          ]
+        ),
+        "MyObject" : .type(
+          name: "CustomObject"
+        ),
+        "MyInputObject" : .inputObject(
+          name: "CustomInputObject",
+          fields: [
+            "myField" : "customField"
+          ]
+        )
+      ]
+    )
+  )
 )
 ```
 
@@ -614,20 +614,20 @@ The current supported experimental features are:
 
 ```json title="CLI Configuration JSON"
 "experimentalFeatures": {
-	"fieldMerging": [
-		"all"
-	],
-	"legacySafelistingCompatibleOperations": false
+  "fieldMerging": [
+    "all"
+  ],
+  "legacySafelistingCompatibleOperations": false
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	experimentalFeatures: ApolloCodegenConfiguration.ExperimentalFeatures(
-		fieldMerging: .all,
-		legacySafelistingCompatibleOperations: false
-	)
+  // Other properties not shown
+  experimentalFeatures: ApolloCodegenConfiguration.ExperimentalFeatures(
+    fieldMerging: .all,
+    legacySafelistingCompatibleOperations: false
+  )
 )
 ```
 
@@ -666,21 +666,21 @@ The properties you will need to configure are:
 
 ```json title="CLI Configuration JSON"
 "schemaDownload": {
-	"downloadMethod": {
-		"apolloRegistry": {
-			"_0": {
-				"graphID": "your-graphid",
-				"apiKey": "your-api-key",
-				"variant": "current"
-			}
-		}
-	},
-	"downloadTimeout": 60,
-	"headers": {
-		"Accept-Encoding" : "gzip",
-		"Authorization" : "Bearer <token>"
-	},
-	"outputPath": "./graphql/"
+  "downloadMethod": {
+    "apolloRegistry": {
+      "_0": {
+        "graphID": "your-graphid",
+        "apiKey": "your-api-key",
+        "variant": "current"
+      }
+    }
+  },
+  "downloadTimeout": 60,
+  "headers": {
+    "Accept-Encoding" : "gzip",
+    "Authorization" : "Bearer <token>"
+  },
+  "outputPath": "./graphql/"
 }
 ```
 
@@ -722,31 +722,31 @@ The properties you will need to configure are:
 
 ```json title="CLI Configuration JSON"
 "schemaDownload": {
-	"downloadMethod": {
-		"introspection": {
-			"endpointURL": "https://server.com",
-			"httpMethod": {
-				"POST": {}
-			},
-			"includeDeprecatedInputValues": false,
-			"outputFormat": "SDL"
-		}
-	},
-	"downloadTimeout": 60,
-	"headers": [],
-	"outputPath": "./graphql/"
+  "downloadMethod": {
+    "introspection": {
+      "endpointURL": "https://server.com",
+      "httpMethod": {
+        "POST": {}
+      },
+      "includeDeprecatedInputValues": false,
+      "outputFormat": "SDL"
+    }
+  },
+  "downloadTimeout": 60,
+  "headers": [],
+  "outputPath": "./graphql/"
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	schemaDownload: ApolloSchemaDownloadConfiguration(
-		using: .introspection(
-			endpointURL: URL(string: "https://server.com")!),
-		timeout: 60.0,
-		headers: [],
-		outputPath: "./graphql/")
+  // Other properties not shown
+  schemaDownload: ApolloSchemaDownloadConfiguration(
+    using: .introspection(
+      endpointURL: URL(string: "https://server.com")!),
+    timeout: 60.0,
+    headers: [],
+    outputPath: "./graphql/")
 )
 ```
 
