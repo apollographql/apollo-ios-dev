@@ -115,10 +115,6 @@ The properties to configure `output` are:
 	},
 	"testMocks": {
 		"none": {}
-	},
-	"operationManifest" : {
-		"path" : "./generated/operationIdentifiers.json",
-		"version" : "persistedQueries"
 	}
 }
 ```
@@ -132,8 +128,7 @@ let configuration = ApolloCodegenConfiguration(
 			moduleType: .swiftPackageManager
 		)
 		operations: .inSchemaModule,
-		testMocks: .none,
-		operationIdentifiersPath: "./generated/"
+		testMocks: .none
 	)
 )
 ```
@@ -414,6 +409,7 @@ The top-level properties are:
 | [`conversionStrategies`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/conversionstrategies) | Rules for how to convert the names of values from the schema in generated code. |
 | [`pruneGeneratedFiles`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/prunegeneratedfiles) | Whether unused generated files will be automatically deleted. |
 | [`markOperationDefinitionsAsFinal`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/markOperationDefinitionsAsFinal) | Whether generated GraphQL operation and local cache mutation class types will be marked as `final`. |
+| [`schemaCustomization`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/schemacustomization) | Customization options to be applied to the schema during code generation. |
 
 <MultiCodeBlock>
 
@@ -447,26 +443,26 @@ The top-level properties are:
 	"pruneGeneratedFiles": true,
 	"markOperationDefinitionsAsFinal": true,
 	"schemaCustomization" : {
-    "customTypeNames" : {
-      "MyEnum" : {
-        "enum" : {
-          "cases" : {
-            "MyCase" : "CustomCase"
-          },
-          "name" : "CustomEnum"
-        }
-      },
-      "MyObject" : "CustomAnimal",
-      "MyInputObject" : {
-        "inputObject" : {
-          "fields" : {
-            "myField" : "customField"
-          },
-          "name" : "CustomInputObject"
-        }
-      }
-    }
-  }
+		"customTypeNames" : {
+			"MyEnum" : {
+				"enum" : {
+					"cases" : {
+						"MyCase" : "CustomCase"
+					},
+					"name" : "CustomEnum"
+				}
+			},
+			"MyObject" : "CustomAnimal",
+			"MyInputObject" : {
+				"inputObject" : {
+					"fields" : {
+						"myField" : "customField"
+					},
+					"name" : "CustomInputObject"
+				}
+			}
+		}
+	}
 }
 ```
 
@@ -498,24 +494,24 @@ let configuration = ApolloCodegenConfiguration(
 		pruneGeneratedFiles: true,
 		markOperationDefinitionsAsFinal: true,
 		schemaCustomization: .init(
-      customTypeNames: [
-        "MyEnum" : .enum(
-          name: "CustomEnum",
-          cases: [
-            "MyCase" : "CustomCase"
-          ]
-        ),
-        "MyObject" : .type(
-          name: "CustomObject"
-        ),
-        "MyInputObject" : .inputObject(
-          name: "CustomInputObject",
-          fields: [
-            "myField" : "customField"
-          ]
-        )
-      ]
-    )
+			customTypeNames: [
+				"MyEnum" : .enum(
+					name: "CustomEnum",
+					cases: [
+						"MyCase" : "CustomCase"
+					]
+				),
+				"MyObject" : .type(
+					name: "CustomObject"
+				),
+				"MyInputObject" : .inputObject(
+					name: "CustomInputObject",
+					fields: [
+						"myField" : "customField"
+					]
+				)
+			]
+		)
 	)
 )
 ```
@@ -549,26 +545,26 @@ The `CustomSchemaTypeName` enum contains the following possible cases:
 ```json title="CLI Configuration JSON"
 "options": {
 	"schemaCustomization" : {
-    "customTypeNames" : {
-      "MyEnum" : {
-        "enum" : {
-          "cases" : {
-            "MyCase" : "CustomCase"
-          },
-          "name" : "CustomEnum"
-        }
-      },
-      "MyObject" : "CustomAnimal",
-      "MyInputObject" : {
-        "inputObject" : {
-          "fields" : {
-            "myField" : "customField"
-          },
-          "name" : "CustomInputObject"
-        }
-      }
-    }
-  }
+		"customTypeNames" : {
+			"MyEnum" : {
+				"enum" : {
+					"cases" : {
+						"MyCase" : "CustomCase"
+					},
+					"name" : "CustomEnum"
+				}
+			},
+			"MyObject" : "CustomAnimal",
+			"MyInputObject" : {
+				"inputObject" : {
+					"fields" : {
+						"myField" : "customField"
+					},
+					"name" : "CustomInputObject"
+				}
+			}
+		}
+	}
 }
 ```
 
@@ -577,24 +573,24 @@ let configuration = ApolloCodegenConfiguration(
 	// Other properties not shown
 	options: ApolloCodegenConfiguration.OutputOptions(
 		schemaCustomization: .init(
-      customTypeNames: [
-        "MyEnum" : .enum(
-          name: "CustomEnum",
-          cases: [
-            "MyCase" : "CustomCase"
-          ]
-        ),
-        "MyObject" : .type(
-          name: "CustomObject"
-        ),
-        "MyInputObject" : .inputObject(
-          name: "CustomInputObject",
-          fields: [
-            "myField" : "customField"
-          ]
-        )
-      ]
-    )
+			customTypeNames: [
+				"MyEnum" : .enum(
+					name: "CustomEnum",
+					cases: [
+						"MyCase" : "CustomCase"
+					]
+				),
+				"MyObject" : .type(
+					name: "CustomObject"
+				),
+				"MyInputObject" : .inputObject(
+					name: "CustomInputObject",
+					fields: [
+						"myField" : "customField"
+					]
+				)
+			]
+		)
 	)
 )
 ```
@@ -611,14 +607,16 @@ The current supported experimental features are:
 
 | Value | escription |
 | ----- | ----------- |
-| [`clientControlledNullability`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/experimentalfeatures-swift.struct/clientcontrollednullability) | If enabled, codegen will understand and parse Client Controlled Nullability. Read the [RFC](https://github.com/graphql/graphql-spec/issues/867) for more detail. |
+| [`fieldMerging`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/experimentalfeatures-swift.struct/fieldmerging) | Determines which merged fields and named fragment accessors are generated. Defaults to `.all`. |
 | [`legacySafelistingCompatibleOperations`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/experimentalfeatures-swift.struct/legacysafelistingcompatibleoperations) | If enabled, the generated operations will be transformed using a method that attempts to maintain compatibility with the legacy behavior from [`apollo-tooling`](https://github.dev/apollographql/apollo-tooling) for registering persisted operation to a safelist.<br/><br/>*Note: Safelisting queries is a deprecated feature of Apollo Server that has reduced support for legacy use cases. This option may not work as intended in all situations.* |
 
 <MultiCodeBlock>
 
 ```json title="CLI Configuration JSON"
 "experimentalFeatures": {
-	"clientControlledNullability": false,
+	"fieldMerging": [
+		"all"
+	],
 	"legacySafelistingCompatibleOperations": false
 }
 ```
@@ -627,7 +625,7 @@ The current supported experimental features are:
 let configuration = ApolloCodegenConfiguration(
 	// Other properties not shown
 	experimentalFeatures: ApolloCodegenConfiguration.ExperimentalFeatures(
-		clientControlledNullability: false,
+		fieldMerging: .all,
 		legacySafelistingCompatibleOperations: false
 	)
 )
@@ -812,7 +810,9 @@ Below is an example that illustrates an `apollo-codegen-config.json` where every
     "outputPath": "./graphql/"
   },
   "experimentalFeatures" : {
-    "clientControlledNullability" : true,
+	"fieldMerging": [
+		"all"
+	],
     "legacySafelistingCompatibleOperations" : true
   },
   "operationManifest" : {
@@ -874,7 +874,9 @@ Below is an example that illustrates an `apollo-codegen-config.json` where every
     "selectionSetInitializers" : {
       "localCacheMutations" : true
     },
-    "warningsOnDeprecatedUsage" : "exclude"
+    "warningsOnDeprecatedUsage" : "exclude",
+	"operationDocumentFormat" : ["definition", "operationId"],
+	"markOperationDefinitionsAsFinal": true
   }
 }
 ```
