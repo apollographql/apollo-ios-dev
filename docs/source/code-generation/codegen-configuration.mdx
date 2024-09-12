@@ -55,22 +55,22 @@ The properties to configure `input` are:
 
 ```json title="CLI Configuration JSON"
 "input": {
-	"schemaSearchPaths": [
-		"**/*.graphqls"
-	],
-	"operationSearchPaths": [
-		"**/*.graphql"
-	]
+  "schemaSearchPaths": [
+    "**/*.graphqls"
+  ],
+  "operationSearchPaths": [
+    "**/*.graphql"
+  ]
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	input: ApolloCodegenConfiguration.FileInput(
-		schemaSearchPaths: ["**/*.graphqls"],
-		operationSearchPaths: ["**/*.graphql"]
-	),
+  // Other properties not shown
+  input: ApolloCodegenConfiguration.FileInput(
+    schemaSearchPaths: ["**/*.graphqls"],
+    operationSearchPaths: ["**/*.graphql"]
+  ),
 )
 ```
 
@@ -104,37 +104,32 @@ The properties to configure `output` are:
 
 ```json title="CLI Configuration JSON"
 "output": {
-	"schemaTypes": {
-		"moduleType": {
-			"swiftPackageManager": {}
-		},
-		"path": "./generated/schema/"
-	},
-	"operations": {
-		"inSchemaModule": {}
-	},
-	"testMocks": {
-		"none": {}
-	},
-	"operationManifest" : {
-		"path" : "./generated/operationIdentifiers.json",
-		"version" : "persistedQueries"
-	}
+  "schemaTypes": {
+    "moduleType": {
+      "swiftPackageManager": {}
+    },
+    "path": "./generated/schema/"
+  },
+  "operations": {
+    "inSchemaModule": {}
+  },
+  "testMocks": {
+    "none": {}
+  }
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	output: ApolloCodegenConfiguration.FileOutput(
-		schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
-			path: "./generated/schema/",
-			moduleType: .swiftPackageManager
-		)
-		operations: .inSchemaModule,
-		testMocks: .none,
-		operationIdentifiersPath: "./generated/"
-	)
+  // Other properties not shown
+  output: ApolloCodegenConfiguration.FileOutput(
+    schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
+      path: "./generated/schema/",
+      moduleType: .swiftPackageManager
+    )
+    operations: .inSchemaModule,
+    testMocks: .none
+  )
 )
 ```
 
@@ -191,28 +186,28 @@ When creating a single target application, this option allows you to include Apo
 
 ```json title="CLI Configuration JSON"
 "output": {
-	"schemaTypes": {
-		"moduleType": {
-			"embeddedInTarget": {
-				"name": "MyApplicationTarget",
-				"accessModifier": "internal"
-			}
-		},
-		"path": "./generated/schema/"
-	}
+  "schemaTypes": {
+    "moduleType": {
+      "embeddedInTarget": {
+        "name": "MyApplicationTarget",
+        "accessModifier": "internal"
+      }
+    },
+    "path": "./generated/schema/"
+  }
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	output: ApolloCodegenConfiguration.FileOutput(
-		schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
-			path: "./generated/schema/",
-			moduleType: .embeddedInTarget(name: "MyApplicationTarget", accessModifier: .internal)
-		)
-		...
-	)
+  // Other properties not shown
+  output: ApolloCodegenConfiguration.FileOutput(
+    schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
+      path: "./generated/schema/",
+      moduleType: .embeddedInTarget(name: "MyApplicationTarget", accessModifier: .internal)
+    )
+    ...
+  )
 )
 ```
 
@@ -238,25 +233,25 @@ For multi-module projects using Swift Package Manager, this is the recommended c
 
 ```json title="CLI Configuration JSON"
 "output": {
-	"schemaTypes": {
-		"moduleType": {
-			"swiftPackageManager": {}
-		},
-		"path": "./generated/schema/"
-	}
+  "schemaTypes": {
+    "moduleType": {
+      "swiftPackageManager": {}
+    },
+    "path": "./generated/schema/"
+  }
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	output: ApolloCodegenConfiguration.FileOutput(
-		schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
-			path: "./generated/schema/",
-			moduleType: .swiftPackageManager
-		)
-		...
-	)
+  // Other properties not shown
+  output: ApolloCodegenConfiguration.FileOutput(
+    schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
+      path: "./generated/schema/",
+      moduleType: .swiftPackageManager
+    )
+    ...
+  )
 )
 ```
 
@@ -278,25 +273,25 @@ Using this option, you are required to create a target, or module, for your sche
 
 ```json title="CLI Configuration JSON"
 "output": {
-	"schemaTypes": {
-		"moduleType": {
-			"other": {}
-		},
-		"path": "./generated/schema/"
-	}
+  "schemaTypes": {
+    "moduleType": {
+      "other": {}
+    },
+    "path": "./generated/schema/"
+  }
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	output: ApolloCodegenConfiguration.FileOutput(
-		schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
-			path: "./generated/schema/",
-			moduleType: .other
-		)
-		...
-	)
+  // Other properties not shown
+  output: ApolloCodegenConfiguration.FileOutput(
+    schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
+      path: "./generated/schema/",
+      moduleType: .other
+    )
+    ...
+  )
 )
 ```
 
@@ -398,6 +393,8 @@ Specify the directory for your test mocks using the `path` parameter. This is re
 
 ## Output options
 
+**[`options: OutputOptions`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions)**
+
 The code generation engine supports a number of configuration options to change the behaviour of the generator and tailor the generated Swift code to your specific needs.
 
 The top-level properties are:
@@ -414,39 +411,40 @@ The top-level properties are:
 | [`conversionStrategies`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/conversionstrategies) | Rules for how to convert the names of values from the schema in generated code. |
 | [`pruneGeneratedFiles`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/prunegeneratedfiles) | Whether unused generated files will be automatically deleted. |
 | [`markOperationDefinitionsAsFinal`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/markOperationDefinitionsAsFinal) | Whether generated GraphQL operation and local cache mutation class types will be marked as `final`. |
+| [`schemaCustomization`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/schemacustomization) | Customization options to be applied to the schema during code generation. |
 
 <MultiCodeBlock>
 
 ```json title="CLI Configuration JSON"
 "options": {
-	"additionalInflectionRules": [{
-		"pluralization": {
-			"replacementRegex": "animals",
-			"singularRegex": "animal"
-		}
-	}],
-	"deprecatedEnumCases": "include",
-	"schemaDocumentation": "include",
-	"selectionSetInitializers" : {
-		"operations": false,
-		"namedFragments": false,
-		"localCacheMutations" : true,
-		"definitionsNamed": [
-			"MyOperation",
-			"MyFragment"
-		]
-	},
-	"operationDocumentFormat" : ["definition", "operationId"],
-	"cocoapodsCompatibleImportStatements": false,
-	"warningsOnDeprecatedUsage": "include",
-	"conversionStrategies": {
-		"enumCases": "camelCase",
-		"fieldAccessors": "default",
-		"inputObjects": "camelCase"
-	},
-	"pruneGeneratedFiles": true,
-	"markOperationDefinitionsAsFinal": true,
-	"schemaCustomization" : {
+  "additionalInflectionRules": [{
+    "pluralization": {
+      "replacementRegex": "animals",
+      "singularRegex": "animal"
+    }
+  }],
+  "deprecatedEnumCases": "include",
+  "schemaDocumentation": "include",
+  "selectionSetInitializers" : {
+    "operations": false,
+    "namedFragments": false,
+    "localCacheMutations" : true,
+    "definitionsNamed": [
+      "MyOperation",
+      "MyFragment"
+    ]
+  },
+  "operationDocumentFormat" : ["definition", "operationId"],
+  "cocoapodsCompatibleImportStatements": false,
+  "warningsOnDeprecatedUsage": "include",
+  "conversionStrategies": {
+    "enumCases": "camelCase",
+    "fieldAccessors": "default",
+    "inputObjects": "camelCase"
+  },
+  "pruneGeneratedFiles": true,
+  "markOperationDefinitionsAsFinal": true,
+  "schemaCustomization" : {
     "customTypeNames" : {
       "MyEnum" : {
         "enum" : {
@@ -472,32 +470,32 @@ The top-level properties are:
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	options: ApolloCodegenConfiguration.OutputOptions(
-		additionalInflectionRules: [
-			.pluralization(
-				singularRegex: "animal",
-				replacementRegex: "animals"
-			)
-		],
-		deprecatedEnumCases: .include,
-		schemaDocumentation: .include,
-		selectionSetInitializers: [
-			.localCacheMutations,
-			.operation(named: "MyOperation"),
-			.fragment(named: "MyFragment")
-		],
-		operationDocumentFormat: [.document, .operationId],
-		cocoapodsCompatibleImportStatements: false,
-		warningsOnDeprecatedUsage: .include,
-		conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies(
-			enumCases: .camelCase,
-			fieldAccessors: .default,
-			inputObjects: .camelCase
-		),
-		pruneGeneratedFiles: true,
-		markOperationDefinitionsAsFinal: true,
-		schemaCustomization: .init(
+  // Other properties not shown
+  options: ApolloCodegenConfiguration.OutputOptions(
+    additionalInflectionRules: [
+      .pluralization(
+        singularRegex: "animal",
+        replacementRegex: "animals"
+      )
+    ],
+    deprecatedEnumCases: .include,
+    schemaDocumentation: .include,
+    selectionSetInitializers: [
+      .localCacheMutations,
+      .operation(named: "MyOperation"),
+      .fragment(named: "MyFragment")
+    ],
+    operationDocumentFormat: [.document, .operationId],
+    cocoapodsCompatibleImportStatements: false,
+    warningsOnDeprecatedUsage: .include,
+    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies(
+      enumCases: .camelCase,
+      fieldAccessors: .default,
+      inputObjects: .camelCase
+    ),
+    pruneGeneratedFiles: true,
+    markOperationDefinitionsAsFinal: true,
+    schemaCustomization: .init(
       customTypeNames: [
         "MyEnum" : .enum(
           name: "CustomEnum",
@@ -516,7 +514,7 @@ let configuration = ApolloCodegenConfiguration(
         )
       ]
     )
-	)
+  )
 )
 ```
 
@@ -548,7 +546,7 @@ The `CustomSchemaTypeName` enum contains the following possible cases:
 
 ```json title="CLI Configuration JSON"
 "options": {
-	"schemaCustomization" : {
+  "schemaCustomization" : {
     "customTypeNames" : {
       "MyEnum" : {
         "enum" : {
@@ -574,9 +572,9 @@ The `CustomSchemaTypeName` enum contains the following possible cases:
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	options: ApolloCodegenConfiguration.OutputOptions(
-		schemaCustomization: .init(
+  // Other properties not shown
+  options: ApolloCodegenConfiguration.OutputOptions(
+    schemaCustomization: .init(
       customTypeNames: [
         "MyEnum" : .enum(
           name: "CustomEnum",
@@ -595,13 +593,15 @@ let configuration = ApolloCodegenConfiguration(
         )
       ]
     )
-	)
+  )
 )
 ```
 
 </MultiCodeBlock>
 
 ## Experimental features
+
+**[`experimentalFeatures: ExperimentalFeatures`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/experimentalfeatures-swift.struct)**
 
 The code generation engine supports some behaviors where the affect on the generated code is considered experimental. An example of this is a specification of the GraphQL schema that is not yet formalized and undergoing change as the proposal advances.
 
@@ -611,31 +611,35 @@ The current supported experimental features are:
 
 | Value | escription |
 | ----- | ----------- |
-| [`clientControlledNullability`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/experimentalfeatures-swift.struct/clientcontrollednullability) | If enabled, codegen will understand and parse Client Controlled Nullability. Read the [RFC](https://github.com/graphql/graphql-spec/issues/867) for more detail. |
+| [`fieldMerging`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/experimentalfeatures-swift.struct/fieldmerging) | Determines which merged fields and named fragment accessors are generated. Defaults to `.all`. |
 | [`legacySafelistingCompatibleOperations`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/experimentalfeatures-swift.struct/legacysafelistingcompatibleoperations) | If enabled, the generated operations will be transformed using a method that attempts to maintain compatibility with the legacy behavior from [`apollo-tooling`](https://github.dev/apollographql/apollo-tooling) for registering persisted operation to a safelist.<br/><br/>*Note: Safelisting queries is a deprecated feature of Apollo Server that has reduced support for legacy use cases. This option may not work as intended in all situations.* |
 
 <MultiCodeBlock>
 
 ```json title="CLI Configuration JSON"
 "experimentalFeatures": {
-	"clientControlledNullability": false,
-	"legacySafelistingCompatibleOperations": false
+  "fieldMerging": [
+    "all"
+  ],
+  "legacySafelistingCompatibleOperations": false
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	experimentalFeatures: ApolloCodegenConfiguration.ExperimentalFeatures(
-		clientControlledNullability: false,
-		legacySafelistingCompatibleOperations: false
-	)
+  // Other properties not shown
+  experimentalFeatures: ApolloCodegenConfiguration.ExperimentalFeatures(
+    fieldMerging: .all,
+    legacySafelistingCompatibleOperations: false
+  )
 )
 ```
 
 </MultiCodeBlock>
 
 ## Schema download configuration
+
+**[`schemaDownload: ApolloSchemaDownloadConfiguration`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apolloschemadownloadconfiguration)**
 
 An optional step in the code generation process is to fetch a GraphQL schema from a remote server. This step ensures that you always have an up-to-date schema on which to base your operations and it eliminates the need to manually download the schema outside of the automated process.
 
@@ -668,21 +672,21 @@ The properties you will need to configure are:
 
 ```json title="CLI Configuration JSON"
 "schemaDownload": {
-	"downloadMethod": {
-		"apolloRegistry": {
-			"_0": {
-				"graphID": "your-graphid",
-				"apiKey": "your-api-key",
-				"variant": "current"
-			}
-		}
-	},
-	"downloadTimeout": 60,
-	"headers": {
-		"Accept-Encoding" : "gzip",
-		"Authorization" : "Bearer <token>"
-	},
-	"outputPath": "./graphql/"
+  "downloadMethod": {
+    "apolloRegistry": {
+      "_0": {
+        "graphID": "your-graphid",
+        "apiKey": "your-api-key",
+        "variant": "current"
+      }
+    }
+  },
+  "downloadTimeout": 60,
+  "headers": {
+    "Accept-Encoding" : "gzip",
+    "Authorization" : "Bearer <token>"
+  },
+  "outputPath": "./graphql/"
 }
 ```
 
@@ -724,31 +728,31 @@ The properties you will need to configure are:
 
 ```json title="CLI Configuration JSON"
 "schemaDownload": {
-	"downloadMethod": {
-		"introspection": {
-			"endpointURL": "https://server.com",
-			"httpMethod": {
-				"POST": {}
-			},
-			"includeDeprecatedInputValues": false,
-			"outputFormat": "SDL"
-		}
-	},
-	"downloadTimeout": 60,
-	"headers": [],
-	"outputPath": "./graphql/"
+  "downloadMethod": {
+    "introspection": {
+      "endpointURL": "https://server.com",
+      "httpMethod": {
+        "POST": {}
+      },
+      "includeDeprecatedInputValues": false,
+      "outputFormat": "SDL"
+    }
+  },
+  "downloadTimeout": 60,
+  "headers": [],
+  "outputPath": "./graphql/"
 }
 ```
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-	// Other properties not shown
-	schemaDownload: ApolloSchemaDownloadConfiguration(
-		using: .introspection(
-			endpointURL: URL(string: "https://server.com")!),
-		timeout: 60.0,
-		headers: [],
-		outputPath: "./graphql/")
+  // Other properties not shown
+  schemaDownload: ApolloSchemaDownloadConfiguration(
+    using: .introspection(
+      endpointURL: URL(string: "https://server.com")!),
+    timeout: 60.0,
+    headers: [],
+    outputPath: "./graphql/")
 )
 ```
 
@@ -757,6 +761,8 @@ let configuration = ApolloCodegenConfiguration(
 For more details, see the section on [downloading a schema](./downloading-schema).
 
 ## Operation Manifest Configuration
+
+**[`operationManifest: OperationManifestConfiguration`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/operationmanifestconfiguration)**
 
 Optional settings used to configure generation of the operation identifier manifest for use with [Persisted Queries](./../fetching/persisted-queries).
 
@@ -812,7 +818,9 @@ Below is an example that illustrates an `apollo-codegen-config.json` where every
     "outputPath": "./graphql/"
   },
   "experimentalFeatures" : {
-    "clientControlledNullability" : true,
+    "fieldMerging": [
+        "all"
+    ],
     "legacySafelistingCompatibleOperations" : true
   },
   "operationManifest" : {
@@ -874,7 +882,9 @@ Below is an example that illustrates an `apollo-codegen-config.json` where every
     "selectionSetInitializers" : {
       "localCacheMutations" : true
     },
-    "warningsOnDeprecatedUsage" : "exclude"
+    "warningsOnDeprecatedUsage" : "exclude",
+    "operationDocumentFormat" : ["definition", "operationId"],
+    "markOperationDefinitionsAsFinal": true
   }
 }
 ```
