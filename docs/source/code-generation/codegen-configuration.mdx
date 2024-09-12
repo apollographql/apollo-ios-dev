@@ -426,13 +426,8 @@ The top-level properties are:
   "deprecatedEnumCases": "include",
   "schemaDocumentation": "include",
   "selectionSetInitializers" : {
-    "operations": false,
-    "namedFragments": false,
-    "localCacheMutations" : true,
-    "definitionsNamed": [
-      "MyOperation",
-      "MyFragment"
-    ]
+    "operations": true,
+    "namedFragments": true
   },
   "operationDocumentFormat" : ["definition", "operationId"],
   "cocoapodsCompatibleImportStatements": false,
@@ -481,9 +476,8 @@ let configuration = ApolloCodegenConfiguration(
     deprecatedEnumCases: .include,
     schemaDocumentation: .include,
     selectionSetInitializers: [
-      .localCacheMutations,
-      .operation(named: "MyOperation"),
-      .fragment(named: "MyFragment")
+      .operations,
+      .namedFragments
     ],
     operationDocumentFormat: [.document, .operationId],
     cocoapodsCompatibleImportStatements: false,
@@ -519,6 +513,40 @@ let configuration = ApolloCodegenConfiguration(
 ```
 
 </MultiCodeBlock>
+
+### Selection Set Initializers
+
+You can get initializers for your generated selection sets by using the [selectionSetInitializers](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/selectionsetinitializers) option.
+
+Manually initialized selection sets can be used for a number of purposes, including:
+* Adding custom data to the normalized cache
+* Setting up fixture data for SwiftUI previews or loading states
+* An alternative to [Test Mocks](#test-mocks) for unit testing
+
+You can configure initializers to be generated for all operations, all named fragments, or only select operations or named fragments instead. Initializers are always generated for local cache mutations. [SelectionSetInitializers](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/selectionsetinitializers) functions like an `OptionSet`, allowing you to combine multiple different instances together to indicate all the types you would like to generate initializers for.
+
+<MultiCodeBlock>
+
+```json title="CLI Configuration JSON"
+"options": {
+  "selectionSetInitializers" : {
+    "operations": true,
+    "namedFragments" : true
+  },
+}
+```
+
+```swift title="Swift Codegen Setup"
+let configuration = ApolloCodegenConfiguration(
+  // Other properties not shown
+  options: ApolloCodegenConfiguration.OutputOptions(
+    selectionSetInitializers: [
+      .operations,
+      .namedFragments
+    ]
+  )
+)
+```
 
 ### Schema Customization
 
@@ -880,7 +908,8 @@ Below is an example that illustrates an `apollo-codegen-config.json` where every
     "pruneGeneratedFiles" : false,
     "schemaDocumentation" : "exclude",
     "selectionSetInitializers" : {
-      "localCacheMutations" : true
+      "operations": true,
+      "namedFragments" : true
     },
     "warningsOnDeprecatedUsage" : "exclude",
     "operationDocumentFormat" : ["definition", "operationId"],
