@@ -468,7 +468,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public let selectionSetInitializers: SelectionSetInitializers
     /// How to generate the operation documents for your generated operations.
     public let operationDocumentFormat: OperationDocumentFormat
-    /// Customization options to be applie to the schema during code generation.
+    /// Customization options to be applied to the schema during code generation.
     public let schemaCustomization: SchemaCustomization
     /// Generate import statements that are compatible with including `Apollo` via Cocoapods.
     ///
