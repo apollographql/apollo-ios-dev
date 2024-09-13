@@ -426,8 +426,12 @@ The top-level properties are:
   "deprecatedEnumCases": "include",
   "schemaDocumentation": "include",
   "selectionSetInitializers" : {
-    "operations": true,
-    "namedFragments": true
+    "operations": false,
+    "namedFragments": false,
+    "definitionsNamed": [
+      "MyOperation",
+      "MyFragment"
+    ]
   },
   "operationDocumentFormat" : ["definition", "operationId"],
   "cocoapodsCompatibleImportStatements": false,
@@ -476,8 +480,8 @@ let configuration = ApolloCodegenConfiguration(
     deprecatedEnumCases: .include,
     schemaDocumentation: .include,
     selectionSetInitializers: [
-      .operations,
-      .namedFragments
+      .operation(named: "MyOperation"),
+      .fragment(named: "MyFragment")
     ],
     operationDocumentFormat: [.document, .operationId],
     cocoapodsCompatibleImportStatements: false,
@@ -530,8 +534,12 @@ You can configure initializers to be generated for all operations, all named fra
 ```json title="CLI Configuration JSON"
 "options": {
   "selectionSetInitializers" : {
-    "operations": true,
-    "namedFragments" : true
+    "operations": false
+    "namedFragments" : false,
+    "definitionsNamed": [
+      "MyOperation,
+      "MyFragment"
+    ]
   },
 }
 ```
@@ -541,8 +549,8 @@ let configuration = ApolloCodegenConfiguration(
   // Other properties not shown
   options: ApolloCodegenConfiguration.OutputOptions(
     selectionSetInitializers: [
-      .operations,
-      .namedFragments
+      .operation(named: "MyOperation"),
+      .fragment(named: "MyFragment")
     ]
   )
 )
@@ -908,8 +916,12 @@ Below is an example that illustrates an `apollo-codegen-config.json` where every
     "pruneGeneratedFiles" : false,
     "schemaDocumentation" : "exclude",
     "selectionSetInitializers" : {
-      "operations": true,
-      "namedFragments" : true
+      "operations": false,
+      "namedFragments" : false,
+      "definitionsNamed": [
+        "MyOperation",
+        "MyFragment"
+      ]
     },
     "warningsOnDeprecatedUsage" : "exclude",
     "operationDocumentFormat" : ["definition", "operationId"],
