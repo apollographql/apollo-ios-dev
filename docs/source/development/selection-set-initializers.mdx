@@ -1,0 +1,143 @@
+---
+title: Using Selection Set Initializers
+---
+
+Being able to create instances of your generated operation models can be useful in a number of different ways: adding custom data to the normalized cache; setting up fixture data for SwiftUI previews or loading states; and as an alternative to [Test Mocks](../testing/test-mocks.mdx). Apollo iOS provides Selection Set Initializers to facilitate this.
+
+When code generation is configured to generate selection set initializers each Swift struct will have an initializer that accepts values for the selected fields (properties) defined in the struct, as well as some inherited fields.
+
+> To learn more about how to configure Selection Set Initializers, check out [Codegen Configuration](../code-generation/codegen-configuration#selection-set-initializers).
+
+## Usage
+
+Generated operation models are immutable and selection set initializers provide a type-safe way to create instances of your operation models.
+
+For example, given the following generated operation model (details are omitted to focus on the relevant parts of the struct):
+
+```swift
+public class HerosQuery: GraphQLQuery {
+  public struct Data: GraphAPI.SelectionSet {
+    public static var __selections: [ApolloAPI.Selection] { [
+      .field("hero", Hero.self),
+    ] }
+
+    public var hero: Hero { __data["hero"] }
+
+    public init(
+      hero: Hero
+    ) { ... }
+
+    /// Hero
+    ///
+    /// Parent Type: `Character`
+    public struct Hero: GraphAPI.SelectionSet {
+      public static var __selections: [ApolloAPI.Selection] { [
+        .field("__typename", String.self),
+        .field("id", String.self),
+        .field("name", String.self),
+        .field("friends", [Friend]?.self),
+        .inlineFragment(AsHuman.self),
+        .inlineFragment(AsDroid.self),
+      ] }
+
+      public var id: String { __data["id"] }
+      public var name: String { __data["name"] }
+      public var friends: [Friend]? { __data["friends"] }
+
+      public var asDroid: AsDroid? { _asInlineFragment() }
+
+      public init(
+        __typename: String,
+        id: String,
+        name: String,
+        friends: [Friend]? = nil
+      ) { ... }
+
+      /// Hero.Friend
+      ///
+      /// Parent Type: `Character`
+      public struct Friend: GraphAPI.SelectionSet {
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .field("name", String.self),
+        ] }
+
+        public var id: String { __data["id"] }
+        public var name: String { __data["name"] }
+
+        public init(
+          __typename: String,
+          id: String,
+          name: String
+        ) { ... }
+      }
+
+      /// Hero.AsDroid
+      ///
+      /// Parent Type: `Droid`
+      public struct AsDroid: GraphAPI.InlineFragment {
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("primaryFunction", String?.self),
+        ] }
+
+        public var primaryFunction: String? { __data["primaryFunction"] }
+        public var id: String { __data["id"] }
+        public var name: String { __data["name"] }
+        public var friends: [Friend]? { __data["friends"] }
+
+        public init(
+          primaryFunction: String? = nil,
+          id: String,
+          name: String,
+          friends: [Friend]? = nil
+        ) { ... }
+      }
+    }
+  }
+}
+```
+
+To create an instance of the `HerosQuery` class you would do the following:
+
+```swift
+let modelData = HerosQuery.Data.init(
+  hero: HerosQuery.Data.Hero(
+    __typename: "Human",
+    id: "luke-skywalker",
+    name: "Luke Skywalker",
+    friends: [
+      HerosQuery.Data.Hero.Friend(
+        __typename: "Wookie",
+        id: "chewbacca",
+        name: "Chewbacca"
+      )
+    ]
+  )
+)
+```
+
+### Type conditions
+
+If you use a [type condition](https://www.apollographql.com/docs/ios/fetching/type-conditions) in your operation you will notice that a struct is generated to match the type (`AsDroid` in the example above) but the generated initializer does not accept a value of that type.
+
+In this case you must create an object of the required type and then use the `asRootEntityType` property to initialize the selection set:
+
+```swift
+let droid = HerosQuery.Data.Hero.AsDroid(
+  primaryFunction: "Etiquette and translation",
+  id: "c-3po",
+  name: "C-3PO",
+  friends: [
+    HerosQuery.Data.Hero.Friend(
+      __typename: "Droid",
+      id: "r2-d2",
+      name: "R2-D2"
+    )
+  ]
+)
+
+let modelData = HerosQuery.Data.init(
+  hero: droid.asRootEntityType
+)
+```
