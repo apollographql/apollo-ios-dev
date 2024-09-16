@@ -124,7 +124,7 @@
     ],
     "Development & Testing": [
       {
-        "Selection Set Initializers": "/development/selection-set-initializers.mdx",
+        "Selection Set Initializers": "/development/selection-set-initializers",
         "Test Mocks": "/testing/test-mocks",
         "Including Apollo as an XCFramework": "/development/using-xcframework"
       },

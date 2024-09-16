@@ -2,7 +2,7 @@
 title: Using Selection Set Initializers
 ---
 
-Being able to create instances of your generated operation models can be useful in a number of different ways: adding custom data to the normalized cache; setting up fixture data for SwiftUI previews or loading states; and as an alternative to [Test Mocks](../testing/test-mocks.mdx). Apollo iOS provides Selection Set Initializers to facilitate this.
+Being able to create instances of your generated operation models can be useful in a number of different ways: adding custom data to the normalized cache; setting up fixture data for SwiftUI previews or loading states; and as an alternative to [Test Mocks](../testing/test-mocks). Apollo iOS provides Selection Set Initializers to facilitate this.
 
 When code generation is configured to generate selection set initializers each Swift struct will have an initializer that accepts values for the selected fields (properties) defined in the struct, as well as some inherited fields.
 
@@ -17,9 +17,7 @@ For example, given the following generated operation model (details are omitted 
 ```swift
 public class HerosQuery: GraphQLQuery {
   public struct Data: GraphAPI.SelectionSet {
-    public static var __selections: [ApolloAPI.Selection] { [
-      .field("hero", Hero.self),
-    ] }
+    ...
 
     public var hero: Hero { __data["hero"] }
 
@@ -31,14 +29,7 @@ public class HerosQuery: GraphQLQuery {
     ///
     /// Parent Type: `Character`
     public struct Hero: GraphAPI.SelectionSet {
-      public static var __selections: [ApolloAPI.Selection] { [
-        .field("__typename", String.self),
-        .field("id", String.self),
-        .field("name", String.self),
-        .field("friends", [Friend]?.self),
-        .inlineFragment(AsHuman.self),
-        .inlineFragment(AsDroid.self),
-      ] }
+      ...
 
       public var id: String { __data["id"] }
       public var name: String { __data["name"] }
@@ -57,11 +48,7 @@ public class HerosQuery: GraphQLQuery {
       ///
       /// Parent Type: `Character`
       public struct Friend: GraphAPI.SelectionSet {
-        public static var __selections: [ApolloAPI.Selection] { [
-          .field("__typename", String.self),
-          .field("id", String.self),
-          .field("name", String.self),
-        ] }
+        ...
 
         public var id: String { __data["id"] }
         public var name: String { __data["name"] }
@@ -77,9 +64,7 @@ public class HerosQuery: GraphQLQuery {
       ///
       /// Parent Type: `Droid`
       public struct AsDroid: GraphAPI.InlineFragment {
-        public static var __selections: [ApolloAPI.Selection] { [
-          .field("primaryFunction", String?.self),
-        ] }
+        ...
 
         public var primaryFunction: String? { __data["primaryFunction"] }
         public var id: String { __data["id"] }
@@ -101,7 +86,7 @@ public class HerosQuery: GraphQLQuery {
 To create an instance of the `HerosQuery` class you would do the following:
 
 ```swift
-let modelData = HerosQuery.Data.init(
+let modelData = HerosQuery.Data(
   hero: HerosQuery.Data.Hero(
     __typename: "Human",
     id: "luke-skywalker",
@@ -119,7 +104,7 @@ let modelData = HerosQuery.Data.init(
 
 ### Type conditions
 
-If you use a [type condition](https://www.apollographql.com/docs/ios/fetching/type-conditions) in your operation you will notice that a struct is generated to match the type (`AsDroid` in the example above) but the generated initializer does not accept a value of that type.
+If you use a [type condition](../fetching/type-conditions) in your operation you will notice that a struct is generated to match the type (`AsDroid` in the example above) but the generated initializer does not accept a value of that type.
 
 In this case you must create an object of the required type and then use the `asRootEntityType` property to initialize the selection set:
 
@@ -137,7 +122,7 @@ let droid = HerosQuery.Data.Hero.AsDroid(
   ]
 )
 
-let modelData = HerosQuery.Data.init(
+let modelData = HerosQuery.Data(
   hero: droid.asRootEntityType
 )
 ```

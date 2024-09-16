@@ -301,7 +301,7 @@ let configuration = ApolloCodegenConfiguration(
 
 Operation files are generated from all the GraphQL operation definitions matched by your configuration's [`operationSearchPaths`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/fileinput/operationsearchpaths). Each operation (query, mutation, or subscription) and fragment definition will be created in a separate file.
 
-> To learn more about GraphQL operations, check out [Defining operations](../fetching/fetching-data#defining-operations)
+> To learn more about GraphQL operations, check out [Defining operations](../fetching/fetching-data#defining-operations).
 
 The `output.operations` property value determines the location of the generated operation files:
 
@@ -529,6 +529,8 @@ Manually initialized selection sets can be used for a number of purposes, includ
 
 You can configure initializers to be generated for all operations, all named fragments, or only select operations or named fragments instead. Initializers are always generated for local cache mutations. [SelectionSetInitializers](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/selectionsetinitializers) functions like an `OptionSet`, allowing you to combine multiple different instances together to indicate all the types you would like to generate initializers for.
 
+> To learn more about how to use Selection Set Initializers, check out [Using Selection Set Initializers](../development/selection-set-initializers).
+
 <MultiCodeBlock>
 
 ```json title="CLI Configuration JSON"
@@ -537,7 +539,7 @@ You can configure initializers to be generated for all operations, all named fra
     "operations": false
     "namedFragments" : false,
     "definitionsNamed": [
-      "MyOperation,
+      "MyOperation",
       "MyFragment"
     ]
   },
@@ -555,6 +557,8 @@ let configuration = ApolloCodegenConfiguration(
   )
 )
 ```
+
+</MultiCodeBlock>
 
 ### Schema Customization
 
