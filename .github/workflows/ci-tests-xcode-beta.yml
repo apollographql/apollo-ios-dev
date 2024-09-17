@@ -150,7 +150,6 @@ jobs:
     - name: Build and Test
       if: ${{ matrix.should-run == true || matrix.should-run == 'true' }}
       id: build-and-test
-      continue-on-error: true
       uses: ./.github/actions/build-and-run-unit-tests
       with:
         destination: ${{ matrix.destination }}
@@ -158,7 +157,6 @@ jobs:
         test-plan: ${{ matrix.test-plan }}
     - name: Run-JS-Tests
       if: ${{ matrix.run-js-tests == true }}
-      continue-on-error: true
       shell: bash
       working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript/
       run: |
