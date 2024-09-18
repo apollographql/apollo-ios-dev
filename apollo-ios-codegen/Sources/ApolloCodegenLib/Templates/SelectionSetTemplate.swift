@@ -478,16 +478,7 @@ struct SelectionSetTemplate {
 
     let typeName = inlineFragment.renderedTypeName
     return """
-      \(renderAccessControl())var \(typeName.firstLowercased): \(typeName)? {\
-      \(if: isMutable,
-      """
-
-        get { _asInlineFragment() }
-        set { if let newData = newValue?.__data._data { __data._data = newData }}
-      }
-      """,
-        else: " _asInlineFragment() }"
-      )
+      \(renderAccessControl())var \(typeName.firstLowercased): \(typeName)? { _asInlineFragment() }
       """
   }
 
