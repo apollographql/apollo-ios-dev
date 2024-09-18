@@ -150,7 +150,6 @@ jobs:
     - name: Build and Test
       if: ${{ matrix.should-run == true || matrix.should-run == 'true' }}
       id: build-and-test
-      continue-on-error: true
       uses: ./.github/actions/build-and-run-unit-tests
       with:
         destination: ${{ matrix.destination }}
@@ -158,33 +157,32 @@ jobs:
         test-plan: ${{ matrix.test-plan }}
     - name: Run-JS-Tests
       if: ${{ matrix.run-js-tests == true }}
-      continue-on-error: true
       shell: bash
       working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript/
       run: |
         npm install && npm test
     - name: Save xcodebuild logs
-      if: ${{ steps.build-and-test.outcome != 'skipped' }}
+      if: ${{ failure() }}
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.name }}-logs
         path: |
           DerivedData/Logs/Build
     - name: Save crash logs
-      if: ${{ steps.build-and-test.outcome != 'skipped' }}
+      if: ${{ failure() }}
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.name }}-crashes
         path: |
           ~/Library/Logs/DiagnosticReports
     - name: Zip Result Bundle
-      if: ${{ steps.build-and-test.outcome != 'skipped' }}
+      if: ${{ failure() }}
       shell: bash
       working-directory: TestResults
       run: |
         zip -r ResultBundle.zip ResultBundle.xcresult
     - name: Save test results
-      if: ${{ steps.build-and-test.outcome != 'skipped' }}
+      if: ${{ failure() }}
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.name }}-results
@@ -307,7 +305,6 @@ jobs:
         key: ${{ github.run_id }}-dependencies
         fail-on-cache-miss: true
     - name: Build and Test
-      continue-on-error: true
       uses: ./.github/actions/build-and-run-unit-tests
       with:
         destination: platform=macOS,arch=x86_64
