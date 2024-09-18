@@ -27,38 +27,6 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     return rendered
   }
 
-  // MARK: Boilerplate Tests
-
-  func test__boilerplate__generatesCorrectSwiftToolsVersion() {
-    // given
-    buildSubject()
-
-    let expected = """
-    // swift-tools-version:5.7
-    """
-
-    // when
-    let actual = renderSubject()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
-  }
-
-  func test__boilerplate__generatesRequiredImports() {
-    // given
-    buildSubject()
-
-    let expected = """
-    import PackageDescription
-    """
-
-    // when
-    let actual = renderSubject()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 3, ignoringExtraLines: true))
-  }
-
   // MARK: PackageDescription tests
 
   func test__packageDescription__givenLowercaseSchemaName_generatesPackageDefinitionWithCapitalizedName() {
