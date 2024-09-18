@@ -139,7 +139,7 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
   }
 
   // MARK: - Accessor Tests
@@ -263,7 +263,7 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
   }
 
-  func test__render_inlineFragmentAccessors__rendersAccessorWithGetterAndSetter() async throws {
+  func test__render_inlineFragmentAccessors__rendersAccessorWithGetterOnly() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -290,10 +290,7 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     """
 
     let expected = """
-      public var asDog: AsDog? {
-        get { _asInlineFragment() }
-        set { if let newData = newValue?.__data._data { __data._data = newData }}
-      }
+      public var asDog: AsDog? { _asInlineFragment() }
     """
 
     // when
@@ -391,7 +388,7 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 21, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
   }
 
   // MARK: - Casing Tests
@@ -435,7 +432,7 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
       public struct AsDog: Myschema.MutableInlineFragment {
     """
 
-    expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
   }
 
   func test__casingForMutableInlineFragment__givenUppercasedSchemaName_generatesUppercasedNamespace() async throws {
@@ -477,7 +474,7 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
       public struct AsDog: MYSCHEMA.MutableInlineFragment {
     """
 
-    expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
   }
 
   func test__casingForMutableInlineFragment__givenCapitalizedSchemaName_generatesCapitalizedNamespace() async throws {
@@ -519,6 +516,6 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
       public struct AsDog: MySchema.MutableInlineFragment {
     """
 
-    expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
   }
 }
