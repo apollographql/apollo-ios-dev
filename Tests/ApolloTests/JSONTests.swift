@@ -172,4 +172,18 @@ class JSONTests: XCTestCase {
     let converted = JSONConverter.convert(result)
     XCTAssertEqual(converted, expected)
   }
+
+  func testJSONDecodeDecimalAsString() throws {
+    let decimal1 = Decimal(0.0123456789)
+    let decimal2 = Decimal(0.0123456789e-10)
+
+    let jsonValue1 = JSONValue(decimal1)
+    let jsonValue2 = JSONValue(decimal2)
+
+    let string1 = try String(_jsonValue: jsonValue1)
+    let string2 = try String(_jsonValue: jsonValue2)
+
+    XCTAssertEqual(string1, decimal1.description)
+    XCTAssertEqual(string2, decimal2.description)
+  }
 }
