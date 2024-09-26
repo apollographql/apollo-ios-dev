@@ -41,12 +41,12 @@ class URLSessionClientTests: XCTestCase {
                                      statusCode: statusCode,
                                      httpVersion: httpVersion,
                                      headerFields: headerFields)
-      return .success((response!, responseData))
+      return .success((response!, responseData, nil))
     }
-    
+
     return request
   }
-  
+
   func testBasicGet() {
     let url = URL(string: "http://www.test.com/basicget")!
     let stringResponse = "Basic GET Response Data"
@@ -300,13 +300,90 @@ class URLSessionClientTests: XCTestCase {
     let client2 = URLSessionClient(sessionConfiguration: sessionConfiguration,
                                    sessionDescription: expected)
     XCTAssertEqual(expected, client2.session.sessionDescription)
-      
+
     client2.invalidate()
   }
-    
+
+  func testMultipartChunkedResponse() {
+    let url = URL(string: "http://www.test.com/multipartchunked")!
+    let boundary = "-"
+
+    let chunks = [
+      "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1--\(boundary)\"}}\r\n",
+      "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field2\": \"value2\"}}\r\n",
+      "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field3\": \"value3\"}}\r\n",
+      "--\(boundary)--"
+    ]
+
+    let fullResponse = chunks.joined()
+
+    Self.requestHandlers[url] = { request in
+      guard let requestURL = request.url else {
+        throw URLError(.badURL)
+      }
+
+      let response = HTTPURLResponse(
+        url: requestURL,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: ["Content-Type": "multipart/mixed; boundary=\(boundary)"]
+      )!
+
+      // Enable chunking for this specific request
+      let chunkingConfig = ChunkingConfig(chunkSize: 10)
+
+      return .success((response, fullResponse.data(using: .utf8), chunkingConfig))
+    }
+
+    let request = URLRequest(url: url, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 10)
+    let expectation = self.expectation(description: "Multipart chunked request completed")
+
+    self.client.sendRequest(request) { result in
+      switch result {
+      case .failure(let error):
+        switch error {
+          // Expected while we're accumulating data
+        case URLSessionClient.URLSessionClientError.cannotParseBoundaryData:
+          break
+        default:
+          XCTFail("Unexpected error: \(error)")
+        }
+        case .success(let (data, httpResponse)):
+          XCTAssert(httpResponse.isSuccessful)
+          XCTAssert(httpResponse.isMultipart)
+
+          guard let dataString = String(data: data, encoding: .utf8) else {
+              XCTFail("Invalid string in response")
+              return
+          }
+
+          let parts = dataString.components(separatedBy: "\r\n--\(boundary)")
+                          .filter { !$0.isEmpty && $0 != "--\(boundary)" }
+          for chunk in parts {
+              switch chunk {
+              case "--":
+                  expectation.fulfill()
+                  break
+              default:
+                // We should get complete pairs of <header> newline <JSON>
+                let chunkLines = chunk.components(separatedBy: "\r\n\r\n")
+                guard chunkLines.count == 2,
+                      let jsonData = chunkLines[1].data(using: String.Encoding.utf8),
+                      let _ = try? JSONSerialization.jsonObject(with: jsonData) else {
+                    XCTFail("Not a valid chunk: \(chunk)")
+                    return
+                }
+              }
+          }
+      }
+    }
+
+    self.wait(for: [expectation], timeout: 5)
+  }
+
   func testTaskDescription() {
     let url = URL(string: "http://www.test.com/taskDesciption")!
-    
+
     let request = request(for: url,
                           responseData: nil,
                           statusCode: -1)
