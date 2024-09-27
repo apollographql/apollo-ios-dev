@@ -41,7 +41,7 @@ class URLSessionClientTests: XCTestCase {
                                      statusCode: statusCode,
                                      httpVersion: httpVersion,
                                      headerFields: headerFields)
-      return .success((response!, responseData, nil))
+      return .success((response!, responseData))
     }
 
     return request
@@ -304,78 +304,104 @@ class URLSessionClientTests: XCTestCase {
     client2.invalidate()
   }
 
-  func testMultipartChunkedResponse() {
-    let url = URL(string: "http://www.test.com/multipartchunked")!
+  func testURLSessionDidReceiveWithMultipartResponse() {
     let boundary = "-"
+    let url = URL(string: "http://example.com/multipart")!
+    let response = HTTPURLResponse(
+      url: url,
+      statusCode: 200,
+      httpVersion: nil,
+      headerFields: ["Content-Type": "multipart/mixed; boundary=\(boundary)"]
+    )!
 
+    // Single chunk with all parts
+    let chunks = [[
+                    "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1\"}}\r\n",
+                    "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field2\": \"value2\"}}\r\n",
+                    "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field3\": \"value3\"}}\r\n",
+                    "--\(boundary)--\r\n"
+                  ].joined()]
+
+    let expectation = self.expectation(description: "Multipart response processed")
+    // We should get 4 parts (including the end boundary)
+    expectation.expectedFulfillmentCount = 4
+
+    // Register an URL handler in the mock protocol
+    let request = request(for: url, responseData: nil, statusCode: 200)
+    let task = self.client.sendRequest(request) { result in
+      handleMultipartResponse(result: result,
+                              boundary: boundary,
+                              expectation: expectation)
+    }
+
+    let mockTask = MockURLSessionDataTask(response: response, request: request, taskIdentifier: task.taskIdentifier)
+
+    self.client.urlSession(
+      URLSession.shared,
+      dataTask: mockTask,
+      didReceive: response,
+      completionHandler: { _ in }
+    )
+
+    for chunk in chunks {
+      // Send the next chunk
+      self.client.urlSession(
+        URLSession.shared,
+        dataTask: mockTask,
+        didReceive: chunk.data(using: .utf8)!
+      )
+    }
+
+    self.wait(for: [expectation], timeout: 5)
+  }
+
+  func testURLSessionDidReceiveWithInlineBoundaryMultipartResponse() {
+    let boundary = "-"
+    let url = URL(string: "http://example.com/multipart-boundary")!
+    let response = HTTPURLResponse(
+      url: url,
+      statusCode: 200,
+      httpVersion: nil,
+      headerFields: ["Content-Type": "multipart/mixed; boundary=\(boundary)"]
+    )!
+
+    // Incremental reception of parts. One of the chunks has a
+    // boundary inside it, which we should not treat as a boundary.
     let chunks = [
       "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1--\(boundary)\"}}\r\n",
       "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field2\": \"value2\"}}\r\n",
       "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field3\": \"value3\"}}\r\n",
-      "--\(boundary)--"
+      "--\(boundary)--\r\n"
     ]
 
-    let fullResponse = chunks.joined()
+    let expectation = self.expectation(description: "Multipart response processed")
+    // We should get 4 parts (including the end boundary)
+    expectation.expectedFulfillmentCount = 4
 
-    Self.requestHandlers[url] = { request in
-      guard let requestURL = request.url else {
-        throw URLError(.badURL)
-      }
-
-      let response = HTTPURLResponse(
-        url: requestURL,
-        statusCode: 200,
-        httpVersion: nil,
-        headerFields: ["Content-Type": "multipart/mixed; boundary=\(boundary)"]
-      )!
-
-      // Enable chunking for this specific request
-      let chunkingConfig = ChunkingConfig(chunkSize: 10)
-
-      return .success((response, fullResponse.data(using: .utf8), chunkingConfig))
+    // Register an URL handler in the mock protocol
+    let request = request(for: url, responseData: nil, statusCode: 200)
+    let task = self.client.sendRequest(request) { result in
+      handleMultipartResponse(result: result,
+                              boundary: boundary,
+                              expectation: expectation)
     }
 
-    let request = URLRequest(url: url, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 10)
-    let expectation = self.expectation(description: "Multipart chunked request completed")
+    let mockTask = MockURLSessionDataTask(response: response, request: request, taskIdentifier: task.taskIdentifier)
 
-    self.client.sendRequest(request) { result in
-      switch result {
-      case .failure(let error):
-        switch error {
-          // Expected while we're accumulating data
-        case URLSessionClient.URLSessionClientError.cannotParseBoundaryData:
-          break
-        default:
-          XCTFail("Unexpected error: \(error)")
-        }
-        case .success(let (data, httpResponse)):
-          XCTAssert(httpResponse.isSuccessful)
-          XCTAssert(httpResponse.isMultipart)
+    self.client.urlSession(
+      URLSession.shared,
+      dataTask: mockTask,
+      didReceive: response,
+      completionHandler: { _ in }
+    )
 
-          guard let dataString = String(data: data, encoding: .utf8) else {
-              XCTFail("Invalid string in response")
-              return
-          }
-
-          let parts = dataString.components(separatedBy: "\r\n--\(boundary)")
-                          .filter { !$0.isEmpty && $0 != "--\(boundary)" }
-          for chunk in parts {
-              switch chunk {
-              case "--":
-                  expectation.fulfill()
-                  break
-              default:
-                // We should get complete pairs of <header> newline <JSON>
-                let chunkLines = chunk.components(separatedBy: "\r\n\r\n")
-                guard chunkLines.count == 2,
-                      let jsonData = chunkLines[1].data(using: String.Encoding.utf8),
-                      let _ = try? JSONSerialization.jsonObject(with: jsonData) else {
-                    XCTFail("Not a valid chunk: \(chunk)")
-                    return
-                }
-              }
-          }
-      }
+    for chunk in chunks {
+      // Send the next chunk
+      self.client.urlSession(
+        URLSession.shared,
+        dataTask: mockTask,
+        didReceive: chunk.data(using: .utf8)!
+      )
     }
 
     self.wait(for: [expectation], timeout: 5)
@@ -420,7 +446,75 @@ extension URLSessionClientTests: MockRequestProvider {
   private static let testObserver = TestObserver() { _ in
     requestHandlers = [:]
   }
-  
+
   public static var requestHandlers = [URL: MockRequestHandler]()
-  
+
+}
+
+// Utility function for validating multipart responses
+func handleMultipartResponse(result: Result<(Data, HTTPURLResponse), any Error>,
+                             boundary: String,
+                             expectation: XCTestExpectation) {
+  switch result {
+  case .failure(let error):
+    switch error {
+    case URLSessionClient.URLSessionClientError.cannotParseBoundaryData:
+      // Expected while we're accumulating data
+      break
+    default:
+      XCTFail("Unexpected error: \(error)")
+    }
+    case .success(let (data, _)):
+      guard let dataString = String(data: data, encoding: .utf8) else {
+        XCTFail("Invalid string in response")
+        return
+      }
+
+      // strip boundary prefixes, to allow parsing JSON
+      let parts = dataString.trimmingCharacters(in: .newlines)
+        .components(separatedBy: "\r\n--\(boundary)")
+        .filter { !$0.isEmpty && $0 != "---" }
+
+      for chunk in parts {
+        expectation.fulfill()
+        switch chunk {
+        case "--":
+          break
+        default:
+          let chunkLines = chunk.components(separatedBy: "\r\n\r\n")
+          guard chunkLines.count == 2,
+                let jsonData = chunkLines[1].data(using: .utf8),
+                let _ = try? JSONSerialization.jsonObject(with: jsonData) else {
+            XCTFail("Not a valid chunk: \(chunk)")
+            return
+          }
+        }
+      }
+  }
+}
+
+
+class MockURLSessionDataTask: URLSessionDataTask {
+    var mockResponse: URLResponse?
+    var mockOriginalRequest: URLRequest?
+    var mockTaskIdentifier: Int
+
+    init(response: URLResponse?, request: URLRequest?, taskIdentifier: Int) {
+        self.mockResponse = response
+        self.mockOriginalRequest = request
+        self.mockTaskIdentifier = taskIdentifier
+        super.init()
+    }
+
+    override var response: URLResponse? {
+        return mockResponse
+    }
+
+    override var originalRequest: URLRequest? {
+        return mockOriginalRequest
+    }
+
+    override var taskIdentifier: Int {
+        return mockTaskIdentifier
+    }
 }
