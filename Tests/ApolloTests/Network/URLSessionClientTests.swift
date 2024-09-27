@@ -369,8 +369,9 @@ class URLSessionClientTests: XCTestCase {
     // boundary inside it, which we should not treat as a boundary.
     let chunks = [
       "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1--\(boundary)\"}}\r\n",
-      "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field2\": \"value2\"}}\r\n",
-      "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field3\": \"value3\"}}\r\n",
+      "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field2\": \"value2\"}}",
+      // Check that we don't make any assumptions about placement of the CRLF
+      "\r\n--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field3\": \"value3\"}}\r\n",
       "--\(boundary)--\r\n"
     ]
 

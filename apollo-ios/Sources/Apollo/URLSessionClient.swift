@@ -302,7 +302,7 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
       guard
         let dataString = String(data: taskData.data, encoding: .utf8),
         let lastBoundaryIndex = dataString.range(of: boundaryMarker, options: .backwards)?.upperBound,
-        let boundaryData = dataString.prefix(upTo: lastBoundaryIndex).trimmingCharacters(in: .newlines).data(using: .utf8)
+        let boundaryData = dataString.prefix(upTo: lastBoundaryIndex).data(using: .utf8)
       else {
         taskData.completionBlock(.failure(URLSessionClientError.cannotParseBoundaryData))
         return
