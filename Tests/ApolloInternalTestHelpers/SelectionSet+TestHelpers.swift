@@ -1,5 +1,5 @@
-@testable import ApolloAPI
-@testable import Apollo
+import ApolloAPI
+import Apollo
 
 public extension SelectionSet {
 

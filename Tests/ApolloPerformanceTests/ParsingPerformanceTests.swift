@@ -67,7 +67,7 @@ class ParsingPerformanceTests: XCTestCase {
         statusCode: 200,
         httpVersion: nil,
         headerFields: [
-          "Content-Type": "multipart/mixed;boundary=graphql",
+          "Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0",
         ])!,
       rawData: rawData.crlfFormattedData(),
       parsedResponse: nil)
