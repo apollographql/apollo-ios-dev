@@ -43,10 +43,10 @@ class URLSessionClientTests: XCTestCase {
                                      headerFields: headerFields)
       return .success((response!, responseData))
     }
-
+    
     return request
   }
-
+  
   func testBasicGet() {
     let url = URL(string: "http://www.test.com/basicget")!
     let stringResponse = "Basic GET Response Data"
@@ -300,7 +300,7 @@ class URLSessionClientTests: XCTestCase {
     let client2 = URLSessionClient(sessionConfiguration: sessionConfiguration,
                                    sessionDescription: expected)
     XCTAssertEqual(expected, client2.session.sessionDescription)
-
+    
     client2.invalidate()
   }
 
@@ -409,7 +409,7 @@ class URLSessionClientTests: XCTestCase {
 
   func testTaskDescription() {
     let url = URL(string: "http://www.test.com/taskDesciption")!
-
+    
     let request = request(for: url,
                           responseData: nil,
                           statusCode: -1)
@@ -446,9 +446,8 @@ extension URLSessionClientTests: MockRequestProvider {
   private static let testObserver = TestObserver() { _ in
     requestHandlers = [:]
   }
-
+  
   public static var requestHandlers = [URL: MockRequestHandler]()
-
 }
 
 // Utility function for validating multipart responses
