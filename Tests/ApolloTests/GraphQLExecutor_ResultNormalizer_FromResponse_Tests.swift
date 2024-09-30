@@ -176,6 +176,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertEqual(luke["name"] as? String, "Luke Skywalker")
   }
 
+  @MainActor
   func test__execute__givenObjectWithCacheKey_andNestedArrayOfObjectsWithCacheKey_normalizesRecordsToIndividualReferences() throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
@@ -199,7 +200,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       }
     }
 
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
 
     let object: JSONObject = [
       "hero": [
@@ -275,6 +276,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertEqual(hero["catchphrase"] as? String, "Beeeeeeeeeeeeeep")
   }
 
+  @MainActor
   func test__execute__givenDifferentAliasedFieldsOnTwoTypeCasesWithSameAlias_givenIsFirstType_hasRecordWithFieldValueUsingNonaliasedFieldName() throws {
     // given
     struct Types {
@@ -282,13 +284,13 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       static let Droid = Object(typename: "Droid", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       case "Droid": return Types.Droid
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -332,6 +334,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertNil(hero["primaryFunction"])
   }
 
+  @MainActor
   func test__execute__givenDifferentAliasedFieldsOnTwoTypeCasesWithSameAlias_givenIsSecondType_hasRecordWithFieldValueUsingNonaliasedFieldName() throws {
     // given
     struct Types {
@@ -339,13 +342,13 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       static let Droid = Object(typename: "Droid", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       case "Droid": return Types.Droid
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -390,6 +393,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertNil(hero["name"])
   }
 
+  @MainActor
   func test__execute__givenSameFieldWithDifferentArgumentValueOnSameNestedFieldOnTwoTypeCases_givenIsFirstType_hasRecordForFieldNameWithFirstTypesArgument() throws {
     // given
     struct Types {
@@ -397,13 +401,14 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       static let Droid = Object(typename: "Droid", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       case "Droid": return Types.Droid
       default: XCTFail(); return nil
       }
-    }
+    })
+
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self),
@@ -462,6 +467,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertNil(han["height"])
   }
 
+  @MainActor
   func test__execute__givenSameFieldWithDifferentArgumentValueOnSameNestedFieldOnTwoTypeCases_givenIsSecondType_hasRecordForFieldNameWithFirstTypesArgument() throws {
     // given
     struct Types {
@@ -469,13 +475,13 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       static let Droid = Object(typename: "Droid", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       case "Droid": return Types.Droid
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[

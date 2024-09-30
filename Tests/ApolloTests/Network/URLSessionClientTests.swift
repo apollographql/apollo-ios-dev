@@ -7,6 +7,7 @@ class URLSessionClientTests: XCTestCase {
   var client: URLSessionClient!
   var sessionConfiguration: URLSessionConfiguration!
 
+  @MainActor
   override func setUp() {
     super.setUp()
     Self.testObserver.start()
@@ -339,7 +340,8 @@ class URLSessionClientTests: XCTestCase {
 }
 
 extension URLSessionClientTests: MockRequestProvider {
-  
+
+  @MainActor
   private static let testObserver = TestObserver() { _ in
     requestHandlers = [:]
   }

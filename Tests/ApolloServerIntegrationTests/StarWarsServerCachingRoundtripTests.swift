@@ -21,10 +21,10 @@ class StarWarsServerCachingRoundtripTests: XCTestCase, CacheDependentTesting {
   var store: ApolloStore!
   var client: ApolloClient!
   
-  override func setUpWithError() throws {
-    try super.setUpWithError()
-    
-    cache = try makeNormalizedCache()
+  override func setUp() async throws {
+    try await super.setUp()
+
+    cache = try await makeNormalizedCache()
     store = ApolloStore(cache: cache)
     let provider = DefaultInterceptorProvider(store: store)
     let network = RequestChainNetworkTransport(interceptorProvider: provider,
