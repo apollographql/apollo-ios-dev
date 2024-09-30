@@ -294,7 +294,8 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       wait(for: [serverRequestExpectation, otherFetchCompletedExpectation, noUpdatedResultExpectation], timeout: Self.defaultWaitTimeout)
     }
   }
-  
+
+  @MainActor
   func testWatchedQueryGetsUpdatedWhenSameObjectHasChangedInAnotherQueryWithDifferentVariables() throws {
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -310,7 +311,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
 
     let watchedQuery = MockQuery<GivenSelectionSet>()
     watchedQuery.__variables = ["episode": "EMPIRE"]
@@ -515,7 +516,8 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       wait(for: [serverRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
     }
   }
-  
+
+  @MainActor
   func testListInWatchedQueryGetsUpdatedByListOfKeysFromOtherQuery() throws {
     class HeroAndFriendsIdsSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -571,7 +573,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         }
       }
     }
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
     
     let watchedQuery = MockQuery<HeroAndFriendsNameSelectionSet>()
     
@@ -660,7 +662,8 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       wait(for: [serverRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
     }
   }
-  
+
+  @MainActor
   func testWatchedQueryRefetchesFromServerAfterOtherQueryUpdatesListWithIncompleteObject() throws {
     class HeroAndFriendsIDsSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -716,7 +719,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
     
     let watchedQuery = MockQuery<HeroAndFriendsNameWithIDsSelectionSet>()
     
@@ -826,6 +829,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     }
   }
 
+  @MainActor
   func testWatchedQuery_givenRefetchOnFailedUpdates_false_doesNotRefetchFromServerAfterOtherQueryUpdatesListWithIncompleteObject() throws {
     class HeroAndFriendsIDsSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -881,7 +885,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
 
     let watchedQuery = MockQuery<HeroAndFriendsNameWithIDsSelectionSet>()
 
@@ -1092,6 +1096,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     }
   }
 
+  @MainActor
   func testWatchedQuery_givenCachePolicyReturnCacheDataDontFetch_doesNotRefetchFromServerAfterOtherQueryUpdatesListWithIncompleteObject() throws {
     // given
     struct HeroAndFriendsNamesSelectionSet: MockMutableRootSelectionSet {
@@ -1206,7 +1211,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
 
     let watchedQuery = MockQuery<HeroAndFriendsNamesSelectionSet>()
 
@@ -1503,6 +1508,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     }
   }
 
+  @MainActor
   func testWatchedQueryDependentKeysAreUpdatedAfterDirectStoreUpdate() {
     // given
     struct HeroAndFriendsNamesWithIDsSelectionSet: MockMutableRootSelectionSet {
@@ -1567,7 +1573,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
 
     typealias HeroAndFriendsNamesWithIDsQuery = MockQuery<HeroAndFriendsNamesWithIDsSelectionSet>
     let watchedQuery = HeroAndFriendsNamesWithIDsQuery()
@@ -1671,6 +1677,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     }
   }
 
+  @MainActor
   func testWatchedQueryDependentKeysAreUpdatedAfterOtherFetchReturnsChangedData() {
     class HeroAndFriendsNameWithIDsSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -1701,7 +1708,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
     
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
 
     let watchedQuery = MockQuery<HeroAndFriendsNameWithIDsSelectionSet>()
 
@@ -1821,6 +1828,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     }
   }
 
+  @MainActor
   func testQueryWatcherDoesNotHaveARetainCycle() {
     class HeroAndFriendsNameWithIDsSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -1850,7 +1858,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         }
       }
     }
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
 
     let watchedQuery = MockQuery<HeroAndFriendsNameWithIDsSelectionSet>()
 

@@ -620,6 +620,7 @@ class SelectionSetTests: XCTestCase {
 
   // MARK: - TypeCase Conversion Tests
 
+  @MainActor
   func test__asInlineFragment_givenObjectType_returnsTypeIfCorrectType() {
     // given
     struct Types {
@@ -627,13 +628,13 @@ class SelectionSetTests: XCTestCase {
       static let Droid = Object(typename: "Droid", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       case "Droid": return Types.Droid
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -679,6 +680,7 @@ class SelectionSetTests: XCTestCase {
     expect(actual.asDroid).toNot(beNil())
   }
 
+  @MainActor
   func test__asInlineFragment_givenInterfaceType_typeForTypeNameImplementsInterface_returnsType() {
     // given
     struct Types {
@@ -686,12 +688,12 @@ class SelectionSetTests: XCTestCase {
       static let Human = Object(typename: "Human", implementedInterfaces: [Humanoid])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -726,6 +728,7 @@ class SelectionSetTests: XCTestCase {
     expect(actual.asHumanoid).toNot(beNil())
   }
 
+  @MainActor
   func test__asInlineFragment_givenInterfaceType_typeForTypeNameDoesNotImplementInterface_returnsNil() {
     // given
     struct Types {
@@ -733,12 +736,12 @@ class SelectionSetTests: XCTestCase {
       static let Droid = Object(typename: "Droid", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Droid": return Types.Droid
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -773,6 +776,7 @@ class SelectionSetTests: XCTestCase {
     expect(actual.asHumanoid).to(beNil())
   }
 
+  @MainActor
   func test__asInlineFragment_givenUnionType_typeNameIsTypeInUnionPossibleTypes_returnsType() {
     // given
     enum Types {
@@ -780,12 +784,12 @@ class SelectionSetTests: XCTestCase {
       static let Character = Union(name: "Character", possibleTypes: [Types.Human])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -819,6 +823,7 @@ class SelectionSetTests: XCTestCase {
     expect(actual.asCharacter).toNot(beNil())
   }
 
+  @MainActor
   func test__asInlineFragment_givenUnionType_typeNameNotIsTypeInUnionPossibleTypes_returnsNil() {
     // given
     enum Types {
@@ -826,12 +831,12 @@ class SelectionSetTests: XCTestCase {
       static let Character = Union(name: "Character", possibleTypes: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -865,6 +870,7 @@ class SelectionSetTests: XCTestCase {
     expect(actual.asCharacter).to(beNil())
   }
 
+  @MainActor
   func test__asInlineFragment_givenInterfaceTypeOnOperationRoot_typeImplementsInterface_returnsType() {
     // given
     struct Types {
@@ -872,12 +878,12 @@ class SelectionSetTests: XCTestCase {
       static let Query = Object(typename: "Query", implementedInterfaces: [AdminQuery])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Query": return Types.Query
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class RootData: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -977,6 +983,7 @@ class SelectionSetTests: XCTestCase {
 
   // MARK: - Initializer Tests
 
+  @MainActor
   func test__selectionInitializer_givenInitTypeWithTypeCondition__canConvertToConditionalType() {
     // given
     struct Types {
@@ -984,12 +991,12 @@ class SelectionSetTests: XCTestCase {
       static let Human = Object(typename: "Human", implementedInterfaces: [Animal])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1034,6 +1041,7 @@ class SelectionSetTests: XCTestCase {
     expect(actual.asAnimal?.name).to(equal("Artoo"))
   }
 
+  @MainActor
   func test__selectionInitializer_givenInitNestedTypeWithTypeCondition__canConvertToConditionalType() {
     // given
     struct Types {
@@ -1042,12 +1050,12 @@ class SelectionSetTests: XCTestCase {
       static let Human = Object(typename: "Human", implementedInterfaces: [Animal])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Data: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1112,18 +1120,19 @@ class SelectionSetTests: XCTestCase {
     expect(actual.hero.asAnimal?.name).to(equal("Artoo"))
   }
 
+  @MainActor
   func test__selectionInitializer_givenInitTypeWithInclusionCondition__canConvertToConditionalType() {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1167,18 +1176,19 @@ class SelectionSetTests: XCTestCase {
     expect(actual.ifA?.name).to(equal("Han Solo"))
   }
 
+  @MainActor
   func test__selectionInitializer_givenInitTypeWithInclusionCondition__cannotConvertToOtherConditionalType() {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1228,6 +1238,7 @@ class SelectionSetTests: XCTestCase {
     expect(actual.ifB).to(beNil())
   }
 
+  @MainActor
   func test__selectionInitializer_givenInitNestedTypeWithInclusionCondition__cannotConvertToOtherConditionalType() {
     // given
     struct Types {
@@ -1235,12 +1246,12 @@ class SelectionSetTests: XCTestCase {
       static let Query = Object(typename: "Query", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Data: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1361,18 +1372,19 @@ class SelectionSetTests: XCTestCase {
     expect(actual.hero.ifB).to(beNil())
   }
 
+  @MainActor
   func test__selectionInitializer_givenInitMultipleTypesWithConflictingInclusionConditions__canConvertToAllConditionalTypes() {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1416,18 +1428,19 @@ class SelectionSetTests: XCTestCase {
 
   // MARK: Initializer - Optional Field Tests
 
+  @MainActor
   func test__selectionInitializer_givenOptionalScalarField__fieldIsPresentWithOptionalNilValue() {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1477,18 +1490,19 @@ class SelectionSetTests: XCTestCase {
     }
   }
 
+  @MainActor
   func test__selectionInitializer_givenOptionalEntityField__fieldIsPresentWithOptionalNilValue() {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1559,18 +1573,19 @@ class SelectionSetTests: XCTestCase {
     }
   }
 
+  @MainActor
   func test__selectionInitializer_givenOptionalListOfOptionalEntitiesField__setsFieldDataCorrectly() {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1624,18 +1639,19 @@ class SelectionSetTests: XCTestCase {
     expect(actual.friends?[2]?.name).to(equal("Leia"))
   }
 
+  @MainActor
   func test__selectionInitializer_givenOptionalListOfOptionalScalarsField__setsFieldDataCorrectly() {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata

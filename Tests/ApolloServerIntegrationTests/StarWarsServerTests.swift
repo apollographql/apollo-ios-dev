@@ -48,12 +48,12 @@ class StarWarsServerTests: XCTestCase, CacheDependentTesting {
   var cache: (any NormalizedCache)!
   var client: ApolloClient!
   
-  override func setUpWithError() throws {
-    try super.setUpWithError()
-    
+  override func setUp() async throws {
+    try await super.setUp()
+
     config = DefaultConfig()
-    
-    cache = try makeNormalizedCache()
+
+    cache = try await makeNormalizedCache()
     let store = ApolloStore(cache: cache)
     
     client = ApolloClient(networkTransport: config.network(store: store), store: store)

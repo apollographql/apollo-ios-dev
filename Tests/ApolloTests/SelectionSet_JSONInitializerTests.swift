@@ -4,6 +4,7 @@ import ApolloAPI
 import ApolloInternalTestHelpers
 import Nimble
 
+@MainActor
 class SelectionSet_JSONInitializerTests: XCTestCase {
 
   func test__initFromJSON__withFragment_canAccessFragment() throws {
@@ -12,12 +13,12 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class GivenFragment: MockFragment {
       override class var __parentType: any ParentType { Types.Human }
@@ -62,12 +63,12 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -97,12 +98,12 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -134,12 +135,12 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       static let Human = Object(typename: "Human", implementedInterfaces: [Character.self, Hero.self])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Character: MockSelectionSet {
       typealias Schema = MockSchemaMetadata

@@ -9,31 +9,39 @@ public class MockSchemaMetadata: SchemaMetadata {
   public init() { }
 
   public static var _configuration: SchemaConfiguration.Type = SchemaConfiguration.self
-  public static var configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
+  public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
 
+  @MainActor
   private static let testObserver = TestObserver() { _ in
-    stub_objectTypeForTypeName = nil
-    stub_cacheKeyInfoForType_Object = nil
+    stub_objectTypeForTypeName(nil)
+    stub_cacheKeyInfoForType_Object(nil)
   }
 
-  public static var stub_objectTypeForTypeName: ((String) -> Object?)? {
-    didSet {
-      if stub_objectTypeForTypeName != nil { testObserver.start() }
+  private static var _objectTypeForTypeName: ((String) -> Object?)?
+  public static var objectTypeForTypeName: ((String) -> Object?)? {
+      _objectTypeForTypeName
+  }
+
+  @MainActor
+  public static func stub_objectTypeForTypeName(_ stub: ((String) -> Object?)?) {
+    _objectTypeForTypeName = stub
+    if _objectTypeForTypeName != nil {
+      testObserver.start()
     }
   }
 
-  public static var stub_cacheKeyInfoForType_Object: ((Object, ObjectData) -> CacheKeyInfo?)? {
-    get {
-      _configuration.stub_cacheKeyInfoForType_Object
-    }
-    set {
-      _configuration.stub_cacheKeyInfoForType_Object = newValue
-      if newValue != nil { testObserver.start() }
+  @MainActor
+  public static func stub_cacheKeyInfoForType_Object(
+    _ stub: ((Object, ObjectData) -> CacheKeyInfo?)?
+  ){
+    _configuration.stub_cacheKeyInfoForType_Object = stub
+    if stub != nil {
+      testObserver.start()
     }
   }
 
   public static func objectType(forTypename __typename: String) -> Object? {
-    if let stub = stub_objectTypeForTypeName {
+    if let stub = objectTypeForTypeName {
       return stub(__typename)
     }
 

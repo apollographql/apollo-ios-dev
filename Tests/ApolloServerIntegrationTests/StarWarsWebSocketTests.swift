@@ -16,10 +16,10 @@ class StarWarsWebSocketTests: XCTestCase, CacheDependentTesting {
   var cache: (any NormalizedCache)!
   var client: ApolloClient!
   
-  override func setUpWithError() throws {
-    try super.setUpWithError()
+  override func setUp() async throws {
+    try await super.setUp()
         
-    cache = try makeNormalizedCache()
+    cache = try await makeNormalizedCache()
     let store = ApolloStore(cache: cache)
     
     let networkTransport = WebSocketTransport(
