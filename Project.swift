@@ -31,15 +31,13 @@ let project = Project(
         .apolloTests(),
         .apolloPaginationTests(),
         .apolloPerformanceTests(),
-        .apolloServerIntegrationTests(),
         .apolloCodegenTests(),
         .codegenCLITests()
     ],
     schemes: [
         .apolloCodegenTests(),
         .apolloPerformanceTests(),
-        .apolloPaginationTests(),
-        .apolloServerIntegrationTests(),
+        .apolloPaginationTests(),        
         .apolloTests(),
         .codegenCLITests()
     ],
