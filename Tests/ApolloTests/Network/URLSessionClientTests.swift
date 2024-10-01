@@ -568,29 +568,3 @@ func handleMultipartResponse(result: Result<(Data, HTTPURLResponse), any Error>,
       }
   }
 }
-
-
-class MockURLSessionDataTask: URLSessionDataTask {
-    var mockResponse: URLResponse?
-    var mockOriginalRequest: URLRequest?
-    var mockTaskIdentifier: Int
-
-    init(response: URLResponse?, request: URLRequest?, taskIdentifier: Int) {
-        self.mockResponse = response
-        self.mockOriginalRequest = request
-        self.mockTaskIdentifier = taskIdentifier
-        super.init()
-    }
-
-    override var response: URLResponse? {
-        return mockResponse
-    }
-
-    override var originalRequest: URLRequest? {
-        return mockOriginalRequest
-    }
-
-    override var taskIdentifier: Int {
-        return mockTaskIdentifier
-    }
-}
