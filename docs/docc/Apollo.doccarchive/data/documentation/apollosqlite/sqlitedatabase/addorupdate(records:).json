@@ -9,11 +9,11 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/addOrUpdateRecordString(_:for:)"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/addOrUpdate(records:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:12ApolloSQLite0B8DatabaseP23addOrUpdateRecordString_3forySS_SStKF",
+    "externalID" : "s:12ApolloSQLite0B8DatabaseP11addOrUpdate7recordsySaySS8cacheKey_SS12recordStringtG_tKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -25,24 +25,19 @@
       },
       {
         "kind" : "identifier",
-        "text" : "addOrUpdateRecordString"
+        "text" : "addOrUpdate"
       },
       {
         "kind" : "text",
         "text" : "("
       },
       {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:SS",
-        "text" : "String"
+        "kind" : "externalParam",
+        "text" : "records"
       },
       {
         "kind" : "text",
-        "text" : ", "
-      },
-      {
-        "kind" : "externalParam",
-        "text" : "for"
+        "text" : ": [(cacheKey"
       },
       {
         "kind" : "text",
@@ -55,7 +50,20 @@
       },
       {
         "kind" : "text",
-        "text" : ") "
+        "text" : ", recordString"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
+      },
+      {
+        "kind" : "text",
+        "text" : ")]) "
       },
       {
         "kind" : "keyword",
@@ -71,7 +79,7 @@
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
-    "title" : "addOrUpdateRecordString(_:for:)"
+    "title" : "addOrUpdate(records:)"
   },
   "primaryContentSections" : [
     {
@@ -94,7 +102,7 @@
             },
             {
               "kind" : "identifier",
-              "text" : "addOrUpdateRecordString"
+              "text" : "addOrUpdate"
             },
             {
               "kind" : "text",
@@ -102,40 +110,11 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "_"
+              "text" : "records"
             },
             {
               "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "internalParam",
-              "text" : "recordString"
-            },
-            {
-              "kind" : "text",
-              "text" : ": "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:SS",
-              "text" : "String"
-            },
-            {
-              "kind" : "text",
-              "text" : ", "
-            },
-            {
-              "kind" : "externalParam",
-              "text" : "for"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "internalParam",
-              "text" : "cacheKey"
+              "text" : ": [(cacheKey"
             },
             {
               "kind" : "text",
@@ -148,7 +127,20 @@
             },
             {
               "kind" : "text",
-              "text" : ") "
+              "text" : ", recordString"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
+            },
+            {
+              "kind" : "text",
+              "text" : ")]) "
             },
             {
               "kind" : "keyword",
@@ -171,7 +163,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/sqlitedatabase\/addorupdaterecordstring(_:for:)"
+        "\/documentation\/apollosqlite\/sqlitedatabase\/addorupdate(records:)"
       ],
       "traits" : [
         {
@@ -256,7 +248,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/sqlitedatabase"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDatabase/addOrUpdateRecordString(_:for:)": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDatabase/addOrUpdate(records:)": {
   "abstract" : [
 
   ],
@@ -271,24 +263,19 @@
     },
     {
       "kind" : "identifier",
-      "text" : "addOrUpdateRecordString"
+      "text" : "addOrUpdate"
     },
     {
       "kind" : "text",
       "text" : "("
     },
     {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
+      "kind" : "externalParam",
+      "text" : "records"
     },
     {
       "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "for"
+      "text" : ": [(cacheKey"
     },
     {
       "kind" : "text",
@@ -301,20 +288,33 @@
     },
     {
       "kind" : "text",
-      "text" : ") "
+      "text" : ", recordString"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ")]) "
     },
     {
       "kind" : "keyword",
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/addOrUpdateRecordString(_:for:)",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/addOrUpdate(records:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
-  "title" : "addOrUpdateRecordString(_:for:)",
+  "title" : "addOrUpdate(records:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedatabase\/addorupdaterecordstring(_:for:)"
+  "url" : "\/documentation\/apollosqlite\/sqlitedatabase\/addorupdate(records:)"
 }
 }
 }

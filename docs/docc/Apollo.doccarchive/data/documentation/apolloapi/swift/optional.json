@@ -226,6 +226,14 @@
         "type" : "text"
       },
       {
+        "code" : "AnyScalarType",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " and ",
+        "type" : "text"
+      },
+      {
         "code" : "Hashable",
         "type" : "codeVoice"
       },

@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Customization options to be applie to the schema during code generation.",
+      "text" : "Customization options to be applied to the schema during code generation.",
       "type" : "text"
     }
   ],
@@ -216,7 +216,7 @@
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/OutputOptions/schemaCustomization": {
   "abstract" : [
     {
-      "text" : "Customization options to be applie to the schema during code generation.",
+      "text" : "Customization options to be applied to the schema during code generation.",
       "type" : "text"
     }
   ],
