@@ -1,35 +1,27 @@
 {
-  "abstract" : [
+  "defaultImplementationsSections" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "SQLiteDatabase.addOrUpdateRecordString(_:for:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
+      "identifiers" : [
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/addOrUpdateRecordString(_:for:)-8xg0a"
+      ],
+      "title" : "SQLiteDatabase Implementations"
     }
   ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/SQLiteDatabase-Implementations"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/addOrUpdateRecordString(_:for:)"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/addOrUpdateRecordString(_:for:)-4jvew"
   },
   "kind" : "symbol",
   "metadata" : {
-    "extendedModule" : "ApolloSQLite",
-    "externalID" : "s:12ApolloSQLite0B8DatabasePAAE23addOrUpdateRecordString_3forySS_SStKF::SYNTHESIZED::s:12ApolloSQLite0B16DotSwiftDatabaseC",
+    "externalID" : "s:12ApolloSQLite0B8DatabaseP23addOrUpdateRecordString_3forySS_SStKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -83,6 +75,10 @@
         "name" : "ApolloSQLite"
       }
     ],
+    "platforms" : [
+
+    ],
+    "required" : true,
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
@@ -186,7 +182,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/addorupdaterecordstring(_:for:)"
+        "\/documentation\/apollosqlite\/sqlitedatabase\/addorupdaterecordstring(_:for:)-4jvew"
       ],
       "traits" : [
         {
@@ -240,14 +236,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDatabase": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "protocol"
     },
     {
       "kind" : "text",
@@ -255,34 +251,85 @@
     },
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "SQLiteDatabase"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "SQLiteDatabase"
     }
   ],
   "role" : "symbol",
-  "title" : "SQLiteDotSwiftDatabase",
+  "title" : "SQLiteDatabase",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+  "url" : "\/documentation\/apollosqlite\/sqlitedatabase"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/SQLiteDatabase-Implementations": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDatabase/addOrUpdateRecordString(_:for:)-4jvew": {
   "abstract" : [
 
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/SQLiteDatabase-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "SQLiteDatabase Implementations",
+  "defaultImplementations" : 1,
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "addOrUpdateRecordString"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "for"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo8CacheKeya",
+      "text" : "CacheKey"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/addOrUpdateRecordString(_:for:)-4jvew",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "addOrUpdateRecordString(_:for:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/sqlitedatabase-implementations"
+  "url" : "\/documentation\/apollosqlite\/sqlitedatabase\/addorupdaterecordstring(_:for:)-4jvew"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/addOrUpdateRecordString(_:for:)": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDatabase/addOrUpdateRecordString(_:for:)-8xg0a": {
   "abstract" : [
 
   ],
@@ -334,12 +381,12 @@
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/addOrUpdateRecordString(_:for:)",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/addOrUpdateRecordString(_:for:)-8xg0a",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "addOrUpdateRecordString(_:for:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/addorupdaterecordstring(_:for:)"
+  "url" : "\/documentation\/apollosqlite\/sqlitedatabase\/addorupdaterecordstring(_:for:)-8xg0a"
 }
 }
 }
