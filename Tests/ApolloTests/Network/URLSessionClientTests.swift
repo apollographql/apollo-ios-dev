@@ -517,7 +517,7 @@ class URLSessionClientTests: XCTestCase {
     self.wait(for: [expectation], timeout: 1)
   }
 
-  func test__multipart__givenChunkContainingBoundaryStringWithoutClosingBoundary_shouldNotSplitChunk_shouldFail() throws {
+  func test__multipart__givenChunkContainingBoundaryStringWithoutClosingBoundary_shouldNotSplitChunk() throws {
     let url = URL(string: "http://www.test.com/multipart-without-closing-boundary")!
     let boundary = "-"
     let multipartString = "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1--\(boundary)\"}}"
