@@ -340,7 +340,7 @@ class URLSessionClientTests: XCTestCase {
   // MARK: Multipart Tests
 
   func test__multipart__givenSingleChunk_shouldReturnSingleChunk() throws {
-    let url = URL(string: "http://www.test.com/multipart")!
+    let url = URL(string: "http://www.test.com/multipart-single-chunk")!
     let boundary = "-"
     let multipartString = "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1\"}}\r\n--\(boundary)--"
 
@@ -384,7 +384,7 @@ class URLSessionClientTests: XCTestCase {
   }
 
   func test__multipart__givenMultipleChunks_shouldReturnAllChunks() throws {
-    let url = URL(string: "http://www.test.com/multipart")!
+    let url = URL(string: "http://www.test.com/multipart-many-chunks")!
     let boundary = "-"
     let multipartString = "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1\"}}\r\n--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field2\": \"value2\"}}\r\n--\(boundary)--"
 
@@ -428,7 +428,7 @@ class URLSessionClientTests: XCTestCase {
   }
 
   func test__multipart__givenCompleteAndPartialChunks_shouldReturnCompleteChunkSeparateFromPartialChunk() throws {
-    let url = URL(string: "http://www.test.com/multipart")!
+    let url = URL(string: "http://www.test.com/multipart-complete-and-partial-chunk")!
     let boundary = "-"
     let completeChunk = "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1\"}}"
     let partialChunk = "\r\n--\(boundary)\r\nConte"
@@ -474,7 +474,7 @@ class URLSessionClientTests: XCTestCase {
   }
 
   func test__multipart__givenChunkContainingBoundaryString_shouldNotSplitChunk() throws {
-    let url = URL(string: "http://www.test.com/multipart")!
+    let url = URL(string: "http://www.test.com/multipart-containing-boundary-string")!
     let boundary = "-"
     let multipartString = "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1--\(boundary)\"}}\r\n--\(boundary)--"
 
@@ -518,7 +518,7 @@ class URLSessionClientTests: XCTestCase {
   }
 
   func test__multipart__givenChunkContainingBoundaryStringWithoutClosingBoundary_shouldNotSplitChunk_shouldFail() throws {
-    let url = URL(string: "http://www.test.com/multipart")!
+    let url = URL(string: "http://www.test.com/multipart-without-closing-boundary")!
     let boundary = "-"
     let multipartString = "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1--\(boundary)\"}}"
 
