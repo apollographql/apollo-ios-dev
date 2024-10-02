@@ -534,16 +534,14 @@ class URLSessionClientTests: XCTestCase {
     self.client.sendRequest(request) { result in
       switch result {
       case .failure(let error):
-        guard case URLSessionClient.URLSessionClientError.cannotParseBoundaryData = error else {
-          return XCTFail("Unexpected error: \(error)")
-        }
+        return XCTFail("Unexpected error: \(error)")
 
-        // Failure is expected here because there is no closing boundary. Without any indication that the chunk is
-        // complete it cannot be correctly parsed and once the request ends the .failure result is sent.
+      case .success(let (data, httpResponse)):
+        XCTAssertTrue(httpResponse.isSuccessful)
+        XCTAssertTrue(httpResponse.isMultipart)
+
+        XCTAssertEqual(String(data: data, encoding: .utf8), multipartString)
         expectation.fulfill()
-
-      case .success(let (data, _)):
-        XCTFail("Unexpected data received: \(data)")
       }
     }
 
