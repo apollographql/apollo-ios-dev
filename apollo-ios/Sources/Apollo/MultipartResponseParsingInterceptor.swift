@@ -140,6 +140,26 @@ extension MultipartResponseSpecificationParser {
   static var dataLineSeparator: StaticString { "\r\n\r\n" }
 }
 
-fileprivate extension String {
-  var isBoundaryMarker: Bool { self == "--" }
+extension String {
+  fileprivate var isBoundaryMarker: Bool { self == "--" }
+
+  /// Returns the range of a complete multipart chunk.
+  func multipartRange(delimitedBy boundary: String) -> String.Index? {
+    let boundaryMarker = "\r\n--\(boundary)"
+    let endBoundaryMarker = "\r\n--\(boundary)--"
+
+    // The end boundary marker indicates that no further chunks will follow so if this delimiter
+    // if found then include the delimiter in the index. Search for this first.
+    if let endIndex = range(of: endBoundaryMarker, options: .backwards)?.upperBound {
+      return endIndex
+    }
+
+    // A chunk boundary indicates there may still be more chunks to follow so the index need not
+    // include the chunk boundary in the index.
+    if let chunkIndex = range(of: boundaryMarker, options: .backwards)?.lowerBound {
+      return chunkIndex
+    }
+
+    return nil
+  }
 }

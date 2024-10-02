@@ -301,10 +301,10 @@ class URLSessionClientTests: XCTestCase {
     let client2 = URLSessionClient(sessionConfiguration: sessionConfiguration,
                                    sessionDescription: expected)
     XCTAssertEqual(expected, client2.session.sessionDescription)
-      
+    
     client2.invalidate()
   }
-    
+
   func testTaskDescription() {
     let url = URL(string: "http://www.test.com/taskDesciption")!
     
@@ -337,6 +337,217 @@ class URLSessionClientTests: XCTestCase {
 
     self.wait(for: [expectation], timeout: 5)
   }
+
+  // MARK: Multipart Tests
+
+  func test__multipart__givenSingleChunk_shouldReturnSingleChunk() throws {
+    let url = URL(string: "http://www.test.com/multipart-single-chunk")!
+    let boundary = "-"
+    let multipartString = "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1\"}}\r\n--\(boundary)--"
+
+    let request = self.request(
+      for: url,
+      responseData: multipartString.data(using: .utf8),
+      statusCode: 200,
+      headerFields: ["Content-Type": "multipart/mixed; boundary=\(boundary)"]
+    )
+
+    let expectation = self.expectation(description: "Multipart chunk received")
+
+    // Results are sent twice for multipart responses with both received here because this test infrastructure uses
+    // URLSessionClient direclty whereas in a request chain it is wrapped by an interceptor (NetworkFetchInterceptor)
+    // and that may handle the callbacks differently.
+    //
+    // 1. When multipart chunks are received, to be processed immediately - from urlSession(_:dataTask:didReceive:)
+    // 2. When the operation completes, with any remaining task data - from urlSession(_:task:didCompleteWithError:)
+    expectation.expectedFulfillmentCount = 2
+
+    self.client.sendRequest(request) { result in
+      switch result {
+      case .failure(let error):
+        XCTFail("Unexpected error: \(error)")
+
+      case .success(let (data, httpResponse)):
+        XCTAssertTrue(httpResponse.isSuccessful)
+        XCTAssertTrue(httpResponse.isMultipart)
+
+        switch String(data: data, encoding: .utf8) {
+        case multipartString, "": // "" is the second result and is expected to be empty
+          expectation.fulfill()
+
+        default:
+          XCTFail("Unexpected data received: \(data)")
+        }
+      }
+    }
+
+    self.wait(for: [expectation], timeout: 1)
+  }
+
+  func test__multipart__givenMultipleChunks_shouldReturnAllChunks() throws {
+    let url = URL(string: "http://www.test.com/multipart-many-chunks")!
+    let boundary = "-"
+    let multipartString = "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1\"}}\r\n--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field2\": \"value2\"}}\r\n--\(boundary)--"
+
+    let request = self.request(
+      for: url,
+      responseData: multipartString.data(using: .utf8),
+      statusCode: 200,
+      headerFields: ["Content-Type": "multipart/mixed; boundary=\(boundary)"]
+    )
+
+    let expectation = self.expectation(description: "Multipart chunk received")
+
+    // Results are sent twice for multipart responses with both received here because this test infrastructure uses
+    // URLSessionClient direclty whereas in a request chain it is wrapped by an interceptor (NetworkFetchInterceptor)
+    // and that may handle the callbacks differently.
+    //
+    // 1. When multipart chunks are received, to be processed immediately - from urlSession(_:dataTask:didReceive:)
+    // 2. When the operation completes, with any remaining task data - from urlSession(_:task:didCompleteWithError:)
+    expectation.expectedFulfillmentCount = 2
+
+    self.client.sendRequest(request) { result in
+      switch result {
+      case .failure(let error):
+        XCTFail("Unexpected error: \(error)")
+
+      case .success(let (data, httpResponse)):
+        XCTAssertTrue(httpResponse.isSuccessful)
+        XCTAssertTrue(httpResponse.isMultipart)
+
+        switch String(data: data, encoding: .utf8) {
+        case multipartString, "": // "" is the second result and is expected to be empty
+          expectation.fulfill()
+
+        default:
+          XCTFail("Unexpected data received: \(data)")
+        }
+      }
+    }
+
+    self.wait(for: [expectation], timeout: 1)
+  }
+
+  func test__multipart__givenCompleteAndPartialChunks_shouldReturnCompleteChunkSeparateFromPartialChunk() throws {
+    let url = URL(string: "http://www.test.com/multipart-complete-and-partial-chunk")!
+    let boundary = "-"
+    let completeChunk = "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1\"}}"
+    let partialChunk = "\r\n--\(boundary)\r\nConte"
+    let multipartString = completeChunk + partialChunk
+
+    let request = self.request(
+      for: url,
+      responseData: multipartString.data(using: .utf8),
+      statusCode: 200,
+      headerFields: ["Content-Type": "multipart/mixed; boundary=\(boundary)"]
+    )
+
+    let expectation = self.expectation(description: "Multipart chunk received")
+
+    // Results are sent twice for multipart responses with both received here because this test infrastructure uses
+    // URLSessionClient direclty whereas in a request chain it is wrapped by an interceptor (NetworkFetchInterceptor)
+    // and that may handle the callbacks differently.
+    //
+    // 1. When multipart chunks are received, to be processed immediately - from urlSession(_:dataTask:didReceive:)
+    // 2. When the operation completes, with any remaining task data - from urlSession(_:task:didCompleteWithError:)
+    expectation.expectedFulfillmentCount = 2
+
+    self.client.sendRequest(request) { result in
+      switch result {
+      case .failure(let error):
+        XCTFail("Unexpected error: \(error)")
+
+      case .success(let (data, httpResponse)):
+        XCTAssertTrue(httpResponse.isSuccessful)
+        XCTAssertTrue(httpResponse.isMultipart)
+
+        switch String(data: data, encoding: .utf8) {
+        case completeChunk, partialChunk:
+          expectation.fulfill()
+
+        default:
+          XCTFail("Unexpected data received: \(data)")
+        }
+      }
+    }
+
+    self.wait(for: [expectation], timeout: 1)
+  }
+
+  func test__multipart__givenChunkContainingBoundaryString_shouldNotSplitChunk() throws {
+    let url = URL(string: "http://www.test.com/multipart-containing-boundary-string")!
+    let boundary = "-"
+    let multipartString = "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1--\(boundary)\"}}\r\n--\(boundary)--"
+
+    let request = self.request(
+      for: url,
+      responseData: multipartString.data(using: .utf8),
+      statusCode: 200,
+      headerFields: ["Content-Type": "multipart/mixed; boundary=\(boundary)"]
+    )
+
+    let expectation = self.expectation(description: "Multipart chunk received")
+
+    // Results are sent twice for multipart responses with both received here because this test infrastructure uses
+    // URLSessionClient direclty whereas in a request chain it is wrapped by an interceptor (NetworkFetchInterceptor)
+    // and that may handle the callbacks differently.
+    //
+    // 1. When multipart chunks are received, to be processed immediately - from urlSession(_:dataTask:didReceive:)
+    // 2. When the operation completes, with any remaining task data - from urlSession(_:task:didCompleteWithError:)
+    expectation.expectedFulfillmentCount = 2
+
+    self.client.sendRequest(request) { result in
+      switch result {
+      case .failure(let error):
+        XCTFail("Unexpected error: \(error)")
+
+      case .success(let (data, httpResponse)):
+        XCTAssertTrue(httpResponse.isSuccessful)
+        XCTAssertTrue(httpResponse.isMultipart)
+
+        switch String(data: data, encoding: .utf8) {
+        case multipartString, "": // "" is the second result and is expected to be empty
+          expectation.fulfill()
+
+        default:
+          XCTFail("Unexpected data received: \(data)")
+        }
+      }
+    }
+
+    self.wait(for: [expectation], timeout: 1)
+  }
+
+  func test__multipart__givenChunkContainingBoundaryStringWithoutClosingBoundary_shouldNotSplitChunk() throws {
+    let url = URL(string: "http://www.test.com/multipart-without-closing-boundary")!
+    let boundary = "-"
+    let multipartString = "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1--\(boundary)\"}}"
+
+    let request = self.request(
+      for: url,
+      responseData: multipartString.data(using: .utf8),
+      statusCode: 200,
+      headerFields: ["Content-Type": "multipart/mixed; boundary=\(boundary)"]
+    )
+
+    let expectation = self.expectation(description: "Multipart chunk received")
+
+    self.client.sendRequest(request) { result in
+      switch result {
+      case .failure(let error):
+        return XCTFail("Unexpected error: \(error)")
+
+      case .success(let (data, httpResponse)):
+        XCTAssertTrue(httpResponse.isSuccessful)
+        XCTAssertTrue(httpResponse.isMultipart)
+
+        XCTAssertEqual(String(data: data, encoding: .utf8), multipartString)
+        expectation.fulfill()
+      }
+    }
+
+    self.wait(for: [expectation], timeout: 1)
+  }
 }
 
 extension URLSessionClientTests: MockRequestProvider {
@@ -347,5 +558,4 @@ extension URLSessionClientTests: MockRequestProvider {
   }
   
   public static var requestHandlers = [URL: MockRequestHandler]()
-  
 }
