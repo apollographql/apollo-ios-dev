@@ -516,6 +516,39 @@ class URLSessionClientTests: XCTestCase {
 
     self.wait(for: [expectation], timeout: 1)
   }
+
+  func test__multipart__givenChunkContainingBoundaryStringWithoutClosingBoundary_shouldNotSplitChunk_shouldFail() throws {
+    let url = URL(string: "http://www.test.com/multipart")!
+    let boundary = "-"
+    let multipartString = "--\(boundary)\r\nContent-Type: application/json\r\n\r\n{\"data\": {\"field1\": \"value1--\(boundary)\"}}"
+
+    let request = self.request(
+      for: url,
+      responseData: multipartString.data(using: .utf8),
+      statusCode: 200,
+      headerFields: ["Content-Type": "multipart/mixed; boundary=\(boundary)"]
+    )
+
+    let expectation = self.expectation(description: "Multipart chunk received")
+
+    self.client.sendRequest(request) { result in
+      switch result {
+      case .failure(let error):
+        guard case URLSessionClient.URLSessionClientError.cannotParseBoundaryData = error else {
+          return XCTFail("Unexpected error: \(error)")
+        }
+
+        // Failure is expected here because there is no closing boundary. Without any indication that the chunk is
+        // complete it cannot be correctly parsed and once the request ends the .failure result is sent.
+        expectation.fulfill()
+
+      case .success(let (data, _)):
+        XCTFail("Unexpected data received: \(data)")
+      }
+    }
+
+    self.wait(for: [expectation], timeout: 1)
+  }
 }
 
 extension URLSessionClientTests: MockRequestProvider {
