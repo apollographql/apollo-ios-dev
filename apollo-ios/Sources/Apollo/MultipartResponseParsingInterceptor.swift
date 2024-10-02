@@ -143,6 +143,7 @@ extension MultipartResponseSpecificationParser {
 extension String {
   fileprivate var isBoundaryMarker: Bool { self == "--" }
 
+  /// Returns the range of a complete multipart chunk.
   func multipartRange(delimitedBy boundary: String) -> String.Index? {
     let boundaryMarker = "\r\n--\(boundary)"
     let endBoundaryMarker = "\r\n--\(boundary)--"
