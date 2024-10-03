@@ -292,15 +292,15 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     taskData.append(additionalData: data)
 
     if let httpResponse = dataTask.response as? HTTPURLResponse, httpResponse.isMultipart {
-      guard let boundaryString = httpResponse.multipartHeaderComponents.boundary else {
+      guard let boundary = httpResponse.multipartHeaderComponents.boundary else {
         taskData.completionBlock(.failure(URLSessionClientError.missingMultipartBoundary))
         return
       }
 
       guard
         let dataString = String(data: taskData.data, encoding: .utf8),
-        let lastBoundaryIndex = dataString.multipartRange(delimitedBy: boundaryString),
-        let boundaryData = dataString.prefix(upTo: lastBoundaryIndex).data(using: .utf8)
+        let lastBoundaryDelimiterIndex = dataString.multipartRange(using: boundary),
+        let boundaryData = dataString.prefix(upTo: lastBoundaryDelimiterIndex).data(using: .utf8)
       else {
         // Do not return .failure here simply because there was no boundary delimiter found; the data
         // may still be arriving. If the request ends without more data arriving it will get handled
@@ -308,7 +308,7 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
         return
       }
 
-      let remainingData = dataString.suffix(from: lastBoundaryIndex).data(using: .utf8)
+      let remainingData = dataString.suffix(from: lastBoundaryDelimiterIndex).data(using: .utf8)
       taskData.reset(data: remainingData)
 
       if let rawCompletion = taskData.rawCompletion {
