@@ -1,4 +1,7 @@
-// swift-tools-version: 5.9
+// swift-tools-version:5.9
+//
+// The swift-tools-version declares the minimum version of Swift required to build this package.
+// Swift 5.9 is available from Xcode 15.0.
 
 import PackageDescription
 
@@ -8,7 +11,7 @@ let package = Package(
     .iOS(.v13),
     .macOS(.v10_15),
     .tvOS(.v13),
-    .watchOS(.v6)
+    .watchOS(.v6),
   ],
   products: [
     .library(name: "ApolloPagination", targets: ["ApolloPagination"]),

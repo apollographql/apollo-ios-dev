@@ -9,7 +9,6 @@ public enum ApolloTarget {
     case apolloInternalTestHelpers
     case apolloPaginationTests
     case apolloPerformanceTests
-    case apolloServerIntegrationTests
     case apolloTests
     case apolloWrapper
     case codegenCLITests
@@ -34,8 +33,6 @@ public enum ApolloTarget {
             return "ApolloPaginationTests"
         case .apolloPerformanceTests:
             return "ApolloPerformanceTests"
-        case .apolloServerIntegrationTests:
-            return "ApolloServerIntegrationTests"
         case .apolloTests:
             return "ApolloTests"
         case .apolloWrapper:
@@ -69,8 +66,6 @@ public enum ApolloTarget {
             return "Apollo-Target-PaginationTests"
         case .apolloPerformanceTests:
             return "Apollo-Target-PerformanceTests"
-        case .apolloServerIntegrationTests:
-            return "Apollo-Target-ServerIntegrationTests"
         case .apolloTests:
             return "Apollo-Target-Tests"
         case .apolloWrapper:
@@ -97,7 +92,6 @@ public enum ApolloTarget {
         .apolloInternalTestHelpers,
         .apolloPaginationTests,
         .apolloPerformanceTests,
-        .apolloServerIntegrationTests,
         .apolloTests,
         .apolloWrapper,
         .codegenCLITests,
@@ -119,8 +113,7 @@ public enum ApolloTarget {
              .uploadAPI:
             return DeploymentTargets(macOS: "10.15")
         case .apolloInternalTestHelpers,
-             .apolloPerformanceTests,
-             .apolloServerIntegrationTests,
+             .apolloPerformanceTests,             
              .apolloTests,
              .apolloPaginationTests:
             return DeploymentTargets(macOS: "12.0")

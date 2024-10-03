@@ -93,7 +93,6 @@ public class HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: GraphQ
         public var name: String { __data["name"] }
 
         public var ifIncludeFriendsDetails: IfIncludeFriendsDetails? { _asInlineFragment() }
-        public var asDroid: AsDroid? { _asInlineFragment() }
 
         public init(
           __typename: String,
@@ -145,7 +144,7 @@ public class HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: GraphQ
             ))
           }
 
-          /// Hero.Friend.AsDroid
+          /// Hero.Friend.IfIncludeFriendsDetails.AsDroid
           ///
           /// Parent Type: `Droid`
           public struct AsDroid: StarWarsAPI.InlineFragment {
@@ -175,47 +174,11 @@ public class HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: GraphQ
                 ],
                 fulfilledFragments: [
                   ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.self),
-                  ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.AsDroid.self)
+                  ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.IfIncludeFriendsDetails.self),
+                  ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.IfIncludeFriendsDetails.AsDroid.self)
                 ]
               ))
             }
-          }
-        }
-
-        /// Hero.Friend.AsDroid
-        ///
-        /// Parent Type: `Droid`
-        public struct AsDroid: StarWarsAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
-
-          public typealias RootEntityType = HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend
-          public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
-          public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
-            HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.self,
-            HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.AsDroid.self
-          ] }
-
-          /// The name of the character
-          public var name: String { __data["name"] }
-          /// This droid's primary function
-          public var primaryFunction: String? { __data["primaryFunction"] }
-
-          public init(
-            name: String,
-            primaryFunction: String? = nil
-          ) {
-            self.init(_dataDict: DataDict(
-              data: [
-                "__typename": StarWarsAPI.Objects.Droid.typename,
-                "name": name,
-                "primaryFunction": primaryFunction,
-              ],
-              fulfilledFragments: [
-                ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.self),
-                ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.AsDroid.self)
-              ]
-            ))
           }
         }
       }

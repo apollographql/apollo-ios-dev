@@ -34,6 +34,13 @@
     {
       "generated" : true,
       "identifiers" : [
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/addOrUpdateRecordString(_:for:)"
+      ],
+      "title" : "Instance Methods"
+    },
+    {
+      "generated" : true,
+      "identifiers" : [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/idColumnName",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/keyColumnName",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/recordColumName",
@@ -129,6 +136,65 @@
   "title" : "SQLiteDotSwiftDatabase",
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+},
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/addOrUpdateRecordString(_:for:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "addOrUpdateRecordString"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "for"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo8CacheKeya",
+      "text" : "CacheKey"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/addOrUpdateRecordString(_:for:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "addOrUpdateRecordString(_:for:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/addorupdaterecordstring(_:for:)"
 },
 "doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/idColumnName": {
   "abstract" : [

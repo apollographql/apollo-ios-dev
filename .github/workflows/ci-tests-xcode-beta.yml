@@ -1,11 +1,11 @@
-name: "CI Tests (Xcode 16.0 Beta)"
+name: "CI Tests (Xcode 16.1 Beta)"
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
 env:
-  XCODE_VERSION: "16.0-beta"
+  XCODE_VERSION: "16.1-beta"
 
 jobs:
   changes:
@@ -23,8 +23,7 @@ jobs:
           filters: |
             ios:
               - 'apollo-ios/**'
-              - 'Tests/ApolloInternalTestHelpers/**'
-              - 'Tests/ApolloServerIntegrationTests/**'
+              - 'Tests/ApolloInternalTestHelpers/**'              
               - 'Tests/ApolloTests/**'
             codegen:
               - 'apollo-ios-codegen/**'
@@ -150,7 +149,6 @@ jobs:
     - name: Build and Test
       if: ${{ matrix.should-run == true || matrix.should-run == 'true' }}
       id: build-and-test
-      continue-on-error: true
       uses: ./.github/actions/build-and-run-unit-tests
       with:
         destination: ${{ matrix.destination }}
@@ -158,33 +156,32 @@ jobs:
         test-plan: ${{ matrix.test-plan }}
     - name: Run-JS-Tests
       if: ${{ matrix.run-js-tests == true }}
-      continue-on-error: true
       shell: bash
       working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript/
       run: |
         npm install && npm test
     - name: Save xcodebuild logs
-      if: ${{ steps.build-and-test.outcome != 'skipped' }}
+      if: ${{ failure() }}
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.name }}-logs
         path: |
           DerivedData/Logs/Build
     - name: Save crash logs
-      if: ${{ steps.build-and-test.outcome != 'skipped' }}
+      if: ${{ failure() }}
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.name }}-crashes
         path: |
           ~/Library/Logs/DiagnosticReports
     - name: Zip Result Bundle
-      if: ${{ steps.build-and-test.outcome != 'skipped' }}
+      if: ${{ failure() }}
       shell: bash
       working-directory: TestResults
       run: |
         zip -r ResultBundle.zip ResultBundle.xcresult
     - name: Save test results
-      if: ${{ steps.build-and-test.outcome != 'skipped' }}
+      if: ${{ failure() }}
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.name }}-results
@@ -248,5 +245,3 @@ jobs:
     - name: Run CocoaPods Integration Tests
       id: run-cocoapods-integration-tests
       uses: ./.github/actions/run-cocoapods-integration-tests
-
-  # IntegrationTests removed because source is not compatible with Sendable yet.

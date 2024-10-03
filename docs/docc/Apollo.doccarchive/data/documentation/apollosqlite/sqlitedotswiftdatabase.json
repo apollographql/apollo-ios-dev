@@ -108,7 +108,7 @@
     },
     {
       "identifiers" : [
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/addOrUpdateRecordString(_:for:)",
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/addOrUpdate(records:)",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/clearDatabase(shouldVacuumOnClear:)",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/createRecordsTableIfNeeded()",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/deleteRecord(for:)",
@@ -256,7 +256,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/sqlitedatabase-implementations"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/addOrUpdateRecordString(_:for:)": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/addOrUpdate(records:)": {
   "abstract" : [
 
   ],
@@ -271,24 +271,19 @@
     },
     {
       "kind" : "identifier",
-      "text" : "addOrUpdateRecordString"
+      "text" : "addOrUpdate"
     },
     {
       "kind" : "text",
       "text" : "("
     },
     {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
+      "kind" : "externalParam",
+      "text" : "records"
     },
     {
       "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "for"
+      "text" : ": [(cacheKey"
     },
     {
       "kind" : "text",
@@ -301,19 +296,32 @@
     },
     {
       "kind" : "text",
-      "text" : ") "
+      "text" : ", recordString"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ")]) "
     },
     {
       "kind" : "keyword",
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/addOrUpdateRecordString(_:for:)",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/addOrUpdate(records:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "addOrUpdateRecordString(_:for:)",
+  "title" : "addOrUpdate(records:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/addorupdaterecordstring(_:for:)"
+  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/addorupdate(records:)"
 },
 "doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/clearDatabase(shouldVacuumOnClear:)": {
   "abstract" : [

@@ -89,10 +89,10 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
   var cache: (any NormalizedCache)!
   var store: ApolloStore!
 
-  override func setUpWithError() throws {
-    try super.setUpWithError()
+  override func setUp() async throws {
+    try await super.setUp()
 
-    cache = try makeNormalizedCache()
+    cache = try await makeNormalizedCache()
     store = ApolloStore(cache: cache)
   }
 

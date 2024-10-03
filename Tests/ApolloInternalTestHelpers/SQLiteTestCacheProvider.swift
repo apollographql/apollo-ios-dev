@@ -2,22 +2,17 @@ import Foundation
 import Apollo
 import ApolloSQLite
 
-public class SQLiteTestCacheProvider: TestCacheProvider {
-  /// Execute a test block rather than return a cache synchronously, since cache setup may be
-  /// asynchronous at some point.
-  public static func withCache(initialRecords: RecordSet? = nil, fileURL: URL? = nil, execute test: (any NormalizedCache) throws -> ()) throws {
-    let fileURL = fileURL ?? temporarySQLiteFileURL()
-    let cache = try! SQLiteNormalizedCache(fileURL: fileURL)
-    if let initialRecords = initialRecords {
-      _ = try cache.merge(records: initialRecords)
-    }
-    try test(cache)
+public class SQLiteTestCacheProvider: TestCacheProvider {  
+  public static func makeNormalizedCache() async -> TestDependency<any NormalizedCache> {
+    await makeNormalizedCache(fileURL: temporarySQLiteFileURL())
   }
-  
-  public static func makeNormalizedCache(_ completionHandler: (Result<TestDependency<any NormalizedCache>, any Error>) -> ()) {
-    let fileURL = temporarySQLiteFileURL()
+
+  public static func makeNormalizedCache(fileURL: URL) async -> TestDependency<any NormalizedCache> {
     let cache = try! SQLiteNormalizedCache(fileURL: fileURL)
-    completionHandler(.success((cache, nil)))
+    let tearDownHandler = { @Sendable in
+      try Self.deleteCache(at: fileURL)
+    }
+    return (cache, tearDownHandler)
   }
 
   public static func temporarySQLiteFileURL() -> URL {
@@ -29,5 +24,9 @@ public class SQLiteTestCacheProvider: TestCacheProvider {
     try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
     
     return folder.appendingPathComponent("db.sqlite3")
+  }
+
+  static func deleteCache(at url: URL) throws {
+    try FileManager.default.removeItem(at: url)
   }
 }

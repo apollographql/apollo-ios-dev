@@ -42,7 +42,7 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
   private var subscriptions = Subscriptions()
   private var completionManager = CompletionManager()
 
-  var publisher: AnyPublisher<Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), any Error>, Never> {
+  var publisher: AnyPublisher<Result<PaginationOutput<InitialQuery, PaginatedQuery>, any Error>, Never> {
     get async { await pager.$currentValue.compactMap { $0 }.eraseToAnyPublisher() }
   }
 
@@ -87,7 +87,7 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
 
   /// Allows the caller to subscribe to new pagination results.
   /// - Parameter onUpdate: A closure which provides the most recent pagination result. Execution may be on any thread.
-  func subscribe(onUpdate: @escaping (Result<(PaginationOutput<InitialQuery, PaginatedQuery>, UpdateSource), any Error>) -> Void) {
+  func subscribe(onUpdate: @escaping (Result<PaginationOutput<InitialQuery, PaginatedQuery>, any Error>) -> Void) {
     Task { [weak self] in
       guard let self else { return }
       let subscription = await self.pager.subscribe(onUpdate: onUpdate)
@@ -167,7 +167,7 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
     callbackQueue: DispatchQueue = .main,
     completion: (() -> Void)? = nil
   ) {
-    execute(callbackQueue: callbackQueue, completion: { _ in completion?() }) { [weak self] in
+    execute(callbackQueue: callbackQueue) { _ in completion?() } operation: { [weak self] in
       guard let self else { return }
       for completion in await self.completionManager.completions {
         completion.execute(error: PaginationError.cancellation)
@@ -184,7 +184,7 @@ class GraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: G
     callbackQueue: DispatchQueue = .main,
     completion: (() -> Void)? = nil
   ) {
-    execute(callbackQueue: callbackQueue, completion: { _ in completion?() }) { [weak self] in
+    execute(callbackQueue: callbackQueue) { _ in completion?() } operation: { [weak self] in
       await self?.pager.fetch()
     }
   }

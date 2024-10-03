@@ -15,10 +15,10 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
   var cache: (any NormalizedCache)!
   var store: ApolloStore!
 
-  override func setUpWithError() throws {
-    try super.setUpWithError()
+  override func setUp() async throws {
+    try await super.setUp()
 
-    cache = try makeNormalizedCache()
+    cache = try await makeNormalizedCache()
     store = ApolloStore(cache: cache)
   }
 
@@ -249,19 +249,19 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-
+  @MainActor
   func test_readObject_givenFragmentWithTypeSpecificProperty() throws {
     // given
     struct Types {
       static let Droid = Object(typename: "Droid", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = { typename in
+    MockSchemaMetadata.stub_objectTypeForTypeName({ typename in
       switch typename {
       case "Droid": return Types.Droid
       default: return nil
       }
-    }
+    })
 
     class GivenSelectionSet: MockFragment {
       typealias Schema = MockSchemaMetadata
@@ -306,18 +306,19 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 
+  @MainActor
   func test_readObject_givenFragmentWithMissingTypeSpecificProperty() throws {
     // given
     struct Types {
       static let Droid = Object(typename: "Droid", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = { typename in
+    MockSchemaMetadata.stub_objectTypeForTypeName({ typename in
       switch typename {
       case "Droid": return Types.Droid
       default: return nil
       }
-    }
+    })
 
     class GivenSelectionSet: MockFragment {
       typealias Schema = MockSchemaMetadata
@@ -863,18 +864,19 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
 
+  @MainActor
   func test_updateCacheMutation_updateNestedFieldOnTypeCase_updatesObjects() throws {
     // given
     struct Types {
       static let Droid = Object(typename: "Droid", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = { typename in
+    MockSchemaMetadata.stub_objectTypeForTypeName({ typename in
       switch typename {
       case "Droid": return Types.Droid
       default: return nil
       }
-    }
+    })
 
     struct GivenSelectionSet: MockMutableRootSelectionSet {
       public var __data: DataDict = .empty()
@@ -963,18 +965,19 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
 
+  @MainActor
   func test_updateCacheMutation_updateNestedFieldOnNamedFragment_updatesObjects() throws {
     // given
     struct Types {
       static let Droid = Object(typename: "Droid", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = { typename in
+    MockSchemaMetadata.stub_objectTypeForTypeName({ typename in
       switch typename {
       case "Droid": return Types.Droid
       default: return nil
       }
-    }
+    })
 
     struct GivenFragment: MockMutableRootSelectionSet, Fragment {
       typealias Schema = MockSchemaMetadata
@@ -1093,18 +1096,19 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
 
+  @MainActor
   func test_updateCacheMutation_updateNestedFieldOnOptionalNamedFragment_updatesObjects() throws {
     // given
     struct Types {
       static let Droid = Object(typename: "Droid", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = { typename in
+    MockSchemaMetadata.stub_objectTypeForTypeName({ typename in
       switch typename {
       case "Droid": return Types.Droid
       default: return nil
       }
-    }
+    })
 
     struct GivenFragment: MockMutableRootSelectionSet, Fragment {
       typealias Schema = MockSchemaMetadata
@@ -1695,18 +1699,18 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
   // MARK: - Write w/Selection Set Initializers
 
-  func test_writeDataForOperation_givenSelectionSetManuallyInitialized_withNullValueForField_fieldHasNullValue() throws {
+  @MainActor func test_writeDataForOperation_givenSelectionSetManuallyInitialized_withNullValueForField_fieldHasNullValue() throws {
     // given
     struct Types {
       static let Query = Object(typename: "Query", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Query": return Types.Query
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Data: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1760,19 +1764,19 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test_writeDataForOperation_givenSelectionSetManuallyInitializedWithInclusionConditions_writesFieldsForInclusionConditions() throws {
+  @MainActor func test_writeDataForOperation_givenSelectionSetManuallyInitializedWithInclusionConditions_writesFieldsForInclusionConditions() throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
       static let Query = Object(typename: "Query", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     class Data: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1914,7 +1918,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test_writeDataForOperation_givenSelectionSetManuallyInitializedWithTypeCases_writesFieldForTypeCasesWithManuallyProvidedImplementedInterfaces() throws {
+  @MainActor func test_writeDataForOperation_givenSelectionSetManuallyInitializedWithTypeCases_writesFieldForTypeCasesWithManuallyProvidedImplementedInterfaces() throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -1922,12 +1926,12 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       static let Character = Interface(name: "Character")
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: return nil
       }
-    }
+    })
 
     class GivenQuery: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -2009,20 +2013,20 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     self.wait(for: [writeCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test_writeDataForOperation_givenSelectionSetManuallyInitializedWithNamedFragmentInInclusionConditionIsFulfilled_writesFieldsForNamedFragment() throws {
+  @MainActor func test_writeDataForOperation_givenSelectionSetManuallyInitializedWithNamedFragmentInInclusionConditionIsFulfilled_writesFieldsForNamedFragment() throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
       static let Query = Object(typename: "Query", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Query": return Types.Query
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     struct GivenFragment: MockMutableRootSelectionSet, Fragment {
       static var fragmentDefinition: StaticString { "" }
@@ -2148,20 +2152,20 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test_writeDataForOperation_givenSelectionSetManuallyInitializedWithNamedFragmentInInclusionConditionNotFulfilled_doesNotAttemptToWriteFieldsForNamedFragment() throws {
+  @MainActor func test_writeDataForOperation_givenSelectionSetManuallyInitializedWithNamedFragmentInInclusionConditionNotFulfilled_doesNotAttemptToWriteFieldsForNamedFragment() throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
       static let Query = Object(typename: "Query", implementedInterfaces: [])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Query": return Types.Query
       case "Human": return Types.Human
       default: XCTFail(); return nil
       }
-    }
+    })
 
     struct GivenFragment: MockMutableRootSelectionSet, Fragment {
       static var fragmentDefinition: StaticString { "" }

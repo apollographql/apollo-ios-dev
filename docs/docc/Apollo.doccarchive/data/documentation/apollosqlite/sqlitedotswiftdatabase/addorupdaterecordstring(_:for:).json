@@ -17,7 +17,8 @@
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/SQLiteDatabase-Implementations"
       ]
     ]
   },
@@ -27,7 +28,8 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:12ApolloSQLite0B16DotSwiftDatabaseC23addOrUpdateRecordString_3forySS_SStKF",
+    "extendedModule" : "ApolloSQLite",
+    "externalID" : "s:12ApolloSQLite0B8DatabasePAAE23addOrUpdateRecordString_3forySS_SStKF::SYNTHESIZED::s:12ApolloSQLite0B16DotSwiftDatabaseC",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -268,6 +270,17 @@
   "title" : "SQLiteDotSwiftDatabase",
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+},
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/SQLiteDatabase-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/SQLiteDatabase-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "SQLiteDatabase Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/sqlitedatabase-implementations"
 },
 "doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/addOrUpdateRecordString(_:for:)": {
   "abstract" : [

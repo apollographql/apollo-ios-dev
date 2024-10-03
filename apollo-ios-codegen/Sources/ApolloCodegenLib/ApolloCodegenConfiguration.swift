@@ -468,7 +468,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public let selectionSetInitializers: SelectionSetInitializers
     /// How to generate the operation documents for your generated operations.
     public let operationDocumentFormat: OperationDocumentFormat
-    /// Customization options to be applie to the schema during code generation.
+    /// Customization options to be applied to the schema during code generation.
     public let schemaCustomization: SchemaCustomization
     /// Generate import statements that are compatible with including `Apollo` via Cocoapods.
     ///
@@ -514,7 +514,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       public static let additionalInflectionRules: [InflectionRule] = []
       public static let deprecatedEnumCases: Composition = .include
       public static let schemaDocumentation: Composition = .include
-      public static let selectionSetInitializers: SelectionSetInitializers = [.localCacheMutations]
+      public static let selectionSetInitializers: SelectionSetInitializers = []
+      public static let fieldMerging: FieldMerging = [.all]
       public static let operationDocumentFormat: OperationDocumentFormat = .definition
       public static let schemaCustomization: SchemaCustomization = .init()
       public static let cocoapodsCompatibleImportStatements: Bool = false
@@ -854,20 +855,13 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   /// The ``SelectionSetInitializers`` configuration is used to determine if you would like
   /// initializers to be generated for your generated selection set models.
   ///
-  /// There are three categories of selection set models that initializers can be generated for:
-  /// - Operations
-  /// - Named fragments
-  /// - Local cache mutations
-  ///
-  /// By default, initializers are only generated for local cache mutations.
+  /// Initializers are always generated for local cache mutations.
+  /// You can additionally configure initializers to be generated for operations and named fragments.
   ///
   /// ``SelectionSetInitializers`` functions like an `OptionSet`, allowing you to combine multiple
   /// different instances together to indicate all the types you would like to generate
   /// initializers for.
   public struct SelectionSetInitializers: Codable, Equatable, ExpressibleByArrayLiteral {
-    private var options: SelectionSetInitializers.Options
-    private var definitions: Set<String>
-
     /// Option to generate initializers for all named fragments.
     public static let namedFragments: SelectionSetInitializers = .init(.namedFragments)
 
@@ -875,13 +869,10 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     /// that are not local cache mutations.
     public static let operations: SelectionSetInitializers = .init(.operations)
 
-    /// Option to generate initializers for all local cache mutations.
-    public static let localCacheMutations: SelectionSetInitializers = .init(.localCacheMutations)
-
     /// Option to generate initializers for all models.
     /// This includes named fragments, operations, and local cache mutations.
     public static let all: SelectionSetInitializers = [
-      .namedFragments, .operations, .localCacheMutations
+      .namedFragments, .operations
     ]
 
     /// An option to generate initializers for a single operation with a given name.
@@ -893,6 +884,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public static func fragment(named: String) -> SelectionSetInitializers {
       .init(definitionName: named)
     }
+
+    private var options: SelectionSetInitializers.Options
+    private var definitions: Set<String>
 
     /// Initializes a `SelectionSetInitializer` with an array of values.
     public init(arrayLiteral elements: SelectionSetInitializers...) {
@@ -914,26 +908,95 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     }
   }
 
+  /// The `FieldMerging` configuration is used to determine what merged fields and named fragment
+  /// accessors are present on the generated selection set models. Field merging generates
+  /// selection set models that are easier to use, but more verbose.
+  ///
+  /// Property accessors are always generated for each field directly included in a selection
+  /// set in the GraphQL definition. In addition, the code generation engine can compute which
+  /// selections from a selection set's parents, sibling inline fragments, and named fragment
+  /// spreads will also be included on the response object, given the selection set's scope.
+  ///
+  /// By default, all possible fields and named fragment accessors are merged into each selection
+  /// set.
+  ///
+  ///  - Note: Disabling field merging and `selectionSetInitializers` functionality are
+  /// incompatible. If using `selectionSetInitializers`, `fieldMerging` must be set to `.all`,
+  /// otherwise a validation error will be thrown when runnning code generation.
+  public struct FieldMerging: Codable, Equatable, ExpressibleByArrayLiteral {
+    /// Merges fields and fragment accessors from the selection set's direct ancestors.
+    public static let ancestors          = FieldMerging(.ancestors)
+
+    /// Merges fields and fragment accessors from sibling inline fragments that match the selection
+    /// set's scope.
+    public static let siblings           = FieldMerging(.siblings)
+
+    /// Merges fields and fragment accessors from named fragments that have been spread into the
+    /// selection set.
+    public static let namedFragments     = FieldMerging(.namedFragments)
+
+    /// Merges all possible fields and fragment accessors from all sources.
+    public static let all: FieldMerging  = [.ancestors, .siblings, .namedFragments]
+
+    /// Disables field merging entirely. Aside from removal of redundant selections, the shape of
+    /// the generated models will directly mirror the GraphQL definition.
+    public static let none: FieldMerging = []
+
+    var options: MergedSelections.MergingStrategy
+
+    private init(_ options: MergedSelections.MergingStrategy) {
+      self.options = options
+    }
+
+    public init(arrayLiteral elements: FieldMerging...) {
+      self.options = []
+      for element in elements {
+        self.options.insert(element.options)
+      }
+    }
+
+    /// Inserts a `SelectionSetInitializer` into the receiver.
+    public mutating func insert(_ member: FieldMerging) {
+      self.options.insert(member.options)
+    }
+  }
+
   public struct ExperimentalFeatures: Codable, Equatable {
-    /**
-     * **EXPERIMENTAL**: If enabled, the generated operations will be transformed using a method
-     * that attempts to maintain compatibility with the legacy behavior from
-     * [`apollo-tooling`](https://github.com/apollographql/apollo-tooling)
-     * for registering persisted operation to a safelist.
-     *
-     * - Note: Safelisting queries is a deprecated feature of Apollo Server that has reduced
-     * support for legacy use cases. This option may not work as intended in all situations.
-     */
+
+    /// **EXPERIMENTAL**: If enabled, the generated operations will be transformed using a method
+    /// that attempts to maintain compatibility with the legacy behavior from
+    /// [`apollo-tooling`](https://github.com/apollographql/apollo-tooling)
+    /// for registering persisted operation to a safelist.
+    ///
+    /// - Note: Safelisting queries is a deprecated feature of Apollo Server that has reduced
+    /// support for legacy use cases. This option may not work as intended in all situations.
     public let legacySafelistingCompatibleOperations: Bool
+
+    /// **EXPERIMENTAL**: Determines which merged fields and named fragment accessors are generated.
+    /// Defaults to `.all`.
+    ///
+    /// - Note: Disabling field merging and `selectionSetInitializers` functionality are
+    /// incompatible. If using `selectionSetInitializers`, `fieldMerging` must be set to `.all`,
+    /// otherwise a validation error will be thrown when runnning code generation.
+    public let fieldMerging: FieldMerging
 
     /// Default property values
     public struct Default {
       public static let legacySafelistingCompatibleOperations: Bool = false
+      public static let fieldMerging: FieldMerging = [.all]
     }
-
+    
+    /// Designated Initializer
+    ///
+    /// - Parameters:
+    ///   - fieldMerging: Which merged fields and named fragment accessors are generated.
+    ///   - legacySafelistingCompatibleOperations: Generate operations that are compatible with
+    ///   legacy safelisting.
     public init(
+      fieldMerging: FieldMerging = Default.fieldMerging,
       legacySafelistingCompatibleOperations: Bool = Default.legacySafelistingCompatibleOperations
     ) {
+      self.fieldMerging = fieldMerging
       self.legacySafelistingCompatibleOperations = legacySafelistingCompatibleOperations
     }
 
@@ -941,15 +1004,28 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
 
     public enum CodingKeys: CodingKey, CaseIterable {
       case legacySafelistingCompatibleOperations
+      case fieldMerging
     }
 
     public init(from decoder: any Decoder) throws {
       let values = try decoder.container(keyedBy: CodingKeys.self)
 
+      fieldMerging = try values.decodeIfPresent(
+        FieldMerging.self,
+        forKey: .fieldMerging
+      ) ?? Default.fieldMerging
+
       legacySafelistingCompatibleOperations = try values.decodeIfPresent(
         Bool.self,
         forKey: .legacySafelistingCompatibleOperations
       ) ?? Default.legacySafelistingCompatibleOperations
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+
+      try container.encode(self.fieldMerging, forKey: .fieldMerging)
+      try container.encode(self.legacySafelistingCompatibleOperations, forKey: .legacySafelistingCompatibleOperations)
     }
   }
 
@@ -1124,31 +1200,33 @@ extension ApolloCodegenConfiguration.OperationsFileOutput {
   }
 }
 
-extension ApolloCodegenConfiguration.OutputOptions {
+extension ApolloCodegenConfiguration {
   /// Determine whether the operations files are output to the schema types module.
   func shouldGenerateSelectionSetInitializers(for operation: IR.Operation) -> Bool {
-    switch operation.definition.isLocalCacheMutation {
-    case true where selectionSetInitializers.contains(.localCacheMutations):
+    guard experimentalFeatures.fieldMerging == .all else { return false }
+
+    if operation.definition.isLocalCacheMutation {
       return true
 
-    case false where selectionSetInitializers.contains(.operations):
+    } else if options.selectionSetInitializers.contains(.operations) {
       return true
 
-    default:
-      return selectionSetInitializers.contains(definitionNamed: operation.definition.name)
+    } else {
+      return options.selectionSetInitializers.contains(definitionNamed: operation.definition.name)
     }
   }
 
   /// Determine whether the operations files are output to the schema types module.
   func shouldGenerateSelectionSetInitializers(for fragment: IR.NamedFragment) -> Bool {
-    if selectionSetInitializers.contains(.namedFragments) { return true }
+    guard experimentalFeatures.fieldMerging == .all else { return false }
 
-    if fragment.definition.isLocalCacheMutation &&
-        selectionSetInitializers.contains(.localCacheMutations) {
+    if options.selectionSetInitializers.contains(.namedFragments) { return true }
+
+    if fragment.definition.isLocalCacheMutation {
       return true
     }
 
-    return selectionSetInitializers.contains(definitionNamed: fragment.definition.name)
+    return options.selectionSetInitializers.contains(definitionNamed: fragment.definition.name)
   }
 }
 
@@ -1157,7 +1235,6 @@ extension ApolloCodegenConfiguration.OutputOptions {
 extension ApolloCodegenConfiguration.SelectionSetInitializers {
   struct Options: OptionSet, Codable, Equatable {
     let rawValue: Int
-    static let localCacheMutations = Options(rawValue: 1 << 0)
     static let namedFragments      = Options(rawValue: 1 << 1)
     static let operations          = Options(rawValue: 1 << 2)
   }
@@ -1185,8 +1262,11 @@ extension ApolloCodegenConfiguration.SelectionSetInitializers {
   enum CodingKeys: CodingKey, CaseIterable {
     case operations
     case namedFragments
-    case localCacheMutations
     case definitionsNamed
+
+    /// Deprecated
+    /// Local Cache Mutations will now always have initializers generated.
+    case localCacheMutations
   }
 
   public init(from decoder: any Decoder) throws {
@@ -1202,7 +1282,6 @@ extension ApolloCodegenConfiguration.SelectionSetInitializers {
 
     try decode(option: .operations, forKey: .operations)
     try decode(option: .namedFragments, forKey: .namedFragments)
-    try decode(option: .localCacheMutations, forKey: .localCacheMutations)
 
     self.options = options
     self.definitions = try values.decodeIfPresent(
@@ -1221,10 +1300,78 @@ extension ApolloCodegenConfiguration.SelectionSetInitializers {
 
     try encodeIfPresent(option: .operations, forKey: .operations)
     try encodeIfPresent(option: .namedFragments, forKey: .namedFragments)
-    try encodeIfPresent(option: .localCacheMutations, forKey: .localCacheMutations)
 
     if !definitions.isEmpty {
       try container.encode(definitions.sorted(), forKey: .definitionsNamed)
+    }
+  }
+}
+
+// MARK: - FieldMerging - Private Implementation
+
+extension ApolloCodegenConfiguration.FieldMerging {
+
+  // MARK: - Codable
+
+  private enum CodableValues: String {
+    case all
+    case ancestors
+    case siblings
+    case namedFragments
+  }
+
+  public init(from decoder: any Decoder) throws {
+    var values = try decoder.unkeyedContainer()
+
+    var options: MergedSelections.MergingStrategy = []
+
+    while !values.isAtEnd {
+      let option = try values.decode(String.self)
+      switch option {
+      case CodableValues.all.rawValue:
+        self.options = [.all]
+        return
+
+      case CodableValues.ancestors.rawValue:
+        options.insert(.ancestors)
+
+      case CodableValues.siblings.rawValue:
+        options.insert(.siblings)
+
+      case CodableValues.namedFragments.rawValue:
+        options.insert(.namedFragments)
+
+      default:
+        throw DecodingError.dataCorrupted(
+          DecodingError.Context(
+            codingPath: values.codingPath,
+            debugDescription: "Unrecognized value: \(option)"
+          )
+        )
+      }
+    }
+
+    self.options = options
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.unkeyedContainer()
+
+    if options == .all {
+      try container.encode(CodableValues.all.rawValue)
+      return
+    }
+
+    if options.contains(.ancestors) {
+      try container.encode(CodableValues.ancestors.rawValue)
+    }
+
+    if options.contains(.siblings) {
+      try container.encode(CodableValues.siblings.rawValue)
+    }
+
+    if options.contains(.namedFragments) {
+      try container.encode(CodableValues.namedFragments.rawValue)
     }
   }
 }
@@ -1496,6 +1643,12 @@ extension ApolloCodegenConfiguration.ConversionStrategies {
       case camelCase
   }
   
+}
+
+extension ApolloCodegenConfiguration.SelectionSetInitializers {
+  /// Option to generate initializers for all local cache mutations.
+  @available(*, deprecated, message: "Local Cache Mutations will now always have initializers generated.")
+  public static let localCacheMutations: ApolloCodegenConfiguration.SelectionSetInitializers = .init([])
 }
 
 private struct AnyCodingKey: CodingKey {

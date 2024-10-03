@@ -16,10 +16,10 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
   var cache: (any NormalizedCache)!
   var store: ApolloStore!
   
-  override func setUpWithError() throws {
-    try super.setUpWithError()
-    
-    cache = try makeNormalizedCache()
+  override func setUp() async throws {
+    try await super.setUp()
+
+    cache = try await makeNormalizedCache()
     store = ApolloStore(cache: cache)
   }
   

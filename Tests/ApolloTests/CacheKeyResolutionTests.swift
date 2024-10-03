@@ -4,10 +4,11 @@ import Nimble
 import ApolloAPI
 import ApolloInternalTestHelpers
 
+@MainActor
 class CacheKeyResolutionTests: XCTestCase {
 
   func test__schemaConfiguration__givenData_whenCacheKeyInfoIsNil_shouldReturnNil() {
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = { _, _ in nil }
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object({ _, _ in nil })
 
     let object: JSONObject = [
       "id": "α"
@@ -20,10 +21,10 @@ class CacheKeyResolutionTests: XCTestCase {
   }
 
   func test__schemaConfiguration__givenData_whenUnknownType_withCacheKeyInfoForUnknownType_shouldReturnInfoWithTypeName() {
-    MockSchemaMetadata.stub_objectTypeForTypeName = { _ in nil }
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = { (_, json) in
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in nil })
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object({ (_, json) in
       return try? CacheKeyInfo(jsonValue: json["id"])
-    }
+    })
 
     let object: JSONObject = [
       "__typename": "Omega",
@@ -37,8 +38,8 @@ class CacheKeyResolutionTests: XCTestCase {
   }
 
   func test__schemaConfiguration__givenData_whenUnknownType_nilCacheKeyInfo_shouldReturnNil() {
-    MockSchemaMetadata.stub_objectTypeForTypeName = { _ in nil }
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = { (_, json) in nil }
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in nil })
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object({ (_, json) in nil })
 
     let object: JSONObject = [
       "__typename": "Omega",
@@ -59,8 +60,8 @@ class CacheKeyResolutionTests: XCTestCase {
       "id": "α"
     ]
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = { _ in Alpha }
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = { (_, json) in nil }
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in Alpha })
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object({ (_, json) in nil })
 
     let objectDict = NetworkResponseExecutionSource().opaqueObjectDataWrapper(for: object)
     let actual = MockSchemaMetadata.cacheKey(for: objectDict)
@@ -74,7 +75,7 @@ class CacheKeyResolutionTests: XCTestCase {
       "id": "β"
     ]
 
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
 
     let objectDict = NetworkResponseExecutionSource().opaqueObjectDataWrapper(for: object)
     let actual = MockSchemaMetadata.cacheKey(for: objectDict)
@@ -82,6 +83,91 @@ class CacheKeyResolutionTests: XCTestCase {
     expect(actual).to(equal(
       "MockSchemaObject:β"
     ))
+  }
+
+  func test__schemaConfiguration__givenData_asInt_equalToBoolFalse_shouldNotConvertToBool() {
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in nil })
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object({ (_, json) in
+      return try? CacheKeyInfo(jsonValue: json["id"])
+    })
+
+    let object: JSONObject = [
+      "__typename": "Omega",
+      "id": 0
+    ]
+
+    let objectDict = NetworkResponseExecutionSource().opaqueObjectDataWrapper(for: object)
+    let actual = MockSchemaMetadata.cacheKey(for: objectDict)
+
+    expect(actual).to(equal("Omega:0"))
+  }
+
+  func test__schemaConfiguration__givenData_asInt_equalToBoolTrue_shouldNotConvertToBool() {
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in nil })
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object({ (_, json) in
+      return try? CacheKeyInfo(jsonValue: json["id"])
+    })
+
+    let object: JSONObject = [
+      "__typename": "Omega",
+      "id": 1
+    ]
+
+    let objectDict = NetworkResponseExecutionSource().opaqueObjectDataWrapper(for: object)
+    let actual = MockSchemaMetadata.cacheKey(for: objectDict)
+
+    expect(actual).to(equal("Omega:1"))
+  }
+
+  func test__schemaConfiguration__givenData_asInt_outsideBoolRange_shouldReturnCacheReference() {
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in nil })
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object({ (_, json) in
+      return try? CacheKeyInfo(jsonValue: json["id"])
+    })
+
+    let object: JSONObject = [
+      "__typename": "Omega",
+      "id": 2
+    ]
+
+    let objectDict = NetworkResponseExecutionSource().opaqueObjectDataWrapper(for: object)
+    let actual = MockSchemaMetadata.cacheKey(for: objectDict)
+
+    expect(actual).to(equal("Omega:2"))
+  }
+
+  func test__schemaConfiguration__givenData_asBool_true_shouldNotConvertToInt() {
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in nil })
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object({ (_, json) in
+      return try? CacheKeyInfo(jsonValue: json["id"])
+    })
+
+    let object: JSONObject = [
+      "__typename": "Omega",
+      "id": true
+    ]
+
+    let objectDict = NetworkResponseExecutionSource().opaqueObjectDataWrapper(for: object)
+    let actual = MockSchemaMetadata.cacheKey(for: objectDict)
+
+    expect(actual).to(beNil())
+  }
+
+  func test__schemaConfiguration__givenData_asBool_false_shouldNotConvertToInt() {
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in nil })
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object({ (_, json) in
+      return try? CacheKeyInfo(jsonValue: json["id"])
+    })
+
+    let object: JSONObject = [
+      "__typename": "Omega",
+      "id": false
+    ]
+
+    let objectDict = NetworkResponseExecutionSource().opaqueObjectDataWrapper(for: object)
+    let actual = MockSchemaMetadata.cacheKey(for: objectDict)
+
+    expect(actual).to(beNil())
   }
 
   func test__multipleSchemaConfigurations_withDifferentCacheKeyProvidersDefinedInExtensions_shouldReturnDifferentCacheKeys() {
@@ -107,10 +193,10 @@ class CacheKeyResolutionTests: XCTestCase {
   func test__schemaConfiguration__givenData_whenKnownType_isCacheKeyProvider_withUniqueKeyGroupId_shouldReturnCacheReference() {
     let Delta = Object(typename: "Delta", implementedInterfaces: [])
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = { _ in Delta }
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = { (_, json) in
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in Delta })
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object({ (_, json) in
         .init(id: "δ", uniqueKeyGroup: "GreekLetters")
-    }
+    })
 
     let object: JSONObject = [
       "__typename": "Delta",

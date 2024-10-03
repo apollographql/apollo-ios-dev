@@ -1,17 +1,18 @@
 import Apollo
 import XCTest
 
+@MainActor
 public class TestObserver: NSObject, XCTestObservation {
 
-  private let onFinish: (XCTestCase) -> Void  
-
-  @Atomic private var isStarted: Bool = false
   let stopAfterEachTest: Bool
+
+  private var isStarted: Bool = false
+  private let onFinish: (XCTestCase) -> Void
 
   public init(
     startOnInit: Bool = true,
     stopAfterEachTest: Bool = true,
-    onFinish: @escaping ((XCTestCase) -> Void)
+    onFinish: @escaping (@MainActor (XCTestCase) -> Void)
   ) {
     self.stopAfterEachTest = stopAfterEachTest
     self.onFinish = onFinish
@@ -22,22 +23,21 @@ public class TestObserver: NSObject, XCTestObservation {
 
   public func start() {
     guard !isStarted else { return }
-    $isStarted.mutate {
-      XCTestObservationCenter.shared.addTestObserver(self)
-      $0 = true
-    }
+
+    XCTestObservationCenter.shared.addTestObserver(self)
+    isStarted = true
   }
 
   public func stop() {
     guard isStarted else { return }
-    $isStarted.mutate {
-      XCTestObservationCenter.shared.removeTestObserver(self)
-      $0 = false
-    }
+    XCTestObservationCenter.shared.removeTestObserver(self)
+    isStarted = false
   }
 
-  public func testCaseDidFinish(_ testCase: XCTestCase) {
-    onFinish(testCase)
-    if stopAfterEachTest { stop() }
+  public nonisolated func testCaseDidFinish(_ testCase: XCTestCase) {
+    MainActor.assumeIsolated {
+      onFinish(testCase)
+      if stopAfterEachTest { stop() }
+    }
   }
 }

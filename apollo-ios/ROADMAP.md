@@ -1,6 +1,6 @@
 # 🔮 Apollo iOS Roadmap
 
-**Last updated: 2024-07-30**
+**Last updated: 2024-09-24**
 
 For up to date release notes, refer to the project's [Changelog](https://github.com/apollographql/apollo-ios/blob/main/CHANGELOG.md).
 
@@ -37,17 +37,23 @@ _Approximate Date: to be released incrementally_
 
 - This effort encompasses several smaller features:
     - ✅ Make codegen support Swift concurrency (`async`/`await`): available in v1.7.0
-    - (in progress) [Add configuration for disabling merging of fragment fields](https://github.com/apollographql/apollo-ios/issues/2560)
+    - ✅ [Add configuration for disabling merging of fragment fields](https://github.com/apollographql/apollo-ios/issues/2560)
     - (in progress) Fix retain cycles and memory issues causing code generation to take very long on certain large, complex schemas with deeply nested fragment composition
 
 ### [2.0 Release] - Swift 6 compatibility
 
 To support the breaking language changes in Swift 6, a major version 2.0 of Apollo iOS will be released. This version will include support for the new Swift Concurrency Model and improve upon networking and caching APIs.
 
-_Approximate Date: Beta release in September alongside Xcode 16 & Swift 6 stable release
+_Approximate Date: _Pending completion of design review._ Current RFC for design is available [here](https://github.com/apollographql/apollo-ios/issues/3411).
 
 - ✅ [`ExistentialAny` upcoming feature](https://github.com/apollographql/apollo-ios/issues/3205)
 - (in progress) [`Sendable` types and `async/await` APIs](https://github.com/apollographql/apollo-ios/issues/3291)
+
+### `@oneOf` Input Object Support
+
+_Approximate Date: TBD, awaiting final approval of RFC into the GraphQL specification._
+
+For more information on this feature, see the [RFC](https://github.com/graphql/graphql-spec/pull/825) for its addition to the GraphQL specification.
 
 ### [Reduce generated schema types](https://github.com/apollographql/apollo-ios/milestone/71)
 

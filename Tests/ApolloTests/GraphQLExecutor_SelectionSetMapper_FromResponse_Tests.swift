@@ -787,7 +787,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   // MARK: - Inline Fragments
 
-  func test__inlineFragment__withoutTypenameMatchingCondition_selectsTypeCaseField() throws {
+  @MainActor func test__inlineFragment__withoutTypenameMatchingCondition_selectsTypeCaseField() throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -819,7 +819,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       }
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName =  { typeName in
+    MockSchemaMetadata.stub_objectTypeForTypeName({ typeName in
       switch typeName {
       case "Human":
         return Types.Human
@@ -827,7 +827,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
         fail()
         return nil
       }
-    }
+    })
 
     let object: JSONObject = [
       "child": [
@@ -1117,7 +1117,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   // MARK: - Fragments
 
-  func test__fragment__asObjectType_matchingParentType_selectsFragmentFields() throws {
+  @MainActor func test__fragment__asObjectType_matchingParentType_selectsFragmentFields() throws {
     // given
     struct Types {
       static let MockChildObject = Object(typename: "MockChildObject", implementedInterfaces: [])
@@ -1150,7 +1150,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       }
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName =  { _ in return Types.MockChildObject }
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in return Types.MockChildObject })
 
     let object: JSONObject = [
       "__typename": "MockChildObject",
@@ -1368,7 +1368,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     expect(data.name).to(beNil())
   }
 
-  func test__booleanCondition_include_typeCase__givenVariableIsTrue_typeCaseMatchesParentType_getsValuesForTypeCaseFields() throws {
+  @MainActor func test__booleanCondition_include_typeCase__givenVariableIsTrue_typeCaseMatchesParentType_getsValuesForTypeCaseFields() throws {
     // given
     struct Types {
       static let Person = Object(typename: "Person", implementedInterfaces: [])
@@ -1388,7 +1388,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
         ]}
       }
     }
-    MockSchemaMetadata.stub_objectTypeForTypeName = { _ in Types.Person }
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in Types.Person })
     let object: JSONObject = [
       "__typename": "Person",
       "name": "Luke Skywalker",
@@ -1404,7 +1404,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     expect(data.name).to(equal("Luke Skywalker"))
   }
 
-  func test__booleanCondition_include_typeCase__givenVariableIsFalse_typeCaseMatchesParentType_doesNotGetValuesForTypeCaseFields() throws {
+  @MainActor func test__booleanCondition_include_typeCase__givenVariableIsFalse_typeCaseMatchesParentType_doesNotGetValuesForTypeCaseFields() throws {
     // given
     struct Types {
       static let Person = Object(typename: "Person", implementedInterfaces: [])
@@ -1424,7 +1424,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
         ]}
       }
     }
-    MockSchemaMetadata.stub_objectTypeForTypeName = { _ in Types.Person }
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in Types.Person })
     let object: JSONObject = [
       "__typename": "Person",
       "name": "Luke Skywalker",
@@ -1440,7 +1440,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     expect(data.name).to(beNil())
   }
 
-  func test__booleanCondition_include_typeCase__givenVariableIsTrue_typeCaseDoesNotMatchParentType_doesNotGetValuesForTypeCaseFields() throws {
+  @MainActor func test__booleanCondition_include_typeCase__givenVariableIsTrue_typeCaseDoesNotMatchParentType_doesNotGetValuesForTypeCaseFields() throws {
     // given
     struct Types {
       static let Person = Object(typename: "Person", implementedInterfaces: [])
@@ -1460,7 +1460,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
         ]}
       }
     }
-    MockSchemaMetadata.stub_objectTypeForTypeName = { _ in Object.mock }
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in Object.mock })
     let object: JSONObject = [
       "__typename": "Person",
       "name": "Luke Skywalker",
@@ -1476,7 +1476,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     expect(data.name).to(beNil())
   }
 
-  func test__booleanCondition_include_singleFieldOnNestedTypeCase__givenVariableIsTrue_typeCaseMatchesParentType_getsValuesForTypeCaseFields() throws {
+  @MainActor func test__booleanCondition_include_singleFieldOnNestedTypeCase__givenVariableIsTrue_typeCaseMatchesParentType_getsValuesForTypeCaseFields() throws {
     // given
     struct Types {
       static let Person = Object(typename: "Person", implementedInterfaces: [])
@@ -1496,7 +1496,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
         ]}
       }
     }
-    MockSchemaMetadata.stub_objectTypeForTypeName = { _ in Types.Person }
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in Types.Person })
     let object: JSONObject = [
       "__typename": "Person",
       "name": "Luke Skywalker",
@@ -1512,7 +1512,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     expect(data.name).to(equal("Luke Skywalker"))
   }
 
-  func test__booleanCondition_include_singleFieldOnNestedTypeCase__givenVariableIsFalse_typeCaseMatchesParentType_getsValuesForTypeCaseFields() throws {
+  @MainActor func test__booleanCondition_include_singleFieldOnNestedTypeCase__givenVariableIsFalse_typeCaseMatchesParentType_getsValuesForTypeCaseFields() throws {
     // given
     struct Types {
       static let Person = Object(typename: "Person", implementedInterfaces: [])
@@ -1532,7 +1532,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
         ]}
       }
     }
-    MockSchemaMetadata.stub_objectTypeForTypeName = { _ in Types.Person }
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in Types.Person })
     let object: JSONObject = [
       "__typename": "Person",
       "name": "Luke Skywalker",
@@ -1548,7 +1548,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     expect(data.name).to(beNil())
   }
 
-  func test__booleanCondition_include_typeCaseOnNamedFragment__givenVariableIsTrue_typeCaseMatchesParentType_getsValuesForTypeCaseFields() throws {
+  @MainActor func test__booleanCondition_include_typeCaseOnNamedFragment__givenVariableIsTrue_typeCaseMatchesParentType_getsValuesForTypeCaseFields() throws {
     // given
     struct Types {
       static let Person = Object(typename: "Person", implementedInterfaces: [])
@@ -1573,7 +1573,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
         ]}
       }
     }
-    MockSchemaMetadata.stub_objectTypeForTypeName = { _ in Types.Person }
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in Types.Person })
     let object: JSONObject = [
       "__typename": "Person",
       "name": "Luke Skywalker",
@@ -2024,19 +2024,19 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   // MARK: Fulfilled Fragment Tests
 
-  func test__nestedEntity_andTypeCaseWithAdditionalMergedNestedEntityFields_givenChildEntityCanConvertToTypeCase_fulfilledFragmentsContainsTypeCase() throws {
+  @MainActor func test__nestedEntity_andTypeCaseWithAdditionalMergedNestedEntityFields_givenChildEntityCanConvertToTypeCase_fulfilledFragmentsContainsTypeCase() throws {
     struct Types {
       static let Character = Interface(name: "Character")
       static let Hero = Interface(name: "Hero")
       static let Human = Object(typename: "Human", implementedInterfaces: [Character.self, Hero.self])
     }
 
-    MockSchemaMetadata.stub_objectTypeForTypeName = {
+    MockSchemaMetadata.stub_objectTypeForTypeName({
       switch $0 {
       case "Human": return Types.Human
       default: fail(); return nil
       }
-    }
+    })
 
     class Character: MockSelectionSet {
       typealias Schema = MockSchemaMetadata

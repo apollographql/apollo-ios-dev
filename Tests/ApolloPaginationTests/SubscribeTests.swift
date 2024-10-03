@@ -16,17 +16,18 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
   var client: ApolloClient!
   var cancellables: [AnyCancellable] = []
 
-  override func setUpWithError() throws {
-    try super.setUpWithError()
+  @MainActor
+  override func setUp() async throws {
+    try await super.setUp()
 
-    cache = try makeNormalizedCache()
+    cache = try await makeNormalizedCache()
     let store = ApolloStore(cache: cache)
 
     server = MockGraphQLServer()
     let networkTransport = MockNetworkTransport(server: server, store: store)
 
     client = ApolloClient(networkTransport: networkTransport, store: store)
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
   }
 
   override func tearDownWithError() throws {
@@ -45,8 +46,8 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     let initialFetchExpectation = expectation(description: "Results")
     initialFetchExpectation.assertForOverFulfill = false
 
-    var results: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
-    var otherResults: [Result<(PaginationOutput<Query, Query>, UpdateSource), any Error>] = []
+    var results: [Result<PaginationOutput<Query, Query>, any Error>] = []
+    var otherResults: [Result<PaginationOutput<Query, Query>, any Error>] = []
     await pager.$currentValue.compactMap({ $0 }).sink { result in
       results.append(result)
       initialFetchExpectation.fulfill()
@@ -62,11 +63,11 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [serverExpectation, initialFetchExpectation], timeout: 1.0)
     XCTAssertFalse(results.isEmpty)
     let result = try XCTUnwrap(results.first)
-    XCTAssertSuccessResult(result) { (output, source) in
+    XCTAssertSuccessResult(result) { output in
       XCTAssertTrue(output.nextPages.isEmpty)
-      XCTAssertEqual(output.initialPage.hero.friendsConnection.friends.count, 2)
-      XCTAssertEqual(output.initialPage.hero.friendsConnection.totalCount, 3)
-      XCTAssertEqual(source, .fetch)
+      XCTAssertEqual(output.initialPage?.data?.hero.friendsConnection.friends.count, 2)
+      XCTAssertEqual(output.initialPage?.data?.hero.friendsConnection.totalCount, 3)
+      XCTAssertEqual(output.initialPage?.source, .server)
       XCTAssertEqual(results.count, otherResults.count)
     }
   }

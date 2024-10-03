@@ -13,6 +13,17 @@
       "type" : "text"
     }
   ],
+  "deprecationSummary" : [
+    {
+      "inlineContent" : [
+        {
+          "text" : "Will be removed in a future version of ApolloPagination. Use the `Combine` publishers instead. If you need to dispatch to the main thread, make sure to use a `.receive(on: RunLoop.main)` as part of your `Combine` operation.",
+          "type" : "text"
+        }
+      ],
+      "type" : "paragraph"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -27,7 +38,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination22AsyncGraphQLQueryPagerC9subscribe10completionyys6ResultOyx_AA12UpdateSourceOts5Error_pGScMYcc_tF",
+    "externalID" : "s:16ApolloPagination22AsyncGraphQLQueryPagerC9subscribe10completionyys6ResultOyxs5Error_pGScMYcc_tF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -93,6 +104,9 @@
       {
         "name" : "ApolloPagination"
       }
+    ],
+    "platforms" : [
+
     ],
     "role" : "symbol",
     "roleHeading" : "Instance Method",
@@ -326,6 +340,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",

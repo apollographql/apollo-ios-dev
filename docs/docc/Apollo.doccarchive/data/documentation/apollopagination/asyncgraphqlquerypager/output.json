@@ -92,7 +92,7 @@
             },
             {
               "kind" : "text",
-              "text" : "<("
+              "text" : "<"
             },
             {
               "kind" : "typeIdentifier",
@@ -100,17 +100,7 @@
             },
             {
               "kind" : "text",
-              "text" : ", "
-            },
-            {
-              "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource",
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:16ApolloPagination12UpdateSourceO",
-              "text" : "UpdateSource"
-            },
-            {
-              "kind" : "text",
-              "text" : "), any "
+              "text" : ", any "
             },
             {
               "kind" : "typeIdentifier",
@@ -224,37 +214,6 @@
   "title" : "AsyncGraphQLQueryPager.Output",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager\/output"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/UpdateSource": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "enum"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "UpdateSource"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "UpdateSource"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "UpdateSource",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/updatesource"
 }
 }
 }

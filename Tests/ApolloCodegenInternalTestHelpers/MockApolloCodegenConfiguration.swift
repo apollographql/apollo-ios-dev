@@ -30,6 +30,7 @@ extension ApolloCodegenConfiguration {
   public static func mock(
     _ moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType,
     options: ApolloCodegenConfiguration.OutputOptions = .init(),
+    experimentalFeatures: ExperimentalFeatures = .init(),
     schemaNamespace: String = "TestSchema",
     to path: String = "MockModulePath"
   ) -> Self {
@@ -42,7 +43,8 @@ extension ApolloCodegenConfiguration {
       output: .init(
         schemaTypes: .init(path: path, moduleType: moduleType)
       ),
-      options: options
+      options: options,
+      experimentalFeatures: experimentalFeatures
     )
   }
 }

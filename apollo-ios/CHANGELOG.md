@@ -1,5 +1,35 @@
 # Change Log
 
+## v1.15.2
+
+### Improvements
+- **Set `URLRequest` cache policy on GET requests ([#476](https://github.com/apollographql/apollo-ios-dev/pull/476)):** Uses the Apollo cache policy to set a comparable cache policy on `URLRequest`. Previously there was no way to opt-out of default `URLRequest` caching behaviour.
+- **Batch writing records to the SQLite store ([#498](https://github.com/apollographql/apollo-ios-dev/pull/498)):** Uses the `insertMany` to batch write records for a given operation vs previously performing a write for each individual record.
+
+### Fixed
+- **Fix `ListData` type check ([#473](https://github.com/apollographql/apollo-ios-dev/pull/473)):** Fixed bool type check in `ListData`.
+- **Remove local cache mutation type condition setter ([#485](https://github.com/apollographql/apollo-ios-dev/pull/485)):** Removes the setter for mutable inline fragments. The correct way to initialize with a type condition is to use `asRootEntityType`.
+
+## v1.15.1
+
+### Fixed
+- **Fix decoding of deprecated `selectionSetInitializer` option `localCacheMutations` ([#467](https://github.com/apollographql/apollo-ios-dev/pull/467)):** This option was deprecated in `1.15.0`, and the removal of the code to parse the option resulted in a validation error when the deprecated option was present in the JSON code generation config file. This is now fixed so that the option is ignored but does not cause code generation to fail.  
+- **Disfavour deprecated watch function ([#469](https://github.com/apollographql/apollo-ios-dev/pull/469)):** A deprecated version of the `watch` function matched the overload of the current version if certain parameters were omitted. This caused an incorrect deprecation warning in this situation. We've fixed this by adding `@_disfavoredOverload` to the deprecated function signature.
+  
+## v1.15.0
+
+### New
+- **Add ability to disable fragment field merging ([#431](https://github.com/apollographql/apollo-ios-dev/pull/431)):** Added `ApolloCodegenConfiguration` option to allow for disabling fragment field merging on generated models. For more information on this feature see the notes [here](https://github.com/apollographql/apollo-ios/releases/tag/preview-field-merging.1).
+
+### Fixed
+- **Fix `legacyResponse` property not being set on `HTTPResponse` ([#456](https://github.com/apollographql/apollo-ios-dev/pull/456)):** When the `legacyResponse` property of `HTTPResponse` was deprecated setting the value was also removed; this was incorrect as it created a hidden breaking change for interceptors that might have been using the value.
+- **Fix `ObjectData` type check ([#459](https://github.com/apollographql/apollo-ios-dev/pull/459)):** Fixed bool type check in `ObjectData`.
+- **Fix `SelectionSetTemplate` scope comparison ([#460](https://github.com/apollographql/apollo-ios-dev/pull/460)):** Refactored the selection set template scope comparison to account for an edge case in merged sources.
+- **Fix memory leak in DataLoader closure ([#457](https://github.com/apollographql/apollo-ios-dev/pull/457)):** Fixed a memory leak in the DataLoader closure in `ApolloStore` caused by implicit use of `self`. _Thank you to [@prabhuamol](https://github.com/prabhuamol) for finding and fixing this._
+
+### Breaking
+- **Bug Fix: Generated Selections Sets in Inclusion Condition Scope:** This fixes a bug when using @include/@skip where generated models that should have been generated inside of a conditional inline fragment were generated outside of the conditional scope. This may cause breaking changes for a small number of users. Those breaking changes are considered a bug fix since accessing the conditional inline fragments outside of the conditional scope could cause runtime crashes (if the conditions for their inclusion were not met). More information [here](https://github.com/apollographql/apollo-ios/releases/tag/preview-field-merging.1)
+
 ## v1.14.1
 
 ### New

@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination0B6OutputV11initialPage4DataQzvp",
+    "externalID" : "s:16ApolloPagination0B6OutputV11initialPage0A013GraphQLResultVy4DataQzGSgvp",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -39,6 +39,15 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
+        "text" : "GraphQLResult"
+      },
+      {
+        "kind" : "text",
+        "text" : "<"
+      },
+      {
+        "kind" : "typeIdentifier",
         "text" : "InitialQuery"
       },
       {
@@ -49,6 +58,10 @@
         "kind" : "typeIdentifier",
         "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
         "text" : "Data"
+      },
+      {
+        "kind" : "text",
+        "text" : ">?"
       }
     ],
     "modules" : [
@@ -90,6 +103,15 @@
             },
             {
               "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
+              "text" : "GraphQLResult"
+            },
+            {
+              "kind" : "text",
+              "text" : "<"
+            },
+            {
+              "kind" : "typeIdentifier",
               "text" : "InitialQuery"
             },
             {
@@ -100,6 +122,10 @@
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
               "text" : "Data"
+            },
+            {
+              "kind" : "text",
+              "text" : ">?"
             }
           ]
         }
@@ -200,6 +226,15 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
+      "text" : "GraphQLResult"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
       "text" : "InitialQuery"
     },
     {
@@ -210,6 +245,10 @@
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
       "text" : "Data"
+    },
+    {
+      "kind" : "text",
+      "text" : ">?"
     }
   ],
   "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput\/initialPage",

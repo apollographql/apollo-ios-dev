@@ -33,7 +33,7 @@ struct SelectionSetTemplate {
     self.nameCache = SelectionSetNameCache(config: config)
   }
 
-  /// MARK: - SelectionSetContext
+  // MARK: - SelectionSetContext
 
   struct SelectionSetContext {
     let selectionSet: IR.ComputedSelectionSet
@@ -42,17 +42,22 @@ struct SelectionSetTemplate {
 
   private func createSelectionSetContext(
     for selectionSet: IR.SelectionSet,
-    inParent context: SelectionSetContext
+    inParent context: SelectionSetContext?
   ) -> SelectionSetContext {
     let computedSelectionSet = ComputedSelectionSet.Builder(
       selectionSet,
+      mergingStrategy: self.config.experimentalFeatures.fieldMerging.options,
       entityStorage: definition.entityStorage
     ).build()
-    var validationContext = context.validationContext
+
+    var validationContext = context?.validationContext ??
+    SelectionSetValidationContext(config: config)
+
     validationContext.runTypeValidationFor(
       computedSelectionSet,
       recordingErrorsTo: nonFatalErrorRecorder
     )
+
     return SelectionSetContext(
       selectionSet: computedSelectionSet,
       validationContext: validationContext
@@ -71,19 +76,9 @@ struct SelectionSetTemplate {
   ///
   /// - Returns: The `TemplateString` for the body of the `SelectionSetTemplate`.
   func renderBody() -> TemplateString {
-    let computedRootSelectionSet = IR.ComputedSelectionSet.Builder(
-      definition.rootField.selectionSet,
-      entityStorage: definition.entityStorage
-    ).build()
-
-    var validationContext = SelectionSetValidationContext(config: config)
-    validationContext.runTypeValidationFor(
-      computedRootSelectionSet,
-      recordingErrorsTo: nonFatalErrorRecorder
-    )
-    let selectionSetContext = SelectionSetContext(
-      selectionSet: computedRootSelectionSet,
-      validationContext: validationContext
+    let selectionSetContext = createSelectionSetContext(
+      for: definition.rootField.selectionSet,
+      inParent: nil
     )
 
     let body = BodyTemplate(selectionSetContext)
@@ -94,6 +89,7 @@ struct SelectionSetTemplate {
   // MARK: - Child Entity
   func render(childEntity context: SelectionSetContext) -> String? {
     let selectionSet = context.selectionSet
+
     let fieldSelectionSetName = nameCache.selectionSetName(for: selectionSet.typeInfo)
 
     if let referencedSelectionSetName = selectionSet.nameForReferencedSelectionSet(config: config) {
@@ -482,16 +478,7 @@ struct SelectionSetTemplate {
 
     let typeName = inlineFragment.renderedTypeName
     return """
-      \(renderAccessControl())var \(typeName.firstLowercased): \(typeName)? {\
-      \(if: isMutable,
-      """
-
-        get { _asInlineFragment() }
-        set { if let newData = newValue?.__data._data { __data._data = newData }}
-      }
-      """,
-        else: " _asInlineFragment() }"
-      )
+      \(renderAccessControl())var \(typeName.firstLowercased): \(typeName)? { _asInlineFragment() }
       """
   }
 
@@ -728,6 +715,7 @@ struct SelectionSetTemplate {
   }
 
   // MARK: - Nested Selection Sets
+
   private func ChildEntityFieldSelectionSets(
     _ context: SelectionSetContext
   ) -> TemplateString {
@@ -801,10 +789,6 @@ extension IR.ComputedSelectionSet {
     return !self.isEntityRoot && !self.isUserDefined && (direct?.isEmpty ?? true)
   }
 
-  fileprivate var shouldBeRendered: Bool {
-    return direct != nil || merged.mergedSources.count != 1
-  }
-
   /// If the SelectionSet is a reference to another rendered SelectionSet, returns the qualified
   /// name of the referenced SelectionSet.
   ///
@@ -815,11 +799,11 @@ extension IR.ComputedSelectionSet {
   fileprivate func nameForReferencedSelectionSet(
     config: ApolloCodegen.ConfigurationContext
   ) -> String? {
-    guard !shouldBeRendered else {
+    guard direct == nil && self.typeInfo.derivedFromMergedSources.count == 1 else {
       return nil
     }
 
-    return merged.mergedSources
+    return self.typeInfo.derivedFromMergedSources
       .first.unsafelyUnwrapped
       .generatedSelectionSetNamePath(
         from: typeInfo,
@@ -854,7 +838,10 @@ extension IR.MergedSelections.MergedSource {
     var sourceTypePathCurrentNode = typeInfo.scopePath.last
     var nodesToSharedRoot = 0
 
-    while targetTypePathCurrentNode.value == sourceTypePathCurrentNode.value {
+    while representsSameScope(
+      target: targetTypePathCurrentNode.value,
+      source: sourceTypePathCurrentNode.value
+    ) {
       guard let previousFieldNode = targetTypePathCurrentNode.previous,
         let previousSourceNode = sourceTypePathCurrentNode.previous
       else {
@@ -900,6 +887,37 @@ extension IR.MergedSelections.MergedSource {
     )
 
     return selectionSetName
+  }
+
+  /// Checks whether the target and source scope descriptors represent the same scope.
+  ///
+  /// There is the obvious comparison when the two scope descriptors are equal but there
+  /// is also a more nuanced edge case that must be considered too.
+  ///
+  /// This edge case occurs when the target merged source has an inclusion condition that
+  /// gets broken out into the next node due to the same field existing without an inclusion
+  /// condition at the target scope. In this case the comparison considers two contiguous
+  /// nodes with a type condition and an inclusion condition at the root of the entity to 
+  /// match a single node with a matching type condition and inclusion condition.
+  ///
+  /// See the test named `test__render_nestedSelectionSet__givenEntityFieldMerged_fromTypeCase_withInclusionCondition_rendersSelectionSetAsTypeAlias_withFullyQualifiedName`
+  /// for a specific test related to this behaviour.
+  fileprivate func representsSameScope(target: ScopeDescriptor, source: ScopeDescriptor) -> Bool {
+    guard target != source else { return true }
+
+    if target.scopePath.head.value.type == source.scopePath.head.value.type {
+      guard 
+        let sourceConditions = source.scopePath.head.value.conditions,
+        target.scopePath[1].type == nil,
+        let targetNextNodeConditions = target.scopePath[1].conditions
+      else {
+        return false
+      }
+
+      return sourceConditions == targetNextNodeConditions
+    }
+
+    return false
   }
 
   private func generatedSelectionSetNameForMergedEntity(

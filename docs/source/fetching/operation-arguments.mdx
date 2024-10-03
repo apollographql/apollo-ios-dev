@@ -4,7 +4,7 @@ title: Operation Arguments
 
 GraphQL operations can define arguments as part of their definitions, the values of these arguments can be passed to field arguments or directive arguments (eg. `@skip` and `@include`).
 
-Apollo iOS generates type-safe initializers for your operation that accept your operation's arguments. These arguments can be [built-in scalar types](https://graphql.org/learn/schema/#scalar-types), [custom scalars](./../custom-scalars), [enums](./../enums), or [input objects](./../input-objects) defined in your schema.
+Apollo iOS generates type-safe initializers for your operation that accept your operation's arguments. These arguments can be [built-in scalar types](https://graphql.org/learn/schema/#scalar-types), [custom scalars](./../custom-scalars), [enums](https://graphql.org/learn/schema/#enumeration-types), or [input objects](https://graphql.org/learn/schema/#input-types) defined in your schema.
 
 Let's say we define a GraphQL query named `HeroName` with an `episode` argument which is a custom `Episode` enum defined in our schema:
 

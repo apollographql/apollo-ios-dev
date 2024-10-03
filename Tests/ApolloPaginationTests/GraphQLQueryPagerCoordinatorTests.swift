@@ -18,17 +18,18 @@ final class GraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTesting
   var client: ApolloClient!
   var cancellables: [AnyCancellable] = []
 
-  override func setUpWithError() throws {
-    try super.setUpWithError()
+  @MainActor
+  override func setUp() async throws {
+    try await super.setUp()
 
-    cache = try makeNormalizedCache()
+    cache = try await makeNormalizedCache()
     let store = ApolloStore(cache: cache)
 
     server = MockGraphQLServer()
     let networkTransport = MockNetworkTransport(server: server, store: store)
 
     client = ApolloClient(networkTransport: networkTransport, store: store)
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object = IDCacheKeyProvider.resolver
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
   }
 
   override func tearDownWithError() throws {
@@ -96,7 +97,7 @@ final class GraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTesting
     server.customDelay = .milliseconds(1)
     let pager = GraphQLQueryPagerCoordinator(pager: createForwardPager())
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-    var results: [Result<(PaginationOutput<ForwardQuery, ForwardQuery>, UpdateSource), any Error>] = []
+    var results: [Result<PaginationOutput<ForwardQuery, ForwardQuery>, any Error>] = []
     var errors: [PaginationError?] = []
 
     pager.fetch()
@@ -127,7 +128,7 @@ final class GraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTesting
     server.customDelay = .milliseconds(1)
     var pager: GraphQLQueryPagerCoordinator! = GraphQLQueryPagerCoordinator(pager: createForwardPager())
     let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-    var results: [Result<(PaginationOutput<ForwardQuery, ForwardQuery>, UpdateSource), any Error>] = []
+    var results: [Result<PaginationOutput<ForwardQuery, ForwardQuery>, any Error>] = []
     var errors: [PaginationError?] = []
 
     pager.fetch()
