@@ -120,6 +120,8 @@ public struct MultipartResponseParsingInterceptor: ApolloInterceptor {
   }
 }
 
+// MARK: Specification Parser Protocol
+
 /// A protocol that multipart response parsers must conform to in order to be added to the list of
 /// available response specification parsers.
 protocol MultipartResponseSpecificationParser {
@@ -141,22 +143,34 @@ extension MultipartResponseSpecificationParser {
   static var dataLineSeparator: StaticString { "\r\n\r\n" }
 }
 
+// MARK: Helpers
+
+extension MultipartResponseParsingInterceptor {
+  static func boundaryMarker(delimitedBy delimiter: String) -> String {
+    "\r\n--\(delimiter)"
+  }
+
+  static func endBoundaryMarker(delimitedBy delimiter: String) -> String {
+    boundaryMarker(delimitedBy: delimiter) + "--"
+  }
+}
+
 extension String {
   fileprivate var isBoundaryMarker: Bool { self == "--" }
+  fileprivate var isMultipartNewLine: Bool { self == "\r\n" }
 
   /// Returns the range of a complete multipart chunk.
-  func multipartRange(delimitedBy boundary: String) -> String.Index? {
-    let boundaryMarker = "\r\n--\(boundary)"
-    let endBoundaryMarker = "\r\n--\(boundary)--"
-
+  func multipartRange(delimitedBy delimiter: String) -> String.Index? {
     // The end boundary marker indicates that no further chunks will follow so if this delimiter
     // if found then include the delimiter in the index. Search for this first.
+    let endBoundaryMarker = MultipartResponseParsingInterceptor.endBoundaryMarker(delimitedBy: delimiter)
     if let endIndex = range(of: endBoundaryMarker, options: .backwards)?.upperBound {
       return endIndex
     }
 
     // A chunk boundary indicates there may still be more chunks to follow so the index need not
     // include the chunk boundary in the index.
+    let boundaryMarker = MultipartResponseParsingInterceptor.boundaryMarker(delimitedBy: delimiter)
     if let chunkIndex = range(of: boundaryMarker, options: .backwards)?.lowerBound {
       return chunkIndex
     }
