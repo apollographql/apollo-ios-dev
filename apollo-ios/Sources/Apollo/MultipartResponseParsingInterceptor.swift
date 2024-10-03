@@ -85,8 +85,9 @@ public struct MultipartResponseParsingInterceptor: ApolloInterceptor {
       return
     }
 
-    for chunk in dataString.components(separatedBy: "--\(boundary)") {
-      if chunk.isEmpty || chunk.isBoundaryMarker { continue }
+    let boundaryMarker = Self.boundaryMarker(delimitedBy: boundary)
+    for chunk in dataString.components(separatedBy: boundaryMarker) {
+      if chunk.isEmpty || chunk.isBoundaryMarker || chunk.isMultipartNewLine { continue }
 
       switch parser.parse(chunk) {
       case let .success(data):
