@@ -103,6 +103,7 @@ final class DeferTests: XCTestCase {
 
   func test__parsing__givenPartialResponse_shouldReturnSingleSuccess() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 
@@ -193,6 +194,7 @@ final class DeferTests: XCTestCase {
 
   func test__parsing__givenPartialAndIncrementalResponses_withRootMerge_shouldReturnMultipleSuccesses() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 
@@ -240,7 +242,7 @@ final class DeferTests: XCTestCase {
           }
         ]
       }
-      --graphql
+      --graphql--
       """.crlfFormattedData()
     )
 
@@ -292,6 +294,7 @@ final class DeferTests: XCTestCase {
 
   func test__parsing__givenPartialAndIncrementalResponses_withNestedMerge_shouldReturnMultipleSuccesses() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 
@@ -353,7 +356,7 @@ final class DeferTests: XCTestCase {
           }
         ]
       }
-      --graphql
+      --graphql--
       """.crlfFormattedData()
     )
 
