@@ -85,6 +85,11 @@ public struct MultipartResponseParsingInterceptor: ApolloInterceptor {
       return
     }
 
+    // Parsing Notes:
+    //
+    // Multipart messages arriving here may consist of more than one chunk, but they are always
+    // expected to be complete chunks. Downstream protocol specification parsers are only built
+    // to handle the protocol specific message formats, i.e.: data between the multipart delimiter.
     let boundaryDelimiter = Self.boundaryDelimiter(with: boundary)
     for chunk in dataString.components(separatedBy: boundaryDelimiter) {
       if chunk.isEmpty || chunk.isDashBoundaryPrefix || chunk.isMultipartNewLine { continue }

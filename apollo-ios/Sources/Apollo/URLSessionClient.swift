@@ -297,14 +297,19 @@ open class URLSessionClient: NSObject, URLSessionDelegate, URLSessionTaskDelegat
         return
       }
 
+      // Parsing Notes:
+      //
+      // Multipart messages are parsed here only to look for complete chunks to pass on to the downstream
+      // parsers. Any leftover data beyond a delimited chunk is held back for more data to arrive.
+      //
+      // Do not return `.failure` here simply because there was no boundary delimiter found; the
+      // data may still be arriving. If the request ends without more data arriving it will get handled
+      // in urlSession(_:task:didCompleteWithError:).
       guard
         let dataString = String(data: taskData.data, encoding: .utf8),
         let lastBoundaryDelimiterIndex = dataString.multipartRange(using: boundary),
         let boundaryData = dataString.prefix(upTo: lastBoundaryDelimiterIndex).data(using: .utf8)
       else {
-        // Do not return .failure here simply because there was no boundary delimiter found; the data
-        // may still be arriving. If the request ends without more data arriving it will get handled
-        // in urlSession(_:task:didCompleteWithError:).
         return
       }
 
