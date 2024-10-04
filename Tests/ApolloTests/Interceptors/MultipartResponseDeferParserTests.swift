@@ -20,6 +20,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
       response: .mock(
         headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
         data: """
+          
           --graphql
           content-type: test/custom
 
@@ -29,7 +30,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
             },
             "hasNext": true
           }
-          --graphql
+          --graphql--
           """.crlfFormattedData()
       )
     ) { result in
@@ -57,11 +58,12 @@ final class MultipartResponseDeferParserTests: XCTestCase {
       response: .mock(
         headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
         data: """
+          
           --graphql
           content-type: application/json
 
           not_a_valid_json_object
-          --graphql
+          --graphql--
           """.crlfFormattedData()
       )
     ) { result in
@@ -89,13 +91,14 @@ final class MultipartResponseDeferParserTests: XCTestCase {
       response: .mock(
         headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
         data: """
+          
           --graphql
           content-type: application/json
 
           {
             "key": "value"
           }
-          --graphql
+          --graphql--
           """.crlfFormattedData()
       )
     ) { result in
@@ -132,6 +135,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
       response: .mock(
         headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
         data: """
+          
           --graphql
           content-type: application/json
 
@@ -141,7 +145,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
             },
             "hasNext": true
           }
-          --graphql
+          --graphql--
           """.crlfFormattedData()
       )
     ) { result in
@@ -202,6 +206,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
       response: .mock(
         headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
         data: """
+          
           --graphql
           content-type: application/json
 
@@ -232,7 +237,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
             ],
             "hasNext": false
           }
-          --graphql
+          --graphql--
           """.crlfFormattedData()
       )
     ) { result in

@@ -20,6 +20,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
       response: .mock(
         headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
         data: """
+          
           --graphql
           content-type: test/custom
 
@@ -28,7 +29,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
               "key" : "value"
             }
           }
-          --graphql
+          --graphql--
           """.crlfFormattedData()
       )
     ) { result in
@@ -56,6 +57,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
       response: .mock(
         headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
         data: """
+          
           --graphql
           content-type: application/json
 
@@ -66,7 +68,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
               }
             ]
           }
-          --graphql
+          --graphql--
           """.crlfFormattedData()
       )
     ) { result in
@@ -94,6 +96,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
       response: .mock(
         headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
         data: """
+          
           --graphql
           content-type: application/json
 
@@ -105,7 +108,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
               }
             ]
           }
-          --graphql
+          --graphql--
           """.crlfFormattedData()
       )
     ) { result in
@@ -133,6 +136,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
       response: .mock(
         headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
         data: """
+          
           --graphql
           content-type: application/json
 
@@ -149,7 +153,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
               }
             ]
           }
-          --graphql
+          --graphql--
           """.crlfFormattedData()
       )
     ) { result in
@@ -177,6 +181,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
       response: .mock(
         headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
         data: """
+          
           --graphql
           content-type: application/json
 
@@ -191,7 +196,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
               }
             ]
           }
-          --graphql
+          --graphql--
           """.crlfFormattedData()
       )
     ) { result in
@@ -219,11 +224,12 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
       response: .mock(
         headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"],
         data: """
+          
           --graphql
           content-type: application/json
 
           not_a_valid_json_object
-          --graphql
+          --graphql--
           """.crlfFormattedData()
       )
     ) { result in
@@ -276,6 +282,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
 
   func test__parsing__givenHeartbeat_shouldIgnore() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 
@@ -302,7 +309,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
           }
         }
       }
-      --graphql
+      --graphql--
       """.crlfFormattedData()
     )
 
@@ -334,6 +341,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
 
   func test__parsing__givenNullPayload_shouldIgnore() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       Content-Type: application/json
 
@@ -351,7 +359,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
           }
         }
       }
-      --graphql
+      --graphql--
       """.crlfFormattedData()
     )
 
@@ -380,6 +388,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
 
   func test__parsing__givenNullErrors_shouldIgnore() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 
@@ -397,7 +406,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
           }
         }
       }
-      --graphql
+      --graphql--
       """.crlfFormattedData()
     )
 
@@ -426,6 +435,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
 
   func test__parsing__givenSingleChunk_shouldReturnSuccess() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 
@@ -437,7 +447,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
           }
         }
       }
-      --graphql
+      --graphql--
       """.crlfFormattedData()
     )
 
@@ -466,6 +476,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
 
   func test__parsing__givenMultipleChunks_shouldReturnMultipleSuccesses() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 
@@ -488,7 +499,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
           }
         }
       }
-      --graphql
+      --graphql--
       """.crlfFormattedData()
     )
 
@@ -519,6 +530,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
 
   func test__parsing__givenPayloadAndUnknownKeys_shouldReturnSuccessAndIgnoreUnknownKeys() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 
@@ -531,7 +543,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
           }
         }
       }
-      --graphql
+      --graphql--
       """.crlfFormattedData()
     )
 
@@ -560,6 +572,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
 
   func test__parsing__givenPayloadWithDataAndGraphQLError_shouldReturnSuccessWithDataAndGraphQLError() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 
@@ -576,7 +589,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
           ]
         }
       }
-      --graphql
+      --graphql--
       """.crlfFormattedData()
     )
 
@@ -606,6 +619,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
 
   func test__parsing__givenPayloadWithNullDataAndGraphQLError_shouldReturnSuccessWithOnlyGraphQLError() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 
@@ -619,7 +633,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
           ]
         }
       }
-      --graphql
+      --graphql--
       """.crlfFormattedData()
     )
 
@@ -642,6 +656,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
 
   func test__parsing__givenEndOfStream_shouldReturnSuccess() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 

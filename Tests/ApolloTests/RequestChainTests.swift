@@ -641,6 +641,7 @@ class RequestChainTests: XCTestCase {
         headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
       ),
       data: """
+      
       --graphql
       content-type: application/json
 
@@ -663,7 +664,7 @@ class RequestChainTests: XCTestCase {
           }
         }
       }
-      --graphql
+      --graphql--
       """.crlfFormattedData()
     )
 
