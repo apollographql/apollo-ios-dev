@@ -244,6 +244,6 @@ private actor CompletionManager {
   }
 
   deinit {
-    completions.forEach { $0.completion?(PaginationError.cancellation) }
+    completions.forEach { $0.execute(error: PaginationError.cancellation) }
   }
 }
