@@ -128,6 +128,8 @@ Downloads a GraphQL schema from the Apollo Registry or GraphQL introspection and
 
 > For more information on schema fetching, see [Downloading a schema](./downloading-schema).
 
+> For more information on configuring schema fetching, see the [configuration documentation](./codegen-configuration#schema-download-configuration).
+
 #### Command:
 
 `apollo-ios-cli fetch-schema [--path <path>] [--string <string>]`
@@ -136,7 +138,7 @@ Downloads a GraphQL schema from the Apollo Registry or GraphQL introspection and
 
 | Option     | Description |
 | ---------- | ----------- |
-| `-p, --path <path>`     | Read the configuration from a file at the path. `--string` overrides this option if used together. (default: `./apollo-codegen-config.json`) |
+| `-p, --path <path>`     | Read the configuration from a file at the path. Requires that the [`schemaDownload`](./codegen-configuration#schema-download-configuration) property is configured in the file. `--string` overrides this option if used together. (default: `./apollo-codegen-config.json`) |
 | `-s, --string <string>` | Provide the configuration string in JSON format. This option overrides `--path`. |
 | `-v, --verbose `        | Increase verbosity to include debug output. |
 | `--version`             | Show the version of the CLI. |
