@@ -82,10 +82,11 @@ final class DeferTests: XCTestCase {
   // MARK: Parsing tests
 
   private func buildNetworkTransport(
-    responseData: Data
+    responseData: Data,
+    multipartBoundary boundary: String = "graphql"
   ) -> RequestChainNetworkTransport {
     let client = MockURLSessionClient(
-      response: .mock(headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"]),
+      response: .mock(headerFields: ["Content-Type": "multipart/mixed;boundary=\(boundary);deferSpec=20220824"]),
       data: responseData
     )
 
@@ -103,6 +104,7 @@ final class DeferTests: XCTestCase {
 
   func test__parsing__givenPartialResponse_shouldReturnSingleSuccess() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 
@@ -193,6 +195,7 @@ final class DeferTests: XCTestCase {
 
   func test__parsing__givenPartialAndIncrementalResponses_withRootMerge_shouldReturnMultipleSuccesses() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 
@@ -223,7 +226,7 @@ final class DeferTests: XCTestCase {
       content-type: application/json
 
       {
-        "hasNext": true,
+        "hasNext": false,
         "incremental": [
           {
             "label": "deferredGenres",
@@ -240,7 +243,7 @@ final class DeferTests: XCTestCase {
           }
         ]
       }
-      --graphql
+      --graphql--
       """.crlfFormattedData()
     )
 
@@ -292,6 +295,7 @@ final class DeferTests: XCTestCase {
 
   func test__parsing__givenPartialAndIncrementalResponses_withNestedMerge_shouldReturnMultipleSuccesses() throws {
     let network = buildNetworkTransport(responseData: """
+      
       --graphql
       content-type: application/json
 
@@ -353,7 +357,7 @@ final class DeferTests: XCTestCase {
           }
         ]
       }
-      --graphql
+      --graphql--
       """.crlfFormattedData()
     )
 
@@ -436,6 +440,97 @@ final class DeferTests: XCTestCase {
           ObjectIdentifier(TVShowQuery.Data.Show.Character.DeferredFriend.self),
         ]))
         expect(scoobyDoo?.__data._deferredFragments).to(beEmpty())
+      }
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
+
+  func test__parsing__givenPartialAndIncrementalResponses_withDashBoundaryInMessageBody_shouldNotSplitChunk() throws {
+    let multipartBoundary = "-"
+    let mysteryCharacterName = "lots\(multipartBoundary)of-\(multipartBoundary)similar--\(multipartBoundary)boundaries---\(multipartBoundary)in----\(multipartBoundary)this-----\(multipartBoundary)string"
+
+    let network = buildNetworkTransport(
+      responseData: """
+        
+        --\(multipartBoundary)
+        content-type: application/json
+
+        {
+          "hasNext": true,
+          "data": {
+            "show" : {
+              "__typename": "show",
+              "name": "The Scooby-Doo Show",
+              "characters": [
+                {
+                  "__typename": "Character",
+                  "name": "Scooby-Doo"
+                },
+                {
+                  "__typename": "Character",
+                  "name": "Shaggy Rogers"
+                },
+                {
+                  "__typename": "Character",
+                  "name": "Velma Dinkley"
+                },
+                {
+                  "__typename": "Character",
+                  "name": "\(mysteryCharacterName)"
+                }
+              ]
+            }
+          }
+        }
+        --\(multipartBoundary)
+        content-type: application/json
+
+        {
+          "hasNext": false,
+          "incremental": [
+            {
+              "label": "deferredGenres",
+              "path": [
+                "show"
+              ],
+              "data": {
+                "genres": [
+                  "Comedy",
+                  "Mystery",
+                  "Adventure"
+                ]
+              }
+            }
+          ]
+        }
+        --\(multipartBoundary)--
+        """.crlfFormattedData(),
+      multipartBoundary: multipartBoundary
+    )
+
+    let expectation = expectation(description: "Result received")
+    expectation.expectedFulfillmentCount = 2
+
+    _ = network.send(operation: TVShowQuery()) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      expect(result).to(beSuccess())
+
+      let data = try? result.get().data
+      expect(data?.__data._fulfilledFragments).to(equal([
+        ObjectIdentifier(TVShowQuery.Data.self),
+      ]))
+      expect(data?.__data._deferredFragments).to(beEmpty())
+
+      let show = data?.show
+      if expectation.numberOfFulfillments == 0 { // Partial data
+        expect(show?.characters).to(haveCount(4))
+
+        let mysteryCharacter = show?.characters[3]
+        expect(mysteryCharacter?.name).to(equal(mysteryCharacterName))
       }
     }
 
