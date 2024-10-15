@@ -13,14 +13,14 @@ Apollo iOS supports subscriptions over the following protocols:
 
 ## Enabling support
 
-To support GraphQL subscriptions, you need to initialize your `ApolloClient` instance with a [`NetworkTransport`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/networktransport) that supports subscriptions. See below for applicable classes for each subscription protocol.
+To support GraphQL subscriptions, you need to initialize your `ApolloClient` instance with a [`NetworkTransport`](/ios/networking/client-creation#networktransport) that supports subscriptions. See below for applicable classes for each subscription protocol.
 
 ### WebSocket
 
-To use Apollo iOS with WebSocket-based subscriptions, you need to install the optional  `ApolloWebSocket` library. This library includes two classes that conform to the [`NetworkTransport` protocol](../docc/documentation/apollo/networktransport):
+To use Apollo iOS with WebSocket-based subscriptions, you need to install the optional  `ApolloWebSocket` library. This library includes two classes that conform to the [`NetworkTransport` protocol](/ios/networking/client-creation#networktransport):
 
-- **[`WebSocketTransport`](../docc/documentation/apollowebsocket/websockettransport)** sends _all_ operations (including queries and mutations) over WebSocket.
-- **[`SplitNetworkTransport`](../docc/documentation/apollowebsocket/splitnetworktransport)** maintains a [`WebSocketTransport`](../docc/documentation/apollowebsocket/websockettransport) instance, _along with_ an [`UploadingNetworkTransport`](../docc/documentation/apollo/uploadingnetworktransport) instance (usually [`RequestChainNetworkTransport`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/requestchainnetworktransport)). This provides a single network transport that uses HTTP for queries and mutations and WebSocket for subscriptions.
+- **[`WebSocketTransport`](/ios/api/ApolloWebSocket/classes/WebSocketTransport)** sends _all_ operations (including queries and mutations) over WebSocket.
+- **[`SplitNetworkTransport`](/ios/api/ApolloWebSocket/classes/SplitNetworkTransport)** maintains a [`WebSocketTransport`](/ios/api/ApolloWebSocket/classes/WebSocketTransport) instance, _along with_ an [`UploadingNetworkTransport`](/ios/api/Apollo/protocols/UploadingNetworkTransport) instance (usually [`RequestChainNetworkTransport`](/ios/api/Apollo/classes/RequestChainNetworkTransport)). This provides a single network transport that uses HTTP for queries and mutations and WebSocket for subscriptions.
 
 `SplitNetworkTransport` is recommended for most use cases, because it enables you to retain a single `NetworkTransport` setup that avoids issues caused by using multiple client objects.
 
@@ -87,7 +87,7 @@ let webSocketTransport: WebSocketTransport = {
 
 ### HTTP
 
-The default `NetworkTransport` for Apollo iOS is the [`RequestChainNetworkTransport`](../docc/documentation/apollo/requestchainnetworktransport). In Apollo iOS `1.1.0` and later, this transport supports subscriptions over HTTP, with no additional configuration required. 
+The default `NetworkTransport` for Apollo iOS is the [`RequestChainNetworkTransport`](/ios/api/Apollo/classes/RequestChainNetworkTransport). In Apollo iOS `1.1.0` and later, this transport supports subscriptions over HTTP, with no additional configuration required. 
 
 > See the instructions for [creating a client](../networking/client-creation).
 

@@ -3,6 +3,7 @@
 > **For Cocoapods users:**
 >
 > Cocoapods combines subspecs into a single target. This means that:
+>
 > - The [`ApolloAPI`](#apolloapi) is merged into the [`Apollo`](#apollo) target.
 > - If you use the [`ApolloSQLite`](#apollosqlite) and [`ApolloWebSocket`](#apollowebsocket) subspecs, they are also merged into the `Apollo` target.
 
@@ -82,7 +83,7 @@ Provides a `NormalizedCache` implementation backed by a `SQLite` database.
 
 Use this library if you'd like to persist cache data across application lifecycles. This library only needs to be linked to your targets that configure the `SQLiteNormalizedCache` and pass it to the `ApolloStore`.
 
-For more information on setting up a persistent SQLite cache, see[`SQLiteNormalizedCache`](./caching/cache-setup#sqlitenormalizedcache).
+For more information on setting up a persistent SQLite cache, see[`SQLiteNormalizedCache`](/ios/caching/cache-setup#sqlitenormalizedcache).
 
 </td>
 </tr>
@@ -105,7 +106,7 @@ Provides a web socket transport implementation that supports `GraphQLSubscriptio
 
 If your project uses GraphQL subscriptions, you **must** include this library. This library only needs to be linked to your targets that configure the `WebSocketTransport` and pass it to the `ApolloClient`.
 
-For more information, see [Enabling GraphQL subscription support](./fetching/subscriptions#enabling-graphql-subscription-support).
+For more information, see [Enabling GraphQL subscription support](/ios/fetching/subscriptions#enabling-graphql-subscription-support).
 
 </td>
 </tr>
@@ -126,7 +127,7 @@ Includes the APIs for creating test mocks for your generated models
 </td>
 <td>
 
-Link this library to *unit test targets* that need to create mocks of generated models.
+Link this library to _unit test targets_ that need to create mocks of generated models.
 
 </td>
 </tr>

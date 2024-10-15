@@ -42,7 +42,7 @@ Using persisted queries for safelisting has the following requirements:
 
 ### 1. Configure generated operation models
 
-Both persisted queries and APQs require your code generation to include operation IDs. You can configure this in your code generation configuration's [`options`](output-options).
+Both persisted queries and APQs require your code generation to include operation IDs. You can configure this in your code generation configuration's [`options`](/ios/code-generation/codegen-configuration#output-options).
 Specifically, set the `operationDocumentFormat` array to `definition`, `operationId`, or both `definition` and `operationId`.
 - To use APQs, you must include both the `definition` and `operationId`.
 - For persisted queries, you only need the `operationId`.
