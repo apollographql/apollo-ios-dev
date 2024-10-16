@@ -110,8 +110,8 @@ class WebSocketTests: XCTestCase {
     subject.cancel()
   }
   
-  func testLocalErrorUnknownId() throws {
-    let expectation = self.expectation(description: "Unknown id for subscription")
+  func testLocalErrorMissingId() throws {
+    let expectation = self.expectation(description: "Missing id for subscription")
     
     let subject = client.subscribe(subscription: MockSubscription<ReviewAddedData>()) { result in
       defer { expectation.fulfill() }
@@ -133,10 +133,10 @@ class WebSocketTests: XCTestCase {
         }
       }
     }
-    
+
+    // Message data below has missing 'id' and should notify all subscribers of the error
     let message : JSONEncodableDictionary = [
       "type": "data",
-      "id": "2",            // subscribing on id = 1, i.e. expecting error when receiving id = 2
       "payload": [
         "data": [
           "reviewAdded": [
