@@ -2,44 +2,47 @@
 import ApolloAPI
 #endif
 
-final class GraphQLDependencyTracker: GraphQLResultAccumulator {
+@_spi(Execution)
+public final class GraphQLDependencyTracker: GraphQLResultAccumulator {
 
-  let requiresCacheKeyComputation: Bool = true
+  public let requiresCacheKeyComputation: Bool = true
 
   private var dependentKeys: Set<CacheKey> = Set()
+  
+  public init() {}
 
-  func accept(scalar: JSONValue, info: FieldExecutionInfo) {
+  public func accept(scalar: JSONValue, info: FieldExecutionInfo) {
     dependentKeys.insert(info.cachePath.joined)
   }
 
-  func accept(customScalar: JSONValue, info: FieldExecutionInfo) {
+  public func accept(customScalar: JSONValue, info: FieldExecutionInfo) {
     dependentKeys.insert(info.cachePath.joined)
   }
 
-  func acceptNullValue(info: FieldExecutionInfo) {
+  public func acceptNullValue(info: FieldExecutionInfo) {
     dependentKeys.insert(info.cachePath.joined)
   }
 
-  func acceptMissingValue(info: FieldExecutionInfo) throws -> () {
+  public func acceptMissingValue(info: FieldExecutionInfo) throws -> () {
     dependentKeys.insert(info.cachePath.joined)
   }
 
-  func accept(list: [Void], info: FieldExecutionInfo) {
+  public func accept(list: [Void], info: FieldExecutionInfo) {
     dependentKeys.insert(info.cachePath.joined)
   }
 
-  func accept(childObject: Void, info: FieldExecutionInfo) {
+  public func accept(childObject: Void, info: FieldExecutionInfo) {
   }
 
-  func accept(fieldEntry: Void, info: FieldExecutionInfo) -> Void? {
+  public func accept(fieldEntry: Void, info: FieldExecutionInfo) -> Void? {
     dependentKeys.insert(info.cachePath.joined)
     return ()
   }
 
-  func accept(fieldEntries: [Void], info: ObjectExecutionInfo) {
+  public func accept(fieldEntries: [Void], info: ObjectExecutionInfo) {
   }
 
-  func finish(rootValue: Void, info: ObjectExecutionInfo) -> Set<CacheKey> {
+  public func finish(rootValue: Void, info: ObjectExecutionInfo) -> Set<CacheKey> {
     return dependentKeys
   }
 }

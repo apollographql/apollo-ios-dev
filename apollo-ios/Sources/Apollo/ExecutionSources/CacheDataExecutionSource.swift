@@ -5,9 +5,10 @@ import ApolloAPI
 /// A `GraphQLExecutionSource` configured to execute upon the data stored in a ``NormalizedCache``.
 ///
 /// Each object exposed by the cache is represented as a `Record`.
-struct CacheDataExecutionSource: GraphQLExecutionSource {
-  typealias RawObjectData = Record
-  typealias FieldCollector = CacheDataFieldSelectionCollector
+@_spi(Execution)
+public struct CacheDataExecutionSource: GraphQLExecutionSource {
+  public typealias RawObjectData = Record
+  public typealias FieldCollector = CacheDataFieldSelectionCollector
 
   /// A `weak` reference to the transaction the cache data is being read from during execution.
   /// This transaction is used to resolve references to other objects in the cache during field
@@ -24,13 +25,13 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
   /// When executing on cache data all selections, including deferred, must be executed together because
   /// there is only a single response from the cache data. Any deferred selection that was cached will
   /// be returned in the response.
-  var shouldAttemptDeferredFragmentExecution: Bool { true }
+  public var shouldAttemptDeferredFragmentExecution: Bool { true }
 
   init(transaction: ApolloStore.ReadTransaction) {
     self.transaction = transaction
   }
 
-  func resolveField(
+  public func resolveField(
     with info: FieldExecutionInfo,
     on object: Record
   ) -> PossiblyDeferred<AnyHashable?> {
@@ -72,14 +73,14 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     return transaction.loadObject(forKey: reference.key)
   }
 
-  func computeCacheKey(for object: Record, in schema: any SchemaMetadata.Type) -> CacheKey? {
+  public func computeCacheKey(for object: Record, in schema: any SchemaMetadata.Type) -> CacheKey? {
     return object.key
   }
 
   /// A wrapper around the `DefaultFieldSelectionCollector` that maps the `Record` object to it's
   /// `fields` representing the object's data.
-  struct CacheDataFieldSelectionCollector: FieldSelectionCollector {
-    static func collectFields(
+  public struct CacheDataFieldSelectionCollector: FieldSelectionCollector {
+    public static func collectFields(
       from selections: [Selection],
       into groupedFields: inout FieldSelectionGrouping,
       for object: Record,
