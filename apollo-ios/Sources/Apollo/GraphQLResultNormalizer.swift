@@ -3,55 +3,57 @@ import Foundation
 import ApolloAPI
 #endif
 
-enum ResultNormalizerFactory {
+@_spi(Execution)
+public enum ResultNormalizerFactory {
 
-  static func selectionSetDataNormalizer() -> SelectionSetDataResultNormalizer {
+  public static func selectionSetDataNormalizer() -> SelectionSetDataResultNormalizer {
     SelectionSetDataResultNormalizer()
   }
 
-  static func networkResponseDataNormalizer() -> RawJSONResultNormalizer {
+  public static func networkResponseDataNormalizer() -> RawJSONResultNormalizer {
     RawJSONResultNormalizer()
   }
 }
 
-class BaseGraphQLResultNormalizer: GraphQLResultAccumulator {
+@_spi(Execution)
+public class BaseGraphQLResultNormalizer: GraphQLResultAccumulator {
   
-  let requiresCacheKeyComputation: Bool = true
+  public let requiresCacheKeyComputation: Bool = true
 
   private var records: RecordSet = [:]
 
   fileprivate init() {}
 
-  final func accept(scalar: JSONValue, info: FieldExecutionInfo) -> JSONValue? {
+  public final func accept(scalar: JSONValue, info: FieldExecutionInfo) -> JSONValue? {
     return scalar
   }
 
-  func accept(customScalar: JSONValue, info: FieldExecutionInfo) -> JSONValue? {
+  public func accept(customScalar: JSONValue, info: FieldExecutionInfo) -> JSONValue? {
     return customScalar
   }
 
-  final func acceptNullValue(info: FieldExecutionInfo) -> JSONValue? {
+  public final func acceptNullValue(info: FieldExecutionInfo) -> JSONValue? {
     return NSNull()
   }
 
-  final func acceptMissingValue(info: FieldExecutionInfo) -> JSONValue? {
+  public final func acceptMissingValue(info: FieldExecutionInfo) -> JSONValue? {
     return nil
   }
 
-  final func accept(list: [JSONValue?], info: FieldExecutionInfo) -> JSONValue? {
+  public final func accept(list: [JSONValue?], info: FieldExecutionInfo) -> JSONValue? {
     return list
   }
 
-  final func accept(childObject: CacheReference, info: FieldExecutionInfo) -> JSONValue? {
+  public final func accept(childObject: CacheReference, info: FieldExecutionInfo) -> JSONValue? {
     return childObject
   }
 
-  final func accept(fieldEntry: JSONValue?, info: FieldExecutionInfo) throws -> (key: String, value: JSONValue)? {
+  public final func accept(fieldEntry: JSONValue?, info: FieldExecutionInfo) throws -> (key: String, value: JSONValue)? {
     guard let fieldEntry else { return nil }
     return (try info.cacheKeyForField(), fieldEntry)
   }
 
-  final func accept(
+  public final func accept(
     fieldEntries: [(key: String, value: JSONValue)],
     info: ObjectExecutionInfo
   ) throws -> CacheReference {
@@ -63,15 +65,17 @@ class BaseGraphQLResultNormalizer: GraphQLResultAccumulator {
     return CacheReference(cachePath)
   }
 
-  final func finish(rootValue: CacheReference, info: ObjectExecutionInfo) throws -> RecordSet {
+  public final func finish(rootValue: CacheReference, info: ObjectExecutionInfo) throws -> RecordSet {
     return records
   }
 }
 
-final class RawJSONResultNormalizer: BaseGraphQLResultNormalizer {}
+@_spi(Execution)
+public final class RawJSONResultNormalizer: BaseGraphQLResultNormalizer {}
 
-final class SelectionSetDataResultNormalizer: BaseGraphQLResultNormalizer {
-  override final func accept(customScalar: JSONValue, info: FieldExecutionInfo) -> JSONValue? {
+@_spi(Execution)
+public final class SelectionSetDataResultNormalizer: BaseGraphQLResultNormalizer {
+  override public final func accept(customScalar: JSONValue, info: FieldExecutionInfo) -> JSONValue? {
     if let customScalar = customScalar as? (any JSONEncodable) {
       return customScalar._jsonValue
     }

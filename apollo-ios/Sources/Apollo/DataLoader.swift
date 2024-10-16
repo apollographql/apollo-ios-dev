@@ -1,4 +1,5 @@
-final class DataLoader<Key: Hashable, Value> {
+@_spi(Execution)
+public final class DataLoader<Key: Hashable, Value> {
   public typealias BatchLoad = (Set<Key>) throws -> [Key: Value]
   private var batchLoad: BatchLoad
 
