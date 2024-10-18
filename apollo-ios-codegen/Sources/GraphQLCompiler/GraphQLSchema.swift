@@ -19,8 +19,7 @@ protocol GraphQLSchemaType: JavaScriptReferencedObject {
 
 }
 
-public class GraphQLNamedType:
-  JavaScriptReferencedObject, @unchecked Sendable, Comparable, Hashable, CustomDebugStringConvertible, GraphQLNamedItem {
+public class GraphQLNamedType: JavaScriptReferencedObject, @unchecked Sendable, Hashable, CustomDebugStringConvertible, GraphQLNamedItem {
   public let name: GraphQLName
 
   public let documentation: String?
@@ -57,10 +56,6 @@ public class GraphQLNamedType:
 
   public static func ==(lhs: GraphQLNamedType, rhs: GraphQLNamedType) -> Bool {
     return lhs.name == rhs.name
-  }
-
-  public static func < (lhs: GraphQLNamedType, rhs: GraphQLNamedType) -> Bool {
-    lhs.name.schemaName < rhs.name.schemaName
   }
 
   public var debugDescription: String {

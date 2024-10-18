@@ -34,7 +34,7 @@ public final class Schema {
       schemaRootTypes: CompilationResult.RootTypeDefinition
     ) {
       // Ensure allTypes is stable
-      self.allTypes = OrderedSet(types.sorted())
+      self.allTypes = OrderedSet(types.sorted(by: { $0.name.schemaName < $1.name.schemaName }))
       self.schemaRootTypes = schemaRootTypes
 
       var objects = OrderedSet<GraphQLObjectType>()
