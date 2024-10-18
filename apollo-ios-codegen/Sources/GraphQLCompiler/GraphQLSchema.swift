@@ -19,7 +19,8 @@ protocol GraphQLSchemaType: JavaScriptReferencedObject {
 
 }
 
-public class GraphQLNamedType: JavaScriptReferencedObject, @unchecked Sendable, Hashable, CustomDebugStringConvertible, GraphQLNamedItem {
+public class GraphQLNamedType: 
+  JavaScriptReferencedObject, @unchecked Sendable, Hashable, CustomDebugStringConvertible, GraphQLNamedItem {
   public let name: GraphQLName
 
   public let documentation: String?
