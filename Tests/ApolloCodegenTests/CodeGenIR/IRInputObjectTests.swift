@@ -25,7 +25,7 @@ class IRInputObjectTests: XCTestCase {
 
   func buildSubject() async throws {
     let ir: IRBuilder = try await .mock(schema: schemaSDL, document: document)
-    subject = ir.schema.referencedTypes.inputObjects.first!
+    subject = ir.schema.referencedTypes.inputObjects[1]
   }
 
   // MARK: - Tests
