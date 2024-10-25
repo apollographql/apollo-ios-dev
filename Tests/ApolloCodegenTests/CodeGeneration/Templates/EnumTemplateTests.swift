@@ -488,7 +488,48 @@ class EnumTemplateTests: XCTestCase {
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     }
   }
-  
+
+  // MARK: - No Enum Cases Tests
+
+  func test_render_givenEmptyEnum_shouldRenderWithoutAssociatedType() {
+    // given
+    buildSubject(values: [], config: .mock(.other))
+
+    let expected = """
+    public enum TestEnum: EnumType {
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test_render_givenEnumWithAllDeprectedValues_shouldRenderWithoutAssociatedType() {
+    // given
+    buildSubject(
+      values: [
+        ("ONE", "Deprecated for tests", "Doc: One", nil),
+        ("TWO", "Deprecated for tests", "Doc: Two", nil),
+        ("THREE", "Deprecated for tests", nil, nil)
+      ],
+      config: ApolloCodegenConfiguration.mock(options: .init(
+        deprecatedEnumCases: .exclude
+      ))
+    )
+
+    let expected = """
+    enum TestEnum: EnumType {
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
   // MARK: - Schema Customization Tests
   
   func test__render__givenEnumAndValues_withCustomNames_shouldRenderWithCustomNames() throws {

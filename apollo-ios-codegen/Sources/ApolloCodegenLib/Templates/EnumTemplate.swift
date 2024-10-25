@@ -15,12 +15,15 @@ struct EnumTemplate: TemplateRenderer {
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
-    TemplateString(
+    let omitAssociatedType = graphqlEnum.values.isEmpty
+    || (config.options.deprecatedEnumCases == .exclude && graphqlEnum.values.allSatisfy(\.isDeprecated))
+
+    return TemplateString(
     """
     \(documentation: graphqlEnum.documentation, config: config)
     \(graphqlEnum.name.typeNameDocumentation)
     \(accessControlModifier(for: .parent))\
-    enum \(graphqlEnum.render(as: .typename)): String, EnumType {
+    enum \(graphqlEnum.render(as: .typename)): \(omitAssociatedType ? "" : "String, ")EnumType {
       \(graphqlEnum.values.compactMap({
         enumCase(for: $0)
       }), separator: "\n")
