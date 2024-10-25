@@ -491,7 +491,7 @@ class EnumTemplateTests: XCTestCase {
 
   // MARK: - No Enum Cases Tests
 
-  func test_render_givenEmptyEnum_shouldRenderWithoutAssociatedType() {
+  func test_render_givenEmptyEnum_shouldRenderWithoutRawType() {
     // given
     buildSubject(values: [], config: .mock(.other))
 
@@ -506,7 +506,7 @@ class EnumTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test_render_givenEnumWithAllDeprectedValues_shouldRenderWithoutAssociatedType() {
+  func test_render_givenEnumWithAllDeprectedValues_shouldRenderWithoutRawType() {
     // given
     buildSubject(
       values: [

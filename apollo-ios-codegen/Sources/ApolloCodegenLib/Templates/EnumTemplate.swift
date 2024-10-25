@@ -15,7 +15,7 @@ struct EnumTemplate: TemplateRenderer {
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
-    let omitAssociatedType = graphqlEnum.values.isEmpty
+    let omitRawType = graphqlEnum.values.isEmpty
     || (config.options.deprecatedEnumCases == .exclude && graphqlEnum.values.allSatisfy(\.isDeprecated))
 
     return TemplateString(
@@ -23,7 +23,7 @@ struct EnumTemplate: TemplateRenderer {
     \(documentation: graphqlEnum.documentation, config: config)
     \(graphqlEnum.name.typeNameDocumentation)
     \(accessControlModifier(for: .parent))\
-    enum \(graphqlEnum.render(as: .typename)): \(omitAssociatedType ? "" : "String, ")EnumType {
+    enum \(graphqlEnum.render(as: .typename)): \(omitRawType ? "" : "String, ")EnumType {
       \(graphqlEnum.values.compactMap({
         enumCase(for: $0)
       }), separator: "\n")
