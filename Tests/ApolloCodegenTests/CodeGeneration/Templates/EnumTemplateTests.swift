@@ -506,7 +506,7 @@ class EnumTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test_render_givenEnumWithAllDeprectedValues_shouldRenderWithoutRawType() {
+  func test_render_givenEnumWithAllDeprecatedValues_shouldRenderWithoutRawType() {
     // given
     buildSubject(
       values: [
