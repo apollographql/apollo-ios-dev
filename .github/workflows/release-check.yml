@@ -90,6 +90,12 @@ jobs:
             test-plan: Apollo-Codegen-CITestPlan
             name: Codegen Lib Unit Tests - macOS
             run-js-tests: true
+          # ApolloPagination Tests
+          - destination: platform=macOS,arch=x86_64
+            scheme: ApolloPaginationTests
+            test-plan: Apollo-PaginationTestPlan
+            name: ApolloPagination Unit Tests - macOS
+            run-js-tests: false
     name: ${{ matrix.name }}
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
