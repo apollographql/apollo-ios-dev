@@ -1,4 +1,4 @@
-name: "CI Tests"
+name: "CI Tests (Xcode 15.4)"
 
 on:
   pull_request:

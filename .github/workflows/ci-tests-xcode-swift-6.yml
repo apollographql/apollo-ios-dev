@@ -1,11 +1,11 @@
-name: "CI Tests (Xcode 16.1 Beta)"
+name: "CI Tests (Xcode 16.1)"
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
 env:
-  XCODE_VERSION: "16.1-beta"
+  XCODE_VERSION: "16.1"
 
 jobs:
   changes:
