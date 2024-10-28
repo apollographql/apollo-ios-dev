@@ -103,11 +103,6 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
-    # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
-    # - uses: actions/cache@v3
-    #   with:
-    #     path: ./DerivedData/SourcePackages
-    #     key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
     - name: Retrieve Build Cache
       uses: actions/cache@v3
       with:
