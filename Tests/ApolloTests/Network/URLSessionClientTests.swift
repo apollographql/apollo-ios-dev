@@ -233,7 +233,13 @@ class URLSessionClientTests: XCTestCase {
 
     self.client.cancel(task: task)
 
-    self.wait(for: [expectation], timeout: 5)
+    // Instead of waiting an arbitrary amount of time for the completion to maybe be called
+    // the following mimics what Apple's documentation for URLSessionTask.cancel() states
+    // happens when a task is cancelled, i.e.: manually calling the delegate method
+    // urlSession(_:task:didCompleteWithError:)
+    self.client.urlSession(self.client.session, task: task, didCompleteWithError: NSError(domain: NSURLErrorDomain, code: NSURLErrorCancelled))
+
+    self.wait(for: [expectation], timeout: 0.5)
 
   }
   
