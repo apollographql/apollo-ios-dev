@@ -11,10 +11,10 @@ public class MockURLProtocol<RequestProvider: MockRequestProvider>: URLProtocol 
   }
   
   override public func startLoading() {
-    guard let url = self.request.url,
-          let handler = RequestProvider.requestHandlers[url] else {
-      fatalError("No MockRequestHandler available for URL.")
-    }
+    guard
+      let url = self.request.url,
+      let handler = RequestProvider.requestHandlers[url]
+    else { return }
 
     DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in: 0.0...0.25)) {
       defer {

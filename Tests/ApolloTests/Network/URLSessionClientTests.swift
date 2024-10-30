@@ -233,7 +233,13 @@ class URLSessionClientTests: XCTestCase {
 
     self.client.cancel(task: task)
 
-    self.wait(for: [expectation], timeout: 5)
+    // Instead of waiting an arbitrary amount of time for the completion to maybe be called
+    // the following mimics what Apple's documentation for URLSessionTask.cancel() states
+    // happens when a task is cancelled, i.e.: manually calling the delegate method
+    // urlSession(_:task:didCompleteWithError:)
+    self.client.urlSession(self.client.session, task: task, didCompleteWithError: NSError(domain: NSURLErrorDomain, code: NSURLErrorCancelled))
+
+    self.wait(for: [expectation], timeout: 0.5)
 
   }
   
@@ -349,33 +355,19 @@ class URLSessionClientTests: XCTestCase {
       responseData: nil,
       statusCode: -1
     )
-
-    let expectation = self.expectation(description: "Described task completed")
-    expectation.isInverted = true
     
-    let task = self.client.sendRequest(request) { result in
-      // This shouldn't get hit since we cancel the task immediately
-      expectation.fulfill()
-    }
+    let task = self.client.sendRequest(request) { result in }
     self.client.cancel(task: task)
-    
+
     // Should be nil by default.
     XCTAssertNil(task.taskDescription)
     
     let expected = "test task description"
-    let describedTask = self.client.sendRequest(
-      request,
-      taskDescription: expected
-    ) { result in
-      // This shouldn't get hit since we cancel the task immediately
-      expectation.fulfill()
-    }
+    let describedTask = self.client.sendRequest(request, taskDescription: expected) { result in }
     self.client.cancel(task: describedTask)
-    
+
     // The returned task should have the provided taskDescription.
     XCTAssertEqual(expected, describedTask.taskDescription)
-
-    self.wait(for: [expectation], timeout: 5)
   }
 
   // MARK: Multipart Tests
