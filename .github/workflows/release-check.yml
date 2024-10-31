@@ -197,24 +197,6 @@ jobs:
     - uses: slackapi/slack-github-action@v1.26.0
       with:
         channel-id: ${{ secrets.APOLLO_IOS_HEALTH_SLACK_CHANNEL_ID }}
-        payload: |
-          {
-            "blocks": [
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "`Main` Branch Health (${{ github.event.head_commit.url }}): ${{ github.action_status }}"
-                }
-              },
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "${{ jobs.tuist-generation.name }}: ${{ jobs.tuist-generation.result }}"
-                }
-              }
-            ]
-          }
+        slack-message: "`Main` Branch Health (${{ github.event.head_commit.url }}): ${{ github.action_status }}"
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
