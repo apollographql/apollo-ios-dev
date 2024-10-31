@@ -186,3 +186,35 @@ jobs:
     - name: Run CocoaPods Integration Tests
       id: run-cocoapods-integration-tests
       uses: ./.github/actions/run-cocoapods-integration-tests
+  
+  send-slack-status-notification:
+    runs-on: macos-latest
+    if: ${{ always() }}
+    timeout-minutes: 5
+    needs: [tuist-generation, run-swift-builds, build-and-unit-test, run-codegen-test-configurations, run-cocoapods-integration-tests]
+    name: Send Slack status notification
+    steps:
+    - uses: slackapi/slack-github-action@v1.26.0
+      with:
+        channel-id: ${{ secrets.APOLLO_IOS_HEALTH_SLACK_CHANNEL_ID }}
+        payload: |
+          {
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "`Main` Branch Health (${{ github.event.head_commit.url }}): ${{ github.action_status }}"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "${{ jobs.tuist-generation.name }}: ${{ jobs.tuist-generation.result }}"
+                }
+              }
+            ]
+          }
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
