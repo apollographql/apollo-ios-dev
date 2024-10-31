@@ -167,10 +167,11 @@ public class WebSocketTransport {
     self.addApolloClientHeaders(to: &self.websocket.request)
 
     self.websocket.delegate = self
+    self.websocket.callbackQueue = processingQueue
+
     if config.connectOnInit {
       self.websocket.connect()
     }
-    self.websocket.callbackQueue = processingQueue
   }
 
   public func isConnected() -> Bool {
