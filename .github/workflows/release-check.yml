@@ -204,42 +204,42 @@ jobs:
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "`${{ github.head_ref }}` Branch Health (${{ github.sha }}):"
+                  "text": "`main` Branch Health (${{ github.sha }}):"
                 }
               },
               {
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "* Run Tuist Generation: ${{ needs.tuist-generation.result }}"
+                  "text": "Run Tuist Generation: ${{ needs.tuist-generation.result }}"
                 }
               },
               {
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "* Build SPM packages: ${{ needs.run-swift-builds.result }}"
+                  "text": "Build SPM packages: ${{ needs.run-swift-builds.result }}"
                 }
               },
               {
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "* Build and Unit Test: ${{ needs.build-and-unit-test.result }}"
+                  "text": "Build and Unit Test: ${{ needs.build-and-unit-test.result }}"
                 }
               },
               {
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "* Codegen Test Configurations - macOS: ${{ needs.run-codegen-test-configurations.result }}"
+                  "text": "Codegen Test Configurations - macOS: ${{ needs.run-codegen-test-configurations.result }}"
                 }
               },
               {
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "* Cocoapods Integration Tests - macOS: ${{ needs.run-cocoapods-integration-tests.result }}"
+                  "text": "Cocoapods Integration Tests - macOS: ${{ needs.run-cocoapods-integration-tests.result }}"
                 }
               }
             ]
