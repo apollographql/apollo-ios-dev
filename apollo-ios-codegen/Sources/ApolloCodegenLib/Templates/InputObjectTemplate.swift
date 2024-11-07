@@ -15,7 +15,7 @@ struct InputObjectTemplate: TemplateRenderer {
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
-    let (validFields, deprecatedFields) = filterFields(graphqlInputObject.fields)
+    let (validFields, deprecatedFields) = graphqlInputObject.fields.filterFields()
     let memberAccessControl = accessControlModifier(for: .member)
 
     return TemplateString(
@@ -63,23 +63,6 @@ struct InputObjectTemplate: TemplateRenderer {
     config.options.warningsOnDeprecatedUsage == .include
   }
 
-  private func filterFields(
-    _ fields: GraphQLInputFieldDictionary
-  ) -> (valid: GraphQLInputFieldDictionary, deprecated: GraphQLInputFieldDictionary) {
-    var valid: GraphQLInputFieldDictionary = [:]
-    var deprecated: GraphQLInputFieldDictionary = [:]
-
-    for (key, value) in fields {
-      if let _ = value.deprecationReason {
-        deprecated[key] = value
-      } else {
-        valid[key] = value
-      }
-    }
-
-    return (valid: valid, deprecated: deprecated)
-  }
-
   private func deprecatedMessage(for fields: GraphQLInputFieldDictionary) -> String {
     guard !fields.isEmpty else { return "" }
 
@@ -122,4 +105,23 @@ struct InputObjectTemplate: TemplateRenderer {
     }
     """
   }
+}
+
+extension GraphQLInputFieldDictionary {
+  
+  func filterFields() -> (valid: GraphQLInputFieldDictionary, deprecated: GraphQLInputFieldDictionary) {
+    var valid: GraphQLInputFieldDictionary = [:]
+    var deprecated: GraphQLInputFieldDictionary = [:]
+
+    for (key, value) in self {
+      if let _ = value.deprecationReason {
+        deprecated[key] = value
+      } else {
+        valid[key] = value
+      }
+    }
+
+    return (valid: valid, deprecated: deprecated)
+  }
+  
 }
