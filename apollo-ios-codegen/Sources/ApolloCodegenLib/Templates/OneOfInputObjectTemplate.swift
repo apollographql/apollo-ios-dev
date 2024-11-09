@@ -21,7 +21,7 @@ struct OneOfInputObjectTemplate: TemplateRenderer {
     \(documentation: graphqlInputObject.documentation, config: config)
     \(graphqlInputObject.name.typeNameDocumentation)
     \(accessControlModifier(for: .parent))\
-    enum \(graphqlInputObject.render(as: .typename)): InputObject {
+    enum \(graphqlInputObject.render(as: .typename)): OneOfInputObject {
       \(graphqlInputObject.fields.map({ "\(FieldCaseTemplate($1))" }), separator: "\n")
     
       \(memberAccessControl)var __data: InputDict {
@@ -39,14 +39,14 @@ struct OneOfInputObjectTemplate: TemplateRenderer {
     \(documentation: field.documentation, config: config)
     \(deprecationReason: field.deprecationReason, config: config)
     \(field.name.typeNameDocumentation)
-    case \(field.render(config: config))(\(field.renderInputValueType(config: config.config)))
+    case \(field.render(config: config))(\(field.type.renderAsInputValue(inNullable: false, config: config.config)))
     """
   }
   
   private func FieldCaseDataTemplate(_ field: GraphQLInputField) -> TemplateString {
     """
     case .\(field.render(config: config))(let value):
-      return InputDict(["\(field.name.schemaName)": value._jsonEncodableValue])
+      return InputDict(["\(field.name.schemaName)": value])
     """
   }
   
