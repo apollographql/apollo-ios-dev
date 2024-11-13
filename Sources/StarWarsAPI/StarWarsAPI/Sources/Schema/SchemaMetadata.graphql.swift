@@ -20,13 +20,13 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
 
   public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
     switch typename {
-    case "Query": return StarWarsAPI.Objects.Query
-    case "Human": return StarWarsAPI.Objects.Human
     case "Droid": return StarWarsAPI.Objects.Droid
+    case "Human": return StarWarsAPI.Objects.Human
+    case "Mutation": return StarWarsAPI.Objects.Mutation
+    case "Query": return StarWarsAPI.Objects.Query
+    case "Review": return StarWarsAPI.Objects.Review
     case "Starship": return StarWarsAPI.Objects.Starship
     case "Subscription": return StarWarsAPI.Objects.Subscription
-    case "Review": return StarWarsAPI.Objects.Review
-    case "Mutation": return StarWarsAPI.Objects.Mutation
     default: return nil
     }
   }

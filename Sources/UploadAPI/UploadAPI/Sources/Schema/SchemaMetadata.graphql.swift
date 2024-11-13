@@ -20,8 +20,8 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
 
   public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
     switch typename {
-    case "Mutation": return UploadAPI.Objects.Mutation
     case "File": return UploadAPI.Objects.File
+    case "Mutation": return UploadAPI.Objects.Mutation
     default: return nil
     }
   }
