@@ -40,7 +40,7 @@ jobs:
               - '.tuist-version'
 
   tuist-generation:
-    runs-on: macos-latest
+    runs-on: macos-15
     needs: [changes]
     if: ${{ needs.changes.outputs.ios == 'true' || needs.changes.outputs.codegen  == 'true' || needs.changes.outputs.pagination  == 'true' || needs.changes.outputs.tuist == 'true' }}
     timeout-minutes: 8
@@ -63,7 +63,7 @@ jobs:
         key: ${{ github.run_id }}-dependencies
 
   run-swift-builds:
-    runs-on: macos-latest
+    runs-on: macos-15
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -85,7 +85,7 @@ jobs:
         cd ${{ matrix.package }} && swift build
 
   build-and-unit-test:
-    runs-on: macos-latest
+    runs-on: macos-15
     needs: [tuist-generation, changes]
     timeout-minutes: 20
     strategy:
@@ -191,7 +191,7 @@ jobs:
   # CodegenTestConfigurations removed because source is not compatible with Sendable yet.
   
   verify-frontend-bundle-latest:
-    runs-on: macos-latest
+    runs-on: macos-15
     needs: [changes]
     if: ${{ needs.changes.outputs.codegen  == 'true' }}
     timeout-minutes: 5
@@ -209,7 +209,7 @@ jobs:
         git diff --exit-code
 
   verify-cli-binary-archive:
-    runs-on: macos-latest
+    runs-on: macos-15
     needs: [changes]
     if: ${{ needs.changes.outputs.codegen  == 'true' }}
     timeout-minutes: 5
@@ -227,7 +227,7 @@ jobs:
       run: ./cli-version-check.sh
 
   run-cocoapods-integration-tests:
-    runs-on: macos-latest
+    runs-on: macos-15
     timeout-minutes: 20
     name: Cocoapods Integration Tests - macOS
     steps:
