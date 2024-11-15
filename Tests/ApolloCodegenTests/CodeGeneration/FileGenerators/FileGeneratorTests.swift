@@ -30,7 +30,7 @@ class FileGeneratorTests: XCTestCase {
 
   private func buildConfig() {
     let mockedConfig = ApolloCodegenConfiguration.mock(output: .mock(
-      moduleType: .swiftPackageManager,      
+      moduleType: .swiftPackageManager(),      
       operations: .inSchemaModule
     ))
 

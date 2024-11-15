@@ -131,7 +131,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     // given
     buildSubject(
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackageManager(),
         schemaNamespace: "aName"
       )
     )
@@ -266,7 +266,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
 
   func test__render__givenModuleSwiftPackageManager_shouldGenerateEnumDefinition_withPublicModifier() {
     // given
-    buildSubject(config: .mock(.swiftPackageManager))
+    buildSubject(config: .mock(.swiftPackageManager()))
 
     let expected = """
     public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
@@ -449,7 +449,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
         GraphQLInputObjectType.mock("InputObjectC"),
       ], schemaRootTypes: .mock()),
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackageManager(),
         schemaNamespace: "ObjectSchema"
       )
     )

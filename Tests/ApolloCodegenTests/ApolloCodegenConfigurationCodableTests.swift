@@ -1238,4 +1238,517 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
       XCTAssertEqual(context.debugDescription, "Unrecognized keys found: contact_info, motto")
     }
   }
+  
+  // MARK: Module Type Tests
+  
+  func test__codableSPMModuleType_noVersionProvided() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackageManager()
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackageManager" : {
+                "version" : {
+                  "default" : {
+
+                  }
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    print("Actual JSON - \(actualJSON)")
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
+  func test__codableSPMModuleType_defaultVersion() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackageManager(version: .default)
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackageManager" : {
+                "version" : {
+                  "default" : {
+
+                  }
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    print("Actual JSON - \(actualJSON)")
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
+  func test__codableSPMModuleType_withBranchVersion() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackageManager(version: .branch(name: "branchName"))
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackageManager" : {
+                "version" : {
+                  "branch" : {
+                    "name" : "branchName"
+                  }
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    print("Actual JSON - \(actualJSON)")
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
+  func test__codableSPMModuleType_withCommitHashVersion() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackageManager(version: .commitHash(hash: "hash"))
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackageManager" : {
+                "version" : {
+                  "commitHash" : {
+                    "hash" : "hash"
+                  }
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    print("Actual JSON - \(actualJSON)")
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
+  func test__codableSPMModuleType_withLocalPathVersion() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackageManager(version: .localPath(path: "path"))
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackageManager" : {
+                "version" : {
+                  "localPath" : {
+                    "path" : "path"
+                  }
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    print("Actual JSON - \(actualJSON)")
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
 }

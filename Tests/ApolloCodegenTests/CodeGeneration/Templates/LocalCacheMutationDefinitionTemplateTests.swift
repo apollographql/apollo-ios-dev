@@ -99,7 +99,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
 
     config = .mock(output: .mock(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackageManager(),
       operations: .inSchemaModule
     ))
 
@@ -168,7 +168,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
 
     config = .mock(output: .mock(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackageManager(),
       operations: .relative(subpath: nil, accessModifier: .public)
     ))
 
@@ -191,7 +191,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
 
     config = .mock(output: .mock(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackageManager(),
       operations: .relative(subpath: nil, accessModifier: .internal)
     ))
 
@@ -214,7 +214,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
 
     config = .mock(output: .mock(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackageManager(),
       operations: .absolute(path: "", accessModifier: .public)
     ))
 
@@ -237,7 +237,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
 
     config = .mock(output: .mock(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackageManager(),
       operations: .absolute(path: "", accessModifier: .internal)
     ))
 
@@ -487,7 +487,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
   func test_render_givenModuleType_swiftPackageManager_generatesClassDefinition_withPublicModifier() async throws {
     // given
-    config = .mock(.swiftPackageManager)
+    config = .mock(.swiftPackageManager())
     try await buildSubjectAndOperation()
 
     let expected = """

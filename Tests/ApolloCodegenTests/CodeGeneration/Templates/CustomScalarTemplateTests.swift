@@ -99,7 +99,7 @@ class CustomScalarTemplateTests: XCTestCase {
 
   func test_render_givenModuleType_swiftPackageManager_generatesTypealias_withPublicAccess() {
     // given
-    buildSubject(config: .mock(.swiftPackageManager))
+    buildSubject(config: .mock(.swiftPackageManager()))
 
     let expected = """
     public typealias MyCustomScalar = String

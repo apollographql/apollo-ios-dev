@@ -332,9 +332,9 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
       """
 
     let tests: [(config: ApolloCodegenConfiguration.FileOutput, expected: String)] = [
-      (.mock(moduleType: .swiftPackageManager, operations: .relative(subpath: nil)), expectedWithNamespace),
-      (.mock(moduleType: .swiftPackageManager, operations: .absolute(path: "custom")), expectedWithNamespace),
-      (.mock(moduleType: .swiftPackageManager, operations: .inSchemaModule), expectedNoNamespace),
+      (.mock(moduleType: .swiftPackageManager(), operations: .relative(subpath: nil)), expectedWithNamespace),
+      (.mock(moduleType: .swiftPackageManager(), operations: .absolute(path: "custom")), expectedWithNamespace),
+      (.mock(moduleType: .swiftPackageManager(), operations: .inSchemaModule), expectedNoNamespace),
       (.mock(moduleType: .other, operations: .relative(subpath: nil)), expectedWithNamespace),
       (.mock(moduleType: .other, operations: .absolute(path: "custom")), expectedWithNamespace),
       (.mock(moduleType: .other, operations: .inSchemaModule), expectedNoNamespace),

@@ -25,7 +25,7 @@ class MockObjectTemplateTests: XCTestCase {
     interfaces: [GraphQLInterfaceType] = [],
     fields: [String : GraphQLField] = [:],
     schemaNamespace: String = "TestSchema",
-    moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackageManager,
+    moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackageManager(),
     testMocks: ApolloCodegenConfiguration.TestMockFileOutput = .swiftPackage(),
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude
   ) {
@@ -64,7 +64,7 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render__givenSchemaType_generatesExtension() {
     // given
-    buildSubject(name: "Dog", moduleType: .swiftPackageManager)
+    buildSubject(name: "Dog", moduleType: .swiftPackageManager())
 
     let expected = """
     public class Dog: MockObject {
@@ -171,7 +171,7 @@ class MockObjectTemplateTests: XCTestCase {
         "objectNestedList": .mock("objectNestedList", type: .list(.nonNull(.list(.nonNull(Cat))))),
         "objectOptionalList": .mock("objectOptionalList", type: .list(Cat)),
       ],
-      moduleType: .swiftPackageManager
+      moduleType: .swiftPackageManager()
     )
 
     let expected = """
@@ -202,7 +202,7 @@ class MockObjectTemplateTests: XCTestCase {
         "enumType": .mock("enumType", type: .enum(.mock(name: "enumType"))),
         "object": .mock("object", type: Cat),
       ],
-      moduleType: .swiftPackageManager
+      moduleType: .swiftPackageManager()
     )
 
     let expected = """
@@ -279,7 +279,7 @@ class MockObjectTemplateTests: XCTestCase {
         "Type": .mock("Type", type: .nonNull(.string())),
         "Any": .mock("Any", type: .nonNull(.string())),
       ],
-      moduleType: .swiftPackageManager
+      moduleType: .swiftPackageManager()
     )
 
     let expected = """
@@ -356,7 +356,7 @@ class MockObjectTemplateTests: XCTestCase {
       fields: [
         "actor": .mock("actor", type: .entity(Actor_Interface)),
       ],
-      moduleType: .swiftPackageManager
+      moduleType: .swiftPackageManager()
     )
 
     let expected = """
@@ -379,7 +379,7 @@ class MockObjectTemplateTests: XCTestCase {
       fields: [
         "actor": .mock("actor", type: .entity(Actor_Union)),
       ],
-      moduleType: .swiftPackageManager
+      moduleType: .swiftPackageManager()
     )
 
     let expected = """
@@ -402,7 +402,7 @@ class MockObjectTemplateTests: XCTestCase {
       fields: [
         "actor": .mock("actor", type: .entity(Actor_Object)),
       ],
-      moduleType: .swiftPackageManager
+      moduleType: .swiftPackageManager()
     )
 
     let expected = """
@@ -474,7 +474,7 @@ class MockObjectTemplateTests: XCTestCase {
         "enumList": .mock("enumList", type: .list(.nonNull(.enum(.mock(name: "enumType"))))),
         "enumOptionalList": .mock("enumOptionalList", type: .list(.enum(.mock(name: "enumType"))))
       ],
-      moduleType: .swiftPackageManager
+      moduleType: .swiftPackageManager()
     )
 
     let expected = """
@@ -547,7 +547,7 @@ class MockObjectTemplateTests: XCTestCase {
   
   func test__render__givenSchemaTypeWithoutFields_doesNotgenerateConvenienceInitializer() {
     // given
-    buildSubject(moduleType: .swiftPackageManager)
+    buildSubject(moduleType: .swiftPackageManager())
 
     let expected = """
     }
@@ -624,7 +624,7 @@ class MockObjectTemplateTests: XCTestCase {
         "Type": .mock("Type", type: .nonNull(.string())),
         "Any": .mock("Any", type: .nonNull(.string())),
       ],
-      moduleType: .swiftPackageManager
+      moduleType: .swiftPackageManager()
     )
 
     let expected = """
@@ -862,7 +862,7 @@ class MockObjectTemplateTests: XCTestCase {
       fields: [
         "string": .mock("string", type: .nonNull(.string()), deprecationReason: "Cause I said so!"),
       ],
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackageManager(),
       warningsOnDeprecatedUsage: .include
     )
 
@@ -885,7 +885,7 @@ class MockObjectTemplateTests: XCTestCase {
       fields: [
         "string": .mock("string", type: .nonNull(.string()), deprecationReason: "Cause I said so!"),
       ],
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackageManager(),
       warningsOnDeprecatedUsage: .exclude
     )
 
@@ -914,7 +914,7 @@ class MockObjectTemplateTests: XCTestCase {
         fields: [
           "string": .mock("string", type: .nonNull(.string())),
         ],
-        moduleType: .swiftPackageManager
+        moduleType: .swiftPackageManager()
       )
 
       let expected = """

@@ -16,7 +16,7 @@ class SchemaConfigurationTemplateTests: XCTestCase {
 
   private func buildSubject(
     name: String = "testSchema",
-    config: ApolloCodegenConfiguration = ApolloCodegenConfiguration.mock(.swiftPackageManager)
+    config: ApolloCodegenConfiguration = ApolloCodegenConfiguration.mock(.swiftPackageManager())
   ) {
     subject = SchemaConfigurationTemplate(
       config: ApolloCodegen.ConfigurationContext(config: config)

@@ -39,7 +39,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
   private func buildSubjectAndOperation(
     named operationName: String = "NameQuery",
     operationIdentifier: String? = nil,
-    moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackageManager,
+    moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackageManager(),
     operations: ApolloCodegenConfiguration.OperationsFileOutput = .inSchemaModule,
     operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat = .definition,
     cocoapodsCompatibleImportStatements: Bool = false
@@ -359,7 +359,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     """
 
     try await buildSubjectAndOperation(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackageManager(),
       operations: .inSchemaModule
     )
 
@@ -434,7 +434,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     """
 
     try await buildSubjectAndOperation(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackageManager(),
       operations: .relative(subpath: nil, accessModifier: .public)
     )
 
@@ -459,7 +459,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     """
 
     try await buildSubjectAndOperation(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackageManager(),
       operations: .relative(subpath: nil, accessModifier: .internal)
     )
 
@@ -484,7 +484,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     """
 
     try await buildSubjectAndOperation(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackageManager(),
       operations: .absolute(path: "", accessModifier: .public)
     )
 
@@ -509,7 +509,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     """
 
     try await buildSubjectAndOperation(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackageManager(),
       operations: .absolute(path: "", accessModifier: .internal)
     )
 

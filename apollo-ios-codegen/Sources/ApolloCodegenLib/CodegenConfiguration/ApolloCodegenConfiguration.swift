@@ -283,7 +283,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case embeddedInTarget(name: String, accessModifier: AccessModifier = .internal)
       /// Generates a `Package.swift` file that is suitable for linking the generated schema types
       /// files to your project using Swift Package Manager.
-      case swiftPackageManager
+      case swiftPackageManager(version: ApolloPackageVersion = .default)
       /// No module will be created for the generated types and you are required to create the
       /// module to support your preferred dependency manager. You must specify the name of the
       /// module you will create in the `schemaNamespace` property as this will be used in `import`
@@ -321,10 +321,64 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
           self = .embeddedInTarget(name: name, accessModifier: accessModifier)
 
         case .swiftPackageManager:
-          self = .swiftPackageManager
+          let nestedContainer = try container.nestedContainer(
+            keyedBy: SwiftPackageManagerCodingKeys.self,
+            forKey: .swiftPackageManager
+          )
+          
+          let version = try nestedContainer.decodeIfPresent(ApolloPackageVersion.self, forKey: .version) ?? .default
+          self = .swiftPackageManager(version: version)
 
         case .other:
           self = .other
+        }
+      }
+    }
+    
+    public enum ApolloPackageVersion: Codable, Equatable {
+      case `default`
+      case branch(name: String)
+      case commitHash(hash: String)
+      case localPath(path: String)
+      
+      public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        guard let key = container.allKeys.first else {
+          throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
+            codingPath: container.codingPath,
+            debugDescription: "Invalid number of keys found, expected one.",
+            underlyingError: nil
+          ))
+        }
+        
+        switch key {
+        case .default:
+          self = .default
+        case .branch:
+          let nestedContainer = try container.nestedContainer(
+            keyedBy: BranchCodingKeys.self,
+            forKey: .branch
+          )
+          
+          let name = try nestedContainer.decode(String.self, forKey: .name)
+          self = .branch(name: name)
+        case .commitHash:
+          let nestedContainer = try container.nestedContainer(
+            keyedBy: CommitHashCodingKeys.self,
+            forKey: .commitHash
+          )
+          
+          let hash = try nestedContainer.decode(String.self, forKey: .hash)
+          self = .commitHash(hash: hash)
+        case .localPath:
+          let nestedContainer = try container.nestedContainer(
+            keyedBy: LocalPathCodingKeys.self,
+            forKey: .localPath
+          )
+          
+          let path = try nestedContainer.decode(String.self, forKey: .path)
+          self = .localPath(path: path)
         }
       }
     }

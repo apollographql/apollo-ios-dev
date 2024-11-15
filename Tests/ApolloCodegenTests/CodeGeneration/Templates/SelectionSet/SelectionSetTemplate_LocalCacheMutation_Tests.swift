@@ -30,7 +30,7 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
   func buildSubjectAndOperation(
     schemaNamespace: String = "TestSchema",
     named operationName: String = "TestOperation",
-    moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackageManager,
+    moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackageManager(),
     operations: ApolloCodegenConfiguration.OperationsFileOutput = .inSchemaModule
   ) async throws {
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
