@@ -10,6 +10,8 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
   let target: TemplateTarget = .moduleFile
 
   let config: ApolloCodegen.ConfigurationContext
+  
+  let version: ApolloCodegenConfiguration.SchemaTypesFileOutput.ApolloPackageVersion
 
   func renderHeaderTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
@@ -42,7 +44,7 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
         """})
       ],
       dependencies: [
-        .package(url: "https://github.com/apollographql/apollo-ios.git", from: "1.0.0"),
+        \(version.dependencyString),
       ],
       targets: [
         .target(
@@ -78,6 +80,29 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
       } else {
         return ("\(config.schemaNamespace.firstUppercased)TestMocks", "./TestMocks")
       }
+    }
+  }
+}
+
+fileprivate extension ApolloCodegenConfiguration.SchemaTypesFileOutput.ApolloPackageVersion {
+  var dependencyString: TemplateString {
+    switch self {
+    case .default:
+      return """
+      .package(url: "https://github.com/apollographql/apollo-ios.git", exact: "\(Constants.CodegenVersion)")
+      """
+    case .branch(let name):
+      return """
+      .package(url: "https://github.com/apollographql/apollo-ios.git", branch: "\(name)")
+      """
+    case .commit(let hash):
+      return """
+      .package(url: "https://github.com/apollographql/apollo-ios.git", revision: "\(hash)")
+      """
+    case .local(let path):
+      return """
+      .package(path: "\(path)")
+      """
     }
   }
 }

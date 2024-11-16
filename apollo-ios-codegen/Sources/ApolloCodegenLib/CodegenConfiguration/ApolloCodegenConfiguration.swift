@@ -338,8 +338,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public enum ApolloPackageVersion: Codable, Equatable {
       case `default`
       case branch(name: String)
-      case commitHash(hash: String)
-      case localPath(path: String)
+      case commit(hash: String)
+      case local(path: String)
       
       public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -363,22 +363,22 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
           
           let name = try nestedContainer.decode(String.self, forKey: .name)
           self = .branch(name: name)
-        case .commitHash:
+        case .commit:
           let nestedContainer = try container.nestedContainer(
-            keyedBy: CommitHashCodingKeys.self,
-            forKey: .commitHash
+            keyedBy: CommitCodingKeys.self,
+            forKey: .commit
           )
           
           let hash = try nestedContainer.decode(String.self, forKey: .hash)
-          self = .commitHash(hash: hash)
-        case .localPath:
+          self = .commit(hash: hash)
+        case .local:
           let nestedContainer = try container.nestedContainer(
-            keyedBy: LocalPathCodingKeys.self,
-            forKey: .localPath
+            keyedBy: LocalCodingKeys.self,
+            forKey: .local
           )
           
           let path = try nestedContainer.decode(String.self, forKey: .path)
-          self = .localPath(path: path)
+          self = .local(path: path)
         }
       }
     }

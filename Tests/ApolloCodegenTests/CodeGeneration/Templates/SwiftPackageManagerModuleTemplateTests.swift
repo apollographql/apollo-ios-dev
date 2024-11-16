@@ -14,11 +14,13 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
 
   private func buildSubject(
     testMockConfig: ApolloCodegenConfiguration.TestMockFileOutput = .none,
-    config: ApolloCodegenConfiguration = .mock(schemaNamespace: "TestModule")
+    config: ApolloCodegenConfiguration = .mock(schemaNamespace: "TestModule"),
+    version: ApolloCodegenConfiguration.SchemaTypesFileOutput.ApolloPackageVersion = .default
   ) {
     subject = .init(
       testMockConfig: testMockConfig,
-      config: .init(config: config)
+      config: .init(config: config),
+      version: version
     )
   }
 
@@ -148,13 +150,64 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
   }
 
-  func test__packageDescription__generatesNoDependencies() {
+  func test__packageDescription__generatesDefaultVersionDependency() {
     // given
-    buildSubject()
+    buildSubject(version: .default)
 
     let expected = """
       dependencies: [
-        .package(url: "https://github.com/apollographql/apollo-ios.git", from: "1.0.0"),
+        .package(url: "https://github.com/apollographql/apollo-ios.git", exact: "\(ApolloCodegenLib.Constants.CodegenVersion)"),
+      ],
+    """
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
+  }
+  
+  func test__packageDescription__generatesBranchVersionDependency() {
+    // given
+    let branchName = "testBranch"
+    buildSubject(version: .branch(name: branchName))
+
+    let expected = """
+      dependencies: [
+        .package(url: "https://github.com/apollographql/apollo-ios.git", branch: "\(branchName)"),
+      ],
+    """
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
+  }
+  
+  func test__packageDescription__generatesCommitVersionDependency() {
+    // given
+    let hash = "testHash"
+    buildSubject(version: .commit(hash: hash))
+
+    let expected = """
+      dependencies: [
+        .package(url: "https://github.com/apollographql/apollo-ios.git", revision: "\(hash)"),
+      ],
+    """
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
+  }
+  
+  func test__packageDescription__generatesLocalVersionDependency() {
+    // given
+    let path = "localPath"
+    buildSubject(version: .local(path: path))
+
+    let expected = """
+      dependencies: [
+        .package(path: "\(path)"),
       ],
     """
     // when

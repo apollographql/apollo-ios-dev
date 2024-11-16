@@ -1241,7 +1241,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
   
   // MARK: Module Type Tests
   
-  func test__codableSPMModuleType_noVersionProvided() throws {
+  func test__codableSPMModuleType_noStructVersionProvided() throws {
     var decodedStruct: ApolloCodegenConfiguration {
       .init(
         schemaNamespace: "SerializedSchema",
@@ -1336,8 +1336,98 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
     }
     
     let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
-    print("Actual JSON - \(actualJSON)")
     expect(actualJSON).to(equalLineByLine(encodedJSON))
+  }
+  
+  func test__codableSPMModuleType_noJSONVersionProvided() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackageManager()
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackageManager" : {
+                
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
     
     let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
     expect(actualStruct).to(equal(decodedStruct))
@@ -1560,7 +1650,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
         output: .init(
           schemaTypes: .init(
             path: "/output/path",
-            moduleType: .swiftPackageManager(version: .commitHash(hash: "hash"))
+            moduleType: .swiftPackageManager(version: .commit(hash: "hash"))
           ),
           operations: .absolute(path: "/absolute/path", accessModifier: .internal)
         )
@@ -1622,7 +1712,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "moduleType" : {
               "swiftPackageManager" : {
                 "version" : {
-                  "commitHash" : {
+                  "commit" : {
                     "hash" : "hash"
                   }
                 }
@@ -1662,7 +1752,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
         output: .init(
           schemaTypes: .init(
             path: "/output/path",
-            moduleType: .swiftPackageManager(version: .localPath(path: "path"))
+            moduleType: .swiftPackageManager(version: .local(path: "path"))
           ),
           operations: .absolute(path: "/absolute/path", accessModifier: .internal)
         )
@@ -1724,7 +1814,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "moduleType" : {
               "swiftPackageManager" : {
                 "version" : {
-                  "localPath" : {
+                  "local" : {
                     "path" : "path"
                   }
                 }
