@@ -45,9 +45,9 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
       schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType,
       operations: ApolloCodegenConfiguration.OperationsFileOutput
     )] = [
-      (schemaTypes: .swiftPackageManager(), operations: .relative(subpath: nil)),
-      (schemaTypes: .swiftPackageManager(), operations: .absolute(path: "path")),
-      (schemaTypes: .swiftPackageManager(), operations: .inSchemaModule),
+      (schemaTypes: .swiftPackage(), operations: .relative(subpath: nil)),
+      (schemaTypes: .swiftPackage(), operations: .absolute(path: "path")),
+      (schemaTypes: .swiftPackage(), operations: .inSchemaModule),
       (schemaTypes: .other, operations: .relative(subpath: nil)),
       (schemaTypes: .other, operations: .absolute(path: "path")),
       (schemaTypes: .other, operations: .inSchemaModule),
@@ -93,17 +93,17 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
       expectation: String
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil),
         expectation: expectedAPIAndSchema
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path"),
         expectation: expectedAPIAndSchema
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule,
         expectation: expectedAPI
       ),
@@ -176,17 +176,17 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
       expectation: String
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil),
         expectation: expectedAPIAndSchema
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path"),
         expectation: expectedAPIAndSchema
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule,
         expectation: expectedAPI
       ),
@@ -269,19 +269,19 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
       atLine: Int
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil),
         expectation: expectedNoNamespace,
         atLine: 7
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path"),
         expectation: expectedNoNamespace,
         atLine: 7
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule,
         expectation: expectedNoNamespace,
         atLine: 6

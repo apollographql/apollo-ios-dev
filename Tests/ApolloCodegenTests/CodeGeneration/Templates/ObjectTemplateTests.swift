@@ -99,7 +99,7 @@ class ObjectTemplateTests: XCTestCase {
         GraphQLInterfaceType.mock("Animal", fields: ["species": GraphQLField.mock("species", type: .scalar(.string()))]),
         GraphQLInterfaceType.mock("Pet", fields: ["name": GraphQLField.mock("name", type: .scalar(.string()))])
       ],
-      config: .mock(.swiftPackageManager())
+      config: .mock(.swiftPackage())
     )
 
     let expected = """

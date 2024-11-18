@@ -45,9 +45,9 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType,
       operations: ApolloCodegenConfiguration.OperationsFileOutput
     )] = [
-      (schemaTypes: .swiftPackageManager(), operations: .relative(subpath: nil)),
-      (schemaTypes: .swiftPackageManager(), operations: .absolute(path: "path")),
-      (schemaTypes: .swiftPackageManager(), operations: .inSchemaModule),
+      (schemaTypes: .swiftPackage(), operations: .relative(subpath: nil)),
+      (schemaTypes: .swiftPackage(), operations: .absolute(path: "path")),
+      (schemaTypes: .swiftPackage(), operations: .inSchemaModule),
       (schemaTypes: .other, operations: .relative(subpath: nil)),
       (schemaTypes: .other, operations: .absolute(path: "path")),
       (schemaTypes: .other, operations: .inSchemaModule),
@@ -80,15 +80,15 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       operations: ApolloCodegenConfiguration.OperationsFileOutput
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil)
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path")
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule
       ),
       (
@@ -141,15 +141,15 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       operations: ApolloCodegenConfiguration.OperationsFileOutput
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil)
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path")
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule
       ),
       (
@@ -237,19 +237,19 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       atLine: Int
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path"),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule,
         expectation: expectedNoNamespace,
         atLine: 6
@@ -330,17 +330,17 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       atLine: Int
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil),
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path"),
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule,
         atLine: 6
       ),
@@ -441,19 +441,19 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       atLine: Int
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path"),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule,
         expectation: expectedNoNamespace,
         atLine: 6
@@ -569,19 +569,19 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       atLine: Int
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path"),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule,
         expectation: expectedNoNamespace,
         atLine: 6
@@ -697,19 +697,19 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       atLine: Int
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path"),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule,
         expectation: expectedNoNamespace,
         atLine: 6
@@ -827,19 +827,19 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       atLine: Int
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path"),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule,
         expectation: expectedNoNamespace,
         atLine: 6
@@ -957,19 +957,19 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       atLine: Int
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path"),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule,
         expectation: expectedNoNamespace,
         atLine: 6
@@ -1087,19 +1087,19 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
       atLine: Int
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path"),
         expectation: expectedNoNamespace,
         atLine: 6
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule,
         expectation: expectedNoNamespace,
         atLine: 6

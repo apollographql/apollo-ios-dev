@@ -268,7 +268,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       moduleType: ModuleType
     ) {
       self.path = path
-      self.moduleType = moduleType
+      self.moduleType = moduleType == .swiftPackageManager ? .swiftPackage(dependencyType: .default) : moduleType
     }
 
     /// Compatible dependency manager automation.
@@ -283,7 +283,12 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case embeddedInTarget(name: String, accessModifier: AccessModifier = .internal)
       /// Generates a `Package.swift` file that is suitable for linking the generated schema types
       /// files to your project using Swift Package Manager.
-      case swiftPackageManager(version: ApolloPackageVersion = .default)
+      @available(*, deprecated, message: "Use .swiftPackage(dependencyType:) case instead.")
+      case swiftPackageManager
+      /// Generates a `Package.swift` file that is suitable for linking then generated schema types
+      /// files to your project using Swift Package Manager. Uses the `dependencyType` associated
+      /// value to determine how to setup the dependency on `apollo-ios`.
+      case swiftPackage(dependencyType: ApolloDependencyType = .default)
       /// No module will be created for the generated types and you are required to create the
       /// module to support your preferred dependency manager. You must specify the name of the
       /// module you will create in the `schemaNamespace` property as this will be used in `import`
@@ -321,64 +326,67 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
           self = .embeddedInTarget(name: name, accessModifier: accessModifier)
 
         case .swiftPackageManager:
+          self = .swiftPackage(dependencyType: .default)
+          
+        case .swiftPackage:
           let nestedContainer = try container.nestedContainer(
-            keyedBy: SwiftPackageManagerCodingKeys.self,
-            forKey: .swiftPackageManager
+            keyedBy: SwiftPackageCodingKeys.self,
+            forKey: .swiftPackage
           )
           
-          let version = try nestedContainer.decodeIfPresent(ApolloPackageVersion.self, forKey: .version) ?? .default
-          self = .swiftPackageManager(version: version)
+          let dependencyType = try nestedContainer.decodeIfPresent(ApolloDependencyType.self, forKey: .dependencyType) ?? .default
+          self = .swiftPackage(dependencyType: dependencyType)
 
         case .other:
           self = .other
         }
       }
-    }
-    
-    public enum ApolloPackageVersion: Codable, Equatable {
-      case `default`
-      case branch(name: String)
-      case commit(hash: String)
-      case local(path: String)
       
-      public init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+      public enum ApolloDependencyType: Codable, Equatable {
+        case `default`
+        case branch(name: String)
+        case commit(hash: String)
+        case local(path: String)
         
-        guard let key = container.allKeys.first else {
-          throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
-            codingPath: container.codingPath,
-            debugDescription: "Invalid number of keys found, expected one.",
-            underlyingError: nil
-          ))
-        }
-        
-        switch key {
-        case .default:
-          self = .default
-        case .branch:
-          let nestedContainer = try container.nestedContainer(
-            keyedBy: BranchCodingKeys.self,
-            forKey: .branch
-          )
+        public init(from decoder: any Decoder) throws {
+          let container = try decoder.container(keyedBy: CodingKeys.self)
           
-          let name = try nestedContainer.decode(String.self, forKey: .name)
-          self = .branch(name: name)
-        case .commit:
-          let nestedContainer = try container.nestedContainer(
-            keyedBy: CommitCodingKeys.self,
-            forKey: .commit
-          )
+          guard let key = container.allKeys.first else {
+            throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
+              codingPath: container.codingPath,
+              debugDescription: "Invalid number of keys found, expected one.",
+              underlyingError: nil
+            ))
+          }
           
-          let hash = try nestedContainer.decode(String.self, forKey: .hash)
-          self = .commit(hash: hash)
-        case .local:
-          let nestedContainer = try container.nestedContainer(
-            keyedBy: LocalCodingKeys.self,
-            forKey: .local
-          )
-          
-          let path = try nestedContainer.decode(String.self, forKey: .path)
-          self = .local(path: path)
+          switch key {
+          case .default:
+            self = .default
+          case .branch:
+            let nestedContainer = try container.nestedContainer(
+              keyedBy: BranchCodingKeys.self,
+              forKey: .branch
+            )
+            
+            let name = try nestedContainer.decode(String.self, forKey: .name)
+            self = .branch(name: name)
+          case .commit:
+            let nestedContainer = try container.nestedContainer(
+              keyedBy: CommitCodingKeys.self,
+              forKey: .commit
+            )
+            
+            let hash = try nestedContainer.decode(String.self, forKey: .hash)
+            self = .commit(hash: hash)
+          case .local:
+            let nestedContainer = try container.nestedContainer(
+              keyedBy: LocalCodingKeys.self,
+              forKey: .local
+            )
+            
+            let path = try nestedContainer.decode(String.self, forKey: .path)
+            self = .local(path: path)
+          }
         }
       }
     }
@@ -1239,7 +1247,7 @@ extension ApolloCodegenConfiguration.SchemaTypesFileOutput {
   var isInModule: Bool {
     switch moduleType {
     case .embeddedInTarget: return false
-    case .swiftPackageManager, .other: return true
+    case .swiftPackageManager, .swiftPackage, .other: return true
     }
   }  
 }

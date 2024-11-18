@@ -11,7 +11,7 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
 
   let config: ApolloCodegen.ConfigurationContext
   
-  let version: ApolloCodegenConfiguration.SchemaTypesFileOutput.ApolloPackageVersion
+  let dependencyType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloDependencyType
 
   func renderHeaderTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
@@ -44,7 +44,7 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
         """})
       ],
       dependencies: [
-        \(version.dependencyString),
+        \(dependencyType.dependencyString),
       ],
       targets: [
         .target(
@@ -84,7 +84,7 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
   }
 }
 
-fileprivate extension ApolloCodegenConfiguration.SchemaTypesFileOutput.ApolloPackageVersion {
+fileprivate extension ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloDependencyType {
   var dependencyString: TemplateString {
     switch self {
     case .default:

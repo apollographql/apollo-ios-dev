@@ -250,6 +250,7 @@ extension TemplateRenderer {
         return ApolloCodegenConfiguration.AccessModifier.internal.swiftString
     case
       (.swiftPackageManager, _),
+      (.swiftPackage, _),
       (.other, _):
         return ApolloCodegenConfiguration.AccessModifier.public.swiftString
     }
@@ -378,7 +379,7 @@ fileprivate extension ApolloCodegenConfiguration {
   var schemaModuleName: String {
     switch output.schemaTypes.moduleType {
     case let .embeddedInTarget(targetName, _): return targetName
-    case .swiftPackageManager, .other: return schemaNamespace.firstUppercased
+    case .swiftPackageManager, .swiftPackage, .other: return schemaNamespace.firstUppercased
     }
   }
 }

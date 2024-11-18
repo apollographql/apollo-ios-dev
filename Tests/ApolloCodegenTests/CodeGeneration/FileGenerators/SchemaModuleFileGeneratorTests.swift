@@ -30,7 +30,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     let fileURL = rootURL.appendingPathComponent("Package.swift")
 
     let configuration = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(
-      .swiftPackageManager(),
+      .swiftPackage(),
       to: rootURL.path
     ))
 

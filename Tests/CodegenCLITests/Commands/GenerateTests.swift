@@ -211,7 +211,7 @@ class GenerateTests: XCTestCase {
         schemaPath: "./schema.graphqls"
       ),
       output: .init(
-        schemaTypes: .init(path: ".", moduleType: .swiftPackageManager())
+        schemaTypes: .init(path: ".", moduleType: .swiftPackage())
       )
     )
 

@@ -17,7 +17,7 @@ class InputObjectTemplateTests: XCTestCase {
     customName: String? = nil,
     fields: [GraphQLInputField] = [],
     documentation: String? = nil,
-    config: ApolloCodegenConfiguration = .mock(.swiftPackageManager())
+    config: ApolloCodegenConfiguration = .mock(.swiftPackage())
   ) {
     let inputObject = GraphQLInputObjectType.mock(
       name,
@@ -80,7 +80,7 @@ class InputObjectTemplateTests: XCTestCase {
           defaultValue: nil
         )
       ],
-      config: .mock(.swiftPackageManager())
+      config: .mock(.swiftPackage())
     )
 
     let expected = """
@@ -539,7 +539,7 @@ class InputObjectTemplateTests: XCTestCase {
         type: .list(.scalar(.string())),
         defaultValue: nil
       )
-    ], config: .mock(.swiftPackageManager(), schemaNamespace: "TestSchema"))
+    ], config: .mock(.swiftPackage(), schemaNamespace: "TestSchema"))
 
     let expected = """
       public init(
@@ -698,9 +698,9 @@ class InputObjectTemplateTests: XCTestCase {
     """
 
     let tests: [(config: ApolloCodegenConfiguration.FileOutput, expected: String)] = [
-      (.mock(moduleType: .swiftPackageManager(), operations: .relative(subpath: nil)), expectedWithNamespace),
-      (.mock(moduleType: .swiftPackageManager(), operations: .absolute(path: "custom")), expectedWithNamespace),
-      (.mock(moduleType: .swiftPackageManager(), operations: .inSchemaModule), expectedNoNamespace),
+      (.mock(moduleType: .swiftPackage(), operations: .relative(subpath: nil)), expectedWithNamespace),
+      (.mock(moduleType: .swiftPackage(), operations: .absolute(path: "custom")), expectedWithNamespace),
+      (.mock(moduleType: .swiftPackage(), operations: .inSchemaModule), expectedNoNamespace),
       (.mock(moduleType: .other, operations: .relative(subpath: nil)), expectedWithNamespace),
       (.mock(moduleType: .other, operations: .absolute(path: "custom")), expectedWithNamespace),
       (.mock(moduleType: .other, operations: .inSchemaModule), expectedNoNamespace),
@@ -1073,7 +1073,7 @@ class InputObjectTemplateTests: XCTestCase {
                                documentation: "Field Documentation!")
       ],
       documentation: documentation,
-      config: .mock(.swiftPackageManager(), options: .init(schemaDocumentation: .include))
+      config: .mock(.swiftPackage(), options: .init(schemaDocumentation: .include))
     )
 
     let expected = """
@@ -1115,7 +1115,7 @@ class InputObjectTemplateTests: XCTestCase {
                                documentation: "Field Documentation!")
       ],
       documentation: documentation,
-      config: .mock(.swiftPackageManager(), options: .init(schemaDocumentation: .exclude))
+      config: .mock(.swiftPackage(), options: .init(schemaDocumentation: .exclude))
     )
 
     let expected = """
@@ -1158,7 +1158,7 @@ class InputObjectTemplateTests: XCTestCase {
         )
       ],
       config: .mock(
-        .swiftPackageManager(),
+        .swiftPackage(),
         options: .init(schemaDocumentation: .include, warningsOnDeprecatedUsage: .include)
       )
     )
@@ -1196,7 +1196,7 @@ class InputObjectTemplateTests: XCTestCase {
         )
       ],
       config: .mock(
-        .swiftPackageManager(),
+        .swiftPackage(),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .include)
       )
     )
@@ -1241,7 +1241,7 @@ class InputObjectTemplateTests: XCTestCase {
         )
       ],
       config: .mock(
-        .swiftPackageManager(),
+        .swiftPackage(),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude)
       )
     )
@@ -1280,7 +1280,7 @@ class InputObjectTemplateTests: XCTestCase {
       ],
       documentation: documentation,
       config: .mock(
-        .swiftPackageManager(),
+        .swiftPackage(),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .include)
       )
     )
@@ -1328,7 +1328,7 @@ class InputObjectTemplateTests: XCTestCase {
       ],
       documentation: documentation,
       config: .mock(
-        .swiftPackageManager(),
+        .swiftPackage(),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude)
       )
     )
@@ -1389,7 +1389,7 @@ class InputObjectTemplateTests: XCTestCase {
         )
       ],
       config: .mock(
-        .swiftPackageManager(),
+        .swiftPackage(),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .include)
       )
     )
@@ -1480,7 +1480,7 @@ class InputObjectTemplateTests: XCTestCase {
         )
       ],
       config: .mock(
-        .swiftPackageManager(),
+        .swiftPackage(),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude)
       )
     )
@@ -1797,7 +1797,7 @@ class InputObjectTemplateTests: XCTestCase {
 
     buildSubject(
       fields: fields,
-      config: .mock(.swiftPackageManager(),
+      config: .mock(.swiftPackage(),
                     options: .init(
                       conversionStrategies: .init(inputObjects: .none)
                     ),
@@ -2214,7 +2214,7 @@ class InputObjectTemplateTests: XCTestCase {
       fields: fields,
       config: .mock(schemaNamespace: "testschema", 
                     output: .mock(
-                      moduleType: .swiftPackageManager(),
+                      moduleType: .swiftPackage(),
                       operations: .relative(subpath: nil)
                     ),
                     options: .init(
@@ -2275,7 +2275,7 @@ class InputObjectTemplateTests: XCTestCase {
     buildSubject(
       fields: fields,
       config: .mock(schemaNamespace: "testschema", output: .mock(
-        moduleType: .swiftPackageManager(),
+        moduleType: .swiftPackage(),
         operations: .relative(subpath: nil)))
     )
 
@@ -2331,7 +2331,7 @@ class InputObjectTemplateTests: XCTestCase {
     buildSubject(
       fields: fields,
       config: .mock(schemaNamespace: "TESTSCHEMA", output: .mock(
-        moduleType: .swiftPackageManager(),
+        moduleType: .swiftPackage(),
         operations: .relative(subpath: nil)))
     )
 
@@ -2387,7 +2387,7 @@ class InputObjectTemplateTests: XCTestCase {
     buildSubject(
       fields: fields,
       config: .mock(schemaNamespace: "TestSchema", output: .mock(
-        moduleType: .swiftPackageManager(),
+        moduleType: .swiftPackage(),
         operations: .relative(subpath: nil)))
     )
 
@@ -2429,7 +2429,7 @@ class InputObjectTemplateTests: XCTestCase {
         defaultValue: nil)],
       config: .mock(
         schemaNamespace: "testschema",
-        output: .mock(moduleType: .swiftPackageManager(), operations: .relative(subpath: nil))
+        output: .mock(moduleType: .swiftPackage(), operations: .relative(subpath: nil))
       )
     )
 
@@ -2461,7 +2461,7 @@ class InputObjectTemplateTests: XCTestCase {
         defaultValue: nil)],
       config: .mock(
         schemaNamespace: "TESTSCHEMA",
-        output: .mock(moduleType: .swiftPackageManager(), operations: .relative(subpath: nil))
+        output: .mock(moduleType: .swiftPackage(), operations: .relative(subpath: nil))
       )
     )
 
@@ -2493,7 +2493,7 @@ class InputObjectTemplateTests: XCTestCase {
         defaultValue: nil)],
       config: .mock(
         schemaNamespace: "TestSchema",
-        output: .mock(moduleType:.swiftPackageManager() ,operations: .relative(subpath: nil))
+        output: .mock(moduleType:.swiftPackage() ,operations: .relative(subpath: nil))
       )
     )
 

@@ -39,9 +39,9 @@ class TemplateRenderer_TestMockFile_Tests: XCTestCase {
       schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType,
       operations: ApolloCodegenConfiguration.OperationsFileOutput
     )] = [
-      (schemaTypes: .swiftPackageManager(), operations: .relative(subpath: nil)),
-      (schemaTypes: .swiftPackageManager(), operations: .absolute(path: "path")),
-      (schemaTypes: .swiftPackageManager(), operations: .inSchemaModule),
+      (schemaTypes: .swiftPackage(), operations: .relative(subpath: nil)),
+      (schemaTypes: .swiftPackage(), operations: .absolute(path: "path")),
+      (schemaTypes: .swiftPackage(), operations: .inSchemaModule),
       (schemaTypes: .other, operations: .relative(subpath: nil)),
       (schemaTypes: .other, operations: .absolute(path: "path")),
       (schemaTypes: .other, operations: .inSchemaModule),
@@ -70,17 +70,17 @@ class TemplateRenderer_TestMockFile_Tests: XCTestCase {
       importModuleName: String
     )] = [
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .relative(subpath: nil),
         importModuleName: "TestSchema"
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .absolute(path: "path"),
         importModuleName: "TestSchema"
       ),
       (
-        schemaTypes: .swiftPackageManager(),
+        schemaTypes: .swiftPackage(),
         operations: .inSchemaModule,
         importModuleName: "TestSchema"
       ),
@@ -141,7 +141,7 @@ class TemplateRenderer_TestMockFile_Tests: XCTestCase {
 
     """
     let config = buildConfig(
-      moduleType: .swiftPackageManager(),
+      moduleType: .swiftPackage(),
       operations: .inSchemaModule,
       cocoapodsCompatibleImportStatements: true
     )

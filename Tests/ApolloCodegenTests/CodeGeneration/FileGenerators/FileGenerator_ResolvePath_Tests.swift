@@ -143,7 +143,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .object
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .inSchemaModule)
+    buildConfig(module: .swiftPackage(), operations: .inSchemaModule)
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -162,7 +162,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .object
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .absolute(path: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .absolute(path: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -180,7 +180,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .object
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: nil))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: nil))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -198,7 +198,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .object
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -356,7 +356,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .enum
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .inSchemaModule)
+    buildConfig(module: .swiftPackage(), operations: .inSchemaModule)
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -375,7 +375,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .enum
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .absolute(path: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .absolute(path: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -393,7 +393,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .enum
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: nil))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: nil))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -411,7 +411,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .enum
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -569,7 +569,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .interface
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .inSchemaModule)
+    buildConfig(module: .swiftPackage(), operations: .inSchemaModule)
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -588,7 +588,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .interface
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .absolute(path: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .absolute(path: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -606,7 +606,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .interface
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: nil))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: nil))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -624,7 +624,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .interface
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -782,7 +782,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .union
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .inSchemaModule)
+    buildConfig(module: .swiftPackage(), operations: .inSchemaModule)
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -801,7 +801,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .union
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .absolute(path: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .absolute(path: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -819,7 +819,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .union
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: nil))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: nil))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -837,7 +837,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .union
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -995,7 +995,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .inputObject
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .inSchemaModule)
+    buildConfig(module: .swiftPackage(), operations: .inSchemaModule)
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1014,7 +1014,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .inputObject
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .absolute(path: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .absolute(path: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1032,7 +1032,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .inputObject
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: nil))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: nil))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1050,7 +1050,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .inputObject
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1208,7 +1208,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .customScalar
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .inSchemaModule)
+    buildConfig(module: .swiftPackage(), operations: .inSchemaModule)
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1227,7 +1227,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .customScalar
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .absolute(path: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .absolute(path: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1245,7 +1245,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .customScalar
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: nil))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: nil))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1263,7 +1263,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .customScalar
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1421,7 +1421,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .schema
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .inSchemaModule)
+    buildConfig(module: .swiftPackage(), operations: .inSchemaModule)
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1439,7 +1439,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .schema
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .absolute(path: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .absolute(path: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1456,7 +1456,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .schema
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: nil))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: nil))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1473,7 +1473,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .schema
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: "NewPath"))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: "NewPath"))
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1622,7 +1622,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .fragment(irFragment.definition)
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .inSchemaModule)
+    buildConfig(module: .swiftPackage(), operations: .inSchemaModule)
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1642,7 +1642,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
 
     // when
     let path = "New/Path"
-    buildConfig(module: .swiftPackageManager(), operations: .absolute(path: path))
+    buildConfig(module: .swiftPackage(), operations: .absolute(path: path))
 
     let expected = currentWorkingDirectoryPath + path + "/Fragments"
 
@@ -1658,7 +1658,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .fragment(irFragment.definition)
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: nil))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: nil))
 
     let expected = deleteLastPathComponent(irFragment.definition.filePath)
 
@@ -1675,7 +1675,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
 
     // when
     let path = "NewPath"
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: path))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: path))
 
     let expected = deleteLastPathComponent(irFragment.definition.filePath, appending: path)
 
@@ -1832,7 +1832,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .operation(irOperation.definition)
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .inSchemaModule)
+    buildConfig(module: .swiftPackage(), operations: .inSchemaModule)
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1852,7 +1852,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .operation(irOperation.definition)
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .inSchemaModule)
+    buildConfig(module: .swiftPackage(), operations: .inSchemaModule)
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1872,7 +1872,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .operation(irOperation.definition)
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .inSchemaModule)
+    buildConfig(module: .swiftPackage(), operations: .inSchemaModule)
 
     let expected = directoryURL
       .appendingPathComponent("Sources")
@@ -1893,7 +1893,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
 
     // when
     let path = "New/Path"
-    buildConfig(module: .swiftPackageManager(), operations: .absolute(path: path))
+    buildConfig(module: .swiftPackage(), operations: .absolute(path: path))
 
     let expected = currentWorkingDirectoryPath + path + "/Queries"
 
@@ -1910,7 +1910,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
 
     // when
     let path = "New/Path"
-    buildConfig(module: .swiftPackageManager(), operations: .absolute(path: path))
+    buildConfig(module: .swiftPackage(), operations: .absolute(path: path))
 
     let expected = currentWorkingDirectoryPath + path + "/Mutations"
 
@@ -1927,7 +1927,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
 
     // when
     let path = "New/Path"
-    buildConfig(module: .swiftPackageManager(), operations: .absolute(path: path))
+    buildConfig(module: .swiftPackage(), operations: .absolute(path: path))
 
     let expected = currentWorkingDirectoryPath + path + "/Subscriptions"
 
@@ -1943,7 +1943,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
     subject = .operation(irOperation.definition)
 
     // when
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: nil))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: nil))
 
     let expected = deleteLastPathComponent(irOperation.definition.filePath)
 
@@ -1960,7 +1960,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
 
     // when
     let path = "NewPath"
-    buildConfig(module: .swiftPackageManager(), operations: .relative(subpath: path))
+    buildConfig(module: .swiftPackage(), operations: .relative(subpath: path))
 
     let expected = deleteLastPathComponent(irOperation.definition.filePath, appending: path)
 
@@ -2265,7 +2265,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
 
     // when
     buildConfig(
-      module: .swiftPackageManager(),
+      module: .swiftPackage(),
       operations: .inSchemaModule,
       testMocks: .swiftPackage()
     )
@@ -2286,7 +2286,7 @@ class FileGenerator_ResolvePath_Tests: XCTestCase {
 
     // when
     buildConfig(
-      module: .swiftPackageManager(),
+      module: .swiftPackage(),
       operations: .inSchemaModule,
       testMocks: .swiftPackage(targetName: "CustomMockTarget")
     )

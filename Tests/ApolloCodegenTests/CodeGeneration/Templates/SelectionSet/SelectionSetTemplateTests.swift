@@ -625,9 +625,9 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let tests: [ApolloCodegenConfiguration.FileOutput] = [
-      .mock(moduleType: .swiftPackageManager(), operations: .relative(subpath: nil, accessModifier: .public)),
-      .mock(moduleType: .swiftPackageManager(), operations: .absolute(path: "custom", accessModifier: .public)),
-      .mock(moduleType: .swiftPackageManager(), operations: .inSchemaModule),
+      .mock(moduleType: .swiftPackage(), operations: .relative(subpath: nil, accessModifier: .public)),
+      .mock(moduleType: .swiftPackage(), operations: .absolute(path: "custom", accessModifier: .public)),
+      .mock(moduleType: .swiftPackage(), operations: .inSchemaModule),
       .mock(moduleType: .other, operations: .relative(subpath: nil, accessModifier: .public)),
       .mock(moduleType: .other, operations: .absolute(path: "custom", accessModifier: .public)),
       .mock(moduleType: .other, operations: .inSchemaModule),
@@ -696,9 +696,9 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let tests: [ApolloCodegenConfiguration.FileOutput] = [
-      .mock(moduleType: .swiftPackageManager(), operations: .relative(subpath: nil, accessModifier: .public)),
-      .mock(moduleType: .swiftPackageManager(), operations: .absolute(path: "custom", accessModifier: .public)),
-      .mock(moduleType: .swiftPackageManager(), operations: .inSchemaModule),
+      .mock(moduleType: .swiftPackage(), operations: .relative(subpath: nil, accessModifier: .public)),
+      .mock(moduleType: .swiftPackage(), operations: .absolute(path: "custom", accessModifier: .public)),
+      .mock(moduleType: .swiftPackage(), operations: .inSchemaModule),
       .mock(moduleType: .other, operations: .relative(subpath: nil, accessModifier: .public)),
       .mock(moduleType: .other, operations: .absolute(path: "custom", accessModifier: .public)),
       .mock(moduleType: .other, operations: .inSchemaModule),
@@ -4694,9 +4694,9 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let tests: [ApolloCodegenConfiguration.FileOutput] = [
-      .mock(moduleType: .swiftPackageManager(), operations: .relative(subpath: nil, accessModifier: .public)),
-      .mock(moduleType: .swiftPackageManager(), operations: .absolute(path: "custom", accessModifier: .public)),
-      .mock(moduleType: .swiftPackageManager(), operations: .inSchemaModule),
+      .mock(moduleType: .swiftPackage(), operations: .relative(subpath: nil, accessModifier: .public)),
+      .mock(moduleType: .swiftPackage(), operations: .absolute(path: "custom", accessModifier: .public)),
+      .mock(moduleType: .swiftPackage(), operations: .inSchemaModule),
       .mock(moduleType: .other, operations: .relative(subpath: nil, accessModifier: .public)),
       .mock(moduleType: .other, operations: .absolute(path: "custom", accessModifier: .public)),
       .mock(moduleType: .other, operations: .inSchemaModule),
@@ -4762,9 +4762,9 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let tests: [ApolloCodegenConfiguration.FileOutput] = [
-      .mock(moduleType: .swiftPackageManager(), operations: .relative(subpath: nil, accessModifier: .public)),
-      .mock(moduleType: .swiftPackageManager(), operations: .absolute(path: "custom", accessModifier: .public)),
-      .mock(moduleType: .swiftPackageManager(), operations: .inSchemaModule),
+      .mock(moduleType: .swiftPackage(), operations: .relative(subpath: nil, accessModifier: .public)),
+      .mock(moduleType: .swiftPackage(), operations: .absolute(path: "custom", accessModifier: .public)),
+      .mock(moduleType: .swiftPackage(), operations: .inSchemaModule),
       .mock(moduleType: .other, operations: .relative(subpath: nil, accessModifier: .public)),
       .mock(moduleType: .other, operations: .absolute(path: "custom", accessModifier: .public)),
       .mock(moduleType: .other, operations: .inSchemaModule),

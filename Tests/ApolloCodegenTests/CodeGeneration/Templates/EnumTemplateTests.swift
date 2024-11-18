@@ -56,7 +56,7 @@ class EnumTemplateTests: XCTestCase {
 
   func test_render_givenModuleType_swiftPackageManager_generatesSwiftEnum_withPublicAccess() {
     // given
-    buildSubject(config: .mock(.swiftPackageManager()))
+    buildSubject(config: .mock(.swiftPackage()))
 
     let expected = """
     public enum TestEnum: String, EnumType {

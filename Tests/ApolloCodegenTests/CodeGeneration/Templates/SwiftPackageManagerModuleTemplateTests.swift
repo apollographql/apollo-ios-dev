@@ -15,12 +15,12 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
   private func buildSubject(
     testMockConfig: ApolloCodegenConfiguration.TestMockFileOutput = .none,
     config: ApolloCodegenConfiguration = .mock(schemaNamespace: "TestModule"),
-    version: ApolloCodegenConfiguration.SchemaTypesFileOutput.ApolloPackageVersion = .default
+    dependencyType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloDependencyType = .default
   ) {
     subject = .init(
       testMockConfig: testMockConfig,
       config: .init(config: config),
-      version: version
+      dependencyType: dependencyType
     )
   }
 
@@ -152,7 +152,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
 
   func test__packageDescription__generatesDefaultVersionDependency() {
     // given
-    buildSubject(version: .default)
+    buildSubject(dependencyType: .default)
 
     let expected = """
       dependencies: [
@@ -169,7 +169,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
   func test__packageDescription__generatesBranchVersionDependency() {
     // given
     let branchName = "testBranch"
-    buildSubject(version: .branch(name: branchName))
+    buildSubject(dependencyType: .branch(name: branchName))
 
     let expected = """
       dependencies: [
@@ -186,7 +186,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
   func test__packageDescription__generatesCommitVersionDependency() {
     // given
     let hash = "testHash"
-    buildSubject(version: .commit(hash: hash))
+    buildSubject(dependencyType: .commit(hash: hash))
 
     let expected = """
       dependencies: [
@@ -203,7 +203,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
   func test__packageDescription__generatesLocalVersionDependency() {
     // given
     let path = "localPath"
-    buildSubject(version: .local(path: path))
+    buildSubject(dependencyType: .local(path: path))
 
     let expected = """
       dependencies: [
