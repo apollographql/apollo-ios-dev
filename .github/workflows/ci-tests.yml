@@ -215,7 +215,7 @@ jobs:
     - name: Build JS Bundle
       shell: bash
       working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript
-      run: npm install && ./auto_rollup.sh
+      run: ./auto_rollup.sh
     - name: Verify Latest
       shell: bash
       run: |
