@@ -136,16 +136,6 @@ jobs:
           ./Derived/*
         key: ${{ github.run_id }}-dependencies
         fail-on-cache-miss: true
-    # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
-    # - uses: actions/cache@v3
-    #   with:
-    #     path: ./DerivedData/SourcePackages
-    #     key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
-    # - name: Run Tuist Generation
-    #   uses: tuist/tuist-action@0.13.0
-    #   with:
-    #       command: 'generate'
-    #       arguments: ''
     - name: Build and Test
       if: ${{ matrix.should-run == true || matrix.should-run == 'true' }}
       id: build-and-test
@@ -189,59 +179,3 @@ jobs:
           TestResults/ResultBundle.zip
 
   # CodegenTestConfigurations removed because source is not compatible with Sendable yet.
-  
-  verify-frontend-bundle-latest:
-    runs-on: macos-15
-    needs: [changes]
-    if: ${{ needs.changes.outputs.codegen  == 'true' }}
-    timeout-minutes: 5
-    name: Verify Frontend Bundle Latest - macOS
-    steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-    - name: Build JS Bundle
-      shell: bash
-      working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript
-      run: npm install && ./auto_rollup.sh
-    - name: Verify Latest
-      shell: bash
-      run: |
-        git diff --exit-code
-
-  verify-cli-binary-archive:
-    runs-on: macos-15
-    needs: [changes]
-    if: ${{ needs.changes.outputs.codegen  == 'true' }}
-    timeout-minutes: 5
-    name: Verify CLI Binary Archive - macOS
-    steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-    - name: Extract CLI Binary
-      shell: bash
-      working-directory: apollo-ios/CLI
-      run: tar -xf apollo-ios-cli.tar.gz apollo-ios-cli
-    - name: Verify Version
-      shell: bash
-      working-directory: apollo-ios/scripts
-      run: ./cli-version-check.sh
-
-  run-cocoapods-integration-tests:
-    runs-on: macos-15
-    timeout-minutes: 20
-    name: Cocoapods Integration Tests - macOS
-    steps:
-    - uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: ${{ env.XCODE_VERSION }}
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-    - name: Export ENV Variables
-      shell: bash
-      working-directory: apollo-ios
-      run: |
-        apollo_ios_sha=$(git rev-parse HEAD)
-        echo "APOLLO_IOS_SHA=$apollo_ios_sha" >> ${GITHUB_ENV}
-    - name: Run CocoaPods Integration Tests
-      id: run-cocoapods-integration-tests
-      uses: ./.github/actions/run-cocoapods-integration-tests
