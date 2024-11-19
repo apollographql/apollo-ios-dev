@@ -1315,7 +1315,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "schemaTypes" : {
             "moduleType" : {
               "swiftPackage" : {
-                "dependencyType" : {
+                "apolloSDKVersion" : {
                   "default" : {
 
                   }
@@ -1507,7 +1507,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "schemaTypes" : {
             "moduleType" : {
               "swiftPackage" : {
-                "dependencyType" : {
+                "apolloSDKVersion" : {
                   "default" : {
 
                   }
@@ -1638,7 +1638,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
         output: .init(
           schemaTypes: .init(
             path: "/output/path",
-            moduleType: .swiftPackage(dependencyType: .default)
+            moduleType: .swiftPackage(apolloSDKVersion: .default)
           ),
           operations: .absolute(path: "/absolute/path", accessModifier: .internal)
         )
@@ -1699,7 +1699,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "schemaTypes" : {
             "moduleType" : {
               "swiftPackage" : {
-                "dependencyType" : {
+                "apolloSDKVersion" : {
                   "default" : {
 
                   }
@@ -1739,7 +1739,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
         output: .init(
           schemaTypes: .init(
             path: "/output/path",
-            moduleType: .swiftPackage(dependencyType: .branch(name: "branchName"))
+            moduleType: .swiftPackage(apolloSDKVersion: .branch(name: "branchName"))
           ),
           operations: .absolute(path: "/absolute/path", accessModifier: .internal)
         )
@@ -1800,7 +1800,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "schemaTypes" : {
             "moduleType" : {
               "swiftPackage" : {
-                "dependencyType" : {
+                "apolloSDKVersion" : {
                   "branch" : {
                     "name" : "branchName"
                   }
@@ -1840,7 +1840,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
         output: .init(
           schemaTypes: .init(
             path: "/output/path",
-            moduleType: .swiftPackage(dependencyType: .commit(hash: "hash"))
+            moduleType: .swiftPackage(apolloSDKVersion: .commit(hash: "hash"))
           ),
           operations: .absolute(path: "/absolute/path", accessModifier: .internal)
         )
@@ -1901,7 +1901,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "schemaTypes" : {
             "moduleType" : {
               "swiftPackage" : {
-                "dependencyType" : {
+                "apolloSDKVersion" : {
                   "commit" : {
                     "hash" : "hash"
                   }
@@ -1941,7 +1941,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
         output: .init(
           schemaTypes: .init(
             path: "/output/path",
-            moduleType: .swiftPackage(dependencyType: .local(path: "path"))
+            moduleType: .swiftPackage(apolloSDKVersion: .local(path: "path"))
           ),
           operations: .absolute(path: "/absolute/path", accessModifier: .internal)
         )
@@ -2002,7 +2002,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "schemaTypes" : {
             "moduleType" : {
               "swiftPackage" : {
-                "dependencyType" : {
+                "apolloSDKVersion" : {
                   "local" : {
                     "path" : "path"
                   }

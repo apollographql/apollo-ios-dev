@@ -20,19 +20,12 @@ struct SchemaModuleFileGenerator {
     let errors: [ApolloCodegen.NonFatalError]
 
     switch config.output.schemaTypes.moduleType {
-    case .swiftPackageManager:
+    case .swiftPackageManager,
+        .swiftPackage(_):
       filePath = pathURL.appendingPathComponent("Package.swift").path
       (rendered, errors) = SwiftPackageManagerModuleTemplate(
         testMockConfig: config.output.testMocks,
-        config: config,
-        dependencyType: .default
-      ).render()
-    case .swiftPackage(let dependencyType):
-      filePath = pathURL.appendingPathComponent("Package.swift").path
-      (rendered, errors) = SwiftPackageManagerModuleTemplate(
-        testMockConfig: config.output.testMocks,
-        config: config,
-        dependencyType: dependencyType
+        config: config
       ).render()
 
     case .embeddedInTarget:

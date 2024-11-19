@@ -14,13 +14,11 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
 
   private func buildSubject(
     testMockConfig: ApolloCodegenConfiguration.TestMockFileOutput = .none,
-    config: ApolloCodegenConfiguration = .mock(schemaNamespace: "TestModule"),
-    dependencyType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloDependencyType = .default
+    config: ApolloCodegenConfiguration = .mock(schemaNamespace: "TestModule")
   ) {
     subject = .init(
       testMockConfig: testMockConfig,
-      config: .init(config: config),
-      dependencyType: dependencyType
+      config: .init(config: config)
     )
   }
 
@@ -152,7 +150,14 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
 
   func test__packageDescription__generatesDefaultVersionDependency() {
     // given
-    buildSubject(dependencyType: .default)
+    buildSubject(config: .mock(
+      schemaNamespace: "TestModule",
+      output: .init(
+        schemaTypes: .init(
+          path: "path/",
+          moduleType: .swiftPackage(apolloSDKVersion: .default)
+        ))
+    ))
 
     let expected = """
       dependencies: [
@@ -169,7 +174,14 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
   func test__packageDescription__generatesBranchVersionDependency() {
     // given
     let branchName = "testBranch"
-    buildSubject(dependencyType: .branch(name: branchName))
+    buildSubject(config: .mock(
+      schemaNamespace: "TestModule",
+      output: .init(
+        schemaTypes: .init(
+          path: "path/",
+          moduleType: .swiftPackage(apolloSDKVersion: .branch(name: branchName))
+        ))
+    ))
 
     let expected = """
       dependencies: [
@@ -186,7 +198,14 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
   func test__packageDescription__generatesCommitVersionDependency() {
     // given
     let hash = "testHash"
-    buildSubject(dependencyType: .commit(hash: hash))
+    buildSubject(config: .mock(
+      schemaNamespace: "TestModule",
+      output: .init(
+        schemaTypes: .init(
+          path: "path/",
+          moduleType: .swiftPackage(apolloSDKVersion: .commit(hash: hash))
+        ))
+    ))
 
     let expected = """
       dependencies: [
@@ -203,7 +222,14 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
   func test__packageDescription__generatesLocalVersionDependency() {
     // given
     let path = "localPath"
-    buildSubject(dependencyType: .local(path: path))
+    buildSubject(config: .mock(
+      schemaNamespace: "TestModule",
+      output: .init(
+        schemaTypes: .init(
+          path: "path/",
+          moduleType: .swiftPackage(apolloSDKVersion: .local(path: path))
+        ))
+    ))
 
     let expected = """
       dependencies: [

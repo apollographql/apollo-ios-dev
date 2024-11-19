@@ -268,7 +268,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       moduleType: ModuleType
     ) {
       self.path = path
-      self.moduleType = moduleType == .swiftPackageManager ? .swiftPackage(dependencyType: .default) : moduleType
+      self.moduleType = moduleType == .swiftPackageManager ? .swiftPackage(apolloSDKVersion: .default) : moduleType
     }
 
     /// Compatible dependency manager automation.
@@ -283,12 +283,12 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case embeddedInTarget(name: String, accessModifier: AccessModifier = .internal)
       /// Generates a `Package.swift` file that is suitable for linking the generated schema types
       /// files to your project using Swift Package Manager.
-      @available(*, deprecated, message: "Use .swiftPackage(dependencyType:) case instead.")
+      /// Attention: This case has been deprecated, use .swiftPackage(apolloSDKVersion:) case instead.
       case swiftPackageManager
       /// Generates a `Package.swift` file that is suitable for linking then generated schema types
       /// files to your project using Swift Package Manager. Uses the `dependencyType` associated
       /// value to determine how to setup the dependency on `apollo-ios`.
-      case swiftPackage(dependencyType: ApolloDependencyType = .default)
+      case swiftPackage(apolloSDKVersion: ApolloSDKVersion = .default)
       /// No module will be created for the generated types and you are required to create the
       /// module to support your preferred dependency manager. You must specify the name of the
       /// module you will create in the `schemaNamespace` property as this will be used in `import`
@@ -326,7 +326,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
           self = .embeddedInTarget(name: name, accessModifier: accessModifier)
 
         case .swiftPackageManager:
-          self = .swiftPackage(dependencyType: .default)
+          self = .swiftPackage(apolloSDKVersion: .default)
           
         case .swiftPackage:
           let nestedContainer = try container.nestedContainer(
@@ -334,15 +334,15 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
             forKey: .swiftPackage
           )
           
-          let dependencyType = try nestedContainer.decodeIfPresent(ApolloDependencyType.self, forKey: .dependencyType) ?? .default
-          self = .swiftPackage(dependencyType: dependencyType)
+          let apolloSDKVersion = try nestedContainer.decodeIfPresent(ApolloSDKVersion.self, forKey: .apolloSDKVersion) ?? .default
+          self = .swiftPackage(apolloSDKVersion: apolloSDKVersion)
 
         case .other:
           self = .other
         }
       }
       
-      public enum ApolloDependencyType: Codable, Equatable {
+      public enum ApolloSDKVersion: Codable, Equatable {
         case `default`
         case branch(name: String)
         case commit(hash: String)

@@ -11,7 +11,22 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
 
   let config: ApolloCodegen.ConfigurationContext
   
-  let dependencyType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloDependencyType
+  let apolloSDKVersion: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKVersion
+  
+  init(
+    testMockConfig: ApolloCodegenConfiguration.TestMockFileOutput,
+    config: ApolloCodegen.ConfigurationContext
+  ) {
+    self.testMockConfig = testMockConfig
+    self.config = config
+    
+    switch config.config.output.schemaTypes.moduleType {
+    case .swiftPackage(let apolloSDKVersion):
+      self.apolloSDKVersion = apolloSDKVersion
+    default:
+      self.apolloSDKVersion = .default
+    }
+  }
 
   func renderHeaderTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
@@ -44,7 +59,7 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
         """})
       ],
       dependencies: [
-        \(dependencyType.dependencyString),
+        \(apolloSDKVersion.dependencyString),
       ],
       targets: [
         .target(
@@ -84,7 +99,7 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
   }
 }
 
-fileprivate extension ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloDependencyType {
+fileprivate extension ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKVersion {
   var dependencyString: TemplateString {
     switch self {
     case .default:
