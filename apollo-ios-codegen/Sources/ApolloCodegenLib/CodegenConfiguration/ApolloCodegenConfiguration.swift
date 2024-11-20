@@ -286,7 +286,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       /// Attention: This case has been deprecated, use .swiftPackage(apolloSDKVersion:) case instead.
       case swiftPackageManager
       /// Generates a `Package.swift` file that is suitable for linking then generated schema types
-      /// files to your project using Swift Package Manager. Uses the `dependencyType` associated
+      /// files to your project using Swift Package Manager. Uses the `apolloSDKVersion` associated
       /// value to determine how to setup the dependency on `apollo-ios`.
       case swiftPackage(apolloSDKVersion: ApolloSDKVersion = .default)
       /// No module will be created for the generated types and you are required to create the
@@ -346,14 +346,23 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         case `default`
         case branch(name: String)
         case commit(hash: String)
-        case custom(url: String, dependencyType: DependencyType, value: String)
+        case fork(url: String, dependencyType: DependencyType, value: String)
         case local(path: String)
         
         public enum DependencyType: String, Codable, Equatable {
-          case branch = "branch"
-          case exact = "exact"
-          case from = "from"
-          case revision = "revision"
+          case branchName
+          case commitHash
+          case exactVersion
+          case fromVersion
+          
+          public var propertyString: String {
+            switch self {
+            case .branchName: return "branch"
+            case .commitHash: return "revision"
+            case .exactVersion: return "exact"
+            case .fromVersion: return "from"
+            }
+          }
         }
         
         public init(from decoder: any Decoder) throws {
@@ -386,16 +395,16 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
             
             let hash = try nestedContainer.decode(String.self, forKey: .hash)
             self = .commit(hash: hash)
-          case .custom:
+          case .fork:
             let nestedContainer = try container.nestedContainer(
-              keyedBy: CustomCodingKeys.self,
-              forKey: .custom
+              keyedBy: ForkCodingKeys.self,
+              forKey: .fork
             )
             
             let url = try nestedContainer.decode(String.self, forKey: .url)
             let dependencyType = try nestedContainer.decode(DependencyType.self, forKey: .dependencyType)
             let value = try nestedContainer.decode(String.self, forKey: .value)
-            self = .custom(url: url, dependencyType: dependencyType, value: value)
+            self = .fork(url: url, dependencyType: dependencyType, value: value)
           case .local:
             let nestedContainer = try container.nestedContainer(
               keyedBy: LocalCodingKeys.self,

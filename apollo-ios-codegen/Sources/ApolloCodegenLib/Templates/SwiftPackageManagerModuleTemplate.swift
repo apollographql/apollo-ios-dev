@@ -114,9 +114,9 @@ fileprivate extension ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleTyp
       return """
       .package(url: "https://github.com/apollographql/apollo-ios.git", revision: "\(hash)")
       """
-    case .custom(let url, let dependencyType, let value):
+    case .fork(let url, let dependencyType, let value):
       return """
-      .package(url: "\(url)", \(dependencyType.rawValue): "\(value)")
+      .package(url: "\(url)", \(dependencyType.propertyString): "\(value)")
       """
     case .local(let path):
       return """

@@ -242,6 +242,106 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
+  
+  func test__packageDescription__generatesForkVersionDependencyWithExactVersion() {
+    // given
+    let url = "myFork"
+    let version = "1.2.3"
+    buildSubject(config: .mock(
+      schemaNamespace: "TestModule",
+      output: .init(
+        schemaTypes: .init(
+          path: "path/",
+          moduleType: .swiftPackage(apolloSDKVersion: .fork(url: url, dependencyType: .exactVersion, value: version))
+        ))
+    ))
+
+    let expected = """
+      dependencies: [
+        .package(url: "\(url)", exact: "\(version)"),
+      ],
+    """
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
+  }
+  
+  func test__packageDescription__generatesForkVersionDependencyWithFromVersion() {
+    // given
+    let url = "myFork"
+    let version = "1.2.3"
+    buildSubject(config: .mock(
+      schemaNamespace: "TestModule",
+      output: .init(
+        schemaTypes: .init(
+          path: "path/",
+          moduleType: .swiftPackage(apolloSDKVersion: .fork(url: url, dependencyType: .fromVersion, value: version))
+        ))
+    ))
+
+    let expected = """
+      dependencies: [
+        .package(url: "\(url)", from: "\(version)"),
+      ],
+    """
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
+  }
+  
+  func test__packageDescription__generatesForkVersionDependencyWithBranchName() {
+    // given
+    let url = "myFork"
+    let branchName = "myBranch"
+    buildSubject(config: .mock(
+      schemaNamespace: "TestModule",
+      output: .init(
+        schemaTypes: .init(
+          path: "path/",
+          moduleType: .swiftPackage(apolloSDKVersion: .fork(url: url, dependencyType: .branchName, value: branchName))
+        ))
+    ))
+
+    let expected = """
+      dependencies: [
+        .package(url: "\(url)", branch: "\(branchName)"),
+      ],
+    """
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
+  }
+  
+  func test__packageDescription__generatesForkVersionDependencyWithCommitHash() {
+    // given
+    let url = "myFork"
+    let commitHash = "myHash"
+    buildSubject(config: .mock(
+      schemaNamespace: "TestModule",
+      output: .init(
+        schemaTypes: .init(
+          path: "path/",
+          moduleType: .swiftPackage(apolloSDKVersion: .fork(url: url, dependencyType: .commitHash, value: commitHash))
+        ))
+    ))
+
+    let expected = """
+      dependencies: [
+        .package(url: "\(url)", revision: "\(commitHash)"),
+      ],
+    """
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
+  }
 
   func test__packageDescription__givenTestMockConfigNone_withLowercaseSchemaName_generatesTargetWithCapitalizedName() {
     // given
