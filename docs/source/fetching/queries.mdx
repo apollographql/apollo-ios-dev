@@ -23,7 +23,7 @@ let watcher = apollo.watch(query: HeroNameQuery()) { result in
 }
 ```
 
-If any of the data for the query changes in the local cache, the result handler will be invoked again.
+If your query shares response objects with other operations you will need to implement a [normalized cache](../caching/introduction.mdx) so that object data received in those other operations is written to the local cache and used to update your query watcher by invoking the result handler.
 
 When you call `ApolloClient.watch(query:)` a [`GraphQLQueryWatcher`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/graphqlquerywatcher) is returned. Changes to the query's data will be watched until `cancel()` is called on the watcher.
 
