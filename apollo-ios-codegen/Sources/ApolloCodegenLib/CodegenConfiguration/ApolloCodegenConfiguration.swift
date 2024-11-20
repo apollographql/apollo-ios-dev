@@ -346,7 +346,15 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         case `default`
         case branch(name: String)
         case commit(hash: String)
+        case custom(url: String, dependencyType: DependencyType, value: String)
         case local(path: String)
+        
+        public enum DependencyType: String, Codable, Equatable {
+          case branch = "branch"
+          case exact = "exact"
+          case from = "from"
+          case revision = "revision"
+        }
         
         public init(from decoder: any Decoder) throws {
           let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -378,6 +386,16 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
             
             let hash = try nestedContainer.decode(String.self, forKey: .hash)
             self = .commit(hash: hash)
+          case .custom:
+            let nestedContainer = try container.nestedContainer(
+              keyedBy: CustomCodingKeys.self,
+              forKey: .custom
+            )
+            
+            let url = try nestedContainer.decode(String.self, forKey: .url)
+            let dependencyType = try nestedContainer.decode(DependencyType.self, forKey: .dependencyType)
+            let value = try nestedContainer.decode(String.self, forKey: .value)
+            self = .custom(url: url, dependencyType: dependencyType, value: value)
           case .local:
             let nestedContainer = try container.nestedContainer(
               keyedBy: LocalCodingKeys.self,
