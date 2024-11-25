@@ -268,7 +268,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       moduleType: ModuleType
     ) {
       self.path = path
-      self.moduleType = moduleType == .swiftPackageManager ? .swiftPackage(apolloSDKVersion: .default) : moduleType
+      self.moduleType = moduleType == .swiftPackageManager ? .swiftPackage(apolloSDKDependency: ModuleType.ApolloSDKDependency()) : moduleType
     }
 
     /// Compatible dependency manager automation.
@@ -288,7 +288,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       /// Generates a `Package.swift` file that is suitable for linking then generated schema types
       /// files to your project using Swift Package Manager. Uses the `apolloSDKVersion` associated
       /// value to determine how to setup the dependency on `apollo-ios`.
-      case swiftPackage(apolloSDKVersion: ApolloSDKVersion = .default)
+      case swiftPackage(apolloSDKDependency: ApolloSDKDependency = ApolloSDKDependency())
       /// No module will be created for the generated types and you are required to create the
       /// module to support your preferred dependency manager. You must specify the name of the
       /// module you will create in the `schemaNamespace` property as this will be used in `import`
@@ -326,7 +326,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
           self = .embeddedInTarget(name: name, accessModifier: accessModifier)
 
         case .swiftPackageManager:
-          self = .swiftPackage(apolloSDKVersion: .default)
+          self = .swiftPackage(apolloSDKDependency: ApolloSDKDependency())
           
         case .swiftPackage:
           let nestedContainer = try container.nestedContainer(
@@ -334,85 +334,89 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
             forKey: .swiftPackage
           )
           
-          let apolloSDKVersion = try nestedContainer.decodeIfPresent(ApolloSDKVersion.self, forKey: .apolloSDKVersion) ?? .default
-          self = .swiftPackage(apolloSDKVersion: apolloSDKVersion)
+          let apolloSDKDependency = try nestedContainer.decodeIfPresent(ApolloSDKDependency.self, forKey: .apolloSDKDependency) ?? ApolloSDKDependency()
+          self = .swiftPackage(apolloSDKDependency: apolloSDKDependency)
 
         case .other:
           self = .other
         }
       }
       
-      public enum ApolloSDKVersion: Codable, Equatable {
-        case `default`
-        case branch(name: String)
-        case commit(hash: String)
-        case fork(url: String, dependencyType: DependencyType, value: String)
-        case local(path: String)
+      public struct ApolloSDKDependency: Codable, Equatable {
+        let url: String
+        let sdkVersion: SDKVersion
         
-        public enum DependencyType: String, Codable, Equatable {
-          case branchName
-          case commitHash
-          case exactVersion
-          case fromVersion
-          
-          public var propertyString: String {
-            switch self {
-            case .branchName: return "branch"
-            case .commitHash: return "revision"
-            case .exactVersion: return "exact"
-            case .fromVersion: return "from"
-            }
-          }
+        public init(
+          url: String = "https://github.com/apollographql/apollo-ios",
+          sdkVersion: SDKVersion = .default
+        ) {
+          self.url = url
+          self.sdkVersion = sdkVersion
         }
         
-        public init(from decoder: any Decoder) throws {
-          let container = try decoder.container(keyedBy: CodingKeys.self)
+        public enum SDKVersion: Codable, Equatable {
+          case `default`
+          case branch(name: String)
+          case commit(hash: String)
+          case exact(version: String)
+          case from(version: String)
+          case local(path: String)
           
-          guard let key = container.allKeys.first else {
-            throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
-              codingPath: container.codingPath,
-              debugDescription: "Invalid number of keys found, expected one.",
-              underlyingError: nil
-            ))
-          }
-          
-          switch key {
-          case .default:
-            self = .default
-          case .branch:
-            let nestedContainer = try container.nestedContainer(
-              keyedBy: BranchCodingKeys.self,
-              forKey: .branch
-            )
+          public init(from decoder: any Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
             
-            let name = try nestedContainer.decode(String.self, forKey: .name)
-            self = .branch(name: name)
-          case .commit:
-            let nestedContainer = try container.nestedContainer(
-              keyedBy: CommitCodingKeys.self,
-              forKey: .commit
-            )
+            guard let key = container.allKeys.first else {
+              throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
+                codingPath: container.codingPath,
+                debugDescription: "Invalid number of keys found, expected one.",
+                underlyingError: nil
+              ))
+            }
             
-            let hash = try nestedContainer.decode(String.self, forKey: .hash)
-            self = .commit(hash: hash)
-          case .fork:
-            let nestedContainer = try container.nestedContainer(
-              keyedBy: ForkCodingKeys.self,
-              forKey: .fork
-            )
-            
-            let url = try nestedContainer.decode(String.self, forKey: .url)
-            let dependencyType = try nestedContainer.decode(DependencyType.self, forKey: .dependencyType)
-            let value = try nestedContainer.decode(String.self, forKey: .value)
-            self = .fork(url: url, dependencyType: dependencyType, value: value)
-          case .local:
-            let nestedContainer = try container.nestedContainer(
-              keyedBy: LocalCodingKeys.self,
-              forKey: .local
-            )
-            
-            let path = try nestedContainer.decode(String.self, forKey: .path)
-            self = .local(path: path)
+            switch key {
+            case .default:
+              self = .default
+            case .branch:
+              let nestedContainer = try container.nestedContainer(
+                keyedBy: BranchCodingKeys.self,
+                forKey: .branch
+              )
+              
+              let name = try nestedContainer.decode(String.self, forKey: .name)
+              self = .branch(name: name)
+            case .commit:
+              let nestedContainer = try container.nestedContainer(
+                keyedBy: CommitCodingKeys.self,
+                forKey: .commit
+              )
+              
+              let hash = try nestedContainer.decode(String.self, forKey: .hash)
+              self = .commit(hash: hash)
+            case .exact:
+              let nestedContainer = try container.nestedContainer(
+                keyedBy: ExactCodingKeys.self,
+                forKey: .exact
+              )
+              
+              let version = try nestedContainer.decode(String.self, forKey: .version)
+              self = .exact(version: version)
+            case .from:
+              let nestedContainer = try container.nestedContainer(
+                keyedBy: FromCodingKeys.self,
+                forKey: .from
+              )
+              
+              let version = try nestedContainer.decode(String.self, forKey: .version)
+              self = .from(version: version)
+            case .local:
+              let nestedContainer = try container.nestedContainer(
+                keyedBy: LocalCodingKeys.self,
+                forKey: .local
+              )
+              
+              let path = try nestedContainer.decode(String.self, forKey: .path)
+              self = .local(path: path)
+            }
           }
         }
       }

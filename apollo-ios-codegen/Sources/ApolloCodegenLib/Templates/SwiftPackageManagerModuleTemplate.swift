@@ -11,7 +11,7 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
 
   let config: ApolloCodegen.ConfigurationContext
   
-  let apolloSDKVersion: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKVersion
+  let apolloSDKDependency: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency
   
   init(
     testMockConfig: ApolloCodegenConfiguration.TestMockFileOutput,
@@ -21,10 +21,10 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
     self.config = config
     
     switch config.config.output.schemaTypes.moduleType {
-    case .swiftPackage(let apolloSDKVersion):
-      self.apolloSDKVersion = apolloSDKVersion
+    case .swiftPackage(let apolloSDKDependency):
+      self.apolloSDKDependency = apolloSDKDependency
     default:
-      self.apolloSDKVersion = .default
+      self.apolloSDKDependency = ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency()
     }
   }
 
@@ -59,7 +59,7 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
         """})
       ],
       dependencies: [
-        \(apolloSDKVersion.dependencyString),
+        \(apolloSDKDependency.dependencyString),
       ],
       targets: [
         .target(
@@ -99,24 +99,28 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
   }
 }
 
-fileprivate extension ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKVersion {
+fileprivate extension ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency {
   var dependencyString: TemplateString {
-    switch self {
+    switch self.sdkVersion {
     case .default:
       return """
-      .package(url: "https://github.com/apollographql/apollo-ios.git", exact: "\(Constants.CodegenVersion)")
+      .package(url: "\(self.url)", exact: "\(Constants.CodegenVersion)")
       """
     case .branch(let name):
       return """
-      .package(url: "https://github.com/apollographql/apollo-ios.git", branch: "\(name)")
+      .package(url: "\(self.url)", branch: "\(name)")
       """
     case .commit(let hash):
       return """
-      .package(url: "https://github.com/apollographql/apollo-ios.git", revision: "\(hash)")
+      .package(url: "\(self.url)", revision: "\(hash)")
       """
-    case .fork(let url, let dependencyType, let value):
+    case .exact(let version):
       return """
-      .package(url: "\(url)", \(dependencyType.propertyString): "\(value)")
+      .package(url: "\(self.url)", exact: "\(version)")
+      """
+    case .from(let version):
+      return """
+      .package(url: "\(self.url)", from: "\(version)")
       """
     case .local(let path):
       return """
