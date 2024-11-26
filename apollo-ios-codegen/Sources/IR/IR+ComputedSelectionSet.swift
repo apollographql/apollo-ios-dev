@@ -18,6 +18,15 @@ public struct ComputedSelectionSet {
 
   /// The `TypeInfo` for the selection set of the computed selections
   public let typeInfo: IR.SelectionSet.TypeInfo
+  
+  /// Indicates if an `id` field is present with a scalar type.
+  public var isIdentifiable: Bool {
+    let idField = direct?.fields["id"] ?? merged.fields["id"]
+    if let type = idField?.type.innerType, case .scalar = type {
+      return true
+    }
+    return false
+  }
 
   // MARK: Dynamic Member Subscript
 

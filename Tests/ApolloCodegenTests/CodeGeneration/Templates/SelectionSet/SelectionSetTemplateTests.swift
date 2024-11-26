@@ -837,6 +837,49 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
   }
+  
+  func test__render_selections__givenFieldWithNonScalarID_doesNotAddIdentifiableConformance() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+    
+    type ComplexID {
+      first: String!
+      second: String!
+    }
+
+    type Animal {
+      id: ComplexID!
+      name: String
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        id { first }
+        name
+      }
+    }
+    """
+
+    let expected = """
+    public struct AllAnimal: TestSchema.SelectionSet {
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 2, ignoringExtraLines: true))
+  }
 
   func test__render_selections__givenEntityFieldWithNameNotMatchingType_rendersFieldSelections() async throws {
     // given
@@ -10601,7 +10644,7 @@ class SelectionSetTemplateTests: XCTestCase {
       public var comments: [Comment]? { __data["comments"] }
 
       /// AllAuthor.PostsInfoById.Awarding.Comment
-      public struct Comment: TestSchema.SelectionSet {
+      public struct Comment: TestSchema.SelectionSet, Identifiable {
     """
 
     let expectedTypeAlias = """
@@ -10697,7 +10740,7 @@ class SelectionSetTemplateTests: XCTestCase {
     public var comments: [Comment]? { __data["comments"] }
 
     /// AllAuthor.PostsInfoById.Awarding.Comment
-    public struct Comment: TestSchema.SelectionSet {
+    public struct Comment: TestSchema.SelectionSet, Identifiable {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -11761,7 +11804,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
       """
       /// AllAnimal.Root
-      public struct Root: TestSchema.InlineFragment {
+      public struct Root: TestSchema.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -11813,7 +11856,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_deferredAsRoot).to(equalLineByLine(
       """
       /// AllAnimal.Root
-      public struct Root: TestSchema.InlineFragment {
+      public struct Root: TestSchema.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -11870,7 +11913,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_asDog_deferredAsRoot).to(equalLineByLine(
       """
       /// AllAnimal.AsDog.Root
-      public struct Root: TestSchema.InlineFragment {
+      public struct Root: TestSchema.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -11935,7 +11978,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_asDog_deferredAsOne).to(equalLineByLine(
       """
       /// AllAnimal.AsDog.One
-      public struct One: TestSchema.InlineFragment {
+      public struct One: TestSchema.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -11949,7 +11992,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_asDog_deferredAsTwo).to(equalLineByLine(
       """
       /// AllAnimal.AsDog.Two
-      public struct Two: TestSchema.InlineFragment {
+      public struct Two: TestSchema.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -12021,7 +12064,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_asDog_deferredAsOne).to(equalLineByLine(
       """
       /// AllAnimal.AsDog.One
-      public struct One: TestSchema.InlineFragment {
+      public struct One: TestSchema.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -12035,7 +12078,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_asCat_deferredAsTwo).to(equalLineByLine(
       """
       /// AllAnimal.AsCat.Two
-      public struct Two: TestSchema.InlineFragment {
+      public struct Two: TestSchema.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -12114,7 +12157,7 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_asDog_deferredAsOuter).to(equalLineByLine(
       """
       /// AllAnimal.AsDog.Outer
-      public struct Outer: TestSchema.InlineFragment {
+      public struct Outer: TestSchema.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
