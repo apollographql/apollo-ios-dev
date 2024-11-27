@@ -1316,11 +1316,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "moduleType" : {
               "swiftPackage" : {
                 "apolloSDKDependency" : {
-                  "sdkVersion" : {
-                    "default" : {
-
-                    }
-                  },
+                  "sdkVersion" : "default",
                   "url" : "https://github.com/apollographql/apollo-ios"
                 }
               }
@@ -1511,11 +1507,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "moduleType" : {
               "swiftPackage" : {
                 "apolloSDKDependency" : {
-                  "sdkVersion" : {
-                    "default" : {
-
-                    }
-                  },
+                  "sdkVersion" : "default",
                   "url" : "https://github.com/apollographql/apollo-ios"
                 }
               }
@@ -1706,11 +1698,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "moduleType" : {
               "swiftPackage" : {
                 "apolloSDKDependency" : {
-                  "sdkVersion" : {
-                    "default" : {
-
-                    }
-                  },
+                  "sdkVersion" : "default",
                   "url" : "https://github.com/apollographql/apollo-ios"
                 }
               }
@@ -2342,11 +2330,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "moduleType" : {
               "swiftPackage" : {
                 "apolloSDKDependency" : {
-                  "sdkVersion" : {
-                    "default" : {
-
-                    }
-                  },
+                  "sdkVersion" : "default",
                   "url" : "www.myurl.com"
                 }
               }
