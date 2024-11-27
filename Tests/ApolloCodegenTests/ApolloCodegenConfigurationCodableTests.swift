@@ -1636,7 +1636,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
         output: .init(
           schemaTypes: .init(
             path: "/output/path",
-            moduleType: .swiftPackage(apolloSDKDependency: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency())
+            moduleType: .swiftPackage(apolloSDKDependency: .default)
           ),
           operations: .absolute(path: "/absolute/path", accessModifier: .internal)
         )

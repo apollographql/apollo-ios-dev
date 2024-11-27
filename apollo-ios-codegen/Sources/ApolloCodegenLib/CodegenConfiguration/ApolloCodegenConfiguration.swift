@@ -268,7 +268,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       moduleType: ModuleType
     ) {
       self.path = path
-      self.moduleType = moduleType == .swiftPackageManager ? .swiftPackage(apolloSDKDependency: ModuleType.ApolloSDKDependency()) : moduleType
+      self.moduleType = moduleType == .swiftPackageManager ? .swiftPackage(apolloSDKDependency: .default) : moduleType
     }
 
     /// Compatible dependency manager automation.
@@ -288,7 +288,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       /// Generates a `Package.swift` file that is suitable for linking then generated schema types
       /// files to your project using Swift Package Manager. Uses the `apolloSDKDependency`
       /// to determine how to setup the dependency on `apollo-ios`.
-      case swiftPackage(apolloSDKDependency: ApolloSDKDependency = ApolloSDKDependency())
+      case swiftPackage(apolloSDKDependency: ApolloSDKDependency = .default)
       /// No module will be created for the generated types and you are required to create the
       /// module to support your preferred dependency manager. You must specify the name of the
       /// module you will create in the `schemaNamespace` property as this will be used in `import`
@@ -326,7 +326,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
           self = .embeddedInTarget(name: name, accessModifier: accessModifier)
 
         case .swiftPackageManager:
-          self = .swiftPackage(apolloSDKDependency: ApolloSDKDependency())
+          self = .swiftPackage(apolloSDKDependency: .default)
           
         case .swiftPackage:
           let nestedContainer = try container.nestedContainer(
@@ -349,6 +349,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         let url: String
         /// Type of SPM dependency to use.
         let sdkVersion: SDKVersion
+        
+        public static let `default` = ApolloSDKDependency()
         
         public init(
           url: String = "https://github.com/apollographql/apollo-ios",

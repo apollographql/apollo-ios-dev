@@ -106,7 +106,7 @@ The properties to configure `output` are:
 "output": {
   "schemaTypes": {
     "moduleType": {
-      "swiftPackageManager": {}
+      "swiftPackage": {}
     },
     "path": "./generated/schema/"
   },
@@ -125,7 +125,7 @@ let configuration = ApolloCodegenConfiguration(
   output: ApolloCodegenConfiguration.FileOutput(
     schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
       path: "./generated/schema/",
-      moduleType: .swiftPackageManager
+      moduleType: .swiftPackage()
     )
     operations: .inSchemaModule,
     testMocks: .none
@@ -156,7 +156,7 @@ Use the [`ModuleType`](https://www.apollographql.com/docs/ios/docc/documentation
 
 For single target applications, [`embeddedInTarget(name:)`](#embedded-in-target) can be used.
 
-For multi-module projects, it is recommended that the schema types be created in a separate module to help with separation of concerns. If using Swift Package Manager, the `swiftPackageManager` option can help automate module creation.
+For multi-module projects, it is recommended that the schema types be created in a separate module to help with separation of concerns. If using Swift Package Manager, the `swiftPackage` option can help automate module creation.
 
 > **Note:** This option must be set correctly for your project structure or generated code will fail to compile.
 
@@ -165,7 +165,8 @@ The possible values for `moduleType` are:
 | Value | Description |
 | ----- | ----------- |
 | [`embeddedInTarget(name:accessModifier:)`](#embedded-in-target) | Indicates that you would like to include the generated module directly in your application target. |
-| [`swiftPackageManager`](#swift-package-manager)  | Creates a schema module as an SPM package that can be included in your project. |
+| [`swiftPackageManager`](#swift-package-manager)  | Creates a schema module as an SPM package that can be included in your project. Note: This option has been deprecated in favor of the new [`swiftPackage`](#swift-package) option. |
+| [`swiftPackage`](#swift-package) | Creates a schema module as an SPM package that can be included in your project and allows for customization of the `apollo-ios` dependency of the pacakge. |
 | [`other`](#other-schema-module-types) 		   | Indicates that you would like to manually define a schema module using a third party package manager (such as Cocoapods). |
 
 #### Embedded in target
@@ -257,11 +258,59 @@ let configuration = ApolloCodegenConfiguration(
 
 </MultiCodeBlock>
 
+#### Swift package
+
+**[`ModuleType.swiftPackage(apolloSDKDependency: ApolloSDKDependency)`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/schematypesfileoutput/moduletype-swift.enum/swiftpackage)**
+
+This option automates the creation of an SPM package for your schema types. This generates a `Package.swift` file that is suitable for linking the generated schema types files to your project using Swift Package Manager.
+
+The `apolloSDKDependency` paramter allows you to customize the `apollo-ios` dependency of your SPM package by providing a url and SDK version. The `url` parameter allows you to customize the location of the `apollo-ios` dependency used by the generated SPM package, and has a default value that points to the main [`apollo-ios`](https://github.com/apollographql/apollo-ios) repository. The `sdkVersion` parameter allows you to set the version of the `apollo-ios` dependency to use. The default value of this is the `default` case, which uses an exact version of `apollo-ios` matching the code generation version in use which is the recommended way of handling this. The other provided options allow flexibility for doing things such as testing experimental branches, or using local versions for testing.
+
+The schema types will be contained in a stand-alone module with the [`schemaNamespace`](#schema-namespace) provided. Other targets in your application that contain generated operation models must have a dependency on this target.
+
+For multi-module projects using Swift Package Manager, this is the recommended configuration option.
+
+> **Including schema types in your own `Package.swift` file:**
+>
+> This option generates an SPM package with its own `Package.swift` file. This is ideal if you want to share your schema module across multiple projects or using Xcode's Package Dependency GUI.
+>
+> If you would like to include your schema module as a target in your own `Package.swift` file, you can define a target with the name and path of the generated files in your `Package.swift` file.
+
+<MultiCodeBlock>
+
+```json title="CLI Configuration JSON"
+"output": {
+  "schemaTypes": {
+    "moduleType": {
+      "swiftPackage": {
+        "apolloSDKDependency" : {}
+      }
+    },
+    "path": "./generated/schema/"
+  }
+}
+```
+
+```swift title="Swift Codegen Setup"
+let configuration = ApolloCodegenConfiguration(
+  // Other properties not shown
+  output: ApolloCodegenConfiguration.FileOutput(
+    schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput(
+      path: "./generated/schema/",
+      moduleType: .swiftPackage(apolloSDKDependency: .default)
+    )
+    ...
+  )
+)
+```
+
+</MultiCodeBlock>
+
 #### Other schema module types
 
 **[`ModuleType.other`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/schematypesfileoutput/moduletype-swift.enum/other)**
 
-This value should be used when you would like to define a schema module using another package management system (such as CocoaPods), or you want more control over the generated package than what [`ModuleType.swiftPackageManager`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/schematypesfileoutput/moduletype-swift.enum/swiftpackagemanager) allows, or manually creating your own targets or modules in another way.
+This value should be used when you would like to define a schema module using another package management system (such as CocoaPods), or you want more control over the generated package than what [`ModuleType.swiftPackage`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/schematypesfileoutput/moduletype-swift.enum/swiftpackage) allows, or manually creating your own targets or modules in another way.
 
 `ModuleType.other` indicates to the Code Generation Engine that your schema types will be contained in their own target, rather than embedded in your application target. This affects the `import` statements in your generated operation definition files.
 
@@ -376,7 +425,7 @@ This option generates test mock files and defines a target in the schema modules
 
 The name of the test mock target can be specified with the `targetName` parameter. If no `targetName` is provided, the target name defaults to `"${schemaNamespace}TestMocks"`.
 
-> **Note:** Using this option requires your [`output.schemaTypes.moduleType`](#module-type) to be [`.swiftPackageManager`](#swift-package-manager). If this option is provided without the `.swiftPackageManager` module type, code generation will fail.
+> **Note:** Using this option requires your [`output.schemaTypes.moduleType`](#module-type) to be [`.swiftPackage`](#swift-package). If this option is provided without the `.swiftPackage` module type, code generation will fail.
 
 #### Absolute test mocks output
 

@@ -24,7 +24,7 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
     case .swiftPackage(let apolloSDKDependency):
       self.apolloSDKDependency = apolloSDKDependency
     default:
-      self.apolloSDKDependency = ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency()
+      self.apolloSDKDependency = .default
     }
   }
 

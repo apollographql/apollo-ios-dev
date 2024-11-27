@@ -155,7 +155,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
       output: .init(
         schemaTypes: .init(
           path: "path/",
-          moduleType: .swiftPackage(apolloSDKDependency: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency())
+          moduleType: .swiftPackage(apolloSDKDependency: .default)
         ))
     ))
 
