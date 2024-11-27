@@ -10,6 +10,23 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
   let target: TemplateTarget = .moduleFile
 
   let config: ApolloCodegen.ConfigurationContext
+  
+  let apolloSDKDependency: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency
+  
+  init(
+    testMockConfig: ApolloCodegenConfiguration.TestMockFileOutput,
+    config: ApolloCodegen.ConfigurationContext
+  ) {
+    self.testMockConfig = testMockConfig
+    self.config = config
+    
+    switch config.config.output.schemaTypes.moduleType {
+    case .swiftPackage(let apolloSDKDependency):
+      self.apolloSDKDependency = apolloSDKDependency
+    default:
+      self.apolloSDKDependency = .default
+    }
+  }
 
   func renderHeaderTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
@@ -42,7 +59,7 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
         """})
       ],
       dependencies: [
-        .package(url: "https://github.com/apollographql/apollo-ios.git", from: "1.0.0"),
+        \(apolloSDKDependency.dependencyString),
       ],
       targets: [
         .target(
@@ -78,6 +95,37 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
       } else {
         return ("\(config.schemaNamespace.firstUppercased)TestMocks", "./TestMocks")
       }
+    }
+  }
+}
+
+fileprivate extension ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency {
+  var dependencyString: TemplateString {
+    switch self.sdkVersion {
+    case .default:
+      return """
+      .package(url: "\(self.url)", exact: "\(Constants.CodegenVersion)")
+      """
+    case .branch(let name):
+      return """
+      .package(url: "\(self.url)", branch: "\(name)")
+      """
+    case .commit(let hash):
+      return """
+      .package(url: "\(self.url)", revision: "\(hash)")
+      """
+    case .exact(let version):
+      return """
+      .package(url: "\(self.url)", exact: "\(version)")
+      """
+    case .from(let version):
+      return """
+      .package(url: "\(self.url)", from: "\(version)")
+      """
+    case .local(let path):
+      return """
+      .package(path: "\(path)")
+      """
     }
   }
 }

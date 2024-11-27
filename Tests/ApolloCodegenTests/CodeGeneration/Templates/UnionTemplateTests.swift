@@ -203,7 +203,7 @@ class UnionTemplateTests: XCTestCase {
 
   func test_render_givenSchemaUnion_schemaTypesNotEmbeddedInTarget_generatesPossibleTypesPropertyWithoutSchemaNamespace() throws {
     // given
-    buildSubject(config: .mock(.swiftPackageManager))
+    buildSubject(config: .mock(.swiftPackage()))
 
     let expected = """
       possibleTypes: [

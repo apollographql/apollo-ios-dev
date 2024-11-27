@@ -30,7 +30,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
   func buildSubjectAndOperation(
     named operationName: String = "TestOperation",
     schemaNamespace: String = "TestSchema",
-    moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackageManager,
+    moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackage(),
     operations: ApolloCodegenConfiguration.OperationsFileOutput = .inSchemaModule
   ) async throws {
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
@@ -58,7 +58,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
   func buildSubjectAndFragment(
     named fragmentName: String = "TestFragment",
     schemaNamespace: String = "TestSchema",
-    moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackageManager,
+    moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackage(),
     operations: ApolloCodegenConfiguration.OperationsFileOutput = .inSchemaModule
   ) async throws -> IRTestWrapper<IR.NamedFragment> {
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
@@ -115,7 +115,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     try await buildSubjectAndOperation(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackage(),
       operations: .inSchemaModule
     )
 
@@ -181,7 +181,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     try await buildSubjectAndOperation(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackage(),
       operations: .relative(subpath: nil, accessModifier: .public)
     )
 
@@ -203,7 +203,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     try await buildSubjectAndOperation(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackage(),
       operations: .relative(subpath: nil, accessModifier: .internal)
     )
 
@@ -225,7 +225,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     try await buildSubjectAndOperation(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackage(),
       operations: .absolute(path: "", accessModifier: .public)
     )
 
@@ -247,7 +247,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     """
 
     try await buildSubjectAndOperation(
-      moduleType: .swiftPackageManager,
+      moduleType: .swiftPackage(),
       operations: .absolute(path: "", accessModifier: .internal)
     )
 

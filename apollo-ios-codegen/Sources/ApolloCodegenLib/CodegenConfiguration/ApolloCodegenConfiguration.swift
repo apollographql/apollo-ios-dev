@@ -268,7 +268,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       moduleType: ModuleType
     ) {
       self.path = path
-      self.moduleType = moduleType
+      self.moduleType = moduleType == .swiftPackageManager ? .swiftPackage(apolloSDKDependency: .default) : moduleType
     }
 
     /// Compatible dependency manager automation.
@@ -283,7 +283,12 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case embeddedInTarget(name: String, accessModifier: AccessModifier = .internal)
       /// Generates a `Package.swift` file that is suitable for linking the generated schema types
       /// files to your project using Swift Package Manager.
+      /// Attention: This case has been deprecated, use .swiftPackage(apolloSDKVersion:) case instead.
       case swiftPackageManager
+      /// Generates a `Package.swift` file that is suitable for linking then generated schema types
+      /// files to your project using Swift Package Manager. Uses the `apolloSDKDependency`
+      /// to determine how to setup the dependency on `apollo-ios`.
+      case swiftPackage(apolloSDKDependency: ApolloSDKDependency = .default)
       /// No module will be created for the generated types and you are required to create the
       /// module to support your preferred dependency manager. You must specify the name of the
       /// module you will create in the `schemaNamespace` property as this will be used in `import`
@@ -321,10 +326,191 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
           self = .embeddedInTarget(name: name, accessModifier: accessModifier)
 
         case .swiftPackageManager:
-          self = .swiftPackageManager
+          self = .swiftPackage(apolloSDKDependency: .default)
+          
+        case .swiftPackage:
+          let nestedContainer = try container.nestedContainer(
+            keyedBy: SwiftPackageCodingKeys.self,
+            forKey: .swiftPackage
+          )
+          
+          let apolloSDKDependency = try nestedContainer.decodeIfPresent(ApolloSDKDependency.self, forKey: .apolloSDKDependency) ?? ApolloSDKDependency()
+          self = .swiftPackage(apolloSDKDependency: apolloSDKDependency)
 
         case .other:
           self = .other
+        }
+      }
+      
+      /// Configuation for apollo-ios dependency in SPM modules
+      public struct ApolloSDKDependency: Codable, Equatable {
+        /// URL for the SPM package dependency, not used for local dependencies.
+        ///  Defaults to 'https://github.com/apollographql/apollo-ios'.
+        let url: String
+        /// Type of SPM dependency to use.
+        let sdkVersion: SDKVersion
+        
+        public static let `default` = ApolloSDKDependency()
+        
+        public init(
+          url: String = "https://github.com/apollographql/apollo-ios",
+          sdkVersion: SDKVersion = .default
+        ) {
+          self.url = url
+          self.sdkVersion = sdkVersion
+        }
+        
+        enum CodingKeys: CodingKey, CaseIterable {
+          case url
+          case sdkVersion
+        }
+        
+        public func encode(to encoder: any Encoder) throws {
+          var container = encoder.container(keyedBy: CodingKeys.self)
+          
+          try container.encode(self.url, forKey: .url)
+          
+          switch self.sdkVersion {
+          case .default:
+            try container.encode(self.sdkVersion.stringValue, forKey: .sdkVersion)
+          default:
+            try container.encode(self.sdkVersion, forKey: .sdkVersion)
+          }
+        }
+        
+        public init(from decoder: any Decoder) throws {
+          let values = try decoder.container(keyedBy: CodingKeys.self)
+          try throwIfContainsUnexpectedKey(
+            container: values,
+            type: Self.self,
+            decoder: decoder
+          )
+          
+          url = try values.decode(String.self, forKey: .url)
+          
+          if let version = try? values.decodeIfPresent(SDKVersion.self, forKey: .sdkVersion) {
+            sdkVersion = version
+          } else if let versionString = try? values.decodeIfPresent(String.self, forKey: .sdkVersion) {
+            let version = try SDKVersion(fromString: versionString)
+            sdkVersion = version
+          } else {
+            throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
+              codingPath: values.codingPath,
+              debugDescription: "No valid 'sdkVersion' provided.",
+              underlyingError: nil
+            ))
+          }
+        }
+        
+        /// Type of SPM dependency
+        public enum SDKVersion: Codable, Equatable {
+          /// Configures SPM dependency to use the exact version of apollo-ios
+          /// that matches the code generation library version currently in use.
+          /// Results in a dependency that looks like:
+          /// '.package(url: "https://github.com/apollographql/apollo-ios.git", exact: "{version}")'
+          case `default`
+          /// Configures SPM dependency to use the given branch name
+          /// for the apollo-ios dependency.
+          /// Results in a dependency that looks like:
+          /// '.package(url: "...", branch: "{name}")'
+          case branch(name: String)
+          /// Configures SPM dependency to use the given commit hash
+          /// for the apollo-ios dependency.
+          /// Results in a dependency that looks like:
+          /// '.package(url: "...", revision: "{hash}")'
+          case commit(hash: String)
+          /// Configures SPM dependency to use the given exact version
+          /// for the apollo-ios dependency.
+          /// Results in a dependency that looks like:
+          /// '.package(url: "...", exact: "{version}")'
+          case exact(version: String)
+          /// Configures SPM dependency to use a version
+          /// starting at the given version for the apollo-ios dependency.
+          /// Results in a dependency that looks like:
+          /// '.package(url: "...", from: "{version}")'
+          case from(version: String)
+          /// Configures SPM dependency to use a local
+          /// path for the apollo-ios dependency.
+          /// Results in a dependency that looks like:
+          /// '.package(path: "{path}")'
+          case local(path: String)
+          
+          public var stringValue: String {
+            switch self {
+            case .default: return "default"
+            case .branch(_): return "branch"
+            case .commit(_): return "commit"
+            case .exact(_): return "exact"
+            case .from(_): return "from"
+            case .local(_): return "local"
+            }
+          }
+          
+          public init(fromString str: String) throws {
+            switch str {
+            case Self.default.stringValue:
+              self = .default
+            default:
+              throw ApolloConfigurationError.invalidValueForKey(key: "sdkVersion", value: str)
+            }
+          }
+          
+          public init(from decoder: any Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            
+            guard let key = container.allKeys.first else {
+              throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
+                codingPath: container.codingPath,
+                debugDescription: "Invalid number of keys found, expected one.",
+                underlyingError: nil
+              ))
+            }
+            
+            switch key {
+            case .default:
+              self = .default
+            case .branch:
+              let nestedContainer = try container.nestedContainer(
+                keyedBy: BranchCodingKeys.self,
+                forKey: .branch
+              )
+              
+              let name = try nestedContainer.decode(String.self, forKey: .name)
+              self = .branch(name: name)
+            case .commit:
+              let nestedContainer = try container.nestedContainer(
+                keyedBy: CommitCodingKeys.self,
+                forKey: .commit
+              )
+              
+              let hash = try nestedContainer.decode(String.self, forKey: .hash)
+              self = .commit(hash: hash)
+            case .exact:
+              let nestedContainer = try container.nestedContainer(
+                keyedBy: ExactCodingKeys.self,
+                forKey: .exact
+              )
+              
+              let version = try nestedContainer.decode(String.self, forKey: .version)
+              self = .exact(version: version)
+            case .from:
+              let nestedContainer = try container.nestedContainer(
+                keyedBy: FromCodingKeys.self,
+                forKey: .from
+              )
+              
+              let version = try nestedContainer.decode(String.self, forKey: .version)
+              self = .from(version: version)
+            case .local:
+              let nestedContainer = try container.nestedContainer(
+                keyedBy: LocalCodingKeys.self,
+                forKey: .local
+              )
+              
+              let path = try nestedContainer.decode(String.self, forKey: .path)
+              self = .local(path: path)
+            }
+          }
         }
       }
     }
@@ -1176,6 +1362,24 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       operationManifest: operationManifest ?? Default.operationManifest
     )
   }
+  
+}
+
+// MARK: Errors
+
+extension ApolloCodegenConfiguration {
+  public enum ApolloConfigurationError: Error, LocalizedError {
+    case invalidValueForKey(key: String, value: String)
+    
+    public var errorDescription: String? {
+      switch self {
+      case .invalidValueForKey(let key, let value):
+        return """
+        Invalid value '\(value)' provided for key '\(key)'.
+        """
+      }
+    }
+  }
 }
 
 // MARK: - Helpers
@@ -1185,7 +1389,7 @@ extension ApolloCodegenConfiguration.SchemaTypesFileOutput {
   var isInModule: Bool {
     switch moduleType {
     case .embeddedInTarget: return false
-    case .swiftPackageManager, .other: return true
+    case .swiftPackageManager, .swiftPackage, .other: return true
     }
   }  
 }

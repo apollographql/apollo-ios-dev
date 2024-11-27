@@ -43,7 +43,7 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
     )
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: "TestSchema",
-      output: .mock(moduleType: .swiftPackageManager, operations: .inSchemaModule),
+      output: .mock(moduleType: .swiftPackage(), operations: .inSchemaModule),
       experimentalFeatures: .init(
         fieldMerging: fieldMerging
       )
@@ -68,7 +68,7 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
     let fragment = await ir.build(fragment: fragmentDefinition)
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: "TestSchema",
-      output: .mock(moduleType: .swiftPackageManager, operations: .inSchemaModule),
+      output: .mock(moduleType: .swiftPackage(), operations: .inSchemaModule),
       options: .init()
     )
     let mockTemplateRenderer = MockTemplateRenderer(

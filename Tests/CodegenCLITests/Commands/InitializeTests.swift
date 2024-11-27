@@ -333,7 +333,7 @@ class InitializeTests: XCTestCase {
     // then
     let decoded = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encoded)
 
-    expect(decoded.output.schemaTypes.moduleType).to(equal(.swiftPackageManager))
+    expect(decoded.output.schemaTypes.moduleType).to(equal(.swiftPackage()))
   }
 
   func test__moduleType__givenModuleTypeExpressibleByArgument_other_shouldEqualSchemaTypesFileOutputModuleType_other() throws {

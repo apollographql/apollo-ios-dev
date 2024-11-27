@@ -640,7 +640,7 @@ class ApolloCodegenTests: XCTestCase {
         operationSearchPaths: [operationsPath]
       ),
       output: .mock(
-        moduleType: .swiftPackageManager,
+        moduleType: .swiftPackage(),
         operations: .inSchemaModule,
         path: directoryURL.path
       )
@@ -757,7 +757,7 @@ class ApolloCodegenTests: XCTestCase {
         operationSearchPaths: [operationsPath]
       ),
       output: .mock(
-        moduleType: .swiftPackageManager,
+        moduleType: .swiftPackage(),
         operations: .absolute(path: operationsOutputURL.path),
         path: directoryURL.path
       )
@@ -864,7 +864,7 @@ class ApolloCodegenTests: XCTestCase {
       input: .init(schemaPath: schemaPath, operationSearchPaths: [operationsPath]),
       output: .init(
         schemaTypes: .init(path: directoryURL.path,
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         operations: .inSchemaModule,
         testMocks: .absolute(path: directoryURL.appendingPathComponent("TestMocks").path)
       )
@@ -940,7 +940,7 @@ class ApolloCodegenTests: XCTestCase {
         operationSearchPaths: [operationsPath]
       ),
       output: .mock(
-        moduleType: .swiftPackageManager,
+        moduleType: .swiftPackage(),
         operations: .inSchemaModule,
         path: "./RelativePath"
       )
@@ -1055,7 +1055,7 @@ class ApolloCodegenTests: XCTestCase {
         operationSearchPaths: [operationsPath]
       ),
       output: .mock(
-        moduleType: .swiftPackageManager,
+        moduleType: .swiftPackage(),
         operations: .absolute(path: "./RelativeOperations"),
         path: "./RelativePath"
       )
@@ -1189,7 +1189,7 @@ class ApolloCodegenTests: XCTestCase {
       ),
       output: .init(
         schemaTypes: .init(path: "SchemaModule",
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         operations: .inSchemaModule
       ),
       options: .init(pruneGeneratedFiles: false)
@@ -1247,7 +1247,7 @@ class ApolloCodegenTests: XCTestCase {
       ),
       output: .init(
         schemaTypes: .init(path: "SchemaModule",
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         operations: .inSchemaModule
       )
     )
@@ -1301,7 +1301,7 @@ class ApolloCodegenTests: XCTestCase {
       ),
       output: .init(
         schemaTypes: .init(path: "SchemaModule",
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         operations: .absolute(path: "OperationPath")
       )
     )
@@ -1370,7 +1370,7 @@ class ApolloCodegenTests: XCTestCase {
       ),
       output: .init(
         schemaTypes: .init(path: "SchemaModule",
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         operations: .relative(subpath: nil)
       )
     )
@@ -1443,7 +1443,7 @@ class ApolloCodegenTests: XCTestCase {
       ),
       output: .init(
         schemaTypes: .init(path: "SchemaModule",
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         operations: .relative(subpath: nil)
       )
     )
@@ -1495,7 +1495,7 @@ class ApolloCodegenTests: XCTestCase {
       ),
       output: .init(
         schemaTypes: .init(path: schemaDirectory,
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         operations: .relative(subpath: relativeSubPath)
       ),
       options: .init(
@@ -1592,7 +1592,7 @@ class ApolloCodegenTests: XCTestCase {
       ),
       output: .init(
         schemaTypes: .init(path: "SchemaModule",
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         operations: .relative(subpath: "subpath")
       )
     )
@@ -1700,7 +1700,7 @@ class ApolloCodegenTests: XCTestCase {
       ),
       output: .init(
         schemaTypes: .init(path: "SchemaModule",
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         operations: .relative(subpath: "subpath")
       )
     )
@@ -1802,7 +1802,7 @@ class ApolloCodegenTests: XCTestCase {
       ),
       output: .init(
         schemaTypes: .init(path: "SchemaModule",
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         operations: .relative(subpath: "subpath")
       )
     )
@@ -1866,7 +1866,7 @@ class ApolloCodegenTests: XCTestCase {
       ),
       output: .init(
         schemaTypes: .init(path: "SchemaModule",
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         operations: .inSchemaModule,
         testMocks: .absolute(path: absolutePath)
       )
@@ -1923,7 +1923,7 @@ class ApolloCodegenTests: XCTestCase {
       ),
       output: .init(
         schemaTypes: .init(path: "SchemaModule",
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         testMocks: .swiftPackage()
       )
     )
@@ -1981,7 +1981,7 @@ class ApolloCodegenTests: XCTestCase {
       ),
       output: .init(
         schemaTypes: .init(path: "SchemaModule",
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         testMocks: .swiftPackage(targetName: testMockTargetName)
       )
     )
@@ -2291,7 +2291,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaTypesModule_swiftPackageManager_withCocoapodsCompatibleImportStatements_true_shouldThrow() throws {
     // given
     let config = ApolloCodegenConfiguration.mock(
-      .swiftPackageManager,
+      .swiftPackage(),
       options: .init(cocoapodsCompatibleImportStatements: true)
     )
 
@@ -2307,7 +2307,7 @@ class ApolloCodegenTests: XCTestCase {
   func test__validation__givenSchemaTypesModule_swiftPackageManager_withCocoapodsCompatibleImportStatements_false_shouldNotThrow() throws {
     // given
     let config = ApolloCodegenConfiguration.mock(
-      .swiftPackageManager,
+      .swiftPackage(),
       options: .init(cocoapodsCompatibleImportStatements: false)
     )
 
@@ -2393,7 +2393,7 @@ class ApolloCodegenTests: XCTestCase {
       ),
       output: .init(
         schemaTypes: .init(path: "SchemaModule",
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         operations: .inSchemaModule
       )
     )
@@ -2544,7 +2544,7 @@ class ApolloCodegenTests: XCTestCase {
       input: .init(schemaPath: schemaPath, operationSearchPaths: [operationsPath]),
       output: .init(
         schemaTypes: .init(path: directoryURL.path,
-                           moduleType: .swiftPackageManager),
+                           moduleType: .swiftPackage()),
         operations: .inSchemaModule
       ),
       options: .init(

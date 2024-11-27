@@ -1238,4 +1238,1121 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
       XCTAssertEqual(context.debugDescription, "Unrecognized keys found: contact_info, motto")
     }
   }
+  
+  // MARK: Module Type Tests
+  
+  func test__codableSPMModuleType_deprecatedSPMStructVersionProvided() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackageManager
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackage" : {
+                "apolloSDKDependency" : {
+                  "sdkVersion" : "default",
+                  "url" : "https://github.com/apollographql/apollo-ios"
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+  }
+  
+  func test__codableSPMModuleType_deprecatedSPMJSONVersionProvided() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackage()
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackageManager" : {
+                
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
+  func test__codableSPMModuleType_noStructVersionProvided() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackage()
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackage" : {
+                "apolloSDKDependency" : {
+                  "sdkVersion" : "default",
+                  "url" : "https://github.com/apollographql/apollo-ios"
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+  }
+  
+  func test__codableSPMModuleType_noJSONVersionProvided() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackage()
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackage" : {
+                
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
+  func test__codableSPMModuleType_defaultVersion() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackage(apolloSDKDependency: .default)
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackage" : {
+                "apolloSDKDependency" : {
+                  "sdkVersion" : "default",
+                  "url" : "https://github.com/apollographql/apollo-ios"
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
+  func test__codableSPMModuleType_withBranchVersion() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackage(apolloSDKDependency: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency(
+              sdkVersion: .branch(name: "branchName")
+            ))
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackage" : {
+                "apolloSDKDependency" : {
+                  "sdkVersion" : {
+                    "branch" : {
+                      "name" : "branchName"
+                    }
+                  },
+                  "url" : "https://github.com/apollographql/apollo-ios"
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
+  func test__codableSPMModuleType_withCommitHashVersion() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackage(apolloSDKDependency: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency(
+              sdkVersion: .commit(hash: "hash")
+            ))
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackage" : {
+                "apolloSDKDependency" : {
+                  "sdkVersion" : {
+                    "commit" : {
+                      "hash" : "hash"
+                    }
+                  },
+                  "url" : "https://github.com/apollographql/apollo-ios"
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
+  func test__codableSPMModuleType_withExactVersion() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackage(apolloSDKDependency: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency(
+              sdkVersion: .exact(version: "1.2.3")
+            ))
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackage" : {
+                "apolloSDKDependency" : {
+                  "sdkVersion" : {
+                    "exact" : {
+                      "version" : "1.2.3"
+                    }
+                  },
+                  "url" : "https://github.com/apollographql/apollo-ios"
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
+  func test__codableSPMModuleType_withFromVersion() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackage(apolloSDKDependency: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency(
+              sdkVersion: .from(version: "1.2.3")
+            ))
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackage" : {
+                "apolloSDKDependency" : {
+                  "sdkVersion" : {
+                    "from" : {
+                      "version" : "1.2.3"
+                    }
+                  },
+                  "url" : "https://github.com/apollographql/apollo-ios"
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
+  func test__codableSPMModuleType_withLocalPathVersion() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackage(apolloSDKDependency: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency(
+              sdkVersion: .local(path: "path")
+            ))
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackage" : {
+                "apolloSDKDependency" : {
+                  "sdkVersion" : {
+                    "local" : {
+                      "path" : "path"
+                    }
+                  },
+                  "url" : "https://github.com/apollographql/apollo-ios"
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
+  func test__codableSPMModuleType_withCustomURL() throws {
+    var decodedStruct: ApolloCodegenConfiguration {
+      .init(
+        schemaNamespace: "SerializedSchema",
+        input: .init(
+          schemaPath: "/path/to/schema.graphqls",
+          operationSearchPaths: [
+            "/search/path/**/*.graphql"
+          ]
+        ),
+        output: .init(
+          schemaTypes: .init(
+            path: "/output/path",
+            moduleType: .swiftPackage(apolloSDKDependency: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency(
+              url: "www.myurl.com"
+            ))
+          ),
+          operations: .absolute(path: "/absolute/path", accessModifier: .internal)
+        )
+      )
+    }
+
+    var encodedJSON: String {
+      """
+      {
+        "experimentalFeatures" : {
+          "fieldMerging" : [
+            "all"
+          ],
+          "legacySafelistingCompatibleOperations" : false
+        },
+        "input" : {
+          "operationSearchPaths" : [
+            "/search/path/**/*.graphql"
+          ],
+          "schemaSearchPaths" : [
+            "/path/to/schema.graphqls"
+          ]
+        },
+        "options" : {
+          "additionalInflectionRules" : [
+
+          ],
+          "cocoapodsCompatibleImportStatements" : false,
+          "conversionStrategies" : {
+            "enumCases" : "camelCase",
+            "fieldAccessors" : "idiomatic",
+            "inputObjects" : "camelCase"
+          },
+          "deprecatedEnumCases" : "include",
+          "markOperationDefinitionsAsFinal" : false,
+          "operationDocumentFormat" : [
+            "definition"
+          ],
+          "pruneGeneratedFiles" : true,
+          "schemaCustomization" : {
+            "customTypeNames" : {
+
+            }
+          },
+          "schemaDocumentation" : "include",
+          "selectionSetInitializers" : {
+
+          },
+          "warningsOnDeprecatedUsage" : "include"
+        },
+        "output" : {
+          "operations" : {
+            "absolute" : {
+              "accessModifier" : "internal",
+              "path" : "/absolute/path"
+            }
+          },
+          "schemaTypes" : {
+            "moduleType" : {
+              "swiftPackage" : {
+                "apolloSDKDependency" : {
+                  "sdkVersion" : "default",
+                  "url" : "www.myurl.com"
+                }
+              }
+            },
+            "path" : "/output/path"
+          },
+          "testMocks" : {
+            "none" : {
+
+            }
+          }
+        },
+        "schemaNamespace" : "SerializedSchema"
+      }
+      """
+    }
+    
+    let actualJSON = try testJSONEncoder.encode(decodedStruct).asString
+    expect(actualJSON).to(equalLineByLine(encodedJSON))
+    
+    let actualStruct = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedJSON.asData)
+    expect(actualStruct).to(equal(decodedStruct))
+  }
+  
 }

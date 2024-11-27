@@ -32,6 +32,13 @@ SEARCH_TEXT="$MATCH_TEXT$CURRENT_CODEGEN_VERSION"
 REPLACE_TEXT="$MATCH_TEXT$NEW_VERSION"
 sed -i '' -e "s/$SEARCH_TEXT/$REPLACE_TEXT/" $codegenDirectory/$CLI_CONSTANTS_FILE
 
+# Set Codegen version constant
+
+MATCH_TEXT='CodegenVersion: String = "'
+SEARCH_TEXT="$MATCH_TEXT$CURRENT_CODEGEN_VERSION"
+REPLACE_TEXT="$MATCH_TEXT$NEW_VERSION"
+sed -i '' -e "s/$SEARCH_TEXT/$REPLACE_TEXT/" $codegenDirectory/$CODEGEN_CONSTANTS_FILE
+
 # Feedback
 echo "Committing change from version $CURRENT_VERSION to $NEW_VERSION"
 git add -A && git commit -m "Updated version numbers"
