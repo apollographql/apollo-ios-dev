@@ -112,7 +112,7 @@ enum FileTarget: Equatable {
     forConfig config: ApolloCodegen.ConfigurationContext
   ) -> String {
     var moduleSubpath: String = "/"
-    if config.output.schemaTypes.moduleType == .swiftPackageManager {
+    if config.output.schemaTypes.moduleType == .swiftPackage() {
       moduleSubpath += "Sources/"
     }
     if config.output.operations.isInModule {
@@ -132,7 +132,7 @@ enum FileTarget: Equatable {
     switch config.output.operations {
     case .inSchemaModule:
       var url = URL(fileURLWithPath: config.output.schemaTypes.path, relativeTo: config.rootURL)
-      if config.output.schemaTypes.moduleType == .swiftPackageManager {
+      if config.output.schemaTypes.moduleType == .swiftPackage() {
         url = url.appendingPathComponent("Sources")
       }
 
@@ -167,7 +167,7 @@ enum FileTarget: Equatable {
     switch config.output.operations {
     case .inSchemaModule:
       var url = URL(fileURLWithPath: config.output.schemaTypes.path, relativeTo: config.rootURL)
-      if config.output.schemaTypes.moduleType == .swiftPackageManager {
+      if config.output.schemaTypes.moduleType == .swiftPackage() {
         url = url.appendingPathComponent("Sources")
       }
       if !operation.isLocalCacheMutation {
