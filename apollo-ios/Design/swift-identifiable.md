@@ -81,7 +81,7 @@ public var id: String { self.uuid }
 
 If the identity field is not called `id`, but another field called `id` is present in the selection, a custom getter cannot be added. Swift does not support using another field to handle the conformance.
 
-In this case, a conformance to Identifiable SHOULD NOT be generated.
+In this case, a conformance to Identifiable SHOULD NOT be generated. Codegen should emit a warning without stopping the generation process.
 
 # Alternatives
 
