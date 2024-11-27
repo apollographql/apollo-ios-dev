@@ -352,7 +352,7 @@ class FragmentTemplateTests: XCTestCase {
 
   func test__render__givenModuleType_swiftPackageManager_generatesFragmentDefinition_withPublicAccess() async throws {
     // given
-    try await buildSubjectAndFragment(config: .mock(.swiftPackageManager))
+    try await buildSubjectAndFragment(config: .mock(.swiftPackage()))
 
     let expected = """
     public struct TestFragment: TestSchema.SelectionSet, Fragment {

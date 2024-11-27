@@ -33,7 +33,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     subject = OperationManifestFileGenerator(
       config: ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(
         output: .init(
-          schemaTypes: .init(path: "", moduleType: .swiftPackageManager)
+          schemaTypes: .init(path: "", moduleType: .swiftPackage())
         ),
         operationManifest: manifest
       ))
@@ -46,7 +46,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     // given
     let config = ApolloCodegenConfiguration.mock(
       output: .init(
-        schemaTypes: .init(path: "", moduleType: .swiftPackageManager)
+        schemaTypes: .init(path: "", moduleType: .swiftPackage())
       ),
       operationManifest: .init(
         path: "a/file/path"

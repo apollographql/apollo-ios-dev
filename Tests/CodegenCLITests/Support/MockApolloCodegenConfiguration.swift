@@ -9,7 +9,7 @@ extension ApolloCodegenConfiguration {
         schemaPath: "./schema.graphqls"
       ),
       output: .init(
-        schemaTypes: .init(path: ".", moduleType: .swiftPackageManager)
+        schemaTypes: .init(path: ".", moduleType: .swiftPackage())
       ),
       options: .init(
         operationDocumentFormat: [.definition, .operationId]
