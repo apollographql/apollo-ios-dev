@@ -123,4 +123,4 @@ Apollo Kotlin has [custom directives](https://www.apollographql.com/docs/kotlin/
 extend type Book @typePolicy(keyFields: "id")
 ```
 
-This could be used for Identifiable conformance if a single field is provided, and caching behavior could also be matched with Apollo Kotlin. A disadvantage is that this directive is only used inside type extensions, and can't be used to mark fields directly in a query.
+This could be used for Identifiable conformance by generating a getter which returns a tuple of all listed key fields, and caching behavior could also be matched with Apollo Kotlin. A disadvantage is that this directive is only used inside type extensions, and can't be used to mark fields directly in a query.
