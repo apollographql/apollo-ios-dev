@@ -291,7 +291,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
 
     let expected = """
       dependencies: [
-        .package(path: "\(path)"),
+        .package(name: "apollo-ios", path: "\(path)"),
       ],
     """
     // when
