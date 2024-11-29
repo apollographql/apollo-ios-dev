@@ -14,10 +14,9 @@ A concept of identity is required to allow response objects to be cached. The va
 
 The directive is defined as:
 ```graphql
-directive @identity(scope: IdentityScope = SELECTION) on FIELD | FIELD_DEFINITION
+directive @identity(scope: IdentityScope = TYPE) on FIELD | FIELD_DEFINITION
 
 enum IdentityScope {
-  SELECTION
   TYPE
   SERVICE
   GLOBAL
@@ -30,10 +29,9 @@ This directive MUST be used on a field with a non-nullable scalar type. Other ty
 
 The directive can have a parameter indicating the scope of the identity. They are ordered from _narrowest_ to _widest_:
 
-1. `SELECTION`: The identifier is only unique within the current list. Identifiers may be reused between different objects with the same typename.
-2. `TYPE`: The identifier is unique for the type, e.g. an auto-incrementing column from a database table.
-3. `SERVICE`: The identifier is unique across the current GraphQL Service.
-4. `GLOBAL`: The identifier is unique across all GraphQL services. This can be used by identifiers generated according to [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) or [RFC 9562](https://datatracker.ietf.org/doc/html/rfc9562) (also known as Universally Unique IDentifiers or UUIDs).
+1. `TYPE`: The identifier is unique for the type, e.g. an auto-incrementing column from a database table.
+2. `SERVICE`: The identifier is unique across the current GraphQL Service.
+3. `GLOBAL`: The identifier is unique across all GraphQL services. This can be used by identifiers generated according to [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) or [RFC 9562](https://datatracker.ietf.org/doc/html/rfc9562) (also known as Universally Unique IDentifiers or UUIDs).
 
 ## Usage in types
 
@@ -73,7 +71,7 @@ query GetAllAnimals {
 }
 ```
 
-It is allowed for a query and a type to both use the directive to describe the same field. If the schema and client define different scopes for the same field, the widest option is used. This allows client authors to widen the scope if required.
+It is allowed for a query and a type to both use the directive to describe the same field. If the client and schema use different scopes for the same field, the scope defined by the schema is used. Clients SHOULD NOT define a wider scope than declared by the schema. Codegen should emit a warning in this case.
 
 If the server defines a field as an identity, a query SHOULD NOT choose another field. A query MUST NOT use the directive on more than one field in the same selection (unless they are in differently nested objects).
 
@@ -103,7 +101,7 @@ In this case, a conformance to Identifiable SHOULD NOT be generated. Codegen sho
 
 ## Caching behavior
 
-A scope of `SELECTION` does not allow the identifier to be used as a caching key. Clients MAY use other mechanisms to determine if and how to cache the object.
+If no `@identity` directive is present, clients MAY use other mechanisms to determine if and how to cache the object.
 
 An identifier with scope `TYPE` can be combined with the `__typename` field to generate a caching key that's unique for the GraphQL Service.
 
@@ -117,7 +115,7 @@ The code generator could be updated to always emit a conformance to Identifiable
 
 ## Apollo Kotlin's @typePolicy directive
 
-Apollo Kotlin has [custom directives](https://www.apollographql.com/docs/kotlin/caching/declarative-ids) that allows for client authors to specify the caching key though pure GraphQL:
+Apollo Kotlin has [custom directives](https://www.apollographql.com/docs/kotlin/caching/declarative-ids) that allows for client authors to specify the caching key through pure GraphQL:
 
 ```graphql
 extend type Book @typePolicy(keyFields: "id")
