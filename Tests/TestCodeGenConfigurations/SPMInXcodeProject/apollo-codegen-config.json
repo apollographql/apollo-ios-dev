@@ -60,7 +60,7 @@
           "apolloSDKDependency" : {
             "sdkVersion" : {
               "local" : {
-                "path" : "../../../apollo-ios"
+                "path" : "../../../../apollo-ios"
               }
             }
           }
