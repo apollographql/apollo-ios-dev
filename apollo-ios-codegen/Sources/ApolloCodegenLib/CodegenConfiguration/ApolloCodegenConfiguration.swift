@@ -386,7 +386,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
             decoder: decoder
           )
           
-          url = try values.decode(String.self, forKey: .url)
+          url = try values.decodeIfPresent(String.self, forKey: .url) ?? "https://github.com/apollographql/apollo-ios"
           
           if let version = try? values.decodeIfPresent(SDKVersion.self, forKey: .sdkVersion) {
             sdkVersion = version
@@ -394,11 +394,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
             let version = try SDKVersion(fromString: versionString)
             sdkVersion = version
           } else {
-            throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
-              codingPath: values.codingPath,
-              debugDescription: "No valid 'sdkVersion' provided.",
-              underlyingError: nil
-            ))
+            sdkVersion = .default
           }
         }
         

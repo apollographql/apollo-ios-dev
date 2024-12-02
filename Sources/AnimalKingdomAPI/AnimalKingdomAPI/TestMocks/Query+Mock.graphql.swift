@@ -12,6 +12,7 @@ public class Query: MockObject {
   public struct MockFields {
     @Field<[Animal]>("allAnimals") public var allAnimals
     @Field<[ClassroomPet?]>("classroomPets") public var classroomPets
+    @Field<[Pet]>("findPet") public var findPet
     @Field<[Pet]>("pets") public var pets
   }
 }
@@ -20,11 +21,13 @@ public extension Mock where O == Query {
   convenience init(
     allAnimals: [(any AnyMock)]? = nil,
     classroomPets: [(any AnyMock)?]? = nil,
+    findPet: [(any AnyMock)]? = nil,
     pets: [(any AnyMock)]? = nil
   ) {
     self.init()
     _setList(allAnimals, for: \.allAnimals)
     _setList(classroomPets, for: \.classroomPets)
+    _setList(findPet, for: \.findPet)
     _setList(pets, for: \.pets)
   }
 }

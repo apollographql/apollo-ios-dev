@@ -60,10 +60,7 @@ public class AllAnimalsLocalCacheMutation: LocalCacheMutation {
         set { __data["skinCovering"] = newValue }
       }
 
-      public var asBird: AsBird? {
-        get { _asInlineFragment() }
-        set { if let newData = newValue?.__data._data { __data._data = newData }}
-      }
+      public var asBird: AsBird? { _asInlineFragment() }
 
       public init(
         __typename: String,

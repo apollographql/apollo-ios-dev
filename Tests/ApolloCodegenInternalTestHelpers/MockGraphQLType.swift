@@ -138,12 +138,14 @@ public extension GraphQLInputObjectType {
     _ name: String,
     fields: [GraphQLInputField] = [],
     documentation: String? = nil,
-    config: ApolloCodegenConfiguration = .mock()
+    config: ApolloCodegenConfiguration = .mock(),
+    isOneOf: Bool = false
   ) -> GraphQLInputObjectType {
     GraphQLInputObjectType(
       name: GraphQLName(schemaName: name),
       documentation: documentation,
-      fields: OrderedDictionary.init(uniqueKeysWithValues: fields.map({ ($0.render(config: config), $0) }))
+      fields: OrderedDictionary.init(uniqueKeysWithValues: fields.map({ ($0.render(config: config), $0) })),
+      isOneOf: isOneOf
     )
   }
 }

@@ -10,7 +10,11 @@ struct InputObjectFileGenerator: FileGenerator {
   let config: ApolloCodegen.ConfigurationContext
 
   var template: any TemplateRenderer {
-    InputObjectTemplate(graphqlInputObject: graphqlInputObject, config: config)
+    if graphqlInputObject.isOneOf {
+      OneOfInputObjectTemplate(graphqlInputObject: graphqlInputObject, config: config)
+    } else {
+      InputObjectTemplate(graphqlInputObject: graphqlInputObject, config: config)
+    }
   }
   var target: FileTarget { .inputObject }
   var fileName: String { graphqlInputObject.render(as: .filename) }

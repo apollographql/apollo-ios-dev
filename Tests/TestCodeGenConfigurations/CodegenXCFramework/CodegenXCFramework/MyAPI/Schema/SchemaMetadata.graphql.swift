@@ -29,17 +29,17 @@ public extension MyAPI {
 
     public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
       switch typename {
-      case "Query": return MyAPI.Objects.Query
-      case "Human": return MyAPI.Objects.Human
-      case "Cat": return MyAPI.Objects.Cat
-      case "Dog": return MyAPI.Objects.Dog
       case "Bird": return MyAPI.Objects.Bird
-      case "Fish": return MyAPI.Objects.Fish
-      case "Rat": return MyAPI.Objects.Rat
-      case "PetRock": return MyAPI.Objects.PetRock
+      case "Cat": return MyAPI.Objects.Cat
       case "Crocodile": return MyAPI.Objects.Crocodile
+      case "Dog": return MyAPI.Objects.Dog
+      case "Fish": return MyAPI.Objects.Fish
       case "Height": return MyAPI.Objects.Height
+      case "Human": return MyAPI.Objects.Human
       case "Mutation": return MyAPI.Objects.Mutation
+      case "PetRock": return MyAPI.Objects.PetRock
+      case "Query": return MyAPI.Objects.Query
+      case "Rat": return MyAPI.Objects.Rat
       default: return nil
       }
     }

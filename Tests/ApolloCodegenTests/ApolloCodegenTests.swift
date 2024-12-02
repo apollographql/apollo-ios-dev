@@ -680,6 +680,7 @@ class ApolloCodegenTests: XCTestCase {
 
       directoryURL.appendingPathComponent("Sources/Schema/Unions/ClassroomPet.graphql.swift").path,
 
+      directoryURL.appendingPathComponent("Sources/Schema/InputObjects/PetSearchInput.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Schema/InputObjects/PetAdoptionInput.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Schema/InputObjects/PetSearchFilters.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Schema/InputObjects/MeasurementsInput.graphql.swift").path,
@@ -705,7 +706,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("Sources/Operations/Queries/ClassroomPetsQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Queries/DogQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Queries/PetSearchQuery.graphql.swift").path,
-      directoryURL.appendingPathComponent("Sources/Operations/Queries/PetSearchQuery.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Operations/Queries/FindPetQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Mutations/PetAdoptionMutation.graphql.swift").path,
 
       directoryURL.appendingPathComponent("Sources/Fragments/PetDetails.graphql.swift").path,
@@ -794,6 +795,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("Sources/Unions/ClassroomPet.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/InputObjects/PetAdoptionInput.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/InputObjects/PetSearchFilters.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/InputObjects/PetSearchInput.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/InputObjects/MeasurementsInput.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Objects/Height.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Objects/Query.graphql.swift").path,
@@ -815,7 +817,7 @@ class ApolloCodegenTests: XCTestCase {
       operationsOutputURL.appendingPathComponent("Queries/AllAnimalsIncludeSkipQuery.graphql.swift").path,
       operationsOutputURL.appendingPathComponent("Queries/ClassroomPetsQuery.graphql.swift").path,
       operationsOutputURL.appendingPathComponent("Queries/PetSearchQuery.graphql.swift").path,
-      operationsOutputURL.appendingPathComponent("Queries/PetSearchQuery.graphql.swift").path,
+      operationsOutputURL.appendingPathComponent("Queries/FindPetQuery.graphql.swift").path,
       operationsOutputURL.appendingPathComponent("Mutations/PetAdoptionMutation.graphql.swift").path,
 
       operationsOutputURL.appendingPathComponent("Fragments/PetDetails.graphql.swift").path,
@@ -979,6 +981,7 @@ class ApolloCodegenTests: XCTestCase {
 
       directoryURL.appendingPathComponent("RelativePath/Sources/Schema/InputObjects/PetAdoptionInput.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/Schema/InputObjects/PetSearchFilters.graphql.swift").path,
+      directoryURL.appendingPathComponent("RelativePath/Sources/Schema/InputObjects/PetSearchInput.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/Schema/InputObjects/MeasurementsInput.graphql.swift").path,
 
       directoryURL.appendingPathComponent("RelativePath/Sources/Schema/Objects/Height.graphql.swift").path,
@@ -1001,6 +1004,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/DogQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/AllAnimalsIncludeSkipQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/ClassroomPetsQuery.graphql.swift").path,
+      directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/FindPetQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/PetSearchQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/PetSearchQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Mutations/PetAdoptionMutation.graphql.swift").path,
@@ -1092,6 +1096,7 @@ class ApolloCodegenTests: XCTestCase {
 
       directoryURL.appendingPathComponent("RelativePath/Sources/InputObjects/PetAdoptionInput.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/InputObjects/PetSearchFilters.graphql.swift").path,
+      directoryURL.appendingPathComponent("RelativePath/Sources/InputObjects/PetSearchInput.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/InputObjects/MeasurementsInput.graphql.swift").path,
 
       directoryURL.appendingPathComponent("RelativePath/Sources/Objects/Height.graphql.swift").path,
@@ -1114,6 +1119,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("RelativeOperations/Queries/DogQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativeOperations/Queries/AllAnimalsIncludeSkipQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativeOperations/Queries/ClassroomPetsQuery.graphql.swift").path,
+      directoryURL.appendingPathComponent("RelativeOperations/Queries/FindPetQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativeOperations/Queries/PetSearchQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativeOperations/Queries/PetSearchQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativeOperations/Mutations/PetAdoptionMutation.graphql.swift").path,

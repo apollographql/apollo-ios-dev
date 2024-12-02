@@ -20,17 +20,17 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
 
   public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
     switch typename {
-    case "Query": return AnimalKingdomAPI.Objects.Query
-    case "Human": return AnimalKingdomAPI.Objects.Human
-    case "Cat": return AnimalKingdomAPI.Objects.Cat
-    case "Dog": return AnimalKingdomAPI.Objects.Dog
     case "Bird": return AnimalKingdomAPI.Objects.Bird
-    case "Fish": return AnimalKingdomAPI.Objects.Fish
-    case "Rat": return AnimalKingdomAPI.Objects.Rat
-    case "PetRock": return AnimalKingdomAPI.Objects.PetRock
+    case "Cat": return AnimalKingdomAPI.Objects.Cat
     case "Crocodile": return AnimalKingdomAPI.Objects.Crocodile
+    case "Dog": return AnimalKingdomAPI.Objects.Dog
+    case "Fish": return AnimalKingdomAPI.Objects.Fish
     case "Height": return AnimalKingdomAPI.Objects.Height
+    case "Human": return AnimalKingdomAPI.Objects.Human
     case "Mutation": return AnimalKingdomAPI.Objects.Mutation
+    case "PetRock": return AnimalKingdomAPI.Objects.PetRock
+    case "Query": return AnimalKingdomAPI.Objects.Query
+    case "Rat": return AnimalKingdomAPI.Objects.Rat
     default: return nil
     }
   }

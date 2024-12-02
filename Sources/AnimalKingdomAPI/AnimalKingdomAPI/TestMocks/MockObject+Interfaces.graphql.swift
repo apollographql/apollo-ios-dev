@@ -6,7 +6,7 @@ import AnimalKingdomAPI
 
 public extension MockObject {
   typealias Animal = Interface
-  typealias WarmBlooded = Interface
-  typealias Pet = Interface
   typealias HousePet = Interface
+  typealias Pet = Interface
+  typealias WarmBlooded = Interface
 }

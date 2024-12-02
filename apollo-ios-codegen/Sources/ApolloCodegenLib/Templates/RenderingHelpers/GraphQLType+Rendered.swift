@@ -71,7 +71,7 @@ extension GraphQLType {
 
   // MARK: Input Value
 
-  private func renderAsInputValue(
+  func renderAsInputValue(
     inNullable: Bool,
     config: ApolloCodegenConfiguration
   ) -> String {

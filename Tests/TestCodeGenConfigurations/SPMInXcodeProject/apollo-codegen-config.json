@@ -56,8 +56,14 @@
     "schemaTypes" : {
       "path" : "./AnimalKingdomAPI",
       "moduleType" : {
-        "swiftPackageManager" : {
-
+        "swiftPackage" : {
+          "apolloSDKDependency" : {
+            "sdkVersion" : {
+              "local" : {
+                "path" : "../../../../apollo-ios"
+              }
+            }
+          }
         }
       }
     },

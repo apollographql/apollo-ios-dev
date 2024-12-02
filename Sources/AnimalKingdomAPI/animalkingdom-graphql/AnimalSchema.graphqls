@@ -2,6 +2,7 @@ type Query {
   allAnimals: [Animal!]!
   classroomPets: [ClassroomPet]
   pets(filters: PetSearchFilters!): [Pet!]!
+  findPet(input: PetSearchInput!): [Pet!]!
 }
 
 type Mutation {
@@ -11,6 +12,12 @@ type Mutation {
 scalar CustomDate
 
 scalar Object
+
+input PetSearchInput @oneOf {
+  ownerID: ID
+  petID: ID
+  searchFilters: PetSearchFilters
+}
 
 input PetAdoptionInput {
   ownerID: ID!
