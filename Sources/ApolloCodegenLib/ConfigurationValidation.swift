@@ -33,9 +33,13 @@ extension ApolloCodegen.ConfigurationContext {
       throw ApolloCodegen.Error.schemaNameConflict(name: self.schemaNamespace)
     }
 
-    if case .swiftPackage = self.output.testMocks,
-       self.output.schemaTypes.moduleType != .swiftPackage() {
-      throw ApolloCodegen.Error.testMocksInvalidSwiftPackageConfiguration
+    if case .swiftPackage = self.output.testMocks {
+      switch self.output.schemaTypes.moduleType {
+      case .swiftPackage(_), .swiftPackageManager:
+        break
+      default:
+        throw ApolloCodegen.Error.testMocksInvalidSwiftPackageConfiguration
+      }
     }
 
     if case .swiftPackage = self.output.schemaTypes.moduleType,

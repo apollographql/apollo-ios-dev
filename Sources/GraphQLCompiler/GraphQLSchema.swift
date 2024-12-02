@@ -154,8 +154,11 @@ public typealias GraphQLInputFieldDictionary = OrderedDictionary<String, GraphQL
 
 public final class GraphQLInputObjectType: GraphQLNamedType {
   public private(set) var fields: GraphQLInputFieldDictionary!
+  
+  public let isOneOf: Bool
 
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    self.isOneOf = jsValue["isOneOf"]
     super.init(jsValue, bridge: bridge)
   }
 
@@ -167,9 +170,11 @@ public final class GraphQLInputObjectType: GraphQLNamedType {
   init(
     name: GraphQLName,
     documentation: String?,
-    fields: GraphQLInputFieldDictionary
+    fields: GraphQLInputFieldDictionary,
+    isOneOf: Bool = false
   ) {
     self.fields = fields
+    self.isOneOf = isOneOf
     super.init(name: name, documentation: documentation)
   }
 }

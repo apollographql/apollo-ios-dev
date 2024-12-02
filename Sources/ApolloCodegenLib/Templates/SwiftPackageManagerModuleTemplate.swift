@@ -124,7 +124,7 @@ fileprivate extension ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleTyp
       """
     case .local(let path):
       return """
-      .package(path: "\(path)")
+      .package(name: "apollo-ios", path: "\(path)")
       """
     }
   }
