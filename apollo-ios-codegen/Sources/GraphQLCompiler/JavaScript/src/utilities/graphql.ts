@@ -22,7 +22,7 @@ import {
 } from "graphql";
 import { isNode } from "graphql/language/ast";
 import { validateSDL } from "graphql/validation/validate";
-import { directive_apollo_client_ios_localCacheMutation, directive_import_statement } from "./apolloCodegenSchemaExtension";
+import { directive_apollo_client_ios_localCacheMutation, directive_import_statement, directive_typePolicy } from "./apolloCodegenSchemaExtension";
 import { addTypeNameFieldForLegacySafelisting } from "./legacySafelistingTransform";
 
 export class GraphQLSchemaValidationError extends Error {
@@ -124,7 +124,8 @@ function transformTypenameFieldIfNeeded(node: FieldNode): FieldNode {
 function stripApolloClientSpecificDirectives(node: DirectiveNode): DirectiveNode | null {
   const apolloClientSpecificDirectives: DirectiveDefinitionNode[] = [
     directive_apollo_client_ios_localCacheMutation,
-    directive_import_statement
+    directive_import_statement,
+    directive_typePolicy,
   ]
 
   for (const directive of apolloClientSpecificDirectives) {
