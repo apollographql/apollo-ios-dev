@@ -53,10 +53,22 @@ extension SchemaMetadata {
   /// - Returns: A `String` representing the cache key for the `object` to be used by
   /// `NormalizedCache` mechanisms.
   @inlinable public static func cacheKey(for object: ObjectData) -> String? {
-    guard let type = graphQLType(for: object),
-          let info = configuration.cacheKeyInfo(for: type, object: object) else {
-      return nil
+    guard let type = graphQLType(for: object) else { return nil }
+    
+    if let info = configuration.cacheKeyInfo(for: type, object: object) {
+      return "\(info.uniqueKeyGroup ?? type.typename):\(info.id)"
     }
-    return "\(info.uniqueKeyGroup ?? type.typename):\(info.id)"
+    
+    guard let keyFields = type.keyFields else { return nil }
+    
+    let idValues = try? keyFields.map {
+      guard let keyFieldValue = object[$0] else {
+        throw JSONDecodingError.missingValue
+      }
+      return try String(_jsonValue: keyFieldValue._asAnyHashable)
+    }
+    
+    guard let id = idValues?.joined(separator: "/") else { return nil }
+    return "\(type.typename):\(id)"
   }
 }

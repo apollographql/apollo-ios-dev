@@ -20,13 +20,15 @@ public extension GraphQLObjectType {
     _ name: String = "",
     interfaces: [GraphQLInterfaceType] = [],
     fields: [String: GraphQLField] = [:],
+    keyFields: [String] = [],
     documentation: String? = nil
   ) -> GraphQLObjectType {
     GraphQLObjectType(
       name: GraphQLName(schemaName: name),
       documentation: documentation,
       fields: fields,
-      interfaces: interfaces
+      interfaces: interfaces,
+      keyFields: keyFields
     )
   }
 }

@@ -41,7 +41,7 @@ input PetSearchFilters {
   measurements: MeasurementsInput
 }
 
-interface Animal {
+interface Animal @typePolicy(keyFields: "id") {
   id: ID!
   species: String!
   height: Height!
@@ -49,7 +49,7 @@ interface Animal {
   skinCovering: SkinCovering
 }
 
-interface Pet {
+interface Pet @typePolicy(keyFields: "id") {
   id: ID!
   humanName: String
   favoriteToy: String!
@@ -198,5 +198,5 @@ enum SkinCovering {
   FUR
   HAIR
   FEATHERS
-  SCALES  
+  SCALES
 }
