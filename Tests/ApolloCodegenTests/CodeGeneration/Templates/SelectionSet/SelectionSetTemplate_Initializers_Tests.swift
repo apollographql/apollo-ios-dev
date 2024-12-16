@@ -2825,4 +2825,128 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 26, ignoringExtraLines: true))
   }
+
+  func test__render__givenDeferredInlineFragment_insideNamedFragment_rendersInitializer() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String
+        species: String
+      }
+
+      type Dog implements Animal {
+        id: String
+        species: String
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...DogFragment
+        }
+      }
+
+      fragment DogFragment on Dog {
+        ... on Dog @defer(label: "slowSpecies") {
+          species
+        }
+      }
+      """
+
+    // when
+    let fragment = try await buildSubjectAndFragment(named: "DogFragment")
+    let fragment_rootField = try XCTUnwrap(fragment.rootField.selectionSet)
+
+    let expected = """
+        public init(
+        ) {
+          self.init(_dataDict: DataDict(
+            data: [
+              "__typename": TestSchema.Objects.Dog.typename,
+            ],
+            fulfilledFragments: [
+              ObjectIdentifier(DogFragment.self)
+            ],
+            deferredFragments: [
+              ObjectIdentifier(DogFragment.SlowSpecies.self)
+            ]
+          ))
+        }
+      """
+
+    let actual = subject.test_render(inlineFragment: fragment_rootField.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 24, ignoringExtraLines: true))
+  }
+
+  func test__render__givenDeferredInlineFragmentOnDifferentTypeCase_insideNamedFragment_rendersInitializer() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String
+        species: String
+      }
+
+      type Dog implements Animal {
+        id: String
+        species: String
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...DogFragment
+        }
+      }
+
+      fragment DogFragment on Animal {
+        ... on Dog @defer(label: "slowSpecies") {
+          species
+        }
+      }
+      """
+
+    // when
+    let fragment = try await buildSubjectAndFragment(named: "DogFragment")
+    let fragment_asDog = try XCTUnwrap(fragment[as: "Dog"])
+
+    let expected = """
+        public init(
+        ) {
+          self.init(_dataDict: DataDict(
+            data: [
+              "__typename": TestSchema.Objects.Dog.typename,
+            ],
+            fulfilledFragments: [
+              ObjectIdentifier(DogFragment.self),
+              ObjectIdentifier(DogFragment.AsDog.self)
+            ],
+            deferredFragments: [
+              ObjectIdentifier(DogFragment.AsDog.SlowSpecies.self)
+            ]
+          ))
+        }
+      """
+
+    let actual = subject.test_render(inlineFragment: fragment_asDog.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 24, ignoringExtraLines: true))
+  }
+
 }
