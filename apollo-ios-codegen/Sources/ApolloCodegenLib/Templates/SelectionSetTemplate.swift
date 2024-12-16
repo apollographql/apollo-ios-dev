@@ -604,6 +604,9 @@ struct SelectionSetTemplate {
   private func InitializerTemplate(
     _ selectionSet: ComputedSelectionSet
   ) -> TemplateString {
+    let containsDeferredFragment = (selectionSet.direct?.inlineFragments.containsDeferredFragment ?? false) ||
+      (selectionSet.direct?.namedFragments.containsDeferredFragment ?? false)
+
     return """
       \(renderAccessControl())init(
         \(InitializerSelectionParametersTemplate(selectionSet))
@@ -612,7 +615,14 @@ struct SelectionSetTemplate {
           data: [
             \(InitializerDataDictTemplate(selectionSet))
           ],
-          fulfilledFragments: \(InitializerFulfilledFragments(selectionSet))
+          fulfilledFragments: [
+            \(InitializerFulfilledFragments(selectionSet))
+          ]\(if: containsDeferredFragment, """
+          ,
+          deferredFragments: [
+            \(InitializerDeferredFragments(selectionSet))
+          ]
+          """)
         ))
       }
       """
@@ -708,9 +718,41 @@ struct SelectionSetTemplate {
     }
 
     return """
-      [
-        \(fulfilledFragments.map { "ObjectIdentifier(\($0).self)" })
-      ]
+      \(fulfilledFragments.map { "ObjectIdentifier(\($0).self)" })
+      """
+  }
+
+  private func InitializerDeferredFragments(
+    _ selectionSet: ComputedSelectionSet
+  ) -> TemplateString? {
+    guard let directSelections = selectionSet.direct else { return nil }
+
+    var deferredFragments: OrderedSet<String> = []
+
+    let nameGenerator: (_ typeInfo: SelectionSet.TypeInfo) -> String = { typeInfo in
+      SelectionSetNameGenerator.generatedSelectionSetName(
+        for: typeInfo,
+        format: .fullyQualified,
+        pluralizer: config.pluralizer
+      )
+    }
+
+    for inlineFragmentSpread in directSelections.inlineFragments.values.elements {
+      if inlineFragmentSpread.typeInfo.isDeferred {
+        let selectionSetName = nameGenerator(inlineFragmentSpread.typeInfo)
+        deferredFragments.append(selectionSetName)
+      }
+    }
+
+    for namedFragment in directSelections.namedFragments.values.elements {
+      if namedFragment.typeInfo.isDeferred {
+        let selectionSetName = nameGenerator(namedFragment.typeInfo)
+        deferredFragments.append(selectionSetName)
+      }
+    }
+
+    return """
+      \(deferredFragments.map { "ObjectIdentifier(\($0).self)" })
       """
   }
 
