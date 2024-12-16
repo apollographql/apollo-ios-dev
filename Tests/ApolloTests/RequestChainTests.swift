@@ -375,7 +375,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseSubscriptionParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseSubscriptionParser.protocolSpec),application/graphql-response+json,application/json")
       expectation.fulfill()
     }
 
@@ -400,7 +400,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseSubscriptionParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseSubscriptionParser.protocolSpec),application/graphql-response+json,application/json")
       XCTAssertNotNil(request.allHTTPHeaderFields?["Random"])
       expectation.fulfill()
     }
@@ -430,7 +430,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/graphql-response+json,application/json")
       expectation.fulfill()
     }
 
@@ -455,7 +455,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/graphql-response+json,application/json")
       expectation.fulfill()
     }
 
@@ -480,7 +480,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/graphql-response+json,application/json")
       XCTAssertNotNil(request.allHTTPHeaderFields?["Random"])
       expectation.fulfill()
     }
@@ -510,7 +510,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/graphql-response+json,application/json")
       XCTAssertNotNil(request.allHTTPHeaderFields?["Random"])
       expectation.fulfill()
     }
