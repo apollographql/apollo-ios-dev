@@ -1,3 +1,5 @@
+import Foundation
+
 /// A protocol that a generated GraphQL schema should conform to.
 ///
 /// The generated schema metadata is the source of information about the generated types in the
@@ -50,13 +52,30 @@ extension SchemaMetadata {
   /// for the `NormalizedCache`.
   ///
   /// - Parameter object: A ``JSONObject`` dictionary representing an object in a GraphQL response.
+  /// - Parameter interface: An optional ``Interface`` of the expected object.
   /// - Returns: A `String` representing the cache key for the `object` to be used by
   /// `NormalizedCache` mechanisms.
-  @inlinable public static func cacheKey(for object: ObjectData) -> String? {
-    guard let type = graphQLType(for: object),
-          let info = configuration.cacheKeyInfo(for: type, object: object) else {
-      return nil
+  @inlinable public static func cacheKey(for object: ObjectData, withInterface interface: Interface? = nil) -> String? {
+    guard let type = graphQLType(for: object) else { return nil }
+    
+    if let info = configuration.cacheKeyInfo(for: type, object: object) {
+      return "\(info.uniqueKeyGroup ?? type.typename):\(info.id)"
     }
-    return "\(info.uniqueKeyGroup ?? type.typename):\(info.id)"
+    
+    guard let keyFields = type.keyFields ?? interface?.keyFields else { return nil }
+    
+    let idValues = try? keyFields.map {
+      guard let keyFieldValue = object[$0] else {
+        throw JSONDecodingError.missingValue
+      }
+      let item = try String(_jsonValue: keyFieldValue._asAnyHashable)
+      
+      // Escape all instances of `+` with a backslash, as well as other backslashes
+      return item.replacingOccurrences(of: "\\", with: "\\\\")
+        .replacingOccurrences(of: "+", with: "\\+")
+    }
+    
+    guard let id = idValues?.joined(separator: "+") else { return nil }
+    return "\(type.typename):\(id)"
   }
 }

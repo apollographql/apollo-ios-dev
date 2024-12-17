@@ -239,16 +239,20 @@ public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImpl
   public private(set) var fields: [String: GraphQLField]!
 
   public private(set) var interfaces: [GraphQLInterfaceType]!
+  
+  public private(set) var keyFields: [String]!
 
   /// Initializer to be used for creating mock objects in tests only.
   init(
     name: GraphQLName,
     documentation: String?,
     fields: [String: GraphQLField],
-    interfaces: [GraphQLInterfaceType]
+    interfaces: [GraphQLInterfaceType],
+    keyFields: [String]
   ) {
     self.fields = fields
     self.interfaces = interfaces
+    self.keyFields = keyFields
     super.init(name: name, documentation: documentation)
   }
 
@@ -259,6 +263,7 @@ public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImpl
   override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
     self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
     self.interfaces = try! bridge.invokeMethod("getInterfaces", on: jsValue)
+    self.keyFields = jsValue["_apolloKeyFields"]
   }
 
   public override var debugDescription: String {
@@ -274,16 +279,20 @@ public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceIm
   public private(set) var fields: [String: GraphQLField]!
 
   public private(set) var interfaces: [GraphQLInterfaceType]!
+  
+  public private(set) var keyFields: [String]!
 
   /// Initializer to be used for creating mock objects in tests only.
   init(
     name: GraphQLName,
     documentation: String?,
     fields: [String: GraphQLField],
-    interfaces: [GraphQLInterfaceType]
+    interfaces: [GraphQLInterfaceType],
+    keyFields: [String]
   ) {
     self.fields = fields
     self.interfaces = interfaces
+    self.keyFields = keyFields
     super.init(name: name, documentation: documentation)
   }
 
@@ -294,6 +303,7 @@ public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceIm
   override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
     self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
     self.interfaces = try! bridge.invokeMethod("getInterfaces", on: jsValue)
+    self.keyFields = jsValue["_apolloKeyFields"]
   }
 
   public override var debugDescription: String {

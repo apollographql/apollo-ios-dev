@@ -19,11 +19,13 @@ class InterfaceTemplateTests: XCTestCase {
     name: String = "Dog",
     customName: String? = nil,
     documentation: String? = nil,
+    keyFields: [String] = [],
     config: ApolloCodegenConfiguration = .mock()
   ) {
     let interfaceType = GraphQLInterfaceType.mock(
       name,
       fields: [:],
+      keyFields: keyFields,
       interfaces: [],
       documentation: documentation
     )
@@ -46,7 +48,7 @@ class InterfaceTemplateTests: XCTestCase {
     buildSubject(name: "aDog")
 
     let expected = """
-    static let ADog = ApolloAPI.Interface(name: "aDog")
+    static let ADog = ApolloAPI.Interface(name: "aDog", keyFields: nil)
     """
 
     // when
@@ -68,7 +70,7 @@ class InterfaceTemplateTests: XCTestCase {
 
     let expected = """
     /// \(documentation)
-    static let Dog = ApolloAPI.Interface(name: "Dog")
+    static let Dog = ApolloAPI.Interface(name: "Dog", keyFields: nil)
     """
 
     // when
@@ -88,7 +90,7 @@ class InterfaceTemplateTests: XCTestCase {
     )
 
     let expected = """
-    static let Dog = ApolloAPI.Interface(name: "Dog")
+    static let Dog = ApolloAPI.Interface(name: "Dog", keyFields: nil)
     """
 
     // when
@@ -108,7 +110,7 @@ class InterfaceTemplateTests: XCTestCase {
     )
 
     let expected = """
-    static let Dog = Apollo.Interface(name: "Dog")
+    static let Dog = Apollo.Interface(name: "Dog", keyFields: nil)
     """
 
     // when
@@ -128,7 +130,7 @@ class InterfaceTemplateTests: XCTestCase {
       buildSubject(name: keyword)
 
       let expected = """
-      static let \(keyword.firstUppercased)_Interface = ApolloAPI.Interface(name: "\(keyword)")
+      static let \(keyword.firstUppercased)_Interface = ApolloAPI.Interface(name: "\(keyword)", keyFields: nil)
       """
 
       // when
@@ -150,7 +152,28 @@ class InterfaceTemplateTests: XCTestCase {
     
     let expected = """
     // Renamed from GraphQL schema value: 'MyInterface'
-    static let MyCustomInterface = ApolloAPI.Interface(name: "MyInterface")
+    static let MyCustomInterface = ApolloAPI.Interface(name: "MyInterface", keyFields: nil)
+    """
+    
+    // when
+    let actual = renderSubject()
+    
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+  
+  func test__render__givenInterface_withKeyFields_shouldRenderKeyFields() throws {
+    // given
+    buildSubject(
+      name: "IndexedNode",
+      keyFields: ["parentID", "index"]
+    )
+    
+    let expected = """
+    static let IndexedNode = ApolloAPI.Interface(name: "IndexedNode", keyFields: [
+      "parentID",
+      "index"
+    ])
     """
     
     // when

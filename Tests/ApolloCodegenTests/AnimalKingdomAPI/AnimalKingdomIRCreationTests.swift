@@ -168,7 +168,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
 
   func test__mergedSelections_AllAnimalsQuery_AllAnimal__isCorrect() async throws {
     // given
-    let Interface_Animal = GraphQLInterfaceType.mock("Animal")
+    let Interface_Animal = GraphQLInterfaceType.mock("Animal", keyFields: ["id"])
 
     try await buildOperation()
 
