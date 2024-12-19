@@ -4,7 +4,7 @@ Excited about the Apollo iOS ecosystem and want to make it better? We’re excit
 
 Apollo is a community of developers just like you, striving to create the best tools and libraries around GraphQL. We welcome anyone who wants to contribute or provide constructive feedback, no matter your age or level of experience. If you want to help but don't know where to start, let us know, and we'll find something for you.
 
-Oh, and if you haven't already, stop by our [community forums](https://community.apollographql.com)!
+Oh, and if you haven't already, stop by our [Community Forum](https://community.apollographql.com)!
 
 ## Overview
 
@@ -106,7 +106,7 @@ At Apollo, we consider the security of our projects a top priority. No matter ho
 
 ### Responding to issues
 
-In addition to reporting issues, a great way to contribute to Apollo iOS is to respond to other peoples' issues and try to identify the problem or help them work around it. If you’re interested in taking a more active role in this process, please go ahead and respond to issues. Don't forget to say "Hi" on our [community forums](https://community.apollographql.com/tag/mobile)!
+In addition to reporting issues, a great way to contribute to Apollo iOS is to respond to other peoples' issues and try to identify the problem or help them work around it. If you’re interested in taking a more active role in this process, please go ahead and respond to issues. Don't forget to say "Hi" on our [Community Forum](https://community.apollographql.com/tag/mobile)!
 
 ### Suggesting features
 
