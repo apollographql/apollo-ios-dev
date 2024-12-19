@@ -72,7 +72,7 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     return transaction.loadObject(forKey: reference.key)
   }
 
-  func computeCacheKey(for object: Record, in schema: any SchemaMetadata.Type) -> CacheKey? {
+  func computeCacheKey(for object: Record, in schema: any SchemaMetadata.Type, withInterface interface: Interface?) -> CacheKey? {
     return object.key
   }
 
