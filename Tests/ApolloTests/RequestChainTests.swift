@@ -375,7 +375,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseSubscriptionParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseSubscriptionParser.protocolSpec),application/graphql-response+json,application/json")
       expectation.fulfill()
     }
 
@@ -400,7 +400,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseSubscriptionParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseSubscriptionParser.protocolSpec),application/graphql-response+json,application/json")
       XCTAssertNotNil(request.allHTTPHeaderFields?["Random"])
       expectation.fulfill()
     }
@@ -430,7 +430,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/graphql-response+json,application/json")
       expectation.fulfill()
     }
 
@@ -455,7 +455,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/graphql-response+json,application/json")
       expectation.fulfill()
     }
 
@@ -480,7 +480,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/graphql-response+json,application/json")
       XCTAssertNotNil(request.allHTTPHeaderFields?["Random"])
       expectation.fulfill()
     }
@@ -510,7 +510,7 @@ class RequestChainTests: XCTestCase {
         return
       }
 
-      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/json")
+      XCTAssertEqual(header, "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/graphql-response+json,application/json")
       XCTAssertNotNil(request.allHTTPHeaderFields?["Random"])
       expectation.fulfill()
     }
@@ -1214,5 +1214,194 @@ class RequestChainTests: XCTestCase {
 
     // then
     wait(for: expectations, timeout: 1, enforceOrder: true)
+  }
+
+  // MARK: Response Tests
+
+  func test__response__givenUnsuccessfulStatusCode_shouldFail() throws {
+    // given
+    let client = MockURLSessionClient(
+      response: .mock(
+        url: TestURL.mockServer.url,
+        statusCode: 500,
+        httpVersion: nil,
+        headerFields: nil
+      ),
+      data: """
+      {
+        "data": {
+          "__typename": "Hero",
+          "name": "R2-D2"
+        }
+      }
+      """.data(using: .utf8)
+    )
+
+    let provider = DefaultInterceptorProvider(
+      client: client,
+      store: ApolloStore()
+    )
+
+    let transport = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: TestURL.mockServer.url
+    )
+
+    let expectation = expectation(description: "Response received")
+
+    _ = transport.send(operation: MockQuery<Hero>()) { result in
+      switch result {
+      case .success:
+        XCTFail("Unexpected response: \(result)")
+
+      case .failure:
+        expectation.fulfill()
+      }
+    }
+
+    wait(for: [expectation], timeout: 1)
+  }
+
+  // This test is odd because you might assume it would fail but there is no content-type checking on standard
+  // GraphQL response parsing. So this test is here to ensure that existing behaviour does not change.
+  func test__response__givenUnknownContentType_shouldNotFail() throws {
+    // given
+    let client = MockURLSessionClient(
+      response: .mock(
+        url: TestURL.mockServer.url,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: ["content-type": "unknown/type"]
+      ),
+      data: """
+      {
+        "data": {
+          "__typename": "Hero",
+          "name": "R2-D2"
+        }
+      }
+      """.data(using: .utf8)
+    )
+
+    let provider = DefaultInterceptorProvider(
+      client: client,
+      store: ApolloStore()
+    )
+
+    let transport = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: TestURL.mockServer.url
+    )
+
+    let expectation = expectation(description: "Response received")
+
+    _ = transport.send(operation: MockQuery<Hero>()) { result in
+      switch result {
+      case let .success(responseData):
+        XCTAssertEqual(responseData.data?.__typename, "Hero")
+        XCTAssertEqual(responseData.data?.name, "R2-D2")
+
+        expectation.fulfill()
+
+      case .failure:
+        XCTFail("Unexpected response: \(result)")
+      }
+    }
+
+    wait(for: [expectation], timeout: 1)
+  }
+
+  func test__response__givenJSONContentType_shouldSucceed() throws {
+    // given
+    let client = MockURLSessionClient(
+      response: .mock(
+        url: TestURL.mockServer.url,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: ["content-type": "application/json"]
+      ),
+      data: """
+      {
+        "data": {
+          "__typename": "Hero",
+          "name": "R2-D2"
+        }
+      }
+      """.data(using: .utf8)
+    )
+
+    let provider = DefaultInterceptorProvider(
+      client: client,
+      store: ApolloStore()
+    )
+
+    let transport = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: TestURL.mockServer.url
+    )
+
+    let expectation = expectation(description: "Response received")
+
+    _ = transport.send(operation: MockQuery<Hero>()) { result in
+      switch result {
+      case let .success(responseData):
+        XCTAssertEqual(responseData.data?.__typename, "Hero")
+        XCTAssertEqual(responseData.data?.name, "R2-D2")
+
+        expectation.fulfill()
+
+      case .failure:
+        XCTFail("Unexpected response: \(result)")
+      }
+    }
+
+    wait(for: [expectation], timeout: 1)
+  }
+
+  func test__response__givenGraphQLOverHTTPContentType_shouldSucceed() throws {
+    // given
+    let client = MockURLSessionClient(
+      response: .mock(
+        url: TestURL.mockServer.url,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: ["content-type": "application/graphql-response+json"]
+      ),
+      data: """
+      {
+        "data": {
+          "__typename": "Hero",
+          "name": "R2-D2"
+        }
+      }
+      """.data(using: .utf8)
+    )
+
+    let provider = DefaultInterceptorProvider(
+      client: client,
+      store: ApolloStore()
+    )
+
+    let transport = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: TestURL.mockServer.url
+    )
+
+    let expectation = expectation(description: "Response received")
+
+    _ = transport.send(operation: MockQuery<Hero>()) { result in
+      switch result {
+      case let .success(responseData):
+        XCTAssertEqual(responseData.data?.__typename, "Hero")
+        XCTAssertEqual(responseData.data?.name, "R2-D2")
+
+        expectation.fulfill()
+
+      case .failure:
+        XCTFail("Unexpected response: \(result)")
+      }
+    }
+
+    wait(for: [expectation], timeout: 1)
   }
 }
