@@ -18,8 +18,8 @@
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "16.0.0",
-    "@rollup/plugin-replace": "6.0.1",
     "@rollup/plugin-typescript": "12.1.2",
+    "@rollup/plugin-replace": "6.0.2",
     "@types/common-tags": "1.8.4",
     "@types/jest": "29.5.14",
     "common-tags": "1.8.2",
