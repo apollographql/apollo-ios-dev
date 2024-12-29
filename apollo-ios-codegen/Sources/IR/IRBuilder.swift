@@ -23,7 +23,8 @@ public class IRBuilder {
   }
 
   public func build(
-    operation operationDefinition: CompilationResult.OperationDefinition
+    operation operationDefinition: CompilationResult.OperationDefinition,
+    usePartialEntities: Bool = false
   ) async -> Operation {
     let rootField = CompilationResult.Field(
       name: operationDefinition.operationType.rawValue,
@@ -86,9 +87,11 @@ public class IRBuilder {
   }
 
   public func build(
-    fragment fragmentDefinition: CompilationResult.FragmentDefinition
+    fragment fragmentDefinition: CompilationResult.FragmentDefinition,
+    shouldGeneratePartialFragment: Bool = false
   ) async -> NamedFragment {
-    await builtFragmentStorage.getFragment(named: fragmentDefinition.name) {
+
+    let namedFragment = await builtFragmentStorage.getFragment(named: fragmentDefinition.name) {
       let rootField = CompilationResult.Field(
         name: fragmentDefinition.name,
         type: .nonNull(.entity(fragmentDefinition.type)),
@@ -113,6 +116,10 @@ public class IRBuilder {
         containsDeferredFragment: result.containsDeferredFragment
       )
     }
-  }
 
+    if shouldGeneratePartialFragment {
+      return namedFragment.partialFragment()
+    }
+    return namedFragment
+  }
 }

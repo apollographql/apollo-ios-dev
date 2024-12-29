@@ -51,3 +51,15 @@ public class NamedFragment: Definition, Hashable, CustomDebugStringConvertible {
     definition.debugDescription
   }
 }
+
+public extension NamedFragment {
+  func partialFragment() -> NamedFragment {
+    NamedFragment(
+      definition: definition,
+      rootField: rootField,
+      referencedFragments: referencedFragments,
+      entityStorage: entityStorage.partial(),
+      containsDeferredFragment: containsDeferredFragment
+    )
+  }
+}

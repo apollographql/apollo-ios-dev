@@ -398,7 +398,7 @@ class RootFieldBuilder {
     spreadIntoParentWithTypePath parentTypeInfo: SelectionSet.TypeInfo,
     deferCondition: CompilationResult.DeferCondition? = nil
   ) async -> NamedFragmentSpread {
-    let fragment = await ir.build(fragment: fragmentSpread.fragment)
+    let fragment = await ir.build(fragment: fragmentSpread.fragment, shouldGeneratePartialFragment: true)
     referencedFragments.append(fragment)
     referencedFragments.append(contentsOf: fragment.referencedFragments)
 
@@ -410,7 +410,7 @@ class RootFieldBuilder {
 
     self.containsDeferredFragment = fragment.containsDeferredFragment || scope.deferCondition != nil
 
-    let scopePath = scope.isEmpty 
+    let scopePath = scope.isEmpty
       ? parentTypeInfo.scopePath
       : parentTypeInfo.scopePath.mutatingLast { $0.appending(scope) }
 

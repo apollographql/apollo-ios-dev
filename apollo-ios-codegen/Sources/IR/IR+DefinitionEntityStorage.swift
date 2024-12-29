@@ -11,6 +11,14 @@ public class DefinitionEntityStorage {
     self.entitiesForFields[rootEntity.location] = rootEntity
   }
 
+  private init(
+    sourceDefinition: Entity.Location.SourceDefinition,
+    entitiesForFields: [Entity.Location: Entity]
+  ) {
+    self.sourceDefinition = sourceDefinition
+    self.entitiesForFields = entitiesForFields
+  }
+
   func entity(
     for field: CompilationResult.Field,
     on enclosingEntity: Entity
@@ -66,5 +74,37 @@ public class DefinitionEntityStorage {
     entitiesForFields[location] = entity
     return entity
   }
-
 }
+
+extension DefinitionEntityStorage {
+  func partial() -> DefinitionEntityStorage {
+    return DefinitionEntityStorage(
+      sourceDefinition: sourceDefinition,
+      entitiesForFields: makePartialEntitiesForFields()
+    )
+  }
+
+  private func makePartialEntitiesForFields() -> [Entity.Location: Entity] {
+    var partialEntitiesForFields: [Entity.Location: Entity] = [:]
+    for (location, entity) in entitiesForFields {
+      /*
+       Based on my understanding:
+       Fragment rendering points to these entities.
+       Whenever we try to render a top-level fragment spread, it resolves the fragment from the entity storage.
+       In theory, the generation flow needs the types and entities to spread, fragments, and their underlying entities,
+       hence the hardcoded 'count < 4'.
+
+       Possibly, could iterate through the field path and exclude irrelevant entities rather than a hardcoded value?
+
+       */
+      if let count = location.fieldPath?.count, count < 4 {
+        partialEntitiesForFields[location] = entity
+      }
+      if location.fieldPath == nil {
+        partialEntitiesForFields[location] = entity
+      }
+    }
+    return partialEntitiesForFields
+  }
+}
+
