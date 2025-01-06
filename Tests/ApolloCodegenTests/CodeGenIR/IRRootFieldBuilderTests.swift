@@ -4090,6 +4090,150 @@ class IRRootFieldBuilderTests: XCTestCase {
       .to(shallowlyMatch(predator_asWarmBlooded_height_expected))
   }
 
+  func test__mergedSelections__givenEntityField_mergedSelectionsFromNamedFragment_intoNestedEntities_withDepthOf4_nestedEntitiesHaveMergedSelectionsAndSources() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      root: Root
+    }
+
+    type Root {      
+      foo: Foo
+    }
+
+    type Foo {
+      a: Int
+      b: Int
+      bar: Bar
+    }
+    
+    type Bar {
+      a: Int
+      b: Int      
+      foo: Foo   
+    }
+    """
+
+    document = """
+    query TestOperation {
+      root {
+        ...FooFragment
+        foo {
+          a
+          bar {
+            a
+            foo {
+              a
+              bar {
+                a
+              }
+            }
+          }
+        }
+      }
+    }
+
+    fragment FooFragment on Root {
+      foo {
+        b
+        bar {
+          b
+          foo {
+            b
+            bar {
+              b              
+            }
+          }
+        }
+      }
+    }    
+    """
+
+    // when
+    try await buildSubjectRootField()
+    
+    let Object_Foo = try XCTUnwrap(schema[object: "Foo"])
+    let Object_Bar = try XCTUnwrap(schema[object: "Bar"])
+
+    let root_foo = try XCTUnwrap(
+      subject?[field: "root"]?[field: "foo"]
+    )
+    let root_foo_bar = try XCTUnwrap(
+      root_foo[field: "bar"]
+    )
+    let root_foo_bar_foo = try XCTUnwrap(
+      root_foo_bar[field: "foo"]
+    )
+    let root_foo_bar_foo_bar = try XCTUnwrap(
+      root_foo_bar_foo[field: "bar"]
+    )
+
+    let Fragment_FooFragment = try XCTUnwrap(
+      subject?[field: "root"]?[fragment: "FooFragment"]
+    )
+
+    let root_foo_expected = SelectionSetMatcher(
+      parentType: Object_Foo,
+      directSelections: [
+        .field("a", type: .integer()),
+        .field("bar", type: .entity(Object_Bar))
+      ],
+      mergedSelections: [
+        .field("b", type: .integer()),
+      ],
+      mergedSources: [
+        try .mock(for: Fragment_FooFragment[field: "foo"], from: Fragment_FooFragment)
+      ]
+    )
+
+    let root_foo_bar_expected = SelectionSetMatcher(
+      parentType: Object_Bar,
+      directSelections: [
+        .field("a", type: .integer()),
+        .field("foo", type: .entity(Object_Foo))
+      ],
+      mergedSelections: [
+        .field("b", type: .integer()),
+      ],
+      mergedSources: [
+        try .mock(for: Fragment_FooFragment[field: "foo"]?[field: "bar"], from: Fragment_FooFragment)
+      ]
+    )
+
+    let root_foo_bar_foo_expected = SelectionSetMatcher(
+      parentType: Object_Foo,
+      directSelections: [
+        .field("a", type: .integer()),
+        .field("bar", type: .entity(Object_Bar))
+      ],
+      mergedSelections: [
+        .field("b", type: .integer()),
+      ],
+      mergedSources: [
+        try .mock(for: Fragment_FooFragment[field: "foo"]?[field: "bar"]?[field: "foo"], from: Fragment_FooFragment)
+      ]
+    )
+
+    let root_foo_bar_foo_bar_expected = SelectionSetMatcher(
+      parentType: Object_Bar,
+      directSelections: [
+        .field("a", type: .integer()),
+      ],
+      mergedSelections: [
+        .field("b", type: .integer()),
+      ],
+      mergedSources: [
+        try .mock(for: Fragment_FooFragment[field: "foo"]?[field: "bar"]?[field: "foo"]?[field: "bar"], from: Fragment_FooFragment)
+      ]
+    )
+
+    // then
+    expect(root_foo.selectionSet).to(shallowlyMatch(root_foo_expected))
+    expect(root_foo_bar.selectionSet).to(shallowlyMatch(root_foo_bar_expected))
+    expect(root_foo_bar_foo.selectionSet).to(shallowlyMatch(root_foo_bar_foo_expected))
+    expect(root_foo_bar_foo_bar.selectionSet).to(shallowlyMatch(root_foo_bar_foo_bar_expected))
+  }
+
   // MARK: - Nested Entity In Fragments - Merged Sources
 
   func test__mergedSources__givenEntityField_DirectSelectonsAndMergedFromNestedEntityInFragment_nestedEntityFieldHasFragmentMergedSources() async throws {
