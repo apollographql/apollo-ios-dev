@@ -24,7 +24,10 @@ public class IRBuilderTestWrapper {
     operation operationDefinition: CompilationResult.OperationDefinition,
     mergingStrategy: MergedSelections.MergingStrategy = .all
   ) async -> IRTestWrapper<IR.Operation> {
-    let operation = await irBuilder.build(operation: operationDefinition)
+    let operation = await irBuilder.build(
+      operation: operationDefinition,
+      mergingNamedFragmentFields: mergingStrategy.contains(.namedFragments)
+    )
     return IRTestWrapper(
       irObject: operation,
       computedSelectionSetCache: .init(
@@ -38,7 +41,10 @@ public class IRBuilderTestWrapper {
     fragment fragmentDefinition: CompilationResult.FragmentDefinition,
     mergingStrategy: MergedSelections.MergingStrategy = .all
   ) async -> IRTestWrapper<IR.NamedFragment> {
-    let fragment = await irBuilder.build(fragment: fragmentDefinition)
+    let fragment = await irBuilder.build(
+      fragment: fragmentDefinition,
+      mergingNamedFragmentFields: mergingStrategy.contains(.namedFragments)
+    )
     return IRTestWrapper(
       irObject: fragment,
       computedSelectionSetCache: .init(

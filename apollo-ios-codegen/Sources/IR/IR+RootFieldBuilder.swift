@@ -16,23 +16,34 @@ class RootFieldBuilder {
   static func buildRootEntityField(
     forRootField rootField: CompilationResult.Field,
     onRootEntity rootEntity: Entity,
-    inIR ir: IRBuilder
+    inIR ir: IRBuilder,
+    mergingNamedFragmentFields: Bool
   ) async -> Result {
-    return await RootFieldBuilder(ir: ir, rootEntity: rootEntity)
-      .build(rootField: rootField)
+    return await RootFieldBuilder(
+      ir: ir,
+      rootEntity: rootEntity,
+      mergeInNamedFragmentFields: mergingNamedFragmentFields
+    )
+    .build(rootField: rootField)
   }
 
   private let ir: IRBuilder
   private let rootEntity: Entity
   private let entityStorage: DefinitionEntityStorage
+  private let mergeInNamedFragmentFields: Bool
   private var referencedFragments: ReferencedFragments = []
   @IsEverTrue private var containsDeferredFragment: Bool
 
   private var schema: Schema { ir.schema }
 
-  private init(ir: IRBuilder, rootEntity: Entity) {
+  private init(
+    ir: IRBuilder,
+    rootEntity: Entity,
+    mergeInNamedFragmentFields: Bool
+  ) {
     self.ir = ir
     self.rootEntity = rootEntity
+    self.mergeInNamedFragmentFields = mergeInNamedFragmentFields
     self.entityStorage = DefinitionEntityStorage(rootEntity: rootEntity)
   }
 
@@ -398,7 +409,10 @@ class RootFieldBuilder {
     spreadIntoParentWithTypePath parentTypeInfo: SelectionSet.TypeInfo,
     deferCondition: CompilationResult.DeferCondition? = nil
   ) async -> NamedFragmentSpread {
-    let fragment = await ir.build(fragment: fragmentSpread.fragment)
+    let fragment = await ir.build(
+      fragment: fragmentSpread.fragment,
+      mergingNamedFragmentFields: self.mergeInNamedFragmentFields
+    )
     referencedFragments.append(fragment)
     referencedFragments.append(contentsOf: fragment.referencedFragments)
 
@@ -425,7 +439,7 @@ class RootFieldBuilder {
       inclusionConditions: AnyOf(scope.conditions)
     )
 
-    if fragmentSpread.typeInfo.deferCondition == nil {
+    if mergeInNamedFragmentFields && fragmentSpread.typeInfo.deferCondition == nil {
       mergeAllSelectionsIntoEntitySelectionTrees(from: fragmentSpread)
     }
 
