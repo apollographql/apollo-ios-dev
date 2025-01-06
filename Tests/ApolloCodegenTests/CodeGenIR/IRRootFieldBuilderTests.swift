@@ -4151,8 +4151,7 @@ class IRRootFieldBuilderTests: XCTestCase {
 
     // when
     try await buildSubjectRootField()
-
-    let Object_Root = try XCTUnwrap(schema[object: "Root"])
+    
     let Object_Foo = try XCTUnwrap(schema[object: "Foo"])
     let Object_Bar = try XCTUnwrap(schema[object: "Bar"])
 
