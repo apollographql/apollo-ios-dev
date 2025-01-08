@@ -1,104 +1,30 @@
 {
-  "abstract" : [
-    {
-      "text" : "Generates a ",
-      "type" : "text"
-    },
-    {
-      "code" : "Package.swift",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " file that is suitable for linking the generated schema types",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "files to your project using Swift Package Manager.",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "Attention: This case has been deprecated, use .swiftPackage(apolloSDKVersion:) case instead.",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/ApolloSDKDependency"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/swiftPackageManager"
+    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/ApolloSDKDependency\/Equatable-Implementations"
   },
-  "kind" : "symbol",
+  "kind" : "article",
   "metadata" : {
-    "externalID" : "s:16ApolloCodegenLib0aB13ConfigurationV21SchemaTypesFileOutputV10ModuleTypeO19swiftPackageManageryA2GmF",
-    "fragments" : [
-      {
-        "kind" : "keyword",
-        "text" : "case"
-      },
-      {
-        "kind" : "text",
-        "text" : " "
-      },
-      {
-        "kind" : "identifier",
-        "text" : "swiftPackageManager"
-      }
-    ],
     "modules" : [
       {
         "name" : "ApolloCodegenLib"
       }
     ],
-    "role" : "symbol",
-    "roleHeading" : "Case",
-    "symbolKind" : "case",
-    "title" : "ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.swiftPackageManager"
+    "role" : "collectionGroup",
+    "roleHeading" : "API Collection",
+    "title" : "Equatable Implementations"
   },
-  "primaryContentSections" : [
-    {
-      "declarations" : [
-        {
-          "languages" : [
-            "swift"
-          ],
-          "platforms" : [
-            "macOS"
-          ],
-          "tokens" : [
-            {
-              "kind" : "keyword",
-              "text" : "case"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "identifier",
-              "text" : "swiftPackageManager"
-            }
-          ]
-        }
-      ],
-      "kind" : "declarations"
-    }
-  ],
   "schemaVersion" : {
     "major" : 0,
     "minor" : 3,
@@ -107,10 +33,19 @@
   "sections" : [
 
   ],
+  "topicSections" : [
+    {
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/ApolloSDKDependency\/!=(_:_:)"
+      ],
+      "title" : "Operators"
+    }
+  ],
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schematypesfileoutput\/moduletype-swift.enum\/swiftpackagemanager"
+        "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schematypesfileoutput\/moduletype-swift.enum\/apollosdkdependency\/equatable-implementations"
       ],
       "traits" : [
         {
@@ -237,41 +172,17 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schematypesfileoutput\/moduletype-swift.enum"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/SchemaTypesFileOutput/ModuleType-swift.enum/swiftPackageManager": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/SchemaTypesFileOutput/ModuleType-swift.enum/ApolloSDKDependency": {
   "abstract" : [
     {
-      "text" : "Generates a ",
-      "type" : "text"
-    },
-    {
-      "code" : "Package.swift",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " file that is suitable for linking the generated schema types",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "files to your project using Swift Package Manager.",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "Attention: This case has been deprecated, use .swiftPackage(apolloSDKVersion:) case instead.",
+      "text" : "Configuation for apollo-ios dependency in SPM modules",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "case"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -279,15 +190,83 @@
     },
     {
       "kind" : "identifier",
-      "text" : "swiftPackageManager"
+      "text" : "ApolloSDKDependency"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/swiftPackageManager",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/ApolloSDKDependency",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ApolloSDKDependency"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.ApolloSDKDependency",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schematypesfileoutput\/moduletype-swift.enum\/apollosdkdependency"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/SchemaTypesFileOutput/ModuleType-swift.enum/ApolloSDKDependency/!=(_:_:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "!="
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Self"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Self"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/ApolloSDKDependency\/!=(_:_:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.swiftPackageManager",
+  "title" : "!=(_:_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schematypesfileoutput\/moduletype-swift.enum\/swiftpackagemanager"
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schematypesfileoutput\/moduletype-swift.enum\/apollosdkdependency\/!=(_:_:)"
 }
 }
 }

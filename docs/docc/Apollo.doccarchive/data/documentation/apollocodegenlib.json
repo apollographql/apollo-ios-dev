@@ -111,6 +111,7 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloURLError",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Constants",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerPathError",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/InflectionRule"
       ],
@@ -382,6 +383,37 @@
   "title" : "CodegenLogger",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/codegenlogger"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Constants": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Constants"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Constants",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Constants"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "Constants",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/constants"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileAttributes": {
   "abstract" : [

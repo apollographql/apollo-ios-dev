@@ -2,19 +2,27 @@
   "hierarchy" : {
     "paths" : [
       [
-        "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Constants"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/query"
+    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Constants\/CodegenVersion"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo19GraphQLQueryWatcherC5queryxvp",
+    "externalID" : "s:16ApolloCodegenLib9ConstantsO0B7VersionSSvpZ",
     "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "static"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
       {
         "kind" : "keyword",
         "text" : "let"
@@ -25,7 +33,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "query"
+        "text" : "CodegenVersion"
       },
       {
         "kind" : "text",
@@ -33,18 +41,19 @@
       },
       {
         "kind" : "typeIdentifier",
-        "text" : "Query"
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
       }
     ],
     "modules" : [
       {
-        "name" : "Apollo"
+        "name" : "ApolloCodegenLib"
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Instance Property",
+    "roleHeading" : "Type Property",
     "symbolKind" : "property",
-    "title" : "query"
+    "title" : "CodegenVersion"
   },
   "primaryContentSections" : [
     {
@@ -59,6 +68,14 @@
           "tokens" : [
             {
               "kind" : "keyword",
+              "text" : "static"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
               "text" : "let"
             },
             {
@@ -67,7 +84,7 @@
             },
             {
               "kind" : "identifier",
-              "text" : "query"
+              "text" : "CodegenVersion"
             },
             {
               "kind" : "text",
@@ -75,7 +92,8 @@
             },
             {
               "kind" : "typeIdentifier",
-              "text" : "Query"
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
             }
           ]
         }
@@ -94,7 +112,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/graphqlquerywatcher\/query"
+        "\/documentation\/apollocodegenlib\/constants\/codegenversion"
       ],
       "traits" : [
         {
@@ -105,63 +123,28 @@
   ]
 , 
 "references": {
-"doc://Apollo/documentation/Apollo": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib": {
   "abstract" : [
     {
-      "text" : "A Strongly typed, Swift-first, GraphQL client.",
+      "text" : "A robust code generation engine for GraphQL operations.",
       "type" : "text"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
   "kind" : "symbol",
   "role" : "collection",
-  "title" : "Apollo",
+  "title" : "ApolloCodegenLib",
   "type" : "topic",
-  "url" : "\/documentation\/apollo"
+  "url" : "\/documentation\/apollocodegenlib"
 },
-"doc://Apollo/documentation/Apollo/GraphQLQueryWatcher": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Constants": {
   "abstract" : [
-    {
-      "text" : "A ",
-      "type" : "text"
-    },
-    {
-      "code" : "GraphQLQueryWatcher",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " is responsible for watching the store, and calling the result handler with a new result",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "whenever any of the data the previous result depends on changes. If your query shares response objects with other",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "operations you should read about normalizing objects by cache key in our documentation. Normalized objects will",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "update all query watchers that had received that object before.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -169,27 +152,35 @@
     },
     {
       "kind" : "identifier",
-      "text" : "GraphQLQueryWatcher"
+      "text" : "Constants"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Constants",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "GraphQLQueryWatcher"
+      "text" : "Constants"
     }
   ],
   "role" : "symbol",
-  "title" : "GraphQLQueryWatcher",
+  "title" : "Constants",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlquerywatcher"
+  "url" : "\/documentation\/apollocodegenlib\/constants"
 },
-"doc://Apollo/documentation/Apollo/GraphQLQueryWatcher/query": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Constants/CodegenVersion": {
   "abstract" : [
 
   ],
   "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
     {
       "kind" : "keyword",
       "text" : "let"
@@ -200,7 +191,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "query"
+      "text" : "CodegenVersion"
     },
     {
       "kind" : "text",
@@ -208,15 +199,16 @@
     },
     {
       "kind" : "typeIdentifier",
-      "text" : "Query"
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/query",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Constants\/CodegenVersion",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "query",
+  "title" : "CodegenVersion",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlquerywatcher\/query"
+  "url" : "\/documentation\/apollocodegenlib\/constants\/codegenversion"
 }
 }
 }
