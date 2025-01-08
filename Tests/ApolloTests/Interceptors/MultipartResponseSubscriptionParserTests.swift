@@ -438,6 +438,47 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     let network = buildNetworkTransport(responseData: """
       
       --graphql
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
+          }
+        }
+      }
+      --graphql--
+      """.crlfFormattedData()
+    )
+
+    let expectedData = try Time(data: [
+      "__typename": "Time",
+      "ticker": 1
+    ], variables: nil)
+
+    let expectation = expectation(description: "Multipart data received")
+
+    _ = network.send(operation: MockSubscription<Time>()) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      switch (result) {
+      case let .success(data):
+        expect(data.data).to(equal(expectedData))
+      case let .failure(error):
+        fail("Unexpected failure result - \(error)")
+      }
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
+
+  func test__parsing__givenSingleChunk_withMultipleContentTypeDirectives_shouldReturnSuccess() throws {
+    let network = buildNetworkTransport(responseData: """
+      
+      --graphql
       Content-Type: application/json; charset=utf-8
 
       {
