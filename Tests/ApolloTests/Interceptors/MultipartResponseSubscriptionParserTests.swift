@@ -438,7 +438,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     let network = buildNetworkTransport(responseData: """
       
       --graphql
-      content-type: application/json
+      Content-Type: application/json; charset=utf-8
 
       {
         "payload": {
