@@ -218,6 +218,56 @@ final class MultipartResponseDeferParserTests: XCTestCase {
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
+  func test__parsing__givenSingleChunk_withGraphQLOverHTTPContentType_shouldReturnSuccess() throws {
+    let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
+
+    let expectation = expectation(description: "Received callback")
+
+    let expected: JSONObject = [
+      "data": [
+        "key": "value"
+      ],
+      "hasNext": true
+    ]
+
+    subject.intercept(
+      request: .mock(operation: MockQuery.mock()),
+      response: .mock(
+        headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
+        data: """
+          
+          --graphql
+          content-type: application/graphql-response+json
+
+          {
+            "data" : {
+              "key" : "value"
+            },
+            "hasNext": true
+          }
+          --graphql--
+          """.crlfFormattedData()
+      )
+    ) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      expect(result).to(beSuccess())
+
+      guard
+        let response = try! result.get(),
+        let deserialized = try! JSONSerialization.jsonObject(with: response.rawData) as? JSONObject
+      else {
+        return fail("data could not be deserialized!")
+      }
+
+      expect(deserialized).to(equal(expected))
+    }
+
+    wait(for: [expectation], timeout: defaultTimeout)
+  }
+
   func test__parsing__givenMultipleChunks_shouldReturnMultipleSuccess() throws {
     let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
 
