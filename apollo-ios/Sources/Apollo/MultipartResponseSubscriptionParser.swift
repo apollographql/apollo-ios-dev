@@ -71,9 +71,7 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
         break
 
       case let .contentHeader(directives):
-        guard directives.contains(where: { directive in
-          directive == "application/json" || directive == "application/graphql-response+json"
-        }) else {
+        guard directives.contains(where: { $0.isValidGraphQLContentType }) else {
           return .failure(ParsingError.unsupportedContentType(type: directives.joined(separator: ";")))
         }
 

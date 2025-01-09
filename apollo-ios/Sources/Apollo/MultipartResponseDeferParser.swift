@@ -53,9 +53,7 @@ struct MultipartResponseDeferParser: MultipartResponseSpecificationParser {
     for dataLine in chunk.components(separatedBy: Self.dataLineSeparator.description) {
       switch DataLine(dataLine.trimmingCharacters(in: .newlines)) {
       case let .contentHeader(directives):
-        guard directives.contains(where: { directive in
-          directive == "application/json" || directive == "application/graphql-response+json"
-        }) else {
+        guard directives.contains(where: { $0.isValidGraphQLContentType }) else {
           return .failure(ParsingError.unsupportedContentType(type: directives.joined(separator: ";")))
         }
 
