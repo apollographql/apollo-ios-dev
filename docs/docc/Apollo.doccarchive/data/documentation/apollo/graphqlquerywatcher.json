@@ -9,7 +9,31 @@
       "type" : "codeVoice"
     },
     {
-      "text" : " is responsible for watching the store, and calling the result handler with a new result whenever any of the data the previous result depends on changes.",
+      "text" : " is responsible for watching the store, and calling the result handler with a new result",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "whenever any of the data the previous result depends on changes. If your query shares response objects with other",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "operations you should read about normalizing objects by cache key in our documentation. Normalized objects will",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "update all query watchers that had received that object before.",
       "type" : "text"
     }
   ],
@@ -145,7 +169,15 @@
               "type" : "codeVoice"
             },
             {
-              "text" : " on your query watcher when you no longer need results. Failure to call ",
+              "text" : " on your query watcher when you no",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "longer need results. Failure to call ",
               "type" : "text"
             },
             {
@@ -153,7 +185,15 @@
               "type" : "codeVoice"
             },
             {
-              "text" : " before releasing your reference to the returned watcher will result in a memory leak.",
+              "text" : " before releasing your reference to the returned watcher will",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "result in a memory leak.",
               "type" : "text"
             }
           ],
@@ -336,7 +376,31 @@
       "type" : "codeVoice"
     },
     {
-      "text" : " is responsible for watching the store, and calling the result handler with a new result whenever any of the data the previous result depends on changes.",
+      "text" : " is responsible for watching the store, and calling the result handler with a new result",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "whenever any of the data the previous result depends on changes. If your query shares response objects with other",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "operations you should read about normalizing objects by cache key in our documentation. Normalized objects will",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "update all query watchers that had received that object before.",
       "type" : "text"
     }
   ],

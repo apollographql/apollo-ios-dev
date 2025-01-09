@@ -19,6 +19,14 @@
     {
       "text" : "files to your project using Swift Package Manager.",
       "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "Attention: This case has been deprecated, use .swiftPackage(apolloSDKVersion:) case instead.",
+      "type" : "text"
     }
   ],
   "hierarchy" : {
@@ -249,6 +257,14 @@
     },
     {
       "text" : "files to your project using Swift Package Manager.",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "Attention: This case has been deprecated, use .swiftPackage(apolloSDKVersion:) case instead.",
       "type" : "text"
     }
   ],

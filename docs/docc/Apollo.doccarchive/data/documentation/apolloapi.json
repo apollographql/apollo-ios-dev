@@ -156,6 +156,7 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/LocalCacheMutation",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableRootSelectionSet",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableSelectionSet",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OneOfInputObject",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OutputTypeConvertible",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ParentType",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/RootSelectionSet",
@@ -2032,6 +2033,37 @@
   "title" : "ObjectData",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/objectdata"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/OneOfInputObject": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "OneOfInputObject"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OneOfInputObject",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "OneOfInputObject"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OneOfInputObject",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/oneofinputobject"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/OperationDefinition": {
   "abstract" : [

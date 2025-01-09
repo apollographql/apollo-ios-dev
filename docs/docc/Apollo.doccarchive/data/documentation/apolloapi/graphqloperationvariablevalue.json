@@ -78,6 +78,7 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CustomScalarType",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/EnumType",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputObject",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OneOfInputObject",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ScalarType"
       ],
       "kind" : "relationships",
@@ -516,6 +517,37 @@
   "title" : "InputObject",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/inputobject"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/OneOfInputObject": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "OneOfInputObject"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OneOfInputObject",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "OneOfInputObject"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OneOfInputObject",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/oneofinputobject"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/ScalarType": {
   "abstract" : [
