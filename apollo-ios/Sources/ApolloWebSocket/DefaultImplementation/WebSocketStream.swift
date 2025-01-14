@@ -9,6 +9,7 @@
 //  Derived Work License: https://github.com/apollographql/apollo-ios/blob/main/LICENSE
 
 import Foundation
+import Apollo
 
 protocol WebSocketStreamDelegate: AnyObject {
   func newBytesInStream()
@@ -44,8 +45,8 @@ protocol WebSocketStream {
 
 class FoundationStream : NSObject, WebSocketStream, StreamDelegate, SOCKSProxyable  {
   private let workQueue = DispatchQueue(label: "com.apollographql.websocket", attributes: [])
-  private var inputStream: InputStream?
-  private var outputStream: OutputStream?
+  @Atomic private var inputStream: InputStream?
+  @Atomic private var outputStream: OutputStream?
   weak var delegate: (any WebSocketStreamDelegate)?
   let BUFFER_MAX = 4096
 
@@ -56,8 +57,8 @@ class FoundationStream : NSObject, WebSocketStream, StreamDelegate, SOCKSProxyab
     var writeStream: Unmanaged<CFWriteStream>?
     let h = url.host! as NSString
     CFStreamCreatePairWithSocketToHost(nil, h, UInt32(port), &readStream, &writeStream)
-    inputStream = readStream!.takeRetainedValue()
-    outputStream = writeStream!.takeRetainedValue()
+    $inputStream.mutate { $0 = readStream!.takeRetainedValue() }
+    $outputStream.mutate { $0 = writeStream!.takeRetainedValue() }
 
     #if os(watchOS) //watchOS us unfortunately is missing the kCFStream properties to make this work
     #else
@@ -186,8 +187,8 @@ class FoundationStream : NSObject, WebSocketStream, StreamDelegate, SOCKSProxyab
       CFWriteStreamSetDispatchQueue(stream, nil)
       stream.close()
     }
-    outputStream = nil
-    inputStream = nil
+    $outputStream.mutate { $0 = nil }
+    $inputStream.mutate { $0 = nil }
   }
 
   #if os(Linux) || os(watchOS)

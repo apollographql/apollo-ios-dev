@@ -10,6 +10,7 @@
 
 import Foundation
 import CommonCrypto
+import Apollo
 
 //Standard WebSocket close codes
 enum CloseCode : UInt16 {
@@ -207,11 +208,12 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
   private var connected = false
   private var isConnecting = false
   private let mutex = NSLock()
+  private let serialQueue = DispatchQueue(label: "com.apollographql.WebSocket.serial", qos: .background)
   private var compressionState = CompressionState()
   private var writeQueue = OperationQueue()
   private var readStack = [WSResponse]()
   private var inputQueue = [Data]()
-  private var fragBuffer: Data?
+  @Atomic private var fragBuffer: Data?
   private var certValidated = false
   private var didDisconnect = false
   private var readyToWrite = false
@@ -278,10 +280,12 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
    Connect to the WebSocket server on a background thread.
    */
   public func connect() {
-    guard !isConnecting else { return }
-    didDisconnect = false
-    isConnecting = true
-    createHTTPRequest()
+    serialQueue.sync {
+      guard !self.isConnecting else { return }
+      self.didDisconnect = false
+      self.isConnecting = true
+      self.createHTTPRequest()
+    }
   }
 
   /**
@@ -562,7 +566,7 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
    */
   private func cleanupStream() {
     stream.cleanup()
-    fragBuffer = nil
+    $fragBuffer.mutate { $0 = nil }
   }
 
   /**
@@ -593,7 +597,7 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
           var combine = NSData(data: buffer) as Data
           combine.append(data)
           work = combine
-          fragBuffer = nil
+          $fragBuffer.mutate { $0 = nil }
         }
         let buffer = UnsafeRawPointer((work as NSData).bytes).assumingMemoryBound(to: UInt8.self)
         let length = work.count
@@ -616,7 +620,7 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
     case 0:
       break
     case -1:
-      fragBuffer = Data(bytes: buffer, count: bufferLen)
+      $fragBuffer.mutate { $0 = Data(bytes: buffer, count: bufferLen) }
       break // do nothing, we are going to collect more data
     default:
       doDisconnect(WSError(type: .upgradeError, message: "Invalid HTTP upgrade", code: code))
@@ -793,7 +797,7 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
     guard let baseAddress = buffer.baseAddress else {return emptyBuffer}
     let bufferLen = buffer.count
     if response != nil && bufferLen < 2 {
-      fragBuffer = Data(buffer: buffer)
+      $fragBuffer.mutate { $0 = Data(buffer: buffer) }
       return emptyBuffer
     }
     if let response = response, response.bytesLeft > 0 {
@@ -865,7 +869,7 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
         offset += MemoryLayout<UInt16>.size
       }
       if bufferLen < offset || UInt64(bufferLen - offset) < dataLength {
-        fragBuffer = Data(bytes: baseAddress, count: bufferLen)
+        $fragBuffer.mutate { $0 = Data(bytes: baseAddress, count: bufferLen) }
         return emptyBuffer
       }
       var len = dataLength
@@ -974,7 +978,7 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
       buffer = processOneRawMessage(inBuffer: buffer)
     } while buffer.count >= 2
     if buffer.count > 0 {
-      fragBuffer = Data(buffer: buffer)
+      $fragBuffer.mutate { $0 = Data(buffer: buffer) }
     }
   }
 
@@ -1106,19 +1110,21 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
    Used to preform the disconnect delegate
    */
   private func doDisconnect(_ error: (any Error)?) {
-    guard !didDisconnect else { return }
-    didDisconnect = true
-    isConnecting = false
-    mutex.lock()
-    connected = false
-    mutex.unlock()
-    guard canDispatch else {return}
-    callbackQueue.async { [weak self] in
-      guard let self = self else { return }
-      self.onDisconnect?(error)
-      self.delegate?.websocketDidDisconnect(socket: self, error: error)
-      let userInfo = error.map{ [Constants.WebsocketDisconnectionErrorKeyName: $0] }
-      NotificationCenter.default.post(name: NSNotification.Name(Constants.Notifications.WebsocketDidDisconnect), object: self, userInfo: userInfo)
+    serialQueue.sync {
+      guard !self.didDisconnect else { return }
+      self.didDisconnect = true
+      self.isConnecting = false
+      self.mutex.lock()
+      self.connected = false
+      self.mutex.unlock()
+      guard self.canDispatch else {return}
+      self.callbackQueue.async { [weak self] in
+        guard let self = self else { return }
+        self.onDisconnect?(error)
+        self.delegate?.websocketDidDisconnect(socket: self, error: error)
+        let userInfo = error.map{ [Constants.WebsocketDisconnectionErrorKeyName: $0] }
+        NotificationCenter.default.post(name: NSNotification.Name(Constants.Notifications.WebsocketDidDisconnect), object: self, userInfo: userInfo)
+      }
     }
   }
 
