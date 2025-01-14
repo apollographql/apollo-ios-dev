@@ -43,7 +43,7 @@ public protocol GraphQLExecutionSource {
   /// - Returns: A cache key for normalizing the object in the cache. If `nil` is returned the
   /// object is assumed to be stored in the cache with no normalization. The executor will
   /// construct a cache key based on the object's path in its enclosing operation.
-  func computeCacheKey(for object: RawObjectData, in schema: any SchemaMetadata.Type) -> CacheKey?
+  func computeCacheKey(for object: RawObjectData, in schema: any SchemaMetadata.Type, withInterface interface: Interface?) -> CacheKey?
 }
 
 /// A type of `GraphQLExecutionSource` that uses the user defined cache key computation
@@ -57,8 +57,8 @@ public protocol CacheKeyComputingExecutionSource: GraphQLExecutionSource {
 }
 
 extension CacheKeyComputingExecutionSource {
-  @_spi(Execution) public func computeCacheKey(for object: RawObjectData, in schema: any SchemaMetadata.Type) -> CacheKey? {
+  @_spi(Execution) public func computeCacheKey(for object: RawObjectData, in schema: any SchemaMetadata.Type, withInterface interface: Interface?) -> CacheKey? {
     let dataWrapper = opaqueObjectDataWrapper(for: object)
-    return schema.cacheKey(for: dataWrapper)
+    return schema.cacheKey(for: dataWrapper, withInterface: interface)
   }
 }

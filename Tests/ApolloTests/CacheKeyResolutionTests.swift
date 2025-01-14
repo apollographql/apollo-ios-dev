@@ -209,4 +209,69 @@ class CacheKeyResolutionTests: XCTestCase {
     expect(actual).to(equal("GreekLetters:δ"))
   }
 
+  func test__schemaConfiguration__givenSingleKeyField_shouldReturnKeyFieldValue() {
+    let Delta = Object(typename: "Dog", implementedInterfaces: [], keyFields: ["id"])
+
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in Delta })
+
+    let object: JSONObject = [
+      "__typename": "Dog",
+      "id": "10",
+      "name": "Beagle"
+    ]
+
+    let objectDict = NetworkResponseExecutionSource().opaqueObjectDataWrapper(for: object)
+    let actual = MockSchemaMetadata.cacheKey(for: objectDict)
+
+    expect(actual).to(equal("Dog:10"))
+  }
+  
+  func test__schemaConfiguration__givenMultipleKeyFields_shouldReturnKeyFieldValues() {
+    let Delta = Object(typename: "Dog", implementedInterfaces: [], keyFields: ["id", "name"])
+
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in Delta })
+
+    let object: JSONObject = [
+      "__typename": "Dog",
+      "id": "10",
+      "name": #"Be\ag+le"#,
+      "height": 20,
+    ]
+
+    let objectDict = NetworkResponseExecutionSource().opaqueObjectDataWrapper(for: object)
+    let actual = MockSchemaMetadata.cacheKey(for: objectDict)
+
+    expect(actual).to(equal(#"Dog:10+Be\\ag\+le"#))
+  }
+  
+  func test__schemaConfiguration__givenMissingKeyFields_shouldReturnNil() {
+    let Delta = Object(typename: "Dog", implementedInterfaces: [], keyFields: ["id", "name"])
+
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in Delta })
+
+    let object: JSONObject = [
+      "__typename": "Dog",
+      "id": "10",
+    ]
+
+    let objectDict = NetworkResponseExecutionSource().opaqueObjectDataWrapper(for: object)
+    let actual = MockSchemaMetadata.cacheKey(for: objectDict)
+
+    expect(actual).to(beNil())
+  }
+  
+  func test__schemaConfiguration__givenInterfaceWithKeyField_shouldReturnKeyFieldValue() {
+    let Interface = Interface(name: "Animal", keyFields: ["id"])
+
+    let object: JSONObject = [
+      "__typename": "Cat",
+      "id": "10",
+    ]
+
+    let objectDict = NetworkResponseExecutionSource().opaqueObjectDataWrapper(for: object)
+    let actual = MockSchemaMetadata.cacheKey(for: objectDict, withInterface: Interface)
+
+    expect(actual).to(equal("Cat:10"))
+  }
+  
 }
