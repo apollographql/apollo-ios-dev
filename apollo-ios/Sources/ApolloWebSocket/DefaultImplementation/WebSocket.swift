@@ -213,7 +213,7 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
   private var writeQueue = OperationQueue()
   private var readStack = [WSResponse]()
   private var inputQueue = [Data]()
-  @Atomic private var fragBuffer: Data?
+  private var fragBuffer: Data?
   private var certValidated = false
   private var didDisconnect = false
   private var readyToWrite = false
@@ -566,7 +566,7 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
    */
   private func cleanupStream() {
     stream.cleanup()
-    $fragBuffer.mutate { $0 = nil }
+    fragBuffer = nil
   }
 
   /**
@@ -597,7 +597,7 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
           var combine = NSData(data: buffer) as Data
           combine.append(data)
           work = combine
-          $fragBuffer.mutate { $0 = nil }
+          fragBuffer = nil
         }
         let buffer = UnsafeRawPointer((work as NSData).bytes).assumingMemoryBound(to: UInt8.self)
         let length = work.count
@@ -620,7 +620,7 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
     case 0:
       break
     case -1:
-      $fragBuffer.mutate { $0 = Data(bytes: buffer, count: bufferLen) }
+      fragBuffer = Data(bytes: buffer, count: bufferLen)
       break // do nothing, we are going to collect more data
     default:
       doDisconnect(WSError(type: .upgradeError, message: "Invalid HTTP upgrade", code: code))
@@ -797,7 +797,7 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
     guard let baseAddress = buffer.baseAddress else {return emptyBuffer}
     let bufferLen = buffer.count
     if response != nil && bufferLen < 2 {
-      $fragBuffer.mutate { $0 = Data(buffer: buffer) }
+      fragBuffer = Data(buffer: buffer)
       return emptyBuffer
     }
     if let response = response, response.bytesLeft > 0 {
@@ -869,7 +869,7 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
         offset += MemoryLayout<UInt16>.size
       }
       if bufferLen < offset || UInt64(bufferLen - offset) < dataLength {
-        $fragBuffer.mutate { $0 = Data(bytes: baseAddress, count: bufferLen) }
+        fragBuffer = Data(bytes: baseAddress, count: bufferLen)
         return emptyBuffer
       }
       var len = dataLength
@@ -978,7 +978,7 @@ public final class WebSocket: NSObject, WebSocketClient, StreamDelegate, WebSock
       buffer = processOneRawMessage(inBuffer: buffer)
     } while buffer.count >= 2
     if buffer.count > 0 {
-      $fragBuffer.mutate { $0 = Data(buffer: buffer) }
+      fragBuffer = Data(buffer: buffer)
     }
   }
 
