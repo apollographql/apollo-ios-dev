@@ -10,7 +10,6 @@
 
 import Foundation
 import CommonCrypto
-import Apollo
 
 //Standard WebSocket close codes
 enum CloseCode : UInt16 {
