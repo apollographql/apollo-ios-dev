@@ -13,5 +13,6 @@ struct EnumFileGenerator: FileGenerator {
   }
 
   var target: FileTarget { .enum }
-  var fileName: String { graphqlEnum.render(as: .filename) + ".enum" }
+  var fileName: String { graphqlEnum.render(as: .filename) }
+  var fileSuffix: String? { ".enum" }
 }

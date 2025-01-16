@@ -13,5 +13,6 @@ struct UnionFileGenerator: FileGenerator {
     config: config
   ) }
   var target: FileTarget { .union }
-  var fileName: String { graphqlUnion.render(as: .filename) + ".union" }
+  var fileName: String { graphqlUnion.render(as: .filename) }
+  var fileSuffix: String? { ".union" }
 }
