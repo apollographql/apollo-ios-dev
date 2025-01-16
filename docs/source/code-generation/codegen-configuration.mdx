@@ -461,6 +461,7 @@ The top-level properties are:
 | [`pruneGeneratedFiles`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/prunegeneratedfiles) | Whether unused generated files will be automatically deleted. |
 | [`markOperationDefinitionsAsFinal`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/markOperationDefinitionsAsFinal) | Whether generated GraphQL operation and local cache mutation class types will be marked as `final`. |
 | [`schemaCustomization`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/schemacustomization) | Customization options to be applied to the schema during code generation. |
+| [`appendSchemaTypeFilenameSuffix`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/appendSchemaTypeFilenameSuffix) | `true` will add a filename suffix matching the schema type, the default is `false`. This can be used to avoid filename conflicts when operation type names match schema type names. |
 
 <MultiCodeBlock>
 
@@ -472,6 +473,7 @@ The top-level properties are:
       "singularRegex": "animal"
     }
   }],
+  "appendSchemaTypeFilenameSuffix": false,
   "deprecatedEnumCases": "include",
   "schemaDocumentation": "include",
   "selectionSetInitializers" : {
@@ -526,6 +528,7 @@ let configuration = ApolloCodegenConfiguration(
         replacementRegex: "animals"
       )
     ],
+    appendSchemaTypeFilenameSuffix: false.
     deprecatedEnumCases: .include,
     schemaDocumentation: .include,
     selectionSetInitializers: [
@@ -956,6 +959,7 @@ Below is an example that illustrates an `apollo-codegen-config.json` where every
         }
       }
     ],
+    "appendSchemaTypeFilenameSuffix": false,
     "cocoapodsCompatibleImportStatements" : true,
     "conversionStrategies" : {
       "enumCases" : "none",
