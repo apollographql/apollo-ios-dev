@@ -690,6 +690,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public let pruneGeneratedFiles: Bool
     /// Whether generated GraphQL operation and local cache mutation class types will be marked as `final`.
     public let markOperationDefinitionsAsFinal: Bool
+    /// `true` will add a filename suffix matching the schema type, the default is `false`. This can be used to
+    /// avoid filename conflicts when operation type names match schema type names.
+    public let appendSchemaTypeFilenameSuffix: Bool
 
     /// Default property values
     public struct Default {
@@ -705,6 +708,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       public static let conversionStrategies: ConversionStrategies = .init()
       public static let pruneGeneratedFiles: Bool = true
       public static let markOperationDefinitionsAsFinal: Bool = false
+      public static let appendSchemaTypeFilenameSuffix: Bool = false
     }
 
     /// Designated initializer.
@@ -725,7 +729,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     ///   - conversionStrategies: Rules for how to convert the names of values from the schema in
     ///     generated code.
     ///   - pruneGeneratedFiles: Whether unused generated files will be automatically deleted.
-    ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation class types will be marked as `final`.
+    ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation
+    ///     class types will be marked as `final`.
+    ///   - appendSchemaTypeFilenameSuffix: `true` will add a filename suffix matching the schema type, the
+    ///     default is `false`. This can be used to avoid filename conflicts when operation type names match
+    ///     schema type names.
     public init(
       additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
       deprecatedEnumCases: Composition = Default.deprecatedEnumCases,
@@ -737,7 +745,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       warningsOnDeprecatedUsage: Composition = Default.warningsOnDeprecatedUsage,
       conversionStrategies: ConversionStrategies = Default.conversionStrategies,
       pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-      markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
+      markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
+      appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix
     ) {
       self.additionalInflectionRules = additionalInflectionRules
       self.deprecatedEnumCases = deprecatedEnumCases
@@ -750,6 +759,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       self.conversionStrategies = conversionStrategies
       self.pruneGeneratedFiles = pruneGeneratedFiles
       self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
+      self.appendSchemaTypeFilenameSuffix = appendSchemaTypeFilenameSuffix
     }
 
     // MARK: Codable
@@ -768,6 +778,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case conversionStrategies
       case pruneGeneratedFiles
       case markOperationDefinitionsAsFinal
+      case appendSchemaTypeFilenameSuffix
     }
 
     public init(from decoder: any Decoder) throws {
@@ -833,6 +844,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         Bool.self,
         forKey: .markOperationDefinitionsAsFinal
       ) ?? Default.markOperationDefinitionsAsFinal
+
+      appendSchemaTypeFilenameSuffix = try values.decodeIfPresent(
+        Bool.self,
+        forKey: .appendSchemaTypeFilenameSuffix
+      ) ?? Default.appendSchemaTypeFilenameSuffix
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -849,6 +865,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       try container.encode(self.conversionStrategies, forKey: .conversionStrategies)
       try container.encode(self.pruneGeneratedFiles, forKey: .pruneGeneratedFiles)
       try container.encode(self.markOperationDefinitionsAsFinal, forKey: .markOperationDefinitionsAsFinal)
+      try container.encode(self.appendSchemaTypeFilenameSuffix, forKey: .appendSchemaTypeFilenameSuffix)
     }
   }
 
@@ -1702,7 +1719,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///   - pruneGeneratedFiles: Whether unused generated files will be automatically deleted.
   ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation class types will be marked as `final`.
   @available(*, deprecated,
-              renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:)"
+              renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
   )
   public init(
     additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
@@ -1728,6 +1745,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.pruneGeneratedFiles = pruneGeneratedFiles
     self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
     self.schemaCustomization = Default.schemaCustomization
+    self.appendSchemaTypeFilenameSuffix = Default.appendSchemaTypeFilenameSuffix
   }
   
   /// Deprecated initializer.
@@ -1778,6 +1796,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.pruneGeneratedFiles = pruneGeneratedFiles
     self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
     self.schemaCustomization = Default.schemaCustomization
+    self.appendSchemaTypeFilenameSuffix = Default.appendSchemaTypeFilenameSuffix
   }
 
   /// Whether the generated operations should use Automatic Persisted Queries.
