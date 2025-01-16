@@ -108,6 +108,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
               }
             }
           ],
+          "appendSchemaTypeFilenameSuffix" : false,
           "cocoapodsCompatibleImportStatements" : true,
           "conversionStrategies" : {
             "enumCases" : "none",
@@ -1282,6 +1283,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "additionalInflectionRules" : [
 
           ],
+          "appendSchemaTypeFilenameSuffix" : false,
           "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
@@ -1473,6 +1475,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "additionalInflectionRules" : [
 
           ],
+          "appendSchemaTypeFilenameSuffix" : false,
           "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
@@ -1664,6 +1667,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "additionalInflectionRules" : [
 
           ],
+          "appendSchemaTypeFilenameSuffix" : false,
           "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
@@ -1766,6 +1770,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "additionalInflectionRules" : [
 
           ],
+          "appendSchemaTypeFilenameSuffix" : false,
           "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
@@ -1872,6 +1877,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "additionalInflectionRules" : [
 
           ],
+          "appendSchemaTypeFilenameSuffix" : false,
           "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
@@ -1978,6 +1984,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "additionalInflectionRules" : [
 
           ],
+          "appendSchemaTypeFilenameSuffix" : false,
           "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
@@ -2084,6 +2091,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "additionalInflectionRules" : [
 
           ],
+          "appendSchemaTypeFilenameSuffix" : false,
           "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
@@ -2190,6 +2198,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "additionalInflectionRules" : [
 
           ],
+          "appendSchemaTypeFilenameSuffix" : false,
           "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
@@ -2296,6 +2305,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "additionalInflectionRules" : [
 
           ],
+          "appendSchemaTypeFilenameSuffix" : false,
           "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
