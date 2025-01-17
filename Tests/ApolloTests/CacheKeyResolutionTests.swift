@@ -209,6 +209,8 @@ class CacheKeyResolutionTests: XCTestCase {
     expect(actual).to(equal("GreekLetters:δ"))
   }
 
+  // MARK: - Key Fields
+  
   func test__schemaConfiguration__givenSingleKeyField_shouldReturnKeyFieldValue() {
     let Delta = Object(typename: "Dog", implementedInterfaces: [], keyFields: ["id"])
 
@@ -269,7 +271,10 @@ class CacheKeyResolutionTests: XCTestCase {
     ]
 
     let objectDict = NetworkResponseExecutionSource().opaqueObjectDataWrapper(for: object)
-    let actual = MockSchemaMetadata.cacheKey(for: objectDict, withInterface: Interface)
+    let actual = MockSchemaMetadata.cacheKey(
+      for: objectDict,
+      inferredToImplementInterface: Interface
+    )
 
     expect(actual).to(equal("Cat:10"))
   }

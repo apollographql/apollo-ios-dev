@@ -497,7 +497,11 @@ public final class GraphQLExecutor<Source: GraphQLExecutionSource> {
     
     let (childExecutionInfo, selections) = fieldInfo.computeChildExecutionData(
       withRootType: rootSelectionSetType,
-      cacheKey: executionSource.computeCacheKey(for: object, in: fieldInfo.parentInfo.schema, withInterface: expectedInterface)
+      cacheKey: executionSource.computeCacheKey(
+        for: object,
+        in: fieldInfo.parentInfo.schema,
+        inferredToImplementInterface: expectedInterface
+      )
     )
     
     return execute(
