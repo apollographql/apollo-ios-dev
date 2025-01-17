@@ -63,7 +63,8 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             inputObjects: .none
           ),
           pruneGeneratedFiles: false,
-          markOperationDefinitionsAsFinal: true
+          markOperationDefinitionsAsFinal: true,
+          appendSchemaTypeFilenameSuffix: true
         ),
         experimentalFeatures: .init(
           fieldMerging: .all,
@@ -108,7 +109,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
               }
             }
           ],
-          "appendSchemaTypeFilenameSuffix" : false,
+          "appendSchemaTypeFilenameSuffix" : true,
           "cocoapodsCompatibleImportStatements" : true,
           "conversionStrategies" : {
             "enumCases" : "none",
