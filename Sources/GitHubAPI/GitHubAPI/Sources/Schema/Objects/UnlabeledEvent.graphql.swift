@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents an 'unlabeled' event on a given issue or pull request.
   static let UnlabeledEvent = ApolloAPI.Object(
     typename: "UnlabeledEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

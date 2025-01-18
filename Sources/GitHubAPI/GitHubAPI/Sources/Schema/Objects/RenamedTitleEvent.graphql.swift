@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents a 'renamed' event on a given issue or pull request
   static let RenamedTitleEvent = ApolloAPI.Object(
     typename: "RenamedTitleEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

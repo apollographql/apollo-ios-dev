@@ -5,5 +5,5 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Represents a comment.
-  static let Comment = ApolloAPI.Interface(name: "Comment")
+  static let Comment = ApolloAPI.Interface(name: "Comment", keyFields: nil)
 }

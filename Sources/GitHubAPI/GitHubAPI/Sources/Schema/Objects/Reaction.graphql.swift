@@ -7,6 +7,7 @@ public extension Objects {
   /// An emoji reaction to a particular piece of content.
   static let Reaction = ApolloAPI.Object(
     typename: "Reaction",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

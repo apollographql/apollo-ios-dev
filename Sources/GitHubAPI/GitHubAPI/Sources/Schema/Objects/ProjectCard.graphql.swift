@@ -7,6 +7,7 @@ public extension Objects {
   /// A card in a project.
   static let ProjectCard = ApolloAPI.Object(
     typename: "ProjectCard",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

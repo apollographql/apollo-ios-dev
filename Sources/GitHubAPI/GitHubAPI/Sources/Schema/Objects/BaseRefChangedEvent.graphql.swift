@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents a 'base_ref_changed' event on a given issue or pull request.
   static let BaseRefChangedEvent = ApolloAPI.Object(
     typename: "BaseRefChangedEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

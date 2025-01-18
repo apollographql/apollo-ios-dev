@@ -10,6 +10,7 @@ public extension Objects {
     implementedInterfaces: [
       Interfaces.Node.self,
       Interfaces.RepositoryNode.self
-    ]
+    ],
+    keyFields: nil
   )
 }

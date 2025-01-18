@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents a 'subscribed' event on a given `Subscribable`.
   static let SubscribedEvent = ApolloAPI.Object(
     typename: "SubscribedEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

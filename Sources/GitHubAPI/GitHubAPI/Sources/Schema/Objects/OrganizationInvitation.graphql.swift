@@ -7,6 +7,7 @@ public extension Objects {
   /// An Invitation for a user to an organization.
   static let OrganizationInvitation = ApolloAPI.Object(
     typename: "OrganizationInvitation",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

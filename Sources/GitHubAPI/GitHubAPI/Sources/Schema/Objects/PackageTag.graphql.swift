@@ -7,6 +7,7 @@ public extension Objects {
   /// A version tag contains the mapping between a tag name and a version.
   static let PackageTag = ApolloAPI.Object(
     typename: "PackageTag",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

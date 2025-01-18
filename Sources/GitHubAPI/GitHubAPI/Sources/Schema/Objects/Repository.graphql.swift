@@ -15,6 +15,7 @@ public extension Objects {
       Interfaces.Starrable.self,
       Interfaces.Subscribable.self,
       Interfaces.UniformResourceLocatable.self
-    ]
+    ],
+    keyFields: nil
   )
 }

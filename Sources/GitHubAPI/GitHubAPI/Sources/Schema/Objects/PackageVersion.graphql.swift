@@ -7,6 +7,7 @@ public extension Objects {
   /// Information about a specific package version.
   static let PackageVersion = ApolloAPI.Object(
     typename: "PackageVersion",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

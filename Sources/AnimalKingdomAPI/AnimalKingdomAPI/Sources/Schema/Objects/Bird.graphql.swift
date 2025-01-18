@@ -10,6 +10,7 @@ public extension Objects {
       Interfaces.Animal.self,
       Interfaces.Pet.self,
       Interfaces.WarmBlooded.self
-    ]
+    ],
+    keyFields: ["id"]
   )
 }

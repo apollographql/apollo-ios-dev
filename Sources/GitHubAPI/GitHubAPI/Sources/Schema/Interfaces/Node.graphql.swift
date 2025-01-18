@@ -5,5 +5,5 @@ import ApolloAPI
 
 public extension Interfaces {
   /// An object with an ID.
-  static let Node = ApolloAPI.Interface(name: "Node")
+  static let Node = ApolloAPI.Interface(name: "Node", keyFields: nil)
 }
