@@ -2113,6 +2113,152 @@ class ApolloCodegenTests: XCTestCase {
     expect(ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderUserFile)).to(beTrue())
   }
 
+  // MARK: Suffix Renaming Tests
+
+  func test__fileRenaming__givenGeneratedPreSuffixFilesExist_withAppendSchemaFilenameSuffix_true_shouldRenameFileWithSuffix() async throws {
+    // given
+    try createFile(
+      containing: """
+      type Query {
+        allBooks: [Book!]!
+      }
+      
+      scalar CustomDate
+      
+      type Book {
+        publishedDate: CustomDate!
+        author: Author!
+      }
+      
+      type Author {
+        name: String!
+      }
+      """.asData,
+      named: "schema.graphqls"
+    )
+
+    try createFile(
+      containing: """
+      query AllBooks {
+        allBooks {
+          publishedDate
+          author {
+            name
+          }
+        }
+      }
+      """.asData,
+      named: "AllBooksQuery.graphql"
+    )
+
+    // Create the pre-suffixed generated file and validate that it exists
+    let customScalarsDirectory = "SchemaModule/Sources/Schema/CustomScalars"
+    let preSuffixFilename = "CustomDate.swift"
+
+    try createFile(filename: preSuffixFilename, inDirectory: customScalarsDirectory)
+
+    expect(ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)"))
+    .to(beTrue())
+
+    // when
+    let config = ApolloCodegenConfiguration.mock(
+      input: .init(
+        schemaSearchPaths: ["schema*.graphqls"],
+        operationSearchPaths: ["*.graphql"]
+      ),
+      output: .init(
+        schemaTypes: .init(path: "SchemaModule", moduleType: .swiftPackage()),
+        operations: .inSchemaModule
+      ),
+      options: .init(
+        appendSchemaTypeFilenameSuffix: true
+      )
+    ) 
+
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
+
+    // then
+    expect(ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/CustomDate.scalar.swift"))
+    .to(beTrue())
+    expect(ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)"))
+    .to(beFalse())
+  }
+
+  func test__fileRenaming__givenGeneratedPreSuffixFilesExist_withAppendSchemaFilenameSuffix_false_shouldNotRenameFile() async throws {
+    // given
+    try createFile(
+      containing: """
+      type Query {
+        allBooks: [Book!]!
+      }
+      
+      scalar CustomDate
+      
+      type Book {
+        publishedDate: CustomDate!
+        author: Author!
+      }
+      
+      type Author {
+        name: String!
+      }
+      """.asData,
+      named: "schema.graphqls"
+    )
+
+    try createFile(
+      containing: """
+      query AllBooks {
+        allBooks {
+          publishedDate
+          author {
+            name
+          }
+        }
+      }
+      """.asData,
+      named: "AllBooksQuery.graphql"
+    )
+
+    // Create the pre-suffixed generated file and validate that it exists
+    let customScalarsDirectory = "SchemaModule/Sources/Schema/CustomScalars"
+    let preSuffixFilename = "CustomDate.swift"
+
+    try createFile(filename: preSuffixFilename, inDirectory: customScalarsDirectory)
+
+    expect(ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)"))
+    .to(beTrue())
+
+    // when
+    let config = ApolloCodegenConfiguration.mock(
+      input: .init(
+        schemaSearchPaths: ["schema*.graphqls"],
+        operationSearchPaths: ["*.graphql"]
+      ),
+      output: .init(
+        schemaTypes: .init(path: "SchemaModule", moduleType: .swiftPackage()),
+        operations: .inSchemaModule
+      ),
+      options: .init(
+        appendSchemaTypeFilenameSuffix: false
+      )
+    )
+
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
+
+    // then
+    expect(ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/CustomDate.scalar.swift"))
+    .to(beFalse())
+    expect(ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)"))
+    .to(beTrue())
+  }
+
   // MARK: Validation Tests
 
   func test_validation_givenTestMockConfiguration_asSwiftPackage_withSchemaTypesModule_asEmbeddedInTarget_shouldThrow() throws {
