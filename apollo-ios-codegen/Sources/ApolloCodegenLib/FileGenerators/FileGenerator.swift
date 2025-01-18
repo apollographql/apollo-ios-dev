@@ -37,6 +37,17 @@ extension FileGenerator {
 
     let (rendered, errors) = template.render()
 
+    if !self.overwrite, let _ = fileSuffix {
+      let preSuffixFilename = fileName.firstUppercased
+      let preSuffixFilePath = URL(fileURLWithPath: directoryPath)
+        .resolvingSymlinksInPath()
+        .appendingPathComponent(preSuffixFilename)
+        .appendingPathExtension(fileExtension)
+        .path
+
+      try await fileManager.renameFile(atPath: preSuffixFilePath, toPath: filePath)
+    }
+
     try await fileManager.createFile(
       atPath: filePath,
       data: rendered.data(using: .utf8),
