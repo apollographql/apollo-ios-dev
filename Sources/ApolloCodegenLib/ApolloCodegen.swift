@@ -295,10 +295,16 @@ public class ApolloCodegen {
     ir: IRBuilder,
     fileManager: ApolloFileManager
   ) async throws -> NonFatalErrors {
+    let mergeNamedFragmentFields = config.experimentalFeatures.fieldMerging.options
+      .contains(.namedFragments)
+
     return try await nonFatalErrorCollectingTaskGroup() { group in
       for fragment in fragments {
         group.addTask {
-          let irFragment = await ir.build(fragment: fragment)
+          let irFragment = await ir.build(
+            fragment: fragment,
+            mergingNamedFragmentFields: mergeNamedFragmentFields
+          )
 
           let errors = try await FragmentFileGenerator(irFragment: irFragment, config: self.config)
             .generate(forConfig: self.config, fileManager: fileManager)
@@ -310,7 +316,10 @@ public class ApolloCodegen {
         group.addTask {
           async let identifier = self.operationIdentifierFactory.identifier(for: operation)
 
-          let irOperation = await ir.build(operation: operation)
+          let irOperation = await ir.build(
+            operation: operation,
+            mergingNamedFragmentFields: mergeNamedFragmentFields
+          )
 
           let errors = try await OperationFileGenerator(
             irOperation: irOperation,
