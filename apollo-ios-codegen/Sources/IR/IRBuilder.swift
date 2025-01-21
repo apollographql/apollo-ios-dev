@@ -23,7 +23,8 @@ public class IRBuilder {
   }
 
   public func build(
-    operation operationDefinition: CompilationResult.OperationDefinition
+    operation operationDefinition: CompilationResult.OperationDefinition,
+    mergingNamedFragmentFields: Bool = true
   ) async -> Operation {
     let rootField = CompilationResult.Field(
       name: operationDefinition.operationType.rawValue,
@@ -38,7 +39,8 @@ public class IRBuilder {
     let result = await RootFieldBuilder.buildRootEntityField(
       forRootField: rootField,
       onRootEntity: rootEntity,
-      inIR: self
+      inIR: self,
+      mergingNamedFragmentFields: mergingNamedFragmentFields
     )
 
     return Operation(
@@ -86,7 +88,8 @@ public class IRBuilder {
   }
 
   public func build(
-    fragment fragmentDefinition: CompilationResult.FragmentDefinition
+    fragment fragmentDefinition: CompilationResult.FragmentDefinition,
+    mergingNamedFragmentFields: Bool = true
   ) async -> NamedFragment {
     await builtFragmentStorage.getFragment(named: fragmentDefinition.name) {
       let rootField = CompilationResult.Field(
@@ -102,7 +105,8 @@ public class IRBuilder {
       let result = await RootFieldBuilder.buildRootEntityField(
         forRootField: rootField,
         onRootEntity: rootEntity,
-        inIR: self
+        inIR: self,
+        mergingNamedFragmentFields: mergingNamedFragmentFields
       )
 
       return NamedFragment(
