@@ -31,13 +31,11 @@ struct DeferredFragmentsMetadataTemplate {
 
     return """
 
-    // MARK: Deferred Fragment Metadata
+    // MARK: - Deferred Fragment Metadata
 
-    \(renderAccessControl())extension \(operation.generatedDefinitionName) {
-      \(DeferredFragmentIdentifiersTemplate(deferredFragmentPathTypeInfo))
+    \(DeferredFragmentIdentifiersTemplate(deferredFragmentPathTypeInfo))
 
-      \(DeferredFragmentsPropertyTemplate(deferredFragmentPathTypeInfo))
-    }
+    \(DeferredFragmentsPropertyTemplate(deferredFragmentPathTypeInfo))
     """
   }
 
@@ -61,7 +59,7 @@ struct DeferredFragmentsMetadataTemplate {
     _ deferredFragmentPathTypeInfo: [DeferredPathTypeInfo]
   ) -> TemplateString {
     """
-    static var deferredFragments: [DeferredFragmentIdentifier: any \(config.ApolloAPITargetName).SelectionSet.Type]? {[
+    public static var deferredFragments: [DeferredFragmentIdentifier: any \(config.ApolloAPITargetName).SelectionSet.Type]? {[
     \(deferredFragmentPathTypeInfo.map {
       return """
         DeferredFragmentIdentifiers.\($0.deferCondition.label): \($0.typeName).self,

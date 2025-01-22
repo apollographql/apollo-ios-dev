@@ -41,12 +41,12 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
             renderAccessControl: { accessControlModifier(for: .member) }()
         ).renderBody())
       }
+      \(DeferredFragmentsMetadataTemplate(
+        operation: operation,
+        config: config,
+        renderAccessControl: { accessControlModifier(for: .parent) }()
+      ).render())
     }
-    \(DeferredFragmentsMetadataTemplate(
-      operation: operation,
-      config: config,
-      renderAccessControl: { accessControlModifier(for: .parent) }()
-    ).render())
 
     """)
   }

@@ -1072,7 +1072,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
   
   // MARK: - Defer Metadata
   
-  func test__generateMetadata__whenContainsDeferredFragment_rendersDeferMetadata() async throws {
+  func test__generateMetadata__givenDeferredFragment_whenModuleTypeIsSwiftPackage_rendersDeferMetadataWithinClassScope() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -1103,6 +1103,8 @@ class OperationDefinitionTemplateTests: XCTestCase {
     """
 
     // when
+    config = .mock(.swiftPackage(apolloSDKDependency: .default))
+    
     try await buildSubjectAndOperation()
     let actual = renderSubject()
     
@@ -1111,26 +1113,151 @@ class OperationDefinitionTemplateTests: XCTestCase {
     
     expect(actual).to(equalLineByLine(
       """
-      }
+        }
+        
+        // MARK: - Deferred Fragment Metadata
       
-      // MARK: Deferred Fragment Metadata
-      
-      extension TestOperationQuery {
+        enum DeferredFragmentIdentifiers {
       """,
-      atLine: 61,
+      atLine: 64,
       ignoringExtraLines: true
     ))
     
     expect(actual).to(equalLineByLine(
       """
+        ]}
       }
 
       """,
-      atLine: 73,
+      atLine: 74,
       ignoringExtraLines: false
     ))
   }
-  
+
+  func test__generateMetadata__givenDeferredFragment_whenModuleTypeIsEmbeddedInTarget_rendersDeferMetadataWithinClassScope() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    config = .mock(.embeddedInTarget(name: "MockApplication"))
+
+    try await buildSubjectAndOperation()
+    let actual = renderSubject()
+
+    // then
+    expect(self.operation.containsDeferredFragment).to(beTrue())
+
+    expect(actual).to(equalLineByLine(
+      """
+        }
+        
+        // MARK: - Deferred Fragment Metadata
+      
+        enum DeferredFragmentIdentifiers {
+      """,
+      atLine: 64,
+      ignoringExtraLines: true
+    ))
+
+    expect(actual).to(equalLineByLine(
+      """
+        ]}
+      }
+
+      """,
+      atLine: 74,
+      ignoringExtraLines: false
+    ))
+  }
+
+  func test__generateMetadata__givenDeferredFragment_whenModuleTypeIsOther_rendersDeferMetadataWithinClassScope() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      id: String!
+      species: String!
+    }
+
+    type Dog implements Animal {
+      id: String!
+      species: String!
+    }
+    """.appendingDeferDirective()
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        __typename
+        id
+        ... @defer(label: "root") {
+          species
+        }
+      }
+    }
+    """
+
+    // when
+    config = .mock(.other)
+
+    try await buildSubjectAndOperation()
+    let actual = renderSubject()
+
+    // then
+    expect(self.operation.containsDeferredFragment).to(beTrue())
+
+    expect(actual).to(equalLineByLine(
+      """
+        }
+        
+        // MARK: - Deferred Fragment Metadata
+      
+        enum DeferredFragmentIdentifiers {
+      """,
+      atLine: 64,
+      ignoringExtraLines: true
+    ))
+
+    expect(actual).to(equalLineByLine(
+      """
+        ]}
+      }
+
+      """,
+      atLine: 74,
+      ignoringExtraLines: false
+    ))
+  }
+
   func test__generateMetadata__whenDoesNotContainDeferredFragment_doesNotRenderDeferMetadata() async throws {
     // given
     schemaSDL = """
