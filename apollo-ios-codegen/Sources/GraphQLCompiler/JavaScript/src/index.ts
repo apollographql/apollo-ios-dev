@@ -17,10 +17,11 @@ import { assertValidSchema, assertValidSDL } from "./utilities/graphql";
 import {
   addApolloCodegenSchemaExtensionToDocument,
 } from "./utilities/apolloCodegenSchemaExtension";
-import { 
+import {
   addExperimentalDeferDirectiveToSDLDocument,
   addExperimentalDeferDirectiveToIntrospectionSchema
 } from "./utilities/experimentalDeferDirective";
+import { addTypePolicyDirectivesToSchema } from "./utilities/typePolicyDirective";
 
 // We need to export all the classes we want to map to native objects,
 // so we have access to the constructor functions for type checks.
@@ -61,6 +62,7 @@ export function loadSchemaFromSources(sources: Source[]): GraphQLSchema {
     assertValidSDL(document)
 
     const schema = buildASTSchema(document, { assumeValid: true, assumeValidSDL: true })
+    addTypePolicyDirectivesToSchema(schema)
     assertValidSchema(schema)
 
     return schema
@@ -69,6 +71,7 @@ export function loadSchemaFromSources(sources: Source[]): GraphQLSchema {
     var schema = loadSchemaFromIntrospectionResult(introspectionJSONResult.body)
     document = addExperimentalDeferDirectiveToIntrospectionSchema(schema, document)
     schema = extendSchema(schema, document, { assumeValid: true, assumeValidSDL: true })
+    addTypePolicyDirectivesToSchema(schema)
 
     assertValidSchema(schema)
 

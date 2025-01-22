@@ -6,6 +6,7 @@ import ApolloAPI
 public extension Objects {
   static let Crocodile = ApolloAPI.Object(
     typename: "Crocodile",
-    implementedInterfaces: [Interfaces.Animal.self]
+    implementedInterfaces: [Interfaces.Animal.self],
+    keyFields: ["id"]
   )
 }

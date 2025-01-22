@@ -15,6 +15,7 @@ public extension Objects {
       Interfaces.RepositoryNode.self,
       Interfaces.Updatable.self,
       Interfaces.UpdatableComment.self
-    ]
+    ],
+    keyFields: nil
   )
 }

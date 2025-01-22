@@ -20,12 +20,14 @@ class ObjectTemplateTests: XCTestCase {
     name: String = "Dog",
     customName: String? = nil,
     interfaces: [GraphQLInterfaceType] = [],
+    keyFields: [String] = [],
     documentation: String? = nil,
     config: ApolloCodegenConfiguration = .mock()
   ) {
     let objectType = GraphQLObjectType.mock(
       name,
       interfaces: interfaces,
+      keyFields: keyFields,
       documentation: documentation
     )
     objectType.name.customName = customName
@@ -82,7 +84,7 @@ class ObjectTemplateTests: XCTestCase {
       implementedInterfaces: [
         TestSchema.Interfaces.Animal.self,
         TestSchema.Interfaces.Pet.self
-      ]
+      ],
     """
 
     // when
@@ -106,7 +108,7 @@ class ObjectTemplateTests: XCTestCase {
       implementedInterfaces: [
         Interfaces.Animal.self,
         Interfaces.Pet.self
-      ]
+      ],
     """
 
     // when
@@ -121,7 +123,7 @@ class ObjectTemplateTests: XCTestCase {
     buildSubject()
 
     let expected = """
-      implementedInterfaces: []
+      implementedInterfaces: [],
     """
 
     // when
@@ -129,6 +131,39 @@ class ObjectTemplateTests: XCTestCase {
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 3, ignoringExtraLines: true))
+  }
+  
+  func test_render_givenKeyField_rendersKeyFieldArray() {
+    // given
+    buildSubject(keyFields: ["id"])
+
+    let expected = """
+      keyFields: ["id"]
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 4, ignoringExtraLines: true))
+  }
+  
+  func test_render_givenMultipleKeyFields_rendersKeyFieldArray() {
+    // given
+    buildSubject(keyFields: ["id", "species"])
+
+    let expected = """
+      keyFields: [
+        "id",
+        "species"
+      ]
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 4, ignoringExtraLines: true))
   }
 
   // MARK: Documentation Tests
@@ -213,7 +248,8 @@ class ObjectTemplateTests: XCTestCase {
     // Renamed from GraphQL schema value: 'MyObject'
     static let MyCustomObject = ApolloAPI.Object(
       typename: "MyObject",
-      implementedInterfaces: [TestSchema.Interfaces.MyCustomInterface.self]
+      implementedInterfaces: [TestSchema.Interfaces.MyCustomInterface.self],
+      keyFields: nil
     )
     """
 

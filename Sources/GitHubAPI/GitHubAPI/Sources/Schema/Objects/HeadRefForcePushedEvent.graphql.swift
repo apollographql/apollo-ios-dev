@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents a 'head_ref_force_pushed' event on a given pull request.
   static let HeadRefForcePushedEvent = ApolloAPI.Object(
     typename: "HeadRefForcePushedEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

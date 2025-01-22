@@ -7,6 +7,7 @@ public extension Objects {
   /// A column inside a project.
   static let ProjectColumn = ApolloAPI.Object(
     typename: "ProjectColumn",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

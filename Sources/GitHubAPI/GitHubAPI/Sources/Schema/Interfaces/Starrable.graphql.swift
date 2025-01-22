@@ -5,5 +5,5 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Things that can be starred.
-  static let Starrable = ApolloAPI.Interface(name: "Starrable")
+  static let Starrable = ApolloAPI.Interface(name: "Starrable", keyFields: nil)
 }

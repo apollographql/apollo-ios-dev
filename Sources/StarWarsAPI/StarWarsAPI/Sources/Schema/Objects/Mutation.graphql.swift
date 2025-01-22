@@ -7,6 +7,7 @@ public extension Objects {
   /// The mutation type, represents all updates we can make to our data
   static let Mutation = ApolloAPI.Object(
     typename: "Mutation",
-    implementedInterfaces: []
+    implementedInterfaces: [],
+    keyFields: nil
   )
 }

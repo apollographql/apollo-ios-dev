@@ -7,6 +7,7 @@ public extension Objects {
   /// The connection type for Issue.
   static let IssueConnection = ApolloAPI.Object(
     typename: "IssueConnection",
-    implementedInterfaces: []
+    implementedInterfaces: [],
+    keyFields: nil
   )
 }

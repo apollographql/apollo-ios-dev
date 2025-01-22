@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents an 'unassigned' event on any assignable object.
   static let UnassignedEvent = ApolloAPI.Object(
     typename: "UnassignedEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

@@ -16,6 +16,7 @@ public extension Objects {
       Interfaces.RepositoryOwner.self,
       Interfaces.Sponsorable.self,
       Interfaces.UniformResourceLocatable.self
-    ]
+    ],
+    keyFields: nil
   )
 }

@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents an 'assigned' event on any assignable object.
   static let AssignedEvent = ApolloAPI.Object(
     typename: "AssignedEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

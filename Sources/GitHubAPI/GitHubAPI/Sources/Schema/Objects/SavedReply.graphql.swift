@@ -7,6 +7,7 @@ public extension Objects {
   /// A Saved Reply is text a user can use to reply quickly.
   static let SavedReply = ApolloAPI.Object(
     typename: "SavedReply",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

@@ -11,6 +11,7 @@ public extension Objects {
       Interfaces.MemberStatusable.self,
       Interfaces.Node.self,
       Interfaces.Subscribable.self
-    ]
+    ],
+    keyFields: nil
   )
 }

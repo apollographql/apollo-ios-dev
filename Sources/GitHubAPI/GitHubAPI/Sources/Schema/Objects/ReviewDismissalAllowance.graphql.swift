@@ -7,6 +7,7 @@ public extension Objects {
   /// A team or user who has the ability to dismiss a review on a protected branch.
   static let ReviewDismissalAllowance = ApolloAPI.Object(
     typename: "ReviewDismissalAllowance",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

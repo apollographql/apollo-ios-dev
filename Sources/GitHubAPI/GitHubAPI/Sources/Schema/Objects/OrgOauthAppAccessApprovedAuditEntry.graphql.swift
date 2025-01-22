@@ -12,6 +12,7 @@ public extension Objects {
       Interfaces.Node.self,
       Interfaces.OauthApplicationAuditEntryData.self,
       Interfaces.OrganizationAuditEntryData.self
-    ]
+    ],
+    keyFields: nil
   )
 }

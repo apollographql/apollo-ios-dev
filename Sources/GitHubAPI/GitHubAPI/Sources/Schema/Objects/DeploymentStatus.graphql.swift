@@ -7,6 +7,7 @@ public extension Objects {
   /// Describes the status of a given deployment attempt.
   static let DeploymentStatus = ApolloAPI.Object(
     typename: "DeploymentStatus",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

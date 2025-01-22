@@ -7,6 +7,7 @@ public extension Objects {
   /// A team, user or app who has the ability to push to a protected branch.
   static let PushAllowance = ApolloAPI.Object(
     typename: "PushAllowance",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

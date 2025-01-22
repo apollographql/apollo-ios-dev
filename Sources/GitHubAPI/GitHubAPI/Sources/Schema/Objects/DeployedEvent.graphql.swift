@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents a 'deployed' event on a given pull request.
   static let DeployedEvent = ApolloAPI.Object(
     typename: "DeployedEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

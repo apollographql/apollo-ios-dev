@@ -9,6 +9,7 @@ public extension Objects {
     implementedInterfaces: [
       Interfaces.Animal.self,
       Interfaces.Pet.self
-    ]
+    ],
+    keyFields: ["id"]
   )
 }

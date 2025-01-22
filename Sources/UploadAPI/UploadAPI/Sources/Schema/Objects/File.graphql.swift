@@ -6,6 +6,7 @@ import ApolloAPI
 public extension Objects {
   static let File = ApolloAPI.Object(
     typename: "File",
-    implementedInterfaces: []
+    implementedInterfaces: [],
+    keyFields: nil
   )
 }

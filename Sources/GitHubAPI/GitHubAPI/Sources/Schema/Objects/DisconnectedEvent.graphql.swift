@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents a 'disconnected' event on a given issue or pull request.
   static let DisconnectedEvent = ApolloAPI.Object(
     typename: "DisconnectedEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

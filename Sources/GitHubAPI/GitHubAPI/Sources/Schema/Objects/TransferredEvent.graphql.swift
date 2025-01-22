@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents a 'transferred' event on a given issue or pull request.
   static let TransferredEvent = ApolloAPI.Object(
     typename: "TransferredEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

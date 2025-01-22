@@ -11,6 +11,7 @@ public extension Objects {
       Interfaces.AuditEntry.self,
       Interfaces.Node.self,
       Interfaces.OrganizationAuditEntryData.self
-    ]
+    ],
+    keyFields: nil
   )
 }

@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents a 'pinned' event on a given issue or pull request.
   static let PinnedEvent = ApolloAPI.Object(
     typename: "PinnedEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

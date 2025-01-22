@@ -11,6 +11,7 @@ public extension Objects {
       Interfaces.Closable.self,
       Interfaces.Node.self,
       Interfaces.UniformResourceLocatable.self
-    ]
+    ],
+    keyFields: nil
   )
 }

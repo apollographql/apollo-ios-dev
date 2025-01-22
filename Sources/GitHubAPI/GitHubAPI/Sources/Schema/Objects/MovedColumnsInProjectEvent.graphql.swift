@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents a 'moved_columns_in_project' event on a given issue or pull request.
   static let MovedColumnsInProjectEvent = ApolloAPI.Object(
     typename: "MovedColumnsInProjectEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

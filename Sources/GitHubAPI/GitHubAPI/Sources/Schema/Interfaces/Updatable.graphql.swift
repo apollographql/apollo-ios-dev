@@ -5,5 +5,5 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Entities that can be updated.
-  static let Updatable = ApolloAPI.Interface(name: "Updatable")
+  static let Updatable = ApolloAPI.Interface(name: "Updatable", keyFields: nil)
 }

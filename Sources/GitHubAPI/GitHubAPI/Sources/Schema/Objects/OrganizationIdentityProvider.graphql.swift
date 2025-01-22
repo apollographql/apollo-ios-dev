@@ -7,6 +7,7 @@ public extension Objects {
   /// An Identity Provider configured to provision SAML and SCIM identities for Organizations
   static let OrganizationIdentityProvider = ApolloAPI.Object(
     typename: "OrganizationIdentityProvider",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

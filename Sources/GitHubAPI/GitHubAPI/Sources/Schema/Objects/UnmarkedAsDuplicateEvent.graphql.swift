@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents an 'unmarked_as_duplicate' event on a given issue or pull request.
   static let UnmarkedAsDuplicateEvent = ApolloAPI.Object(
     typename: "UnmarkedAsDuplicateEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

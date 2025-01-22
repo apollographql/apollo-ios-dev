@@ -12,6 +12,7 @@ public extension Objects {
       Interfaces.Node.self,
       Interfaces.Subscribable.self,
       Interfaces.UniformResourceLocatable.self
-    ]
+    ],
+    keyFields: nil
   )
 }

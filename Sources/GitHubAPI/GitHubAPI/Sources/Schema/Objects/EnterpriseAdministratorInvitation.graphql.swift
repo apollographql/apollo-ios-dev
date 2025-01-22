@@ -7,6 +7,7 @@ public extension Objects {
   /// An invitation for a user to become an owner or billing manager of an enterprise.
   static let EnterpriseAdministratorInvitation = ApolloAPI.Object(
     typename: "EnterpriseAdministratorInvitation",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

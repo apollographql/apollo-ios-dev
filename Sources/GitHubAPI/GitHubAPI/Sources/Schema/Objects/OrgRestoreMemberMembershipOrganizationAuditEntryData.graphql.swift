@@ -7,6 +7,7 @@ public extension Objects {
   /// Metadata for an organization membership for org.restore_member actions
   static let OrgRestoreMemberMembershipOrganizationAuditEntryData = ApolloAPI.Object(
     typename: "OrgRestoreMemberMembershipOrganizationAuditEntryData",
-    implementedInterfaces: [Interfaces.OrganizationAuditEntryData.self]
+    implementedInterfaces: [Interfaces.OrganizationAuditEntryData.self],
+    keyFields: nil
   )
 }

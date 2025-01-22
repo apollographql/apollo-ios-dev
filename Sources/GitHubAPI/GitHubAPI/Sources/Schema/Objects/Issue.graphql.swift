@@ -20,6 +20,7 @@ public extension Objects {
       Interfaces.UniformResourceLocatable.self,
       Interfaces.Updatable.self,
       Interfaces.UpdatableComment.self
-    ]
+    ],
+    keyFields: nil
   )
 }

@@ -540,4 +540,85 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertNil(luke["height(unit:FOOT)"])
     XCTAssertNil(luke["height"])
   }
+
+  // MARK: - @typePolicy Tests
+
+  @MainActor
+  func test__execute__givenObjectOfTypeWithKeyFields_normalizesRecordsToReference() throws {
+    // given
+    class GivenSelectionSet: MockSelectionSet {
+      override class var __selections: [Selection] {[
+        .field("hero", Hero.self)
+      ]}
+
+      class Hero: MockSelectionSet {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [], keyFields: ["name"])
+        }
+
+        override class var __selections: [Selection] {[
+          .field("id", String.self),
+          .field("name", String.self),
+        ]}
+      }
+    }
+
+    MockSchemaMetadata.stub_objectTypeForTypeName { _ in
+      Object(typename: "Hero", implementedInterfaces: [], keyFields: ["name"])
+    }
+
+    let object: JSONObject = [
+      "hero": [
+        "__typename": "Hero",
+        "id": "2001",
+        "name": "R2-D2",
+      ]
+    ]
+
+    // when
+    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+
+    // then
+    XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
+                   CacheReference("Hero:R2-D2"))
+  }
+
+  @MainActor
+  func test__execute__givenObjectOfUnknownType_forInterfaceFieldWithKeyFields_normalizesRecordsToReference() throws {
+    // given
+    class GivenSelectionSet: MockSelectionSet {
+      override class var __selections: [Selection] {[
+        .field("hero", Hero.self)
+      ]}
+
+      class Hero: MockSelectionSet {
+        override class var __parentType: any ParentType {
+          Interface(name: "Hero", keyFields: ["name"])
+        }
+
+        override class var __selections: [Selection] {[
+          .field("id", String.self),
+          .field("name", String.self),
+        ]}
+      }
+    }
+
+    MockSchemaMetadata.stub_objectTypeForTypeName { _ in nil }
+
+    let object: JSONObject = [
+      "hero": [
+        "__typename": "Hero",
+        "id": "2001",
+        "name": "R2-D2",
+      ]
+    ]
+
+    // when
+    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+
+    // then
+    XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
+                   CacheReference("Hero:R2-D2"))
+  }
+  
 }

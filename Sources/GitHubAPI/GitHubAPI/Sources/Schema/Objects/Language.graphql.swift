@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents a given language found in repositories.
   static let Language = ApolloAPI.Object(
     typename: "Language",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

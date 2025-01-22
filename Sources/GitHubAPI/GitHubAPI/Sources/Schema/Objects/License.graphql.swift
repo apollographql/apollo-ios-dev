@@ -7,6 +7,7 @@ public extension Objects {
   /// A repository's open source license
   static let License = ApolloAPI.Object(
     typename: "License",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

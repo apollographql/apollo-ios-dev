@@ -7,6 +7,7 @@ public extension Objects {
   /// Represents a 'removed_from_project' event on a given issue or pull request.
   static let RemovedFromProjectEvent = ApolloAPI.Object(
     typename: "RemovedFromProjectEvent",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }

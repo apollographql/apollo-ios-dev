@@ -7,6 +7,7 @@ public extension Objects {
   /// A file in a package version.
   static let PackageFile = ApolloAPI.Object(
     typename: "PackageFile",
-    implementedInterfaces: [Interfaces.Node.self]
+    implementedInterfaces: [Interfaces.Node.self],
+    keyFields: nil
   )
 }
