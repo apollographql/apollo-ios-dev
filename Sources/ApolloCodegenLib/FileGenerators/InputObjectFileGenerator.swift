@@ -18,4 +18,5 @@ struct InputObjectFileGenerator: FileGenerator {
   }
   var target: FileTarget { .inputObject }
   var fileName: String { graphqlInputObject.render(as: .filename) }
+  var fileSuffix: String? { ".inputObject" }
 }
