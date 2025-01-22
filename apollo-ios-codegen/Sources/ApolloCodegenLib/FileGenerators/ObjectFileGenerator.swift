@@ -15,4 +15,5 @@ struct ObjectFileGenerator: FileGenerator {
 
   var target: FileTarget { .object }
   var fileName: String { graphqlObject.render(as: .filename) }
+  var fileSuffix: String? { ".object" }
 }

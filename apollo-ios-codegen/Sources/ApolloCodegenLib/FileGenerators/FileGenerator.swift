@@ -7,6 +7,7 @@ import GraphQLCompiler
 protocol FileGenerator {
   var fileName: String { get }
   var fileExtension: String { get }
+  var fileSuffix: String? { get }
   var overwrite: Bool { get }
   var template: any TemplateRenderer { get }
   var target: FileTarget { get }
@@ -15,6 +16,7 @@ protocol FileGenerator {
 extension FileGenerator {
   var overwrite: Bool { true }
   var fileExtension: String { overwrite ? "graphql.swift" : "swift" }
+  var fileSuffix: String? { nil }
 
   /// Generates the file writing the template content to the specified config output paths.
   ///
@@ -25,14 +27,26 @@ extension FileGenerator {
     forConfig config: ApolloCodegen.ConfigurationContext,
     fileManager: ApolloFileManager = .default
   ) async throws -> [ApolloCodegen.NonFatalError] {
+    let filename = resolveFilename(forConfig: config)
     let directoryPath = target.resolvePath(forConfig: config)
     let filePath = URL(fileURLWithPath: directoryPath)
       .resolvingSymlinksInPath()
-      .appendingPathComponent(fileName.firstUppercased)
+      .appendingPathComponent(filename)
       .appendingPathExtension(fileExtension)
       .path
 
     let (rendered, errors) = template.render()
+
+    if !self.overwrite, let _ = fileSuffix {
+      let preSuffixFilename = fileName.firstUppercased
+      let preSuffixFilePath = URL(fileURLWithPath: directoryPath)
+        .resolvingSymlinksInPath()
+        .appendingPathComponent(preSuffixFilename)
+        .appendingPathExtension(fileExtension)
+        .path
+
+      try await fileManager.renameFile(atPath: preSuffixFilePath, toPath: filePath)
+    }
 
     try await fileManager.createFile(
       atPath: filePath,
@@ -41,6 +55,16 @@ extension FileGenerator {
     )
 
     return errors
+  }
+
+  /// Filename to be used taking into account any generated filename options.
+  private func resolveFilename(forConfig config: ApolloCodegen.ConfigurationContext) -> String {
+    let prefix = fileName.firstUppercased
+    guard config.options.appendSchemaTypeFilenameSuffix, let suffix = self.fileSuffix else {
+      return prefix
+    }
+
+    return prefix + suffix
   }
 }
 

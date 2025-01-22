@@ -852,6 +852,122 @@ class ApolloCodegenTests: XCTestCase {
     expect(fileManager.allClosuresCalled).to(beTrue())
   }
 
+  func test_fileGenerators_givenSchemaAndOperationDocuments_whenAppendingFileSuffix_shouldGenerateSchemaFilenamesWithSuffix() async throws {
+    // given
+    let schemaPath = ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.Schema.path
+    let operationsPath = ApolloCodegenInternalTestHelpers.Resources.url
+      .appendingPathComponent("animalkingdom-graphql")
+      .appendingPathComponent("*.graphql").path
+
+    let config = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(
+      schemaNamespace: "AnimalKingdomAPI",
+      input: .init(
+        schemaPath: schemaPath,
+        operationSearchPaths: [operationsPath]
+      ),
+      output: .mock(
+        moduleType: .swiftPackage(),
+        operations: .inSchemaModule,
+        path: directoryURL.path
+      ),
+      options: .init(appendSchemaTypeFilenameSuffix: true)
+    ), rootURL: nil)
+
+
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
+    let fileManager = MockApolloFileManager(strict: false)
+
+    let filePathStore = ApolloFileManager.WrittenFiles()
+    let concurrentTasks = ConcurrentTaskContainer()
+
+    fileManager.mock(closure: .createFile({ path, data, attributes in
+      concurrentTasks.dispatch {
+        await filePathStore.addWrittenFile(path: path)
+      }
+      return true
+    }))
+
+    let expectedPaths: Set<String> = [
+      directoryURL.appendingPathComponent("Sources/Schema/SchemaMetadata.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/SchemaConfiguration.swift").path,
+
+      directoryURL.appendingPathComponent("Sources/Schema/Enums/SkinCovering.enum.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Enums/SkinCovering.enum.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Enums/RelativeSize.enum.graphql.swift").path,
+      
+      directoryURL.appendingPathComponent("Sources/Schema/Interfaces/Pet.interface.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Interfaces/Animal.interface.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Interfaces/WarmBlooded.interface.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Interfaces/HousePet.interface.graphql.swift").path,
+
+      directoryURL.appendingPathComponent("Sources/Schema/Unions/ClassroomPet.union.graphql.swift").path,
+
+      directoryURL.appendingPathComponent("Sources/Schema/InputObjects/PetSearchInput.inputObject.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/InputObjects/PetAdoptionInput.inputObject.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/InputObjects/PetSearchFilters.inputObject.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/InputObjects/MeasurementsInput.inputObject.graphql.swift").path,
+
+      directoryURL.appendingPathComponent("Sources/Schema/Objects/Height.object.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Objects/Query.object.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Objects/Cat.object.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Objects/Human.object.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Objects/Bird.object.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Objects/Rat.object.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Objects/PetRock.object.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Objects/Fish.object.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Objects/Crocodile.object.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Objects/Mutation.object.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/Objects/Dog.object.graphql.swift").path,
+
+      directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/CustomDate.scalar.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/Object.scalar.swift").path,
+      directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/ID.scalar.swift").path,
+
+      directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsQuery.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsIncludeSkipQuery.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Operations/Queries/ClassroomPetsQuery.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Operations/Queries/DogQuery.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Operations/Queries/PetSearchQuery.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Operations/Queries/FindPetQuery.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Operations/Mutations/PetAdoptionMutation.graphql.swift").path,
+
+      directoryURL.appendingPathComponent("Sources/Fragments/PetDetails.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Fragments/DogFragment.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Fragments/ClassroomPetDetails.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Fragments/HeightInMeters.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Fragments/WarmBloodedDetails.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Fragments/CrocodileFragment.graphql.swift").path,
+
+      directoryURL.appendingPathComponent("Sources/LocalCacheMutations/AllAnimalsLocalCacheMutation.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/LocalCacheMutations/PetDetailsMutation.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/LocalCacheMutations/PetSearchLocalCacheMutation.graphql.swift").path,
+
+      directoryURL.appendingPathComponent("Package.swift").path,
+    ]
+
+    // when
+    let compilationResult = try await subject.compileGraphQLResult()
+
+    let ir = IRBuilder(compilationResult: compilationResult)
+
+    try await subject.generateFiles(
+      compilationResult: compilationResult,
+      ir: ir,
+      fileManager: fileManager
+    )
+    await concurrentTasks.waitForAllTasks()
+    let filePaths = await filePathStore.value
+
+    // then
+    expect(filePaths).to(equal(expectedPaths))
+    expect(fileManager.allClosuresCalled).to(beTrue())
+  }
+
   func test_fileGenerators_givenTestMockOutput_absolutePath_shouldGenerateTestMocks() async throws {
     // given
     let schemaPath = ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.Schema.path
@@ -1995,6 +2111,152 @@ class ApolloCodegenTests: XCTestCase {
     expect(ApolloFileManager.default.doesFileExist(atPath: testInSourcesUserFile)).to(beTrue())
     expect(ApolloFileManager.default.doesFileExist(atPath: testInOtherFolderUserFile)).to(beTrue())
     expect(ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderUserFile)).to(beTrue())
+  }
+
+  // MARK: Suffix Renaming Tests
+
+  func test__fileRenaming__givenGeneratedPreSuffixFilesExist_withAppendSchemaFilenameSuffix_true_shouldRenameFileWithSuffix() async throws {
+    // given
+    try createFile(
+      containing: """
+      type Query {
+        allBooks: [Book!]!
+      }
+      
+      scalar CustomDate
+      
+      type Book {
+        publishedDate: CustomDate!
+        author: Author!
+      }
+      
+      type Author {
+        name: String!
+      }
+      """.asData,
+      named: "schema.graphqls"
+    )
+
+    try createFile(
+      containing: """
+      query AllBooks {
+        allBooks {
+          publishedDate
+          author {
+            name
+          }
+        }
+      }
+      """.asData,
+      named: "AllBooksQuery.graphql"
+    )
+
+    // Create the pre-suffixed generated file and validate that it exists
+    let customScalarsDirectory = "SchemaModule/Sources/Schema/CustomScalars"
+    let preSuffixFilename = "CustomDate.swift"
+
+    try createFile(filename: preSuffixFilename, inDirectory: customScalarsDirectory)
+
+    expect(ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)"))
+    .to(beTrue())
+
+    // when
+    let config = ApolloCodegenConfiguration.mock(
+      input: .init(
+        schemaSearchPaths: ["schema*.graphqls"],
+        operationSearchPaths: ["*.graphql"]
+      ),
+      output: .init(
+        schemaTypes: .init(path: "SchemaModule", moduleType: .swiftPackage()),
+        operations: .inSchemaModule
+      ),
+      options: .init(
+        appendSchemaTypeFilenameSuffix: true
+      )
+    ) 
+
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
+
+    // then
+    expect(ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/CustomDate.scalar.swift"))
+    .to(beTrue())
+    expect(ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)"))
+    .to(beFalse())
+  }
+
+  func test__fileRenaming__givenGeneratedPreSuffixFilesExist_withAppendSchemaFilenameSuffix_false_shouldNotRenameFile() async throws {
+    // given
+    try createFile(
+      containing: """
+      type Query {
+        allBooks: [Book!]!
+      }
+      
+      scalar CustomDate
+      
+      type Book {
+        publishedDate: CustomDate!
+        author: Author!
+      }
+      
+      type Author {
+        name: String!
+      }
+      """.asData,
+      named: "schema.graphqls"
+    )
+
+    try createFile(
+      containing: """
+      query AllBooks {
+        allBooks {
+          publishedDate
+          author {
+            name
+          }
+        }
+      }
+      """.asData,
+      named: "AllBooksQuery.graphql"
+    )
+
+    // Create the pre-suffixed generated file and validate that it exists
+    let customScalarsDirectory = "SchemaModule/Sources/Schema/CustomScalars"
+    let preSuffixFilename = "CustomDate.swift"
+
+    try createFile(filename: preSuffixFilename, inDirectory: customScalarsDirectory)
+
+    expect(ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)"))
+    .to(beTrue())
+
+    // when
+    let config = ApolloCodegenConfiguration.mock(
+      input: .init(
+        schemaSearchPaths: ["schema*.graphqls"],
+        operationSearchPaths: ["*.graphql"]
+      ),
+      output: .init(
+        schemaTypes: .init(path: "SchemaModule", moduleType: .swiftPackage()),
+        operations: .inSchemaModule
+      ),
+      options: .init(
+        appendSchemaTypeFilenameSuffix: false
+      )
+    )
+
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
+
+    // then
+    expect(ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/CustomDate.scalar.swift"))
+    .to(beFalse())
+    expect(ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)"))
+    .to(beTrue())
   }
 
   // MARK: Validation Tests

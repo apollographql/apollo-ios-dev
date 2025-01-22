@@ -85,8 +85,9 @@ public class ApolloFileManager {
     try base.removeItem(atPath: path)
   }
 
-  /// Creates a file at the specified path and writes any given data to it. If a file already exists at `path`, this method overwrites the
-  /// contents of that file if the current process has the appropriate privileges to do so.
+  /// Creates a file at the specified path and writes any given data to it. If a file already exists at `path` this
+  /// method can be configured to overwrite the contents of that file, if the current process has the appropriate
+  /// privileges to do so.
   ///
   /// - Parameters:
   ///   - path: Path to the file.
@@ -106,8 +107,16 @@ public class ApolloFileManager {
     await _writtenFiles.addWrittenFile(path: path)
   }
 
-  /// Creates the containing directory (including all intermediate directories) for the given file URL if necessary. This method will not
-  /// overwrite any existing directory.
+  public func renameFile(atPath oldPath: String, toPath newPath: String) async throws {
+    guard doesFileExist(atPath: oldPath) else { return }
+
+    try base.moveItem(atPath: oldPath, toPath: newPath)
+
+    await _writtenFiles.addWrittenFile(path: newPath)
+  }
+
+  /// Creates the containing directory (including all intermediate directories) for the given file URL if necessary.
+  /// This method will not overwrite any existing directory.
   ///
   /// - Parameter fileURL: The URL of the file to create a containing directory for if necessary.
   public func createContainingDirectoryIfNeeded(forPath path: String) throws {
@@ -115,8 +124,8 @@ public class ApolloFileManager {
     try createDirectoryIfNeeded(atPath: parent.path)
   }
 
-  /// Creates the directory (including all intermediate directories) for the given URL if necessary. This method will not overwrite any
-  /// existing directory.
+  /// Creates the directory (including all intermediate directories) for the given URL if necessary. This method will
+  /// not overwrite any existing directory.
   ///
   /// - Parameter path: The path of the directory to create if necessary.
   public func createDirectoryIfNeeded(atPath path: String) throws {
