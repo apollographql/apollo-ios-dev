@@ -102,7 +102,9 @@ struct SelectionSetTemplate {
       """
       \(SelectionSetNameDocumentation(selectionSet))
       \(renderAccessControl())\
-      struct \(fieldSelectionSetName): \(SelectionSetType()) {
+      struct \(fieldSelectionSetName): \(SelectionSetType())\
+      \(if: selectionSet.isIdentifiable, ", Identifiable")\
+       {
         \(BodyTemplate(context))
       }
       """
@@ -118,6 +120,7 @@ struct SelectionSetTemplate {
       \(renderAccessControl())\
       struct \(inlineFragment.renderedTypeName): \(SelectionSetType(asInlineFragment: true))\
       \(if: inlineFragment.isCompositeInlineFragment, ", \(config.ApolloAPITargetName).CompositeInlineFragment")\
+      \(if: inlineFragment.isIdentifiable, ", Identifiable")\
        {
         \(BodyTemplate(context))
       }

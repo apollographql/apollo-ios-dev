@@ -1,4 +1,5 @@
 import Foundation
+import GraphQLCompiler
 import OrderedCollections
 import Utilities
 
@@ -18,6 +19,24 @@ public struct ComputedSelectionSet {
 
   /// The `TypeInfo` for the selection set of the computed selections
   public let typeInfo: IR.SelectionSet.TypeInfo
+  
+  /// Indicates if the parent type has a single keyField named `id`.
+  public var isIdentifiable: Bool {
+    guard direct?.fields["id"] != nil || merged.fields["id"] != nil else {
+      return false
+    }
+    if let type = typeInfo.parentType as? GraphQLObjectType,
+       type.keyFields == ["id"] {
+      return true
+    }
+    
+    if let type = typeInfo.parentType as? GraphQLInterfaceType,
+       type.keyFields == ["id"] {
+      return true
+    }
+    
+    return false
+  }
 
   // MARK: Dynamic Member Subscript
 
