@@ -8,181 +8,64 @@ The normalized cache computes a **cache key** for each object that is stored in 
 
 > To learn more, read about how the cache [normalizes objects by cache key](./introduction#normalizing-objects-by-cache-key).
 
-## `CacheKeyInfo`
+For most uses cases, you can configure cache keys declaratively using the methods described here. For advanced use cases not supported by declarative cache keys, you can configure cache keys [programmatically](./programmatic-cache-keys).
 
-The information needed to construct a **cache key** is represented by a [`CacheKeyInfo`](https://www.apollographql.com/docs/ios/docc/documentation/apolloapi/cachekeyinfo) value. This `struct` consists of two properties you can provide to  affect how a cache key is computed:
+## Schema Extensions
 
-1. `let uniqueKeyGroup: String?`
+Declarative cache keys work by adding directives to your backend schema types to indicate how cache keys should be resolved for those times. To do this, you can extend your backend schema by creating a schema extension file with the file extension `.graphqls`. You can add any number of schema extension files to your project.
 
-    An optional **group identifier** for a set of objects that should be grouped together in the normalized cache. This is used as the first component of the **cache key**.
+> **Note:** Make sure that your schema extension files are included in the `schemaSearchPaths` of your code generation configuration's [`FileInput`](./../code-generation/codegen-configuration#file-input).
 
-    > #### Important: Cache key group uniqueness
-    >
-    > All objects with the same `uniqueKeyGroup` must have unique `id`s across all types.
+## The `@typePolicy` directive
 
-    To prevent cache key collisions, cache keys will always have a **group identifier** component. When the `uniqueKeyGroup` is `nil` (the default value), to [`__typename`](https://spec.graphql.org/draft/#sec-Type-Name-Introspection) of the response object is used as the **group identifier** by default.
+The `@typePolicy` directive enables you to specify an object's cache ID from **key fields** of the object returned by your GraphQL server. Type policies can be applied to both concrete object types and interface types in your schema.
 
-    If multiple distinct types can be grouped together in the cache, the `CacheKeyInfo` for each `Object` should have the same `uniqueKeyGroup`.
+To declare a type policy, add an extension to a type which applies the `@typePolicy` directive in a schema extension file.
 
-    > **Tip:** By grouping objects together, their **keys** in the normalized cache will have the same prefix. This allows you to search for cached objects in the same group by their cache `id`. To learn more, read about [direct cache access](./cache-transactions)
+### Key Fields
 
-2. `let id: String`
+The `@typePolicy` directive has a single `keyFields` argument, which takes a string indicating the fields used to determine a type's cache key.
 
-    The unique **cache ID** representing the object. This is used as the second component of the **cache key**.
-
-    > #### Important: Cache ID uniqueness
-    >
-    > The ID must be deterministic and unique for all objects with the same **group identifier** (`__typename` or `uniqueKeyGroup`).
-    >
-    >That is, the key will be the same every time for a response object representing the same entity in the cache and the same key will never be used for reponse objects representing different objects that also have the same **group identifier**.
-
-The normalized cache constructs cache keys with the format:
-
-`"${GroupIdentifier}:${CacheID}"`
-
-Given a `CacheKeyInfo`:
-```swift
-CacheKeyInfo(id: "123", uniqueKeyGroup: "Animal")
-```
-Apollo iOS would construct a cache key of `"Animal:123"`.
-
-## The `SchemaConfiguration` file
-
-The `SchemaConfiguration` file is your entry point to configuring **cache keys** for the types in your schema.
-
-When Apollo iOS [generates code for your project](../code-generation/introduction), it will generate a set of metadata types representing the GraphQL schema for your application. One of these files is named `SchemaConfiguration.swift`.
-
- The code generation engine creates this file if it doesn't exist yet, but never overwrites an existing `SchemaConfiguration.swift` file. This means you can edit your schema configuration without those changes being overwritten on subsequent code generation runs.
-
-> *Tip:* You can configure the location of the generated schema types with the [`output.schemaTypes` option in your code generation configuration](./../code-generation/codegen-configuration).
-
-## Specifying cache IDs
-
-The `SchemaConfiguration` contains a [`cacheKeyInfo(for type:object:)`](https://www.apollographql.com/docs/ios/docc/documentation/apolloapi/schemaconfiguration/cachekeyinfo(for:object:)) function. This function provides you a JSON response `object` and the concrete `type` of the object represented by the response.
-
-The `object` parameter provides a JSON response from either a network request or a cache hit.
-
-The `type` parameter provides a strongly typed [`Object`](https://www.apollographql.com/docs/ios/docc/documentation/apolloapi/object) type. This is a generated metadata type representing a concrete `type` in your GraphQL schema.
-
-To configure how cache keys are computed from a response object, you can create and return [`CacheKeyInfo`](#cachekeyinfo) values from your implementation of [`cacheKeyInfo(for:object:)`](https://www.apollographql.com/docs/ios/docc/documentation/apolloapi/schemaconfiguration/cachekeyinfo(for:object:)).
-
-> **Note:** When specifying **cache IDs**, make sure that you are always fetching the fields used to construct those IDs in your operations. Any response objects that don't contain the **cache ID** fields will not be able to be [merged via cache normalization](./introduction#normalizing-responses).
-
-### Using a default cache ID field
-
-If your schema provides a common unique identifier across many of your objects types, you may want to use that field as the **cache ID** by default.
-
-```swift title="SchemaConfiguration.swift"
-public enum SchemaConfiguration: ApolloAPI.SchemaConfiguration {
-  static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
-    guard let id = object["id"] as? String else {
-        return nil
-    }
-
-    return CacheKeyInfo(id: id)
-  }
-}
+```graphql title="typePolicies.graphqls"
+extend type Book @typePolicy(keyFields: "id")
 ```
 
-If the JSON response `object` has no `id` field, the function returns `nil` and the cache will normalize the object using the [default response path normalization](./introduction#normalizing-responses).
+Apollo iOS will now resolve the cache key for all objects with a `__typename` of `"Book"` by using the value of their `id` field. The concrete type of the object is always prepended to the cache key. This means that a `Book` object with an `id` of `456` will resolve to have a cache key of `Book:456`.
 
-#### JSON value convenience initializer
+> **Note:** All of a type's key fields must return a scalar type. To use non-scalar fields in cache keys, try using [programmatic cache key configuration](./programmatic-cache-keys).
 
-Alternatively, you can use the [`init(jsonValue:uniqueKeyGroup:)`](https://www.apollographql.com/docs/ios/docc/documentation/apolloapi/cachekeyinfo/init(jsonvalue:uniquekeygroup:)) convenience initializer. This initializer attempts to use the value of a key in the JSON response, throwing an error if the key does not exist.
+### Multiple Key Fields
 
-If you want to return `nil` when the value does not exist, you can use `try?`.
+You can specify _multiple_ key fields for an object if they are all required to uniquely identify a particular cache entry. Multiple key fields should be seperated by a single space.
 
-```swift title="SchemaConfiguration.swift"
-public enum SchemaConfiguration: ApolloAPI.SchemaConfiguration {
-  static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
-    return try? CacheKeyInfo(jsonValue: object["id"])
-  }
-}
+```graphql title="typePolicies.graphqls"
+extend type Author @typePolicy(keyFields: "firstName lastName")
 ```
 
-### Specifying cache IDs by `Object` type
+The resolved cache key will include all declared key fields separated by the `+` character. In this case, an `Author` object with a `firstName` of `"Ray"` and a last name of `"Bradbury"` would resolve to have a cache key of `Author:Ray+Bradbury`.
 
-If you would like to specify **cache IDs** differently for different types of objects, you can use the `type` parameter.
+### Type policies on interface types
 
-For an object of the type `Dog` with a unique key represented by an `id` field, you may implement cache key resolution as:
+It is also possible to use `@typePolicy` on _interfaces_. This specifies a default set of key fields for all types that implement that interface.
 
-```swift title="SchemaConfiguration.swift"
-public enum SchemaConfiguration: ApolloAPI.SchemaConfiguration {
-  static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
-    switch type {
-    case Objects.Dog:
-      return try? CacheKeyInfo(jsonValue: object["id"])
-
-      default:
-      return nil
-    }
-  }
-}
+```graphql title="extra.graphqls"
+extend interface Node @typePolicy(keyFields: "id")
 ```
 
-### Specifying cache IDs by abstract types
-
-If object types sharing the same `interface` or `union` in your schema have the same cache key resolution strategy, you can resolve the key based on those abstract types.
-
-The generated schema metadata includes `Interfaces` and `Unions` types that contain a list of all the abstract types used in your GraphQL schema.
-
-For example, for a schema with `Dog` and `Cat` types that implement `interface Pet`, you may implement cache key resolution as:
-
-```swift title="SchemaConfiguration.swift"
-public enum SchemaConfiguration: ApolloAPI.SchemaConfiguration {
-  static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
-    if type.implements(Interfaces.Pet) {
-      return try? CacheKeyInfo(jsonValue: object["id"])
-    }
-
-    return nil
-  }
-}
-```
-
-To instead configure cache key resolution based on a `union` type, use the union's [`possibleTypes`](https://www.apollographql.com/docs/ios/docc/documentation/apolloapi/union/possibletypes) property.
-
-```swift title="SchemaConfiguration.swift"
-public enum SchemaConfiguration: ApolloAPI.SchemaConfiguration {
-  static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
-    if Unions.ClassroomPets.possibleTypes.contains(type) {
-      return try? CacheKeyInfo(jsonValue: object["id"])
-    }
-
-    return nil
-  }
-}
-```
-
-### Grouping cached objects with `uniqueKeyGroup`
-
-If your **cache IDs** values are guaranteed to be unique across a number of different types, you may want to group them together in the cache with a common [`uniqueKeyGroup`](#cachekeyinfo).
-
-> See [`uniqueKeyGroup`](#cachekeyinfo) for more information on grouping cached objects.
-
-For example, if all objects that implement `interface Animal` will have unique **cache IDs**, whether they are `Dog`, `Cat`, or any other type that implements `Animal`, they can share a `uniqueKeyGroup`.
-
-```swift title="SchemaConfiguration.swift"
-public enum SchemaConfiguration: ApolloAPI.SchemaConfiguration {
-  static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
-    if type.implements(Interfaces.Pet) {
-      return try? CacheKeyInfo(
-        jsonValue: object["id"],
-        uniqueKeyGroupId: Interfaces.Pet.name
-      )
-    }
-
-    return nil
-  }
-}
-```
+If an object type has a type policy of its own, it will take precedence and the type policy on an interface it implements will not be applied.
 
 ## Caveats & limitations
 
-Cache key resolution has a few notable quirks and limitations you should be aware of while implementing your cache key resolution function:
+Declarative cache key resolution has a few notable quirks and limitations you should be aware of while implementing your `@typePolicy` directives:
 
-1. While the cache key for an object can use a field from another nested object, if the fields on the referenced object are changed in another operation, the cache key for the dependent object will not be updated. For nested objects that are not normalized with their own cache key, this will never occur, but if the nested object is an entity with its own cache key, it can be mutated independently. In that case, any other objects whose cache keys are dependent on the mutated entity will not be updated automatically. You must take care to update those entities manually with a cache mutation.
+1. If any type implements two interfaces with conflicting type policies, a validation error will be thrown when executing code generation. This can be corrected by applying a type policy to the type directly to disambiguate the conflict.
 
-2. The `object` passed to this function represents data for an object in an specific operation model, not a type in your schema. This means that [aliased fields](https://spec.graphql.org/draft/#sec-Field-Alias) will be keyed on their alias name, not the name of the field on the schema type.
+2. When an object is returned for a field of an interface type where the interface has a `@typePolicy`, Apollo iOS will first attempt to find a `@typePolicy` for the concrete type by using the `__typename` field of the returned object. If the type does not have an `@typePolicy` of its own, the interface's `@typePolicy` will be applied.
 
-3. The `object` parameter of this function is an ``ObjectData`` struct that wraps the underlying object data. Because cache key resolution is performed both on raw JSON (from a network response) and `SelectionSet` model data (when writing to the cache directly), the underlying data will have different formats. The ``ObjectData`` wrapper is used to normalize this data to a consistent format in this context.
+If the same object is returned for multiple fields of different interface types with conflicting type policies, it is possible that the same object is resolved with two different type policies, leading to cache inconsistencies.
+
+In most circumstances, validation that is run during code generation prevents this from occuring. However this may still occur if changes are made to the schema after code generation runs (or after your application is published).
+
+This is possible if:
+  A) A type is added to your schema after code generation is executed and that type implements two different interfaces with different type policies
+  B) Implementation of an interface is added to an existing type which already implements an interface with a different type policy
