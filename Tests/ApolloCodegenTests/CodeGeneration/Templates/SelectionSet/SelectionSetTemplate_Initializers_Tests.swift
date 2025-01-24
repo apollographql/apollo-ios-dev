@@ -2749,7 +2749,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
               ObjectIdentifier(TestOperationQuery.Data.AllAnimal.self)
             ],
             deferredFragments: [
-              ObjectIdentifier(TestOperationQuery.Data.AllAnimal.SlowSpecies.self)
+              ObjectIdentifier(AnimalFragment.self)
             ]
           ))
         }
@@ -2814,7 +2814,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
               ObjectIdentifier(TestOperationQuery.Data.AllAnimal.AsDog.self)
             ],
             deferredFragments: [
-              ObjectIdentifier(TestOperationQuery.Data.AllAnimal.AsDog.SlowSpecies.self)
+              ObjectIdentifier(DogFragment.self)
             ]
           ))
         }
