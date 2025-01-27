@@ -1,0 +1,170 @@
+switcher:
+  heading: "Apollo iOS"
+  versions:
+    - label: v1
+      latest: true
+      href: ./
+    - label: v0.x (legacy)
+      href: ./v0-legacy
+items:
+  - label: Introduction
+    href: "."
+  - label: Get Started
+    href: ./get-started
+  - label: Project Configuration
+    children:
+      - label: Introduction
+        href: ./project-configuration/intro
+      - label: 1. Project Modularization
+        href: ./project-configuration/modularization
+      - label: 2. Schema Types
+        href: ./project-configuration/schema-types
+      - label: 3. Operation Models
+        href: ./project-configuration/operation-models
+      - label: SDK components
+        href: ./project-configuration/sdk-components
+  - label: Migration Guides
+    children:
+      - label: v1.0
+        href: ./migrations/1.0
+      - label: v1.2
+        href: ./migrations/1.2
+      - label: v1.3
+        href: ./migrations/1.3
+      - label: v1.5
+        href: ./migrations/1.5
+      - label: v1.6
+        href: ./migrations/1.6
+      - label: v1.7
+        href: ./migrations/1.7
+  - label: Tutorial
+    children:
+      - label: Code Generation
+        href: ./tutorial/codegen-getting-started
+      - label: Build a project with Apollo
+        children:
+          - label: Introduction
+            href: ./tutorial/tutorial-introduction
+          - label: 1. Configure your project
+            href: ./tutorial/tutorial-configure-project
+          - label: 2. Add the GraphQL schema
+            href: ./tutorial/tutorial-add-graphql-schema
+          - label: 3. Write your first query
+            href: ./tutorial/tutorial-write-your-first-query
+          - label: 4. Running code generation
+            href: ./tutorial/tutorial-running-code-generation
+          - label: 5. Execute your first query
+            href: ./tutorial/tutorial-execute-first-query
+          - label: 6. Connect your queries to your UI
+            href: ./tutorial/tutorial-connect-queries-to-ui
+          - label: 7. Add more info to the list
+            href: ./tutorial/tutorial-add-more-info-to-list
+          - label: 8. Paginate results
+            href: ./tutorial/tutorial-paginate-results
+          - label: 9. Complete the details view
+            href: ./tutorial/tutorial-complete-details-view
+          - label: 10. Write your first mutation
+            href: ./tutorial/tutorial-first-mutation
+          - label: 11. Authenticate your operations
+            href: ./tutorial/tutorial-authenticate-operations
+          - label: 12. Define additional mutations
+            href: ./tutorial/tutorial-define-additional-mutations
+          - label: 13. Write your first subscription
+            href: ./tutorial/tutorial-subscriptions
+  - label: API Reference
+    children:
+      - label: Overview
+        href: https://www.apollographql.com/docs/ios/docc/documentation/index
+      - label: Apollo Client
+        href: https://www.apollographql.com/docs/ios/docc/documentation/Apollo
+      - label: ApolloAPI
+        href: https://www.apollographql.com/docs/ios/docc/documentation/ApolloAPI
+      - label: ApolloWebSocket
+        href: https://www.apollographql.com/docs/ios/docc/documentation/ApolloWebSocket
+      - label: ApolloSQLite
+        href: https://www.apollographql.com/docs/ios/docc/documentation/ApolloSQLite
+      - label: ApolloCodegenLib
+        href: https://www.apollographql.com/docs/ios/docc/documentation/ApolloCodegenLib
+      - label: ApolloPagination
+        href: https://www.apollographql.com/docs/ios/docc/documentation/ApolloPagination
+      - label: Client Directives
+        href: ./client-directives
+  - label: Code Generation
+    children:
+      - label: Introduction
+        href: ./code-generation/introduction
+      - label: The Codegen CLI
+        href: ./code-generation/codegen-cli
+      - label: Configuration
+        href: ./code-generation/codegen-configuration
+      - label: Downloading a Schema
+        href: ./code-generation/downloading-schema
+      - label: Running Code Generation in Swift Code
+        href: ./code-generation/run-codegen-in-swift-code
+      - label: Code Generation Troubleshooting
+        href: ./troubleshooting/codegen-troubleshooting
+  - label: Fetching
+    children:
+      - label: Fetching Data
+        href: ./fetching/fetching-data
+      - label: Operations
+        children:
+          - label: Queries
+            href: ./fetching/queries
+          - label: Mutations
+            href: ./fetching/mutations
+          - label: Subscriptions
+            href: ./fetching/subscriptions
+          - label: Fragments
+            href: ./fetching/fragments
+      - label: Operation Arguments
+        href: ./fetching/operation-arguments
+      - label: Error Handling
+        href: ./fetching/error-handling
+      - label: Type Conditions
+        href: ./fetching/type-conditions
+      - label: Custom Scalars
+        href: ./custom-scalars
+      - label: Persisted Queries
+        href: ./fetching/persisted-queries
+      - label: "@defer support (experimental)"
+        href: ./fetching/defer
+  - label: Caching
+    children:
+      - label: Introduction
+        href: ./caching/introduction
+      - label: Setup
+        href: ./caching/cache-setup
+      - label: Direct Cache Access
+        href: ./caching/cache-transactions
+      - label: Custom Cache Keys
+        href: ./caching/cache-key-resolution
+      - label: Programmatic Cache Keys
+        href: ./caching/programmatic-cache-keys
+  - label: Networking
+    children:
+      - label: Creating a Client
+        href: ./networking/client-creation
+  - label: Pagination
+    children:
+      - label: Introduction
+        href: ./pagination/introduction
+      - label: Using Custom Response Models
+        href: ./pagination/custom-types
+      - label: Directional Pagination
+        href: ./pagination/directional-pagers
+      - label: Multi-query Pagination
+        href: ./pagination/multi-query
+  - label: Development & Testing
+    children:
+      - label: Test Mocks
+        href: ./testing/test-mocks
+      - label: Including Apollo as an XCFramework
+        href: ./development/using-xcframework
+  - label: Advanced
+    children:
+      - label: File Uploads
+        href: ./file-uploads
+      - label: Request Chain Customization
+        href: ./networking/request-pipeline
+
