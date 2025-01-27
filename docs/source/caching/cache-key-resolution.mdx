@@ -60,15 +60,23 @@ You can also use `@typePolicy` on interface types. Doing so specifies a default 
 extend interface Node @typePolicy(keyFields: "id")
 ```
 
-> **Note:** If an object type has a type policy of its own, it will take precedence and the type policy on an interface it implements will not be applied.
+<Note>
+
+Overriding type policies is not currently supported. If an object type has a `@typePolicy`, it must match any type policies of any interfaces the object type implements.
+
+</Note>
 
 ## Caveats and limitations
 
 Declarative cache key resolution has a few limitations you should be aware of while implementing your `@typePolicy` directives:
 
-- If any type implements two interfaces with conflicting type policies, Apollo iOS throws a validation error when executing code generation. You can correct this by applying a type policy to the type directly to disambiguate the conflict.
+### Conflicting Type Policies
 
-2. When an object is returned for a field of an interface type where the interface has a `@typePolicy`, Apollo iOS will first attempt to find a `@typePolicy` for the concrete type by using the `__typename` field of the returned object. If the type does not have an `@typePolicy` of its own, the interface's `@typePolicy` will be applied.
+If any type implements two interfaces with conflicting type policies, Apollo iOS throws a validation error when executing code generation.
+
+### Cache Inconsistencies
+
+When an object is returned for a field of an interface type where the interface has a `@typePolicy`, Apollo iOS will first attempt to find a `@typePolicy` for the concrete type by using the `__typename` field of the returned object. If the type does not have an `@typePolicy` of its own, the interface's `@typePolicy` will be applied.
 
 If the same object is returned for multiple fields of different interface types with conflicting type policies, it is possible that the same object is resolved with two different type policies, leading to cache inconsistencies.
 

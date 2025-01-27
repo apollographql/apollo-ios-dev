@@ -21,9 +21,9 @@ The information needed to construct a **cache key** is represented by a [`CacheK
     An optional **group identifier** for a set of objects that should be grouped together in the normalized cache. This is used as the first component of the **cache key**.
 
     <Caution>
-    
+
     To ensure cache key group uniqueness, all objects with the same `uniqueKeyGroup` must have unique `id`s across all types.
-    
+
     </Caution >
 
     To prevent cache key collisions, cache keys will always have a **group identifier** component. When the `uniqueKeyGroup` is `nil` (the default value), the [`__typename`](https://spec.graphql.org/draft/#sec-Type-Name-Introspection) of the response object is used as the **group identifier**.
@@ -31,21 +31,21 @@ The information needed to construct a **cache key** is represented by a [`CacheK
     If multiple distinct types can be grouped together in the cache, the `CacheKeyInfo` for each `Object` should have the same `uniqueKeyGroup`.
 
     <Tip>
-    
+
     By grouping objects together, their **keys** in the normalized cache will have the same prefix. This allows you to search for cached objects in the same group by their cache `id`. To learn more, read about [direct cache access](./cache-transactions)
-    
+
     </Tip>
 
 2. `let id: String`
 
     The unique **cache ID** representing the object. This is used as the second component of the **cache key**.
 
-    <Warning>
-    
+    <Caution>
+
     To ensure cache ID uniqueness, the `id` must be deterministic and unique for all objects with the same **group identifier** (`__typename` or `uniqueKeyGroup`).
-    
+
     That is, a response object for the same entity will always have the same key in the cache.  Different objects, even with the same group identifier, will always have distinct keys.
-    
+
     </Caution>
 
 The normalized cache constructs cache keys with the format:
