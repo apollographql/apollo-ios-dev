@@ -9,17 +9,17 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/init(typename:implementedInterfaces:)"
+    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface\/init(name:keyFields:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI6ObjectV8typename21implementedInterfacesACSS_SayAA9InterfaceVGtcfc",
+    "externalID" : "s:9ApolloAPI9InterfaceV4name9keyFieldsACSS_SaySSGSgtcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -31,7 +31,7 @@
       },
       {
         "kind" : "externalParam",
-        "text" : "typename"
+        "text" : "name"
       },
       {
         "kind" : "text",
@@ -48,7 +48,7 @@
       },
       {
         "kind" : "externalParam",
-        "text" : "implementedInterfaces"
+        "text" : "keyFields"
       },
       {
         "kind" : "text",
@@ -56,12 +56,12 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI9InterfaceV",
-        "text" : "Interface"
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
       },
       {
         "kind" : "text",
-        "text" : "])"
+        "text" : "]?)"
       }
     ],
     "modules" : [
@@ -72,7 +72,7 @@
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",
-    "title" : "init(typename:implementedInterfaces:)"
+    "title" : "init(name:keyFields:)"
   },
   "primaryContentSections" : [
     {
@@ -95,7 +95,7 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "typename"
+              "text" : "name"
             },
             {
               "kind" : "text",
@@ -112,21 +112,20 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "implementedInterfaces"
+              "text" : "keyFields"
             },
             {
               "kind" : "text",
               "text" : ": ["
             },
             {
-              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI9InterfaceV",
-              "text" : "Interface"
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
             },
             {
               "kind" : "text",
-              "text" : "])"
+              "text" : "]? = nil)"
             }
           ]
         }
@@ -141,28 +140,23 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "The name of the type.",
+                  "text" : "The name of the ",
                   "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "typename"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
+                },
                 {
-                  "text" : "A list of the interfaces implemented by the type.",
+                  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface",
+                  "isActive" : true,
+                  "type" : "reference"
+                },
+                {
+                  "text" : " in the GraphQL schema.",
                   "type" : "text"
                 }
               ],
               "type" : "paragraph"
             }
           ],
-          "name" : "implementedInterfaces"
+          "name" : "name"
         }
       ]
     }
@@ -178,7 +172,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apolloapi\/object\/init(typename:implementedinterfaces:)"
+        "\/documentation\/apolloapi\/interface\/init(name:keyfields:)"
       ],
       "traits" : [
         {
@@ -283,49 +277,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/interface"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Object": {
-  "abstract" : [
-    {
-      "text" : "Represents an object ",
-      "type" : "text"
-    },
-    {
-      "code" : "type",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " in a generated GraphQL schema.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "struct"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "Object"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "Object"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "Object",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/object"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Object/init(typename:implementedInterfaces:)": {
+"doc://ApolloAPI/documentation/ApolloAPI/Interface/init(name:keyFields:)": {
   "abstract" : [
     {
       "text" : "Designated Initializer",
@@ -343,7 +295,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "typename"
+      "text" : "name"
     },
     {
       "kind" : "text",
@@ -360,7 +312,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "implementedInterfaces"
+      "text" : "keyFields"
     },
     {
       "kind" : "text",
@@ -368,20 +320,20 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9InterfaceV",
-      "text" : "Interface"
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
     },
     {
       "kind" : "text",
-      "text" : "])"
+      "text" : "]?)"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/init(typename:implementedInterfaces:)",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface\/init(name:keyFields:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(typename:implementedInterfaces:)",
+  "title" : "init(name:keyFields:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/object\/init(typename:implementedinterfaces:)"
+  "url" : "\/documentation\/apolloapi\/interface\/init(name:keyfields:)"
 }
 }
 }

@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Creates the containing directory (including all intermediate directories) for the given file URL if necessary. This method will not",
+      "text" : "Creates the containing directory (including all intermediate directories) for the given file URL if necessary.",
       "type" : "text"
     },
     {
@@ -9,7 +9,7 @@
       "type" : "text"
     },
     {
-      "text" : "overwrite any existing directory.",
+      "text" : "This method will not overwrite any existing directory.",
       "type" : "text"
     }
   ],
@@ -228,7 +228,7 @@
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloFileManager/createContainingDirectoryIfNeeded(forPath:)": {
   "abstract" : [
     {
-      "text" : "Creates the containing directory (including all intermediate directories) for the given file URL if necessary. This method will not",
+      "text" : "Creates the containing directory (including all intermediate directories) for the given file URL if necessary.",
       "type" : "text"
     },
     {
@@ -236,7 +236,7 @@
       "type" : "text"
     },
     {
-      "text" : "overwrite any existing directory.",
+      "text" : "This method will not overwrite any existing directory.",
       "type" : "text"
     }
   ],

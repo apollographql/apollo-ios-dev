@@ -96,7 +96,8 @@
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager\/deleteDirectory(atPath:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager\/deleteFile(atPath:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager\/doesDirectoryExist(atPath:)",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager\/doesFileExist(atPath:)"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager\/doesFileExist(atPath:)",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager\/renameFile(atPath:toPath:)"
       ],
       "title" : "Instance Methods"
     },
@@ -203,7 +204,7 @@
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloFileManager/createContainingDirectoryIfNeeded(forPath:)": {
   "abstract" : [
     {
-      "text" : "Creates the containing directory (including all intermediate directories) for the given file URL if necessary. This method will not",
+      "text" : "Creates the containing directory (including all intermediate directories) for the given file URL if necessary.",
       "type" : "text"
     },
     {
@@ -211,7 +212,7 @@
       "type" : "text"
     },
     {
-      "text" : "overwrite any existing directory.",
+      "text" : "This method will not overwrite any existing directory.",
       "type" : "text"
     }
   ],
@@ -264,7 +265,7 @@
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloFileManager/createDirectoryIfNeeded(atPath:)": {
   "abstract" : [
     {
-      "text" : "Creates the directory (including all intermediate directories) for the given URL if necessary. This method will not overwrite any",
+      "text" : "Creates the directory (including all intermediate directories) for the given URL if necessary. This method will",
       "type" : "text"
     },
     {
@@ -272,7 +273,7 @@
       "type" : "text"
     },
     {
-      "text" : "existing directory.",
+      "text" : "not overwrite any existing directory.",
       "type" : "text"
     }
   ],
@@ -333,7 +334,7 @@
       "type" : "codeVoice"
     },
     {
-      "text" : ", this method overwrites the",
+      "text" : " this",
       "type" : "text"
     },
     {
@@ -341,7 +342,15 @@
       "type" : "text"
     },
     {
-      "text" : "contents of that file if the current process has the appropriate privileges to do so.",
+      "text" : "method can be configured to overwrite the contents of that file, if the current process has the appropriate",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "privileges to do so.",
       "type" : "text"
     }
   ],
@@ -688,6 +697,81 @@
   "title" : "doesFileExist(atPath:)",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollofilemanager\/doesfileexist(atpath:)"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloFileManager/renameFile(atPath:toPath:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "renameFile"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "atPath"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "toPath"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager\/renameFile(atPath:toPath:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "renameFile(atPath:toPath:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/apollofilemanager\/renamefile(atpath:topath:)"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloFileManager/writtenFiles": {
   "abstract" : [
