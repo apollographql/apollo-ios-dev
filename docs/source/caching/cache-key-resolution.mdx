@@ -8,45 +8,53 @@ The normalized cache computes a **cache key** for each object that is stored in 
 
 > To learn more, read about how the cache [normalizes objects by cache key](./introduction#normalizing-objects-by-cache-key).
 
-For most uses cases, you can configure cache keys declaratively using the methods described here. For advanced use cases not supported by declarative cache keys, you can configure cache keys [programmatically](./programmatic-cache-keys).
+For most use cases, you can configure cache keys declaratively using the methods described on this page. For advanced use cases not supported by declarative cache keys, you can configure cache keys [programmatically](./programmatic-cache-keys).
 
-## Schema Extensions
+## Schema extensions
 
 Declarative cache keys work by adding directives to your backend schema types to indicate how cache keys should be resolved for those types. To do this, you can extend your backend schema by creating a schema extension file with the file extension `.graphqls`. You can add any number of schema extension files to your project.
 
-> **Note:** Make sure that your schema extension files are included in the `schemaSearchPaths` of your code generation configuration's [`FileInput`](./../code-generation/codegen-configuration#file-input).
+<Note>
+
+Make sure you include your schema extension files in the `schemaSearchPaths` of your code generation configuration's [`FileInput`](./../code-generation/codegen-configuration#file-input).
+
+</Note>
 
 ## The `@typePolicy` directive
 
-The `@typePolicy` directive enables you to specify an object's cache ID from **key fields** of the object returned by your GraphQL server. Type policies can be applied to both concrete object types and interface types in your schema.
+The `@typePolicy` directive lets you specify an object's cache ID using [key fields](#key-fields) of the object returned by your GraphQL server. You can apply `@typePolicy` to both concrete object types and interface types in your schema.
 
-To declare a type policy, add an extension to a type which applies the `@typePolicy` directive in a schema extension file.
+To declare a type policy, extend the type with the `@typePolicy` directive in a `.graphqls` schema extension file.
 
-### Key Fields
+### Key fields
 
 The `@typePolicy` directive has a single `keyFields` argument, which takes a string indicating the fields used to determine a type's cache key.
 
-```graphql title="typePolicies.graphqls"
+```graphql title="typePolicies.graphqls" showLineNumbers=false
 extend type Book @typePolicy(keyFields: "id")
 ```
 
-Apollo iOS will now resolve the cache key for all objects with a `__typename` of `"Book"` by using the value of their `id` field. The concrete type of the object is always prepended to the cache key. This means that a `Book` object with an `id` of `456` will resolve to have a cache key of `Book:456`.
+If you add the above schema extension file , Apollo iOS resolves the cache key for all objects with a `__typename` of `"Book"` by using the value of their `id` field. The concrete type of the object is always prepended to the cache key. This means that a `Book` object with an `id` of `456` will resolve to have a cache key of `Book:456`.
 
-> **Note:** All of a type's key fields must return a scalar type. To use non-scalar fields in cache keys, try using [programmatic cache key configuration](./programmatic-cache-keys).
+<Note>
 
-### Multiple Key Fields
+All of a type's `@typePolicy` key fields must return a scalar type. To use non-scalar fields in cache keys, use [programmatic cache key configuration](./programmatic-cache-keys).
 
-You can specify _multiple_ key fields for an object if they are all required to uniquely identify a particular cache entry. Multiple key fields should be seperated by a single space.
+</Note>
+
+### Multiple key fields
+
+You can specify _multiple_ key fields for an object if they are all required to uniquely identify a particular cache entry. Separate multiple key fields with a single space when declaring them:
 
 ```graphql title="typePolicies.graphqls"
 extend type Author @typePolicy(keyFields: "firstName lastName")
 ```
 
-The resolved cache key will include all declared key fields separated by the `+` character. In this case, an `Author` object with a `firstName` of `"Ray"` and a last name of `"Bradbury"` would resolve to have a cache key of `Author:Ray+Bradbury`.
+With this extension, the resolved cache key includes all declared key fields and separates them by the `+` character. In this case, an `Author` object with a `firstName` of `"Ray"` and a last name of `"Bradbury"` would resolve to have a cache key of `Author:Ray+Bradbury`.
 
 ### Type policies on interface types
 
-It is also possible to use `@typePolicy` on _interfaces_. This specifies a default set of key fields for all types that implement that interface.
+You can also use `@typePolicy` on interface types. Doing so specifies a default set of key fields for all types that implement that interface.
 
 ```graphql title="extra.graphqls"
 extend interface Node @typePolicy(keyFields: "id")
@@ -54,17 +62,17 @@ extend interface Node @typePolicy(keyFields: "id")
 
 > **Note:** If an object type has a type policy of its own, it will take precedence and the type policy on an interface it implements will not be applied.
 
-## Caveats & limitations
+## Caveats and limitations
 
-Declarative cache key resolution has a few notable quirks and limitations you should be aware of while implementing your `@typePolicy` directives:
+Declarative cache key resolution has a few limitations you should be aware of while implementing your `@typePolicy` directives:
 
-1. If any type implements two interfaces with conflicting type policies, a validation error will be thrown when executing code generation. This can be corrected by applying a type policy to the type directly to disambiguate the conflict.
+- If any type implements two interfaces with conflicting type policies, Apollo iOS throws a validation error when executing code generation. You can correct this by applying a type policy to the type directly to disambiguate the conflict.
 
 2. When an object is returned for a field of an interface type where the interface has a `@typePolicy`, Apollo iOS will first attempt to find a `@typePolicy` for the concrete type by using the `__typename` field of the returned object. If the type does not have an `@typePolicy` of its own, the interface's `@typePolicy` will be applied.
 
 If the same object is returned for multiple fields of different interface types with conflicting type policies, it is possible that the same object is resolved with two different type policies, leading to cache inconsistencies.
 
-In most circumstances, validation that is run during code generation prevents this from occuring. However this may still occur if changes are made to the schema after code generation runs (or after your application is published).
+In most circumstances, validation that is run during code generation prevents this from occurring. However, this may still occur if changes are made to the schema after code generation runs or after your application is published.
 
 This is possible if:
 
