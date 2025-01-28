@@ -31,7 +31,7 @@ See the documentation on [defining local cache mutations](./caching/cache-transa
 
 ### `@typePolicy(keyFields: String!)`
 
-`directive @typePolicy(module: String!) repeatable on OBJECT | INTERFACE`
+`directive @typePolicy(keyFields: String!) on OBJECT | INTERFACE`
 
 Adds a type policy to a type that can be used to resolve cache keys for objects of that type.
 
