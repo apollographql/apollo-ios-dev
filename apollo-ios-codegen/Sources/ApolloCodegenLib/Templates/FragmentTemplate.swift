@@ -23,7 +23,9 @@ struct FragmentTemplate: TemplateRenderer {
     """
     \(accessControlModifier(for: .parent))\
     struct \(fragment.generatedDefinitionName.asFragmentName): \
-    \(fragment.renderedSelectionSetType(config)), Fragment {
+    \(fragment.renderedSelectionSetType(config)), Fragment\
+    \(if: fragment.isIdentifiable, ", Identifiable")\
+     {
     \(if: includeDefinition, """
       \(accessControlModifier(for: .member))\
     static var fragmentDefinition: StaticString {

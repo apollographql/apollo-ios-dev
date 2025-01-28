@@ -41,7 +41,7 @@ public class DogQuery: GraphQLQuery {
     /// AllAnimal
     ///
     /// Parent Type: `Animal`
-    public struct AllAnimal: AnimalKingdomAPI.SelectionSet {
+    public struct AllAnimal: AnimalKingdomAPI.SelectionSet, Identifiable {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -78,7 +78,7 @@ public class DogQuery: GraphQLQuery {
       /// AllAnimal.AsDog
       ///
       /// Parent Type: `Dog`
-      public struct AsDog: AnimalKingdomAPI.InlineFragment {
+      public struct AsDog: AnimalKingdomAPI.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 

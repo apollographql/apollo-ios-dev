@@ -22,6 +22,23 @@ public class NamedFragment: Definition, Hashable, CustomDebugStringConvertible {
   public var name: String { definition.name }
   public var type: GraphQLCompositeType { definition.type }
   public var isLocalCacheMutation: Bool { definition.isLocalCacheMutation }
+  
+  /// Indicates if the parent type has a single keyField named `id`.
+  public var isIdentifiable: Bool {
+    guard definition.selectionSet.selections.contains(where: {
+      guard case .field(let field) = $0 else { return false }
+      return field.name == "id"
+    }) else { return false }
+    
+    switch(type) {
+    case let interface as GraphQLInterfaceType:
+      return interface.keyFields == ["id"]
+    case let object as GraphQLObjectType:
+      return object.keyFields == ["id"]
+    default:
+      return false
+    }
+  }
 
   init(
     definition: CompilationResult.FragmentDefinition,
