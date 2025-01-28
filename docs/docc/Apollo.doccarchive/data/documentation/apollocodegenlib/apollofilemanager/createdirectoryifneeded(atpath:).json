@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Creates the directory (including all intermediate directories) for the given URL if necessary. This method will not overwrite any",
+      "text" : "Creates the directory (including all intermediate directories) for the given URL if necessary. This method will",
       "type" : "text"
     },
     {
@@ -9,7 +9,7 @@
       "type" : "text"
     },
     {
-      "text" : "existing directory.",
+      "text" : "not overwrite any existing directory.",
       "type" : "text"
     }
   ],
@@ -228,7 +228,7 @@
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloFileManager/createDirectoryIfNeeded(atPath:)": {
   "abstract" : [
     {
-      "text" : "Creates the directory (including all intermediate directories) for the given URL if necessary. This method will not overwrite any",
+      "text" : "Creates the directory (including all intermediate directories) for the given URL if necessary. This method will",
       "type" : "text"
     },
     {
@@ -236,7 +236,7 @@
       "type" : "text"
     },
     {
-      "text" : "existing directory.",
+      "text" : "not overwrite any existing directory.",
       "type" : "text"
     }
   ],

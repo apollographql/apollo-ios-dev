@@ -148,7 +148,7 @@
     },
     {
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaMetadata\/cacheKey(for:)",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaMetadata\/cacheKey(for:inferredToImplementInterface:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaMetadata\/graphQLType(for:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaMetadata\/objectType(forTypename:)"
       ],
@@ -331,7 +331,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/schemametadata"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/SchemaMetadata/cacheKey(for:)": {
+"doc://ApolloAPI/documentation/ApolloAPI/SchemaMetadata/cacheKey(for:inferredToImplementInterface:)": {
   "abstract" : [
     {
       "text" : "Resolves the cache key for an object in a GraphQL response to be used by",
@@ -390,7 +390,24 @@
     },
     {
       "kind" : "text",
-      "text" : ") -> "
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "inferredToImplementInterface"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9InterfaceV",
+      "text" : "Interface"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) -> "
     },
     {
       "kind" : "typeIdentifier",
@@ -402,12 +419,12 @@
       "text" : "?"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaMetadata\/cacheKey(for:)",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaMetadata\/cacheKey(for:inferredToImplementInterface:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "cacheKey(for:)",
+  "title" : "cacheKey(for:inferredToImplementInterface:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/schemametadata\/cachekey(for:)"
+  "url" : "\/documentation\/apolloapi\/schemametadata\/cachekey(for:inferredtoimplementinterface:)"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/SchemaMetadata/configuration": {
   "abstract" : [

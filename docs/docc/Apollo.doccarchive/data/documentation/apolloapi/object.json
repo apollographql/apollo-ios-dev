@@ -175,13 +175,14 @@
   "topicSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/init(typename:implementedInterfaces:)"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/init(typename:implementedInterfaces:keyFields:)"
       ],
       "title" : "Initializers"
     },
     {
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/implementedInterfaces",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/keyFields",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/typename"
       ],
       "title" : "Instance Properties"
@@ -547,7 +548,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/object\/implements(_:)"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Object/init(typename:implementedInterfaces:)": {
+"doc://ApolloAPI/documentation/ApolloAPI/Object/init(typename:implementedInterfaces:keyFields:)": {
   "abstract" : [
     {
       "text" : "Designated Initializer",
@@ -595,15 +596,73 @@
     },
     {
       "kind" : "text",
-      "text" : "])"
+      "text" : "], "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "keyFields"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : "]?)"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/init(typename:implementedInterfaces:)",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/init(typename:implementedInterfaces:keyFields:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(typename:implementedInterfaces:)",
+  "title" : "init(typename:implementedInterfaces:keyFields:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/object\/init(typename:implementedinterfaces:)"
+  "url" : "\/documentation\/apolloapi\/object\/init(typename:implementedinterfaces:keyfields:)"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/Object/keyFields": {
+  "abstract" : [
+    {
+      "text" : "A list of fields used to uniquely identify an instance of this object.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "keyFields"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : "]?"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/keyFields",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "keyFields",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/object\/keyfields"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Object/typename": {
   "abstract" : [

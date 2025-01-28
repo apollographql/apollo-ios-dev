@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Designated Initializer",
+      "text" : "A list of fields used to uniquely identify an instance of this object.",
       "type" : "text"
     }
   ],
@@ -9,33 +9,33 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface\/init(name:)"
+    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/keyFields"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI9InterfaceV4nameACSS_tcfc",
+    "externalID" : "s:9ApolloAPI6ObjectV9keyFieldsSaySSGSgvp",
     "fragments" : [
       {
+        "kind" : "keyword",
+        "text" : "let"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
         "kind" : "identifier",
-        "text" : "init"
+        "text" : "keyFields"
       },
       {
         "kind" : "text",
-        "text" : "("
-      },
-      {
-        "kind" : "externalParam",
-        "text" : "name"
-      },
-      {
-        "kind" : "text",
-        "text" : ": "
+        "text" : ": ["
       },
       {
         "kind" : "typeIdentifier",
@@ -44,7 +44,7 @@
       },
       {
         "kind" : "text",
-        "text" : ")"
+        "text" : "]?"
       }
     ],
     "modules" : [
@@ -53,9 +53,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Initializer",
-    "symbolKind" : "init",
-    "title" : "init(name:)"
+    "roleHeading" : "Instance Property",
+    "symbolKind" : "property",
+    "title" : "keyFields"
   },
   "primaryContentSections" : [
     {
@@ -70,19 +70,19 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "init"
+              "text" : "let"
             },
             {
               "kind" : "text",
-              "text" : "("
+              "text" : " "
             },
             {
-              "kind" : "externalParam",
-              "text" : "name"
+              "kind" : "identifier",
+              "text" : "keyFields"
             },
             {
               "kind" : "text",
-              "text" : ": "
+              "text" : ": ["
             },
             {
               "kind" : "typeIdentifier",
@@ -91,7 +91,7 @@
             },
             {
               "kind" : "text",
-              "text" : ")"
+              "text" : "]?"
             }
           ]
         }
@@ -99,32 +99,32 @@
       "kind" : "declarations"
     },
     {
-      "kind" : "parameters",
-      "parameters" : [
+      "content" : [
         {
-          "content" : [
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
             {
-              "inlineContent" : [
-                {
-                  "text" : "The name of the ",
-                  "type" : "text"
-                },
-                {
-                  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface",
-                  "isActive" : true,
-                  "type" : "reference"
-                },
-                {
-                  "text" : " in the GraphQL schema.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
+              "text" : "This is set by adding a ",
+              "type" : "text"
+            },
+            {
+              "code" : "@typePolicy",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " directive to the schema.",
+              "type" : "text"
             }
           ],
-          "name" : "name"
+          "type" : "paragraph"
         }
-      ]
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -138,7 +138,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apolloapi\/interface\/init(name:)"
+        "\/documentation\/apolloapi\/object\/keyfields"
       ],
       "traits" : [
         {
@@ -201,18 +201,18 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Interface": {
+"doc://ApolloAPI/documentation/ApolloAPI/Object": {
   "abstract" : [
     {
-      "text" : "Represents an ",
+      "text" : "Represents an object ",
       "type" : "text"
     },
     {
-      "code" : "interface",
+      "code" : "type",
       "type" : "codeVoice"
     },
     {
-      "text" : " type in a generated GraphQL schema.",
+      "text" : " in a generated GraphQL schema.",
       "type" : "text"
     }
   ],
@@ -227,45 +227,45 @@
     },
     {
       "kind" : "identifier",
-      "text" : "Interface"
+      "text" : "Object"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "Interface"
+      "text" : "Object"
     }
   ],
   "role" : "symbol",
-  "title" : "Interface",
+  "title" : "Object",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/interface"
+  "url" : "\/documentation\/apolloapi\/object"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Interface/init(name:)": {
+"doc://ApolloAPI/documentation/ApolloAPI/Object/keyFields": {
   "abstract" : [
     {
-      "text" : "Designated Initializer",
+      "text" : "A list of fields used to uniquely identify an instance of this object.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
       "kind" : "identifier",
-      "text" : "init"
+      "text" : "keyFields"
     },
     {
       "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "name"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
+      "text" : ": ["
     },
     {
       "kind" : "typeIdentifier",
@@ -274,15 +274,15 @@
     },
     {
       "kind" : "text",
-      "text" : ")"
+      "text" : "]?"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface\/init(name:)",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/keyFields",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(name:)",
+  "title" : "keyFields",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/interface\/init(name:)"
+  "url" : "\/documentation\/apolloapi\/object\/keyfields"
 }
 }
 }
