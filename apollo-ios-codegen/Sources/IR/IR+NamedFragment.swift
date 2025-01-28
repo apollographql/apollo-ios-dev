@@ -30,14 +30,7 @@ public class NamedFragment: Definition, Hashable, CustomDebugStringConvertible {
       return field.name == "id"
     }) else { return false }
     
-    switch(type) {
-    case let interface as GraphQLInterfaceType:
-      return interface.keyFields == ["id"]
-    case let object as GraphQLObjectType:
-      return object.keyFields == ["id"]
-    default:
-      return false
-    }
+    return type.isIdentifiable
   }
 
   init(

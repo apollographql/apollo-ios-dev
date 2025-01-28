@@ -25,17 +25,8 @@ public struct ComputedSelectionSet {
     guard direct?.fields["id"] != nil || merged.fields["id"] != nil else {
       return false
     }
-    if let type = typeInfo.parentType as? GraphQLObjectType,
-       type.keyFields == ["id"] {
-      return true
-    }
-    
-    if let type = typeInfo.parentType as? GraphQLInterfaceType,
-       type.keyFields == ["id"] {
-      return true
-    }
-    
-    return false
+
+    return typeInfo.parentType.isIdentifiable
   }
 
   // MARK: Dynamic Member Subscript
