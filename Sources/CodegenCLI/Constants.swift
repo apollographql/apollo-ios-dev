@@ -1,6 +1,6 @@
 import Foundation
 
 public enum Constants {
-  public static let CLIVersion: String = "1.16.1"
+  public static let CLIVersion: String = "1.17.0"
   static let defaultFilePath: String = "./apollo-codegen-config.json"
 }
