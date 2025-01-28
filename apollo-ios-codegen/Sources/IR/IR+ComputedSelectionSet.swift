@@ -20,7 +20,8 @@ public struct ComputedSelectionSet {
   /// The `TypeInfo` for the selection set of the computed selections
   public let typeInfo: IR.SelectionSet.TypeInfo
   
-  /// Indicates if the parent type has a single keyField named `id`.
+  /// Indicates if a field named `id` is selected as well as requiring that the parent type
+  /// be identifiable.
   public var isIdentifiable: Bool {
     guard direct?.fields["id"] != nil || merged.fields["id"] != nil else {
       return false

@@ -23,7 +23,8 @@ public class NamedFragment: Definition, Hashable, CustomDebugStringConvertible {
   public var type: GraphQLCompositeType { definition.type }
   public var isLocalCacheMutation: Bool { definition.isLocalCacheMutation }
   
-  /// Indicates if the parent type has a single keyField named `id`.
+  /// Indicates if a field named `id` is selected as well as requiring that the parent type
+  /// be identifiable.
   public var isIdentifiable: Bool {
     guard definition.selectionSet.selections.contains(where: {
       guard case .field(let field) = $0 else { return false }
