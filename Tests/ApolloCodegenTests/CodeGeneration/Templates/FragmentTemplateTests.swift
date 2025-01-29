@@ -834,5 +834,68 @@ class FragmentTemplateTests: XCTestCase {
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     }
   }
+ 
+  // MARK: - Protocol conformance
   
+  func test__render__givenFragmentWithIdKeyField_rendersIdentifiableConformance() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      getUser(id: String): User
+    }
+      
+    type User @typePolicy(keyFields: "id") {
+      id: String!
+      name: String!
+    }
+    """
+    
+    document = """
+    fragment NodeFragment on User {
+      id
+    }
+    """
+    
+    let expected = """
+    struct NodeFragment: TestSchema.SelectionSet, Fragment, Identifiable {
+    """
+    
+    // when
+    try await buildSubjectAndFragment(named: "NodeFragment")
+    let actual = renderSubject()
+    
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+  
+  func test__render_givenFragment_withoutUsingIDField_doesNotRenderIdentifiableConformance() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      getUser(id: String): User
+    }
+      
+    type User @typePolicy(keyFields: "id") {
+      id: String!
+      name: String!
+    }
+    """
+    
+    document = """
+    fragment UserFragment on User {
+      name
+    }
+    """
+    
+    let expected = """
+    struct UserFragment: TestSchema.SelectionSet, Fragment {
+    """
+    
+    // when
+    try await buildSubjectAndFragment(named: "UserFragment")
+    let actual = renderSubject()
+    
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
 }

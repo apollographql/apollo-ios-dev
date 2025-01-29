@@ -1,4 +1,5 @@
 fragment PetDetails on Pet {
+  id
   humanName
   favoriteToy
   owner {
