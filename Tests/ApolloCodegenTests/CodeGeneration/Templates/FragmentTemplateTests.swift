@@ -837,7 +837,7 @@ class FragmentTemplateTests: XCTestCase {
  
   // MARK: - Protocol conformance
   
-  func test__render__givenFragmentithIdKeyField_rendersIdentifiableConformance() async throws {
+  func test__render__givenFragmentWithIdKeyField_rendersIdentifiableConformance() async throws {
     // given
     schemaSDL = """
     type Query {
