@@ -11,7 +11,7 @@ class GraphQLResponseTests: XCTestCase {
   func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyFetchIgnoringCacheCompletely_extensionShouldNotBeNil() throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
-      "extensions": [:]
+      "extensions": [:] as JSONValue
     ])
 
     // when
@@ -24,7 +24,7 @@ class GraphQLResponseTests: XCTestCase {
   func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyFetchIgnoringCacheData_extensionShouldNotBeNil() throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
-      "extensions": [:]
+      "extensions": [:] as JSONValue
     ])
 
     // when
@@ -37,7 +37,7 @@ class GraphQLResponseTests: XCTestCase {
   func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataAndFetch_extensionShouldNotBeNil() throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
-      "extensions": [:]
+      "extensions": [:] as JSONValue
     ])
 
     // when
@@ -50,7 +50,7 @@ class GraphQLResponseTests: XCTestCase {
   func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataDontFetch_extensionShouldNotBeNil() throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
-      "extensions": [:]
+      "extensions": [:] as JSONValue
     ])
 
     // when
@@ -63,7 +63,7 @@ class GraphQLResponseTests: XCTestCase {
   func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataElseFetch_extensionShouldNotBeNil() throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
-      "extensions": [:]
+      "extensions": [:] as JSONValue
     ])
 
     // when
@@ -76,7 +76,7 @@ class GraphQLResponseTests: XCTestCase {
   func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyDefault_extensionShouldNotBeNil() throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
-      "extensions": [:]
+      "extensions": [:] as JSONValue
     ])
 
     // when
@@ -90,7 +90,7 @@ class GraphQLResponseTests: XCTestCase {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "data": ["human": NSNull()],
-      "extensions": [:]
+      "extensions": [:] as JSONValue
     ])
 
     // when
@@ -241,7 +241,7 @@ class GraphQLResponseTests: XCTestCase {
             ["line": 1, "column": 2]
           ]
         ]
-      ]
+      ] as JSONValue
     ])
 
     // when
@@ -261,7 +261,7 @@ class GraphQLResponseTests: XCTestCase {
           "message": "Some error",
           "path": ["Some field", 1]
         ]
-      ]
+      ] as JSONValue
     ])
 
     // when

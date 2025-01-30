@@ -455,7 +455,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "name": "Leia Organa"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
       
@@ -598,7 +598,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "id": "1003", "name": "Leia Organa"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
       
@@ -633,7 +633,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "id": "1000"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
       
@@ -745,7 +745,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "id": "1003", "name": "Leia Organa"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
       
@@ -781,7 +781,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "id": "1000"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
       
@@ -799,7 +799,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "id": "1000", "name": "Luke Skywalker"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
       
@@ -913,7 +913,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "id": "1003", "name": "Leia Organa"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
 
@@ -949,7 +949,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "id": "1000"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
 
@@ -1044,7 +1044,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "name": "Leia Organa"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
 
@@ -1283,7 +1283,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "id": "1000"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
 
@@ -1595,7 +1595,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "id": "1000", "name": "Luke Skywalker"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
 
@@ -1730,7 +1730,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "id": "1000", "name": "Luke Skywalker"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
 
@@ -1782,7 +1782,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "id": "1002", "name": "Han Solo"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
 
@@ -1884,7 +1884,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
                 ["__typename": "Human", "id": "1000", "name": "Luke Skywalker"],
               ]
             ]
-          ]
+          ] as JSONValue
         ]
       }
 
