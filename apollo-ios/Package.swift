@@ -1,16 +1,12 @@
 // swift-tools-version:5.9
-//
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-// Swift 5.9 is available from Xcode 15.0.
-
 
 import PackageDescription
 
 let package = Package(
   name: "Apollo",
   platforms: [
-    .iOS(.v12),
-    .macOS(.v10_14),
+    .iOS(.v15),
+    .macOS(.v10_15),
     .tvOS(.v12),
     .watchOS(.v5),
     .visionOS(.v1),
@@ -38,7 +34,10 @@ let package = Package(
       resources: [
         .copy("Resources/PrivacyInfo.xcprivacy")
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableExperimentalFeature("StrictConcurrency")
+      ]
     ),
     .target(
       name: "ApolloAPI",
@@ -46,7 +45,10 @@ let package = Package(
       resources: [
         .copy("Resources/PrivacyInfo.xcprivacy")
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableExperimentalFeature("StrictConcurrency")
+      ]
     ),
     .target(
       name: "ApolloSQLite",
@@ -90,5 +92,6 @@ let package = Package(
       dependencies: [],
       path: "Plugins/InstallCLI"
     )
-  ]
+  ],
+  swiftLanguageVersions: [.version("6"), .v5]
 )

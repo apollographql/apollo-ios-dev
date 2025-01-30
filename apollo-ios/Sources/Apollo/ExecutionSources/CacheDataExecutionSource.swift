@@ -33,13 +33,13 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
   func resolveField(
     with info: FieldExecutionInfo,
     on object: Record
-  ) -> PossiblyDeferred<AnyHashable?> {
-    PossiblyDeferred {      
+  ) -> PossiblyDeferred<JSONValue?> {
+    PossiblyDeferred {
       let value = try object[info.cacheKeyForField()]
 
       switch value {
       case let reference as CacheReference:
-        return deferredResolve(reference: reference).map { $0 as AnyHashable }
+        return deferredResolve(reference: reference).map { $0 as JSONValue }
 
       case let referenceList as [CacheReference]:
         return referenceList
@@ -56,7 +56,7 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
                   return error
                 }
               }
-          }.map { $0._asAnyHashable }
+          }.map { $0 as JSONValue }
 
       default:
         return .immediate(.success(value))

@@ -9,4 +9,4 @@ import ApolloAPI
 ///
 /// This allows the various interceptors to make modifications, or perform actions, with information
 /// that they cannot get just from the existing operation. It can be anything that conforms to this protocol.
-public protocol RequestContext {}
+public protocol RequestContext: Sendable {}
