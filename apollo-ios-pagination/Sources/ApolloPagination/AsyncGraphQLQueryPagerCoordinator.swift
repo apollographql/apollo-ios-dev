@@ -18,6 +18,8 @@ public protocol AsyncPagerType {
 }
 
 actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: AsyncPagerType {
+  typealias VariableValue = AnyHashable
+
   private let client: any ApolloClientProtocol
   private var firstPageWatcher: GraphQLQueryWatcher<InitialQuery>?
   private var nextPageWatchers: [GraphQLQueryWatcher<PaginatedQuery>] = []
@@ -35,9 +37,9 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   }
 
   var publishers: (
-    previousPageVarMap: Published<OrderedDictionary<Set<JSONValue>, GraphQLResult<PaginatedQuery.Data>>>.Publisher,
+    previousPageVarMap: Published<OrderedDictionary<Set<VariableValue>, GraphQLResult<PaginatedQuery.Data>>>.Publisher,
     initialPageResult: Published<GraphQLResult<InitialQuery.Data>?>.Publisher,
-    nextPageVarMap: Published<OrderedDictionary<Set<JSONValue>, GraphQLResult<PaginatedQuery.Data>>>.Publisher
+    nextPageVarMap: Published<OrderedDictionary<Set<VariableValue>, GraphQLResult<PaginatedQuery.Data>>>.Publisher
   ) {
     return ($previousPageVarMap, $initialPageResult, $nextPageVarMap)
   }
@@ -58,8 +60,8 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
   }
 
   /// Maps each query variable set to latest results from internal watchers.
-  @Published var nextPageVarMap: OrderedDictionary<Set<JSONValue>, GraphQLResult<PaginatedQuery.Data>> = [:]
-  @Published var previousPageVarMap: OrderedDictionary<Set<JSONValue>, GraphQLResult<PaginatedQuery.Data>> = [:]
+  @Published var nextPageVarMap: OrderedDictionary<Set<VariableValue>, GraphQLResult<PaginatedQuery.Data>> = [:]
+  @Published var previousPageVarMap: OrderedDictionary<Set<VariableValue>, GraphQLResult<PaginatedQuery.Data>> = [:]
   private var tasks: Set<Task<Void, any Error>> = []
   private var taskGroup: ThrowingTaskGroup<Void, any Error>?
   private var watcherCallbackQueue: DispatchQueue
@@ -273,7 +275,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
 
     await execute { [weak self] publisher in
       guard let self else { return }
-      let watcher = GraphQLQueryWatcher(client: self.client, query: pageQuery, callbackQueue: await watcherCallbackQueue) { [weak self] result in
+      let watcher = await GraphQLQueryWatcher(client: self.client, query: pageQuery, callbackQueue: watcherCallbackQueue) { [weak self] result in
         Task { [weak self] in
           await self?.onFetch(
             fetchType: .paginated(direction, pageQuery),
@@ -328,7 +330,7 @@ actor AsyncGraphQLQueryPagerCoordinator<InitialQuery: GraphQLQuery, PaginatedQue
           didFail = true
         }
       case .paginated(let direction, let query):
-        let variables = Set(query.__variables?.underlyingJson ?? [])
+        let variables: Set<VariableValue> = query.__variables?.underlyingJsonValues ?? []
         let underlyingData = data.data as? PaginatedQuery.Data
         switch direction {
         case .next:
@@ -463,8 +465,14 @@ private extension AsyncGraphQLQueryPagerCoordinator {
 }
 
 private extension GraphQLOperation.Variables {
-  var underlyingJson: [JSONValue] {
-    values.compactMap { $0._jsonEncodableValue?._jsonValue }
+  var underlyingJsonValues: Set<AnyHashable> {
+    var set = Set<AnyHashable>()
+    for value in values {
+      if let encodableValue = value._jsonEncodableValue?._jsonValue {
+        _ = set.insert(encodableValue)
+      }
+    }
+    return set
   }
 }
 
