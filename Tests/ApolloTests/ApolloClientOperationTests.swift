@@ -62,8 +62,8 @@ final class ApolloClientOperationTests: XCTestCase {
         "__typename": "Review",
         "stars": 3,
         "commentary": ""
-      ]
-    ]
+      ] as JSONValue
+    ] as JSONValue
   ]
 
   func test__performMutation_givenPublishResultToStore_true_publishResultsToStore() throws {

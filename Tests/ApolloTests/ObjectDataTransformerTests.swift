@@ -5,7 +5,7 @@ import ApolloAPI
 class ObjectDataTransformerTests: XCTestCase {
 
   fileprivate struct DataTransformer: _ObjectData_Transformer {
-    func transform(_ value: AnyHashable) -> (any ScalarType)? {
+    func transform(_ value: any Hashable & Sendable) -> (any ScalarType)? {
       switch value {
       case let scalar as any ScalarType:
         return scalar
@@ -15,8 +15,8 @@ class ObjectDataTransformerTests: XCTestCase {
     }
 
     // Empty until needed in tests
-    func transform(_ value: AnyHashable) -> ObjectData? { return nil }
-    func transform(_ value: AnyHashable) -> ListData? { return nil }
+    func transform(_ value: any Hashable & Sendable) -> ObjectData? { return nil }
+    func transform(_ value: any Hashable & Sendable) -> ListData? { return nil }
   }
 
   // MARK: ObjectData Tests

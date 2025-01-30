@@ -1,7 +1,7 @@
 import XCTest
 import Nimble
 @testable import Apollo
-import ApolloAPI
+@_spi(Internal) import ApolloAPI
 import ApolloInternalTestHelpers
 
 final class MultipartResponseDeferParserTests: XCTestCase {
@@ -23,7 +23,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
           
           --graphql
           content-type: test/custom
-
+          
           {
             "data" : {
               "key" : "value"
@@ -61,7 +61,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
           
           --graphql
           content-type: application/json
-
+          
           not_a_valid_json_object
           --graphql--
           """.crlfFormattedData()
@@ -94,7 +94,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
           
           --graphql
           content-type: application/json
-
+          
           {
             "key": "value"
           }
@@ -138,7 +138,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
           
           --graphql
           content-type: application/json
-
+          
           {
             "data" : {
               "key" : "value"
@@ -188,7 +188,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
           
           --graphql
           Content-Type: application/json; charset=utf-8
-
+          
           {
             "data" : {
               "key" : "value"
@@ -238,7 +238,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
           
           --graphql
           content-type: application/graphql-response+json
-
+          
           {
             "data" : {
               "key" : "value"
@@ -282,7 +282,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
             "__typename": "Animal",
             "species": "Canis familiaris"
           ]
-        ],
+        ] as JSONValue,
         "hasNext": true
       ],
       [
@@ -296,20 +296,21 @@ final class MultipartResponseDeferParserTests: XCTestCase {
               "animal"
             ]
           ]
-        ],
+        ] as JSONValue,
         "hasNext": false
       ]
     ]
 
-    subject.intercept(
-      request: .mock(operation: MockQuery.mock()),
-      response: .mock(
-        headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
-        data: """
+    subject
+      .intercept(
+        request: .mock(operation: MockQuery.mock()) as HTTPRequest<MockQuery<MockSelectionSet>>,
+        response: .mock(
+          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
+          data: """
           
           --graphql
           content-type: application/json
-
+          
           {
             "data": {
               "__typename": "AnAnimal",
@@ -322,7 +323,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
           }
           --graphql
           content-type: application/json
-
+          
           {
             "incremental": [
               {
@@ -339,24 +340,26 @@ final class MultipartResponseDeferParserTests: XCTestCase {
           }
           --graphql--
           """.crlfFormattedData()
+        ) as HTTPResponse<MockQuery<MockSelectionSet>>,
+        completion: { (result: Result<HTTPResponse<MockQuery<MockSelectionSet>>?, any Error>) in
+          defer {
+            expectation.fulfill()
+          }
+
+          expect(result).to(beSuccess())
+
+          guard
+            let response = try! result.get(),
+            let deserialized = try! JSONSerialization.jsonObject(with: response.rawData) as? JSONObject
+          else {
+            fail("data could not be deserialized!")
+            return
+          }
+
+          expect(expected).to(contain(deserialized))
+          expected.removeAll(where: { AnySendableHashable.equatableCheck($0, deserialized) })
+        }
       )
-    ) { result in
-      defer {
-        expectation.fulfill()
-      }
-
-      expect(result).to(beSuccess())
-
-      guard
-        let response = try! result.get(),
-        let deserialized = try! JSONSerialization.jsonObject(with: response.rawData) as? JSONObject
-      else {
-        return fail("data could not be deserialized!")
-      }
-
-      expect(expected).to(contain(deserialized))
-      expected.removeAll(where: { $0 == deserialized })
-    }
 
     wait(for: [expectation], timeout: defaultTimeout)
     expect(expected).to(beEmpty())
