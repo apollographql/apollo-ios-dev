@@ -155,7 +155,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
           ["__typename": "Human", "name": "Han Solo"],
           ["__typename": "Human", "name": "Leia Organa"]
         ]
-      ]
+      ] as JSONValue
     ]
 
     // when
@@ -212,7 +212,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
           ["__typename": "Human", "id": "1002", "name": "Han Solo"],
           ["__typename": "Human", "id": "1003", "name": "Leia Organa"]
         ]
-      ]
+      ] as JSONValue
     ]
 
     // when
@@ -454,7 +454,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
         "name": "Luke Skywalker",
         "__typename": "Human",
         "friend": ["__typename": "Human", "name": "Han Solo", "height": 5.905512],
-      ]
+      ] as JSONValue
     ]
 
     // when
@@ -528,7 +528,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
         "name": "Luke Skywalker",
         "__typename": "Droid",
         "friend": ["__typename": "Human", "name": "Luke Skywalker", "height": 1.72],
-      ]
+      ] as JSONValue
     ]
 
     // when
