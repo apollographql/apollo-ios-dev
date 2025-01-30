@@ -426,7 +426,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
           CacheReference("1003")
         ]
       ],
-      "1000": ["__typename": "Human", "name": ["dictionary": "badValues", "nested bad val": ["subdictionary": "some value"] ]
+      "1000": ["__typename": "Human", "name": ["dictionary": "badValues", "nested bad val": ["subdictionary": "some value"] ] as JSONValue
       ],
       "1002": ["__typename": "Human", "name": "Han Solo"],
       "1003": ["__typename": "Human", "name": "Leia Organa"],

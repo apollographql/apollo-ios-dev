@@ -464,7 +464,7 @@ private extension AsyncGraphQLQueryPagerCoordinator {
   }
 }
 
-private extension GraphQLOperation.Variables {
+extension GraphQLOperation.Variables {
   var underlyingJsonValues: Set<AnyHashable> {
     var set = Set<AnyHashable>()
     for value in values {

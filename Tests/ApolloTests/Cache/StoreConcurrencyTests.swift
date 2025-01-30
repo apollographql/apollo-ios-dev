@@ -207,7 +207,7 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
         "name": "R2-D2",
         "id": "2001",
         "__typename": "Droid",
-        "friends": []
+        "friends": [] as JSONValue
       ]
     ])
 
@@ -331,7 +331,7 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
         "name": "R2-D2",
         "id": "2001",
         "__typename": "Droid",
-        "friends": []
+        "friends": [] as JSONValue
       ]
     ])
 

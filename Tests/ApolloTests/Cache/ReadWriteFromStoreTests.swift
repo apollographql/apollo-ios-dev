@@ -2686,13 +2686,13 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
         ]
       ],
       "1101": [
-        "__typename": "Human", "name": "Luke Skywalker", "id": "1101", "friends": []
+        "__typename": "Human", "name": "Luke Skywalker", "id": "1101", "friends": [] as JSONValue
       ],
       "1002": [
-        "__typename": "Human", "name": "Han Solo", "id": "1002", "friends": []
+        "__typename": "Human", "name": "Han Solo", "id": "1002", "friends": [] as JSONValue
       ],
       "1003": [
-        "__typename": "Human", "name": "Leia Organa", "id": "1003", "friends": []
+        "__typename": "Human", "name": "Leia Organa", "id": "1003", "friends": [] as JSONValue
       ],
     ])
 

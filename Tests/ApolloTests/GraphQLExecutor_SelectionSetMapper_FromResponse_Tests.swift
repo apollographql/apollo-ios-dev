@@ -398,7 +398,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [.field("favorites", [String].self)] }
     }
-    let object: JSONObject = ["favorites": []]
+    let object: JSONObject = ["favorites": [] as JSONValue]
 
     // when
     let data = try readValues(GivenSelectionSet.self, from: object)
@@ -510,7 +510,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [.field("favorites", [String]?.self)] }
     }
-    let object: JSONObject = ["favorites": []]
+    let object: JSONObject = ["favorites": [] as JSONValue]
 
     // when
     let data = try readValues(GivenSelectionSet.self, from: object)
@@ -601,7 +601,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [.field("favorites", [String?].self)] }
     }
-    let object: JSONObject = ["favorites": []]
+    let object: JSONObject = ["favorites": [] as JSONValue]
 
     // when
     let data = try readValues(GivenSelectionSet.self, from: object)
@@ -645,7 +645,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [.field("favorites", [String?].self)] }
     }
-    let object: JSONObject = ["favorites": ["Red", NSNull(), "Bird"]]
+    let object: JSONObject = ["favorites": ["Red", NSNull(), "Bird"] as JSONValue]
 
     let data = try readValues(GivenSelectionSet.self, from: object)
 
@@ -774,7 +774,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       "child": [
         "__typename": "Child",
         "name": NSNull()
-      ]
+      ] as JSONValue
     ]
 
     // when
