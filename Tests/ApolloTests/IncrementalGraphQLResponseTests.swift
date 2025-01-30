@@ -121,7 +121,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
       "path": ["animal"],
-      "extensions": [:]
+      "extensions": [:]  as JSONValue
     ])
 
     // when
@@ -136,7 +136,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
       "path": ["animal"],
-      "extensions": [:]
+      "extensions": [:]  as JSONValue
     ])
 
     // when
@@ -151,7 +151,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
       "path": ["animal"],
-      "extensions": [:]
+      "extensions": [:]  as JSONValue
     ])
 
     // when
@@ -166,7 +166,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
       "path": ["animal"],
-      "extensions": [:]
+      "extensions": [:] as JSONValue
     ])
 
     // when
@@ -181,7 +181,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
       "path": ["animal"],
-      "extensions": [:]
+      "extensions": [:] as JSONValue
     ])
 
     // when
@@ -196,7 +196,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
       "path": ["animal"],
-      "extensions": [:]
+      "extensions": [:] as JSONValue
     ])
 
     // when
@@ -363,7 +363,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
             ["line": 1, "column": 2]
           ]
         ]
-      ]
+      ] as JSONValue
     ])
 
     // when
@@ -385,7 +385,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
           "message": "Some error",
           "path": ["Some field", 1]
         ]
-      ]
+      ] as JSONValue
     ])
 
     // when
@@ -407,7 +407,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
           "message": "Some error",
           "userMessage": "Some message"
         ]
-      ]
+      ] as JSONValue
     ])
 
     // when
