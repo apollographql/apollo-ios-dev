@@ -127,8 +127,8 @@ open class RequestChainNetworkTransport: NetworkTransport {
     contextIdentifier: UUID? = nil,
     context: (any RequestContext)? = nil,
     callbackQueue: DispatchQueue = .main,
-    completionHandler: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Cancellable {
-    
+    completionHandler: @escaping @Sendable (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Cancellable {
+
     let chain = makeChain(operation: operation, callbackQueue: callbackQueue)
     let request = self.constructRequest(
       for: operation,
@@ -186,8 +186,9 @@ extension RequestChainNetworkTransport: UploadingNetworkTransport {
     files: [GraphQLFile],
     context: (any RequestContext)?,
     callbackQueue: DispatchQueue = .main,
-    completionHandler: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Cancellable {
-    
+    completionHandler: @escaping GraphQLResultHandler<Operation.Data>
+  ) -> any Cancellable {
+
     let request = self.constructUploadRequest(for: operation, with: files, context: context)
     let chain = makeChain(operation: operation, callbackQueue: callbackQueue)
     chain.kickoff(request: request, completion: completionHandler)
