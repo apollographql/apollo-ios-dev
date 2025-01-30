@@ -236,7 +236,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
             "appearsIn": ["NEWHOPE", "EMPIRE", "JEDI"],
             "__typename": "Droid"
           ]
-        ]
+        ] as JSONValue
       ]
     }
     
@@ -411,7 +411,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery.mock()
 
     let serverRequestExpectation = server.expect(MockQuery<MockSelectionSet>.self) { request in
-      ["data": [:]]
+      ["data": [:] as JSONValue]
     }
     
     let resultObserver = makeResultObserver(for: query)

@@ -1,5 +1,6 @@
 import XCTest
 @testable import Apollo
+import ApolloAPI
 
 class CacheKeyForFieldTests: XCTestCase {
   func testFieldWithNameOnly() {
@@ -30,7 +31,9 @@ class CacheKeyForFieldTests: XCTestCase {
   func testFieldWithNestedNullArgument() throws {
     let actual = CacheKeyForField(
       named: "hero",
-      arguments: ["nested": ["foo": 1, "bar": NSNull()]]
+      arguments: [
+        "nested": ["foo": 1, "bar": NSNull()] as JSONValue
+      ]
     )
     XCTAssertEqual(actual, "hero([nested:bar:null,foo:1])")
   }
@@ -43,7 +46,9 @@ class CacheKeyForFieldTests: XCTestCase {
   func testFieldWithDictionaryArgument() throws {
     let actual = CacheKeyForField(
       named: "hero",
-      arguments: ["nested": ["foo": 1, "bar": "2"]]
+      arguments: [
+        "nested": ["foo": 1, "bar": "2"] as JSONValue
+      ]
     )
     XCTAssertEqual(actual, "hero([nested:bar:2,foo:1])")
   }
