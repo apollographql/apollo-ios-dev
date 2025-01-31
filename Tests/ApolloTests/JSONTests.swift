@@ -61,10 +61,10 @@ class JSONTests: XCTestCase {
       }
       """
     let data = try XCTUnwrap(jsonString.data(using: .utf8))
-    let json = try JSONSerializationFormat.deserialize(data: data)
+    let json = try JSONSerializationFormat.deserialize(data: data) as JSONObject
     XCTAssertNotNil(json)
     
-    let dict = try JSONObject(_jsonValue: json)
+    let dict = try JSONObject(_jsonValue: json as JSONValue)
     XCTAssertNotNil(dict)
     
     let reserialized = try JSONSerializationFormat.serialize(value: dict)

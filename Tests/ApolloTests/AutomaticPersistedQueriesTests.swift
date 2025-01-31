@@ -75,7 +75,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
 
     guard
       let httpBody = request.httpBody,
-      let jsonBody = try? JSONSerializationFormat.deserialize(data: httpBody) as? JSONObject else {
+      let jsonBody = try? JSONSerializationFormat.deserialize(data: httpBody) as JSONObject else {
       fail(
         "httpBody invalid",
         location: SourceLocation(file: file, line: line)
@@ -199,7 +199,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard
         let ext = ext,
         let data = ext.data(using: .utf8),
-        let jsonBody = try? JSONSerializationFormat.deserialize(data: data) as? JSONObject
+        let jsonBody = try? JSONSerializationFormat.deserialize(data: data) as JSONObject
         else {
         fail(
           "extensions json data should not be nil",
