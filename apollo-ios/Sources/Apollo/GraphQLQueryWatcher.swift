@@ -139,6 +139,9 @@ public final class GraphQLQueryWatcher<Query: GraphQLQuery>: Cancellable, Apollo
           if self.refetchOnFailedUpdates && self.fetching.cachePolicy != .returnCacheDataDontFetch {
             // If the cache fetch is not successful, for instance if the data is missing, refresh from the server.
             self.fetch(cachePolicy: .fetchIgnoringCacheData)
+          } else {
+            // Propagate the error so the watcher knows something is wrong.
+            self.resultHandler(result)
           }
         }
       }
