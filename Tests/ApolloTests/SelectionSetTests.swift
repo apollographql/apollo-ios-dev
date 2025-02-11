@@ -84,7 +84,7 @@ class SelectionSetTests: XCTestCase {
 
   func test__selection_givenOptionalField_givenNilValue__returnsNil() {
     // given
-    class Hero: MockSelectionSet {
+    final class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
       override class var __selections: [Selection] {[
@@ -98,7 +98,7 @@ class SelectionSetTests: XCTestCase {
     let object: JSONObject = [
       "__typename": "Human",
       "name": String?.none
-    ]
+    ] 
 
     // when
     let actual = try! Hero(data: object)
@@ -111,7 +111,7 @@ class SelectionSetTests: XCTestCase {
 
   func test__selection__nestedArrayOfScalar_nonNull_givenValue__returnsValue() {
     // given
-    class Hero: MockSelectionSet {
+    final class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
       override class var __selections: [Selection] {[
