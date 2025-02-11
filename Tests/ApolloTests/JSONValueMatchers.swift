@@ -8,24 +8,28 @@ public func equalJSONValue(_ expectedValue: (any JSONEncodable)?) -> Matcher<any
   }
 }
 
+@_disfavoredOverload
 public func equal(
   _ expectedValue: any Sendable & Hashable
 ) -> Nimble.Matcher<any Sendable & Hashable> {
   return equal(expectedValue, by: AnySendableHashable.equatableCheck)
 }
 
+@_disfavoredOverload
 public func equal(
   _ expectedValue: [String: any Sendable & Hashable]
 ) -> Nimble.Matcher<[String: any Sendable & Hashable]> {
   return equal(expectedValue, by: AnySendableHashable.equatableCheck)
 }
 
+@_disfavoredOverload
 public func contain(
   _ items: [String: any Sendable & Hashable]...
 ) -> Matcher<[[String: any Sendable & Hashable]]> {
   contain(items)
 }
 
+@_disfavoredOverload
 public func contain(
   _ items: [[String: any Sendable & Hashable]]
 ) -> Matcher<[[String: any Sendable & Hashable]]> {
