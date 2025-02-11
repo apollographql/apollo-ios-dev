@@ -39,6 +39,8 @@ final class DeferTests: XCTestCase {
           override class var __selections: [Selection] {[
             .field("genres", [String].self),
           ]}
+
+          var genres: [String] { __data["genres"] }
         }
 
         class Character: AbstractMockSelectionSet<Character.Fragments, MockSchemaMetadata> {
