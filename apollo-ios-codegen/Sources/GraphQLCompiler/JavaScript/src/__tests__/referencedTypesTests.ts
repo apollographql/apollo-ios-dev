@@ -40,7 +40,7 @@ describe("mutation defined using ReportCarProblemInput", () => {
     const schema: GraphQLSchema = loadSchemaFromSources([new Source(schemaJSON, "TestSchema.json", { line: 1, column: 1 })]);
 
     it("should compile with referencedTypes including ReportCarProblemInput and CarProblem enum", () => {
-      const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
+      const compilationResult: CompilationResult = compileDocument(schema, document, false, false, emptyValidationOptions);
       const reportCarProblemInput: GraphQLInputObjectType = compilationResult.referencedTypes.find(function(element) {
         return element.name == 'ReportCarProblemInput'
       }) as GraphQLInputObjectType
@@ -79,7 +79,7 @@ describe("mutation defined using ReportCarProblemInput", () => {
     const schema: GraphQLSchema = loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
 
     it("should compile with referencedTypes inlcuding InputObject and enum", () => {
-      const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
+      const compilationResult: CompilationResult = compileDocument(schema, document, false, false, emptyValidationOptions);
       const reportCarProblemInput: GraphQLInputObjectType = compilationResult.referencedTypes.find(function(element) {
         return element.name == 'ReportCarProblemInput'
       }) as GraphQLInputObjectType
@@ -118,7 +118,7 @@ describe("query with selections", () => {
     const schema: GraphQLSchema = loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
 
     it("should compile with referencedTypes including interface", () => {
-      const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
+      const compilationResult: CompilationResult = compileDocument(schema, document, false, false, emptyValidationOptions);
       const validInterface: GraphQLInterfaceType = compilationResult.referencedTypes.find(function(element) {
         return element.name == 'MissingInterface'
       }) as GraphQLInterfaceType
