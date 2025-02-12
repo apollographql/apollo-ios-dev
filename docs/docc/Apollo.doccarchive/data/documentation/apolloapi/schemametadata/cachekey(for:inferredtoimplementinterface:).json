@@ -27,12 +27,12 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaMetadata\/cacheKey(for:)"
+    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaMetadata\/cacheKey(for:inferredToImplementInterface:)"
   },
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "ApolloAPI",
-    "externalID" : "s:9ApolloAPI14SchemaMetadataPAAE8cacheKey3forSSSgAA10ObjectDataV_tFZ",
+    "externalID" : "s:9ApolloAPI14SchemaMetadataPAAE8cacheKey3for28inferredToImplementInterfaceSSSgAA10ObjectDataV_AA0K0VSgtFZ",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -73,7 +73,24 @@
       },
       {
         "kind" : "text",
-        "text" : ") -> "
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "inferredToImplementInterface"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:9ApolloAPI9InterfaceV",
+        "text" : "Interface"
+      },
+      {
+        "kind" : "text",
+        "text" : "?) -> "
       },
       {
         "kind" : "typeIdentifier",
@@ -93,7 +110,7 @@
     "role" : "symbol",
     "roleHeading" : "Type Method",
     "symbolKind" : "method",
-    "title" : "cacheKey(for:)"
+    "title" : "cacheKey(for:inferredToImplementInterface:)"
   },
   "primaryContentSections" : [
     {
@@ -154,7 +171,33 @@
             },
             {
               "kind" : "text",
-              "text" : ") -> "
+              "text" : ", "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "inferredToImplementInterface"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "internalParam",
+              "text" : "implementedInterface"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI9InterfaceV",
+              "text" : "Interface"
+            },
+            {
+              "kind" : "text",
+              "text" : "? = nil) -> "
             },
             {
               "kind" : "typeIdentifier",
@@ -195,6 +238,61 @@
             }
           ],
           "name" : "object"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "An optional ",
+                  "type" : "text"
+                },
+                {
+                  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface",
+                  "isActive" : true,
+                  "type" : "reference"
+                },
+                {
+                  "text" : " that the object is",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "inferred to implement. If the cache key is being resolved for a selection set with an",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "interface as it’s ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "__parentType",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ", you can infer the object must implement that interface.",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "You should provide that interface to this parameter.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "implementedInterface"
         }
       ]
     },
@@ -257,100 +355,218 @@
         {
           "inlineContent" : [
             {
-              "text" : "Maps the type of the ",
-              "type" : "text"
-            },
-            {
-              "code" : "object",
-              "type" : "codeVoice"
-            },
-            {
-              "text" : " using the ",
-              "type" : "text"
-            },
-            {
-              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaMetadata\/graphQLType(for:)",
-              "isActive" : true,
-              "type" : "reference"
-            },
-            {
-              "text" : " function, then gets the",
-              "type" : "text"
-            },
-            {
-              "text" : " ",
-              "type" : "text"
-            },
-            {
-              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheKeyInfo",
-              "isActive" : true,
-              "type" : "reference"
-            },
-            {
-              "text" : " for the ",
-              "type" : "text"
-            },
-            {
-              "code" : "object",
-              "type" : "codeVoice"
-            },
-            {
-              "text" : " using the ",
-              "type" : "text"
-            },
-            {
-              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaConfiguration\/cacheKeyInfo(for:object:)",
-              "isActive" : true,
-              "type" : "reference"
-            },
-            {
-              "text" : " ",
-              "type" : "text"
-            },
-            {
-              "text" : "function.",
-              "type" : "text"
-            },
-            {
-              "text" : " ",
-              "type" : "text"
-            },
-            {
-              "text" : "Finally, this function transforms the ",
-              "type" : "text"
-            },
-            {
-              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheKeyInfo",
-              "isActive" : true,
-              "type" : "reference"
-            },
-            {
-              "text" : " into the correct ",
-              "type" : "text"
-            },
-            {
-              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference",
-              "isActive" : true,
-              "type" : "reference"
-            },
-            {
-              "text" : " ",
-              "type" : "text"
-            },
-            {
-              "text" : "for the ",
-              "type" : "text"
-            },
-            {
-              "code" : "NormalizedCache",
-              "type" : "codeVoice"
-            },
-            {
-              "text" : ".",
+              "text" : "The algorithm for resolving the objects cache key:",
               "type" : "text"
             }
           ],
           "type" : "paragraph"
+        },
+        {
+          "items" : [
+            {
+              "content" : [
+                {
+                  "inlineContent" : [
+                    {
+                      "text" : "Map the type of the ",
+                      "type" : "text"
+                    },
+                    {
+                      "code" : "object",
+                      "type" : "codeVoice"
+                    },
+                    {
+                      "text" : " using the ",
+                      "type" : "text"
+                    },
+                    {
+                      "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaMetadata\/graphQLType(for:)",
+                      "isActive" : true,
+                      "type" : "reference"
+                    },
+                    {
+                      "text" : " function.",
+                      "type" : "text"
+                    }
+                  ],
+                  "type" : "paragraph"
+                }
+              ]
+            },
+            {
+              "content" : [
+                {
+                  "inlineContent" : [
+                    {
+                      "text" : "Attempt to gets the ",
+                      "type" : "text"
+                    },
+                    {
+                      "code" : "CacheKeyInfo`` using programmatic cache key configuration.  2a. Call the ``SchemaConfiguration\/cacheKeyInfo(for:object:)`` function.  2b. If ",
+                      "type" : "codeVoice"
+                    },
+                    {
+                      "text" : "CacheKeyInfo",
+                      "type" : "text"
+                    },
+                    {
+                      "code" : "is found, transforms the ``CacheKeyInfo`` into the correct ``CacheReference``  for the",
+                      "type" : "codeVoice"
+                    },
+                    {
+                      "text" : "NormalizedCache` and return it.",
+                      "type" : "text"
+                    }
+                  ],
+                  "type" : "paragraph"
+                }
+              ]
+            },
+            {
+              "content" : [
+                {
+                  "inlineContent" : [
+                    {
+                      "text" : "If no programmatic cache key is returned, attempt to resolve the ",
+                      "type" : "text"
+                    },
+                    {
+                      "code" : "keyFields",
+                      "type" : "codeVoice"
+                    },
+                    {
+                      "text" : " for the object",
+                      "type" : "text"
+                    },
+                    {
+                      "text" : " ",
+                      "type" : "text"
+                    },
+                    {
+                      "text" : "3a. Check if the object’s type has ",
+                      "type" : "text"
+                    },
+                    {
+                      "code" : "keyFields",
+                      "type" : "codeVoice"
+                    },
+                    {
+                      "text" : ".",
+                      "type" : "text"
+                    },
+                    {
+                      "text" : " ",
+                      "type" : "text"
+                    },
+                    {
+                      "text" : "3b. If the type of the object is unknown (ie. it cannot be found by ",
+                      "type" : "text"
+                    },
+                    {
+                      "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaMetadata\/graphQLType(for:)",
+                      "isActive" : true,
+                      "type" : "reference"
+                    },
+                    {
+                      "text" : "),",
+                      "type" : "text"
+                    },
+                    {
+                      "text" : " ",
+                      "type" : "text"
+                    },
+                    {
+                      "text" : "or the type does not have ",
+                      "type" : "text"
+                    },
+                    {
+                      "code" : "keyFields",
+                      "type" : "codeVoice"
+                    },
+                    {
+                      "text" : ", check if the inferred interface for the type has",
+                      "type" : "text"
+                    },
+                    {
+                      "text" : " ",
+                      "type" : "text"
+                    },
+                    {
+                      "code" : "keyFields",
+                      "type" : "codeVoice"
+                    },
+                    {
+                      "text" : ".",
+                      "type" : "text"
+                    },
+                    {
+                      "text" : " ",
+                      "type" : "text"
+                    },
+                    {
+                      "text" : "3c. If ",
+                      "type" : "text"
+                    },
+                    {
+                      "code" : "keyFields",
+                      "type" : "codeVoice"
+                    },
+                    {
+                      "text" : " are found, resolve the cache key by escaping and joining the values of",
+                      "type" : "text"
+                    },
+                    {
+                      "text" : " ",
+                      "type" : "text"
+                    },
+                    {
+                      "text" : "the ",
+                      "type" : "text"
+                    },
+                    {
+                      "code" : "keyFields",
+                      "type" : "codeVoice"
+                    },
+                    {
+                      "text" : " on the object. Return the resolved cache key.",
+                      "type" : "text"
+                    }
+                  ],
+                  "type" : "paragraph"
+                }
+              ]
+            },
+            {
+              "content" : [
+                {
+                  "inlineContent" : [
+                    {
+                      "text" : "If a cache key is not resolved programmatically or using ",
+                      "type" : "text"
+                    },
+                    {
+                      "code" : "keyFields",
+                      "type" : "codeVoice"
+                    },
+                    {
+                      "text" : ", return ",
+                      "type" : "text"
+                    },
+                    {
+                      "code" : "nil",
+                      "type" : "codeVoice"
+                    },
+                    {
+                      "text" : ".",
+                      "type" : "text"
+                    }
+                  ],
+                  "type" : "paragraph"
+                }
+              ]
+            }
+          ],
+          "type" : "orderedList"
         }
       ],
       "kind" : "content"
@@ -367,7 +583,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apolloapi\/schemametadata\/cachekey(for:)"
+        "\/documentation\/apolloapi\/schemametadata\/cachekey(for:inferredtoimplementinterface:)"
       ],
       "traits" : [
         {
@@ -430,27 +646,18 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/CacheKeyInfo": {
+"doc://ApolloAPI/documentation/ApolloAPI/Interface": {
   "abstract" : [
     {
-      "text" : "Contains the information needed to resolve a ",
+      "text" : "Represents an ",
       "type" : "text"
     },
     {
-      "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference",
-      "isActive" : true,
-      "type" : "reference"
-    },
-    {
-      "text" : " in a ",
-      "type" : "text"
-    },
-    {
-      "code" : "NormalizedCache",
+      "code" : "interface",
       "type" : "codeVoice"
     },
     {
-      "text" : ".",
+      "text" : " type in a generated GraphQL schema.",
       "type" : "text"
     }
   ],
@@ -465,55 +672,21 @@
     },
     {
       "kind" : "identifier",
-      "text" : "CacheKeyInfo"
+      "text" : "Interface"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheKeyInfo",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "CacheKeyInfo"
+      "text" : "Interface"
     }
   ],
   "role" : "symbol",
-  "title" : "CacheKeyInfo",
+  "title" : "Interface",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/cachekeyinfo"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/CacheReference": {
-  "abstract" : [
-    {
-      "text" : "Represents a reference to a record for a GraphQL object in the cache.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "struct"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "CacheReference"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "CacheReference"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "CacheReference",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/cachereference"
+  "url" : "\/documentation\/apolloapi\/interface"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/JSONObject": {
   "abstract" : [
@@ -649,106 +822,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/objectdata"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/SchemaConfiguration/cacheKeyInfo(for:object:)": {
-  "abstract" : [
-    {
-      "text" : "The entry point for configuring the cache key resolution",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "for the types in the schema, which is used by ",
-      "type" : "text"
-    },
-    {
-      "code" : "NormalizedCache",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " mechanisms.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "cacheKeyInfo"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "for"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI6ObjectV",
-      "text" : "Object"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "object"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI10ObjectDataV",
-      "text" : "ObjectData"
-    },
-    {
-      "kind" : "text",
-      "text" : ") -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI12CacheKeyInfoV",
-      "text" : "CacheKeyInfo"
-    },
-    {
-      "kind" : "text",
-      "text" : "?"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaConfiguration\/cacheKeyInfo(for:object:)",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "cacheKeyInfo(for:object:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/schemaconfiguration\/cachekeyinfo(for:object:)"
-},
 "doc://ApolloAPI/documentation/ApolloAPI/SchemaMetadata": {
   "abstract" : [
     {
@@ -783,7 +856,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/schemametadata"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/SchemaMetadata/cacheKey(for:)": {
+"doc://ApolloAPI/documentation/ApolloAPI/SchemaMetadata/cacheKey(for:inferredToImplementInterface:)": {
   "abstract" : [
     {
       "text" : "Resolves the cache key for an object in a GraphQL response to be used by",
@@ -842,7 +915,24 @@
     },
     {
       "kind" : "text",
-      "text" : ") -> "
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "inferredToImplementInterface"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9InterfaceV",
+      "text" : "Interface"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) -> "
     },
     {
       "kind" : "typeIdentifier",
@@ -854,12 +944,12 @@
       "text" : "?"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaMetadata\/cacheKey(for:)",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SchemaMetadata\/cacheKey(for:inferredToImplementInterface:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "cacheKey(for:)",
+  "title" : "cacheKey(for:inferredToImplementInterface:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/schemametadata\/cachekey(for:)"
+  "url" : "\/documentation\/apolloapi\/schemametadata\/cachekey(for:inferredtoimplementinterface:)"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/SchemaMetadata/graphQLType(for:)": {
   "abstract" : [

@@ -46,7 +46,7 @@ public class FindPetQuery: GraphQLQuery {
     /// FindPet
     ///
     /// Parent Type: `Pet`
-    public struct FindPet: AnimalKingdomAPI.SelectionSet {
+    public struct FindPet: AnimalKingdomAPI.SelectionSet, Identifiable {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 

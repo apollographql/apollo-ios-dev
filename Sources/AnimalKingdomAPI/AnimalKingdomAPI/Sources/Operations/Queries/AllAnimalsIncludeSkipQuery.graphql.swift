@@ -421,7 +421,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
       /// AllAnimal.AsPet
       ///
       /// Parent Type: `Pet`
-      public struct AsPet: AnimalKingdomAPI.InlineFragment {
+      public struct AsPet: AnimalKingdomAPI.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -437,6 +437,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
         public var species: String? { __data["species"] }
         public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
         public var predators: [Predator] { __data["predators"] }
+        public var id: AnimalKingdomAPI.ID { __data["id"] }
         public var humanName: String? { __data["humanName"] }
         public var favoriteToy: String { __data["favoriteToy"] }
         public var owner: Owner? { __data["owner"] }
@@ -457,6 +458,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
           species: String? = nil,
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
           predators: [Predator],
+          id: AnimalKingdomAPI.ID,
           humanName: String? = nil,
           favoriteToy: String,
           owner: Owner? = nil
@@ -468,6 +470,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
               "species": species,
               "skinCovering": skinCovering,
               "predators": predators._fieldData,
+              "id": id,
               "humanName": humanName,
               "favoriteToy": favoriteToy,
               "owner": owner._fieldData,
@@ -528,7 +531,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
         /// AllAnimal.AsPet.AsWarmBlooded
         ///
         /// Parent Type: `WarmBlooded`
-        public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment {
+        public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment, Identifiable {
           public let __data: DataDict
           public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -543,6 +546,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
           public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
           public var predators: [Predator] { __data["predators"] }
           public var bodyTemperature: Int { __data["bodyTemperature"] }
+          public var id: AnimalKingdomAPI.ID { __data["id"] }
           public var humanName: String? { __data["humanName"] }
           public var favoriteToy: String { __data["favoriteToy"] }
           public var owner: Owner? { __data["owner"] }
@@ -563,6 +567,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
             skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
             predators: [Predator],
             bodyTemperature: Int,
+            id: AnimalKingdomAPI.ID,
             humanName: String? = nil,
             favoriteToy: String,
             owner: Owner? = nil
@@ -575,6 +580,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
                 "skinCovering": skinCovering,
                 "predators": predators._fieldData,
                 "bodyTemperature": bodyTemperature,
+                "id": id,
                 "humanName": humanName,
                 "favoriteToy": favoriteToy,
                 "owner": owner._fieldData,
@@ -638,7 +644,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
       /// AllAnimal.AsCatIfGetCat
       ///
       /// Parent Type: `Cat`
-      public struct AsCatIfGetCat: AnimalKingdomAPI.InlineFragment {
+      public struct AsCatIfGetCat: AnimalKingdomAPI.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -654,6 +660,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
         public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
         public var predators: [Predator] { __data["predators"] }
         public var bodyTemperature: Int { __data["bodyTemperature"] }
+        public var id: AnimalKingdomAPI.ID { __data["id"] }
         public var humanName: String? { __data["humanName"] }
         public var favoriteToy: String { __data["favoriteToy"] }
         public var owner: Owner? { __data["owner"] }
@@ -674,6 +681,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
           predators: [Predator],
           bodyTemperature: Int,
+          id: AnimalKingdomAPI.ID,
           humanName: String? = nil,
           favoriteToy: String,
           owner: Owner? = nil
@@ -687,6 +695,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
               "skinCovering": skinCovering,
               "predators": predators._fieldData,
               "bodyTemperature": bodyTemperature,
+              "id": id,
               "humanName": humanName,
               "favoriteToy": favoriteToy,
               "owner": owner._fieldData,
@@ -799,7 +808,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
         /// AllAnimal.AsClassroomPet.AsBird
         ///
         /// Parent Type: `Bird`
-        public struct AsBird: AnimalKingdomAPI.InlineFragment {
+        public struct AsBird: AnimalKingdomAPI.InlineFragment, Identifiable {
           public let __data: DataDict
           public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -815,6 +824,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
           public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
           public var predators: [Predator] { __data["predators"] }
           public var bodyTemperature: Int { __data["bodyTemperature"] }
+          public var id: AnimalKingdomAPI.ID { __data["id"] }
           public var humanName: String? { __data["humanName"] }
           public var favoriteToy: String { __data["favoriteToy"] }
           public var owner: Owner? { __data["owner"] }
@@ -835,6 +845,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
             skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
             predators: [Predator],
             bodyTemperature: Int,
+            id: AnimalKingdomAPI.ID,
             humanName: String? = nil,
             favoriteToy: String,
             owner: Owner? = nil
@@ -848,6 +859,7 @@ public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
                 "skinCovering": skinCovering,
                 "predators": predators._fieldData,
                 "bodyTemperature": bodyTemperature,
+                "id": id,
                 "humanName": humanName,
                 "favoriteToy": favoriteToy,
                 "owner": owner._fieldData,

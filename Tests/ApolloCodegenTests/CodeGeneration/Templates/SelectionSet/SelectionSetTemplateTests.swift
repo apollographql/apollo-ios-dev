@@ -125,6 +125,154 @@ class SelectionSetTemplateTests: XCTestCase {
     // then
     expect(String(actual.reversed())).to(equalLineByLine("}", ignoringExtraLines: true))
   }
+  
+  // MARK: Protocol conformance
+  
+  func test__render_selectionSet__givenTypeWithKeyFieldID_rendersIdentifiableConformance() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    type Animal @typePolicy(keyFields: "id") {
+      id: ID!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        id
+      }
+    }
+    """
+
+    let expected = """
+    public struct AllAnimal: TestSchema.SelectionSet, Identifiable {
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 2, ignoringExtraLines: true))
+  }
+  
+  func test__render_selectionSet__givenInterfaceWithKeyFieldID_rendersIdentifiableConformance() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal @typePolicy(keyFields: "id") {
+      id: ID!
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        id
+      }
+    }
+    """
+
+    let expected = """
+    public struct AllAnimal: TestSchema.SelectionSet, Identifiable {
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 2, ignoringExtraLines: true))
+  }
+  
+  func test__render_selectionSet__givenTypeWithOtherKeyField_doesNotRenderIdentifiableConformance() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    type Animal @typePolicy(keyFields: "species") {
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        species
+      }
+    }
+    """
+
+    let expected = """
+    public struct AllAnimal: TestSchema.SelectionSet {
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 2, ignoringExtraLines: true))
+  }
+  
+  func test__render_selectionSet__withoutUsingIDField_doesNotRenderIdentifiableConformance() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    type Animal @typePolicy(keyFields: "id") {
+      id: ID!
+      name: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        name
+      }
+    }
+    """
+
+    let expected = """
+    public struct AllAnimal: TestSchema.SelectionSet {
+    """
+
+    // when
+    try await buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 2, ignoringExtraLines: true))
+  }
 
   // MARK: Parent Type
 

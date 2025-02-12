@@ -26,3 +26,13 @@ This directive can be used to enable sharing of fragment models across generated
 Defines a definition as a local cache mutation. This changes makes the generated operation model mutable.
 
 See the documentation on [defining local cache mutations](./caching/cache-transactions#defining-local-cache-mutations) for more information.
+
+---
+
+### `@typePolicy(keyFields: String!)`
+
+`directive @typePolicy(keyFields: String!) on OBJECT | INTERFACE`
+
+Adds a type policy to a type that can be used to resolve cache keys for objects of that type.
+
+This directive can be used to configure how the normalized cache operates. See the documentation on [custom cache keys](./caching/cache-key-resolution) for more information.

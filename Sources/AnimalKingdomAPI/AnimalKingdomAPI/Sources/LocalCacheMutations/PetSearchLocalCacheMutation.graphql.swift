@@ -56,7 +56,7 @@ public class PetSearchLocalCacheMutation: LocalCacheMutation {
     /// Pet
     ///
     /// Parent Type: `Pet`
-    public struct Pet: AnimalKingdomAPI.MutableSelectionSet {
+    public struct Pet: AnimalKingdomAPI.MutableSelectionSet, Identifiable {
       public var __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 

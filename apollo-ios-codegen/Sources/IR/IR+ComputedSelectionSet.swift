@@ -1,4 +1,5 @@
 import Foundation
+import GraphQLCompiler
 import OrderedCollections
 import Utilities
 
@@ -18,6 +19,16 @@ public struct ComputedSelectionSet {
 
   /// The `TypeInfo` for the selection set of the computed selections
   public let typeInfo: IR.SelectionSet.TypeInfo
+  
+  /// Indicates if a field named `id` is selected as well as requiring that the parent type
+  /// be identifiable.
+  public var isIdentifiable: Bool {
+    guard direct?.fields["id"] != nil || merged.fields["id"] != nil else {
+      return false
+    }
+
+    return typeInfo.parentType.isIdentifiable
+  }
 
   // MARK: Dynamic Member Subscript
 

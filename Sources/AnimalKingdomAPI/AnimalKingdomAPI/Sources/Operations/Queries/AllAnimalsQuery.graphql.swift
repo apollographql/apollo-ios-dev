@@ -41,7 +41,7 @@ public class AllAnimalsQuery: GraphQLQuery {
     /// AllAnimal
     ///
     /// Parent Type: `Animal`
-    public struct AllAnimal: AnimalKingdomAPI.SelectionSet {
+    public struct AllAnimal: AnimalKingdomAPI.SelectionSet, Identifiable {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -267,7 +267,7 @@ public class AllAnimalsQuery: GraphQLQuery {
       /// AllAnimal.AsWarmBlooded
       ///
       /// Parent Type: `WarmBlooded`
-      public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment {
+      public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -358,7 +358,7 @@ public class AllAnimalsQuery: GraphQLQuery {
       /// AllAnimal.AsPet
       ///
       /// Parent Type: `Pet`
-      public struct AsPet: AnimalKingdomAPI.InlineFragment {
+      public struct AsPet: AnimalKingdomAPI.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -470,7 +470,7 @@ public class AllAnimalsQuery: GraphQLQuery {
         /// AllAnimal.AsPet.AsWarmBlooded
         ///
         /// Parent Type: `WarmBlooded`
-        public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment {
+        public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment, Identifiable {
           public let __data: DataDict
           public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -583,7 +583,7 @@ public class AllAnimalsQuery: GraphQLQuery {
       /// AllAnimal.AsCat
       ///
       /// Parent Type: `Cat`
-      public struct AsCat: AnimalKingdomAPI.InlineFragment {
+      public struct AsCat: AnimalKingdomAPI.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -786,7 +786,7 @@ public class AllAnimalsQuery: GraphQLQuery {
         /// AllAnimal.AsClassroomPet.AsBird
         ///
         /// Parent Type: `Bird`
-        public struct AsBird: AnimalKingdomAPI.InlineFragment {
+        public struct AsBird: AnimalKingdomAPI.InlineFragment, Identifiable {
           public let __data: DataDict
           public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -904,7 +904,7 @@ public class AllAnimalsQuery: GraphQLQuery {
       /// AllAnimal.AsDog
       ///
       /// Parent Type: `Dog`
-      public struct AsDog: AnimalKingdomAPI.InlineFragment {
+      public struct AsDog: AnimalKingdomAPI.InlineFragment, Identifiable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 

@@ -102,7 +102,9 @@ struct SelectionSetTemplate {
       """
       \(SelectionSetNameDocumentation(selectionSet))
       \(renderAccessControl())\
-      struct \(fieldSelectionSetName): \(SelectionSetType()) {
+      struct \(fieldSelectionSetName): \(SelectionSetType())\
+      \(if: selectionSet.isIdentifiable, ", Identifiable")\
+       {
         \(BodyTemplate(context))
       }
       """
@@ -118,6 +120,7 @@ struct SelectionSetTemplate {
       \(renderAccessControl())\
       struct \(inlineFragment.renderedTypeName): \(SelectionSetType(asInlineFragment: true))\
       \(if: inlineFragment.isCompositeInlineFragment, ", \(config.ApolloAPITargetName).CompositeInlineFragment")\
+      \(if: inlineFragment.isIdentifiable, ", Identifiable")\
        {
         \(BodyTemplate(context))
       }
@@ -729,25 +732,20 @@ struct SelectionSetTemplate {
 
     var deferredFragments: OrderedSet<String> = []
 
-    let nameGenerator: (_ typeInfo: SelectionSet.TypeInfo) -> String = { typeInfo in
-      SelectionSetNameGenerator.generatedSelectionSetName(
-        for: typeInfo,
-        format: .fullyQualified,
-        pluralizer: config.pluralizer
-      )
-    }
-
     for inlineFragmentSpread in directSelections.inlineFragments.values.elements {
       if inlineFragmentSpread.typeInfo.isDeferred {
-        let selectionSetName = nameGenerator(inlineFragmentSpread.typeInfo)
+        let selectionSetName = SelectionSetNameGenerator.generatedSelectionSetName(
+          for: inlineFragmentSpread.typeInfo,
+          format: .fullyQualified,
+          pluralizer: config.pluralizer
+        )
         deferredFragments.append(selectionSetName)
       }
     }
 
     for namedFragment in directSelections.namedFragments.values.elements {
       if namedFragment.typeInfo.isDeferred {
-        let selectionSetName = nameGenerator(namedFragment.typeInfo)
-        deferredFragments.append(selectionSetName)
+        deferredFragments.append(namedFragment.fragment.generatedDefinitionName)
       }
     }
 
