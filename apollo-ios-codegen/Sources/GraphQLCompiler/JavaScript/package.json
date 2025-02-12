@@ -13,7 +13,7 @@
     "npm": ">=7"
   },
   "dependencies": {
-    "graphql": "17.0.0-alpha.7",
+    "graphql": "17.0.0-alpha.8",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
