@@ -564,7 +564,7 @@ enum TestMockSchema: SchemaMetadata {
   }
 
   struct Interfaces {
-    static let Animal = Interface(name: "Animal")
+    static let Animal = Interface(name: "Animal", implementingObjects: ["Dog", "Cat"])
   }
   struct Types {
     static let Query = Object(typename: "Query", implementedInterfaces: [])

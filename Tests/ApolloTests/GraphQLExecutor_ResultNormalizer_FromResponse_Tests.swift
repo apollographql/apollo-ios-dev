@@ -593,7 +593,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
 
       class Hero: MockSelectionSet {
         override class var __parentType: any ParentType {
-          Interface(name: "Hero", keyFields: ["name"])
+          Interface(name: "Hero", keyFields: ["name"], implementingObjects: ["Hero"])
         }
 
         override class var __selections: [Selection] {[

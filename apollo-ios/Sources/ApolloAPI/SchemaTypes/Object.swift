@@ -44,6 +44,6 @@ public struct Object: Hashable, Sendable {
   /// - Parameter interface: An ``Interface`` Type
   /// - Returns: A `Bool` indicating if the receiver implements the given ``Interface`` Type.
   public func implements(_ interface: Interface) -> Bool {
-    implementedInterfaces.contains(where: { $0 == interface })
+    interface.implementingObjects.contains(typename)
   }
 }

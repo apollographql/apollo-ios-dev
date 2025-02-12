@@ -5,5 +5,13 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Represents an owner of a Project.
-  static let ProjectOwner = ApolloAPI.Interface(name: "ProjectOwner", keyFields: nil)
+  static let ProjectOwner = ApolloAPI.Interface(
+    name: "ProjectOwner",
+    keyFields: nil,
+    implementingObjects: [
+      "Organization",
+      "Repository",
+      "User"
+    ]
+  )
 }

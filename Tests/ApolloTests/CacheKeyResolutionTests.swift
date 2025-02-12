@@ -263,7 +263,7 @@ class CacheKeyResolutionTests: XCTestCase {
   }
   
   func test__schemaConfiguration__givenInterfaceWithKeyField_shouldReturnKeyFieldValue() {
-    let Interface = Interface(name: "Animal", keyFields: ["id"])
+    let Interface = Interface(name: "Animal", keyFields: ["id"], implementingObjects: ["Cat"])
 
     let object: JSONObject = [
       "__typename": "Cat",

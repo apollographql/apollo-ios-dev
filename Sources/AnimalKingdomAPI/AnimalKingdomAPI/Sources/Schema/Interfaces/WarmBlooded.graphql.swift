@@ -4,5 +4,14 @@
 import ApolloAPI
 
 public extension Interfaces {
-  static let WarmBlooded = ApolloAPI.Interface(name: "WarmBlooded", keyFields: ["id"])
+  static let WarmBlooded = ApolloAPI.Interface(
+    name: "WarmBlooded",
+    keyFields: ["id"],
+    implementingObjects: [
+      "Human",
+      "Cat",
+      "Dog",
+      "Bird"
+    ]
+  )
 }

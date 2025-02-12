@@ -1923,7 +1923,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
       static let Query = Object(typename: "Query", implementedInterfaces: [])
-      static let Character = Interface(name: "Character")
+      static let Character = Interface(name: "Character", implementingObjects: [])
     }
 
     MockSchemaMetadata.stub_objectTypeForTypeName({

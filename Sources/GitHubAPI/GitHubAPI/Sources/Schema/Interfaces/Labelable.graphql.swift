@@ -5,5 +5,12 @@ import ApolloAPI
 
 public extension Interfaces {
   /// An object that can have labels assigned to it.
-  static let Labelable = ApolloAPI.Interface(name: "Labelable", keyFields: nil)
+  static let Labelable = ApolloAPI.Interface(
+    name: "Labelable",
+    keyFields: nil,
+    implementingObjects: [
+      "Issue",
+      "PullRequest"
+    ]
+  )
 }

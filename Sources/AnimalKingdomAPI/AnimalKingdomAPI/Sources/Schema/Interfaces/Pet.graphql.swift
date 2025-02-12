@@ -4,5 +4,16 @@
 import ApolloAPI
 
 public extension Interfaces {
-  static let Pet = ApolloAPI.Interface(name: "Pet", keyFields: ["id"])
+  static let Pet = ApolloAPI.Interface(
+    name: "Pet",
+    keyFields: ["id"],
+    implementingObjects: [
+      "Cat",
+      "Dog",
+      "Bird",
+      "Fish",
+      "Rat",
+      "PetRock"
+    ]
+  )
 }

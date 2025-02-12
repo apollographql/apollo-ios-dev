@@ -684,7 +684,7 @@ class SelectionSetTests: XCTestCase {
   func test__asInlineFragment_givenInterfaceType_typeForTypeNameImplementsInterface_returnsType() {
     // given
     struct Types {
-      static let Humanoid = Interface(name: "Humanoid")
+      static let Humanoid = Interface(name: "Humanoid", implementingObjects: ["Human"])
       static let Human = Object(typename: "Human", implementedInterfaces: [Humanoid])
     }
 
@@ -732,7 +732,7 @@ class SelectionSetTests: XCTestCase {
   func test__asInlineFragment_givenInterfaceType_typeForTypeNameDoesNotImplementInterface_returnsNil() {
     // given
     struct Types {
-      static let Humanoid = Interface(name: "Humanoid")
+      static let Humanoid = Interface(name: "Humanoid", implementingObjects: [])
       static let Droid = Object(typename: "Droid", implementedInterfaces: [])
     }
 
@@ -874,7 +874,7 @@ class SelectionSetTests: XCTestCase {
   func test__asInlineFragment_givenInterfaceTypeOnOperationRoot_typeImplementsInterface_returnsType() {
     // given
     struct Types {
-      static let AdminQuery = Interface(name: "AdminQuery")
+      static let AdminQuery = Interface(name: "AdminQuery", implementingObjects: ["Query"])
       static let Query = Object(typename: "Query", implementedInterfaces: [AdminQuery])
     }
 
@@ -987,7 +987,7 @@ class SelectionSetTests: XCTestCase {
   func test__selectionInitializer_givenInitTypeWithTypeCondition__canConvertToConditionalType() {
     // given
     struct Types {
-      static let Animal = Interface(name: "Animal")
+      static let Animal = Interface(name: "Animal", implementingObjects: ["Human"])
       static let Human = Object(typename: "Human", implementedInterfaces: [Animal])
     }
 
@@ -1046,7 +1046,7 @@ class SelectionSetTests: XCTestCase {
     // given
     struct Types {
       static let Query = Object(typename: "Query", implementedInterfaces: [])
-      static let Animal = Interface(name: "Animal")
+      static let Animal = Interface(name: "Animal", implementingObjects: ["Human"])
       static let Human = Object(typename: "Human", implementedInterfaces: [Animal])
     }
 

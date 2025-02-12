@@ -39,6 +39,7 @@ public extension GraphQLInterfaceType {
     fields: [String: GraphQLField] = [:],
     keyFields: [String] = [],
     interfaces: [GraphQLInterfaceType] = [],
+    implementingObjects: [GraphQLObjectType] = [],
     documentation: String? = nil
   ) -> GraphQLInterfaceType {
     GraphQLInterfaceType(
@@ -46,7 +47,8 @@ public extension GraphQLInterfaceType {
       documentation: documentation,
       fields: fields,
       interfaces: interfaces,
-      keyFields: keyFields
+      keyFields: keyFields,
+      implementingObject: implementingObjects
     )
   }
 }

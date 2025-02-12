@@ -91,6 +91,7 @@ public final class GraphQLJSFrontend {
     schema: GraphQLSchema,
     document: GraphQLDocument,
     experimentalLegacySafelistingCompatibleOperations: Bool = false,
+    reduceGeneratedSchemaTypes: Bool = false,
     validationOptions: ValidationOptions
   ) async throws -> CompilationResult {
     return try await library.call(
@@ -98,6 +99,7 @@ public final class GraphQLJSFrontend {
       with: schema,
       document,
       experimentalLegacySafelistingCompatibleOperations,
+      reduceGeneratedSchemaTypes,
       ValidationOptions.Bridged(from: validationOptions, bridge: self.bridge)
     )
   }

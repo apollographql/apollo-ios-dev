@@ -281,6 +281,8 @@ public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceIm
   public private(set) var interfaces: [GraphQLInterfaceType]!
   
   public private(set) var keyFields: [String]!
+  
+  public private(set) var implementingObjects: [GraphQLObjectType]!
 
   /// Initializer to be used for creating mock objects in tests only.
   init(
@@ -288,11 +290,13 @@ public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceIm
     documentation: String?,
     fields: [String: GraphQLField],
     interfaces: [GraphQLInterfaceType],
-    keyFields: [String]
+    keyFields: [String],
+    implementingObject: [GraphQLObjectType]
   ) {
     self.fields = fields
     self.interfaces = interfaces
     self.keyFields = keyFields
+    self.implementingObjects = implementingObject
     super.init(name: name, documentation: documentation)
   }
 
@@ -304,6 +308,7 @@ public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceIm
     self.fields = try! bridge.invokeMethod("getFields", on: jsValue)
     self.interfaces = try! bridge.invokeMethod("getInterfaces", on: jsValue)
     self.keyFields = jsValue["_apolloKeyFields"]
+    self.implementingObjects = jsValue["_implementingObjects"].isUndefined ? [] :  Array<GraphQLObjectType>.fromJSValue(jsValue["_implementingObjects"], bridge: bridge)
   }
 
   public override var debugDescription: String {

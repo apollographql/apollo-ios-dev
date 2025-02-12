@@ -5,5 +5,17 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Entities that can be deleted.
-  static let Deletable = ApolloAPI.Interface(name: "Deletable", keyFields: nil)
+  static let Deletable = ApolloAPI.Interface(
+    name: "Deletable",
+    keyFields: nil,
+    implementingObjects: [
+      "CommitComment",
+      "GistComment",
+      "IssueComment",
+      "PullRequestReview",
+      "PullRequestReviewComment",
+      "TeamDiscussion",
+      "TeamDiscussionComment"
+    ]
+  )
 }

@@ -5,5 +5,19 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Comments that can be updated.
-  static let UpdatableComment = ApolloAPI.Interface(name: "UpdatableComment", keyFields: nil)
+  static let UpdatableComment = ApolloAPI.Interface(
+    name: "UpdatableComment",
+    keyFields: nil,
+    implementingObjects: [
+      "CommitComment",
+      "GistComment",
+      "Issue",
+      "IssueComment",
+      "PullRequest",
+      "PullRequestReview",
+      "PullRequestReviewComment",
+      "TeamDiscussion",
+      "TeamDiscussionComment"
+    ]
+  )
 }

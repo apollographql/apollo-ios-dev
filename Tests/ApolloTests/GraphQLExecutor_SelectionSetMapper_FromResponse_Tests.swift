@@ -2026,8 +2026,8 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   @MainActor func test__nestedEntity_andTypeCaseWithAdditionalMergedNestedEntityFields_givenChildEntityCanConvertToTypeCase_fulfilledFragmentsContainsTypeCase() throws {
     struct Types {
-      static let Character = Interface(name: "Character")
-      static let Hero = Interface(name: "Hero")
+      static let Character = Interface(name: "Character", implementingObjects: ["Human"])
+      static let Hero = Interface(name: "Hero", implementingObjects: ["Human"])
       static let Human = Object(typename: "Human", implementedInterfaces: [Character.self, Hero.self])
     }
 

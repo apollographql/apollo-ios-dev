@@ -5,5 +5,12 @@ import ApolloAPI
 
 public extension Interfaces {
   /// An object that can have users assigned to it.
-  static let Assignable = ApolloAPI.Interface(name: "Assignable", keyFields: nil)
+  static let Assignable = ApolloAPI.Interface(
+    name: "Assignable",
+    keyFields: nil,
+    implementingObjects: [
+      "Issue",
+      "PullRequest"
+    ]
+  )
 }
