@@ -291,12 +291,12 @@ public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceIm
     fields: [String: GraphQLField],
     interfaces: [GraphQLInterfaceType],
     keyFields: [String],
-    implementingObject: [GraphQLObjectType]
+    implementingObjects: [GraphQLObjectType]
   ) {
     self.fields = fields
     self.interfaces = interfaces
     self.keyFields = keyFields
-    self.implementingObjects = implementingObject
+    self.implementingObjects = implementingObjects
     super.init(name: name, documentation: documentation)
   }
 

@@ -18,6 +18,7 @@ extension GraphQLJSFrontend {
     return try await compile(
       schema: schema,
       document: document,
+      reduceGeneratedSchemaTypes: false,
       validationOptions: ValidationOptions(config: config)
     )
   }
@@ -68,6 +69,7 @@ extension GraphQLJSFrontend {
     return try await compile(
       schema: schema,
       document: mergedDocument,
+      reduceGeneratedSchemaTypes: false,
       validationOptions: ValidationOptions(config: config)
     )
   }
@@ -99,6 +101,7 @@ extension GraphQLJSFrontend {
     return try await compile(
       schema: schema,
       document: document,
+      reduceGeneratedSchemaTypes: false,
       validationOptions: ValidationOptions(config: config)
     )
   }

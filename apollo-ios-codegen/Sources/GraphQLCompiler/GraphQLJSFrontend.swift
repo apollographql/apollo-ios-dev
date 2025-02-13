@@ -91,7 +91,7 @@ public final class GraphQLJSFrontend {
     schema: GraphQLSchema,
     document: GraphQLDocument,
     experimentalLegacySafelistingCompatibleOperations: Bool = false,
-    reduceGeneratedSchemaTypes: Bool = false,
+    reduceGeneratedSchemaTypes: Bool,
     validationOptions: ValidationOptions
   ) async throws -> CompilationResult {
     return try await library.call(

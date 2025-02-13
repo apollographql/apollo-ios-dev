@@ -724,8 +724,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     ///   - selectionSetInitializers: Which generated selection sets should include
     ///     generated initializers.
     ///   - operationDocumentFormat: How to generate the operation documents for your generated operations.
-    ///   - schemaCustomization:Customization options to be applied to the schema during code generation.
-    ///   - reduceGeneratedSchemaTypes:Whether to reduce the number of schema types that are generated to only those that are referenced in an operation.
+    ///   - schemaCustomization: Customization options to be applied to the schema during code generation.
+    ///   - reduceGeneratedSchemaTypes: Whether to reduce the number of schema types that are generated to only those that are referenced in an operation.
     ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
     ///     including `Apollo` via Cocoapods.
     ///   - warningsOnDeprecatedUsage: Annotate generated Swift code with the Swift `available`
@@ -1711,7 +1711,7 @@ extension ApolloCodegenConfiguration.FileOutput {
 }
 
 extension ApolloCodegenConfiguration.OutputOptions {
-  /// Designated initializer.
+  /// Deprecated initializer.
   ///
   /// - Parameters:
   ///   - additionalInflectionRules: Any non-default rules for pluralization or singularization
@@ -1734,6 +1734,10 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///   - appendSchemaTypeFilenameSuffix: `true` will add a filename suffix matching the schema type, the
   ///     default is `false`. This can be used to avoid filename conflicts when operation type names match
   ///     schema type names.
+  ///
+  @available(*, deprecated,
+              renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:reduceGeneratedSchemaTypes:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
+  )
   public init(
     additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
     deprecatedEnumCases: ApolloCodegenConfiguration.Composition = Default.deprecatedEnumCases,
