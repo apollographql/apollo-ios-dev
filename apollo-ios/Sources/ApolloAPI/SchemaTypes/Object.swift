@@ -26,7 +26,7 @@ public struct Object: Hashable, Sendable {
   }
 
   /// A list of the interfaces implemented by the type.
-  @available(*, deprecated, message: "This property will be removed in version 2.0. To check if an Object implements an interface please use the 'implements(_)' function.")
+  /// Deprecated: This property will be removed in version 2.0. To check if an Object implements an interface please use the 'implements(_)' function.
   public let implementedInterfaces: [Interface]
 
   /// The name of the type.
