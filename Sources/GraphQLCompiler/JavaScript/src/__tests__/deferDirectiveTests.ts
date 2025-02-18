@@ -210,7 +210,7 @@ describe("given SDL with valid defer directive", () => {
     );
 
     it("should compile inline fragment with directive", () => {
-      const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
+      const compilationResult: CompilationResult = compileDocument(schema, document, false, false, emptyValidationOptions);
       const operation = compilationResult.operations[0];
       const allAnimals = operation.selectionSet.selections[0] as Field;
       const inlineFragment = allAnimals?.selectionSet?.selections?.[0] as InlineFragment;
@@ -237,7 +237,7 @@ describe("given SDL with valid defer directive", () => {
     );
 
     it("should compile inline fragment with directive and arguments", () => {
-      const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
+      const compilationResult: CompilationResult = compileDocument(schema, document, false, false, emptyValidationOptions);
       const operation = compilationResult.operations[0];
       const allAnimals = operation.selectionSet.selections[0] as Field;
       const inlineFragment = allAnimals?.selectionSet?.selections?.[0] as InlineFragment;
@@ -270,7 +270,7 @@ describe("given SDL with valid defer directive", () => {
     );
 
     it("should compile fragment spread with directive", () => {
-      const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
+      const compilationResult: CompilationResult = compileDocument(schema, document, false, false, emptyValidationOptions);
       const operation = compilationResult.operations[0];
       const allAnimals = operation.selectionSet.selections[0] as Field;
       const inlineFragment = allAnimals?.selectionSet?.selections?.[0] as FragmentSpread;
@@ -299,7 +299,7 @@ describe("given SDL with valid defer directive", () => {
     );
 
     it("should compile fragment spread with directive and arguments", () => {
-      const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
+      const compilationResult: CompilationResult = compileDocument(schema, document, false, false,  emptyValidationOptions);
       const operation = compilationResult.operations[0];
       const allAnimals = operation.selectionSet.selections[0] as Field;
       const inlineFragment = allAnimals?.selectionSet?.selections?.[0] as FragmentSpread;

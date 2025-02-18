@@ -48,7 +48,7 @@ describe("given schema", () => {
     );
 
     it("should compile inline fragment with inclusion condition", () => {
-      const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
+      const compilationResult: CompilationResult = compileDocument(schema, document, false, false, emptyValidationOptions);
       const operation = compilationResult.operations[0];
       const allAnimals = operation.selectionSet.selections[0] as Field;
       const inlineFragment = allAnimals?.selectionSet?.selections?.[0] as InlineFragment;

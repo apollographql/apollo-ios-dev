@@ -68,7 +68,7 @@ describe("operation with referencedFragments", () => {
     fragmentBDocument,
     fragmentCDocument])
 
-  const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
+  const compilationResult: CompilationResult = compileDocument(schema, document, false, false, emptyValidationOptions);
 
   const operationA: OperationDefinition = compilationResult.operations.find(function(element) {
     return element.name == 'OperationA'
@@ -157,7 +157,7 @@ describe("operation with referencedFragments on child entity selection sets", ()
     fragmentBDocument,
     fragmentCDocument])
 
-  const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
+  const compilationResult: CompilationResult = compileDocument(schema, document, false, false, emptyValidationOptions);
 
   const operationA: OperationDefinition = compilationResult.operations.find(function(element) {
     return element.name == 'OperationA'
