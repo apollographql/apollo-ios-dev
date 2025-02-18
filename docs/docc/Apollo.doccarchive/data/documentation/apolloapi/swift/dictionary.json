@@ -222,11 +222,11 @@
         "type" : "codeVoice"
       },
       {
-        "text" : " conforms to ",
+        "text" : " is ",
         "type" : "text"
       },
       {
-        "code" : "Hashable",
+        "code" : "String",
         "type" : "codeVoice"
       },
       {
@@ -238,11 +238,11 @@
         "type" : "codeVoice"
       },
       {
-        "text" : " conforms to ",
+        "text" : " is ",
         "type" : "text"
       },
       {
-        "code" : "Hashable",
+        "code" : "AnyHashable",
         "type" : "codeVoice"
       },
       {

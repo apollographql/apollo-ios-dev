@@ -9,11 +9,11 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict\/subscript(_:)"
+    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict\/subscript(_:)-2fzfl"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI9InputDictVyxSScAA29GraphQLOperationVariableValueRzluip",
+    "externalID" : "s:9ApolloAPI9InputDictVyAA15GraphQLNullableOyxGSScAA0E24QLOperationVariableValueRzluip",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -42,7 +42,20 @@
       },
       {
         "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:9ApolloAPI15GraphQLNullableO",
+        "text" : "GraphQLNullable"
+      },
+      {
+        "kind" : "text",
+        "text" : "<"
+      },
+      {
+        "kind" : "typeIdentifier",
         "text" : "T"
+      },
+      {
+        "kind" : "text",
+        "text" : ">"
       }
     ],
     "modules" : [
@@ -100,12 +113,22 @@
               "text" : ") -> "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI15GraphQLNullableO",
+              "text" : "GraphQLNullable"
+            },
+            {
+              "kind" : "text",
+              "text" : "<"
+            },
+            {
               "kind" : "typeIdentifier",
               "text" : "T"
             },
             {
               "kind" : "text",
-              "text" : " "
+              "text" : "> "
             },
             {
               "kind" : "keyword",
@@ -166,7 +189,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apolloapi\/inputdict\/subscript(_:)"
+        "\/documentation\/apolloapi\/inputdict\/subscript(_:)-2fzfl"
       ],
       "traits" : [
         {
@@ -228,6 +251,56 @@
   "title" : "ApolloAPI",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable": {
+  "abstract" : [
+    {
+      "text" : "Indicates the presence of a value, supporting both ",
+      "type" : "text"
+    },
+    {
+      "code" : "nil",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " and ",
+      "type" : "text"
+    },
+    {
+      "code" : "null",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " values.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLNullable"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLNullable"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "GraphQLNullable",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqlnullable"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperationVariableValue": {
   "abstract" : [
@@ -302,7 +375,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/inputdict"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/InputDict/subscript(_:)": {
+"doc://ApolloAPI/documentation/ApolloAPI/InputDict/subscript(_:)-2fzfl": {
   "abstract" : [
 
   ],
@@ -334,15 +407,28 @@
     },
     {
       "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI15GraphQLNullableO",
+      "text" : "GraphQLNullable"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
       "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict\/subscript(_:)",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict\/subscript(_:)-2fzfl",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "subscript(_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/inputdict\/subscript(_:)"
+  "url" : "\/documentation\/apolloapi\/inputdict\/subscript(_:)-2fzfl"
 }
 }
 }

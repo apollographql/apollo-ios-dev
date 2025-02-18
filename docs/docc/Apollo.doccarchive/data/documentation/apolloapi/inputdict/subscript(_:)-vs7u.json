@@ -1,41 +1,35 @@
 {
-  "abstract" : [
-    {
-      "text" : "Designated Initializer",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface\/init(name:keyFields:)"
+    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict\/subscript(_:)-vs7u"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI9InterfaceV4name9keyFieldsACSS_SaySSGSgtcfc",
+    "externalID" : "s:9ApolloAPI9InputDictVyxSScAA29GraphQLOperationVariableValueRzluip",
     "fragments" : [
       {
-        "kind" : "identifier",
-        "text" : "init"
+        "kind" : "keyword",
+        "text" : "subscript"
       },
       {
         "kind" : "text",
-        "text" : "("
+        "text" : "<"
       },
       {
-        "kind" : "externalParam",
-        "text" : "name"
+        "kind" : "genericParameter",
+        "text" : "T"
       },
       {
         "kind" : "text",
-        "text" : ": "
+        "text" : ">("
       },
       {
         "kind" : "typeIdentifier",
@@ -44,24 +38,11 @@
       },
       {
         "kind" : "text",
-        "text" : ", "
-      },
-      {
-        "kind" : "externalParam",
-        "text" : "keyFields"
-      },
-      {
-        "kind" : "text",
-        "text" : ": ["
+        "text" : ") -> "
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:SS",
-        "text" : "String"
-      },
-      {
-        "kind" : "text",
-        "text" : "]?)"
+        "text" : "T"
       }
     ],
     "modules" : [
@@ -70,9 +51,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Initializer",
-    "symbolKind" : "init",
-    "title" : "init(name:keyFields:)"
+    "roleHeading" : "Instance Subscript",
+    "symbolKind" : "subscript",
+    "title" : "subscript(_:)"
   },
   "primaryContentSections" : [
     {
@@ -87,15 +68,23 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "init"
+              "text" : "subscript"
             },
             {
               "kind" : "text",
-              "text" : "("
+              "text" : "<"
             },
             {
-              "kind" : "externalParam",
-              "text" : "name"
+              "kind" : "genericParameter",
+              "text" : "T"
+            },
+            {
+              "kind" : "text",
+              "text" : ">("
+            },
+            {
+              "kind" : "internalParam",
+              "text" : "key"
             },
             {
               "kind" : "text",
@@ -108,57 +97,62 @@
             },
             {
               "kind" : "text",
-              "text" : ", "
-            },
-            {
-              "kind" : "externalParam",
-              "text" : "keyFields"
-            },
-            {
-              "kind" : "text",
-              "text" : ": ["
+              "text" : ") -> "
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:SS",
-              "text" : "String"
+              "text" : "T"
             },
             {
               "kind" : "text",
-              "text" : "]? = nil)"
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "where"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "T"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI29GraphQLOperationVariableValueP",
+              "text" : "GraphQLOperationVariableValue"
+            },
+            {
+              "kind" : "text",
+              "text" : " { "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "get"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "set"
+            },
+            {
+              "kind" : "text",
+              "text" : " }"
             }
           ]
         }
       ],
       "kind" : "declarations"
-    },
-    {
-      "kind" : "parameters",
-      "parameters" : [
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The name of the ",
-                  "type" : "text"
-                },
-                {
-                  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface",
-                  "isActive" : true,
-                  "type" : "reference"
-                },
-                {
-                  "text" : " in the GraphQL schema.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "name"
-        }
-      ]
     }
   ],
   "schemaVersion" : {
@@ -172,7 +166,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apolloapi\/interface\/init(name:keyfields:)"
+        "\/documentation\/apolloapi\/inputdict\/subscript(_:)-vs7u"
       ],
       "traits" : [
         {
@@ -235,18 +229,49 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Interface": {
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperationVariableValue": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLOperationVariableValue"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLOperationVariableValue"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "GraphQLOperationVariableValue",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqloperationvariablevalue"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/InputDict": {
   "abstract" : [
     {
-      "text" : "Represents an ",
+      "text" : "A structure that wraps the underlying data dictionary used by ",
       "type" : "text"
     },
     {
-      "code" : "interface",
+      "code" : "InputObject",
       "type" : "codeVoice"
     },
     {
-      "text" : " type in a generated GraphQL schema.",
+      "text" : "s.",
       "type" : "text"
     }
   ],
@@ -261,45 +286,42 @@
     },
     {
       "kind" : "identifier",
-      "text" : "Interface"
+      "text" : "InputDict"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "Interface"
+      "text" : "InputDict"
     }
   ],
   "role" : "symbol",
-  "title" : "Interface",
+  "title" : "InputDict",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/interface"
+  "url" : "\/documentation\/apolloapi\/inputdict"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Interface/init(name:keyFields:)": {
+"doc://ApolloAPI/documentation/ApolloAPI/InputDict/subscript(_:)-vs7u": {
   "abstract" : [
-    {
-      "text" : "Designated Initializer",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
-      "kind" : "identifier",
-      "text" : "init"
+      "kind" : "keyword",
+      "text" : "subscript"
     },
     {
       "kind" : "text",
-      "text" : "("
+      "text" : "<"
     },
     {
-      "kind" : "externalParam",
-      "text" : "name"
+      "kind" : "genericParameter",
+      "text" : "T"
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : ">("
     },
     {
       "kind" : "typeIdentifier",
@@ -308,32 +330,19 @@
     },
     {
       "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "keyFields"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ["
+      "text" : ") -> "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : "]?)"
+      "text" : "T"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface\/init(name:keyFields:)",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict\/subscript(_:)-vs7u",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(name:keyFields:)",
+  "title" : "subscript(_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/interface\/init(name:keyfields:)"
+  "url" : "\/documentation\/apolloapi\/inputdict\/subscript(_:)-vs7u"
 }
 }
 }

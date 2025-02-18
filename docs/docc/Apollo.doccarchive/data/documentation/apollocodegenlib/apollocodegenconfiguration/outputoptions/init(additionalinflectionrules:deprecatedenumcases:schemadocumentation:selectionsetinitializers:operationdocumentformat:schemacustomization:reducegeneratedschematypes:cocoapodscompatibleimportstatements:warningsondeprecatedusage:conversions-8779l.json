@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Deprecated initializer.",
+      "text" : "Designated initializer.",
       "type" : "text"
     }
   ],
@@ -16,12 +16,11 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/OutputOptions\/init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
+    "url" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/OutputOptions\/init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:reduceGeneratedSchemaTypes:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "extendedModule" : "ApolloCodegenLib",
-    "externalID" : "s:16ApolloCodegenLib0aB13ConfigurationV13OutputOptionsV25additionalInflectionRules19deprecatedEnumCases19schemaDocumentation24selectionSetInitializers23operationDocumentFormat0M13Customization35cocoapodsCompatibleImportStatements25warningsOnDeprecatedUsage20conversionStrategies19pruneGeneratedFiles31markOperationDefinitionsAsFinal30appendSchemaTypeFilenameSuffixAESayAA0H4RuleOG_AC11CompositionOAvC09SelectionpQ0VAC09OperationsT0VAC06SchemaU0VSbAvC20ConversionStrategiesVS3btcfc",
+    "externalID" : "s:16ApolloCodegenLib0aB13ConfigurationV13OutputOptionsV25additionalInflectionRules19deprecatedEnumCases19schemaDocumentation24selectionSetInitializers23operationDocumentFormat0M13Customization26reduceGeneratedSchemaTypes35cocoapodsCompatibleImportStatements25warningsOnDeprecatedUsage20conversionStrategies05pruneW5Files31markOperationDefinitionsAsFinal06appendX18TypeFilenameSuffixAESayAA0H4RuleOG_AC11CompositionOAwC09SelectionpQ0VAC09OperationsT0VAC0xU0VS2bAwC20ConversionStrategiesVS3btcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -180,6 +179,23 @@
       },
       {
         "kind" : "externalParam",
+        "text" : "reduceGeneratedSchemaTypes"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:Sb",
+        "text" : "Bool"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
         "text" : "cocoapodsCompatibleImportStatements"
       },
       {
@@ -304,13 +320,10 @@
         "name" : "ApolloCodegenLib"
       }
     ],
-    "platforms" : [
-
-    ],
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",
-    "title" : "init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
+    "title" : "init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:reduceGeneratedSchemaTypes:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
   },
   "primaryContentSections" : [
     {
@@ -488,6 +501,23 @@
             {
               "kind" : "text",
               "text" : " = Default.schemaCustomization, "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "reduceGeneratedSchemaTypes"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:Sb",
+              "text" : "Bool"
+            },
+            {
+              "kind" : "text",
+              "text" : " = Default.reduceGeneratedSchemaTypes, "
             },
             {
               "kind" : "externalParam",
@@ -712,6 +742,34 @@
             {
               "inlineContent" : [
                 {
+                  "text" : "Customization options to be applied to the schema during code generation.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "schemaCustomization"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Whether to reduce the number of schema types that are generated to only those that are referenced in an operation.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "reduceGeneratedSchemaTypes"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
                   "text" : "Generate import statements that are compatible with",
                   "type" : "text"
                 },
@@ -913,7 +971,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/outputoptions\/init(additionalinflectionrules:deprecatedenumcases:schemadocumentation:selectionsetinitializers:operationdocumentformat:schemacustomization:cocoapodscompatibleimportstatements:warningsondeprecatedusage:conversionstrategies:prunegeneratedfil-140ri"
+        "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/outputoptions\/init(additionalinflectionrules:deprecatedenumcases:schemadocumentation:selectionsetinitializers:operationdocumentformat:schemacustomization:reducegeneratedschematypes:cocoapodscompatibleimportstatements:warningsondeprecatedusage:conversions-8779l"
       ],
       "traits" : [
         {
@@ -1143,14 +1201,13 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/outputoptions"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/OutputOptions/init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/OutputOptions/init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:reduceGeneratedSchemaTypes:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)": {
   "abstract" : [
     {
-      "text" : "Deprecated initializer.",
+      "text" : "Designated initializer.",
       "type" : "text"
     }
   ],
-  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "identifier",
@@ -1309,6 +1366,23 @@
     },
     {
       "kind" : "externalParam",
+      "text" : "reduceGeneratedSchemaTypes"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
       "text" : "cocoapodsCompatibleImportStatements"
     },
     {
@@ -1428,12 +1502,12 @@
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/OutputOptions\/init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/OutputOptions\/init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:reduceGeneratedSchemaTypes:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)",
+  "title" : "init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:reduceGeneratedSchemaTypes:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/outputoptions\/init(additionalinflectionrules:deprecatedenumcases:schemadocumentation:selectionsetinitializers:operationdocumentformat:schemacustomization:cocoapodscompatibleimportstatements:warningsondeprecatedusage:conversionstrategies:prunegeneratedfil-140ri"
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/outputoptions\/init(additionalinflectionrules:deprecatedenumcases:schemadocumentation:selectionsetinitializers:operationdocumentformat:schemacustomization:reducegeneratedschematypes:cocoapodscompatibleimportstatements:warningsondeprecatedusage:conversions-8779l"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/SchemaCustomization": {
   "abstract" : [
