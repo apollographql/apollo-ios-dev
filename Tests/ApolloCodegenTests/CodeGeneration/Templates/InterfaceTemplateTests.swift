@@ -20,6 +20,7 @@ class InterfaceTemplateTests: XCTestCase {
     customName: String? = nil,
     documentation: String? = nil,
     keyFields: [String] = [],
+    implementingObjects: [GraphQLObjectType] = [],
     config: ApolloCodegenConfiguration = .mock()
   ) {
     let interfaceType = GraphQLInterfaceType.mock(
@@ -27,6 +28,7 @@ class InterfaceTemplateTests: XCTestCase {
       fields: [:],
       keyFields: keyFields,
       interfaces: [],
+      implementingObjects: implementingObjects,
       documentation: documentation
     )
     interfaceType.name.customName = customName
@@ -48,7 +50,11 @@ class InterfaceTemplateTests: XCTestCase {
     buildSubject(name: "aDog")
 
     let expected = """
-    static let ADog = ApolloAPI.Interface(name: "aDog", keyFields: nil)
+    static let ADog = ApolloAPI.Interface(
+      name: "aDog",
+      keyFields: nil,
+      implementingObjects: []
+    )
     """
 
     // when
@@ -70,7 +76,11 @@ class InterfaceTemplateTests: XCTestCase {
 
     let expected = """
     /// \(documentation)
-    static let Dog = ApolloAPI.Interface(name: "Dog", keyFields: nil)
+    static let Dog = ApolloAPI.Interface(
+      name: "Dog",
+      keyFields: nil,
+      implementingObjects: []
+    )
     """
 
     // when
@@ -90,7 +100,11 @@ class InterfaceTemplateTests: XCTestCase {
     )
 
     let expected = """
-    static let Dog = ApolloAPI.Interface(name: "Dog", keyFields: nil)
+    static let Dog = ApolloAPI.Interface(
+      name: "Dog",
+      keyFields: nil,
+      implementingObjects: []
+    )
     """
 
     // when
@@ -110,7 +124,11 @@ class InterfaceTemplateTests: XCTestCase {
     )
 
     let expected = """
-    static let Dog = Apollo.Interface(name: "Dog", keyFields: nil)
+    static let Dog = Apollo.Interface(
+      name: "Dog",
+      keyFields: nil,
+      implementingObjects: []
+    )
     """
 
     // when
@@ -130,7 +148,11 @@ class InterfaceTemplateTests: XCTestCase {
       buildSubject(name: keyword)
 
       let expected = """
-      static let \(keyword.firstUppercased)_Interface = ApolloAPI.Interface(name: "\(keyword)", keyFields: nil)
+      static let \(keyword.firstUppercased)_Interface = ApolloAPI.Interface(
+        name: "\(keyword)",
+        keyFields: nil,
+        implementingObjects: []
+      )
       """
 
       // when
@@ -152,7 +174,11 @@ class InterfaceTemplateTests: XCTestCase {
     
     let expected = """
     // Renamed from GraphQL schema value: 'MyInterface'
-    static let MyCustomInterface = ApolloAPI.Interface(name: "MyInterface", keyFields: nil)
+    static let MyCustomInterface = ApolloAPI.Interface(
+      name: "MyInterface",
+      keyFields: nil,
+      implementingObjects: []
+    )
     """
     
     // when
@@ -170,10 +196,66 @@ class InterfaceTemplateTests: XCTestCase {
     )
     
     let expected = """
-    static let IndexedNode = ApolloAPI.Interface(name: "IndexedNode", keyFields: [
-      "parentID",
-      "index"
-    ])
+    static let IndexedNode = ApolloAPI.Interface(
+      name: "IndexedNode",
+      keyFields: [
+        "parentID",
+        "index"
+      ],
+      implementingObjects: []
+    )
+    """
+    
+    // when
+    let actual = renderSubject()
+    
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+  
+  // MARK: - Implementing Objects Tests
+  
+  func test__render__givenInterface_withOneImplementingObject_shouldRenderSingleLineArray() throws {
+    // given
+    let obj = GraphQLObjectType.mock("MyObject")
+    buildSubject(
+      name: "MyInterface",
+      implementingObjects: [obj]
+    )
+    
+    let expected = """
+    static let MyInterface = ApolloAPI.Interface(
+      name: "MyInterface",
+      keyFields: nil,
+      implementingObjects: ["MyObject"]
+    )
+    """
+    
+    // when
+    let actual = renderSubject()
+    
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+  
+  func test__render__givenInterface_withMultipleImplementingObjects_shouldRenderMultiLineArray() throws {
+    // given
+    let obj = GraphQLObjectType.mock("MyObject")
+    let secondObj = GraphQLObjectType.mock("SecondObject")
+    buildSubject(
+      name: "MyInterface",
+      implementingObjects: [obj, secondObj]
+    )
+    
+    let expected = """
+    static let MyInterface = ApolloAPI.Interface(
+      name: "MyInterface",
+      keyFields: nil,
+      implementingObjects: [
+        "MyObject",
+        "SecondObject"
+      ]
+    )
     """
     
     // when

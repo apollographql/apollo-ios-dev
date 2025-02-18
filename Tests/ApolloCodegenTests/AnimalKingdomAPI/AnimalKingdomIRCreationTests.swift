@@ -25,6 +25,7 @@ final class AnimalKingdomIRCreationTests: XCTestCase {
       self.compilationResult = try await frontend.compile(
         schema: schema,
         document: try await operationDocuments(),
+        reduceGeneratedSchemaTypes: false,
         validationOptions: validationOptions()
       )
     }

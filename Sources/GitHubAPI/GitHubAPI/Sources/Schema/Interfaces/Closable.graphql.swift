@@ -5,5 +5,14 @@ import ApolloAPI
 
 public extension Interfaces {
   /// An object that can be closed
-  static let Closable = ApolloAPI.Interface(name: "Closable", keyFields: nil)
+  static let Closable = ApolloAPI.Interface(
+    name: "Closable",
+    keyFields: nil,
+    implementingObjects: [
+      "Issue",
+      "Milestone",
+      "Project",
+      "PullRequest"
+    ]
+  )
 }

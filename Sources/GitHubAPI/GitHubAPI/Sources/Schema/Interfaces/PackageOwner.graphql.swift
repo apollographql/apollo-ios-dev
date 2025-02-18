@@ -5,5 +5,13 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Represents an owner of a package.
-  static let PackageOwner = ApolloAPI.Interface(name: "PackageOwner", keyFields: nil)
+  static let PackageOwner = ApolloAPI.Interface(
+    name: "PackageOwner",
+    keyFields: nil,
+    implementingObjects: [
+      "Organization",
+      "Repository",
+      "User"
+    ]
+  )
 }

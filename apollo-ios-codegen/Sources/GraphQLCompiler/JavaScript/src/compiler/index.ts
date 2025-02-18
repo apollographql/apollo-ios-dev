@@ -39,6 +39,7 @@ import {
 import * as ir from "./ir";
 import { valueFromValueNode } from "./values";
 import { ValidationOptions } from "../validationRules";
+import { directive_typePolicy } from "../utilities/apolloCodegenSchemaExtension";
 
 function filePathForNode(node: ASTNode): string | undefined {
   return node.loc?.source?.name;
@@ -56,6 +57,7 @@ export function compileToIR(
   schema: GraphQLSchema,
   document: DocumentNode,
   legacySafelistingCompatibleOperations: boolean,
+  reduceGeneratedSchemaTypes: boolean,
   validationOptions: ValidationOptions
 ): CompilationResult {
   // Collect fragment definition nodes upfront so we can compile these as we encounter them.
@@ -70,6 +72,7 @@ export function compileToIR(
   const operations: ir.OperationDefinition[] = [];
   const fragmentMap = new Map<String, ir.FragmentDefinition>();
   const referencedTypes = new Set<GraphQLNamedType>();
+  const reduceSchemaTypes: boolean = reduceGeneratedSchemaTypes
 
   const queryType = schema.getQueryType() as GraphQLNamedType;
   if (queryType === undefined) {
@@ -108,10 +111,16 @@ export function compileToIR(
     if (referencedTypes.has(type)) { return }
 
     referencedTypes.add(type)
-
+    
     if (isInterfaceType(type)) {
-      for (const objectType of schema.getPossibleTypes(type)) {
-        addReferencedType(getNamedType(objectType))
+      const possibleTypes = schema.getPossibleTypes(type);
+
+      (type as any)._implementingObjects = possibleTypes;
+
+      for (const objectType of possibleTypes) {
+        if (!reduceSchemaTypes || hasTypePolicyDirective(objectType)) {
+          addReferencedType(getNamedType(objectType))
+        }
       }
     }
 
@@ -141,6 +150,18 @@ export function compileToIR(
       const field = fieldMap[key]
       addReferencedType(getNamedType(field.type))
     }
+  }
+
+  function hasTypePolicyDirective(
+    type: GraphQLCompositeType
+  ): boolean {
+    const directiveName = directive_typePolicy.name.value;
+    for (const directive of type.astNode?.directives ?? []) {
+      if (directive.name.value === directiveName) {
+        return true;
+      }
+    }
+    return false;
   }
 
   function getFragment(name: string): ir.FragmentDefinition | undefined {

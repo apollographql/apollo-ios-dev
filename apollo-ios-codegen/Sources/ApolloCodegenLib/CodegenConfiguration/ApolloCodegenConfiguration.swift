@@ -652,6 +652,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public let operationDocumentFormat: OperationDocumentFormat
     /// Customization options to be applied to the schema during code generation.
     public let schemaCustomization: SchemaCustomization
+    /// Whether to reduce the number of schema types that are generated to only those that are referenced in an operation.
+    public let reduceGeneratedSchemaTypes: Bool
     /// Generate import statements that are compatible with including `Apollo` via Cocoapods.
     ///
     /// Cocoapods bundles all files from subspecs into the main target for a pod. This means that
@@ -703,6 +705,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       public static let fieldMerging: FieldMerging = [.all]
       public static let operationDocumentFormat: OperationDocumentFormat = .definition
       public static let schemaCustomization: SchemaCustomization = .init()
+      public static let reduceGeneratedSchemaTypes: Bool = false
       public static let cocoapodsCompatibleImportStatements: Bool = false
       public static let warningsOnDeprecatedUsage: Composition = .include
       public static let conversionStrategies: ConversionStrategies = .init()
@@ -721,6 +724,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     ///   - selectionSetInitializers: Which generated selection sets should include
     ///     generated initializers.
     ///   - operationDocumentFormat: How to generate the operation documents for your generated operations.
+    ///   - schemaCustomization: Customization options to be applied to the schema during code generation.
+    ///   - reduceGeneratedSchemaTypes: Whether to reduce the number of schema types that are generated to only those that are referenced in an operation.
     ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
     ///     including `Apollo` via Cocoapods.
     ///   - warningsOnDeprecatedUsage: Annotate generated Swift code with the Swift `available`
@@ -741,6 +746,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       selectionSetInitializers: SelectionSetInitializers = Default.selectionSetInitializers,
       operationDocumentFormat: OperationDocumentFormat = Default.operationDocumentFormat,
       schemaCustomization: SchemaCustomization = Default.schemaCustomization,
+      reduceGeneratedSchemaTypes: Bool = Default.reduceGeneratedSchemaTypes,
       cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
       warningsOnDeprecatedUsage: Composition = Default.warningsOnDeprecatedUsage,
       conversionStrategies: ConversionStrategies = Default.conversionStrategies,
@@ -754,6 +760,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       self.selectionSetInitializers = selectionSetInitializers
       self.operationDocumentFormat = operationDocumentFormat
       self.schemaCustomization = schemaCustomization
+      self.reduceGeneratedSchemaTypes = reduceGeneratedSchemaTypes
       self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
       self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
       self.conversionStrategies = conversionStrategies
@@ -773,6 +780,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case apqs
       case operationDocumentFormat
       case schemaCustomization
+      case reduceGeneratedSchemaTypes
       case cocoapodsCompatibleImportStatements
       case warningsOnDeprecatedUsage
       case conversionStrategies
@@ -819,6 +827,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         SchemaCustomization.self,
         forKey: .schemaCustomization
       ) ?? Default.schemaCustomization
+      
+      reduceGeneratedSchemaTypes = try values.decodeIfPresent(
+        Bool.self,
+        forKey: .reduceGeneratedSchemaTypes
+      ) ?? Default.reduceGeneratedSchemaTypes
 
       cocoapodsCompatibleImportStatements = try values.decodeIfPresent(
         Bool.self,
@@ -860,6 +873,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       try container.encode(self.selectionSetInitializers, forKey: .selectionSetInitializers)
       try container.encode(self.operationDocumentFormat, forKey: .operationDocumentFormat)
       try container.encode(self.schemaCustomization, forKey: .schemaCustomization)
+      try container.encode(self.reduceGeneratedSchemaTypes, forKey: .reduceGeneratedSchemaTypes)
       try container.encode(self.cocoapodsCompatibleImportStatements, forKey: .cocoapodsCompatibleImportStatements)
       try container.encode(self.warningsOnDeprecatedUsage, forKey: .warningsOnDeprecatedUsage)
       try container.encode(self.conversionStrategies, forKey: .conversionStrategies)
@@ -1702,6 +1716,62 @@ extension ApolloCodegenConfiguration.OutputOptions {
   /// - Parameters:
   ///   - additionalInflectionRules: Any non-default rules for pluralization or singularization
   ///   you wish to include.
+  ///   - deprecatedEnumCases: How deprecated enum cases from the schema should be handled.
+  ///   - schemaDocumentation: Whether schema documentation is added to the generated files.
+  ///   - selectionSetInitializers: Which generated selection sets should include
+  ///     generated initializers.
+  ///   - operationDocumentFormat: How to generate the operation documents for your generated operations.
+  ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
+  ///     including `Apollo` via Cocoapods.
+  ///   - warningsOnDeprecatedUsage: Annotate generated Swift code with the Swift `available`
+  ///     attribute and `deprecated` argument for parts of the GraphQL schema annotated with the
+  ///     built-in `@deprecated` directive.
+  ///   - conversionStrategies: Rules for how to convert the names of values from the schema in
+  ///     generated code.
+  ///   - pruneGeneratedFiles: Whether unused generated files will be automatically deleted.
+  ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation
+  ///     class types will be marked as `final`.
+  ///   - appendSchemaTypeFilenameSuffix: `true` will add a filename suffix matching the schema type, the
+  ///     default is `false`. This can be used to avoid filename conflicts when operation type names match
+  ///     schema type names.
+  ///
+  @available(*, deprecated,
+              renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:reduceGeneratedSchemaTypes:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
+  )
+  public init(
+    additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
+    deprecatedEnumCases: ApolloCodegenConfiguration.Composition = Default.deprecatedEnumCases,
+    schemaDocumentation: ApolloCodegenConfiguration.Composition = Default.schemaDocumentation,
+    selectionSetInitializers: ApolloCodegenConfiguration.SelectionSetInitializers = Default.selectionSetInitializers,
+    operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat = Default.operationDocumentFormat,
+    schemaCustomization: ApolloCodegenConfiguration.SchemaCustomization = Default.schemaCustomization,
+    cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
+    warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
+    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
+    pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
+    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
+    appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix
+  ) {
+    self.additionalInflectionRules = additionalInflectionRules
+    self.deprecatedEnumCases = deprecatedEnumCases
+    self.schemaDocumentation = schemaDocumentation
+    self.selectionSetInitializers = selectionSetInitializers
+    self.operationDocumentFormat = operationDocumentFormat
+    self.schemaCustomization = schemaCustomization
+    self.reduceGeneratedSchemaTypes = Default.reduceGeneratedSchemaTypes
+    self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
+    self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
+    self.conversionStrategies = conversionStrategies
+    self.pruneGeneratedFiles = pruneGeneratedFiles
+    self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
+    self.appendSchemaTypeFilenameSuffix = appendSchemaTypeFilenameSuffix
+  }
+  
+  /// Deprecated initializer.
+  ///
+  /// - Parameters:
+  ///   - additionalInflectionRules: Any non-default rules for pluralization or singularization
+  ///   you wish to include.
   ///   - queryStringLiteralFormat: Formatting of the GraphQL query string literal that is
   ///   included in each generated operation object.
   ///   - deprecatedEnumCases: How deprecated enum cases from the schema should be handled.
@@ -1746,6 +1816,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
     self.schemaCustomization = Default.schemaCustomization
     self.appendSchemaTypeFilenameSuffix = Default.appendSchemaTypeFilenameSuffix
+    self.reduceGeneratedSchemaTypes = Default.reduceGeneratedSchemaTypes
   }
   
   /// Deprecated initializer.
@@ -1797,6 +1868,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
     self.schemaCustomization = Default.schemaCustomization
     self.appendSchemaTypeFilenameSuffix = Default.appendSchemaTypeFilenameSuffix
+    self.reduceGeneratedSchemaTypes = Default.reduceGeneratedSchemaTypes
   }
 
   /// Whether the generated operations should use Automatic Persisted Queries.

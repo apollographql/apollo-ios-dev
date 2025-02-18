@@ -49,7 +49,7 @@ describe("given schema", () => {
     );
 
     it("should compile enum values with deprecation reason", () => {
-      const compilationResult: CompilationResult = compileDocument(schema, document, false, emptyValidationOptions);
+      const compilationResult: CompilationResult = compileDocument(schema, document, false, false, emptyValidationOptions);
       const speciesEnum: GraphQLEnumType = compilationResult.referencedTypes.find(function(element) {
         return element.name == 'Species'
       }) as GraphQLEnumType

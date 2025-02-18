@@ -462,6 +462,7 @@ The top-level properties are:
 | [`markOperationDefinitionsAsFinal`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/markOperationDefinitionsAsFinal) | Whether generated GraphQL operation and local cache mutation class types will be marked as `final`. |
 | [`schemaCustomization`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/schemacustomization) | Customization options to be applied to the schema during code generation. |
 | [`appendSchemaTypeFilenameSuffix`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/appendSchemaTypeFilenameSuffix) | `true` will add a filename suffix matching the schema type, the default is `false`. This can be used to avoid filename conflicts when operation type names match schema type names. |
+| [`reduceGeneratedSchemaTypes`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/reducegeneratedschematypes) | Defaults to `false` which generates `Object` types for all objects that implement any `Interface` referenced in operation documents. Setting this to `true` will only generate `Object` types for objects that are referenced in an operation document or have a `@typePolicy` |
 
 <MultiCodeBlock>
 
@@ -494,6 +495,7 @@ The top-level properties are:
   },
   "pruneGeneratedFiles": true,
   "markOperationDefinitionsAsFinal": true,
+  "reduceGeneratedSchemaTypes": false,
   "schemaCustomization" : {
     "customTypeNames" : {
       "MyEnum" : {
@@ -545,6 +547,7 @@ let configuration = ApolloCodegenConfiguration(
     ),
     pruneGeneratedFiles: true,
     markOperationDefinitionsAsFinal: true,
+    reduceGeneratedSchemaTypes: false,
     schemaCustomization: .init(
       customTypeNames: [
         "MyEnum" : .enum(

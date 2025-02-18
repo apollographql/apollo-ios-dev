@@ -55,6 +55,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
               "MyObject": .type(name: "CustomObject")
             ]
           ),
+          reduceGeneratedSchemaTypes: false,
           cocoapodsCompatibleImportStatements: true,
           warningsOnDeprecatedUsage: .exclude,
           conversionStrategies:.init(
@@ -122,6 +123,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "definition"
           ],
           "pruneGeneratedFiles" : false,
+          "reduceGeneratedSchemaTypes" : false,
           "schemaCustomization" : {
             "customTypeNames" : {
               "MyEnum" : {
@@ -1297,6 +1299,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "definition"
           ],
           "pruneGeneratedFiles" : true,
+          "reduceGeneratedSchemaTypes" : false,
           "schemaCustomization" : {
             "customTypeNames" : {
 
@@ -1489,6 +1492,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "definition"
           ],
           "pruneGeneratedFiles" : true,
+          "reduceGeneratedSchemaTypes" : false,
           "schemaCustomization" : {
             "customTypeNames" : {
 
@@ -1681,6 +1685,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "definition"
           ],
           "pruneGeneratedFiles" : true,
+          "reduceGeneratedSchemaTypes" : false,
           "schemaCustomization" : {
             "customTypeNames" : {
 
@@ -1784,6 +1789,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "definition"
           ],
           "pruneGeneratedFiles" : true,
+          "reduceGeneratedSchemaTypes" : false,
           "schemaCustomization" : {
             "customTypeNames" : {
 
@@ -1891,6 +1897,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "definition"
           ],
           "pruneGeneratedFiles" : true,
+          "reduceGeneratedSchemaTypes" : false,
           "schemaCustomization" : {
             "customTypeNames" : {
 
@@ -1998,6 +2005,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "definition"
           ],
           "pruneGeneratedFiles" : true,
+          "reduceGeneratedSchemaTypes" : false,
           "schemaCustomization" : {
             "customTypeNames" : {
 
@@ -2105,6 +2113,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "definition"
           ],
           "pruneGeneratedFiles" : true,
+          "reduceGeneratedSchemaTypes" : false,
           "schemaCustomization" : {
             "customTypeNames" : {
 
@@ -2212,6 +2221,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "definition"
           ],
           "pruneGeneratedFiles" : true,
+          "reduceGeneratedSchemaTypes" : false,
           "schemaCustomization" : {
             "customTypeNames" : {
 
@@ -2319,6 +2329,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "definition"
           ],
           "pruneGeneratedFiles" : true,
+          "reduceGeneratedSchemaTypes" : false,
           "schemaCustomization" : {
             "customTypeNames" : {
 

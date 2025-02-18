@@ -130,8 +130,8 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
   /// Confirms bug fix for issue [#2915](https://github.com/apollographql/apollo-ios/issues/2915).
   func test__initFromJSON__givenMergedOnlyNestedSelectionSet_withTypeCase_canConvertToTypeCase() throws {
     struct Types {
-      static let Character = Interface(name: "Character")
-      static let Hero = Interface(name: "Hero")
+      static let Character = Interface(name: "Character", implementingObjects: ["Human"])
+      static let Hero = Interface(name: "Hero", implementingObjects: ["Human"])
       static let Human = Object(typename: "Human", implementedInterfaces: [Character.self, Hero.self])
     }
 

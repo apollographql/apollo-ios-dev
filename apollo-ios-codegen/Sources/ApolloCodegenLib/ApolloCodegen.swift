@@ -191,6 +191,7 @@ public class ApolloCodegen {
       document: operationsDocument,
       experimentalLegacySafelistingCompatibleOperations:
         config.experimentalFeatures.legacySafelistingCompatibleOperations,
+      reduceGeneratedSchemaTypes: config.options.reduceGeneratedSchemaTypes,
       validationOptions: validationOptions
     )
   }
