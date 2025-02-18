@@ -127,7 +127,8 @@
     },
     {
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict\/subscript(_:)"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict\/subscript(_:)-2fzfl",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict\/subscript(_:)-vs7u"
       ],
       "title" : "Subscripts"
     },
@@ -456,7 +457,62 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/inputdict\/init(_:)"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/InputDict/subscript(_:)": {
+"doc://ApolloAPI/documentation/ApolloAPI/InputDict/subscript(_:)-2fzfl": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "subscript"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI15GraphQLNullableO",
+      "text" : "GraphQLNullable"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict\/subscript(_:)-2fzfl",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "subscript(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/inputdict\/subscript(_:)-2fzfl"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/InputDict/subscript(_:)-vs7u": {
   "abstract" : [
 
   ],
@@ -491,12 +547,12 @@
       "text" : "T"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict\/subscript(_:)",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict\/subscript(_:)-vs7u",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "subscript(_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/inputdict\/subscript(_:)"
+  "url" : "\/documentation\/apolloapi\/inputdict\/subscript(_:)-vs7u"
 }
 }
 }

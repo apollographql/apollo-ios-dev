@@ -1,40 +1,29 @@
 {
   "abstract" : [
     {
-      "text" : "A list of the interfaces implemented by the type.",
+      "text" : "A list of name for Objects that implement this Interface",
       "type" : "text"
-    }
-  ],
-  "deprecationSummary" : [
-    {
-      "inlineContent" : [
-        {
-          "text" : "This property will be removed in version 2.0. To check if an Object implements an interface please use the 'implements(_)' function.",
-          "type" : "text"
-        }
-      ],
-      "type" : "paragraph"
     }
   ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/implementedInterfaces"
+    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface\/implementingObjects"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI6ObjectV21implementedInterfacesSayAA9InterfaceVGvp",
+    "externalID" : "s:9ApolloAPI9InterfaceV19implementingObjectsSaySSGvp",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "var"
+        "text" : "let"
       },
       {
         "kind" : "text",
@@ -42,7 +31,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "implementedInterfaces"
+        "text" : "implementingObjects"
       },
       {
         "kind" : "text",
@@ -50,8 +39,8 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI9InterfaceV",
-        "text" : "Interface"
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
       },
       {
         "kind" : "text",
@@ -63,13 +52,10 @@
         "name" : "ApolloAPI"
       }
     ],
-    "platforms" : [
-
-    ],
     "role" : "symbol",
     "roleHeading" : "Instance Property",
     "symbolKind" : "property",
-    "title" : "implementedInterfaces"
+    "title" : "implementingObjects"
   },
   "primaryContentSections" : [
     {
@@ -84,7 +70,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "var"
+              "text" : "let"
             },
             {
               "kind" : "text",
@@ -92,29 +78,20 @@
             },
             {
               "kind" : "identifier",
-              "text" : "implementedInterfaces"
+              "text" : "implementingObjects"
             },
             {
               "kind" : "text",
               "text" : ": ["
             },
             {
-              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI9InterfaceV",
-              "text" : "Interface"
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
             },
             {
               "kind" : "text",
-              "text" : "] { "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "get"
-            },
-            {
-              "kind" : "text",
-              "text" : " }"
+              "text" : "]"
             }
           ]
         }
@@ -133,7 +110,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apolloapi\/object\/implementedinterfaces"
+        "\/documentation\/apolloapi\/interface\/implementingobjects"
       ],
       "traits" : [
         {
@@ -238,25 +215,17 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/interface"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Object": {
+"doc://ApolloAPI/documentation/ApolloAPI/Interface/implementingObjects": {
   "abstract" : [
     {
-      "text" : "Represents an object ",
-      "type" : "text"
-    },
-    {
-      "code" : "type",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " in a generated GraphQL schema.",
+      "text" : "A list of name for Objects that implement this Interface",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "struct"
+      "text" : "let"
     },
     {
       "kind" : "text",
@@ -264,42 +233,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "Object"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "Object"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "Object",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/object"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Object/implementedInterfaces": {
-  "abstract" : [
-    {
-      "text" : "A list of the interfaces implemented by the type.",
-      "type" : "text"
-    }
-  ],
-  "deprecated" : true,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "implementedInterfaces"
+      "text" : "implementingObjects"
     },
     {
       "kind" : "text",
@@ -307,20 +241,20 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9InterfaceV",
-      "text" : "Interface"
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
     },
     {
       "kind" : "text",
       "text" : "]"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/implementedInterfaces",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface\/implementingObjects",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "implementedInterfaces",
+  "title" : "implementingObjects",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/object\/implementedinterfaces"
+  "url" : "\/documentation\/apolloapi\/interface\/implementingobjects"
 }
 }
 }
