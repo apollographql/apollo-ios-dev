@@ -1,0 +1,39 @@
+name: "Update Swift JS Bundle"
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch'
+        required: true
+        type: string
+
+env:
+  BRANCH_NAME: ${{ github.event.inputs.branch }}
+
+jobs:
+  update-swift-js-bundle:
+    runs-on: macos-latest
+    timeout-minutes: 5
+    name: "Update Swift JS Bundle"
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+    - name: Setup SSH Keys
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: |
+          ${{ secrets.APOLLO_IOS_DEV_DEPLOY_KEY }}
+    - name: Configure Git
+      uses: ./.github/actions/configure-git
+    - name: Build JS Bundle
+      shell: bash
+      working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript
+      run: ./auto_rollup.sh
+    - name: Commit and Push Branch
+      shell: bash
+      run: |
+        git checkout -b ${{ env.BRANCH_NAME }}
+        git add -A
+        git commit -m "Update Swift JS bundle"
+        git push -u origin ${{ env.BRANCH_NAME }}
