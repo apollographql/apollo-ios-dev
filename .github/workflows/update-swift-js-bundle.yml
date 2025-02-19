@@ -35,7 +35,6 @@ jobs:
     - name: Commit and Push Branch
       shell: bash
       run: |
-        git checkout -b ${{ env.BRANCH_NAME }}
         git add -A
         git commit -m "Update Swift JS bundle"
         git push -u origin ${{ env.BRANCH_NAME }}
