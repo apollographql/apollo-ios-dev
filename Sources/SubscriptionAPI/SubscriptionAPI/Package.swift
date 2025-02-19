@@ -14,7 +14,7 @@ let package = Package(
     .library(name: "SubscriptionAPI", targets: ["SubscriptionAPI"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/apollographql/apollo-ios", exact: "1.16.1"),
+    .package(url: "https://github.com/apollographql/apollo-ios", exact: "1.18.0"),
   ],
   targets: [
     .target(
