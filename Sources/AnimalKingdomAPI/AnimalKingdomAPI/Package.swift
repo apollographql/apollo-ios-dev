@@ -15,7 +15,7 @@ let package = Package(
     .library(name: "AnimalKingdomAPITestMocks", targets: ["AnimalKingdomAPITestMocks"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/apollographql/apollo-ios", exact: "1.16.1"),
+    .package(name: "apollo-ios", path: "../../../apollo-ios"),
   ],
   targets: [
     .target(
