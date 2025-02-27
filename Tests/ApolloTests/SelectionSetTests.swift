@@ -82,7 +82,7 @@ class SelectionSetTests: XCTestCase {
     expect(actual.name).to(beNil())
   }
 
-  func test__selection_givenOptionalField_givenNilValue__returnsNil() {
+  func test__selection_givenOptionalField_givenNilValue__returnsNil() throws {
     // given
     final class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -101,7 +101,7 @@ class SelectionSetTests: XCTestCase {
     ] 
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try Hero(data: object)
 
     // then
     expect(actual.name).to(beNil())
