@@ -31,6 +31,17 @@ public extension MutableSelectionSet {
   }
 }
 
+public extension MutableSelectionSet where Fragments: FragmentContainer {
+  @inlinable var fragments: Fragments {
+    get { Self.Fragments(_dataDict: __data) }
+    _modify {
+      var f = Self.Fragments(_dataDict: __data)
+      yield &f
+      self.__data._data = f.__data._data
+    }
+  }
+}
+
 public extension MutableSelectionSet where Self: InlineFragment {
 
   /// Function for mutating a conditional inline fragment on a mutable selection set.
