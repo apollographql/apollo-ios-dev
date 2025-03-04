@@ -157,7 +157,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
 
       guard
         let response = try! result.get(),
-        let deserialized = try! JSONSerialization.jsonObject(with: response.rawData) as? JSONObject
+        let deserialized = try? JSONSerializationFormat.deserialize(data: response.rawData) as JSONObject
       else {
         return fail("data could not be deserialized!")
       }
@@ -207,7 +207,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
 
       guard
         let response = try! result.get(),
-        let deserialized = try! JSONSerialization.jsonObject(with: response.rawData) as? JSONObject
+        let deserialized = try? JSONSerializationFormat.deserialize(data: response.rawData) as JSONObject
       else {
         return fail("data could not be deserialized!")
       }
@@ -257,7 +257,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
 
       guard
         let response = try! result.get(),
-        let deserialized = try! JSONSerialization.jsonObject(with: response.rawData) as? JSONObject
+        let deserialized = try? JSONSerializationFormat.deserialize(data: response.rawData) as JSONObject
       else {
         return fail("data could not be deserialized!")
       }
@@ -350,7 +350,7 @@ final class MultipartResponseDeferParserTests: XCTestCase {
 
           guard
             let response = try! result.get(),
-            let deserialized = try! JSONSerialization.jsonObject(with: response.rawData) as? JSONObject
+            let deserialized = try? JSONSerializationFormat.deserialize(data: response.rawData) as JSONObject
           else {
             fail("data could not be deserialized!")
             return
