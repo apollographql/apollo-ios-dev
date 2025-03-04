@@ -1816,11 +1816,11 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
           override class var __selections: [Selection] {[
             .field("name", String.self),
             .include(if: !"c", .field("friend", Friend.self)),
-            .include(if: !"d", .field("other", String.self))
+            .include(if: !"d", .field("other", String?.self))
           ]}
           var name: String { __data["name"] }
           var friend: Friend? { __data["friend"] }
-          var other: String? { __data["name"] }
+          var other: String? { __data["other"] }
 
           convenience init(
             name: String,
