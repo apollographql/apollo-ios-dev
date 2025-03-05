@@ -19,12 +19,13 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     from object: JSONObject,
     variables: GraphQLOperation.Variables? = nil
   ) throws -> T {
-    return try GraphQLExecutor_SelectionSetMapper_FromResponse_Tests.executor.execute(
+    let dataDict = try GraphQLExecutor_SelectionSetMapper_FromResponse_Tests.executor.execute(
       selectionSet: selectionSet,
       on: object,      
       variables: variables,
-      accumulator: GraphQLSelectionSetMapper<T>()
+      accumulator: DataDictMapper()
     )
+    return T(_dataDict: dataDict)
   }
 
   private func readValues<T: SelectionSet, Operation: GraphQLOperation>(
@@ -33,12 +34,13 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     from object: JSONObject,
     variables: GraphQLOperation.Variables? = nil
   ) throws -> T {
-    return try GraphQLExecutor_SelectionSetMapper_FromResponse_Tests.executor.execute(
+    let dataDict = try GraphQLExecutor_SelectionSetMapper_FromResponse_Tests.executor.execute(
       selectionSet: selectionSet,
       in: operation,
       on: object,
-      accumulator: GraphQLSelectionSetMapper<T>()
+      accumulator: DataDictMapper()
     )
+    return T(_dataDict: dataDict)
   }
 
   // MARK: - Tests
