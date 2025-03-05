@@ -539,7 +539,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [.field("favorites", [String]?.self)] }
     }
-    let object: JSONObject = ["favorites": DataDict._NullValue]
+    let object: JSONObject = ["favorites": NSNull()]
 
     // when
     let data = try readValues(GivenSelectionSet.self, from: object)
