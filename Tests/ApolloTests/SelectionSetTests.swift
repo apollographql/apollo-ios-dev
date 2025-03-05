@@ -241,7 +241,7 @@ class SelectionSetTests: XCTestCase {
 
     let object: JSONObject = [
       "__typename": "Human",
-      "friend": DataDict._NullValue
+      "friend": NSNull()
     ]
 
     // when
@@ -1474,20 +1474,12 @@ class SelectionSetTests: XCTestCase {
       return
     }
     expect(nameValue).to(beNil())
-    
-    if DataDict._AnyHashableCanBeCoerced {
-      guard let nameValue = nameValue as? String? else {
-        fail("name should be Optional.some(Optional.none).")
-        return
-      }
-      expect(nameValue).to(beNil())
-    } else {
-      guard let nameValue = nameValue as? String? else {
-        fail("name should be Optional.some(Optional.none).")
-        return
-      }
-      expect(nameValue).to(beNil())
+
+    guard let nameValue = nameValue as? String? else {
+      fail("name should be Optional.some(Optional.none).")
+      return
     }
+    expect(nameValue).to(beNil())
   }
 
   @MainActor
@@ -1557,20 +1549,11 @@ class SelectionSetTests: XCTestCase {
     }
     expect(childValue).to(beNil())
 
-    if DataDict._AnyHashableCanBeCoerced {
-      guard let childValue = childValue as? Hero.Child? else {
-        fail("child should be Optional.some(Optional.none).")
-        return
-      }
-      expect(childValue).to(beNil())
-
-    } else {
-      guard let childValue = childValue as? Hero.Child? else {
-        fail("child should be Optional.some(Optional.none).")
-        return
-      }
-      expect(childValue).to(beNil())
+    guard let childValue = childValue as? Hero.Child? else {
+      fail("child should be Optional.some(Optional.none).")
+      return
     }
+    expect(childValue).to(beNil())
   }
 
   @MainActor
