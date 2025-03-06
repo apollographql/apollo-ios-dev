@@ -27,6 +27,6 @@
     "rollup": "4.34.7",
     "@rollup/plugin-terser": "0.4.4",
     "ts-jest": "29.2.5",
-    "typescript": "5.7.3"
+    "typescript": "5.8.2"
   }
 }
