@@ -58,7 +58,7 @@ public extension MutableSelectionSet where Self: InlineFragment {
   /// - Returns: A `Bool` indicating if the fragment was fulfilled.
   ///   If this returns `false`, the `transform` block will not be called.
   @discardableResult
-  mutating func mutateIfFulfilled<T: ApolloAPI.InlineFragment>(
+  mutating func mutateIfFulfilled<T: InlineFragment>(
     _ keyPath: KeyPath<Self, T?>,
     _ transform: (inout T) -> Void
   ) -> Bool where T.RootEntityType == Self.RootEntityType {
@@ -90,7 +90,7 @@ public extension MutableRootSelectionSet {
   /// - Returns: A `Bool` indicating if the fragment was fulfilled.
   ///   If this returns `false`, the `transform` block will not be called.
   @discardableResult
-  mutating func mutateIfFulfilled<T: ApolloAPI.InlineFragment>(
+  mutating func mutateIfFulfilled<T: InlineFragment>(
     _ keyPath: KeyPath<Self, T?>,
     _ transform: (inout T) -> Void
   ) -> Bool where T.RootEntityType == Self {
