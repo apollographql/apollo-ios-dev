@@ -1113,7 +1113,7 @@ class SelectionSetTests: XCTestCase {
 
     // when
     let actual = Data(
-      hero: .AsAnimal(__typename: "Droid", name: "Artoo").asRootEntityType
+      hero: Data.Hero.AsAnimal(__typename: "Droid", name: "Artoo").asRootEntityType
     )
 
     // then
