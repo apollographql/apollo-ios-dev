@@ -120,6 +120,7 @@ open class JSONRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
   private func createBody() -> JSONEncodableDictionary {
     let sendQueryDocument: Bool
     let autoPersistQueries: Bool
+
     switch Operation.operationType {
     case .query:
       if isPersistedQueryRetry {
@@ -142,12 +143,14 @@ open class JSONRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
       autoPersistQueries = false
     }
     
-    let body = self.requestBodyCreator.requestBody(
+    var body = self.requestBodyCreator.requestBody(
       for: operation,
       sendQueryDocument: sendQueryDocument,
       autoPersistQuery: autoPersistQueries
     )
-    
+
+    addClientMetadataExtension(to: &body)
+
     return body
   }
 
