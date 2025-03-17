@@ -24,12 +24,16 @@ let package = Package(
     .package(
       url: "https://github.com/stephencelis/SQLite.swift.git",
       .upToNextMajor(from: "0.15.1")),
+    .package(
+      url: "https://github.com/apple/swift-atomics",
+      .upToNextMajor(from: "1.2.0"))
   ],
   targets: [
     .target(
       name: "Apollo",
       dependencies: [
-        "ApolloAPI"
+        "ApolloAPI",
+        .product(name: "Atomics", package: "swift-atomics"),
       ],
       resources: [
         .copy("Resources/PrivacyInfo.xcprivacy")
