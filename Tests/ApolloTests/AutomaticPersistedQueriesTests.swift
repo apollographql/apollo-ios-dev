@@ -69,16 +69,18 @@ class AutomaticPersistedQueriesTests: XCTestCase {
     operation: O,
     queryDocument: Bool = false,
     persistedQuery: Bool = false,
+    fileID: String = #fileID,
     file: Nimble.FileString = #filePath,
-    line: UInt = #line
+    line: UInt = #line,
+    column: UInt = #column
   ) throws {
-
+    let location = SourceLocation(fileID: fileID, filePath: file, line: line, column: column)
     guard
       let httpBody = request.httpBody,
       let jsonBody = try? JSONSerializationFormat.deserialize(data: httpBody) as JSONObject else {
       fail(
         "httpBody invalid",
-        location: SourceLocation(file: file, line: line)
+        location: location
       )
       return
     }
@@ -102,7 +104,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       } else {
         fail(
           "variables should not be nil",
-          location: SourceLocation(file: file, line: line)
+          location: location
         )
       }
     }
@@ -112,7 +114,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let ext = ext else {
         fail(
           "extensions json data should not be nil",
-          location: SourceLocation(file: file, line: line)
+          location: location
         )
         return
       }
@@ -120,7 +122,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let persistedQuery = ext["persistedQuery"] as? JSONObject else {
         fail(
           "persistedQuery is missing",
-          location: SourceLocation(file: file, line: line)
+          location: location
         )
         return
       }
@@ -128,7 +130,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let version = persistedQuery["version"] as? Int else {
         fail(
           "version is missing",
-          location: SourceLocation(file: file, line: line)
+          location: location
         )
         return
       }
@@ -136,7 +138,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let sha256Hash = persistedQuery["sha256Hash"] as? String else {
         fail(
           "sha256Hash is missing",
-          location: SourceLocation(file: file, line: line)
+          location: location
         )
         return
       }
@@ -156,13 +158,16 @@ class AutomaticPersistedQueriesTests: XCTestCase {
     query: MockHeroNameQuery,
     queryDocument: Bool = false,
     persistedQuery: Bool = false,
+    fileID: String = #fileID,
     file: Nimble.FileString = #filePath,
-    line: UInt = #line
+    line: UInt = #line,
+    column: UInt = #column
   ) throws {
+    let location = SourceLocation(fileID: fileID, filePath: file, line: line, column: column)
     guard let url = request.url else {
       fail(
         "URL not valid",
-        location: SourceLocation(file: file, line: line)
+        location: location
       )
       return
     }
@@ -193,7 +198,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
     } else {
       fail(
         "variables should not be nil",
-        location: SourceLocation(file: file, line: line)
+        location: location
       )
     }
     
@@ -206,7 +211,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
         else {
         fail(
           "extensions json data should not be nil",
-          location: SourceLocation(file: file, line: line)
+          location: location
         )
         return
       }
@@ -214,7 +219,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let persistedQuery = jsonBody["persistedQuery"] as? JSONObject else {
         fail(
           "persistedQuery is missing",
-          location: SourceLocation(file: file, line: line)
+          location: location
         )
         return
       }
@@ -222,7 +227,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let sha256Hash = persistedQuery["sha256Hash"] as? String else {
         fail(
           "sha256Hash is missing",
-          location: SourceLocation(file: file, line: line)
+          location: location
         )
         return
       }
@@ -230,7 +235,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let version = persistedQuery["version"] as? Int else {
         fail(
           "version is missing",
-          location: SourceLocation(file: file, line: line)
+          location: location
         )
         return
       }
