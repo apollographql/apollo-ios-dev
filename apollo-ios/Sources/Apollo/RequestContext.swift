@@ -18,5 +18,7 @@ public protocol RequestContext {}
 public protocol RequestContextTimeoutConfigurable: RequestContext {
   /// The timeout interval specifies the limit on the idle interval allotted to a request in the process of
   /// loading. This timeout interval is measured in seconds.
+  ///
+  /// The value of this property will be set as the `timeoutInterval` on the `URLRequest` created for this GraphQL request.
   var requestTimeout: TimeInterval { get }
 }
