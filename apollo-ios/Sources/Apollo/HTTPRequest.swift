@@ -87,7 +87,7 @@ open class HTTPRequest<Operation: GraphQLOperation>: Hashable {
   open func toURLRequest() throws -> URLRequest {
     var request: URLRequest
 
-    if let configContext = context as? any RequestConfigurationContext {
+    if let configContext = context as? any RequestContextTimeoutConfigurable {
       request = URLRequest(url: self.graphQLEndpoint, timeoutInterval: configContext.requestTimeout)
     } else {
       request = URLRequest(url: self.graphQLEndpoint)
