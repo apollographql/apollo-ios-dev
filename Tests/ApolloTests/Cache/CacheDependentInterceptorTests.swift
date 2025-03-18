@@ -25,7 +25,7 @@ class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting {
     super.tearDown()
   }
   
-  func testChangingCachePolicyInErrorInterceptorWorks() {
+  func testChangingCachePolicyInErrorInterceptorWorks() async {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -41,7 +41,7 @@ class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting {
     }
 
     // Set up initial cache state
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -55,7 +55,7 @@ class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting {
         chain: any RequestChain,
         request: HTTPRequest<Operation>,
         response: HTTPResponse<Operation>?,
-        completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
+        completion: @escaping @Sendable (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
         
         self.handledError = error
         
