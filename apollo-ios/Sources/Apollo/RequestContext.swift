@@ -11,7 +11,10 @@ import ApolloAPI
 /// that they cannot get just from the existing operation. It can be anything that conforms to this protocol.
 public protocol RequestContext {}
 
-/// A specialized request context that specifies configuration details for the URLRequest timing.
+/// A request context specialization protocol that specifies options for configuring the timeout of a `URLRequest`.
+///
+/// A `RequestContext` object can conform to this protocol to provide a custom `requestTimeout` for an individual request.
+/// If the `RequestContext` for a request does not conform to this protocol, the default request timeout of `URLRequest` will be used.
 public protocol RequestContextTimeoutConfigurable: RequestContext {
   /// The timeout interval specifies the limit on the idle interval allotted to a request in the process of
   /// loading. This timeout interval is measured in seconds.
