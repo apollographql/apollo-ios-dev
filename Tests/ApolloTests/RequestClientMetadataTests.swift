@@ -17,7 +17,13 @@ class RequestClientMetadataTests : XCTestCase {
     var name: String { __data["name"] }
   }
 
-  func test__urlRequest__givenQueryRequest_shouldAddClientHeadersAndExtension() throws {
+  private struct LocalControlClientMetadata: RequestContextClientMetadata {
+    var disableClientLibraryRequestExtension: Bool
+  }
+
+  // MARK: JSONRequest
+
+  func test__jsonRequest__withoutRequestContext_shouldAddClientHeadersAndExtension() throws {
     let jsonRequest = JSONRequest(
       operation: MockQuery<Hero>(),
       graphQLEndpoint: TestURL.mockServer.url,
@@ -49,7 +55,72 @@ class RequestClientMetadataTests : XCTestCase {
     expect(clientLibrary["version"]).to(equal(Constants.ApolloVersion))
   }
 
-  func test__urlRequest__givenUploadRequest_shouldAddClientHeadersAndExtension() throws {
+  func test__jsonRequest__givenRequestContextEnablingClientExtension_shouldAddClientHeadersAndExtension() throws {
+    let jsonRequest = JSONRequest(
+      operation: MockQuery<Hero>(),
+      graphQLEndpoint: TestURL.mockServer.url,
+      clientName: "test-client",
+      clientVersion: "test-client-version",
+      context: LocalControlClientMetadata(disableClientLibraryRequestExtension: false)
+    )
+
+    let urlRequest = try jsonRequest.toURLRequest()
+
+    guard let httpHeaderFields = urlRequest.allHTTPHeaderFields else {
+      fail("Missing HTTP header fields!")
+      return
+    }
+
+    expect(httpHeaderFields["apollographql-client-version"]).to(equal("test-client-version"))
+    expect(httpHeaderFields["apollographql-client-name"]).to(equal("test-client"))
+
+    guard
+      let httpBody = urlRequest.httpBody,
+      let jsonBody = try? JSONSerialization.jsonObject(with: httpBody) as? JSONObject,
+      let extensions = jsonBody["extensions"] as? JSONObject,
+      let clientLibrary = extensions["clientLibrary"] as? JSONObject
+    else {
+      fail("Could not deserialize client library extension.")
+      return
+    }
+
+    expect(clientLibrary["name"]).to(equal(Constants.ApolloName))
+    expect(clientLibrary["version"]).to(equal(Constants.ApolloVersion))
+  }
+
+  func test__jsonRequest__givenRequestContextDisablingClientExtension_shouldAddClientHeaders_doesNotAddClientExtension() throws {
+    let jsonRequest = JSONRequest(
+      operation: MockQuery<Hero>(),
+      graphQLEndpoint: TestURL.mockServer.url,
+      clientName: "test-client",
+      clientVersion: "test-client-version",
+      context: LocalControlClientMetadata(disableClientLibraryRequestExtension: true)
+    )
+
+    let urlRequest = try jsonRequest.toURLRequest()
+
+    guard let httpHeaderFields = urlRequest.allHTTPHeaderFields else {
+      fail("Missing HTTP header fields!")
+      return
+    }
+
+    expect(httpHeaderFields["apollographql-client-version"]).to(equal("test-client-version"))
+    expect(httpHeaderFields["apollographql-client-name"]).to(equal("test-client"))
+
+    guard
+      let httpBody = urlRequest.httpBody,
+      let jsonBody = try? JSONSerialization.jsonObject(with: httpBody) as? JSONObject
+    else {
+      fail("Could not deserialize client library extension.")
+      return
+    }
+
+    expect(jsonBody["extensions"]).to(beNil())
+  }
+
+  // MARK: UploadRequest
+
+  func test__uploadRequest__withoutRequestContext_shouldAddClientHeadersAndExtension() throws {
     let uploadRequest = UploadRequest(
       graphQLEndpoint: TestURL.mockServer.url,
       operation: MockQuery<Hero>(),
@@ -76,6 +147,68 @@ class RequestClientMetadataTests : XCTestCase {
       return
     }
 
-    expect(multipartBody).to(contain(#"{"extensions":{"clientLibrary":{"name":"apollo-ios","version":"1.18.0"}},"operationName":"MockOperationName","query":"Mock Operation Definition","variables":{"x":null}}"#))
+    expect(multipartBody).to(contain("{\"extensions\":{\"clientLibrary\":{\"name\":\"apollo-ios\",\"version\":\"\(Constants.ApolloVersion)\"}},\"operationName\":\"MockOperationName\",\"query\":\"Mock Operation Definition\",\"variables\":{\"x\":null}}"))
+  }
+
+  func test__uploadRequest__givenRequestContextEnablingClientExtension_shouldAddClientHeadersAndExtension() throws {
+    let uploadRequest = UploadRequest(
+      graphQLEndpoint: TestURL.mockServer.url,
+      operation: MockQuery<Hero>(),
+      clientName: "test-client",
+      clientVersion: "test-client-version",
+      files: [GraphQLFile(fieldName: "x", originalName: "y", data: "z".data(using: .utf8)!)],
+      context: LocalControlClientMetadata(disableClientLibraryRequestExtension: false)
+    )
+
+    let urlRequest = try uploadRequest.toURLRequest()
+
+    guard let httpHeaderFields = urlRequest.allHTTPHeaderFields else {
+      fail("Missing HTTP header fields!")
+      return
+    }
+
+    expect(httpHeaderFields["apollographql-client-version"]).to(equal("test-client-version"))
+    expect(httpHeaderFields["apollographql-client-name"]).to(equal("test-client"))
+
+    guard
+      let httpBody = urlRequest.httpBody,
+      let multipartBody = String(data: httpBody, encoding: .utf8)
+    else {
+      fail("Could not deserialize client library extension.")
+      return
+    }
+
+    expect(multipartBody).to(contain("{\"extensions\":{\"clientLibrary\":{\"name\":\"apollo-ios\",\"version\":\"\(Constants.ApolloVersion)\"}},\"operationName\":\"MockOperationName\",\"query\":\"Mock Operation Definition\",\"variables\":{\"x\":null}}"))
+  }
+
+  func test__uploadRequest__givenRequestContextDisablingClientExtension_shouldAddClientHeaders_doesNotAddClientExtension() throws {
+    let uploadRequest = UploadRequest(
+      graphQLEndpoint: TestURL.mockServer.url,
+      operation: MockQuery<Hero>(),
+      clientName: "test-client",
+      clientVersion: "test-client-version",
+      files: [GraphQLFile(fieldName: "x", originalName: "y", data: "z".data(using: .utf8)!)],
+      context: LocalControlClientMetadata(disableClientLibraryRequestExtension: true)
+    )
+
+    let urlRequest = try uploadRequest.toURLRequest()
+
+    guard let httpHeaderFields = urlRequest.allHTTPHeaderFields else {
+      fail("Missing HTTP header fields!")
+      return
+    }
+
+    expect(httpHeaderFields["apollographql-client-version"]).to(equal("test-client-version"))
+    expect(httpHeaderFields["apollographql-client-name"]).to(equal("test-client"))
+
+    guard
+      let httpBody = urlRequest.httpBody,
+      let multipartBody = String(data: httpBody, encoding: .utf8)
+    else {
+      fail("Could not deserialize client library extension.")
+      return
+    }
+
+    expect(multipartBody).notTo(contain("\"extensions\":{\"clientLibrary\":{\"name\":\"apollo-ios\",\"version\":\"\(Constants.ApolloVersion)\"}}"))
   }
 }

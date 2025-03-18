@@ -88,7 +88,9 @@ open class UploadRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
     }
     fields["variables"] = variables
 
-    addClientMetadataExtension(to: &fields)
+    if !((context as? any RequestContextClientMetadata)?.disableClientLibraryRequestExtension ?? false) {
+      addClientMetadataExtension(to: &fields)
+    }
 
     let operationData = try serializationFormat.serialize(value: fields)
     formData.appendPart(data: operationData, name: "operations")

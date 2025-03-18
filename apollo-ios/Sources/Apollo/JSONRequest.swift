@@ -149,7 +149,9 @@ open class JSONRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
       autoPersistQuery: autoPersistQueries
     )
 
-    addClientMetadataExtension(to: &body)
+    if !((context as? any RequestContextClientMetadata)?.disableClientLibraryRequestExtension ?? false) {
+      addClientMetadataExtension(to: &body)
+    }
 
     return body
   }
