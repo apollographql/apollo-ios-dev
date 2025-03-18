@@ -232,7 +232,7 @@ final public class InterceptorRequestChain: Cancellable, RequestChain {
     _ error: any Error,
     request: HTTPRequest<Operation>,
     response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
+    completion: @escaping @Sendable (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
   ) {
     guard !self.isCancelled else {
       return

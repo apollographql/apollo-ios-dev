@@ -8,85 +8,85 @@ class GraphQLResponseTests: XCTestCase {
 
   // MARK: Parsing Tests (Extensions)
 
-  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyFetchIgnoringCacheCompletely_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyFetchIgnoringCacheCompletely_extensionShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "extensions": [:] as JSONValue
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .fetchIgnoringCacheCompletely)
+    let (result, _) = try await response.parseResult(withCachePolicy: .fetchIgnoringCacheCompletely)
 
     // then
     expect(result.extensions).to(equal([:]))
   }
 
-  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyFetchIgnoringCacheData_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyFetchIgnoringCacheData_extensionShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "extensions": [:] as JSONValue
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .fetchIgnoringCacheData)
+    let (result, _) = try await response.parseResult(withCachePolicy: .fetchIgnoringCacheData)
 
     // then
     expect(result.extensions).to(equal([:]))
   }
 
-  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataAndFetch_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataAndFetch_extensionShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "extensions": [:] as JSONValue
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .returnCacheDataAndFetch)
+    let (result, _) = try await response.parseResult(withCachePolicy: .returnCacheDataAndFetch)
 
     // then
     expect(result.extensions).to(equal([:]))
   }
 
-  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataDontFetch_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataDontFetch_extensionShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "extensions": [:] as JSONValue
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .returnCacheDataDontFetch)
+    let (result, _) = try await response.parseResult(withCachePolicy: .returnCacheDataDontFetch)
 
     // then
     expect(result.extensions).to(equal([:]))
   }
 
-  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataElseFetch_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataElseFetch_extensionShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "extensions": [:] as JSONValue
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .returnCacheDataElseFetch)
+    let (result, _) = try await response.parseResult(withCachePolicy: .returnCacheDataElseFetch)
 
     // then
     expect(result.extensions).to(equal([:]))
   }
 
-  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyDefault_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyDefault_extensionShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "extensions": [:] as JSONValue
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .default)
+    let (result, _) = try await response.parseResult(withCachePolicy: .default)
 
     // then
     expect(result.extensions).to(equal([:]))
   }
 
-  func test__parsing__givenExtensionWithEmptyValue_andData_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithEmptyValue_andData_extensionShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "data": ["human": NSNull()],
@@ -94,13 +94,13 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .default)
+    let (result, _) = try await response.parseResult(withCachePolicy: .default)
 
     // then
     expect(result.extensions).to(equal([:]))
   }
 
-  func test__parsing__givenExtensionWithChildValue_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithChildValue_extensionShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "data": ["human": NSNull()],
@@ -108,20 +108,20 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .default)
+    let (result, _) = try await response.parseResult(withCachePolicy: .default)
 
     // then
     expect(result.extensions?["parentKey"]).to(equal(["childKey": "someValue"]))
   }
 
-  func test__parsing__givenMissingExtensions_extensionShouldBeNil() throws {
+  func test__parsing__givenMissingExtensions_extensionShouldBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "data": ["human": NSNull()]
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .default)
+    let (result, _) = try await response.parseResult(withCachePolicy: .default)
 
     // then
     expect(result.extensions).to(beNil())
@@ -129,7 +129,7 @@ class GraphQLResponseTests: XCTestCase {
 
   // MARK: Parsing Tests (Errors)
 
-  func test__parsing__givenErrorWithMessage_usingCachePolicyFetchIgnoringCacheCompletely_errorMessageShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithMessage_usingCachePolicyFetchIgnoringCacheCompletely_errorMessageShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "errors": [
@@ -140,13 +140,13 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .fetchIgnoringCacheCompletely)
+    let (result, _) = try await response.parseResult(withCachePolicy: .fetchIgnoringCacheCompletely)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
   }
 
-  func test__parsing__givenErrorWithMessage_usingCachePolicyFetchIgnoringCacheData_errorMessageShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithMessage_usingCachePolicyFetchIgnoringCacheData_errorMessageShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "errors": [
@@ -157,13 +157,13 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .fetchIgnoringCacheData)
+    let (result, _) = try await response.parseResult(withCachePolicy: .fetchIgnoringCacheData)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
   }
 
-  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataAndFetch_errorMessageShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataAndFetch_errorMessageShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "errors": [
@@ -174,13 +174,13 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .returnCacheDataAndFetch)
+    let (result, _) = try await response.parseResult(withCachePolicy: .returnCacheDataAndFetch)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
   }
 
-  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataDontFetch_errorMessageShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataDontFetch_errorMessageShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "errors": [
@@ -191,13 +191,13 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .returnCacheDataDontFetch)
+    let (result, _) = try await response.parseResult(withCachePolicy: .returnCacheDataDontFetch)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
   }
 
-  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataElseFetch_errorMessageShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataElseFetch_errorMessageShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "errors": [
@@ -208,13 +208,13 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .returnCacheDataElseFetch)
+    let (result, _) = try await response.parseResult(withCachePolicy: .returnCacheDataElseFetch)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
   }
 
-  func test__parsing__givenErrorWithMessage_usingCachePolicyDefault_errorMessageShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithMessage_usingCachePolicyDefault_errorMessageShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "errors": [
@@ -225,13 +225,13 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .default)
+    let (result, _) = try await response.parseResult(withCachePolicy: .default)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
   }
 
-  func test__parsing__givenErrorWithLocation_errorLocationShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithLocation_errorLocationShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "errors": [
@@ -245,7 +245,7 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .default)
+    let (result, _) = try await response.parseResult(withCachePolicy: .default)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
@@ -253,7 +253,7 @@ class GraphQLResponseTests: XCTestCase {
     expect(result.errors?.first?.locations?.first?.column).to(equal(2))
   }
 
-  func test__parsing__givenErrorWithPath_errorPathShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithPath_errorPathShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "errors": [
@@ -265,7 +265,7 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .default)
+    let (result, _) = try await response.parseResult(withCachePolicy: .default)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
@@ -273,7 +273,7 @@ class GraphQLResponseTests: XCTestCase {
     expect(result.errors?.first?.path?[1]).to(equal(.index(1)))
   }
 
-  func test__parsing__givenErrorWithCustomKey_errorCustomKeyShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithCustomKey_errorCustomKeyShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "errors": [
@@ -285,14 +285,14 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .default)
+    let (result, _) = try await response.parseResult(withCachePolicy: .default)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
     expect(result.errors?.first?["userMessage"] as? String).to(equal("Some message"))
   }
 
-  func test__parsing__givenMultipleErrors_shouldReturnAllErrors() throws {
+  func test__parsing__givenMultipleErrors_shouldReturnAllErrors() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery.mock(), body: [
       "errors": [
@@ -306,7 +306,7 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try response.parseResult(withCachePolicy: .default)
+    let (result, _) = try await response.parseResult(withCachePolicy: .default)
 
     // then
     expect(result.errors?[0].message).to(equal("Some error"))
@@ -332,7 +332,7 @@ class GraphQLResponseTests: XCTestCase {
     }
   }
 
-  func test__parsing__givenCachePolicyFetchIgnoringCacheCompletely_cacheRecordSetShouldBeNil() throws {
+  func test__parsing__givenCachePolicyFetchIgnoringCacheCompletely_cacheRecordSetShouldBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery<HeroQuery>(), body: [
       "data": ["hero": [
@@ -342,14 +342,14 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, recordSet) = try response.parseResult(withCachePolicy: .fetchIgnoringCacheCompletely)
+    let (result, recordSet) = try await response.parseResult(withCachePolicy: .fetchIgnoringCacheCompletely)
 
     // then
     expect(result.data?.hero.name).to(equal("Luke Skywalker"))
     expect(recordSet).to(beNil())
   }
 
-  func test__parsing__givenCachePolicyFetchIgnoringCacheData_cacheRecordSetShouldNotBeNil() throws {
+  func test__parsing__givenCachePolicyFetchIgnoringCacheData_cacheRecordSetShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery<HeroQuery>(), body: [
       "data": ["hero": [
@@ -359,7 +359,7 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, recordSet) = try response.parseResult(withCachePolicy: .fetchIgnoringCacheData)
+    let (result, recordSet) = try await response.parseResult(withCachePolicy: .fetchIgnoringCacheData)
 
     // then
     expect(result.data?.hero.name).to(equal("Luke Skywalker"))
@@ -374,7 +374,7 @@ class GraphQLResponseTests: XCTestCase {
     ])))
   }
 
-  func test__parsing__givenCachePolicyReturnCacheDataAndFetch_cacheRecordSetShouldNotBeNil() throws {
+  func test__parsing__givenCachePolicyReturnCacheDataAndFetch_cacheRecordSetShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery<HeroQuery>(), body: [
       "data": ["hero": [
@@ -384,7 +384,7 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, recordSet) = try response.parseResult(withCachePolicy: .returnCacheDataAndFetch)
+    let (result, recordSet) = try await response.parseResult(withCachePolicy: .returnCacheDataAndFetch)
 
     // then
     expect(result.data?.hero.name).to(equal("Luke Skywalker"))
@@ -399,7 +399,7 @@ class GraphQLResponseTests: XCTestCase {
     ])))
   }
 
-  func test__parsing__givenCachePolicyReturnCacheDataDontFetch_cacheRecordSetShouldNotBeNil() throws {
+  func test__parsing__givenCachePolicyReturnCacheDataDontFetch_cacheRecordSetShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery<HeroQuery>(), body: [
       "data": ["hero": [
@@ -409,7 +409,7 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, recordSet) = try response.parseResult(withCachePolicy: .returnCacheDataDontFetch)
+    let (result, recordSet) = try await response.parseResult(withCachePolicy: .returnCacheDataDontFetch)
 
     // then
     expect(result.data?.hero.name).to(equal("Luke Skywalker"))
@@ -424,7 +424,7 @@ class GraphQLResponseTests: XCTestCase {
     ])))
   }
 
-  func test__parsing__givenCachePolicyReturnCacheDataElseFetch_cacheRecordSetShouldNotBeNil() throws {
+  func test__parsing__givenCachePolicyReturnCacheDataElseFetch_cacheRecordSetShouldNotBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery<HeroQuery>(), body: [
       "data": ["hero": [
@@ -434,7 +434,7 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, recordSet) = try response.parseResult(withCachePolicy: .returnCacheDataElseFetch)
+    let (result, recordSet) = try await response.parseResult(withCachePolicy: .returnCacheDataElseFetch)
 
     // then
     expect(result.data?.hero.name).to(equal("Luke Skywalker"))
@@ -449,7 +449,7 @@ class GraphQLResponseTests: XCTestCase {
     ])))
   }
 
-  func test__parsing__givenCachePolicyDefault_cacheRecordSetShouldBeNil() throws {
+  func test__parsing__givenCachePolicyDefault_cacheRecordSetShouldBeNil() async throws {
     // given
     let response = GraphQLResponse(operation: MockQuery<HeroQuery>(), body: [
       "data": ["hero": [
@@ -459,7 +459,7 @@ class GraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, recordSet) = try response.parseResult(withCachePolicy: .default)
+    let (result, recordSet) = try await response.parseResult(withCachePolicy: .default)
 
     // then
     expect(result.data?.hero.name).to(equal("Luke Skywalker"))
