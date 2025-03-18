@@ -16,7 +16,7 @@ class RequestContextTests: XCTestCase {
     var name: String { __data["name"] }
   }
 
-  private struct TwoMinuteTimeoutContext: RequestConfigurationContext {
+  private struct TwoMinuteTimeoutContext: RequestContextTimeoutConfigurable {
     let requestTimeout: TimeInterval
 
     init(requestTimeout: TimeInterval) {
