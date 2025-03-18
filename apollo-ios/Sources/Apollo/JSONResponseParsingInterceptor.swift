@@ -49,33 +49,35 @@ public struct JSONResponseParsingInterceptor: ApolloInterceptor {
       return
     }
 
-    do {
-      guard
-        let body = try? JSONSerializationFormat.deserialize(data: createdResponse.rawData) as JSONObject
-      else {
-        throw JSONResponseParsingError.couldNotParseToJSON(data: createdResponse.rawData)
+    Task {
+      do {
+        guard
+          let body = try? JSONSerializationFormat.deserialize(data: createdResponse.rawData) as JSONObject
+        else {
+          throw JSONResponseParsingError.couldNotParseToJSON(data: createdResponse.rawData)
+        }
+        
+        let graphQLResponse = GraphQLResponse(operation: request.operation, body: body)
+        
+        let (result, cacheRecords) = try await graphQLResponse.parseResult(withCachePolicy: request.cachePolicy)
+        createdResponse.parsedResponse = result
+        createdResponse.cacheRecords = cacheRecords
+        
+        chain.proceedAsync(
+          request: request,
+          response: createdResponse,
+          interceptor: self,
+          completion: completion
+        )
+        
+      } catch {
+        chain.handleErrorAsync(
+          error,
+          request: request,
+          response: createdResponse,
+          completion: completion
+        )
       }
-
-      let graphQLResponse = GraphQLResponse(operation: request.operation, body: body)
-
-      let (result, cacheRecords) = try graphQLResponse.parseResult(withCachePolicy: request.cachePolicy)
-      createdResponse.parsedResponse = result
-      createdResponse.cacheRecords = cacheRecords
-      
-      chain.proceedAsync(
-        request: request,
-        response: createdResponse,
-        interceptor: self,
-        completion: completion
-      )
-
-    } catch {
-      chain.handleErrorAsync(
-        error,
-        request: request,
-        response: createdResponse,
-        completion: completion
-      )
     }
   }
 
