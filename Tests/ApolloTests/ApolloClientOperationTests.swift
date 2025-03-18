@@ -6,38 +6,35 @@ import Nimble
 
 final class ApolloClientOperationTests: XCTestCase {
 
-  var store: MockStore!
+  var cache: MockCache!
   var server: MockGraphQLServer!
   var client: ApolloClient!
+  var store: ApolloStore { client.store }
 
   override func setUpWithError() throws {
     try super.setUpWithError()
 
-    self.store = MockStore()
+    self.cache = MockCache()
     self.server = MockGraphQLServer()
     self.client = ApolloClient(
       networkTransport: MockNetworkTransport(server: self.server, store: self.store),
-      store: self.store
+      store: ApolloStore(cache: self.cache)
     )
   }
 
   override func tearDownWithError() throws {    
-    self.store = nil
+    self.cache = nil
     self.server = nil
     self.client = nil
 
     try super.tearDownWithError()
   }
 
-  class MockStore: ApolloStore {
+  class MockCache: InMemoryNormalizedCache {
     var publishedRecordSets: [RecordSet] = []
-
-    init() {
-      super.init(cache: NoCache())
-    }
-
-    override func publish(records: RecordSet, identifier: UUID? = nil, callbackQueue: DispatchQueue = .main, completion: ((Result<Void, any Swift.Error>) -> Void)? = nil) {
-      publishedRecordSets.append(records)
+    override func merge(records newRecords: RecordSet) throws -> Set<CacheKey> {
+      publishedRecordSets.append(newRecords)
+      return try super.merge(records: newRecords)
     }
   }
 
@@ -92,9 +89,9 @@ final class ApolloClientOperationTests: XCTestCase {
     self.wait(for: [serverRequestExpectation, performResultFromServerExpectation], timeout: 0.2)
 
     // then
-    expect(self.store.publishedRecordSets.count).to(equal(1))
-    
-    let actual = self.store.publishedRecordSets[0]
+    expect(self.cache.publishedRecordSets.count).to(equal(1))
+
+    let actual = self.cache.publishedRecordSets[0]
     expect(actual["MUTATION_ROOT"]).to(equal(
       Record(key: "MUTATION_ROOT", [
         "createReview": CacheReference("MUTATION_ROOT.createReview")
@@ -135,6 +132,6 @@ final class ApolloClientOperationTests: XCTestCase {
     self.wait(for: [serverRequestExpectation, performResultFromServerExpectation], timeout: 0.2)
 
     // then
-    expect(self.store.publishedRecordSets).to(beEmpty())
+    expect(self.cache.publishedRecordSets).to(beEmpty())
   }
 }

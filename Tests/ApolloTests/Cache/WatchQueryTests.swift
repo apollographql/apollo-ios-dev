@@ -1085,7 +1085,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         }
       }
 
-      client.store.withinReadWriteTransaction({ transaction in
+      await client.store.withinReadWriteTransaction({ transaction in
         let cacheMutation = MockLocalCacheMutation<HeroAndFriendsNamesSelectionSet>()
         try transaction.update(cacheMutation) { data in
           data.hero?.name = "Artoo"

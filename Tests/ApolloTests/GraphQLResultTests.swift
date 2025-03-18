@@ -154,16 +154,16 @@ final class GraphQLResultTests: XCTestCase {
 
   // MARK: Incremental merging tests
 
-  func test__merging__givenIncrementalData_shouldMergeData() throws {
+  func test__merging__givenIncrementalData_shouldMergeData() async throws {
     // given
-    let resultData = try MockHeroQuery.Data(data: [
+    let resultData = try await MockHeroQuery.Data(data: [
       "hero": [
         "__typename": "Human",
         "name": "Luke Skywalker",
       ]
     ])
 
-    let incrementalData = try MockHeroQuery.Data.Hero.DeferredFriends(
+    let incrementalData = try await MockHeroQuery.Data.Hero.DeferredFriends(
       data: [
         "friends": [
           "Obi-Wan Kenobi",
