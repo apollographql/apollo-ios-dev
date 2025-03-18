@@ -4,7 +4,7 @@ import Nimble
 import ApolloAPI
 import ApolloInternalTestHelpers
 
-class RequestContextTests: XCTestCase {
+class RequestContextTimeoutTests: XCTestCase {
   private class Hero: MockSelectionSet {
     typealias Schema = MockSchemaMetadata
 
