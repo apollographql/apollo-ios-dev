@@ -127,11 +127,12 @@ public enum PossiblyDeferred<Value> {
   ///   instance.
   /// - Returns: A `PossiblyDeferred` instance with the result of evaluating `transform`
   ///   as the new success value if this instance represents a success.
-  func flatMap<NewValue>(_ transform: @escaping (Value) -> PossiblyDeferred<NewValue>) -> PossiblyDeferred<NewValue> {
+  func flatMap<NewValue>(
+    _ transform: @escaping (Value) async -> PossiblyDeferred<NewValue>) async -> PossiblyDeferred<NewValue> {
     switch self {
     case .immediate(let result):
       do {
-        return transform(try result.get())
+        return await transform(try result.get())
       } catch {
         return .immediate(.failure(error))
       }
