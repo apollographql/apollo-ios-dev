@@ -207,7 +207,7 @@ public final class ApolloStore: Sendable {
     ) async throws -> Accumulator.FinalResult {
       let object = try await loadObject(forKey: key).get()
 
-      return try executor.execute(
+      return try await executor.execute(
         selectionSet: type,
         on: object,
         withRootCacheReference: CacheReference(key),
@@ -292,7 +292,7 @@ public final class ApolloStore: Sendable {
 
       let executor = GraphQLExecutor(executionSource: SelectionSetModelExecutionSource())
 
-      let records = try executor.execute(
+      let records = try await executor.execute(
         selectionSet: SelectionSet.self,
         on: selectionSet.__data,
         withRootCacheReference: CacheReference(key),
@@ -448,7 +448,7 @@ public final class ApolloStore: Sendable {
       },
       callbackQueue: callbackQueue,
       completion: resultHandler
-    )    
+    )
   }
 
   @available(*, deprecated)

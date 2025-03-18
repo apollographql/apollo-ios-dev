@@ -465,42 +465,32 @@ extension WebSocketTransport: NetworkTransport {
         return EmptyCancellable()
       }
 
-      return WebSocketTask(self, operation) { [weak store, contextIdentifier, callbackQueue] result in
-        switch result {
-        case .success(let jsonBody):
+      return WebSocketTask(self, operation) { [weak store, contextIdentifier] result in
+        Task {
           do {
+            let jsonBody = try result.get()
             let response = GraphQLResponse(operation: operation, body: jsonBody)
-
+            
             if let store = store {
-              let (graphQLResult, parsedRecords) = try response.parseResult()
+              let (graphQLResult, parsedRecords) = try await response.parseResult()
               guard let records = parsedRecords else {
                 callCompletion(with: .success(graphQLResult))
                 return
               }
-
-              store.publish(records: records,
-                            identifier: contextIdentifier,
-                            callbackQueue: callbackQueue) { result in
-                switch result {
-                case .success:
-                  completionHandler(.success(graphQLResult))
-
-                case let .failure(error):
-                  callCompletion(with: .failure(error))
-                }
-              }
-
+              
+              try await store.publish(records: records, identifier: contextIdentifier)
+              
+              callCompletion(with: .success(graphQLResult))
+              
             } else {
-              let graphQLResult = try response.parseResultFast()
+              let graphQLResult = try await response.parseResultFast()
               callCompletion(with: .success(graphQLResult))
             }
-
+            
           } catch {
             callCompletion(with: .failure(error))
           }
-        case .failure(let error):
-          callCompletion(with: .failure(error))
-        }
+        }        
       }
     }
 }
