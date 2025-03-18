@@ -66,74 +66,76 @@ public struct IncrementalJSONResponseParsingInterceptor: ApolloInterceptor {
       return
     }
 
-    do {
-      guard
-        let body = try? JSONSerializationFormat.deserialize(data: createdResponse.rawData) as JSONObject
-      else {
-        throw ParsingError.couldNotParseToJSON(data: createdResponse.rawData)
-      }
-
-      let parsedResult: GraphQLResult<Operation.Data>
-      let parsedCacheRecords: RecordSet?
-
-      if let currentResult = resultStorage.currentResult {
-        guard var currentResult = currentResult as? GraphQLResult<Operation.Data> else {
-          throw ParsingError.mismatchedCurrentResultType
+    Task {
+      do {
+        guard
+          let body = try? JSONSerializationFormat.deserialize(data: createdResponse.rawData) as JSONObject
+        else {
+          throw ParsingError.couldNotParseToJSON(data: createdResponse.rawData)
         }
 
-        guard let incrementalItems = body["incremental"] as? [JSONObject] else {
-          throw ParsingError.couldNotParseIncrementalJSON(json: body as JSONValue)
-        }
+        let parsedResult: GraphQLResult<Operation.Data>
+        let parsedCacheRecords: RecordSet?
 
-        var currentCacheRecords = resultStorage.currentCacheRecords ?? RecordSet()
-
-        for item in incrementalItems {
-          let incrementalResponse = try IncrementalGraphQLResponse<Operation>(
-            operation: request.operation,
-            body: item
-          )
-          let (incrementalResult, incrementalCacheRecords) = try incrementalResponse.parseIncrementalResult(
-            withCachePolicy: request.cachePolicy
-          )
-          currentResult = try currentResult.merging(incrementalResult)
-
-          if let incrementalCacheRecords {
-            currentCacheRecords.merge(records: incrementalCacheRecords)
+        if let currentResult = resultStorage.currentResult {
+          guard var currentResult = currentResult as? GraphQLResult<Operation.Data> else {
+            throw ParsingError.mismatchedCurrentResultType
           }
+
+          guard let incrementalItems = body["incremental"] as? [JSONObject] else {
+            throw ParsingError.couldNotParseIncrementalJSON(json: body as JSONValue)
+          }
+
+          var currentCacheRecords = resultStorage.currentCacheRecords ?? RecordSet()
+
+          for item in incrementalItems {
+            let incrementalResponse = try IncrementalGraphQLResponse<Operation>(
+              operation: request.operation,
+              body: item
+            )
+            let (incrementalResult, incrementalCacheRecords) = try await incrementalResponse.parseIncrementalResult(
+              withCachePolicy: request.cachePolicy
+            )
+            currentResult = try currentResult.merging(incrementalResult)
+
+            if let incrementalCacheRecords {
+              currentCacheRecords.merge(records: incrementalCacheRecords)
+            }
+          }
+
+          parsedResult = currentResult
+          parsedCacheRecords = currentCacheRecords
+
+        } else {
+          let graphQLResponse = GraphQLResponse(operation: request.operation, body: body)
+
+          let (result, cacheRecords) = try await graphQLResponse.parseResult(withCachePolicy: request.cachePolicy)
+
+          parsedResult = result
+          parsedCacheRecords = cacheRecords
         }
 
-        parsedResult = currentResult
-        parsedCacheRecords = currentCacheRecords
+        createdResponse.parsedResponse = parsedResult
+        createdResponse.cacheRecords = parsedCacheRecords
 
-      } else {
-        let graphQLResponse = GraphQLResponse(operation: request.operation, body: body)
+        resultStorage.currentResult = parsedResult
+        resultStorage.currentCacheRecords = parsedCacheRecords
 
-        let (result, cacheRecords) = try graphQLResponse.parseResult(withCachePolicy: request.cachePolicy)
+        chain.proceedAsync(
+          request: request,
+          response: createdResponse,
+          interceptor: self,
+          completion: completion
+        )
 
-        parsedResult = result
-        parsedCacheRecords = cacheRecords
+      } catch {
+        chain.handleErrorAsync(
+          error,
+          request: request,
+          response: createdResponse,
+          completion: completion
+        )
       }
-
-      createdResponse.parsedResponse = parsedResult
-      createdResponse.cacheRecords = parsedCacheRecords
-
-      resultStorage.currentResult = parsedResult
-      resultStorage.currentCacheRecords = parsedCacheRecords
-
-      chain.proceedAsync(
-        request: request,
-        response: createdResponse,
-        interceptor: self,
-        completion: completion
-      )
-
-    } catch {
-      chain.handleErrorAsync(
-        error,
-        request: request,
-        response: createdResponse,
-        completion: completion
-      )
     }
   }
 
