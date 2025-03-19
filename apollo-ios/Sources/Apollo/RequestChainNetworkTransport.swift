@@ -52,13 +52,16 @@ open class RequestChainNetworkTransport: NetworkTransport {
   ///   - requestBodyCreator: The `RequestBodyCreator` object to use to build your `URLRequest`. Defaults to the provided `ApolloRequestBodyCreator` implementation.
   ///   - useGETForQueries: Pass `true` if you want to use `GET` instead of `POST` for queries, for example to take advantage of a CDN. Defaults to `false`.
   ///   - useGETForPersistedQueryRetry: Pass `true` to use `GET` instead of `POST` for a retry of a persisted query. Defaults to `false`. 
-  public init(interceptorProvider: any InterceptorProvider,
-              endpointURL: URL,
-              additionalHeaders: [String: String] = [:],
-              autoPersistQueries: Bool = false,
-              requestBodyCreator: any RequestBodyCreator = ApolloRequestBodyCreator(),
-              useGETForQueries: Bool = false,
-              useGETForPersistedQueryRetry: Bool = false) {
+  public init(
+    interceptorProvider: any InterceptorProvider,
+    endpointURL: URL,
+    additionalHeaders: [String: String] = [:],
+    autoPersistQueries: Bool = false,
+    requestBodyCreator: any RequestBodyCreator = ApolloRequestBodyCreator(),
+    useGETForQueries: Bool = false,
+    useGETForPersistedQueryRetry: Bool = false,
+    sendClientMetadataExtension: Bool = true
+  ) {
     self.interceptorProvider = interceptorProvider
     self.endpointURL = endpointURL
 

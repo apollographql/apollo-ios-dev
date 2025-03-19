@@ -5,12 +5,15 @@ import ApolloAPI
 
 /// A request which sends JSON related to a GraphQL operation.
 open class JSONRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
-  
+
   public let requestBodyCreator: any RequestBodyCreator
-  
   public let autoPersistQueries: Bool
   public let useGETForQueries: Bool
   public let useGETForPersistedQueryRetry: Bool
+  public let serializationFormat = JSONSerializationFormat.self
+
+  private let sendClientMetadataExtension: Bool
+
   public var isPersistedQueryRetry = false {
     didSet {
       _body = nil
@@ -24,8 +27,6 @@ open class JSONRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
       }
       return _body!
   }
-  
-  public let serializationFormat = JSONSerializationFormat.self
   
   /// Designated initializer
   ///
@@ -54,12 +55,14 @@ open class JSONRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
     autoPersistQueries: Bool = false,
     useGETForQueries: Bool = false,
     useGETForPersistedQueryRetry: Bool = false,
-    requestBodyCreator: any RequestBodyCreator = ApolloRequestBodyCreator()
+    requestBodyCreator: any RequestBodyCreator = ApolloRequestBodyCreator(),
+    sendClientMetadataExtension: Bool = true
   ) {
     self.autoPersistQueries = autoPersistQueries
     self.useGETForQueries = useGETForQueries
     self.useGETForPersistedQueryRetry = useGETForPersistedQueryRetry
     self.requestBodyCreator = requestBodyCreator
+    self.sendClientMetadataExtension = sendClientMetadataExtension
 
     super.init(
       graphQLEndpoint: graphQLEndpoint,
@@ -149,7 +152,7 @@ open class JSONRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
       autoPersistQuery: autoPersistQueries
     )
 
-    if !((context as? any RequestContextClientMetadata)?.disableClientLibraryRequestExtension ?? false) {
+    if self.sendClientMetadataExtension {
       addClientMetadataExtension(to: &body)
     }
 

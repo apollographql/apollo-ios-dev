@@ -23,13 +23,3 @@ public protocol RequestContextTimeoutConfigurable: RequestContext {
   /// The value of this property will be set as the `timeoutInterval` on the `URLRequest` created for this GraphQL request.
   var requestTimeout: TimeInterval { get }
 }
-
-/// A request context specialization protocol that specifies options for configuring the sending of client library
-/// name and version metadata in the request `extensions` key.
-///
-/// A `RequestContext` object can conform to this protocol to disable the sending of the client library metadata.
-/// If the `RequestContext` for a request does not conform to this protocol, the default is to send the client
-/// library metadata.
-public protocol RequestContextClientMetadata: RequestContext {
-  var disableClientLibraryRequestExtension: Bool { get }
-}

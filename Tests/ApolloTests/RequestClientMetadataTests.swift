@@ -17,13 +17,9 @@ class RequestClientMetadataTests : XCTestCase {
     var name: String { __data["name"] }
   }
 
-  private struct LocalControlClientMetadata: RequestContextClientMetadata {
-    var disableClientLibraryRequestExtension: Bool
-  }
-
   // MARK: JSONRequest
 
-  func test__jsonRequest__withoutRequestContext_shouldAddClientHeadersAndExtension() throws {
+  func test__jsonRequest__usingDefaultInitializer_shouldAddClientHeadersAndExtension() throws {
     let jsonRequest = JSONRequest(
       operation: MockQuery<Hero>(),
       graphQLEndpoint: TestURL.mockServer.url,
@@ -55,13 +51,13 @@ class RequestClientMetadataTests : XCTestCase {
     expect(clientLibrary["version"]).to(equal(Constants.ApolloClientVersion))
   }
 
-  func test__jsonRequest__givenRequestContextEnablingClientExtension_shouldAddClientHeadersAndExtension() throws {
+  func test__jsonRequest__usingInitializerEnablingClientExtension_shouldAddClientHeadersAndExtension() throws {
     let jsonRequest = JSONRequest(
       operation: MockQuery<Hero>(),
       graphQLEndpoint: TestURL.mockServer.url,
       clientName: "test-client",
       clientVersion: "test-client-version",
-      context: LocalControlClientMetadata(disableClientLibraryRequestExtension: false)
+      sendClientMetadataExtension: true
     )
 
     let urlRequest = try jsonRequest.toURLRequest()
@@ -88,13 +84,13 @@ class RequestClientMetadataTests : XCTestCase {
     expect(clientLibrary["version"]).to(equal(Constants.ApolloClientVersion))
   }
 
-  func test__jsonRequest__givenRequestContextDisablingClientExtension_shouldAddClientHeaders_doesNotAddClientExtension() throws {
+  func test__jsonRequest__usingInitializerDisablingClientExtension_shouldAddClientHeaders_doesNotAddClientExtension() throws {
     let jsonRequest = JSONRequest(
       operation: MockQuery<Hero>(),
       graphQLEndpoint: TestURL.mockServer.url,
       clientName: "test-client",
       clientVersion: "test-client-version",
-      context: LocalControlClientMetadata(disableClientLibraryRequestExtension: true)
+      sendClientMetadataExtension: false
     )
 
     let urlRequest = try jsonRequest.toURLRequest()
@@ -120,7 +116,7 @@ class RequestClientMetadataTests : XCTestCase {
 
   // MARK: UploadRequest
 
-  func test__uploadRequest__withoutRequestContext_shouldAddClientHeadersAndExtension() throws {
+  func test__uploadRequest__usingDefaultInitializer_shouldAddClientHeadersAndExtension() throws {
     let uploadRequest = UploadRequest(
       graphQLEndpoint: TestURL.mockServer.url,
       operation: MockQuery<Hero>(),
@@ -150,14 +146,14 @@ class RequestClientMetadataTests : XCTestCase {
     expect(multipartBody).to(contain("{\"extensions\":{\"clientLibrary\":{\"name\":\"apollo-ios\",\"version\":\"\(Constants.ApolloClientVersion)\"}},\"operationName\":\"MockOperationName\",\"query\":\"Mock Operation Definition\",\"variables\":{\"x\":null}}"))
   }
 
-  func test__uploadRequest__givenRequestContextEnablingClientExtension_shouldAddClientHeadersAndExtension() throws {
+  func test__uploadRequest__usingInitializerEnablingClientExtension_shouldAddClientHeadersAndExtension() throws {
     let uploadRequest = UploadRequest(
       graphQLEndpoint: TestURL.mockServer.url,
       operation: MockQuery<Hero>(),
       clientName: "test-client",
       clientVersion: "test-client-version",
       files: [GraphQLFile(fieldName: "x", originalName: "y", data: "z".data(using: .utf8)!)],
-      context: LocalControlClientMetadata(disableClientLibraryRequestExtension: false)
+      sendClientMetadataExtension: true
     )
 
     let urlRequest = try uploadRequest.toURLRequest()
@@ -181,14 +177,14 @@ class RequestClientMetadataTests : XCTestCase {
     expect(multipartBody).to(contain("{\"extensions\":{\"clientLibrary\":{\"name\":\"apollo-ios\",\"version\":\"\(Constants.ApolloClientVersion)\"}},\"operationName\":\"MockOperationName\",\"query\":\"Mock Operation Definition\",\"variables\":{\"x\":null}}"))
   }
 
-  func test__uploadRequest__givenRequestContextDisablingClientExtension_shouldAddClientHeaders_doesNotAddClientExtension() throws {
+  func test__uploadRequest__usingInitializerDisablingClientExtension_shouldAddClientHeaders_doesNotAddClientExtension() throws {
     let uploadRequest = UploadRequest(
       graphQLEndpoint: TestURL.mockServer.url,
       operation: MockQuery<Hero>(),
       clientName: "test-client",
       clientVersion: "test-client-version",
       files: [GraphQLFile(fieldName: "x", originalName: "y", data: "z".data(using: .utf8)!)],
-      context: LocalControlClientMetadata(disableClientLibraryRequestExtension: true)
+      sendClientMetadataExtension: false
     )
 
     let urlRequest = try uploadRequest.toURLRequest()
