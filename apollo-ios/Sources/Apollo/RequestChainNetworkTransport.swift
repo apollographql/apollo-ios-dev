@@ -41,7 +41,9 @@ open class RequestChainNetworkTransport: NetworkTransport {
   ///
   /// Defaults to an ``ApolloRequestBodyCreator`` initialized with the default configuration.
   public var requestBodyCreator: any RequestBodyCreator
-  
+
+  private let sendClientMetadataExtension: Bool
+
   /// Designated initializer
   ///
   /// - Parameters:
@@ -77,6 +79,7 @@ open class RequestChainNetworkTransport: NetworkTransport {
     self.requestBodyCreator = requestBodyCreator
     self.useGETForQueries = useGETForQueries
     self.useGETForPersistedQueryRetry = useGETForPersistedQueryRetry
+    self.sendClientMetadataExtension = sendClientMetadataExtension
   }
   
   /// Constructs a GraphQL request for the given operation.
@@ -107,7 +110,8 @@ open class RequestChainNetworkTransport: NetworkTransport {
       autoPersistQueries: self.autoPersistQueries,
       useGETForQueries: self.useGETForQueries,
       useGETForPersistedQueryRetry: self.useGETForPersistedQueryRetry,
-      requestBodyCreator: self.requestBodyCreator
+      requestBodyCreator: self.requestBodyCreator,
+      sendClientMetadataExtension: self.sendClientMetadataExtension
     )
 
     if Operation.operationType == .subscription {
@@ -179,16 +183,19 @@ extension RequestChainNetworkTransport: UploadingNetworkTransport {
     with files: [GraphQLFile],
     context: (any RequestContext)? = nil,
     manualBoundary: String? = nil) -> HTTPRequest<Operation> {
-    
-    UploadRequest(graphQLEndpoint: self.endpointURL,
-                  operation: operation,
-                  clientName: self.clientName,
-                  clientVersion: self.clientVersion,
-                  additionalHeaders: self.additionalHeaders,
-                  files: files,
-                  manualBoundary: manualBoundary,
-                  context: context,
-                  requestBodyCreator: self.requestBodyCreator)
+
+      UploadRequest(
+        graphQLEndpoint: self.endpointURL,
+        operation: operation,
+        clientName: self.clientName,
+        clientVersion: self.clientVersion,
+        additionalHeaders: self.additionalHeaders,
+        files: files,
+        manualBoundary: manualBoundary,
+        context: context,
+        requestBodyCreator: self.requestBodyCreator,
+        sendClientMetadataExtension: self.sendClientMetadataExtension
+      )
   }
   
   public func upload<Operation: GraphQLOperation>(
