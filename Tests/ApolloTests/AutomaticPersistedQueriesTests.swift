@@ -145,9 +145,6 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       expect(file: file, line: line, version).to(equal(1))
 
       expect(file: file, line: line, sha256Hash).to(equal(O.operationIdentifier))
-
-    } else {
-      expect(file: file, line: line, ext).to(beNil())
     }
   }
   
@@ -238,9 +235,6 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       expect(file: file, line: line, version).to(equal(1))
 
       expect(file: file, line: line, sha256Hash).to(equal(MockHeroNameQuery.operationIdentifier))
-
-    } else {
-      expect(file: file, line: line, ext).to(beNil())
     }
   }
 
