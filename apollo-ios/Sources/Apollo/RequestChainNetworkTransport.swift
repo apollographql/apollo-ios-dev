@@ -47,11 +47,18 @@ open class RequestChainNetworkTransport: NetworkTransport {
   /// - Parameters:
   ///   - interceptorProvider: The interceptor provider to use when constructing a request chain
   ///   - endpointURL: The GraphQL endpoint URL to use
-  ///   - additionalHeaders: Any additional headers that should be automatically added to every request. Defaults to an empty dictionary.
-  ///   - autoPersistQueries: Pass `true` if Automatic Persisted Queries should be used to send a query hash instead of the full query body by default. Defaults to `false`.
-  ///   - requestBodyCreator: The `RequestBodyCreator` object to use to build your `URLRequest`. Defaults to the provided `ApolloRequestBodyCreator` implementation.
-  ///   - useGETForQueries: Pass `true` if you want to use `GET` instead of `POST` for queries, for example to take advantage of a CDN. Defaults to `false`.
-  ///   - useGETForPersistedQueryRetry: Pass `true` to use `GET` instead of `POST` for a retry of a persisted query. Defaults to `false`. 
+  ///   - additionalHeaders: Any additional headers that should be automatically added to every request. Defaults to
+  ///   an empty dictionary.
+  ///   - autoPersistQueries: Pass `true` if Automatic Persisted Queries should be used to send a query hash instead
+  ///   of the full query body by default. Defaults to `false`.
+  ///   - requestBodyCreator: The `RequestBodyCreator` object to use to build your `URLRequest`. Defaults to the
+  ///   provided `ApolloRequestBodyCreator` implementation.
+  ///   - useGETForQueries: Pass `true` if you want to use `GET` instead of `POST` for queries, for example to take
+  ///   advantage of a CDN. Defaults to `false`.
+  ///   - useGETForPersistedQueryRetry: Pass `true` to use `GET` instead of `POST` for a retry of a persisted query.
+  ///   Defaults to `false`.
+  ///   - sendClientMetadataExtension: Specifies whether client library metadata is sent in each request `extensions`
+  ///   key. Client library metadata is the Apollo iOS library name and version. Defaults to `true`.
   public init(
     interceptorProvider: any InterceptorProvider,
     endpointURL: URL,

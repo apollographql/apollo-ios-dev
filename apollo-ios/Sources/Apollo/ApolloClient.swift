@@ -51,7 +51,10 @@ public class ApolloClient {
   ///
   /// - Parameters:
   ///   - networkTransport: A network transport used to send operations to a server.
-  ///   - store: A store used as a local cache. Note that if the `NetworkTransport` or any of its dependencies takes a store, you should make sure the same store is passed here so that it can be cleared properly.
+  ///   - store: A store used as a local cache. Note that if the `NetworkTransport` or any of its dependencies takes
+  ///   a store, you should make sure the same store is passed here so that it can be cleared properly.
+  ///   - sendClientMetadataExtension: Specifies whether client library metadata is sent in each request `extensions`
+  ///   key. Client library metadata is the Apollo iOS library name and version. Defaults to `true`.
   public init(
     networkTransport: any NetworkTransport,
     store: ApolloStore,
