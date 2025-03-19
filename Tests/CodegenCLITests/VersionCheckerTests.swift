@@ -11,7 +11,7 @@ class VerifyCLIVersionUpdateTest: XCTestCase {
   /// This version number uses the project configurations `CURRENT_PROJECT_VERSION`.
   func test__cliVersion__matchesApolloProjectVersion() {
     // given
-    let codegenLibVersion = Apollo.Constants.ApolloVersion
+    let codegenLibVersion = Apollo.Constants.ApolloClientVersion
 
     // when
     let cliVersion = CodegenCLI.Constants.CLIVersion

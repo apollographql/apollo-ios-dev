@@ -51,8 +51,8 @@ class RequestClientMetadataTests : XCTestCase {
       return
     }
 
-    expect(clientLibrary["name"]).to(equal(Constants.ApolloName))
-    expect(clientLibrary["version"]).to(equal(Constants.ApolloVersion))
+    expect(clientLibrary["name"]).to(equal(Constants.ApolloClientName))
+    expect(clientLibrary["version"]).to(equal(Constants.ApolloClientVersion))
   }
 
   func test__jsonRequest__givenRequestContextEnablingClientExtension_shouldAddClientHeadersAndExtension() throws {
@@ -84,8 +84,8 @@ class RequestClientMetadataTests : XCTestCase {
       return
     }
 
-    expect(clientLibrary["name"]).to(equal(Constants.ApolloName))
-    expect(clientLibrary["version"]).to(equal(Constants.ApolloVersion))
+    expect(clientLibrary["name"]).to(equal(Constants.ApolloClientName))
+    expect(clientLibrary["version"]).to(equal(Constants.ApolloClientVersion))
   }
 
   func test__jsonRequest__givenRequestContextDisablingClientExtension_shouldAddClientHeaders_doesNotAddClientExtension() throws {
@@ -147,7 +147,7 @@ class RequestClientMetadataTests : XCTestCase {
       return
     }
 
-    expect(multipartBody).to(contain("{\"extensions\":{\"clientLibrary\":{\"name\":\"apollo-ios\",\"version\":\"\(Constants.ApolloVersion)\"}},\"operationName\":\"MockOperationName\",\"query\":\"Mock Operation Definition\",\"variables\":{\"x\":null}}"))
+    expect(multipartBody).to(contain("{\"extensions\":{\"clientLibrary\":{\"name\":\"apollo-ios\",\"version\":\"\(Constants.ApolloClientVersion)\"}},\"operationName\":\"MockOperationName\",\"query\":\"Mock Operation Definition\",\"variables\":{\"x\":null}}"))
   }
 
   func test__uploadRequest__givenRequestContextEnablingClientExtension_shouldAddClientHeadersAndExtension() throws {
@@ -178,7 +178,7 @@ class RequestClientMetadataTests : XCTestCase {
       return
     }
 
-    expect(multipartBody).to(contain("{\"extensions\":{\"clientLibrary\":{\"name\":\"apollo-ios\",\"version\":\"\(Constants.ApolloVersion)\"}},\"operationName\":\"MockOperationName\",\"query\":\"Mock Operation Definition\",\"variables\":{\"x\":null}}"))
+    expect(multipartBody).to(contain("{\"extensions\":{\"clientLibrary\":{\"name\":\"apollo-ios\",\"version\":\"\(Constants.ApolloClientVersion)\"}},\"operationName\":\"MockOperationName\",\"query\":\"Mock Operation Definition\",\"variables\":{\"x\":null}}"))
   }
 
   func test__uploadRequest__givenRequestContextDisablingClientExtension_shouldAddClientHeaders_doesNotAddClientExtension() throws {
@@ -209,6 +209,6 @@ class RequestClientMetadataTests : XCTestCase {
       return
     }
 
-    expect(multipartBody).notTo(contain("\"extensions\":{\"clientLibrary\":{\"name\":\"apollo-ios\",\"version\":\"\(Constants.ApolloVersion)\"}}"))
+    expect(multipartBody).notTo(contain("\"extensions\":{\"clientLibrary\":{\"name\":\"apollo-ios\",\"version\":\"\(Constants.ApolloClientVersion)\"}}"))
   }
 }

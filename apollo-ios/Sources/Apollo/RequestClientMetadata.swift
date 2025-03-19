@@ -23,8 +23,8 @@ extension UploadRequest {
 
 fileprivate func _addClientMetadataExtension(to body: inout JSONEncodableDictionary) {
   let clientLibraryMetadata: JSONEncodableDictionary = [
-    "name": Constants.ApolloName,
-    "version": Constants.ApolloVersion
+    "name": Constants.ApolloClientName,
+    "version": Constants.ApolloClientVersion
   ]
 
   var extensions = body["extensions"] as? JSONEncodableDictionary ?? JSONEncodableDictionary()
