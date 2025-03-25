@@ -731,9 +731,6 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
 
     // Read Queries
-    let readCompletedExpectation = expectation(description: "Read completed")
-    readCompletedExpectation.expectedFulfillmentCount = 2
-
     let query = MockQuery<GivenSelectionSet>()
     query.__variables = ["episode": Episode.JEDI]
 
@@ -1994,8 +1991,6 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
 
     // when
-    let writeCompletedExpectation = expectation(description: "Write completed")
-
     try await store.withinReadWriteTransaction { transaction in
       let data = GivenQuery()
       let query = MockQuery<GivenQuery>()
