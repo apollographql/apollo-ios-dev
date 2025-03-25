@@ -30,7 +30,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     try super.tearDownWithError()
   }
   
-  func testLoadingHeroNameQuery() throws {
+  func testLoadingHeroNameQuery() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -45,7 +45,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -65,7 +65,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingHeroNameQueryWithVariable() throws {
+  func testLoadingHeroNameQueryWithVariable() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -80,7 +80,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero(episode:JEDI)": CacheReference("hero(episode:JEDI)")],
       "hero(episode:JEDI)": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -101,7 +101,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingHeroNameQueryWithMissingName_throwsMissingValueError() throws {
+  func testLoadingHeroNameQueryWithMissingName_throwsMissingValueError() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -116,7 +116,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid"]
     ])
@@ -137,7 +137,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingHeroNameQueryWithNullName_throwsNullValueError() throws {
+  func testLoadingHeroNameQueryWithNullName_throwsNullValueError() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -152,7 +152,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid", "name": NSNull()]
     ])
@@ -173,7 +173,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingHeroAndFriendsNamesQueryWithoutIDs() throws {
+  func testLoadingHeroAndFriendsNamesQueryWithoutIDs() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -199,7 +199,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -232,7 +232,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingHeroAndFriendsNamesQueryWithIDs() throws {
+  func testLoadingHeroAndFriendsNamesQueryWithIDs() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -258,7 +258,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -291,7 +291,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriends() throws {
+  func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriends() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -317,7 +317,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -342,7 +342,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withFriendsNotInCache_throwsMissingValueError() throws {
+  func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withFriendsNotInCache_throwsMissingValueError() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -368,7 +368,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -389,7 +389,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingWithBadCacheSerialization() throws {
+  func testLoadingWithBadCacheSerialization() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -415,7 +415,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -449,7 +449,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingQueryWithFloats() throws {
+  func testLoadingQueryWithFloats() async throws {
     // given
     let starshipLength: Float = 1234.5
     let coordinates: [[Double]] = [[38.857150, -94.798464]]
@@ -469,7 +469,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
     
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["starshipCoordinates": CacheReference("starshipCoordinates")],
       "starshipCoordinates": ["__typename": "Starship",
                               "name": "Millennium Falcon",

@@ -33,7 +33,7 @@ class SelectionSetTests: XCTestCase {
 
   // MARK: - Field Accessor Tests
 
-  func test__selection_givenOptionalField_givenValue__returnsValue() {
+  func test__selection_givenOptionalField_givenValue__returnsValue() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -52,13 +52,13 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.name).to(equal("Johnny Tsunami"))
   }
 
-  func test__selection_givenOptionalField_missingValue__returnsNil() {
+  func test__selection_givenOptionalField_missingValue__returnsNil() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -76,13 +76,13 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.name).to(beNil())
   }
 
-  func test__selection_givenOptionalField_givenNilValue__returnsNil() throws {
+  func test__selection_givenOptionalField_givenNilValue__returnsNil() async throws {
     // given
     final class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -101,7 +101,7 @@ class SelectionSetTests: XCTestCase {
     ] 
 
     // when
-    let actual = try Hero(data: object)
+    let actual = try await Hero(data: object)
 
     // then
     expect(actual.name).to(beNil())
@@ -109,7 +109,7 @@ class SelectionSetTests: XCTestCase {
 
   // MARK: Scalar - Nested Array Tests
 
-  func test__selection__nestedArrayOfScalar_nonNull_givenValue__returnsValue() {
+  func test__selection__nestedArrayOfScalar_nonNull_givenValue__returnsValue() async {
     // given
     final class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -128,7 +128,7 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.nestedList).to(equal([["A"]]))
@@ -136,7 +136,7 @@ class SelectionSetTests: XCTestCase {
 
   // MARK: Entity
 
-  func test__selection_givenRequiredEntityField_givenValue__returnsValue() {
+  func test__selection_givenRequiredEntityField_givenValue__returnsValue() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -164,16 +164,16 @@ class SelectionSetTests: XCTestCase {
       "friend": friendData as JSONValue
     ]
 
-    let expected = try! Hero.Friend(data: friendData)
+    let expected = try! await Hero.Friend(data: friendData)
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friend).to(equal(expected))
   }
 
-  func test__selection_givenOptionalEntityField_givenValue__returnsValue() {
+  func test__selection_givenOptionalEntityField_givenValue__returnsValue() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -193,16 +193,16 @@ class SelectionSetTests: XCTestCase {
       "friend": friendData as JSONValue
     ]
 
-    let expected = try! Hero(data: friendData, variables: nil)
+    let expected = try! await Hero(data: friendData, variables: nil)
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friend).to(equal(expected))
   }
 
-  func test__selection_givenOptionalEntityField_givenNilValue__returnsNil() {
+  func test__selection_givenOptionalEntityField_givenNilValue__returnsNil() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -220,13 +220,13 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friend).to(beNil())
   }
 
-  func test__selection_givenOptionalEntityField_givenNullValue__returnsNil() {
+  func test__selection_givenOptionalEntityField_givenNullValue__returnsNil() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -245,7 +245,7 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friend).to(beNil())
@@ -253,7 +253,7 @@ class SelectionSetTests: XCTestCase {
 
   // MARK: Entity - Array Tests
 
-  func test__selection__arrayOfEntity_nonNull_givenValue__returnsValue() {
+  func test__selection__arrayOfEntity_nonNull_givenValue__returnsValue() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -276,7 +276,7 @@ class SelectionSetTests: XCTestCase {
       ] as JSONValue
     ]
 
-    let expected = try! Hero(
+    let expected = try! await Hero(
       data: [
         "__typename": "Human",
         "friends": []
@@ -285,13 +285,13 @@ class SelectionSetTests: XCTestCase {
     )
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friends).to(equal([expected]))
   }
 
-  func test__selection__arrayOfEntity_nullableEntity_givenValue__returnsValue() {
+  func test__selection__arrayOfEntity_nullableEntity_givenValue__returnsValue() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -314,7 +314,7 @@ class SelectionSetTests: XCTestCase {
       ] as JSONValue
     ]
 
-    let expected = try! Hero(
+    let expected = try! await Hero(
       data: [
         "__typename": "Human",
         "friends": []
@@ -323,13 +323,13 @@ class SelectionSetTests: XCTestCase {
     )
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friends).to(equal([expected]))
   }
 
-  func test__selection__arrayOfEntity_nullableEntity_givenNilValueInList__returnsArrayWithNil() {
+  func test__selection__arrayOfEntity_nullableEntity_givenNilValueInList__returnsArrayWithNil() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -351,7 +351,7 @@ class SelectionSetTests: XCTestCase {
       ] as JSONValue
     ]
 
-    let expected = try! Hero(
+    let expected = try! await Hero(
       data: [
         "__typename": "Human",
         "friends": []
@@ -360,13 +360,13 @@ class SelectionSetTests: XCTestCase {
     )
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friends).to(equal([Hero?.none, expected, Hero?.none]))
   }
 
-  func test__selection__arrayOfEntity_nullableList_givenValue__returnsValue() {
+  func test__selection__arrayOfEntity_nullableList_givenValue__returnsValue() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -389,7 +389,7 @@ class SelectionSetTests: XCTestCase {
       ] as JSONValue
     ]
 
-    let expected = try! Hero(
+    let expected = try! await Hero(
       data: [
         "__typename": "Human",
         "friends": []
@@ -398,13 +398,13 @@ class SelectionSetTests: XCTestCase {
     )
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friends).to(equal([expected]))
   }
 
-  func test__selection__arrayOfEntity_nullableList_givenNoListValue__returnsNil() {
+  func test__selection__arrayOfEntity_nullableList_givenNoListValue__returnsNil() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -422,7 +422,7 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friends).to(beNil())
@@ -430,7 +430,7 @@ class SelectionSetTests: XCTestCase {
 
   // MARK: Entity - Nested Array Tests
 
-  func test__selection__nestedArrayOfEntity_nonNull_givenValue__returnsValue() {
+  func test__selection__nestedArrayOfEntity_nonNull_givenValue__returnsValue() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -453,7 +453,7 @@ class SelectionSetTests: XCTestCase {
       ]] as JSONValue
     ]
 
-    let expected = try! Hero(
+    let expected = try! await Hero(
       data: [
         "__typename": "Human",
         "nestedList": [[]]
@@ -462,13 +462,13 @@ class SelectionSetTests: XCTestCase {
     )
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.nestedList).to(equal([[expected]]))
   }
 
-  func test__selection__nestedArrayOfEntity_nullableInnerList_givenValue__returnsValue() {
+  func test__selection__nestedArrayOfEntity_nullableInnerList_givenValue__returnsValue() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -491,7 +491,7 @@ class SelectionSetTests: XCTestCase {
       ]] as JSONValue
     ]
 
-    let expected = try! Hero(
+    let expected = try! await Hero(
       data: [
         "__typename": "Human",
         "nestedList": [[]]
@@ -500,13 +500,13 @@ class SelectionSetTests: XCTestCase {
     )
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.nestedList).to(equal([[expected]]))
   }
 
-  func test__selection__nestedArrayOfEntity_nullableInnerList_givenNilValues__returnsListWithNils() {
+  func test__selection__nestedArrayOfEntity_nullableInnerList_givenNilValues__returnsListWithNils() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -533,16 +533,16 @@ class SelectionSetTests: XCTestCase {
       ] as JSONValue
     ]
 
-    let expectedItem = try! Hero(data: nestedObjectData, variables: nil)
+    let expectedItem = try! await Hero(data: nestedObjectData, variables: nil)
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.nestedList).to(equal([[Hero]?.none, [expectedItem], [Hero]?.none]))
   }
 
-  func test__selection__nestedArrayOfEntity_nullableEntity_givenValue__returnsValue() {
+  func test__selection__nestedArrayOfEntity_nullableEntity_givenValue__returnsValue() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -565,7 +565,7 @@ class SelectionSetTests: XCTestCase {
       ]] as JSONValue
     ]
     
-    let expected = try! Hero(
+    let expected = try! await Hero(
       data: [
         "__typename": "Human",
         "nestedList": [[]]
@@ -574,13 +574,13 @@ class SelectionSetTests: XCTestCase {
     )
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.nestedList).to(equal([[expected]]))
   }
 
-  func test__selection__nestedArrayOfEntity_nullableOuterList_givenValue__returnsValue() {
+  func test__selection__nestedArrayOfEntity_nullableOuterList_givenValue__returnsValue() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -603,7 +603,7 @@ class SelectionSetTests: XCTestCase {
       ]] as JSONValue
     ]
 
-    let expected = try! Hero(
+    let expected = try! await Hero(
       data: [
         "__typename": "Human",
         "nestedList": [[]]
@@ -612,7 +612,7 @@ class SelectionSetTests: XCTestCase {
     )
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.nestedList).to(equal([[expected]]))
@@ -621,7 +621,7 @@ class SelectionSetTests: XCTestCase {
   // MARK: - TypeCase Conversion Tests
 
   @MainActor
-  func test__asInlineFragment_givenObjectType_returnsTypeIfCorrectType() {
+  func test__asInlineFragment_givenObjectType_returnsTypeIfCorrectType() async {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -673,7 +673,7 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.asHuman).to(beNil())
@@ -681,7 +681,7 @@ class SelectionSetTests: XCTestCase {
   }
 
   @MainActor
-  func test__asInlineFragment_givenInterfaceType_typeForTypeNameImplementsInterface_returnsType() {
+  func test__asInlineFragment_givenInterfaceType_typeForTypeNameImplementsInterface_returnsType() async {
     // given
     struct Types {
       static let Humanoid = Interface(name: "Humanoid", implementingObjects: ["Human"])
@@ -722,14 +722,14 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.asHumanoid).toNot(beNil())
   }
 
   @MainActor
-  func test__asInlineFragment_givenInterfaceType_typeForTypeNameDoesNotImplementInterface_returnsNil() {
+  func test__asInlineFragment_givenInterfaceType_typeForTypeNameDoesNotImplementInterface_returnsNil() async {
     // given
     struct Types {
       static let Humanoid = Interface(name: "Humanoid", implementingObjects: [])
@@ -770,14 +770,14 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.asHumanoid).to(beNil())
   }
 
   @MainActor
-  func test__asInlineFragment_givenUnionType_typeNameIsTypeInUnionPossibleTypes_returnsType() {
+  func test__asInlineFragment_givenUnionType_typeNameIsTypeInUnionPossibleTypes_returnsType() async {
     // given
     enum Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -817,14 +817,14 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.asCharacter).toNot(beNil())
   }
 
   @MainActor
-  func test__asInlineFragment_givenUnionType_typeNameNotIsTypeInUnionPossibleTypes_returnsNil() {
+  func test__asInlineFragment_givenUnionType_typeNameNotIsTypeInUnionPossibleTypes_returnsNil() async {
     // given
     enum Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -864,14 +864,14 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.asCharacter).to(beNil())
   }
 
   @MainActor
-  func test__asInlineFragment_givenInterfaceTypeOnOperationRoot_typeImplementsInterface_returnsType() {
+  func test__asInlineFragment_givenInterfaceTypeOnOperationRoot_typeImplementsInterface_returnsType() async {
     // given
     struct Types {
       static let AdminQuery = Interface(name: "AdminQuery", implementingObjects: ["Query"])
@@ -912,7 +912,7 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! RootData(data: object)
+    let actual = try! await RootData(data: object)
 
     // then
     expect(actual.asAdminQuery).toNot(beNil())
@@ -921,7 +921,7 @@ class SelectionSetTests: XCTestCase {
 
   // MARK: - To Fragment Conversion Tests
 
-  func test__toFragment_givenInclusionCondition_true_returnsFragment() {
+  func test__toFragment_givenInclusionCondition_true_returnsFragment() async {
     // given
     class GivenFragment: MockFragment { }
 
@@ -945,13 +945,13 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object, variables: ["includeFragment": true])
+    let actual = try! await Hero(data: object, variables: ["includeFragment": true])
 
     // then
     expect(actual.fragments.givenFragment).toNot(beNil())
   }
 
-  func test__toFragment_givenInclusionCondition_false_returnsNil() {
+  func test__toFragment_givenInclusionCondition_false_returnsNil() async {
     // given
     class GivenFragment: MockFragment { }
 
@@ -975,7 +975,7 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object, variables: ["includeFragment": false])
+    let actual = try! await Hero(data: object, variables: ["includeFragment": false])
 
     // then
     expect(actual.fragments.givenFragment).to(beNil())
@@ -1715,7 +1715,7 @@ class SelectionSetTests: XCTestCase {
   }
 
   // MARK Selection dict intializer
-  func test__selectionDictInitializer_givenNonOptionalEntityField_givenValue__setsFieldDataCorrectly() {
+  func test__selectionDictInitializer_givenNonOptionalEntityField_givenValue__setsFieldDataCorrectly() async {
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
@@ -1733,13 +1733,13 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.name).to(equal("Johnny Tsunami"))
   }
   
-  func test__selectionDictInitializer_givenOptionalEntityField_givenNilValue__returnsNil() {
+  func test__selectionDictInitializer_givenOptionalEntityField_givenNilValue__returnsNil() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1757,13 +1757,13 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friend).to(beNil())
   }
   
-  func test__selectionDictInitializer_giveDictionaryEntityFiled_givenNonOptionalValue__setsFieldDataCorrectly() {
+  func test__selectionDictInitializer_giveDictionaryEntityFiled_givenNonOptionalValue__setsFieldDataCorrectly() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1790,13 +1790,13 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friend.__typename).to(equal("Human"))
   }
   
-  func test__selectionDictInitializer_giveOptionalDictionaryEntityFiled_givenNilValue__returnsNil() {
+  func test__selectionDictInitializer_giveOptionalDictionaryEntityFiled_givenNilValue__returnsNil() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1822,13 +1822,13 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friend).to(beNil())
   }
   
-  func test__selectionDictInitializer_giveDictionaryArrayEntityField_givenNonOptionalValue__setsFieldDataCorrectly() {
+  func test__selectionDictInitializer_giveDictionaryArrayEntityField_givenNonOptionalValue__setsFieldDataCorrectly() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1859,13 +1859,13 @@ class SelectionSetTests: XCTestCase {
     ]
     
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friends.count).to(equal(3))
   }
   
-  func test__selectionDictInitializer_giveOptionalDictionaryArrayEntityField_givenNilValue__returnsNil() {
+  func test__selectionDictInitializer_giveOptionalDictionaryArrayEntityField_givenNilValue__returnsNil() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1891,13 +1891,13 @@ class SelectionSetTests: XCTestCase {
     ]
     
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friends).to(beNil())
   }
   
-  func test__selectionDictInitializer_giveDictionaryArrayEntityField_givenEmptyValue__returnsEmpty() {
+  func test__selectionDictInitializer_giveDictionaryArrayEntityField_givenEmptyValue__returnsEmpty() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1924,13 +1924,13 @@ class SelectionSetTests: XCTestCase {
     ]
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.friends).to(beEmpty())
   }
 
-  func test__selectionDictInitializer_giveNestedListEntityField_givenNonOptionalValue__setsFieldDataCorrectly() {
+  func test__selectionDictInitializer_giveNestedListEntityField_givenNonOptionalValue__setsFieldDataCorrectly() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1953,7 +1953,7 @@ class SelectionSetTests: XCTestCase {
       ]]
     ]
     
-    let expected = try! Hero(
+    let expected = try! await Hero(
       data: [
         "__typename": "Human",
         "nestedList": [[]]
@@ -1962,13 +1962,13 @@ class SelectionSetTests: XCTestCase {
     )
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.nestedList).to(equal([[expected]]))
   }
   
-  func test__selectionDictInitializer_giveOptionalNestedListEntityField_givenNilValue__returnsNil() {
+  func test__selectionDictInitializer_giveOptionalNestedListEntityField_givenNilValue__returnsNil() async {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -1986,7 +1986,7 @@ class SelectionSetTests: XCTestCase {
     ]
   
     // when
-    let actual = try! Hero(data: object)
+    let actual = try! await Hero(data: object)
 
     // then
     expect(actual.nestedList).to(beNil())
