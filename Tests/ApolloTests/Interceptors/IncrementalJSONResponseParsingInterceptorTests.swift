@@ -470,8 +470,8 @@ class IncrementalJSONResponseParsingInterceptorTests: XCTestCase {
     let subject = InterceptorTester(interceptor: IncrementalJSONResponseParsingInterceptor())
 
     let partialExpectation = expectation(description: "Received partial response callback")
-    let incrementalExpectation = expectation(description: "Received incremental response callback")
-    incrementalExpectation.expectedFulfillmentCount = 2
+    let incrementalExpectation1 = expectation(description: "Received incremental response callback 1")
+    let incrementalExpectation2 = expectation(description: "Received incremental response callback 2")
 
     // when
     subject.intercept(
@@ -528,7 +528,7 @@ class IncrementalJSONResponseParsingInterceptorTests: XCTestCase {
       )
     ) { result in
       defer {
-        incrementalExpectation.fulfill()
+        incrementalExpectation1.fulfill()
       }
 
       expect(result).to(beSuccess())
@@ -546,6 +546,8 @@ class IncrementalJSONResponseParsingInterceptorTests: XCTestCase {
       ])))
     }
 
+    wait(for: [incrementalExpectation1], timeout: defaultTimeout)
+    
     subject.intercept(
       request: .mock(operation: AnimalQuery()),
       response: .mock(data: """
@@ -568,7 +570,7 @@ class IncrementalJSONResponseParsingInterceptorTests: XCTestCase {
       )
     ) { result in
       defer {
-        incrementalExpectation.fulfill()
+        incrementalExpectation2.fulfill()
       }
 
       expect(result).to(beSuccess())
@@ -590,6 +592,6 @@ class IncrementalJSONResponseParsingInterceptorTests: XCTestCase {
       ])))
     }
 
-    wait(for: [incrementalExpectation], timeout: defaultTimeout)
+    wait(for: [incrementalExpectation2], timeout: defaultTimeout)
   }
 }
