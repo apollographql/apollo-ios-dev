@@ -33,11 +33,7 @@ public extension XCTestCase {
       }
     }
   }
-  
-  /// Wrapper around `XCTContext.runActivity` to  allow for future extension.
-  func runActivity<Result>(_ name: String, perform: (any XCTActivity) throws -> Result) rethrows -> Result {
-    return try XCTContext.runActivity(named: name, block: perform)
-  }
+    
 }
 
 import Apollo
