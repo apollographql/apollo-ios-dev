@@ -16,9 +16,10 @@ final class ApolloClientOperationTests: XCTestCase {
 
     self.cache = MockCache()
     self.server = MockGraphQLServer()
+    let store = ApolloStore(cache: self.cache)
     self.client = ApolloClient(
-      networkTransport: MockNetworkTransport(server: self.server, store: self.store),
-      store: ApolloStore(cache: self.cache)
+      networkTransport: MockNetworkTransport(server: self.server, store: store),
+      store: store
     )
   }
 

@@ -1,7 +1,7 @@
 import XCTest
 @testable import Apollo
 import ApolloAPI
-import ApolloInternalTestHelpers
+@preconcurrency import ApolloInternalTestHelpers
 
 class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
   
@@ -58,9 +58,9 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
   }
 
   // MARK - Tests
-  
-  func testConcurrentReadsInitiatedFromMainThread() throws {
-    mergeRecordsIntoCache([
+
+  func testMultipleReadsInitiatedFromMainThread() async throws {
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -82,25 +82,25 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
     
     let allReadsCompletedExpectation = XCTestExpectation(description: "All reads completed")
     allReadsCompletedExpectation.expectedFulfillmentCount = numberOfReads
-    
+
     for _ in 0..<numberOfReads {
-      store.withinReadTransaction({ transaction in
-        let data = try transaction.read(query: query)
-        
-        XCTAssertEqual(data.hero?.name, "R2-D2")
-        let friendsNames = data.hero?.friends?.map { $0.name }
-        XCTAssertEqual(friendsNames, ["Luke Skywalker", "Han Solo", "Leia Organa"])
-      }, completion: { result in
+      Task { @MainActor in
         defer { allReadsCompletedExpectation.fulfill() }
-        XCTAssertSuccessResult(result)
-      })
+        try await store.withinReadTransaction { transaction in
+          let data = try await transaction.read(query: query)
+
+          XCTAssertEqual(data.hero?.name, "R2-D2")
+          let friendsNames = data.hero?.friends?.map { $0.name }
+          XCTAssertEqual(friendsNames, ["Luke Skywalker", "Han Solo", "Leia Organa"])
+        }
+      }
     }
-    
-    self.wait(for: [allReadsCompletedExpectation], timeout: defaultWaitTimeout)
+
+    await fulfillment(of: [allReadsCompletedExpectation], timeout: defaultWaitTimeout)
   }
   
-  func testConcurrentReadsInitiatedFromBackgroundThreads() throws {
-    mergeRecordsIntoCache([
+  func testConcurrentReadsInitiatedFromBackgroundTasks() async throws {
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -122,24 +122,24 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
     
     let allReadsCompletedExpectation = XCTestExpectation(description: "All reads completed")
     allReadsCompletedExpectation.expectedFulfillmentCount = numberOfReads
-    
-    DispatchQueue.concurrentPerform(iterations: numberOfReads) { _ in
-      store.withinReadTransaction({ transaction in
-        let data = try transaction.read(query: query)
-        
-        XCTAssertEqual(data.hero?.name, "R2-D2")
-        let friendsNames = data.hero?.friends?.map { $0.name }
-        XCTAssertEqual(friendsNames, ["Luke Skywalker", "Han Solo", "Leia Organa"])
-      }, completion: { result in
+
+    for _ in 0..<numberOfReads {
+      Task(priority: .background) {
         defer { allReadsCompletedExpectation.fulfill() }
-        XCTAssertSuccessResult(result)
-      })
+        try await store.withinReadTransaction { transaction in
+          let data = try await transaction.read(query: query)
+
+          XCTAssertEqual(data.hero?.name, "R2-D2")
+          let friendsNames = data.hero?.friends?.map { $0.name }
+          XCTAssertEqual(friendsNames, ["Luke Skywalker", "Han Solo", "Leia Organa"])
+        }
+      }
     }
-    
-    self.wait(for: [allReadsCompletedExpectation], timeout: defaultWaitTimeout)
+
+    await fulfillment(of: [allReadsCompletedExpectation], timeout: defaultWaitTimeout)
   }
 
-  func testConcurrentUpdatesInitiatedFromMainThread() throws {
+  func testMultipleUpdatesInitiatedFromMainThread() async throws {
     /// given
     struct GivenSelectionSet: MockMutableRootSelectionSet {
       public var __data: DataDict = .empty()
@@ -201,7 +201,7 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -215,13 +215,10 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<GivenSelectionSet>()
 
     let numberOfUpdates = 100
-
-    let allUpdatesCompletedExpectation = XCTestExpectation(description: "All store updates completed")
-    allUpdatesCompletedExpectation.expectedFulfillmentCount = numberOfUpdates
 
     for i in 0..<numberOfUpdates {
-      store.withinReadWriteTransaction({ transaction in
-        try transaction.update(cacheMutation) { data in
+      try await store.withinReadWriteTransaction { transaction in
+        try await transaction.update(cacheMutation) { data in
           data.hero.name = "Artoo"
 
           var newDroid = GivenSelectionSet.Hero.Friend()
@@ -231,22 +228,15 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
           data.hero.friends.append(newDroid)
         }
 
-        let data = try transaction.read(query: query)
+        let data = try await transaction.read(query: query)
 
         XCTAssertEqual(data.hero.name, "Artoo")
         XCTAssertEqual(data.hero.friends.last?.name, "Droid #\(i)")
-      }, completion: { result in
-        defer { allUpdatesCompletedExpectation.fulfill() }
-        XCTAssertSuccessResult(result)
-      })
+      }
     }
 
-    self.wait(for: [allUpdatesCompletedExpectation], timeout: defaultWaitTimeout)
-
-    let readCompletedExpectation = expectation(description: "Read completed")
-
-    store.withinReadTransaction({ transaction in
-      let data = try transaction.read(query: query)
+    try await store.withinReadTransaction { transaction in
+      let data = try await transaction.read(query: query)
 
       XCTAssertEqual(data.hero.name, "Artoo")
 
@@ -255,15 +245,11 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
       )
       let expectedFriendsNames = (0..<numberOfUpdates).map { "Droid #\($0)" }
       XCTAssertEqualUnordered(friendsNames, expectedFriendsNames)
-    }, completion: { result in
-      defer { readCompletedExpectation.fulfill() }
-      XCTAssertSuccessResult(result)
-    })
-
-    self.wait(for: [readCompletedExpectation], timeout: 5)
+    }
   }
 
-  func testConcurrentUpdatesInitiatedFromBackgroundThreads() throws {
+  @available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)
+  func testUpdatesInitiatedConcurrentlyFromBackgroundTasks_preventsConcurrentWriteTransactions() async throws {
     /// given
     struct GivenSelectionSet: MockMutableRootSelectionSet {
       public var __data: DataDict = .empty()
@@ -325,7 +311,7 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -343,34 +329,36 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
     let allUpdatesCompletedExpectation = XCTestExpectation(description: "All store updates completed")
     allUpdatesCompletedExpectation.expectedFulfillmentCount = numberOfUpdates
 
-    DispatchQueue.concurrentPerform(iterations: numberOfUpdates) { i in
-      store.withinReadWriteTransaction({ transaction in
-        try transaction.update(cacheMutation) { data in
-          data.hero.name = "Artoo"
+    try await withThrowingDiscardingTaskGroup { group in
+      for _ in 0..<numberOfUpdates {
+        _ = group.addTaskUnlessCancelled {
+          let i = allUpdatesCompletedExpectation.numberOfFulfillments
 
-          var newDroid = GivenSelectionSet.Hero.Friend()
-          newDroid.__typename = "Droid"
-          newDroid.id = "\(i)"
-          newDroid.name = "Droid #\(i)"
-          data.hero.friends.append(newDroid)
+          try await self.store.withinReadWriteTransaction { transaction in
+            try await transaction.update(cacheMutation) { data in
+              data.hero.name = "Artoo"
+
+              var newDroid = GivenSelectionSet.Hero.Friend()
+              newDroid.__typename = "Droid"
+              newDroid.id = "\(i)"
+              newDroid.name = "Droid #\(i)"
+              data.hero.friends.append(newDroid)
+            }
+
+            let data = try await transaction.read(query: query)
+
+            XCTAssertEqual(data.hero.name, "Artoo")
+            XCTAssertEqual(data.hero.friends.last?.name, "Droid #\(i)")
+
+            allUpdatesCompletedExpectation.fulfill()
+          }
         }
-
-        let data = try transaction.read(query: query)
-
-        XCTAssertEqual(data.hero.name, "Artoo")
-        XCTAssertEqual(data.hero.friends.last?.name, "Droid #\(i)")
-      }, completion: { result in
-        defer { allUpdatesCompletedExpectation.fulfill() }
-        XCTAssertSuccessResult(result)
-      })
+      }
     }
+    await fulfillment(of: [allUpdatesCompletedExpectation], timeout: defaultWaitTimeout)
 
-    self.wait(for: [allUpdatesCompletedExpectation], timeout: defaultWaitTimeout)
-
-    let readCompletedExpectation = expectation(description: "Read completed")
-
-    store.withinReadTransaction({ transaction in
-      let data = try transaction.read(query: query)
+    try await store.withinReadTransaction { transaction in
+      let data = try await transaction.read(query: query)
 
       XCTAssertEqual(data.hero.name, "Artoo")
 
@@ -380,11 +368,6 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
 
       let expectedFriendsNames = (0..<numberOfUpdates).map { "Droid #\($0)" }
       XCTAssertEqualUnordered(friendsNames, expectedFriendsNames)
-    }, completion: { result in
-      defer { readCompletedExpectation.fulfill() }
-      XCTAssertSuccessResult(result)
-    })
-
-    self.wait(for: [readCompletedExpectation], timeout: 5)
+    }
   }
 }
