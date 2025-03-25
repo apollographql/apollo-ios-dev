@@ -167,4 +167,6 @@ items:
         href: ./advanced/file-uploads
       - label: Request Chain Customization
         href: ./advanced/request-pipeline
+      - label: Request Configuration
+        href: ./advanced/request-configuration
 

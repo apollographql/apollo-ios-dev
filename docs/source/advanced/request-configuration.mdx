@@ -1,0 +1,32 @@
+---
+title: Request Configuration
+description: Learn how to customize GraphQL requests in Apollo iOS
+---
+
+## Request Context
+
+Sometimes you might need to perform actions, or make modifications, in a request chain interceptor that relies on information not available in the operation. Examples of this might be custom headers, authentication tokens, or specific behaviour for particular requests.
+
+`RequestContext` is a flexible way to inject additional data during the lifecycle of a GraphQL request. As a marker protocol there is no specific context implementation which allows for maximum flexibility to satisfy a wide variety of complex needs. This context is attached to the request and available to request chain interceptors.
+
+### Per-request Timeout
+
+`RequestContextTimeoutConfigurable` is a request context specialization protocol used to configure the timeout of a `URLRequest`. A `RequestContext` object can conform to this protocol to provide a custom `requestTimeout` for an individual request.
+
+This request timeout interval is used to set the `timeoutInterval` on a `URLRequest`. The timeout interval specifies the limit on the idle interval alloted to a request in the process of loading. This timeout is measured in seconds.
+
+```swift
+// Define your timeout context
+struct TwoMinuteTimeoutContext: RequestContextTimeoutConfigurable {
+  let requestTimeout: TimeInterval
+
+  init() {
+    self.requestTimeout = 120
+  }
+}
+
+// Then pass it into the operation request
+client.fetch(query: QueryOperation(), context: TwoMinuteTimeoutContext()) { result in
+  ...
+}
+```
