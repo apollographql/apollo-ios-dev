@@ -23,6 +23,7 @@ public protocol ApolloStoreSubscriber: AnyObject, Sendable {
 /// The `ApolloStore` class acts as a local cache for normalized GraphQL results.
 #warning("TODO: Docs. ReaderWriter usage; why you should not share a cache with 2 stores, etc.")
 public final class ApolloStore: Sendable {
+  #warning("TODO: remove queue")
   private let queue: DispatchQueue
   private let readerWriterLock = ReaderWriter()
 
@@ -222,7 +223,7 @@ public final class ApolloStore: Sendable {
     
     final func loadObject(forKey key: CacheKey) -> PossiblyDeferred<Record> {
       self.loader[key].map { record in
-        guard let record = record else { throw JSONDecodingError.missingValue }
+        guard let record = record else { return Record(key: key, [:]) }
         return record
       }
     }

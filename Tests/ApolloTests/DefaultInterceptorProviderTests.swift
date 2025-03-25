@@ -82,8 +82,10 @@ class DefaultInterceptorProviderTests: XCTestCase {
       DefaultInterceptorProviderTests.mockData
     }
     initialLoadExpectation.assertForOverFulfill = false
+    let fetchCompleteExpectation = self.expectation(description: "fetch complete")
 
     client.fetch(query: MockQuery<GivenSelectionSet>()) { result in
+      defer { fetchCompleteExpectation.fulfill() }
       switch result {
       case .success(let graphQLResult):
         XCTAssertEqual(graphQLResult.source, .server)
@@ -93,7 +95,7 @@ class DefaultInterceptorProviderTests: XCTestCase {
       }
     }
 
-    self.wait(for: [initialLoadExpectation], timeout: 10)
+    self.wait(for: [initialLoadExpectation, fetchCompleteExpectation], timeout: 10)
 
     let secondLoadExpectation = self.expectation(description: "loaded with default client")
 

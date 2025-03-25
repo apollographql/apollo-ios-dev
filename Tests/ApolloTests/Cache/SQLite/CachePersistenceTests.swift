@@ -225,35 +225,35 @@ class CachePersistenceTests: XCTestCase {
       }
 
       client.clearCache(completion: { result in
+        defer { cacheClearExpectation.fulfill() }
         switch result {
         case .success:
           break
         case .failure(let error):
           XCTFail("Error clearing cache: \(error)")
         }
-        cacheClearExpectation.fulfill()
-      })
 
-      client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch) { innerResult in
-        defer { emptyCacheExpectation.fulfill() }
+        client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch) { innerResult in
+          defer { emptyCacheExpectation.fulfill() }
 
-        switch innerResult {
-        case .success:
-          XCTFail("This should have returned an error")
-        case .failure(let error):
-          if let resultError = error as? JSONDecodingError {
-            switch resultError {
-            case .missingValue:
-              // Correct error!
-              break
-            default:
-              XCTFail("Unexpected JSON error: \(error)")
+          switch innerResult {
+          case .success:
+            XCTFail("This should have returned an error")
+          case .failure(let error):
+            if let resultError = error as? GraphQLExecutionError {
+              switch resultError.underlying {
+              case .missingValue:
+                // Correct error!
+                break
+              default:
+                XCTFail("Unexpected JSON error: \(error)")
+              }
+            } else {
+              XCTFail("Unexpected error: \(error)")
             }
-          } else {
-            XCTFail("Unexpected error: \(error)")
           }
         }
-      }
+      })
     }
 
     await fulfillment(
