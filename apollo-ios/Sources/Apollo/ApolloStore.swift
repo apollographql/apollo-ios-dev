@@ -35,7 +35,7 @@ public final class ApolloStore: Sendable {
 
   /// In order to comply with `Sendable` requirements, this unsafe property should
   /// only be accessed within a `readerWriterLock.write { }` block.
-  nonisolated(unsafe) fileprivate var subscribers: [any ApolloStoreSubscriber] = []
+  nonisolated(unsafe) private(set) var subscribers: [any ApolloStoreSubscriber] = []
 
   /// Designated initializer
   /// - Parameters:
@@ -119,7 +119,7 @@ public final class ApolloStore: Sendable {
   ///   - body: The body of the operation to perform
   public func withinReadWriteTransaction<T>(
     _ body: (ReadWriteTransaction) async throws -> T
-  ) async throws -> T {
+  ) async rethrows -> T {
     var value: T!
     try await readerWriterLock.write {
       value = try await body(ReadWriteTransaction(store: self))
@@ -161,6 +161,10 @@ public final class ApolloStore: Sendable {
   }
 
   // MARK: -
+  #warning("""
+  TODO: figure out how to prevent transaction from escaping closure scope.
+  Maybe explicitly mark non-sendable: https://forums.swift.org/t/what-does-available-unavailable-sendable-actually-do/65218
+  """)
   public class ReadTransaction {
     fileprivate let cache: any NormalizedCache
       

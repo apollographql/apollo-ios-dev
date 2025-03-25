@@ -434,7 +434,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
-  func test__parsing__givenSingleChunk_shouldReturnSuccess() throws {
+  func test__parsing__givenSingleChunk_shouldReturnSuccess() async throws {
     let network = buildNetworkTransport(responseData: """
       
       --graphql
@@ -452,7 +452,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
       """.crlfFormattedData()
     )
 
-    let expectedData = try Time(data: [
+    let expectedData = try await Time(data: [
       "__typename": "Time",
       "ticker": 1
     ], variables: nil)
@@ -475,7 +475,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
-  func test__parsing__givenSingleChunk_withMultipleContentTypeDirectives_shouldReturnSuccess() throws {
+  func test__parsing__givenSingleChunk_withMultipleContentTypeDirectives_shouldReturnSuccess() async throws {
     let network = buildNetworkTransport(responseData: """
       
       --graphql
@@ -493,7 +493,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
       """.crlfFormattedData()
     )
 
-    let expectedData = try Time(data: [
+    let expectedData = try await Time(data: [
       "__typename": "Time",
       "ticker": 1
     ], variables: nil)
@@ -516,7 +516,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
-  func test__parsing__givenSingleChunk_withGraphQLOverHTTPContentType_shouldReturnSuccess() throws {
+  func test__parsing__givenSingleChunk_withGraphQLOverHTTPContentType_shouldReturnSuccess() async throws {
     let network = buildNetworkTransport(responseData: """
       
       --graphql
@@ -534,7 +534,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
       """.crlfFormattedData()
     )
 
-    let expectedData = try Time(data: [
+    let expectedData = try await Time(data: [
       "__typename": "Time",
       "ticker": 1
     ], variables: nil)
@@ -557,7 +557,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
-  func test__parsing__givenSingleChunk_withDashBoundaryInMessageBody_shouldReturnSuccess() throws {
+  func test__parsing__givenSingleChunk_withDashBoundaryInMessageBody_shouldReturnSuccess() async throws {
     let multipartBoundary = "-"
     let network = buildNetworkTransport(
       responseData: """
@@ -579,7 +579,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
       multipartBoundary: multipartBoundary
     )
 
-    let expectedData = try Time(data: [
+    let expectedData = try await Time(data: [
       "__typename": "Time",
       "ticker": 1
     ], variables: nil)
@@ -656,7 +656,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
-  func test__parsing__givenPayloadAndUnknownKeys_shouldReturnSuccessAndIgnoreUnknownKeys() throws {
+  func test__parsing__givenPayloadAndUnknownKeys_shouldReturnSuccessAndIgnoreUnknownKeys() async throws {
     let network = buildNetworkTransport(responseData: """
       
       --graphql
@@ -675,7 +675,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
       """.crlfFormattedData()
     )
 
-    let expectedData = try Time(data: [
+    let expectedData = try await Time(data: [
       "__typename": "Time",
       "ticker": 1
     ], variables: nil)
@@ -782,7 +782,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
-  func test__parsing__givenEndOfStream_shouldReturnSuccess() throws {
+  func test__parsing__givenEndOfStream_shouldReturnSuccess() async throws {
     let network = buildNetworkTransport(responseData: """
       
       --graphql
@@ -800,7 +800,7 @@ final class MultipartResponseSubscriptionParserTests: XCTestCase {
       """.crlfFormattedData()
     )
 
-    let expectedData = try Time(data: [
+    let expectedData = try await Time(data: [
       "__typename": "Time",
       "ticker": 5
     ], variables: nil)

@@ -103,7 +103,7 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
     store = nil
   }
 
-  func test__write__givenOnlyPartialDataAsFulfilled_returnsAllDeferredFragmentsAsPending() throws {
+  func test__write__givenOnlyPartialDataAsFulfilled_returnsAllDeferredFragmentsAsPending() async throws {
     // given
     let data = AnimalQuery.AnAnimal(_dataDict: DataDict(
       data: [
@@ -126,26 +126,13 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
     ))
 
     // when
-    let writeCompletedExpectation = expectation(description: "Cache write completed")
-
-    store.withinReadWriteTransaction({ transaction in
-      try transaction.write(data: data, for: AnimalQuery())
-
-    }, completion: { result in
-      defer { writeCompletedExpectation.fulfill() }
-
-      expect(result).to(beSuccess())
-    })
-
-    self.wait(for: [writeCompletedExpectation], timeout: Self.defaultWaitTimeout)
+    try await store.withinReadWriteTransaction { transaction in
+      try await transaction.write(data: data, for: AnimalQuery())
+    }
 
     // then
-    let readCompletedExpectation = expectation(description: "Cache read completed")
-
-    store.withinReadTransaction { transaction in
-      defer { readCompletedExpectation.fulfill() }
-
-      let data = try transaction.read(query: AnimalQuery())
+    try await store.withinReadTransaction { transaction in
+      let data = try await transaction.read(query: AnimalQuery())
 
       expect(data.animal.__typename).to(equal("Animal"))
       expect(data.animal.species).to(equal("Canis latrans"))
@@ -155,11 +142,9 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
       expect(data.animal.fragments.$deferredGenus).to(equal(.pending))
       expect(data.animal.fragments.$deferredFriend).to(equal(.pending))
     }
-
-    self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__write__givenSingleDeferredFragmentAsFulfilled_returnsSingleDeferredFragmentAsFulfilled() throws {
+  func test__write__givenSingleDeferredFragmentAsFulfilled_returnsSingleDeferredFragmentAsFulfilled() async throws {
     // given
     let animalData = DataDict(
       data: [
@@ -185,26 +170,13 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
     ))
 
     // when
-    let writeCompletedExpectation = expectation(description: "Cache write completed")
-
-    store.withinReadWriteTransaction({ transaction in
-      try transaction.write(data: data, for: AnimalQuery())
-
-    }, completion: { result in
-      defer { writeCompletedExpectation.fulfill() }
-
-      expect(result).to(beSuccess())
-    })
-
-    self.wait(for: [writeCompletedExpectation], timeout: Self.defaultWaitTimeout)
+    try await store.withinReadWriteTransaction { transaction in
+      try await transaction.write(data: data, for: AnimalQuery())
+    }
 
     // then
-    let readCompletedExpectation = expectation(description: "Cache read completed")
-
-    store.withinReadTransaction { transaction in
-      defer { readCompletedExpectation.fulfill() }
-
-      let data = try transaction.read(query: AnimalQuery())
+    try await store.withinReadTransaction { transaction in
+      let data = try await transaction.read(query: AnimalQuery())
 
       expect(data.animal.__typename).to(equal("Animal"))
       expect(data.animal.species).to(equal("Canis latrans"))
@@ -216,11 +188,9 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
       ))
       expect(data.animal.fragments.$deferredFriend).to(equal(.pending))
     }
-
-    self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__write__givenAllDeferredFragmentsAsFulfilled_returnsAllDeferredFragmentsAsFulfilled() throws {
+  func test__write__givenAllDeferredFragmentsAsFulfilled_returnsAllDeferredFragmentsAsFulfilled() async throws {
     // given
     let friendData = DataDict(
       data: [
@@ -256,26 +226,13 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
     ))
 
     // when
-    let writeCompletedExpectation = expectation(description: "Cache write completed")
-
-    store.withinReadWriteTransaction({ transaction in
-      try transaction.write(data: data, for: AnimalQuery())
-
-    }, completion: { result in
-      defer { writeCompletedExpectation.fulfill() }
-
-      expect(result).to(beSuccess())
-    })
-
-    self.wait(for: [writeCompletedExpectation], timeout: Self.defaultWaitTimeout)
+    try await store.withinReadWriteTransaction { transaction in
+      try await transaction.write(data: data, for: AnimalQuery())
+    }
 
     // then
-    let readCompletedExpectation = expectation(description: "Cache read completed")
-
-    store.withinReadTransaction { transaction in
-      defer { readCompletedExpectation.fulfill() }
-
-      let data = try transaction.read(query: AnimalQuery())
+    try await store.withinReadTransaction { transaction in
+      let data = try await transaction.read(query: AnimalQuery())
 
       expect(data.animal.__typename).to(equal("Animal"))
       expect(data.animal.species).to(equal("Canis latrans"))
@@ -292,11 +249,9 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
         .fulfilled(DeferredFriendName(_dataDict: friendData))
       ))
     }
-
-    self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__write__givenDeferredData_withoutFragmentFulfilled_returnsDeferredFragmentAsPending() throws {
+  func test__write__givenDeferredData_withoutFragmentFulfilled_returnsDeferredFragmentAsPending() async throws {
     // given
     let animalData = DataDict(
       data: [
@@ -321,26 +276,13 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
     ))
 
     // when
-    let writeCompletedExpectation = expectation(description: "Cache write completed")
-
-    store.withinReadWriteTransaction({ transaction in
-      try transaction.write(data: data, for: AnimalQuery())
-
-    }, completion: { result in
-      defer { writeCompletedExpectation.fulfill() }
-
-      expect(result).to(beSuccess())
-    })
-
-    self.wait(for: [writeCompletedExpectation], timeout: Self.defaultWaitTimeout)
+    try await store.withinReadWriteTransaction { transaction in
+      try await transaction.write(data: data, for: AnimalQuery())
+    }
 
     // then
-    let readCompletedExpectation = expectation(description: "Cache read completed")
-
-    store.withinReadTransaction { transaction in
-      defer { readCompletedExpectation.fulfill() }
-
-      let data = try transaction.read(query: AnimalQuery())
+    try await store.withinReadTransaction { transaction in
+      let data = try await transaction.read(query: AnimalQuery())
 
       expect(data.animal.__typename).to(equal("Animal"))
       expect(data.animal.species).to(equal("Canis latrans"))
@@ -350,11 +292,9 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
       expect(data.animal.fragments.$deferredGenus).to(equal(.pending))
       expect(data.animal.fragments.$deferredFriend).to(equal(.pending))
     }
-
-    self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__write__givenDeferredNamedFragment_returnsDeferredNamedFragmentAsFulfilled() throws {
+  func test__write__givenDeferredNamedFragment_returnsDeferredNamedFragmentAsFulfilled() async throws {
     // given
     let friendData = DataDict(
       data: [
@@ -367,7 +307,7 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
 
     let friendSelectionSet = DeferredFriendName(_dataDict: friendData)
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal"),
       ],
@@ -380,26 +320,13 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
     ])
 
     // when
-    let writeCompletedExpectation = expectation(description: "Cache write completed")
-
-    store.withinReadWriteTransaction({ transaction in
-      try transaction.write(selectionSet: friendSelectionSet, withKey: CacheKey("QUERY_ROOT.animal.friend"))
-
-    }, completion: { result in
-      defer { writeCompletedExpectation.fulfill() }
-
-      expect(result).to(beSuccess())
-    })
-
-    self.wait(for: [writeCompletedExpectation], timeout: Self.defaultWaitTimeout)
+    try await store.withinReadWriteTransaction { transaction in
+      try await transaction.write(selectionSet: friendSelectionSet, withKey: CacheKey("QUERY_ROOT.animal.friend"))
+    }
 
     // then
-    let readCompletedExpectation = expectation(description: "Cache read completed")
-
-    store.withinReadTransaction { transaction in
-      defer { readCompletedExpectation.fulfill() }
-
-      let data = try transaction.read(query: AnimalQuery())
+    try await store.withinReadTransaction { transaction in
+      let data = try await transaction.read(query: AnimalQuery())
 
       expect(data.animal.__typename).to(equal("Animal"))
       expect(data.animal.species).to(equal("Canis latrans"))
@@ -410,7 +337,5 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
         .fulfilled(DeferredFriendName(_dataDict: friendData))
       ))
     }
-
-    self.wait(for: [readCompletedExpectation], timeout: Self.defaultWaitTimeout)
   }
 }

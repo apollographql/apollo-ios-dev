@@ -7,7 +7,7 @@ import Nimble
 @MainActor
 class SelectionSet_JSONInitializerTests: XCTestCase {
 
-  func test__initFromJSON__withFragment_canAccessFragment() throws {
+  func test__initFromJSON__withFragment_canAccessFragment() async throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -52,13 +52,13 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       "__typename": "Human", "name": "Luke Skywalker", "height": 1.72
     ]
 
-    let data = try Hero(data: jsonObject)
+    let data = try await Hero(data: jsonObject)
 
 
     expect(data.fragments.givenFragment.height).to(equal(1.72))
   }
 
-  func test__initFromJSON__withInclusionConditionOnField_canAccessFieldWhenVariableIsTrue() throws {
+  func test__initFromJSON__withInclusionConditionOnField_canAccessFieldWhenVariableIsTrue() async throws {
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
@@ -86,14 +86,14 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       "__typename": "Hero", "name": "R2-D2"
     ]
 
-    let data = try Hero(data: jsonObject, variables: ["includeName" : true])
+    let data = try await Hero(data: jsonObject, variables: ["includeName" : true])
     expect(data.name).to(equal("R2-D2"))
 
-    let dataWithNoName = try Hero(data: jsonObject, variables: ["includeName" : false])
+    let dataWithNoName = try await Hero(data: jsonObject, variables: ["includeName" : false])
     expect(dataWithNoName.name).to(beNil())
   }
 
-  func test__initFromJSON__withInclusionConditionOnField_variableNotPresent_fieldIsNil() throws {
+  func test__initFromJSON__withInclusionConditionOnField_variableNotPresent_fieldIsNil() async throws {
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
@@ -121,14 +121,14 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       "__typename": "Hero", "name": "R2-D2"
     ]
 
-    let dataWithNoName = try Hero(data: jsonObject)
+    let dataWithNoName = try await Hero(data: jsonObject)
     expect(dataWithNoName.name).to(beNil())
   }
 
   // MARK: - Merged Only Selection Set Tests
 
   /// Confirms bug fix for issue [#2915](https://github.com/apollographql/apollo-ios/issues/2915).
-  func test__initFromJSON__givenMergedOnlyNestedSelectionSet_withTypeCase_canConvertToTypeCase() throws {
+  func test__initFromJSON__givenMergedOnlyNestedSelectionSet_withTypeCase_canConvertToTypeCase() async throws {
     struct Types {
       static let Character = Interface(name: "Character", implementingObjects: ["Human"])
       static let Hero = Interface(name: "Hero", implementingObjects: ["Human"])
@@ -245,7 +245,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       ]
     ]
 
-    let data = try Character(data: jsonObject)
+    let data = try await Character(data: jsonObject)
     expect(data.asHuman?.friend.asHuman).toNot(beNil())
     expect(data.asHuman?.friend.asHuman?.heroName).to(equal("Han Solo"))
   }
