@@ -970,7 +970,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     }
   }
 
-  func testWatchedQueryGetsUpdatedWhenObjectIsChangedByDirectStoreUpdate() throws {
+  func testWatchedQueryGetsUpdatedWhenObjectIsChangedByDirectStoreUpdate() async throws {
     struct HeroAndFriendsNamesSelectionSet: MockMutableRootSelectionSet {
       public var __data: DataDict = .empty()
       init(_dataDict: DataDict) { __data = _dataDict }
@@ -1069,35 +1069,34 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
     }
 
-    runActivity("Update object directly in store") { _ in
-      let updatedWatcherResultExpectation = resultObserver.expectation(
-        description: "Watcher received updated result from cache"
-      ) { result in
-        try XCTAssertSuccessResult(result) { graphQLResult in
-          XCTAssertEqual(graphQLResult.source, .cache)
-          XCTAssertNil(graphQLResult.errors)
+    // Update object directly in store
+    let updatedWatcherResultExpectation = resultObserver.expectation(
+      description: "Watcher received updated result from cache"
+    ) { result in
+      try XCTAssertSuccessResult(result) { graphQLResult in
+        XCTAssertEqual(graphQLResult.source, .cache)
+        XCTAssertNil(graphQLResult.errors)
 
-          let data = try XCTUnwrap(graphQLResult.data)
-          XCTAssertEqual(data.hero?.name, "Artoo")
+        let data = try XCTUnwrap(graphQLResult.data)
+        XCTAssertEqual(data.hero?.name, "Artoo")
 
-          let friendsNames = data.hero?.friends?.compactMap { $0.name }
-          XCTAssertEqual(friendsNames, ["Luke Skywalker", "Han Solo", "Leia Organa"])
-        }
+        let friendsNames = data.hero?.friends?.compactMap { $0.name }
+        XCTAssertEqual(friendsNames, ["Luke Skywalker", "Han Solo", "Leia Organa"])
       }
-
-      await client.store.withinReadWriteTransaction({ transaction in
-        let cacheMutation = MockLocalCacheMutation<HeroAndFriendsNamesSelectionSet>()
-        try transaction.update(cacheMutation) { data in
-          data.hero?.name = "Artoo"
-        }
-      })
-
-      wait(for: [updatedWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
     }
+
+    try await client.store.withinReadWriteTransaction({ transaction in
+      let cacheMutation = MockLocalCacheMutation<HeroAndFriendsNamesSelectionSet>()
+      try await transaction.update(cacheMutation) { data in
+        data.hero?.name = "Artoo"
+      }
+    })
+
+    await fulfillment(of: [updatedWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
   }
 
   @MainActor
-  func testWatchedQuery_givenCachePolicyReturnCacheDataDontFetch_doesNotRefetchFromServerAfterOtherQueryUpdatesListWithIncompleteObject() throws {
+  func testWatchedQuery_givenCachePolicyReturnCacheDataDontFetch_doesNotRefetchFromServerAfterOtherQueryUpdatesListWithIncompleteObject() async throws {
     // given
     struct HeroAndFriendsNamesSelectionSet: MockMutableRootSelectionSet {
       public var __data: DataDict = .empty()
@@ -1220,36 +1219,28 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     let watcher = GraphQLQueryWatcher(client: client, query: watchedQuery, resultHandler: resultObserver.handler)
     addTeardownBlock { watcher.cancel() }
 
-    runActivity("Write data to cache") { _ in
-      let writeToStoreExpectation = expectation(description: "Initial Data written to store")
-
-      client.store.withinReadWriteTransaction({ transaction in
-        let data = try! HeroAndFriendsNamesSelectionSet(
-          data:
-            [
-              "hero": [
-                "id": "2001",
-                "name": "R2-D2",
-                "__typename": "Droid",
-                "friends": [
-                  ["__typename": "Human", "id": "1000", "name": "Luke Skywalker"],
-                  ["__typename": "Human", "id": "1002", "name": "Han Solo"],
-                  ["__typename": "Human", "id": "1003", "name": "Leia Organa"],
-                ]
+    // Write data to cache
+    try await client.store.withinReadWriteTransaction({ transaction in
+      let data = try! await HeroAndFriendsNamesSelectionSet(
+        data:
+          [
+            "hero": [
+              "id": "2001",
+              "name": "R2-D2",
+              "__typename": "Droid",
+              "friends": [
+                ["__typename": "Human", "id": "1000", "name": "Luke Skywalker"],
+                ["__typename": "Human", "id": "1002", "name": "Han Solo"],
+                ["__typename": "Human", "id": "1003", "name": "Leia Organa"],
               ]
-            ],
-            variables: nil
-          )
+            ]
+          ],
+        variables: nil
+      )
 
-        let cacheMutation = MockLocalCacheMutation<HeroAndFriendsNamesSelectionSet>()
-        try transaction.write(data: data, for: cacheMutation)
-      }) { result in
-        XCTAssertSuccessResult(result)
-        writeToStoreExpectation.fulfill()
-      }
-
-      wait(for: [writeToStoreExpectation], timeout: Self.defaultWaitTimeout)
-    }
+      let cacheMutation = MockLocalCacheMutation<HeroAndFriendsNamesSelectionSet>()
+      try await transaction.write(data: data, for: cacheMutation)
+    })
 
     runActivity("Initial fetch from cache") { _ in
       let initialWatcherResultExpectation = resultObserver.expectation(description: "Watcher received initial result from cache") { result in
@@ -1509,7 +1500,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
   }
 
   @MainActor
-  func testWatchedQueryDependentKeysAreUpdatedAfterDirectStoreUpdate() {
+  func testWatchedQueryDependentKeysAreUpdatedAfterDirectStoreUpdate() async throws {
     // given
     struct HeroAndFriendsNamesWithIDsSelectionSet: MockMutableRootSelectionSet {
       public var __data: DataDict = .empty()
@@ -1631,50 +1622,49 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
     }
 
-    runActivity("Update same query directly in store") { _ in
-      let updatedWatcherResultExpectation = resultObserver.expectation(description: "Watcher received updated result from cache") { result in
-        try XCTAssertSuccessResult(result) { graphQLResult in
-          XCTAssertEqual(graphQLResult.source, .cache)
-          XCTAssertNil(graphQLResult.errors)
+    // Update same query directly in store
+    let updatedWatcherResultExpectation = resultObserver.expectation(description: "Watcher received updated result from cache") { result in
+      try XCTAssertSuccessResult(result) { graphQLResult in
+        XCTAssertEqual(graphQLResult.source, .cache)
+        XCTAssertNil(graphQLResult.errors)
 
-          let data = try XCTUnwrap(graphQLResult.data)
+        let data = try XCTUnwrap(graphQLResult.data)
 
-          XCTAssertEqual(data.hero.name, "R2-D2")
+        XCTAssertEqual(data.hero.name, "R2-D2")
 
-          let friendsNames = data.hero.friends.compactMap { $0.name }
-          XCTAssertEqual(friendsNames, ["Luke Skywalker", "Han Solo"])
+        let friendsNames = data.hero.friends.compactMap { $0.name }
+        XCTAssertEqual(friendsNames, ["Luke Skywalker", "Han Solo"])
 
-          let expectedDependentKeys: Set = [
-            "Droid:2001.__typename",
-            "Droid:2001.friends",
-            "Droid:2001.id",
-            "Droid:2001.name",
-            "Human:1000.__typename",
-            "Human:1000.id",
-            "Human:1000.name",
-            "Human:1002.__typename",
-            "Human:1002.id",
-            "Human:1002.name",
-            "QUERY_ROOT.hero",
-          ]
-          let actualDependentKeys = try XCTUnwrap(graphQLResult.dependentKeys)
-          expect(actualDependentKeys).to(equal(expectedDependentKeys))
-        }
+        let expectedDependentKeys: Set = [
+          "Droid:2001.__typename",
+          "Droid:2001.friends",
+          "Droid:2001.id",
+          "Droid:2001.name",
+          "Human:1000.__typename",
+          "Human:1000.id",
+          "Human:1000.name",
+          "Human:1002.__typename",
+          "Human:1002.id",
+          "Human:1002.name",
+          "QUERY_ROOT.hero",
+        ]
+        let actualDependentKeys = try XCTUnwrap(graphQLResult.dependentKeys)
+        expect(actualDependentKeys).to(equal(expectedDependentKeys))
       }
-
-      let cacheMutation = MockLocalCacheMutation<HeroAndFriendsNamesWithIDsSelectionSet>()
-      client.store.withinReadWriteTransaction({ transaction in
-        try transaction.update(cacheMutation) { data in
-          var human = HeroAndFriendsNamesWithIDsSelectionSet.Hero.Friend()
-          human.__typename = "Human"
-          human.id = "1002"
-          human.name = "Han Solo"
-          data.hero.friends.append(human)
-        }
-      })
-
-      wait(for: [updatedWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
     }
+
+    let cacheMutation = MockLocalCacheMutation<HeroAndFriendsNamesWithIDsSelectionSet>()
+    try await client.store.withinReadWriteTransaction({ transaction in
+      try await transaction.update(cacheMutation) { data in
+        var human = HeroAndFriendsNamesWithIDsSelectionSet.Hero.Friend()
+        human.__typename = "Human"
+        human.id = "1002"
+        human.name = "Han Solo"
+        data.hero.friends.append(human)
+      }
+    })
+
+    await fulfillment(of: [updatedWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
   }
 
   @MainActor
