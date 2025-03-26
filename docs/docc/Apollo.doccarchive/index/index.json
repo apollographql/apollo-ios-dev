@@ -2234,6 +2234,22 @@
           {
             "children" : [
               {
+                "title" : "Instance Properties",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/requestcontexttimeoutconfigurable\/requesttimeout",
+                "title" : "var requestTimeout: TimeInterval",
+                "type" : "property"
+              }
+            ],
+            "path" : "\/documentation\/apollo\/requestcontexttimeoutconfigurable",
+            "title" : "RequestContextTimeoutConfigurable",
+            "type" : "protocol"
+          },
+          {
+            "children" : [
+              {
                 "title" : "Instance Methods",
                 "type" : "groupMarker"
               },

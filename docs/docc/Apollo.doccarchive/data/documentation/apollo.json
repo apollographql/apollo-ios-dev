@@ -98,6 +98,7 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestBodyCreator",
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestContext",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestContextTimeoutConfigurable",
         "doc:\/\/Apollo\/documentation\/Apollo\/UploadingNetworkTransport"
       ],
       "title" : "Protocols"
@@ -2058,6 +2059,48 @@
   "title" : "RequestContext",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestcontext"
+},
+"doc://Apollo/documentation/Apollo/RequestContextTimeoutConfigurable": {
+  "abstract" : [
+    {
+      "text" : "A request context specialization protocol that specifies options for configuring the timeout of a ",
+      "type" : "text"
+    },
+    {
+      "code" : "URLRequest",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "RequestContextTimeoutConfigurable"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestContextTimeoutConfigurable",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "RequestContextTimeoutConfigurable"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "RequestContextTimeoutConfigurable",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestcontexttimeoutconfigurable"
 },
 "doc://Apollo/documentation/Apollo/ResponseCodeInterceptor": {
   "abstract" : [
