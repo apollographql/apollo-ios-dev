@@ -164,7 +164,9 @@ items:
   - label: Advanced
     children:
       - label: File Uploads
-        href: ./file-uploads
+        href: ./advanced/file-uploads
       - label: Request Chain Customization
-        href: ./networking/request-pipeline
+        href: ./advanced/request-pipeline
+      - label: Request Configuration
+        href: ./advanced/request-configuration
 
