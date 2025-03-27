@@ -39,8 +39,6 @@ extension InstallCLIPluginCommand: XcodeCommandPlugin {
     let downloadScriptPath = try downloadScriptPath(context: context)
     process.arguments = [downloadScriptPath, context.xcodeProject.directory.string]
 
-    Logger().info("Using download script path: \(downloadScriptPath)")
-
     try process.run()
     process.waitUntilExit()
   }
@@ -90,8 +88,6 @@ extension InstallCLIPluginCommand: XcodeCommandPlugin {
     guard !xcodeVersionString.isEmpty else {
       throw Error.CannotDetermineXcodeVersion
     }
-
-    Logger().info("Found Xcode Version: \(xcodeVersionString)")
 
     let versionString = xcodeVersionString
       .components(separatedBy: CharacterSet.decimalDigits.inverted)
