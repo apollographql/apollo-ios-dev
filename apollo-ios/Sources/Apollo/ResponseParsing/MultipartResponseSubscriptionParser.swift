@@ -15,7 +15,7 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
       switch self {
 
       case let .unsupportedContentType(type):
-        return "Unsupported content type: 'application/graphql-response+json' or 'application/json' are supported, received '\(type)'."
+        return "Unsupported content type: application/json is required but got \(type)."
       case .cannotParseChunkData:
         return "The chunk data could not be parsed."
       case let .irrecoverableError(message):
@@ -30,7 +30,7 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
 
   private enum DataLine {
     case heartbeat
-    case contentHeader(directives: [String])
+    case contentHeader(type: String)
     case json(object: JSONObject)
     case unknown
 
@@ -46,10 +46,15 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
         return .heartbeat
       }
 
-      if let directives = dataLine.parseContentTypeDirectives() {
-        return .contentHeader(directives: directives)
+      if dataLine.lowercased().starts(with: contentTypeHeader.description) {
+        let contentType = (dataLine
+          .components(separatedBy: ":").last ?? dataLine
+        ).trimmingCharacters(in: .whitespaces)
+
+        return .contentHeader(type: contentType)
       }
 
+#warning("TODO: do we really need to turn the string into data to turn it back into a JSONObject?")
       if
         let data = dataLine.data(using: .utf8),
         let jsonObject = try? JSONSerializationFormat.deserialize(data: data) as JSONObject
@@ -63,16 +68,16 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
 
   static let protocolSpec: String = "subscriptionSpec=1.0"
 
-  static func parse(_ chunk: String) -> Result<Data?, any Error> {
+  static func parse(_ chunk: String) -> Result<JSONObject?, any Error> {
     for dataLine in chunk.components(separatedBy: Self.dataLineSeparator.description) {
       switch DataLine(dataLine.trimmingCharacters(in: .newlines)) {
       case .heartbeat:
         // Periodically sent by the router - noop
         break
 
-      case let .contentHeader(directives):
-        guard directives.contains(where: { $0.isValidGraphQLContentType }) else {
-          return .failure(ParsingError.unsupportedContentType(type: directives.joined(separator: ";")))
+      case let .contentHeader(type):
+        guard type == "application/json" else {
+          return .failure(ParsingError.unsupportedContentType(type: type))
         }
 
       case let .json(object):
@@ -89,13 +94,12 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
 
         if let payload = object.payload, !(payload is NSNull) {
           guard
-            let payload = payload as? JSONObject,
-            let data: Data = try? JSONSerializationFormat.serialize(value: payload)
+            let payload = payload as? JSONObject
           else {
             return .failure(ParsingError.cannotParsePayloadData)
           }
 
-          return .success(data)
+          return .success(payload)
         }
 
         // 'errors' is optional because valid payloads don't have transport errors.
