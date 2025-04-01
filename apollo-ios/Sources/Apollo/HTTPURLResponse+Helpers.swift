@@ -15,11 +15,11 @@ extension HTTPURLResponse {
   }
 
   struct MultipartHeaderComponents {
-    let media: String?
-    let boundary: String?
-    let `protocol`: String?
+    let media: String
+    let boundary: String
+    let `protocol`: String
 
-    init(media: String? = nil, boundary: String? = nil, protocol: String? = nil) {
+    init(media: String, boundary: String, protocol: String) {
       self.media = media
       self.boundary = boundary
       self.protocol = `protocol`
@@ -27,9 +27,9 @@ extension HTTPURLResponse {
   }
 
   /// Components of the `Content-Type` header specifically related to the `multipart` media type.
-  var multipartHeaderComponents: MultipartHeaderComponents {
+  var multipartHeaderComponents: MultipartHeaderComponents? {
     guard let contentType = allHeaderFields["Content-Type"] as? String else {
-      return MultipartHeaderComponents()
+      return nil
     }
 
     var media: String? = nil
@@ -64,6 +64,10 @@ extension HTTPURLResponse {
         `protocol` = directive
         continue
       }
+    }
+
+    guard let media, let boundary, let `protocol` else {
+      return nil
     }
 
     return MultipartHeaderComponents(media: media, boundary: boundary, protocol: `protocol`)
