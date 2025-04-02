@@ -29,24 +29,26 @@ public struct JSONResponseParsingInterceptor: ApolloInterceptor {
     }
   }
 
-  public var id: String = UUID().uuidString
-
   public init() { }
 
-  public func interceptAsync<Operation: GraphQLOperation>(
-    chain: any RequestChain,
+  public func intercept<Operation: GraphQLOperation>(
     request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping GraphQLResultHandler<Operation.Data>
-  ) {
-    guard var createdResponse = response else {
-      chain.handleErrorAsync(
-        JSONResponseParsingError.noResponseToParse,
-        request: request,
-        response: response,
-        completion: completion
-      )
-      return
+    next: NextInterceptorFunction<Operation>
+  ) async throws -> InterceptorResultStream<Operation> {
+    let responseStream = try await next()
+
+    let responseDataStream = responseStream.map { interceptorResult in
+      guard let createdResponse = interceptorResult. else {
+        chain.handleErrorAsync(
+          JSONResponseParsingError.noResponseToParse,
+          request: request,
+          response: response,
+          completion: completion
+        )
+    }
+
+    for try await response in responseStream {
+      response
     }
 
     Task {
