@@ -1,91 +1,39 @@
 import Foundation
+import Combine
 #if !COCOAPODS
 import ApolloAPI
 #endif
 
-#warning("TODO: should be able to remove @unchecked once we get rid of currentTask and id.")
+#warning("TODO: Kill this and put logic in RequestChain.")
 /// An interceptor which actually fetches data from the network.
-public final class NetworkFetchInterceptor: ApolloInterceptor, @unchecked Sendable, Cancellable {
-  let client: URLSessionClient
-  @Atomic private var currentTask: URLSessionTask?
+public final class NetworkFetchInterceptor: ApolloInterceptor {
+  let session: any ApolloURLSession
 
-  public var id: String = UUID().uuidString
-  
   /// Designated initializer.
   ///
-  /// - Parameter client: The `URLSessionClient` to use to fetch data
-  public init(client: URLSessionClient) {
-    self.client = client
+  /// - Parameter session: The `URLSession` to use to fetch data
+  public init(session: some ApolloURLSession) {
+    self.session = session
   }
   
-  public func interceptAsync<Operation: GraphQLOperation>(
-    chain: any RequestChain,
+  public func intercept<Operation: GraphQLOperation>(
     request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping GraphQLResultHandler<Operation.Data>
-  ) {
-    let urlRequest: URLRequest
-    do {
-      urlRequest = try request.toURLRequest()
-    } catch {
-      chain.handleErrorAsync(
-        error,
-        request: request,
+    next: NextInterceptorFunction<Operation>
+  ) async throws -> InterceptorResult<Operation> {
+    let urlRequest = try request.toURLRequest()
+
+    let (bytes, response) = try await session.bytes(for: urlRequest, delegate: nil)
+
+    guard let response = response as? HTTPURLResponse else {
+      preconditionFailure()
+      #warning("Throw error instead of precondition failure? Look into if it is possible for this to even occur.")
+    }
+
+    return InterceptorResult(
+      response: .init(
         response: response,
-        completion: completion
-      )
-      return
-    }
-    
-    let taskDescription = "\(Operation.operationType) \(Operation.operationName)"
-    let task = self.client.sendRequest(urlRequest, taskDescription: taskDescription) { [weak self] result in
-      guard let self = self else {
-        return
-      }
-      
-      defer {
-        if Operation.operationType != .subscription {
-          self.$currentTask.mutate { $0 = nil }
-        }
-      }
-      
-      guard !chain.isCancelled else {
-        return
-      }
-      
-      switch result {
-      case .failure(let error):
-        chain.handleErrorAsync(
-          error,
-          request: request,
-          response: response,
-          completion: completion
-        )
-
-      case .success(let (data, httpResponse)):
-        let response = HTTPResponse<Operation>(
-          response: httpResponse,
-          rawData: data,
-          parsedResponse: nil
-        )
-
-        chain.proceedAsync(
-          request: request,
-          response: response,
-          interceptor: self,
-          completion: completion
-        )
-      }
-    }
-    
-    self.$currentTask.mutate { $0 = task }
+        asyncBytes: bytes
+      ))
   }
-  
-  public func cancel() {
-    guard let task = self.currentTask else {
-      return
-    }
-    
-    task.cancel()
-  }
+
 }
