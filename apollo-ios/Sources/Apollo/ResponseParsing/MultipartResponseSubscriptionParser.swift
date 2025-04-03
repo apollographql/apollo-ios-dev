@@ -68,7 +68,7 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
 
   static let protocolSpec: String = "subscriptionSpec=1.0"
 
-  static func parse(_ chunk: String) -> Result<JSONObject?, any Error> {
+  static func parse(multipartChunk chunk: String) -> Result<JSONObject?, any Error> {
     for dataLine in chunk.components(separatedBy: Self.dataLineSeparator.description) {
       switch DataLine(dataLine.trimmingCharacters(in: .newlines)) {
       case .heartbeat:
