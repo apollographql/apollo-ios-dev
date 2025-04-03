@@ -3,62 +3,50 @@ import Foundation
 import ApolloAPI
 #endif
 
-#warning("""
-TODO: Can we kill this? Data is not all data for response in multi-part, making this confusing.
-Alternatively, add more properties to help understand which portion of a multi-part response is being returned.
-""")
+#warning("TODO: Docs Update")
 /// Data about a response received by an HTTP request.
-public struct HTTPResponse<Operation: GraphQLOperation>: Sendable {
+public struct HTTPResponse: Sendable {
 
   /// The `HTTPURLResponse` received from the URL loading system
-  public var httpResponse: HTTPURLResponse
-  
-  /// The raw data received from the URL loading system
-  public var rawData: Data
-  
-  /// [optional] The data as parsed into a `GraphQLResult`, which can eventually be returned to the UI. Will be nil 
-  /// if not yet parsed.
-  public var parsedResponse: GraphQLResult<Operation.Data>?
+  public let httpResponse: HTTPURLResponse
 
-  /// A set of cache records from the response
-  public var cacheRecords: RecordSet?
+  /// The raw data received from the URL loading system.
+  ///
+  /// If this is an incremental response for a multi-part reponse, the data will only be the data
+  /// of the current chunks to parse and return.
+  internal let asyncBytes: URLSession.AsyncBytes
 
   /// Designated initializer
   ///
   /// - Parameters:
   ///   - response: The `HTTPURLResponse` received from the server.
   ///   - rawData: The raw, unparsed data received from the server.
-  ///   - parsedResponse: [optional] The response parsed into the `ParsedValue` type. Will be nil if not yet parsed, 
+  ///   - parsedResult: [optional] The response parsed into the `ParsedValue` type. Will be nil if not yet parsed,
   ///   or if parsing failed.
-  public init(
+  init(
     response: HTTPURLResponse,
-    rawData: Data,
-    parsedResponse: GraphQLResult<Operation.Data>?
+    asyncBytes: URLSession.AsyncBytes
   ) {
     self.httpResponse = response
-    self.rawData = rawData
-    self.parsedResponse = parsedResponse
+    self.asyncBytes = asyncBytes
   }
+
 }
 
-// MARK: - Equatable Conformance
-
-extension HTTPResponse: Equatable where Operation.Data: Equatable {
-  public static func == (lhs: HTTPResponse<Operation>, rhs: HTTPResponse<Operation>) -> Bool {
-    lhs.httpResponse == rhs.httpResponse &&
-    lhs.rawData == rhs.rawData &&
-    lhs.parsedResponse == rhs.parsedResponse &&    
-    lhs.cacheRecords == rhs.cacheRecords
-  }
-}
-
-// MARK: - Hashable Conformance
-
-extension HTTPResponse: Hashable where Operation.Data: Hashable {
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(httpResponse)
-    hasher.combine(rawData)
-    hasher.combine(parsedResponse)
-    hasher.combine(cacheRecords)
-  }
-}
+//// MARK: - Equatable Conformance
+//
+//extension HTTPResponse: Equatable {
+//  public static func == (lhs: HTTPResponse, rhs: HTTPResponse) -> Bool {
+//    lhs.httpResponse == rhs.httpResponse &&
+//    lhs.rawData == rhs.rawData
+//  }
+//}
+//
+//// MARK: - Hashable Conformance
+//
+//extension HTTPResponse: Hashable {
+//  public func hash(into hasher: inout Hasher) {
+//    hasher.combine(httpResponse)
+//    hasher.combine(rawData)
+//  }
+//}
