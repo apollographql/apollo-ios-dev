@@ -13,7 +13,7 @@ public struct JSONResponseParsingInterceptor: ApolloInterceptor {
     request: HTTPRequest<Operation>,
     next: NextInterceptorFunction<Operation>
   ) async throws -> InterceptorResult<Operation> {
-    var result = try await next()
+    var result = try await next(request)
 
     let parser = JSONResponseParser<Operation>(
       response: result.response,
@@ -21,19 +21,11 @@ public struct JSONResponseParsingInterceptor: ApolloInterceptor {
       includeCacheRecords: request.cachePolicy.shouldParsingIncludeCacheRecords
     )
     
-    result.parsedResultStream = parser.parseJSONtoResults(
+    result.parsedResults = parser.parseJSONtoResults(
       fromByteStream: result.responseAsyncBytes
     ).map {
       InterceptorResult<Operation>.ParsedResult(result: $0, cacheRecords: $1)
     }
-//
-//    let publisher = parser.parsedJSONResultPublisher(
-//      byteStream: result.responseAsyncBytes
-//    ).map {
-//      InterceptorResult<Operation>.ParsedResult(result: $0, cacheRecords: $1)
-//    }.share()
-//
-//    result.parsedResultStream = AnyPublisher(publisher)
 
     return result
   }

@@ -36,13 +36,10 @@ open class DefaultInterceptorProvider: InterceptorProvider {
     for operation: Operation
   ) -> [any ApolloInterceptor] {
       return [
-        MaxRetryInterceptor(),
-        CacheReadInterceptor(store: self.store),
-        CacheWriteInterceptor(store: self.store),
+        MaxRetryInterceptor(),        
         AutomaticPersistedQueryInterceptor(),
         JSONResponseParsingInterceptor(),
-        ResponseCodeInterceptor(),
-        NetworkFetchInterceptor(session: self.session)
+        ResponseCodeInterceptor()
     ]
   }
 
