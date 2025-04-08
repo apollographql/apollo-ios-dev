@@ -1,9 +1,11 @@
+import Foundation
 #if !COCOAPODS
 import ApolloAPI
 #endif
 
 #warning("TODO: Implement retrying based on catching error")
-public struct RequestChainRetryError: Swift.Error { }
+#warning("TODO: add optional underlying error property to retry error")
+public struct RequestChainRetry: Swift.Error { }
 
 struct RequestChain<Operation: GraphQLOperation>: Sendable {
 
@@ -53,8 +55,7 @@ struct RequestChain<Operation: GraphQLOperation>: Sendable {
         }
       }
 
-      try await startRequestInterceptors(for: request, continuation: continuation)
-
+      try await kickoffRequestInterceptors(for: request, continuation: continuation)
     }
   }
 
@@ -80,38 +81,42 @@ struct RequestChain<Operation: GraphQLOperation>: Sendable {
     }
   }
 
-  private func startRequestInterceptors(
-    for request: HTTPRequest<Operation>,
+  private func kickoffRequestInterceptors(
+    for initialRequest: HTTPRequest<Operation>,
     continuation: ResultStream.Continuation
   ) async throws {
-    var interceptorIterator = interceptors.makeIterator()
-    var currentResult: InterceptorResult<Operation>
 
-////    for interceptor in interceptors {
-////      try await interceptor.intercept(request: request) {
-////        currentResult =
-////      }
-////    }
-//
-//    @Sendable func proceedThrough(
-//      interceptor: any ApolloInterceptor
-//    ) async throws {
-//      try await interceptor.intercept(request: request) {
-//        guard let nextInterceptor = interceptorIterator.next() else {
-//          return
-//        }
-//
-//        try await proceedThrough(interceptor: nextInterceptor)
-//      }
-//    }
-////
-//    try await proceedThroughInterceptors()
+    var next: @Sendable (HTTPRequest<Operation>) async throws -> InterceptorResult<Operation> = { request in
+      try await executeNetworkFetch(request: request)
+    }
 
-    while let nextInterceptor = interceptorIterator.next() {
-      try await nextInterceptor.intercept(request: request) {
+    for interceptor in interceptors.reversed() {
+      let tempNext = next
 
+      next = { request in
+        try await interceptor.intercept(request: request, next: tempNext)
       }
     }
+
+    let result = try await next(initialRequest)
+  }
+
+  private func executeNetworkFetch(
+    request: HTTPRequest<Operation>
+  ) async throws -> InterceptorResult<Operation> {
+    let urlRequest = try request.toURLRequest()
+
+    let (bytes, response) = try await urlSession.bytes(for: urlRequest, delegate: nil)
+
+    guard let response = response as? HTTPURLResponse else {
+      preconditionFailure()
+      #warning("Throw error instead of precondition failure? Look into if it is possible for this to even occur.")
+    }
+
+    return InterceptorResult(
+      response: response,
+      responseAsyncBytes: bytes
+    )
   }
 
 

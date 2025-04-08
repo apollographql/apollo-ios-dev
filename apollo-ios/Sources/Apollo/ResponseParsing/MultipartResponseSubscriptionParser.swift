@@ -68,7 +68,7 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
 
   static let protocolSpec: String = "subscriptionSpec=1.0"
 
-  static func parse(multipartChunk chunk: String) -> Result<JSONObject?, any Error> {
+  static func parse(multipartChunk chunk: String) throws -> JSONObject? {
     for dataLine in chunk.components(separatedBy: Self.dataLineSeparator.description) {
       switch DataLine(dataLine.trimmingCharacters(in: .newlines)) {
       case .heartbeat:
@@ -77,7 +77,7 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
 
       case let .contentHeader(type):
         guard type == "application/json" else {
-          return .failure(ParsingError.unsupportedContentType(type: type))
+          throw ParsingError.unsupportedContentType(type: type)
         }
 
       case let .json(object):
@@ -86,34 +86,34 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
             let errors = errors as? [JSONObject],
             let message = errors.first?["message"] as? String
           else {
-            return .failure(ParsingError.cannotParseErrorData)
+            throw ParsingError.cannotParseErrorData
           }
 
-          return .failure(ParsingError.irrecoverableError(message: message))
+          throw ParsingError.irrecoverableError(message: message)
         }
 
         if let payload = object.payload, !(payload is NSNull) {
           guard
             let payload = payload as? JSONObject
           else {
-            return .failure(ParsingError.cannotParsePayloadData)
+            throw ParsingError.cannotParsePayloadData
           }
 
-          return .success(payload)
+          return payload
         }
 
         // 'errors' is optional because valid payloads don't have transport errors.
         // `errors` can be null because it's taken to be the same as optional.
         // `payload` is optional because the heartbeat message does not contain a payload field.
         // `payload` can be null such as in the case of a transport error or future use (TBD).
-        return .success(nil)
+        return nil
 
       case .unknown:
-        return .failure(ParsingError.cannotParseChunkData)
+        throw ParsingError.cannotParseChunkData
       }
     }
 
-    return .success(nil)
+    return nil
   }
 }
 
