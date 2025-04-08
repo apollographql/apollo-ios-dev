@@ -4,14 +4,47 @@ import Combine
 import ApolloAPI
 #endif
 
-public struct InterceptorResult<Operation: GraphQLOperation>: Sendable {
+public struct InterceptorResult<Operation: GraphQLOperation>: Sendable, ~Copyable {
   public let response: HTTPURLResponse
-//  public var parsedResult: ParsedResult?
-  public var parsedResultStream: (any AnyAsyncSequence<ParsedResult>)?
+  public internal(set) var parsedResults: ParsedResultStream?
 
   public struct ParsedResult: Sendable {
     public var result: GraphQLResult<Operation.Data>
     public var cacheRecords: RecordSet?
+  }
+
+  public struct ParsedResultStream: Sendable, ~Copyable {
+
+    private let stream: AsyncThrowingStream<ParsedResult, any Error>
+
+    init(stream: AsyncThrowingStream<ParsedResult, any Error>) {
+      self.stream = stream
+    }
+
+    public mutating func map(
+      _ transform: @escaping @Sendable (ParsedResult) async throws -> ParsedResult
+    ) async throws {
+      let stream = self.stream
+
+      let newStream = AsyncThrowingStream { continuation in
+        let task = Task {
+          for try await result in stream {
+            try Task.checkCancellation()
+
+            try await continuation.yield(transform(result))
+          }
+          continuation.finish()
+        }
+
+        continuation.onTermination = { _ in task.cancel() }
+      }
+      self = Self.init(stream: newStream)
+    }
+
+    public consuming func getResults() -> AsyncThrowingStream<ParsedResult, any Error> {
+      return stream
+    }
+
   }
 
   // MARK: - Internal
@@ -22,7 +55,6 @@ public struct InterceptorResult<Operation: GraphQLOperation>: Sendable {
   /// Because `AsyncSequence` elements are consumed when read, any external access to this stream
   /// will result in data loss.
   internal let responseAsyncBytes: URLSession.AsyncBytes
-
 }
 
 #warning("TODO: Wrap RequestChain apis in SPI?")
@@ -32,17 +64,7 @@ public struct InterceptorResult<Operation: GraphQLOperation>: Sendable {
 #warning("TODO: Should this be Sendable or not?")
 public protocol ApolloInterceptor: Sendable {
 
-  /// Used to uniquely identify this interceptor from other interceptors in a request chain.
-  ///
-  /// Each operation request has it's own interceptor request chain so the interceptors do not
-  /// need to be uniquely identifiable between each and every request, only unique between the
-  /// list of interceptors in a single request.
-#warning("Get rid of?")
-//  var id: String { get }
-
-  typealias NextInterceptorFunction<Operation: GraphQLOperation> = @Sendable () async throws -> InterceptorResult<Operation>
-
-//  typealias InterceptorResultStream<Operation: GraphQLOperation> = any AnyAsyncSequence<InterceptorResult<Operation>>
+  typealias NextInterceptorFunction<Operation: GraphQLOperation> = @Sendable (HTTPRequest<Operation>) async throws -> InterceptorResult<Operation>
 
   /// Called when this interceptor should do its work.
   ///
@@ -58,63 +80,28 @@ public protocol ApolloInterceptor: Sendable {
 
 }
 
+
 //
-//public struct InterceptorResultStream<Operation: GraphQLOperation>: Sendable {
+//#warning("TODO: Move to new file; rename??")
+//public protocol AnyAsyncSequence<Element>: AsyncSequence, Sendable {
+//  associatedtype Iterator: AsyncIteratorProtocol where Iterator.Element == Element
 //
-////  public let result: InterceptorResult<Operation>
-//
-//  private let stream: AsyncThrowingStream<InterceptorResult<Operation>, any Error>
-//
-//  init(stream: AsyncThrowingStream<InterceptorResult<Operation>, any Error>) {
-//    self.stream = stream
-//  }
-//
-//  consuming func mapResults(
-//    _ transform: @escaping @Sendable (InterceptorResult<Operation>) async throws -> InterceptorResult<Operation>
-//  ) async throws -> Self {
-//    let stream = self.stream
-//
-//    let newStream = AsyncThrowingStream { continuation in
-//      let task = Task {
-//        for try await result in stream {
-//          try Task.checkCancellation()
-//
-//          try await continuation.yield(transform(result))
-//        }
-//        continuation.finish()
-//      }
-//
-//      continuation.onTermination = { _ in task.cancel() }
-//    }
-//    return Self.init(stream: newStream)
-//  }
-//
-//  consuming func getResults() -> AsyncThrowingStream<InterceptorResult<Operation>, any Error> {
-//    return stream
-//  }
-//
+//  func map<T>(_ transform: @escaping @Sendable (Self.Element) async throws -> T) -> any AnyAsyncSequence<T>
 //}
-
-#warning("TODO: Move to new file; rename??")
-public protocol AnyAsyncSequence<Element>: AsyncSequence, Sendable {
-  associatedtype Iterator: AsyncIteratorProtocol where Iterator.Element == Element
-
-  func map<T>(_ transform: @escaping @Sendable (Self.Element) async throws -> T) -> any AnyAsyncSequence<T>
-}
-
-extension AsyncThrowingStream: AnyAsyncSequence {
-
-  public func map<T>(
-    _ transform: @escaping @Sendable (Element) async throws -> T
-  ) -> any AnyAsyncSequence<T> {
-    self.map(transform) as AsyncThrowingMapSequence<Self, T>
-  }
-}
-
-extension AsyncThrowingMapSequence: AnyAsyncSequence {
-  public func map<T>(
-    _ transform: @escaping @Sendable (Element) async throws -> T
-  ) -> any AnyAsyncSequence<T> {
-    self.map(transform) as AsyncThrowingMapSequence<Self, T>
-  }
-}
+//
+//extension AsyncThrowingStream: AnyAsyncSequence {
+//
+//  public func map<T>(
+//    _ transform: @escaping @Sendable (Element) async throws -> T
+//  ) -> any AnyAsyncSequence<T> {
+//    self.map(transform) as AsyncThrowingMapSequence<Self, T>
+//  }
+//}
+//
+//extension AsyncThrowingMapSequence: AnyAsyncSequence {
+//  public func map<T>(
+//    _ transform: @escaping @Sendable (Element) async throws -> T
+//  ) -> any AnyAsyncSequence<T> {
+//    self.map(transform) as AsyncThrowingMapSequence<Self, T>
+//  }
+//}

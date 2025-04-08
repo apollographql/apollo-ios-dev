@@ -27,6 +27,15 @@ public struct AutomaticPersistedQueryInterceptor: ApolloInterceptor {
   /// Designated initializer
   public init() {}
 
+  actor IsInitialResult {
+    var value = true
+
+    func get() -> Bool {
+      defer { value = false }
+      return value
+    }
+  }
+
   public func intercept<Operation: GraphQLOperation>(
     request: HTTPRequest<Operation>,
     next: NextInterceptorFunction<Operation>
@@ -34,37 +43,44 @@ public struct AutomaticPersistedQueryInterceptor: ApolloInterceptor {
     guard let jsonRequest = request as? JSONRequest,
           jsonRequest.autoPersistQueries else {
       // Not a request that handles APQs, continue along
-      return try await next()
+      return try await next(request)
     }
 
-    let result = try await next()
+    let isInitialResult = IsInitialResult()
 
-    guard let parsedResult = try await result.parsedResultStream?.first(where: { _ in true }) else {
-      throw APQError.noParsedResponse
+    return try await next(request).parsedResults.map { result in
+
+      guard await isInitialResult.get() else {
+        return result
+      }
+
+//      guard let parsedResult = result.parsedResult else {
+//        throw APQError.noParsedResponse
+//      }
+
+      guard let errors = result.result.errors else {
+        // No errors were returned so no retry is necessary, continue along.
+        return result
+      }
+
+      let errorMessages = errors.compactMap { $0.message }
+      guard errorMessages.contains("PersistedQueryNotFound") else {
+        // The errors were not APQ errors, continue along.
+        return result
+      }
+
+      guard !jsonRequest.isPersistedQueryRetry else {
+        // We already retried this and it didn't work.
+        throw APQError.persistedQueryRetryFailed(operationName: Operation.operationName)
+      }
+
+      if Operation.operationDocument.definition == nil {
+        throw APQError.persistedQueryNotFoundForPersistedOnlyQuery(operationName: Operation.operationName)
+      }
+
+      // We need to retry this query with the full body.
+      jsonRequest.isPersistedQueryRetry = true
+      throw RequestChainRetryError()
     }
-
-    guard let errors = parsedResult.result.errors else {
-      // No errors were returned so no retry is necessary, continue along.
-      return result
-    }
-
-    let errorMessages = errors.compactMap { $0.message }
-    guard errorMessages.contains("PersistedQueryNotFound") else {
-      // The errors were not APQ errors, continue along.
-      return result
-    }
-
-    guard !jsonRequest.isPersistedQueryRetry else {
-      // We already retried this and it didn't work.
-      throw APQError.persistedQueryRetryFailed(operationName: Operation.operationName)
-    }
-
-    if Operation.operationDocument.definition == nil {
-      throw APQError.persistedQueryNotFoundForPersistedOnlyQuery(operationName: Operation.operationName)
-    }
-
-    // We need to retry this query with the full body.
-    jsonRequest.isPersistedQueryRetry = true
-    throw RequestChainRetryError()
   }
 }

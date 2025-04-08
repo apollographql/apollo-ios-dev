@@ -23,7 +23,8 @@ public struct DefaultCacheInterceptor: CacheInterceptor {
   public func readCacheData<Query: GraphQLQuery>(
     for query: Query
   ) async throws -> GraphQLResult<Query.Data> {
-    try await store.load(query)
+    try Task.checkCancellation()
+    return try await store.load(query)
   }
 
   public func writeCacheData<Operation: GraphQLOperation>(
@@ -31,6 +32,7 @@ public struct DefaultCacheInterceptor: CacheInterceptor {
     for operation: Operation,
     with result: GraphQLResult<Operation.Data>
   ) async throws {
+    #warning("TODO: need to pass through context identifier. Can we use task local values?")
     try await store.publish(records: cacheRecords)
   }
   
