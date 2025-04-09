@@ -17,6 +17,7 @@ protocol MultipartResponseSpecificationParser {
   ///            action to take on the message, such as a heartbeat message. Successful results
   ///            with a `nil` data value will not be returned to the user.
   static func parse(multipartChunk: String) throws -> JSONObject?
+  #warning("TODO: change this to take in Data? Better performance")
 
 }
 

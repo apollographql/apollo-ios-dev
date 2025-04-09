@@ -39,7 +39,7 @@ public struct AutomaticPersistedQueryInterceptor: ApolloInterceptor {
   public func intercept<Operation: GraphQLOperation>(
     request: HTTPRequest<Operation>,
     next: NextInterceptorFunction<Operation>
-  ) async throws -> InterceptorResult<Operation> {
+  ) async throws -> InterceptorResultStream<Operation> {
     guard let jsonRequest = request as? JSONRequest,
           jsonRequest.autoPersistQueries else {
       // Not a request that handles APQs, continue along
@@ -48,17 +48,17 @@ public struct AutomaticPersistedQueryInterceptor: ApolloInterceptor {
 
     let isInitialResult = IsInitialResult()
 
-    return try await next(request).parsedResults.map { result in
+    return try await next(request).map { result in
 
       guard await isInitialResult.get() else {
         return result
       }
 
-//      guard let parsedResult = result.parsedResult else {
-//        throw APQError.noParsedResponse
-//      }
+      guard let parsedResult = result.parsedResult else {
+        throw APQError.noParsedResponse
+      }
 
-      guard let errors = result.result.errors else {
+      guard let errors = parsedResult.result.errors else {
         // No errors were returned so no retry is necessary, continue along.
         return result
       }
@@ -80,7 +80,7 @@ public struct AutomaticPersistedQueryInterceptor: ApolloInterceptor {
 
       // We need to retry this query with the full body.
       jsonRequest.isPersistedQueryRetry = true
-      throw RequestChainRetryError()
+      throw RequestChainRetry()
     }
   }
 }

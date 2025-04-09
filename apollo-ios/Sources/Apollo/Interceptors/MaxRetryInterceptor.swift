@@ -29,7 +29,7 @@ public actor MaxRetryInterceptor: ApolloInterceptor, Sendable {
   public func intercept<Operation: GraphQLOperation>(
     request: HTTPRequest<Operation>,
     next: NextInterceptorFunction<Operation>
-  ) async throws -> InterceptorResult<Operation> {
+  ) async throws -> InterceptorResultStream<Operation> {
     guard self.hitCount <= self.maxRetries else {
       throw MaxRetriesError(
         count: self.maxRetries,
@@ -38,6 +38,6 @@ public actor MaxRetryInterceptor: ApolloInterceptor, Sendable {
     }
 
     self.hitCount += 1
-    return try await next()
+    return try await next(request)
   }
 }
