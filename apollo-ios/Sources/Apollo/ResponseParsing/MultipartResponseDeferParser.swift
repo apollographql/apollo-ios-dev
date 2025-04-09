@@ -45,7 +45,7 @@ struct MultipartResponseDeferParser: MultipartResponseSpecificationParser {
       #warning("TODO: do we really need to turn the string into data to turn it back into a JSONObject?")
       if
         let data = dataLine.data(using: .utf8),
-        let jsonObject = try? JSONSerializationFormat.deserialize(data: data) as? JSONObject
+        let jsonObject = try? JSONSerializationFormat.deserialize(data: data) as JSONObject
       {
         return .json(object: jsonObject)
       }
@@ -57,31 +57,31 @@ struct MultipartResponseDeferParser: MultipartResponseSpecificationParser {
   static let protocolSpec: String = "deferSpec=20220824"
 
   #warning("TODO: This returns after parsing the first dataLine. This seems like a bug? Do subsequent data lines get ignored?")
-  static func parse(multipartChunk chunk: String) -> Result<JSONObject?, any Error> {
+  static func parse(multipartChunk chunk: String) throws -> JSONObject? {
     for dataLine in chunk.components(separatedBy: Self.dataLineSeparator.description) {
       switch DataLine(dataLine.trimmingCharacters(in: .newlines)) {
       case let .contentHeader(type):
         guard type == "application/json" else {
-          return .failure(ParsingError.unsupportedContentType(type: type))
+          throw ParsingError.unsupportedContentType(type: type)
         }
 
       case let .json(object):
         guard object.isPartialResponse || object.isIncrementalResponse else {
-          return .failure(ParsingError.cannotParsePayloadData)
+          throw ParsingError.cannotParsePayloadData
         }
 
         guard let serialized: Data = try? JSONSerializationFormat.serialize(value: object) else {
-          return .failure(ParsingError.cannotParsePayloadData)
+          throw ParsingError.cannotParsePayloadData
         }
 
-        return .success(object)
+        return object
 
       case .unknown:
-        return .failure(ParsingError.cannotParseChunkData)
+        throw ParsingError.cannotParseChunkData
       }
     }
 
-    return .success(nil)
+    return nil
   }
 }
 
