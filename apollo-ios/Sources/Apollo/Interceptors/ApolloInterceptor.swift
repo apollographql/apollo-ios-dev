@@ -4,7 +4,7 @@ import Combine
 import ApolloAPI
 #endif
 
-public struct InterceptorResult<Operation: GraphQLOperation>: Sendable {
+public struct InterceptorResult<Operation: GraphQLOperation>: Sendable, Equatable {
 
   public let response: HTTPURLResponse
 
@@ -18,7 +18,7 @@ public struct InterceptorResult<Operation: GraphQLOperation>: Sendable {
 
   public var parsedResult: ParsedResult?
 
-  public struct ParsedResult: Sendable {
+  public struct ParsedResult: Sendable, Equatable {
     public let result: GraphQLResult<Operation.Data>
     public let cacheRecords: RecordSet?
   }
@@ -105,28 +105,3 @@ public struct InterceptorResultStream<Operation: GraphQLOperation>: Sendable, ~C
   }
 
 }
-
-//
-//#warning("TODO: Move to new file; rename??")
-//public protocol AnyAsyncSequence<Element>: AsyncSequence, Sendable {
-//  associatedtype Iterator: AsyncIteratorProtocol where Iterator.Element == Element
-//
-//  func map<T>(_ transform: @escaping @Sendable (Self.Element) async throws -> T) -> any AnyAsyncSequence<T>
-//}
-//
-//extension AsyncThrowingStream: AnyAsyncSequence {
-//
-//  public func map<T>(
-//    _ transform: @escaping @Sendable (Element) async throws -> T
-//  ) -> any AnyAsyncSequence<T> {
-//    self.map(transform) as AsyncThrowingMapSequence<Self, T>
-//  }
-//}
-//
-//extension AsyncThrowingMapSequence: AnyAsyncSequence {
-//  public func map<T>(
-//    _ transform: @escaping @Sendable (Element) async throws -> T
-//  ) -> any AnyAsyncSequence<T> {
-//    self.map(transform) as AsyncThrowingMapSequence<Self, T>
-//  }
-//}
