@@ -1,5 +1,4 @@
 import Foundation
-import Combine
 #if !COCOAPODS
 import ApolloAPI
 #endif
@@ -38,8 +37,7 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
     }
   }
 
-  public typealias ParsedResult = (GraphQLResult<Operation.Data>, RecordSet?)
-  typealias ParsedResultStream = AsyncThrowingStream<ParsedResult, any Swift.Error>
+  public typealias ParsedResult = (GraphQLResult<Operation.Data>, RecordSet?)  
 
   let response: HTTPURLResponse
   let operationVariables: Operation.Variables?
@@ -55,93 +53,50 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
     self.includeCacheRecords = includeCacheRecords
   }
 
-  func parsedJSONResultPublisher(
-    byteStream: URLSession.AsyncBytes
-  ) -> AnyPublisher<ParsedResult, any Swift.Error> {
-    let subject = PassthroughSubject<ParsedResult, any Swift.Error>()
+  public func parse(
+    dataChunk: Data,
+    mergingIncrementalItemsInto existingResult: ParsedResult?
+  ) async throws -> ParsedResult? {
+    switch response.isMultipart {
+    case false:
+      return try await parseSingleResponse(data: dataChunk)
 
-    Task {
-      do {
-        defer { subject.send(completion: .finished) }
+    case true:
+      let multipartHeader = response.multipartHeaderComponents
+      guard let boundary = multipartHeader.boundary else {
+        throw Error.missingMultipartBoundary
+      }
+
+      guard
+        let `protocol` = multipartHeader.`protocol`,
+        let parser = multipartParser(forProtocol: `protocol`)
+      else {
+        throw Error.invalidMultipartProtocol
+      }
+
+      guard let chunkString = String(data: dataChunk, encoding: .utf8) else {
+        throw Error.couldNotParseToJSON(data: dataChunk)
+      }
+
+      guard let parsedChunk = try parser.parse(multipartChunk: chunkString) else {
+        return nil
+      }
+
+      if let incrementalParser = parser as? any IncrementalResponseSpecificationParser.Type {
+        return try await executeIncrementalResponses(fromParsedChunk: parsedChunk, mergingIncrementalItemsInto: existingResult)
+
+      } else {
+        let response = try await parseSingleResponse(body: parsedChunk)
         try Task.checkCancellation()
 
-        for try await result in parseJSONtoResults(
-          fromByteStream: byteStream
-        ) {
-          try Task.checkCancellation()
-          subject.send(result)
-        }
-
-      } catch {
-        subject.send(completion: .failure(error))
+        return response
       }
-    }
-
-    return AnyPublisher(subject)
-  }
-
-  func parseJSONtoResults(
-    fromByteStream byteStream: URLSession.AsyncBytes
-  ) -> ParsedResultStream {
-    AsyncThrowingStream { continuation in
-      #warning("Do we need to catch and yield errors inside the Task, or will they throw properly on their own?")
-      let task = Task {
-        switch response.isMultipart {
-        case false:
-          var data = Data()
-          for try await byte in byteStream {
-            data.append(byte)
-          }
-          try Task.checkCancellation()
-
-          let response = try await parseSingleResponse(data: data)
-          try Task.checkCancellation()
-
-          continuation.yield(response)
-
-        case true:
-          let multipartHeader = response.multipartHeaderComponents
-          guard let boundary = multipartHeader.boundary else {
-            throw Error.missingMultipartBoundary
-          }
-
-          guard
-            let `protocol` = multipartHeader.`protocol`,
-            let parser = multipartParser(forProtocol: `protocol`)
-          else {
-            continuation.finish(throwing: Error.invalidMultipartProtocol)
-            return
-          }
-
-          let parsedChunksStream = parseChunksFrom(
-            multipartResponseDataStream: byteStream,
-            withMultipartParser: parser,
-            multipartBoundary: boundary
-          )
-
-          if let incrementalParser = parser as? any IncrementalResponseSpecificationParser.Type {
-            try await executeIncrementalResponses(from: parsedChunksStream, into: continuation)
-
-          } else {
-            for try await chunk in parsedChunksStream {
-              let response = try await parseSingleResponse(body: chunk)
-              try Task.checkCancellation()
-
-              continuation.yield(response)
-            }
-          }
-        }
-
-        continuation.finish()
-      }
-
-      continuation.onTermination = { _ in task.cancel() }
     }
   }
 
   // MARK: - Single Response Parsing
 
-  private func parseSingleResponse(data: Data) async throws -> ParsedResult {
+  public func parseSingleResponse(data: Data) async throws -> ParsedResult {
     guard
       let body = try? JSONSerializationFormat.deserialize(data: data) as JSONObject
     else {
@@ -151,7 +106,7 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
     return try await parseSingleResponse(body: body)
   }
 
-  private func parseSingleResponse(body: JSONObject) async throws -> ParsedResult {
+  public func parseSingleResponse(body: JSONObject) async throws -> ParsedResult {
     let executionHandler = SingleResponseExecutionHandler(
       responseBody: body,
       operationVariables: operationVariables
@@ -160,46 +115,6 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
   }
 
   // MARK: - Multipart Response Parsing
-
-  private func parseChunksFrom(
-    multipartResponseDataStream byteStream: URLSession.AsyncBytes,
-    withMultipartParser parser: any MultipartResponseSpecificationParser.Type,
-    multipartBoundary: String
-  ) -> AsyncThrowingStream<JSONObject, any Swift.Error> {
-    AsyncThrowingStream { continuation in
-      let task = Task {
-        do {
-          var currentChunkString = String()
-
-          for try await line in byteStream.lines {
-            try Task.checkCancellation()
-
-            if line == "--\(multipartBoundary)" {
-              defer { currentChunkString = String() }
-              let chunk = currentChunkString
-
-              if chunk.isEmpty { continue }
-              let chunkData = try parser.parse(multipartChunk: chunk)
-
-              // Some chunks can be successfully parsed but do not require to be passed on to the next
-              // interceptor, such as an HTTP subscription heartbeat message.
-              if let chunkData {
-                continuation.yield(chunkData)
-              }
-
-            } else {
-              currentChunkString.append(line)
-            }
-          }
-
-          continuation.finish()
-        } catch {
-          continuation.finish(throwing: error)
-        }
-      }
-      continuation.onTermination = { _ in task.cancel() }
-    }
-  }
 
   private func multipartParser(
     forProtocol protocol: String
@@ -216,43 +131,37 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
   }
 
   private func executeIncrementalResponses(
-    from parsedChunksStream: AsyncThrowingStream<JSONObject, any Swift.Error>,
-    into resultStreamContinuation: AsyncThrowingStream<ParsedResult, any Swift.Error>.Continuation
-  ) async throws {
-    var currentResult: GraphQLResult<Operation.Data>!
-    var currentCacheRecords: RecordSet?
+    fromParsedChunk chunk: JSONObject,
+    mergingIncrementalItemsInto existingResult: ParsedResult?
+  ) async throws -> ParsedResult {
+    try Task.checkCancellation()
 
-    for try await chunk in parsedChunksStream {
+    guard let existingResult else {
+      // Parse initial incremental chunk
+      return try await parseSingleResponse(body: chunk)
+    }
+
+    guard let incrementalItems = chunk["incremental"] as? [JSONObject] else {
+      throw Error.couldNotParseIncrementalJSON(json: chunk)
+    }
+
+    var currentResult = existingResult.0
+    var currentCacheRecords = existingResult.1
+
+    for item in incrementalItems {
+      let (incrementalResult, incrementalCacheRecords) = try await executeIncrementalItem(
+        itemBody: item
+      )
       try Task.checkCancellation()
 
-      if currentResult == nil {
-        // Parse initial incremental chunk
-        (currentResult, currentCacheRecords) = try await parseSingleResponse(body: chunk)
-        try Task.checkCancellation()
+      currentResult = try currentResult.merging(incrementalResult)
 
-        resultStreamContinuation.yield((currentResult, currentCacheRecords))
-        continue
+      if let incrementalCacheRecords {
+        currentCacheRecords?.merge(records: incrementalCacheRecords)
       }
-
-      guard let incrementalItems = chunk["incremental"] as? [JSONObject] else {
-        throw Error.couldNotParseIncrementalJSON(json: chunk)
-      }
-
-      for item in incrementalItems {
-        let (incrementalResult, incrementalCacheRecords) = try await executeIncrementalItem(
-          itemBody: item
-        )
-        try Task.checkCancellation()
-
-        currentResult = try currentResult.merging(incrementalResult)
-
-        if let incrementalCacheRecords {
-          currentCacheRecords?.merge(records: incrementalCacheRecords)
-        }
-      }
-
-      resultStreamContinuation.yield((currentResult, currentCacheRecords))
     }
+
+    return (currentResult, currentCacheRecords)
   }
 
   private func executeIncrementalItem(
@@ -266,10 +175,4 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
     return try await incrementalExecutionHandler.execute(includeCacheRecords: includeCacheRecords)
   }
 
-}
-
-// MARK: - Helper Extensions
-
-fileprivate extension String {
-  var isBoundaryMarker: Bool { self == "--" }
 }
