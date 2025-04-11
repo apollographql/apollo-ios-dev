@@ -5,7 +5,13 @@ import ApolloAPI
 
 #warning("TODO: Implement retrying based on catching error")
 #warning("TODO: add optional underlying error property to retry error")
-public struct RequestChainRetry: Swift.Error { }
+public struct RequestChainRetry: Swift.Error {
+  public let underlyingError: (any Swift.Error)?
+
+  public init(underlyingError: (any Error)? = nil) {
+    self.underlyingError = underlyingError
+  }
+}
 
 struct RequestChain<Operation: GraphQLOperation>: Sendable {
 
@@ -86,7 +92,7 @@ struct RequestChain<Operation: GraphQLOperation>: Sendable {
     continuation: ResultStream.Continuation
   ) async throws {
 
-    var next: @Sendable (HTTPRequest<Operation>) async throws -> InterceptorResult<Operation> = { request in
+    var next: @Sendable (HTTPRequest<Operation>) async throws -> InterceptorResultStream<Operation> = { request in
       try await executeNetworkFetch(request: request)
     }
 
@@ -103,20 +109,33 @@ struct RequestChain<Operation: GraphQLOperation>: Sendable {
 
   private func executeNetworkFetch(
     request: HTTPRequest<Operation>
-  ) async throws -> InterceptorResult<Operation> {
+  ) async throws -> InterceptorResultStream<Operation> {
     let urlRequest = try request.toURLRequest()
 
-    let (bytes, response) = try await urlSession.bytes(for: urlRequest, delegate: nil)
 
-    guard let response = response as? HTTPURLResponse else {
-      preconditionFailure()
-      #warning("Throw error instead of precondition failure? Look into if it is possible for this to even occur.")
-    }
+    return InterceptorResultStream(stream: AsyncThrowingStream { continuation in
+      let task = Task {
+        let (bytes, response) = try await urlSession.bytes(for: urlRequest, delegate: nil)
 
-    return InterceptorResult(
-      response: response,
-      responseAsyncBytes: bytes
-    )
+        guard let response = response as? HTTPURLResponse else {
+          preconditionFailure()
+#warning("Throw error instead of precondition failure? Look into if it is possible for this to even occur.")
+        }
+
+        for try await chunk in bytes.chunks {
+          continuation.yield(
+            InterceptorResult(
+              response: response,
+              rawResponseChunk: chunk
+            )
+          )
+        }
+
+        continuation.finish()
+      }
+
+      continuation.onTermination = { _ in task.cancel() }
+    })
   }
 
 

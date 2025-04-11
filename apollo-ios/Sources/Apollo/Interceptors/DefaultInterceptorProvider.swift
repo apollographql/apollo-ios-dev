@@ -32,6 +32,12 @@ open class DefaultInterceptorProvider: InterceptorProvider {
     }
   }
 
+  public func urlSession<Operation: GraphQLOperation>(
+    for operation: Operation
+  ) -> any ApolloURLSession {
+    session
+  }
+
   open func interceptors<Operation: GraphQLOperation>(
     for operation: Operation
   ) -> [any ApolloInterceptor] {
@@ -49,7 +55,9 @@ open class DefaultInterceptorProvider: InterceptorProvider {
     DefaultCacheInterceptor(store: self.store)
   }
 
-  open func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
+  open func errorInterceptor<Operation: GraphQLOperation>(
+    for operation: Operation
+  ) -> (any ApolloErrorInterceptor)? {
     return nil
   }
 }
