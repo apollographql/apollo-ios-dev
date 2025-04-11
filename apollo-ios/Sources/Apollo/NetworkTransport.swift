@@ -15,17 +15,13 @@ public protocol NetworkTransport: AnyObject {
   ///   - cachePolicy: The `CachePolicy` to use making this request.
   ///   - contextIdentifier:  [optional] A unique identifier for this request, to help with deduping cache hits for watchers. Defaults to `nil`.
   ///   - context: [optional] A context that is being passed through the request chain. Defaults to `nil`.
-  ///   - callbackQueue: The queue to call back on with the results. Should default to `.main`.
-  ///   - completionHandler: A closure to call when a request completes. On `success` will contain the response received from the server. On `failure` will contain the error which occurred.
-  /// - Returns: An object that can be used to cancel an in progress request.
+  /// - Returns: A stream of `GraphQLResult`s for each response.
   func send<Operation: GraphQLOperation>(
     operation: Operation,
     cachePolicy: CachePolicy,
     contextIdentifier: UUID?,
-    context: (any RequestContext)?,
-    callbackQueue: DispatchQueue,
-    completionHandler: @escaping GraphQLResultHandler<Operation.Data>
-  ) -> any Cancellable
+    context: (any RequestContext)?
+  ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error>
 
   /// The name of the client to send as a header value.
   var clientName: String { get }
@@ -104,14 +100,10 @@ public protocol UploadingNetworkTransport: NetworkTransport {
   ///   - operation: The operation to send
   ///   - files: An array of `GraphQLFile` objects to send.
   ///   - context: [optional] A context that is being passed through the request chain.
-  ///   - callbackQueue: The queue to call back on with the results. Should default to `.main`.
-  ///   - completionHandler: The completion handler to execute when the request completes or errors
-  /// - Returns: An object that can be used to cancel an in progress request.
+  /// - Returns: A stream of `GraphQLResult`s for each response.
   func upload<Operation: GraphQLOperation>(
     operation: Operation,
     files: [GraphQLFile],
-    context: (any RequestContext)?,
-    callbackQueue: DispatchQueue,
-    completionHandler: @escaping GraphQLResultHandler<Operation.Data>
-  ) -> any Cancellable
+    context: (any RequestContext)?
+  ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error>
 }
