@@ -3,6 +3,7 @@ import Foundation
 import ApolloAPI
 #endif
 
+#warning("TODO: Reconsider design of this. Should this be constructing the request? Do we even need it?")
 /// An implementation of `NetworkTransport` which creates a `RequestChain` object
 /// for each item sent through it.
 open class RequestChainNetworkTransport: NetworkTransport {
@@ -120,33 +121,32 @@ open class RequestChainNetworkTransport: NetworkTransport {
   
   public var clientName = RequestChainNetworkTransport.defaultClientName
   public var clientVersion = RequestChainNetworkTransport.defaultClientVersion
-  
+
   public func send<Operation: GraphQLOperation>(
     operation: Operation,
-    cachePolicy: CachePolicy = .default,
-    contextIdentifier: UUID? = nil,
-    context: (any RequestContext)? = nil,
-    callbackQueue: DispatchQueue = .main,
-    completionHandler: @escaping @Sendable (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Cancellable {
-
-    let chain = makeChain(operation: operation, callbackQueue: callbackQueue)
+    cachePolicy: CachePolicy,
+    contextIdentifier: UUID?,
+    context: (any RequestContext)?
+  ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+    let chain = makeChain(operation: operation)
     let request = self.constructRequest(
       for: operation,
       cachePolicy: cachePolicy,
       contextIdentifier: contextIdentifier,
       context: context)
     
-    chain.kickoff(request: request, completion: completionHandler)
-    return chain
+    return chain.kickoff(request: request)
   }
 
   private func makeChain<Operation: GraphQLOperation>(
     operation: Operation,
-    callbackQueue: DispatchQueue = .main
-  ) -> any RequestChain {
-    let interceptors = self.interceptorProvider.interceptors(for: operation)
-    let chain = InterceptorRequestChain(interceptors: interceptors, callbackQueue: callbackQueue)
-    chain.additionalErrorHandler = self.interceptorProvider.additionalErrorInterceptor(for: operation)
+  ) -> RequestChain<Operation> {
+    let chain = RequestChain<Operation>(
+      urlSession: interceptorProvider.urlSession(for: operation),
+      interceptors: interceptorProvider.interceptors(for: operation),
+      cacheInterceptor: interceptorProvider.cacheInterceptor(for: operation),
+      errorInterceptor: interceptorProvider.errorInterceptor(for: operation)
+    )
     return chain
   }
   
@@ -184,14 +184,10 @@ extension RequestChainNetworkTransport: UploadingNetworkTransport {
   public func upload<Operation: GraphQLOperation>(
     operation: Operation,
     files: [GraphQLFile],
-    context: (any RequestContext)?,
-    callbackQueue: DispatchQueue = .main,
-    completionHandler: @escaping GraphQLResultHandler<Operation.Data>
-  ) -> any Cancellable {
-
+    context: (any RequestContext)?
+  ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
     let request = self.constructUploadRequest(for: operation, with: files, context: context)
-    let chain = makeChain(operation: operation, callbackQueue: callbackQueue)
-    chain.kickoff(request: request, completion: completionHandler)
-    return chain
+    let chain = makeChain(operation: operation)
+    return chain.kickoff(request: request)
   }
 }
