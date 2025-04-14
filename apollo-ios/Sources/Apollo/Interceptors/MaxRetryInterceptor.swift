@@ -3,7 +3,6 @@ import Foundation
 import ApolloAPI
 #endif
 
-#warning("TODO: remove unchecked when making interceptor functions async.")
 /// An interceptor to enforce a maximum number of retries of any `HTTPRequest`
 public actor MaxRetryInterceptor: ApolloInterceptor, Sendable {
 

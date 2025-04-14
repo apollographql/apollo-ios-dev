@@ -18,7 +18,11 @@ public protocol CacheInterceptor: Sendable {
 
 public struct DefaultCacheInterceptor: CacheInterceptor {
 
-  let store: ApolloStore
+  public let store: ApolloStore
+
+  public init(store: ApolloStore) {
+    self.store = store
+  }
 
   public func readCacheData<Query: GraphQLQuery>(
     for query: Query

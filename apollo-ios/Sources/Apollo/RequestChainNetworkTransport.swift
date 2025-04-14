@@ -113,9 +113,9 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
   public func send<Operation: GraphQLOperation>(
     operation: Operation,
     cachePolicy: CachePolicy,
-    contextIdentifier: UUID?,
-    context: (any RequestContext)?
-  ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+    contextIdentifier: UUID? = nil,
+    context: (any RequestContext)? = nil
+  ) throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
     let request = self.constructRequest(
       for: operation,
       cachePolicy: cachePolicy,

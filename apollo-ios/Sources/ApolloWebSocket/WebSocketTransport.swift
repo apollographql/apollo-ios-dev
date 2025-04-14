@@ -451,7 +451,7 @@ extension WebSocketTransport: NetworkTransport {
     cachePolicy: CachePolicy,
     contextIdentifier: UUID? = nil,
     context: (any RequestContext)? = nil
-  ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+  ) throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
     if let error = self.error {
       return AsyncThrowingStream.init {
         throw error
