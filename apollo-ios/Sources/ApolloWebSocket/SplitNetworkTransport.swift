@@ -53,15 +53,15 @@ extension SplitNetworkTransport: NetworkTransport {
     cachePolicy: CachePolicy,
     contextIdentifier: UUID? = nil,
     context: (any RequestContext)? = nil
-  ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+  ) throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
     if Operation.operationType == .subscription {
-      return try await webSocketNetworkTransport.send(
+      return try webSocketNetworkTransport.send(
         operation: operation,
         cachePolicy: cachePolicy,
         contextIdentifier: contextIdentifier,
         context: context)
     } else {
-      return try await uploadingNetworkTransport.send(
+      return try uploadingNetworkTransport.send(
         operation: operation,
         cachePolicy: cachePolicy,
         contextIdentifier: contextIdentifier,

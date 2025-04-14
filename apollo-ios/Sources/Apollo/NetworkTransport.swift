@@ -21,7 +21,7 @@ public protocol NetworkTransport: AnyObject, Sendable {
     cachePolicy: CachePolicy,
     contextIdentifier: UUID?,
     context: (any RequestContext)?
-  ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error>
+  ) throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error>
 
 }
 
