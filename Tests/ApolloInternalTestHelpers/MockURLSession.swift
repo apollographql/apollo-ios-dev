@@ -6,7 +6,7 @@ public struct MockURLSession: ApolloURLSession {
 
   public let session: URLSession
 
-  public init<T: MockResponseProvider>(requestProvider: T.Type) {
+  public init<T: MockResponseProvider>(responseProvider: T.Type) {
     let configuration = URLSessionConfiguration.ephemeral
     configuration.protocolClasses = [MockURLProtocol<T>.self]
     session = URLSession(configuration: configuration)
@@ -19,7 +19,7 @@ public struct MockURLSession: ApolloURLSession {
     return try await session.bytes(for: request, delegate: delegate)
   }
 
-  public func invalidateAndCancel() {
+  public func invalidateAndCancel() {	
     session.invalidateAndCancel()
   }
 }

@@ -11,8 +11,8 @@ public actor MaxRetryInterceptor: ApolloInterceptor, Sendable {
   private var hitCount = 0
   
   public struct MaxRetriesError: Error, LocalizedError {
-    let count: Int
-    let operationName: String
+    public let count: Int
+    public let operationName: String
 
     public var errorDescription: String? {
       return "The maximum number of retries (\(count)) was hit without success for operation \"\(operationName)\"."

@@ -26,7 +26,9 @@ public protocol InterceptorProvider {
 
 public extension InterceptorProvider {
   
-  func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
+  func errorInterceptor<Operation: GraphQLOperation>(
+    for operation: Operation
+  ) -> (any ApolloErrorInterceptor)? {
     return nil
   }
 }
