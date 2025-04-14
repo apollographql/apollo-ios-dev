@@ -4,8 +4,12 @@ import Apollo
 import ApolloAPI
 #endif
 
+#warning("""
+TODO: This is messy. Why is http network transport called "uploadingNetworkTransport"?
+Websocket transport should be typesafe to a protocol that guaruntees it supports web sockets/ subscriptions
+""")
 /// A network transport that sends subscriptions using one `NetworkTransport` and other requests using another `NetworkTransport`. Ideal for sending subscriptions via a web socket but everything else via HTTP.
-public class SplitNetworkTransport {
+public final class SplitNetworkTransport: Sendable {
   private let uploadingNetworkTransport: any UploadingNetworkTransport
   private let webSocketNetworkTransport: any NetworkTransport
 
@@ -48,24 +52,20 @@ extension SplitNetworkTransport: NetworkTransport {
     operation: Operation,
     cachePolicy: CachePolicy,
     contextIdentifier: UUID? = nil,
-    context: (any RequestContext)? = nil,
-    callbackQueue: DispatchQueue = .main,
-    completionHandler: @escaping GraphQLResultHandler<Operation.Data>
-  ) -> any Cancellable {
+    context: (any RequestContext)? = nil
+  ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
     if Operation.operationType == .subscription {
-      return webSocketNetworkTransport.send(operation: operation,
-                                            cachePolicy: cachePolicy,
-                                            contextIdentifier: contextIdentifier,
-                                            context: context,
-                                            callbackQueue: callbackQueue,
-                                            completionHandler: completionHandler)
+      return try await webSocketNetworkTransport.send(
+        operation: operation,
+        cachePolicy: cachePolicy,
+        contextIdentifier: contextIdentifier,
+        context: context)
     } else {
-      return uploadingNetworkTransport.send(operation: operation,
-                                            cachePolicy: cachePolicy,
-                                            contextIdentifier: contextIdentifier,
-                                            context: context,
-                                            callbackQueue: callbackQueue,
-                                            completionHandler: completionHandler)
+      return try await uploadingNetworkTransport.send(
+        operation: operation,
+        cachePolicy: cachePolicy,
+        contextIdentifier: contextIdentifier,
+        context: context)
     }
   }
 }
@@ -77,14 +77,12 @@ extension SplitNetworkTransport: UploadingNetworkTransport {
   public func upload<Operation: GraphQLOperation>(
     operation: Operation,
     files: [GraphQLFile],
-    context: (any RequestContext)?,
-    callbackQueue: DispatchQueue = .main,
-    completionHandler: @escaping GraphQLResultHandler<Operation.Data>
-  ) -> any Cancellable {
-    return uploadingNetworkTransport.upload(operation: operation,
-                                            files: files,
-                                            context: context,
-                                            callbackQueue: callbackQueue,
-                                            completionHandler: completionHandler)
+    context: (any RequestContext)?
+  ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+    return try await uploadingNetworkTransport.upload(
+      operation: operation,
+      files: files,
+      context: context
+    )
   }
 }
