@@ -1,28 +1,26 @@
 import XCTest
 @testable import Apollo
+import Nimble
 import ApolloInternalTestHelpers
 
-class URLSessionClientTests: XCTestCase {
-  
-  var client: URLSessionClient!
+class URLSessionClientTests: XCTestCase, MockResponseProvider {
+
+  var session: MockURLSession!
   var sessionConfiguration: URLSessionConfiguration!
 
   @MainActor
   override func setUp() {
     super.setUp()
 
-    Self.testObserver.start()
-
-    sessionConfiguration = URLSessionConfiguration.default
-    sessionConfiguration.protocolClasses = [MockURLProtocol<Self>.self]
-    client = URLSessionClient(sessionConfiguration: sessionConfiguration)
+    session = MockURLSession(requestProvider: Self.self)
   }
 
-  override func tearDown() {
-    client = nil
+  override func tearDown() async throws {
+    await Self.cleanUpRequestHandlers()
+    session = nil
     sessionConfiguration = nil
 
-    super.tearDown()
+    try await super.tearDown()
   }
   
   private func request(
@@ -31,14 +29,14 @@ class URLSessionClientTests: XCTestCase {
     statusCode: Int,
     httpVersion: String? = nil,
     headerFields: [String: String]? = nil
-  ) -> URLRequest {
+  ) async -> URLRequest {
     let request = URLRequest(
       url: url,
       cachePolicy: .reloadIgnoringCacheData,
       timeoutInterval: 10
     )
 
-    Self.requestHandlers[url] = { request in
+    await Self.registerRequestHandler(for: url) { request in
       guard let requestURL = request.url else {
         throw URLError(.badURL)
       }
@@ -50,41 +48,34 @@ class URLSessionClientTests: XCTestCase {
         headerFields: headerFields
       )
 
-      return .success((response!, responseData))
+      return (response!, responseData)
     }
     
     return request
   }
   
-  func test__request__basicGet() {
+  func test__request__basicGet() async throws {
     let url = URL(string: "http://www.test.com/basicget")!
     let stringResponse = "Basic GET Response Data"
-    let request = self.request(
+    let request = await self.request(
       for: url,
       responseData: stringResponse.data(using: .utf8),
       statusCode: 200
     )
 
-    let expectation = self.expectation(description: "Basic GET request completed")
+    let (dataStream, response) = try await self.session.bytes(for: request, delegate: nil)
 
-    self.client.sendRequest(request) { result in
-      defer {
-        expectation.fulfill()
-      }
-      
-      switch result {
-      case .failure(let error):
-        XCTFail("Unexpected error: \(error)")
+    XCTAssertEqual(request.url, response.url)
+    XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
 
-      case .success(let (data, httpResponse)):
-        XCTAssertFalse(data.isEmpty)
-        XCTAssertEqual(String(data: data, encoding: .utf8), stringResponse)
-        XCTAssertEqual(request.url, httpResponse.url)
-        XCTAssertEqual(httpResponse.statusCode, 200)
-      }
+    var chunkCount = 0
+    for try await chunk in dataStream.chunks {
+      chunkCount += 1
+      expect(chunk).toNot(beEmpty())
+      expect(String(data: chunk, encoding: .utf8)).to(equal(stringResponse))
     }
-    
-    self.wait(for: [expectation], timeout: 5)
+
+    expect(chunkCount).to(equal(1))
   }
   
   func test__request__gettingImage() {
@@ -334,7 +325,7 @@ class URLSessionClientTests: XCTestCase {
   
   func test__request__sessionDescription() {
     // Should be nil by default.
-    XCTAssertNil(client.session.sessionDescription)
+    XCTAssertNil(session.session.sessionDescription)
             
     // Should set the sessionDescription of the URLSession.
     let expected = "test description"
@@ -580,16 +571,4 @@ class URLSessionClientTests: XCTestCase {
 
     self.wait(for: [expectation], timeout: 1)
   }
-}
-
-// MARK: - MockRequestProvider Conformance
-
-extension URLSessionClientTests: MockRequestProvider {
-
-  @MainActor
-  private static let testObserver = TestObserver() { _ in
-    requestHandlers = [:]
-  }
-  
-  public static var requestHandlers = [URL: MockRequestHandler]()
 }
