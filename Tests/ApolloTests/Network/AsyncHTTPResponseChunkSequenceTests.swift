@@ -12,7 +12,7 @@ class AsyncHTTPResponseChunkSequenceTests: XCTestCase, MockResponseProvider {
   override func setUp() {
     super.setUp()
 
-    session = MockURLSession(requestProvider: Self.self)
+    session = MockURLSession(responseProvider: Self.self)
   }
 
   override func tearDown() async throws {
