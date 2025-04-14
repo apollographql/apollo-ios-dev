@@ -449,49 +449,48 @@ extension WebSocketTransport: NetworkTransport {
     operation: Operation,
     cachePolicy: CachePolicy,
     contextIdentifier: UUID? = nil,
-    context: (any RequestContext)? = nil,
-    callbackQueue: DispatchQueue = .main,
-    completionHandler: @escaping @Sendable (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Cancellable {
+    context: (any RequestContext)? = nil
+  ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+    if let error = self.error {
+      return AsyncThrowingStream.init {
+        throw error
+      }
+    }
 
-      @Sendable func callCompletion(with result: Result<GraphQLResult<Operation.Data>, any Error>) {
-        callbackQueue.async {
-          completionHandler(result)
+    #warning("TODO: stream never finishes. WebSocketTask does not report subscription termination.")
+    return AsyncThrowingStream { continuation in
+      let task = WebSocketTask(self, operation) { [weak store, contextIdentifier] result in
+        Task {
+          try Task.checkCancellation()
+
+          let jsonBody = try result.get()
+          let response = GraphQLResponse(operation: operation, body: jsonBody)
+
+          if let store = store {
+            let (graphQLResult, parsedRecords) = try await response.parseResult()
+
+            try Task.checkCancellation()
+
+            guard let records = parsedRecords else {
+              continuation.yield(graphQLResult)
+              return
+            }
+
+            try await store.publish(records: records, identifier: contextIdentifier)
+            continuation.yield(graphQLResult)
+
+          } else {
+            let graphQLResult = try await response.parseResultFast()
+            try Task.checkCancellation()
+
+            continuation.yield(graphQLResult)
+          }
         }
       }
 
-      if let error = self.error {
-        callCompletion(with: .failure(error))
-        return EmptyCancellable()
-      }
-
-      return WebSocketTask(self, operation) { [weak store, contextIdentifier] result in
-        Task {
-          do {
-            let jsonBody = try result.get()
-            let response = GraphQLResponse(operation: operation, body: jsonBody)
-            
-            if let store = store {
-              let (graphQLResult, parsedRecords) = try await response.parseResult()
-              guard let records = parsedRecords else {
-                callCompletion(with: .success(graphQLResult))
-                return
-              }
-              
-              try await store.publish(records: records, identifier: contextIdentifier)
-              
-              callCompletion(with: .success(graphQLResult))
-              
-            } else {
-              let graphQLResult = try await response.parseResultFast()
-              callCompletion(with: .success(graphQLResult))
-            }
-            
-          } catch {
-            callCompletion(with: .failure(error))
-          }
-        }        
-      }
+      continuation.onTermination = { _ in task.cancel() }
     }
+  }
 }
 
 // MARK: - WebSocketDelegate implementation

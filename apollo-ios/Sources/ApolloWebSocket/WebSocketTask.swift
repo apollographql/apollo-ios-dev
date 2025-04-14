@@ -5,7 +5,7 @@ import ApolloAPI
 import Foundation
 
 /// A task to wrap sending/canceling operations over a websocket.
-final class WebSocketTask<Operation: GraphQLOperation>: Cancellable {
+final class WebSocketTask<Operation: GraphQLOperation>: Sendable, Cancellable {
   let sequenceNumber : String?
   let transport: WebSocketTransport
 
