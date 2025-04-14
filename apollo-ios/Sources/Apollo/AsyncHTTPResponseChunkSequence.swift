@@ -26,7 +26,7 @@ public struct AsyncHTTPResponseChunkSequence: AsyncSequence {
       return nil
     }
 
-    return response.multipartHeaderComponents?.boundary
+    return response.multipartHeaderComponents.boundary
   }
 
   public struct AsyncIterator: AsyncIteratorProtocol {
@@ -51,12 +51,12 @@ public struct AsyncHTTPResponseChunkSequence: AsyncSequence {
         buffer.append(next)
 
         if let boundary,
-            let boundaryRange = buffer.range(of: boundary, options: [.anchored, .backwards]) {
+           let boundaryRange = buffer.range(of: boundary, options: [.anchored, .backwards]) {
           buffer.removeSubrange(boundaryRange)
           return buffer
         }
       }
-
+      
       return buffer
     }
   }
