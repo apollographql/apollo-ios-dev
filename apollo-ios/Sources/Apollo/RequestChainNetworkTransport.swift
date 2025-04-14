@@ -3,10 +3,13 @@ import Foundation
 import ApolloAPI
 #endif
 
-#warning("TODO: Reconsider design of this. Should this be constructing the request? Do we even need it?")
+#warning("""
+TODO: Reconsider design of this. Should this be constructing the request? Do we even need it?
+can we stop this being an open class? If not, it's currently unchecked, can we verify that its correct.
+""")
 /// An implementation of `NetworkTransport` which creates a `RequestChain` object
 /// for each item sent through it.
-open class RequestChainNetworkTransport: NetworkTransport {
+open class RequestChainNetworkTransport: NetworkTransport, @unchecked Sendable {
 
   /// The interceptor provider to use when constructing a request chain
   let interceptorProvider: any InterceptorProvider
