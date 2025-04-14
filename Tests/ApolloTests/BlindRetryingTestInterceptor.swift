@@ -3,20 +3,18 @@ import Apollo
 import ApolloAPI
 
 // An interceptor which blindly retries every time it receives a request. 
-class BlindRetryingTestInterceptor: ApolloInterceptor {
+class BlindRetryingTestInterceptor: ApolloInterceptor, @unchecked Sendable {
   var hitCount = 0
   private(set) var hasBeenCancelled = false
 
   public var id: String = UUID().uuidString
 
-  func interceptAsync<Operation: GraphQLOperation>(
-    chain: any RequestChain,
+  func intercept<Operation: GraphQLOperation>(
     request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
+    next: NextInterceptorFunction<Operation>
+  ) async throws -> InterceptorResultStream<Operation> {
     self.hitCount += 1
-    chain.retry(request: request,
-                completion: completion)
+    throw RequestChainRetry()
   }
   
   // Purposely not adhering to `Cancellable` here to make sure non `Cancellable` interceptors don't have this called.
