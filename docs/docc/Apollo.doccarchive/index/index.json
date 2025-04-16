@@ -3486,6 +3486,16 @@
                     "type" : "case"
                   },
                   {
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/invalidmultipartprotocol",
+                    "title" : "case invalidMultipartProtocol",
+                    "type" : "case"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/missingmultipartboundary",
+                    "title" : "case missingMultipartBoundary",
+                    "type" : "case"
+                  },
+                  {
                     "path" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/noresponsetoparse",
                     "title" : "case noResponseToParse",
                     "type" : "case"
