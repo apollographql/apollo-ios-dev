@@ -933,7 +933,7 @@
         "type" : "text"
       },
       {
-        "code" : "JSONEncodable",
+        "code" : "AnyScalarType",
         "type" : "codeVoice"
       },
       {

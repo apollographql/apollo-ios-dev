@@ -1,7 +1,15 @@
 {
   "abstract" : [
     {
-      "text" : "A marker protocol to set up an object to pass through the request chain.",
+      "text" : "A request context specialization protocol that specifies options for configuring the timeout of a ",
+      "type" : "text"
+    },
+    {
+      "code" : "URLRequest",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
       "type" : "text"
     }
   ],
@@ -14,11 +22,11 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestContext"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestContextTimeoutConfigurable"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo14RequestContextP",
+    "externalID" : "s:6Apollo33RequestContextTimeoutConfigurableP",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -30,7 +38,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "RequestContext"
+        "text" : "RequestContextTimeoutConfigurable"
       }
     ],
     "modules" : [
@@ -41,13 +49,13 @@
     "navigatorTitle" : [
       {
         "kind" : "identifier",
-        "text" : "RequestContext"
+        "text" : "RequestContextTimeoutConfigurable"
       }
     ],
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",
-    "title" : "RequestContext"
+    "title" : "RequestContextTimeoutConfigurable"
   },
   "primaryContentSections" : [
     {
@@ -70,6 +78,16 @@
             },
             {
               "kind" : "identifier",
+              "text" : "RequestContextTimeoutConfigurable"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestContext",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo14RequestContextP",
               "text" : "RequestContext"
             }
           ]
@@ -88,16 +106,23 @@
         {
           "inlineContent" : [
             {
-              "text" : "Used to allow additional context-specific information to pass the length of the request chain.",
+              "text" : "A ",
               "type" : "text"
-            }
-          ],
-          "type" : "paragraph"
-        },
-        {
-          "inlineContent" : [
+            },
             {
-              "text" : "This allows the various interceptors to make modifications, or perform actions, with information",
+              "code" : "RequestContext",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " object can conform to this protocol to provide a custom ",
+              "type" : "text"
+            },
+            {
+              "code" : "requestTimeout",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " for an individual request.",
               "type" : "text"
             },
             {
@@ -105,7 +130,23 @@
               "type" : "text"
             },
             {
-              "text" : "that they cannot get just from the existing operation. It can be anything that conforms to this protocol.",
+              "text" : "If the ",
+              "type" : "text"
+            },
+            {
+              "code" : "RequestContext",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " for a request does not conform to this protocol, the default request timeout of ",
+              "type" : "text"
+            },
+            {
+              "code" : "URLRequest",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " will be used.",
               "type" : "text"
             }
           ],
@@ -118,11 +159,11 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestContextTimeoutConfigurable"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestContext"
       ],
       "kind" : "relationships",
-      "title" : "Inherited By",
-      "type" : "inheritedBy"
+      "title" : "Inherits From",
+      "type" : "inheritsFrom"
     }
   ],
   "schemaVersion" : {
@@ -133,10 +174,18 @@
   "sections" : [
 
   ],
+  "topicSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestContextTimeoutConfigurable\/requestTimeout"
+      ],
+      "title" : "Instance Properties"
+    }
+  ],
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/requestcontext"
+        "\/documentation\/apollo\/requestcontexttimeoutconfigurable"
       ],
       "traits" : [
         {
@@ -236,6 +285,52 @@
   "title" : "RequestContextTimeoutConfigurable",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestcontexttimeoutconfigurable"
+},
+"doc://Apollo/documentation/Apollo/RequestContextTimeoutConfigurable/requestTimeout": {
+  "abstract" : [
+    {
+      "text" : "The timeout interval specifies the limit on the idle interval allotted to a request in the process of",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "loading. This timeout interval is measured in seconds.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "requestTimeout"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:@T@NSTimeInterval",
+      "text" : "TimeInterval"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestContextTimeoutConfigurable\/requestTimeout",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "requestTimeout",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestcontexttimeoutconfigurable\/requesttimeout"
 }
 }
 }

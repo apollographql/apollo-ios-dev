@@ -45,7 +45,7 @@ final class MultipartResponseParsingInterceptorTests: XCTestCase {
 
       expect(result).to(beFailure { error in
         expect(error).to(
-          matchError(MultipartResponseParsingInterceptor.ParsingError.cannotParseResponse)
+          matchError(MultipartResponseParsingInterceptor.ParsingError.missingMultipartBoundary)
         )
       })
     }
@@ -53,7 +53,7 @@ final class MultipartResponseParsingInterceptorTests: XCTestCase {
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
-  func test__error__givenResponse_withMissingMultipartProtocolHeader_shouldReturnError() throws {
+  func test__error__givenResponse_withMissingMultipartProtocolSpecifier_shouldReturnError() throws {
     let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
 
     let expectation = expectation(description: "Received callback")
@@ -68,7 +68,7 @@ final class MultipartResponseParsingInterceptorTests: XCTestCase {
 
       expect(result).to(beFailure { error in
         expect(error).to(
-          matchError(MultipartResponseParsingInterceptor.ParsingError.cannotParseResponse)
+          matchError(MultipartResponseParsingInterceptor.ParsingError.invalidMultipartProtocol)
         )
       })
     }
@@ -76,7 +76,7 @@ final class MultipartResponseParsingInterceptorTests: XCTestCase {
     wait(for: [expectation], timeout: defaultTimeout)
   }
 
-  func test__error__givenResponse_withUnknownMultipartParser_shouldReturnError() throws {
+  func test__error__givenResponse_withUnknownMultipartProtocolSpecifier_shouldReturnError() throws {
     let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
 
     let expectation = expectation(description: "Received callback")
@@ -91,7 +91,7 @@ final class MultipartResponseParsingInterceptorTests: XCTestCase {
 
       expect(result).to(beFailure { error in
         expect(error).to(
-          matchError(MultipartResponseParsingInterceptor.ParsingError.cannotParseResponse)
+          matchError(MultipartResponseParsingInterceptor.ParsingError.invalidMultipartProtocol)
         )
       })
     }

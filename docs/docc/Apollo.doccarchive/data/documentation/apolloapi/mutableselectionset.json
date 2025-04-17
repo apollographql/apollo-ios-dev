@@ -117,6 +117,12 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableSelectionSet\/fragments"
       ],
       "title" : "Instance Properties"
+    },
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableSelectionSet\/mutateIfFulfilled(_:_:)"
+      ],
+      "title" : "Instance Methods"
     }
   ],
   "variants" : [
@@ -330,6 +336,133 @@
   "title" : "fragments",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/mutableselectionset\/fragments"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/MutableSelectionSet/mutateIfFulfilled(_:_:)": {
+  "abstract" : [
+    {
+      "text" : "Function for mutating a conditional inline fragment on a mutable selection set.",
+      "type" : "text"
+    }
+  ],
+  "conformance" : {
+    "availabilityPrefix" : [
+      {
+        "text" : "Available when",
+        "type" : "text"
+      }
+    ],
+    "conformancePrefix" : [
+      {
+        "text" : "Conforms when",
+        "type" : "text"
+      }
+    ],
+    "constraints" : [
+      {
+        "code" : "Self",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "InlineFragment",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ".",
+        "type" : "text"
+      }
+    ]
+  },
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "mutateIfFulfilled"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s7KeyPathC",
+      "text" : "KeyPath"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Self"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : "?>, ("
+    },
+    {
+      "kind" : "keyword",
+      "text" : "inout"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s4Voida",
+      "text" : "Void"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableSelectionSet\/mutateIfFulfilled(_:_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "mutateIfFulfilled(_:_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/mutableselectionset\/mutateiffulfilled(_:_:)"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/SelectionSet": {
   "abstract" : [
