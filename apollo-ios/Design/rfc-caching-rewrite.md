@@ -17,6 +17,40 @@
 
  The current SQLite structure stores your data as a cache key and a JSON blob of the response data from your query. This makes it difficult to operate on the data without having to pull the JSON out of the SQLite and then deserialize it. With the new caching system we will be storing data in the SQLite so that each row represents a single field of an object. This will allow us to be able to implement many features which currently either wouldn't be possible, or would be very complex to implement and have poor performance implications.
 
+ We are going to be doing a lot of performance testing and investigation to find the right SQLite structure to use, final structure is currently TBD and will be updated here once it has been decided.
+
+ ### Removing SQLite.swift dependency
+
+ The SQLite.swift dependency has been a bottleneck in the past due to needing to wait for updates to it in order to fix or unblock things in Apollo iOS. While we could shift to another SQLite library, we feel the best path forward is for us to interact directly with the SQLite C API so that we have full control and aren't reliant on updates to other libraries for things we may need, with the added benefit removing an extra dependency for users.
+
+ This will be the first step we take in the overall caching work outlined in this RFC, with the goal of being able to release a 1.x minor version with the dependency removed.
+
+ ## Directives
+
+ We will be adding two new directives to facilitate some of the features being added to the caching system. The `@cacheControl` and `@onDelete` directives will be discussed further below, but the spec being used for them can be found [here](https://specs.apollo.dev/cache/v0.2/).
+
+ ### @cacheControl
+
+ The `@cacheControl` directive will allow you to configure the Time to Live for objects and fields within the cache. Detailed examples of the usage of the directive can be found [here](https://github.com/apollographql/apollo-ios-dev/blob/design/rfc-caching/apollo-ios/Design/Samples/cache-control-samples.md). There is also a `@cacheControlField` which can be used on type system extensions if you don't own the schema to be able to apply `@cacheControl` directly to the schema. The `@cacheControlField` would be applied like this:
+
+ ```graphql
+# extend the schema to set a max age on User.email.
+extend type User @cacheControlField(name: "email", maxAge: 20)
+```
+
+The `@cacheControl` directive will be referenced in below sections for further context.
+
+ ### @onDelete
+
+The `@onDelete` directive will allow you to mark child objects on types to be deleted along with the parent object from the cache. Detail examples of the usage of the directive can be found [here](https://github.com/apollographql/apollo-ios-dev/blob/design/rfc-caching/apollo-ios/Design/Samples/on-delete-samples.md). There is also a `@onDeleteField` which, like the `@cacheControlField` directive, can be used on type system extensions to apply `@onDelete` functionality when you can't apply it directly to the schema. The `@onDeleteField` would be applied like this:
+
+```graphql
+# extend the schema to set cascading deletion on Author.book
+extend type Author @onDeleteField(name: "book", cascade: true)
+```
+
+The `@onDelete` directive will be referenced in below sections for further context.
+
  ## Time to Live (TTL)
 
  To help control when data becomes "stale" we will introduce the ability to configure a TTL for an entire object or an individual field. This means that when accessing data from the cache, if any part of an object has surpassed its TTL it will cause a cache miss and the object will need to be re-fetched from the server. This will be configured through your schema and operations using a local directive, and allow the flexibility to set overall TTL's at the schema level but override them at an operation level if needed.
@@ -103,7 +137,7 @@ So for the `GetSong` query, the `description` field would have a TTL of 5 minute
 
  ### Cascading Deletions
 
- By default when an object is delete from a cache if there are any child objects within it they will not be deleted. Cascading deletions is the idea child objects would be deleted along with the object referencing them. In order to support this there will be a parameter available on the `@cacheControl(...)` directive referenced above in the TTL sections which allows you to mark child objects for deletions in your schema. As an example given the following schema types:
+ By default when an object is delete from a cache if there are any child objects within it they will not be deleted. Cascading deletions is the idea that child objects would be deleted along with the object referencing them. To enable this you will use the `@onDelete` directive detailed above. As an example given the following schema types:
 
  ```graphql
  type Song {
@@ -124,14 +158,14 @@ So for the `GetSong` query, the `description` field would have a TTL of 5 minute
 
  ### Directive
 
- As part of the `@cacheControl(...)` directive you will be able to mark child objects for deletion by marking them with `@cacheControl(cascadeDeletion: true)`. The below example shows how this would look in your schema, along with an example of marking an object for deletion while also setting its TTL:
+ The `@onDelete` directive will allow you to mark child objects for deletion along with its parent with the `cascade` input on the directive. The below example shows how this would look in your schema:
 
  ```graphql
  type Song @cacheControl(maxAge: 3600) {
   id: ID!
   name: String!
   description: String!
-  artist: Artist! @cacheControl(maxAge: 900, cascadeDeletion: true)
+  artist: Artist! @onDelete(cascade: true)
  }
 
  type Artist {
