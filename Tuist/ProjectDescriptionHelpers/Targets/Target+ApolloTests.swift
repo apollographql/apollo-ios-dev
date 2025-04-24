@@ -23,7 +23,6 @@ extension Target {
                 .package(product: "ApolloSQLite"),
                 .package(product: "ApolloWebSocket"),
                 .package(product: "ApolloTestSupport"),
-                .package(product: "SQLite"),
                 .package(product: "Nimble")
             ],
             settings: .forTarget(target)

@@ -3,7 +3,7 @@ import XCTest
 import ApolloAPI
 @testable import ApolloSQLite
 import ApolloInternalTestHelpers
-import SQLite
+import SQLite3
 import StarWarsAPI
 
 class CachePersistenceTests: XCTestCase {
@@ -160,16 +160,6 @@ class CachePersistenceTests: XCTestCase {
     }
 
     await fulfillment(of: [networkExpectation, newCacheExpectation], timeout: 2)
-  }
-
-  func testPassInConnectionDoesNotThrow() {
-    do {
-      let database = try SQLiteDotSwiftDatabase(connection: Connection())
-      _ = try SQLiteNormalizedCache(database: database)
-
-    } catch {
-      XCTFail("Passing in connection failed with error: \(error)")
-    }
   }
 
   func testClearCache() async throws {
