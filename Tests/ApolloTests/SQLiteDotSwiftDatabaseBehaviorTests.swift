@@ -3,7 +3,7 @@ import XCTest
 import ApolloInternalTestHelpers
 import SQLite3
 
-class SQLiteDotSwiftDatabaseBehaviorTests: XCTestCase {
+class ApolloSQLiteDatabaseBehaviorTests: XCTestCase {
 
   func testSelection_withForcedError_shouldThrow() throws {
     let sqliteFileURL = SQLiteTestCacheProvider.temporarySQLiteFileURL()
@@ -16,7 +16,7 @@ class SQLiteDotSwiftDatabaseBehaviorTests: XCTestCase {
     XCTAssertNoThrow(rows = try db.selectRawRows(forKeys: ["key"]))
     XCTAssertEqual(rows.count, 1)
 
-    // Use SQLite directly to manipulate the database (cannot be done with SQLiteDotSwiftDatabase)
+    // Use SQLite directly to manipulate the database (cannot be done with ApolloSQLiteDatabase)
     try dropSQLiteTable(dbURL: sqliteFileURL, tableName: ApolloSQLiteDatabase.tableName)
 
     XCTAssertThrowsError(try db.selectRawRows(forKeys: ["key"]))
