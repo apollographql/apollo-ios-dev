@@ -1,15 +1,4 @@
 {
-  "deprecationSummary" : [
-    {
-      "inlineContent" : [
-        {
-          "text" : "Use the more specific `missingMultipartBoundary` and `invalidMultipartProtocol` errors instead.",
-          "type" : "text"
-        }
-      ],
-      "type" : "paragraph"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -21,11 +10,11 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/cannotParseResponse"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/missingMultipartBoundary"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo35MultipartResponseParsingInterceptorV0D5ErrorO011cannotParseC0yA2EmF",
+    "externalID" : "s:6Apollo35MultipartResponseParsingInterceptorV0D5ErrorO07missingB8BoundaryyA2EmF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -37,7 +26,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "cannotParseResponse"
+        "text" : "missingMultipartBoundary"
       }
     ],
     "modules" : [
@@ -45,13 +34,10 @@
         "name" : "Apollo"
       }
     ],
-    "platforms" : [
-
-    ],
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",
-    "title" : "MultipartResponseParsingInterceptor.ParsingError.cannotParseResponse"
+    "title" : "MultipartResponseParsingInterceptor.ParsingError.missingMultipartBoundary"
   },
   "primaryContentSections" : [
     {
@@ -74,7 +60,7 @@
             },
             {
               "kind" : "identifier",
-              "text" : "cannotParseResponse"
+              "text" : "missingMultipartBoundary"
             }
           ]
         }
@@ -93,7 +79,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/cannotparseresponse"
+        "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/missingmultipartboundary"
       ],
       "traits" : [
         {
@@ -183,11 +169,10 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror"
 },
-"doc://Apollo/documentation/Apollo/MultipartResponseParsingInterceptor/ParsingError/cannotParseResponse": {
+"doc://Apollo/documentation/Apollo/MultipartResponseParsingInterceptor/ParsingError/missingMultipartBoundary": {
   "abstract" : [
 
   ],
-  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -199,15 +184,15 @@
     },
     {
       "kind" : "identifier",
-      "text" : "cannotParseResponse"
+      "text" : "missingMultipartBoundary"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/cannotParseResponse",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/missingMultipartBoundary",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "MultipartResponseParsingInterceptor.ParsingError.cannotParseResponse",
+  "title" : "MultipartResponseParsingInterceptor.ParsingError.missingMultipartBoundary",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/cannotparseresponse"
+  "url" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/missingmultipartboundary"
 }
 }
 }
