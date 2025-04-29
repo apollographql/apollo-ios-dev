@@ -2,21 +2,30 @@
   "hierarchy" : {
     "paths" : [
       [
-        "doc:\/\/Apollo\/documentation\/Apollo"
+        "doc:\/\/Apollo\/documentation\/Apollo",
+        "doc:\/\/Apollo\/documentation\/Apollo\/Constants"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/Constants"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/Constants\/ApolloClientName"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo9ConstantsO",
+    "externalID" : "s:6Apollo9ConstantsO0A10ClientNameSSvpZ",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "enum"
+        "text" : "static"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "let"
       },
       {
         "kind" : "text",
@@ -24,7 +33,16 @@
       },
       {
         "kind" : "identifier",
-        "text" : "Constants"
+        "text" : "ApolloClientName"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
       }
     ],
     "modules" : [
@@ -32,16 +50,10 @@
         "name" : "Apollo"
       }
     ],
-    "navigatorTitle" : [
-      {
-        "kind" : "identifier",
-        "text" : "Constants"
-      }
-    ],
     "role" : "symbol",
-    "roleHeading" : "Enumeration",
-    "symbolKind" : "enum",
-    "title" : "Constants"
+    "roleHeading" : "Type Property",
+    "symbolKind" : "property",
+    "title" : "ApolloClientName"
   },
   "primaryContentSections" : [
     {
@@ -56,7 +68,15 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "enum"
+              "text" : "static"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "let"
             },
             {
               "kind" : "text",
@@ -64,7 +84,16 @@
             },
             {
               "kind" : "identifier",
-              "text" : "Constants"
+              "text" : "ApolloClientName"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
             }
           ]
         }
@@ -80,19 +109,10 @@
   "sections" : [
 
   ],
-  "topicSections" : [
-    {
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/Constants\/ApolloClientName",
-        "doc:\/\/Apollo\/documentation\/Apollo\/Constants\/ApolloClientVersion"
-      ],
-      "title" : "Type Properties"
-    }
-  ],
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/constants"
+        "\/documentation\/apollo\/constants\/apolloclientname"
       ],
       "traits" : [
         {
@@ -189,48 +209,6 @@
   "title" : "ApolloClientName",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/constants\/apolloclientname"
-},
-"doc://Apollo/documentation/Apollo/Constants/ApolloClientVersion": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "let"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "ApolloClientVersion"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Constants\/ApolloClientVersion",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "ApolloClientVersion",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/constants\/apolloclientversion"
 }
 }
 }

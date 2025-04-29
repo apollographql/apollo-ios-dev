@@ -1,35 +1,19 @@
 {
-  "abstract" : [
-    {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "SQLiteDatabase.addOrUpdateRecordString(_:for:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/SQLiteDatabase-Implementations"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/addOrUpdateRecordString(_:for:)"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/setJournalMode(mode:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "extendedModule" : "ApolloSQLite",
-    "externalID" : "s:12ApolloSQLite0B8DatabasePAAE23addOrUpdateRecordString_3forySS_SStKF::SYNTHESIZED::s:12ApolloSQLite0B16DotSwiftDatabaseC",
+    "externalID" : "s:12ApolloSQLite0aB8DatabaseC14setJournalMode4modeyAA0eF0O_tKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -41,24 +25,15 @@
       },
       {
         "kind" : "identifier",
-        "text" : "addOrUpdateRecordString"
+        "text" : "setJournalMode"
       },
       {
         "kind" : "text",
         "text" : "("
       },
       {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:SS",
-        "text" : "String"
-      },
-      {
-        "kind" : "text",
-        "text" : ", "
-      },
-      {
         "kind" : "externalParam",
-        "text" : "for"
+        "text" : "mode"
       },
       {
         "kind" : "text",
@@ -66,8 +41,8 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo8CacheKeya",
-        "text" : "CacheKey"
+        "preciseIdentifier" : "s:12ApolloSQLite11JournalModeO",
+        "text" : "JournalMode"
       },
       {
         "kind" : "text",
@@ -86,7 +61,7 @@
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
-    "title" : "addOrUpdateRecordString(_:for:)"
+    "title" : "setJournalMode(mode:)"
   },
   "primaryContentSections" : [
     {
@@ -109,7 +84,7 @@
             },
             {
               "kind" : "identifier",
-              "text" : "addOrUpdateRecordString"
+              "text" : "setJournalMode"
             },
             {
               "kind" : "text",
@@ -117,49 +92,17 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "_"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "internalParam",
-              "text" : "recordString"
+              "text" : "mode"
             },
             {
               "kind" : "text",
               "text" : ": "
             },
             {
+              "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/JournalMode",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:SS",
-              "text" : "String"
-            },
-            {
-              "kind" : "text",
-              "text" : ", "
-            },
-            {
-              "kind" : "externalParam",
-              "text" : "for"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "internalParam",
-              "text" : "cacheKey"
-            },
-            {
-              "kind" : "text",
-              "text" : ": "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo8CacheKeya",
-              "text" : "CacheKey"
+              "preciseIdentifier" : "s:12ApolloSQLite11JournalModeO",
+              "text" : "JournalMode"
             },
             {
               "kind" : "text",
@@ -186,7 +129,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/addorupdaterecordstring(_:for:)"
+        "\/documentation\/apollosqlite\/apollosqlitedatabase\/setjournalmode(mode:)"
       ],
       "traits" : [
         {
@@ -240,7 +183,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase": {
   "abstract" : [
 
   ],
@@ -255,34 +198,23 @@
     },
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
   "role" : "symbol",
-  "title" : "SQLiteDotSwiftDatabase",
+  "title" : "ApolloSQLiteDatabase",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/SQLiteDatabase-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/SQLiteDatabase-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "SQLiteDatabase Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/sqlitedatabase-implementations"
-},
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/addOrUpdateRecordString(_:for:)": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/setJournalMode(mode:)": {
   "abstract" : [
 
   ],
@@ -297,24 +229,15 @@
     },
     {
       "kind" : "identifier",
-      "text" : "addOrUpdateRecordString"
+      "text" : "setJournalMode"
     },
     {
       "kind" : "text",
       "text" : "("
     },
     {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
       "kind" : "externalParam",
-      "text" : "for"
+      "text" : "mode"
     },
     {
       "kind" : "text",
@@ -322,8 +245,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo8CacheKeya",
-      "text" : "CacheKey"
+      "preciseIdentifier" : "s:12ApolloSQLite11JournalModeO",
+      "text" : "JournalMode"
     },
     {
       "kind" : "text",
@@ -334,12 +257,43 @@
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/addOrUpdateRecordString(_:for:)",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/setJournalMode(mode:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "addOrUpdateRecordString(_:for:)",
+  "title" : "setJournalMode(mode:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/addorupdaterecordstring(_:for:)"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/setjournalmode(mode:)"
+},
+"doc://ApolloSQLite/documentation/ApolloSQLite/JournalMode": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "JournalMode"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/JournalMode",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "JournalMode"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "JournalMode",
+  "type" : "topic",
+  "url" : "\/documentation\/apollosqlite\/journalmode"
 }
 }
 }

@@ -1,42 +1,34 @@
 {
   "abstract" : [
     {
-      "text" : "Creates a client with a ",
+      "text" : "Inherited from ",
       "type" : "text"
     },
     {
-      "code" : "RequestChainNetworkTransport",
+      "code" : "SQLiteDatabase.init(fileURL:)",
       "type" : "codeVoice"
     },
     {
-      "text" : " connecting to the specified URL.",
+      "text" : ".",
       "type" : "text"
     }
   ],
   "hierarchy" : {
     "paths" : [
       [
-        "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:)"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/init(fileURL:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A6ClientC3urlAC10Foundation3URLV_tcfc",
+    "externalID" : "s:12ApolloSQLite0aB8DatabaseC7fileURLAC10Foundation0E0V_tKcfc",
     "fragments" : [
-      {
-        "kind" : "keyword",
-        "text" : "convenience"
-      },
-      {
-        "kind" : "text",
-        "text" : " "
-      },
       {
         "kind" : "identifier",
         "text" : "init"
@@ -47,7 +39,7 @@
       },
       {
         "kind" : "externalParam",
-        "text" : "url"
+        "text" : "fileURL"
       },
       {
         "kind" : "text",
@@ -60,18 +52,22 @@
       },
       {
         "kind" : "text",
-        "text" : ")"
+        "text" : ") "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "throws"
       }
     ],
     "modules" : [
       {
-        "name" : "Apollo"
+        "name" : "ApolloSQLite"
       }
     ],
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",
-    "title" : "init(url:)"
+    "title" : "init(fileURL:)"
   },
   "primaryContentSections" : [
     {
@@ -86,14 +82,6 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "convenience"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "keyword",
               "text" : "init"
             },
             {
@@ -102,7 +90,7 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "url"
+              "text" : "fileURL"
             },
             {
               "kind" : "text",
@@ -115,31 +103,16 @@
             },
             {
               "kind" : "text",
-              "text" : ")"
+              "text" : ") "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "throws"
             }
           ]
         }
       ],
       "kind" : "declarations"
-    },
-    {
-      "kind" : "parameters",
-      "parameters" : [
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The URL of a GraphQL server to connect to.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "url"
-        }
-      ]
     }
   ],
   "schemaVersion" : {
@@ -153,7 +126,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/apolloclient\/init(url:)"
+        "\/documentation\/apollosqlite\/apollosqlitedatabase\/init(fileurl:)"
       ],
       "traits" : [
         {
@@ -164,42 +137,52 @@
   ]
 , 
 "references": {
-"doc://Apollo/documentation/Apollo": {
+"/documentation/apollo/normalizedcache": {
+  "identifier" : "\/documentation\/apollo\/normalizedcache",
+  "title" : "NormalizedCache",
+  "titleInlineContent" : [
+    {
+      "code" : "NormalizedCache",
+      "type" : "codeVoice"
+    }
+  ],
+  "type" : "link",
+  "url" : "\/documentation\/apollo\/normalizedcache"
+},
+"doc://ApolloSQLite/documentation/ApolloSQLite": {
   "abstract" : [
     {
-      "text" : "A Strongly typed, Swift-first, GraphQL client.",
+      "text" : "A ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "\/documentation\/apollo\/normalizedcache",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " implementation backed by a ",
+      "type" : "text"
+    },
+    {
+      "code" : "SQLite",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " database.",
       "type" : "text"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
   "kind" : "symbol",
   "role" : "collection",
-  "title" : "Apollo",
+  "title" : "ApolloSQLite",
   "type" : "topic",
-  "url" : "\/documentation\/apollo"
+  "url" : "\/documentation\/apollosqlite"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase": {
   "abstract" : [
-    {
-      "text" : "The ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloClient",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " class implements the core API for Apollo by conforming to ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloClientProtocol",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
@@ -212,46 +195,27 @@
     },
     {
       "kind" : "identifier",
-      "text" : "ApolloClient"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "ApolloClient"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
   "role" : "symbol",
-  "title" : "ApolloClient",
+  "title" : "ApolloSQLiteDatabase",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient/init(url:)": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/init(fileURL:)": {
   "abstract" : [
-    {
-      "text" : "Creates a client with a ",
-      "type" : "text"
-    },
-    {
-      "code" : "RequestChainNetworkTransport",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " connecting to the specified URL.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "convenience"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
     {
       "kind" : "identifier",
       "text" : "init"
@@ -262,7 +226,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "url"
+      "text" : "fileURL"
     },
     {
       "kind" : "text",
@@ -275,15 +239,19 @@
     },
     {
       "kind" : "text",
-      "text" : ")"
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:)",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/init(fileURL:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(url:)",
+  "title" : "init(fileURL:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/init(url:)"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/init(fileurl:)"
 }
 }
 }

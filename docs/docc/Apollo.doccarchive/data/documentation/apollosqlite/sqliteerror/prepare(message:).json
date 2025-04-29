@@ -3,21 +3,29 @@
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/init(connection:)"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError\/prepare(message:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:12ApolloSQLite0B16DotSwiftDatabaseC10connectionAC0B010ConnectionC_tcfc",
+    "externalID" : "s:12ApolloSQLite0B5ErrorO7prepareyACSS_tcACmF",
     "fragments" : [
       {
+        "kind" : "keyword",
+        "text" : "case"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
         "kind" : "identifier",
-        "text" : "init"
+        "text" : "prepare"
       },
       {
         "kind" : "text",
@@ -25,7 +33,7 @@
       },
       {
         "kind" : "externalParam",
-        "text" : "connection"
+        "text" : "message"
       },
       {
         "kind" : "text",
@@ -33,8 +41,8 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6SQLite10ConnectionC",
-        "text" : "Connection"
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
       },
       {
         "kind" : "text",
@@ -47,9 +55,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Initializer",
-    "symbolKind" : "init",
-    "title" : "init(connection:)"
+    "roleHeading" : "Case",
+    "symbolKind" : "case",
+    "title" : "SQLiteError.prepare(message:)"
   },
   "primaryContentSections" : [
     {
@@ -64,7 +72,15 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "init"
+              "text" : "case"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "prepare"
             },
             {
               "kind" : "text",
@@ -72,7 +88,7 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "connection"
+              "text" : "message"
             },
             {
               "kind" : "text",
@@ -80,8 +96,8 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6SQLite10ConnectionC",
-              "text" : "Connection"
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
             },
             {
               "kind" : "text",
@@ -104,7 +120,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/init(connection:)"
+        "\/documentation\/apollosqlite\/sqliteerror\/prepare(message:)"
       ],
       "traits" : [
         {
@@ -158,14 +174,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteError": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -173,30 +189,38 @@
     },
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "SQLiteError"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "SQLiteError"
     }
   ],
   "role" : "symbol",
-  "title" : "SQLiteDotSwiftDatabase",
+  "title" : "SQLiteError",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+  "url" : "\/documentation\/apollosqlite\/sqliteerror"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/init(connection:)": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteError/prepare(message:)": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
       "kind" : "identifier",
-      "text" : "init"
+      "text" : "prepare"
     },
     {
       "kind" : "text",
@@ -204,7 +228,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "connection"
+      "text" : "message"
     },
     {
       "kind" : "text",
@@ -212,20 +236,20 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6SQLite10ConnectionC",
-      "text" : "Connection"
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
     },
     {
       "kind" : "text",
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/init(connection:)",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError\/prepare(message:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(connection:)",
+  "title" : "SQLiteError.prepare(message:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/init(connection:)"
+  "url" : "\/documentation\/apollosqlite\/sqliteerror\/prepare(message:)"
 }
 }
 }

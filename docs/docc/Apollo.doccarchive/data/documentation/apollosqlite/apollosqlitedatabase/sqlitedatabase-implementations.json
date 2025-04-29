@@ -3,13 +3,13 @@
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/SQLiteDatabase-Implementations"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/SQLiteDatabase-Implementations"
   },
   "kind" : "article",
   "metadata" : {
@@ -34,17 +34,17 @@
     {
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/addOrUpdateRecordString(_:for:)"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/addOrUpdateRecordString(_:for:)"
       ],
       "title" : "Instance Methods"
     },
     {
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/idColumnName",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/keyColumnName",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/recordColumName",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/tableName"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/idColumnName",
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/keyColumnName",
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/recordColumName",
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/tableName"
       ],
       "title" : "Type Properties"
     }
@@ -52,7 +52,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/sqlitedatabase-implementations"
+        "\/documentation\/apollosqlite\/apollosqlitedatabase\/sqlitedatabase-implementations"
       ],
       "traits" : [
         {
@@ -106,7 +106,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase": {
   "abstract" : [
 
   ],
@@ -121,23 +121,23 @@
     },
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
   "role" : "symbol",
-  "title" : "SQLiteDotSwiftDatabase",
+  "title" : "ApolloSQLiteDatabase",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/addOrUpdateRecordString(_:for:)": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/addOrUpdateRecordString(_:for:)": {
   "abstract" : [
 
   ],
@@ -189,14 +189,14 @@
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/addOrUpdateRecordString(_:for:)",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/addOrUpdateRecordString(_:for:)",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "addOrUpdateRecordString(_:for:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/addorupdaterecordstring(_:for:)"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/addorupdaterecordstring(_:for:)"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/idColumnName": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/idColumnName": {
   "abstract" : [
 
   ],
@@ -231,14 +231,14 @@
       "text" : "String"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/idColumnName",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/idColumnName",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "idColumnName",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/idcolumnname"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/idcolumnname"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/keyColumnName": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/keyColumnName": {
   "abstract" : [
 
   ],
@@ -273,14 +273,14 @@
       "text" : "String"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/keyColumnName",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/keyColumnName",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "keyColumnName",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/keycolumnname"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/keycolumnname"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/recordColumName": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/recordColumName": {
   "abstract" : [
 
   ],
@@ -315,14 +315,14 @@
       "text" : "String"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/recordColumName",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/recordColumName",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "recordColumName",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/recordcolumname"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/recordcolumname"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/tableName": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/tableName": {
   "abstract" : [
 
   ],
@@ -357,12 +357,12 @@
       "text" : "String"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/tableName",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/tableName",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "tableName",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/tablename"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/tablename"
 }
 }
 }

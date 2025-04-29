@@ -5,7 +5,7 @@
       "type" : "text"
     },
     {
-      "code" : "SQLiteDatabase.selectRawRows(forKeys:)",
+      "code" : "SQLiteDatabase.addOrUpdateRecordString(_:for:)",
       "type" : "codeVoice"
     },
     {
@@ -17,17 +17,19 @@
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase",
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/SQLiteDatabase-Implementations"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/selectRawRows(forKeys:)"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/addOrUpdateRecordString(_:for:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:12ApolloSQLite0B16DotSwiftDatabaseC13selectRawRows7forKeysSayAA0E3RowVGShySSG_tKF",
+    "extendedModule" : "ApolloSQLite",
+    "externalID" : "s:12ApolloSQLite0B8DatabasePAAE23addOrUpdateRecordString_3forySS_SStKF::SYNTHESIZED::s:12ApolloSQLite0aB8DatabaseC",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -39,28 +41,28 @@
       },
       {
         "kind" : "identifier",
-        "text" : "selectRawRows"
+        "text" : "addOrUpdateRecordString"
       },
       {
         "kind" : "text",
         "text" : "("
       },
       {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
         "kind" : "externalParam",
-        "text" : "forKeys"
+        "text" : "for"
       },
       {
         "kind" : "text",
         "text" : ": "
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:Sh",
-        "text" : "Set"
-      },
-      {
-        "kind" : "text",
-        "text" : "<"
       },
       {
         "kind" : "typeIdentifier",
@@ -69,24 +71,11 @@
       },
       {
         "kind" : "text",
-        "text" : ">) "
+        "text" : ") "
       },
       {
         "kind" : "keyword",
         "text" : "throws"
-      },
-      {
-        "kind" : "text",
-        "text" : " -> ["
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:12ApolloSQLite11DatabaseRowV",
-        "text" : "DatabaseRow"
-      },
-      {
-        "kind" : "text",
-        "text" : "]"
       }
     ],
     "modules" : [
@@ -97,7 +86,7 @@
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
-    "title" : "selectRawRows(forKeys:)"
+    "title" : "addOrUpdateRecordString(_:for:)"
   },
   "primaryContentSections" : [
     {
@@ -120,7 +109,7 @@
             },
             {
               "kind" : "identifier",
-              "text" : "selectRawRows"
+              "text" : "addOrUpdateRecordString"
             },
             {
               "kind" : "text",
@@ -128,7 +117,7 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "forKeys"
+              "text" : "_"
             },
             {
               "kind" : "text",
@@ -136,7 +125,7 @@
             },
             {
               "kind" : "internalParam",
-              "text" : "keys"
+              "text" : "recordString"
             },
             {
               "kind" : "text",
@@ -144,12 +133,28 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:Sh",
-              "text" : "Set"
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
             },
             {
               "kind" : "text",
-              "text" : "<"
+              "text" : ", "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "for"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "internalParam",
+              "text" : "cacheKey"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
             },
             {
               "kind" : "typeIdentifier",
@@ -158,25 +163,11 @@
             },
             {
               "kind" : "text",
-              "text" : ">) "
+              "text" : ") "
             },
             {
               "kind" : "keyword",
               "text" : "throws"
-            },
-            {
-              "kind" : "text",
-              "text" : " -> ["
-            },
-            {
-              "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow",
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:12ApolloSQLite11DatabaseRowV",
-              "text" : "DatabaseRow"
-            },
-            {
-              "kind" : "text",
-              "text" : "]"
             }
           ]
         }
@@ -195,7 +186,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/selectrawrows(forkeys:)"
+        "\/documentation\/apollosqlite\/apollosqlitedatabase\/addorupdaterecordstring(_:for:)"
       ],
       "traits" : [
         {
@@ -249,38 +240,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/DatabaseRow": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "struct"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "DatabaseRow"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "DatabaseRow"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "DatabaseRow",
-  "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/databaserow"
-},
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase": {
   "abstract" : [
 
   ],
@@ -295,23 +255,34 @@
     },
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
   "role" : "symbol",
-  "title" : "SQLiteDotSwiftDatabase",
+  "title" : "ApolloSQLiteDatabase",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/selectRawRows(forKeys:)": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/SQLiteDatabase-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/SQLiteDatabase-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "SQLiteDatabase Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/sqlitedatabase-implementations"
+},
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/addOrUpdateRecordString(_:for:)": {
   "abstract" : [
 
   ],
@@ -326,28 +297,28 @@
     },
     {
       "kind" : "identifier",
-      "text" : "selectRawRows"
+      "text" : "addOrUpdateRecordString"
     },
     {
       "kind" : "text",
       "text" : "("
     },
     {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
       "kind" : "externalParam",
-      "text" : "forKeys"
+      "text" : "for"
     },
     {
       "kind" : "text",
       "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sh",
-      "text" : "Set"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
     },
     {
       "kind" : "typeIdentifier",
@@ -356,32 +327,19 @@
     },
     {
       "kind" : "text",
-      "text" : ">) "
+      "text" : ") "
     },
     {
       "kind" : "keyword",
       "text" : "throws"
-    },
-    {
-      "kind" : "text",
-      "text" : " -> ["
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:12ApolloSQLite11DatabaseRowV",
-      "text" : "DatabaseRow"
-    },
-    {
-      "kind" : "text",
-      "text" : "]"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/selectRawRows(forKeys:)",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/addOrUpdateRecordString(_:for:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "selectRawRows(forKeys:)",
+  "title" : "addOrUpdateRecordString(_:for:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/selectrawrows(forkeys:)"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/addorupdaterecordstring(_:for:)"
 }
 }
 }

@@ -5,7 +5,7 @@
       "type" : "text"
     },
     {
-      "code" : "SQLiteDatabase.deleteRecord(for:)",
+      "code" : "SQLiteDatabase.selectRawRows(forKeys:)",
       "type" : "codeVoice"
     },
     {
@@ -17,17 +17,17 @@
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/deleteRecord(for:)"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/selectRawRows(forKeys:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:12ApolloSQLite0B16DotSwiftDatabaseC12deleteRecord3forySS_tKF",
+    "externalID" : "s:12ApolloSQLite0aB8DatabaseC13selectRawRows7forKeysSayAA0C3RowVGShySSG_tKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -39,7 +39,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "deleteRecord"
+        "text" : "selectRawRows"
       },
       {
         "kind" : "text",
@@ -47,11 +47,20 @@
       },
       {
         "kind" : "externalParam",
-        "text" : "for"
+        "text" : "forKeys"
       },
       {
         "kind" : "text",
         "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:Sh",
+        "text" : "Set"
+      },
+      {
+        "kind" : "text",
+        "text" : "<"
       },
       {
         "kind" : "typeIdentifier",
@@ -60,11 +69,24 @@
       },
       {
         "kind" : "text",
-        "text" : ") "
+        "text" : ">) "
       },
       {
         "kind" : "keyword",
         "text" : "throws"
+      },
+      {
+        "kind" : "text",
+        "text" : " -> ["
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:12ApolloSQLite11DatabaseRowV",
+        "text" : "DatabaseRow"
+      },
+      {
+        "kind" : "text",
+        "text" : "]"
       }
     ],
     "modules" : [
@@ -75,7 +97,7 @@
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
-    "title" : "deleteRecord(for:)"
+    "title" : "selectRawRows(forKeys:)"
   },
   "primaryContentSections" : [
     {
@@ -98,7 +120,7 @@
             },
             {
               "kind" : "identifier",
-              "text" : "deleteRecord"
+              "text" : "selectRawRows"
             },
             {
               "kind" : "text",
@@ -106,7 +128,7 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "for"
+              "text" : "forKeys"
             },
             {
               "kind" : "text",
@@ -114,11 +136,20 @@
             },
             {
               "kind" : "internalParam",
-              "text" : "cacheKey"
+              "text" : "keys"
             },
             {
               "kind" : "text",
               "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:Sh",
+              "text" : "Set"
+            },
+            {
+              "kind" : "text",
+              "text" : "<"
             },
             {
               "kind" : "typeIdentifier",
@@ -127,11 +158,25 @@
             },
             {
               "kind" : "text",
-              "text" : ") "
+              "text" : ">) "
             },
             {
               "kind" : "keyword",
               "text" : "throws"
+            },
+            {
+              "kind" : "text",
+              "text" : " -> ["
+            },
+            {
+              "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:12ApolloSQLite11DatabaseRowV",
+              "text" : "DatabaseRow"
+            },
+            {
+              "kind" : "text",
+              "text" : "]"
             }
           ]
         }
@@ -150,7 +195,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/deleterecord(for:)"
+        "\/documentation\/apollosqlite\/apollosqlitedatabase\/selectrawrows(forkeys:)"
       ],
       "traits" : [
         {
@@ -204,7 +249,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase": {
   "abstract" : [
 
   ],
@@ -219,23 +264,23 @@
     },
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
   "role" : "symbol",
-  "title" : "SQLiteDotSwiftDatabase",
+  "title" : "ApolloSQLiteDatabase",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/deleteRecord(for:)": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/selectRawRows(forKeys:)": {
   "abstract" : [
 
   ],
@@ -250,7 +295,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "deleteRecord"
+      "text" : "selectRawRows"
     },
     {
       "kind" : "text",
@@ -258,11 +303,20 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "for"
+      "text" : "forKeys"
     },
     {
       "kind" : "text",
       "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sh",
+      "text" : "Set"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
     },
     {
       "kind" : "typeIdentifier",
@@ -271,19 +325,63 @@
     },
     {
       "kind" : "text",
-      "text" : ") "
+      "text" : ">) "
     },
     {
       "kind" : "keyword",
       "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:12ApolloSQLite11DatabaseRowV",
+      "text" : "DatabaseRow"
+    },
+    {
+      "kind" : "text",
+      "text" : "]"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/deleteRecord(for:)",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/selectRawRows(forKeys:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "deleteRecord(for:)",
+  "title" : "selectRawRows(forKeys:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/deleterecord(for:)"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/selectrawrows(forkeys:)"
+},
+"doc://ApolloSQLite/documentation/ApolloSQLite/DatabaseRow": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "DatabaseRow"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "DatabaseRow"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "DatabaseRow",
+  "type" : "topic",
+  "url" : "\/documentation\/apollosqlite\/databaserow"
 }
 }
 }

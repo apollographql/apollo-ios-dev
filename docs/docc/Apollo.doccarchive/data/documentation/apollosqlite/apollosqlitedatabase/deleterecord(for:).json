@@ -1,7 +1,15 @@
 {
   "abstract" : [
     {
-      "text" : "Sets the journal mode for the current database.",
+      "text" : "Inherited from ",
+      "type" : "text"
+    },
+    {
+      "code" : "SQLiteDatabase.deleteRecord(for:)",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
       "type" : "text"
     }
   ],
@@ -9,17 +17,17 @@
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/setJournalMode(mode:)"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/deleteRecord(for:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:12ApolloSQLite0B16DotSwiftDatabaseC14setJournalMode4modeyAA0gH0O_tKF",
+    "externalID" : "s:12ApolloSQLite0aB8DatabaseC12deleteRecord3forySS_tKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -31,7 +39,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "setJournalMode"
+        "text" : "deleteRecord"
       },
       {
         "kind" : "text",
@@ -39,7 +47,7 @@
       },
       {
         "kind" : "externalParam",
-        "text" : "mode"
+        "text" : "for"
       },
       {
         "kind" : "text",
@@ -47,8 +55,8 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:12ApolloSQLite11JournalModeO",
-        "text" : "JournalMode"
+        "preciseIdentifier" : "s:6Apollo8CacheKeya",
+        "text" : "CacheKey"
       },
       {
         "kind" : "text",
@@ -67,7 +75,7 @@
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
-    "title" : "setJournalMode(mode:)"
+    "title" : "deleteRecord(for:)"
   },
   "primaryContentSections" : [
     {
@@ -90,7 +98,7 @@
             },
             {
               "kind" : "identifier",
-              "text" : "setJournalMode"
+              "text" : "deleteRecord"
             },
             {
               "kind" : "text",
@@ -98,17 +106,24 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "mode"
+              "text" : "for"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "internalParam",
+              "text" : "cacheKey"
             },
             {
               "kind" : "text",
               "text" : ": "
             },
             {
-              "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/JournalMode",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:12ApolloSQLite11JournalModeO",
-              "text" : "JournalMode"
+              "preciseIdentifier" : "s:6Apollo8CacheKeya",
+              "text" : "CacheKey"
             },
             {
               "kind" : "text",
@@ -122,25 +137,6 @@
         }
       ],
       "kind" : "declarations"
-    },
-    {
-      "kind" : "parameters",
-      "parameters" : [
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The journal mode controls how the journal file is stored and processed.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "mode"
-        }
-      ]
     }
   ],
   "schemaVersion" : {
@@ -154,7 +150,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/setjournalmode(mode:)"
+        "\/documentation\/apollosqlite\/apollosqlitedatabase\/deleterecord(for:)"
       ],
       "traits" : [
         {
@@ -208,38 +204,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/JournalMode": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "enum"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "JournalMode"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/JournalMode",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "JournalMode"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "JournalMode",
-  "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/journalmode"
-},
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase": {
   "abstract" : [
 
   ],
@@ -254,28 +219,25 @@
     },
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
   "role" : "symbol",
-  "title" : "SQLiteDotSwiftDatabase",
+  "title" : "ApolloSQLiteDatabase",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/setJournalMode(mode:)": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/deleteRecord(for:)": {
   "abstract" : [
-    {
-      "text" : "Sets the journal mode for the current database.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
@@ -288,7 +250,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "setJournalMode"
+      "text" : "deleteRecord"
     },
     {
       "kind" : "text",
@@ -296,7 +258,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "mode"
+      "text" : "for"
     },
     {
       "kind" : "text",
@@ -304,8 +266,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:12ApolloSQLite11JournalModeO",
-      "text" : "JournalMode"
+      "preciseIdentifier" : "s:6Apollo8CacheKeya",
+      "text" : "CacheKey"
     },
     {
       "kind" : "text",
@@ -316,12 +278,12 @@
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/setJournalMode(mode:)",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/deleteRecord(for:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "setJournalMode(mode:)",
+  "title" : "deleteRecord(for:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/setjournalmode(mode:)"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/deleterecord(for:)"
 }
 }
 }

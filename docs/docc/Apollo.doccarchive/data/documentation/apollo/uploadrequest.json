@@ -148,7 +148,7 @@
     },
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:sendEnhancedClientAwareness:)"
       ],
       "title" : "Initializers"
     },
@@ -448,7 +448,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/uploadrequest\/hash(into:)"
 },
-"doc://Apollo/documentation/Apollo/UploadRequest/init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:)": {
+"doc://Apollo/documentation/Apollo/UploadRequest/init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:sendEnhancedClientAwareness:)": {
   "abstract" : [
     {
       "text" : "Designated Initializer",
@@ -623,15 +623,32 @@
     },
     {
       "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "sendEnhancedClientAwareness"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:sendEnhancedClientAwareness:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:)",
+  "title" : "init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:sendEnhancedClientAwareness:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/uploadrequest\/init(graphqlendpoint:operation:clientname:clientversion:additionalheaders:files:manualboundary:context:requestbodycreator:)"
+  "url" : "\/documentation\/apollo\/uploadrequest\/init(graphqlendpoint:operation:clientname:clientversion:additionalheaders:files:manualboundary:context:requestbodycreator:sendenhancedclientawareness:)"
 },
 "doc://Apollo/documentation/Apollo/UploadRequest/manualBoundary": {
   "abstract" : [

@@ -5,7 +5,7 @@
       "type" : "text"
     },
     {
-      "code" : "SQLiteDatabase.tableName",
+      "code" : "SQLiteDatabase.deleteRecords(matching:)",
       "type" : "codeVoice"
     },
     {
@@ -17,31 +17,21 @@
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/SQLiteDatabase-Implementations"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/tableName"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/deleteRecords(matching:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "extendedModule" : "ApolloSQLite",
-    "externalID" : "s:12ApolloSQLite0B8DatabasePAAE9tableNameSSvpZ::SYNTHESIZED::s:12ApolloSQLite0B16DotSwiftDatabaseC",
+    "externalID" : "s:12ApolloSQLite0aB8DatabaseC13deleteRecords8matchingySS_tKF",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "static"
-      },
-      {
-        "kind" : "text",
-        "text" : " "
-      },
-      {
-        "kind" : "keyword",
-        "text" : "var"
+        "text" : "func"
       },
       {
         "kind" : "text",
@@ -49,7 +39,15 @@
       },
       {
         "kind" : "identifier",
-        "text" : "tableName"
+        "text" : "deleteRecords"
+      },
+      {
+        "kind" : "text",
+        "text" : "("
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "matching"
       },
       {
         "kind" : "text",
@@ -57,8 +55,16 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:SS",
-        "text" : "String"
+        "preciseIdentifier" : "s:6Apollo8CacheKeya",
+        "text" : "CacheKey"
+      },
+      {
+        "kind" : "text",
+        "text" : ") "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "throws"
       }
     ],
     "modules" : [
@@ -67,9 +73,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Type Property",
-    "symbolKind" : "property",
-    "title" : "tableName"
+    "roleHeading" : "Instance Method",
+    "symbolKind" : "method",
+    "title" : "deleteRecords(matching:)"
   },
   "primaryContentSections" : [
     {
@@ -84,15 +90,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "static"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "var"
+              "text" : "func"
             },
             {
               "kind" : "text",
@@ -100,7 +98,23 @@
             },
             {
               "kind" : "identifier",
-              "text" : "tableName"
+              "text" : "deleteRecords"
+            },
+            {
+              "kind" : "text",
+              "text" : "("
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "matching"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "internalParam",
+              "text" : "pattern"
             },
             {
               "kind" : "text",
@@ -108,20 +122,16 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:SS",
-              "text" : "String"
+              "preciseIdentifier" : "s:6Apollo8CacheKeya",
+              "text" : "CacheKey"
             },
             {
               "kind" : "text",
-              "text" : " { "
+              "text" : ") "
             },
             {
               "kind" : "keyword",
-              "text" : "get"
-            },
-            {
-              "kind" : "text",
-              "text" : " }"
+              "text" : "throws"
             }
           ]
         }
@@ -140,7 +150,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/tablename"
+        "\/documentation\/apollosqlite\/apollosqlitedatabase\/deleterecords(matching:)"
       ],
       "traits" : [
         {
@@ -194,7 +204,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase": {
   "abstract" : [
 
   ],
@@ -209,49 +219,30 @@
     },
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
   "role" : "symbol",
-  "title" : "SQLiteDotSwiftDatabase",
+  "title" : "ApolloSQLiteDatabase",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/SQLiteDatabase-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/SQLiteDatabase-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "SQLiteDatabase Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/sqlitedatabase-implementations"
-},
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/tableName": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/deleteRecords(matching:)": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "var"
+      "text" : "func"
     },
     {
       "kind" : "text",
@@ -259,7 +250,15 @@
     },
     {
       "kind" : "identifier",
-      "text" : "tableName"
+      "text" : "deleteRecords"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "matching"
     },
     {
       "kind" : "text",
@@ -267,16 +266,24 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
+      "preciseIdentifier" : "s:6Apollo8CacheKeya",
+      "text" : "CacheKey"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/tableName",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/deleteRecords(matching:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "tableName",
+  "title" : "deleteRecords(matching:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/tablename"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/deleterecords(matching:)"
 }
 }
 }

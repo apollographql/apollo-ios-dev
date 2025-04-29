@@ -147,7 +147,7 @@
             },
             {
               "kind" : "text",
-              "text" : ".Type = SQLiteDotSwiftDatabase.self, "
+              "text" : ".Type = ApolloSQLiteDatabase.self, "
             },
             {
               "kind" : "externalParam",

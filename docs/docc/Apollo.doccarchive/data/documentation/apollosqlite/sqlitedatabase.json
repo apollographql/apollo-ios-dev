@@ -75,7 +75,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase"
       ],
       "kind" : "relationships",
       "title" : "Conforming Types",
@@ -175,6 +175,37 @@
   "title" : "ApolloSQLite",
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite"
+},
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ApolloSQLiteDatabase"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ApolloSQLiteDatabase"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloSQLiteDatabase",
+  "type" : "topic",
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase"
 },
 "doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDatabase": {
   "abstract" : [
@@ -807,37 +838,6 @@
   "title" : "tableName",
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/sqlitedatabase\/tablename"
-},
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "class"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "SQLiteDotSwiftDatabase",
-  "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
 }
 }
 }

@@ -124,7 +124,7 @@
   "topicSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)"
       ],
       "title" : "Initializers"
     },
@@ -761,7 +761,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport\/endpointurl"
 },
-"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:)": {
+"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)": {
   "abstract" : [
     {
       "text" : "Designated initializer",
@@ -903,15 +903,32 @@
     },
     {
       "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "sendEnhancedClientAwareness"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:)",
+  "title" : "init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/init(interceptorprovider:endpointurl:additionalheaders:autopersistqueries:requestbodycreator:usegetforqueries:usegetforpersistedqueryretry:)"
+  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/init(interceptorprovider:endpointurl:additionalheaders:autopersistqueries:requestbodycreator:usegetforqueries:usegetforpersistedqueryretry:sendenhancedclientawareness:)"
 },
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/requestBodyCreator": {
   "abstract" : [

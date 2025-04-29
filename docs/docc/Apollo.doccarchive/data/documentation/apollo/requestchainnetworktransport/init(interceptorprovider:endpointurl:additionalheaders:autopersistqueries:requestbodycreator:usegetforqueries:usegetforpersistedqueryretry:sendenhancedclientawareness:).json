@@ -15,11 +15,11 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:)"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo28RequestChainNetworkTransportC19interceptorProvider11endpointURL17additionalHeaders18autoPersistQueries18requestBodyCreator09useGETForN00rS19PersistedQueryRetryAcA011InterceptorG0_p_10Foundation0I0VSDyS2SGSbAA0bpQ0_pS2btcfc",
+    "externalID" : "s:6Apollo28RequestChainNetworkTransportC19interceptorProvider11endpointURL17additionalHeaders18autoPersistQueries18requestBodyCreator09useGETForN00rS19PersistedQueryRetry27sendEnhancedClientAwarenessAcA011InterceptorG0_p_10Foundation0I0VSDyS2SGSbAA0bpQ0_pS3btcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -155,6 +155,23 @@
       },
       {
         "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "sendEnhancedClientAwareness"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:Sb",
+        "text" : "Bool"
+      },
+      {
+        "kind" : "text",
         "text" : ")"
       }
     ],
@@ -166,7 +183,7 @@
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",
-    "title" : "init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:)"
+    "title" : "init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)"
   },
   "primaryContentSections" : [
     {
@@ -315,7 +332,24 @@
             },
             {
               "kind" : "text",
-              "text" : " = false)"
+              "text" : " = false, "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "sendEnhancedClientAwareness"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:Sb",
+              "text" : "Bool"
+            },
+            {
+              "kind" : "text",
+              "text" : " = true)"
             }
           ]
         }
@@ -358,7 +392,15 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "Any additional headers that should be automatically added to every request. Defaults to an empty dictionary.",
+                  "text" : "Any additional headers that should be automatically added to every request. Defaults to",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "an empty dictionary.",
                   "type" : "text"
                 }
               ],
@@ -380,7 +422,15 @@
                   "type" : "codeVoice"
                 },
                 {
-                  "text" : " if Automatic Persisted Queries should be used to send a query hash instead of the full query body by default. Defaults to ",
+                  "text" : " if Automatic Persisted Queries should be used to send a query hash instead",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "of the full query body by default. Defaults to ",
                   "type" : "text"
                 },
                 {
@@ -418,7 +468,15 @@
                   "type" : "codeVoice"
                 },
                 {
-                  "text" : ". Defaults to the provided ",
+                  "text" : ". Defaults to the",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "provided ",
                   "type" : "text"
                 },
                 {
@@ -464,7 +522,15 @@
                   "type" : "codeVoice"
                 },
                 {
-                  "text" : " for queries, for example to take advantage of a CDN. Defaults to ",
+                  "text" : " for queries, for example to take",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "advantage of a CDN. Defaults to ",
                   "type" : "text"
                 },
                 {
@@ -510,7 +576,15 @@
                   "type" : "codeVoice"
                 },
                 {
-                  "text" : " for a retry of a persisted query. Defaults to ",
+                  "text" : " for a retry of a persisted query.",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "Defaults to ",
                   "type" : "text"
                 },
                 {
@@ -526,6 +600,40 @@
             }
           ],
           "name" : "useGETForPersistedQueryRetry"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Specifies whether client library metadata is sent in each request ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "extensions",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "key. Client library metadata is the Apollo iOS library name and version. Defaults to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "true",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "sendEnhancedClientAwareness"
         }
       ]
     }
@@ -541,7 +649,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/requestchainnetworktransport\/init(interceptorprovider:endpointurl:additionalheaders:autopersistqueries:requestbodycreator:usegetforqueries:usegetforpersistedqueryretry:)"
+        "\/documentation\/apollo\/requestchainnetworktransport\/init(interceptorprovider:endpointurl:additionalheaders:autopersistqueries:requestbodycreator:usegetforqueries:usegetforpersistedqueryretry:sendenhancedclientawareness:)"
       ],
       "traits" : [
         {
@@ -689,7 +797,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport"
 },
-"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:)": {
+"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)": {
   "abstract" : [
     {
       "text" : "Designated initializer",
@@ -831,15 +939,32 @@
     },
     {
       "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "sendEnhancedClientAwareness"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:)",
+  "title" : "init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/init(interceptorprovider:endpointurl:additionalheaders:autopersistqueries:requestbodycreator:usegetforqueries:usegetforpersistedqueryretry:)"
+  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/init(interceptorprovider:endpointurl:additionalheaders:autopersistqueries:requestbodycreator:usegetforqueries:usegetforpersistedqueryretry:sendenhancedclientawareness:)"
 }
 }
 }

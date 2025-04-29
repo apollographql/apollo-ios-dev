@@ -1,7 +1,15 @@
 {
   "abstract" : [
     {
-      "text" : "Creates a client with the specified network transport and store.",
+      "text" : "Creates a client with a ",
+      "type" : "text"
+    },
+    {
+      "code" : "RequestChainNetworkTransport",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " connecting to the specified URL.",
       "type" : "text"
     }
   ],
@@ -15,12 +23,20 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(networkTransport:store:)"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:sendEnhancedClientAwareness:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A6ClientC16networkTransport5storeAcA07NetworkD0_p_AA0A5StoreCtcfc",
+    "externalID" : "s:6Apollo0A6ClientC3url012sendEnhancedB9AwarenessAC10Foundation3URLV_Sbtcfc",
     "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "convenience"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
       {
         "kind" : "identifier",
         "text" : "init"
@@ -31,24 +47,7 @@
       },
       {
         "kind" : "externalParam",
-        "text" : "networkTransport"
-      },
-      {
-        "kind" : "text",
-        "text" : ": any "
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo16NetworkTransportP",
-        "text" : "NetworkTransport"
-      },
-      {
-        "kind" : "text",
-        "text" : ", "
-      },
-      {
-        "kind" : "externalParam",
-        "text" : "store"
+        "text" : "url"
       },
       {
         "kind" : "text",
@@ -56,8 +55,25 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo0A5StoreC",
-        "text" : "ApolloStore"
+        "preciseIdentifier" : "s:10Foundation3URLV",
+        "text" : "URL"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "sendEnhancedClientAwareness"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:Sb",
+        "text" : "Bool"
       },
       {
         "kind" : "text",
@@ -72,7 +88,7 @@
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",
-    "title" : "init(networkTransport:store:)"
+    "title" : "init(url:sendEnhancedClientAwareness:)"
   },
   "primaryContentSections" : [
     {
@@ -87,6 +103,14 @@
           "tokens" : [
             {
               "kind" : "keyword",
+              "text" : "convenience"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
               "text" : "init"
             },
             {
@@ -95,17 +119,16 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "networkTransport"
+              "text" : "url"
             },
             {
               "kind" : "text",
-              "text" : ": any "
+              "text" : ": "
             },
             {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo16NetworkTransportP",
-              "text" : "NetworkTransport"
+              "preciseIdentifier" : "s:10Foundation3URLV",
+              "text" : "URL"
             },
             {
               "kind" : "text",
@@ -113,21 +136,20 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "store"
+              "text" : "sendEnhancedClientAwareness"
             },
             {
               "kind" : "text",
               "text" : ": "
             },
             {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo0A5StoreC",
-              "text" : "ApolloStore"
+              "preciseIdentifier" : "s:Sb",
+              "text" : "Bool"
             },
             {
               "kind" : "text",
-              "text" : ")"
+              "text" : " = true)"
             }
           ]
         }
@@ -142,36 +164,14 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "A network transport used to send operations to a server.",
+                  "text" : "The URL of a GraphQL server to connect to.",
                   "type" : "text"
                 }
               ],
               "type" : "paragraph"
             }
           ],
-          "name" : "networkTransport"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "A store used as a local cache. Note that if the ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "NetworkTransport",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : " or any of its dependencies takes a store, you should make sure the same store is passed here so that it can be cleared properly.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "store"
+          "name" : "url"
         }
       ]
     }
@@ -187,7 +187,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/apolloclient\/init(networktransport:store:)"
+        "\/documentation\/apollo\/apolloclient\/init(url:sendenhancedclientawareness:)"
       ],
       "traits" : [
         {
@@ -262,14 +262,30 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclient"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient/init(networkTransport:store:)": {
+"doc://Apollo/documentation/Apollo/ApolloClient/init(url:sendEnhancedClientAwareness:)": {
   "abstract" : [
     {
-      "text" : "Creates a client with the specified network transport and store.",
+      "text" : "Creates a client with a ",
+      "type" : "text"
+    },
+    {
+      "code" : "RequestChainNetworkTransport",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " connecting to the specified URL.",
       "type" : "text"
     }
   ],
   "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "convenience"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
     {
       "kind" : "identifier",
       "text" : "init"
@@ -280,24 +296,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "networkTransport"
-    },
-    {
-      "kind" : "text",
-      "text" : ": any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo16NetworkTransportP",
-      "text" : "NetworkTransport"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "store"
+      "text" : "url"
     },
     {
       "kind" : "text",
@@ -305,96 +304,37 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo0A5StoreC",
-      "text" : "ApolloStore"
+      "preciseIdentifier" : "s:10Foundation3URLV",
+      "text" : "URL"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "sendEnhancedClientAwareness"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
     },
     {
       "kind" : "text",
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(networkTransport:store:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:sendEnhancedClientAwareness:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(networkTransport:store:)",
+  "title" : "init(url:sendEnhancedClientAwareness:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/init(networktransport:store:)"
-},
-"doc://Apollo/documentation/Apollo/ApolloStore": {
-  "abstract" : [
-    {
-      "text" : "The ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloStore",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " class acts as a local cache for normalized GraphQL results.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "class"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "ApolloStore"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "ApolloStore"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "ApolloStore",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollostore"
-},
-"doc://Apollo/documentation/Apollo/NetworkTransport": {
-  "abstract" : [
-    {
-      "text" : "A network transport is responsible for sending GraphQL operations to a server.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "protocol"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "NetworkTransport"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "NetworkTransport"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "NetworkTransport",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/networktransport"
+  "url" : "\/documentation\/apollo\/apolloclient\/init(url:sendenhancedclientawareness:)"
 }
 }
 }
