@@ -19,7 +19,7 @@ NEW_VERSION="$1"
 # Set Apollo version constant
 
 CURRENT_APOLLO_VERSION=$($apolloDirectory/scripts/get-version.sh)
-MATCH_TEXT='ApolloVersion: String = "'
+MATCH_TEXT='ApolloClientVersion: String = "'
 SEARCH_TEXT="$MATCH_TEXT$CURRENT_APOLLO_VERSION"
 REPLACE_TEXT="$MATCH_TEXT$NEW_VERSION"
 sed -i '' -e "s/$SEARCH_TEXT/$REPLACE_TEXT/" $apolloDirectory/$APOLLO_CONSTANTS_FILE
