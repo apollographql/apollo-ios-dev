@@ -5,7 +5,7 @@
       "type" : "text"
     },
     {
-      "code" : "SQLiteDatabase.init(fileURL:)",
+      "code" : "SQLiteDatabase.keyColumnName",
       "type" : "codeVoice"
     },
     {
@@ -17,29 +17,39 @@
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase",
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/SQLiteDatabase-Implementations"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/init(fileURL:)"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/keyColumnName"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:12ApolloSQLite0B16DotSwiftDatabaseC7fileURLAC10Foundation0G0V_tKcfc",
+    "extendedModule" : "ApolloSQLite",
+    "externalID" : "s:12ApolloSQLite0B8DatabasePAAE13keyColumnNameSSvpZ::SYNTHESIZED::s:12ApolloSQLite0aB8DatabaseC",
     "fragments" : [
       {
-        "kind" : "identifier",
-        "text" : "init"
+        "kind" : "keyword",
+        "text" : "static"
       },
       {
         "kind" : "text",
-        "text" : "("
+        "text" : " "
       },
       {
-        "kind" : "externalParam",
-        "text" : "fileURL"
+        "kind" : "keyword",
+        "text" : "var"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "keyColumnName"
       },
       {
         "kind" : "text",
@@ -47,16 +57,8 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:10Foundation3URLV",
-        "text" : "URL"
-      },
-      {
-        "kind" : "text",
-        "text" : ") "
-      },
-      {
-        "kind" : "keyword",
-        "text" : "throws"
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
       }
     ],
     "modules" : [
@@ -65,9 +67,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Initializer",
-    "symbolKind" : "init",
-    "title" : "init(fileURL:)"
+    "roleHeading" : "Type Property",
+    "symbolKind" : "property",
+    "title" : "keyColumnName"
   },
   "primaryContentSections" : [
     {
@@ -82,15 +84,23 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "init"
+              "text" : "static"
             },
             {
               "kind" : "text",
-              "text" : "("
+              "text" : " "
             },
             {
-              "kind" : "externalParam",
-              "text" : "fileURL"
+              "kind" : "keyword",
+              "text" : "var"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "keyColumnName"
             },
             {
               "kind" : "text",
@@ -98,16 +108,20 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:10Foundation3URLV",
-              "text" : "URL"
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
             },
             {
               "kind" : "text",
-              "text" : ") "
+              "text" : " { "
             },
             {
               "kind" : "keyword",
-              "text" : "throws"
+              "text" : "get"
+            },
+            {
+              "kind" : "text",
+              "text" : " }"
             }
           ]
         }
@@ -126,7 +140,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/init(fileurl:)"
+        "\/documentation\/apollosqlite\/apollosqlitedatabase\/keycolumnname"
       ],
       "traits" : [
         {
@@ -180,7 +194,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase": {
   "abstract" : [
 
   ],
@@ -195,38 +209,57 @@
     },
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
   "role" : "symbol",
-  "title" : "SQLiteDotSwiftDatabase",
+  "title" : "ApolloSQLiteDatabase",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/init(fileURL:)": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/SQLiteDatabase-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/SQLiteDatabase-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "SQLiteDatabase Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/sqlitedatabase-implementations"
+},
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/keyColumnName": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
-      "kind" : "identifier",
-      "text" : "init"
+      "kind" : "keyword",
+      "text" : "static"
     },
     {
       "kind" : "text",
-      "text" : "("
+      "text" : " "
     },
     {
-      "kind" : "externalParam",
-      "text" : "fileURL"
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "keyColumnName"
     },
     {
       "kind" : "text",
@@ -234,24 +267,16 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:10Foundation3URLV",
-      "text" : "URL"
-    },
-    {
-      "kind" : "text",
-      "text" : ") "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "throws"
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/init(fileURL:)",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/keyColumnName",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(fileURL:)",
+  "title" : "keyColumnName",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/init(fileurl:)"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/keycolumnname"
 }
 }
 }

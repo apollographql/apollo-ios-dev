@@ -122,7 +122,7 @@
               "type" : "codeVoice"
             },
             {
-              "text" : " for an individual request.",
+              "text" : " for an individual",
               "type" : "text"
             },
             {
@@ -130,7 +130,7 @@
               "type" : "text"
             },
             {
-              "text" : "If the ",
+              "text" : "request. If the ",
               "type" : "text"
             },
             {
@@ -138,7 +138,15 @@
               "type" : "codeVoice"
             },
             {
-              "text" : " for a request does not conform to this protocol, the default request timeout of ",
+              "text" : " for a request does not conform to this protocol, the default request timeout",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "of ",
               "type" : "text"
             },
             {

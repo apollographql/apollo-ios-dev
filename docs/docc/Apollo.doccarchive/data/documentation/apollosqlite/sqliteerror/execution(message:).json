@@ -1,37 +1,23 @@
 {
-  "abstract" : [
-    {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "SQLiteDatabase.deleteRecords(matching:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/deleteRecords(matching:)"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError\/execution(message:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:12ApolloSQLite0B16DotSwiftDatabaseC13deleteRecords8matchingySS_tKF",
+    "externalID" : "s:12ApolloSQLite0B5ErrorO9executionyACSS_tcACmF",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "func"
+        "text" : "case"
       },
       {
         "kind" : "text",
@@ -39,7 +25,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "deleteRecords"
+        "text" : "execution"
       },
       {
         "kind" : "text",
@@ -47,7 +33,7 @@
       },
       {
         "kind" : "externalParam",
-        "text" : "matching"
+        "text" : "message"
       },
       {
         "kind" : "text",
@@ -55,16 +41,12 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo8CacheKeya",
-        "text" : "CacheKey"
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
       },
       {
         "kind" : "text",
-        "text" : ") "
-      },
-      {
-        "kind" : "keyword",
-        "text" : "throws"
+        "text" : ")"
       }
     ],
     "modules" : [
@@ -73,9 +55,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Instance Method",
-    "symbolKind" : "method",
-    "title" : "deleteRecords(matching:)"
+    "roleHeading" : "Case",
+    "symbolKind" : "case",
+    "title" : "SQLiteError.execution(message:)"
   },
   "primaryContentSections" : [
     {
@@ -90,7 +72,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "func"
+              "text" : "case"
             },
             {
               "kind" : "text",
@@ -98,7 +80,7 @@
             },
             {
               "kind" : "identifier",
-              "text" : "deleteRecords"
+              "text" : "execution"
             },
             {
               "kind" : "text",
@@ -106,15 +88,7 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "matching"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "internalParam",
-              "text" : "pattern"
+              "text" : "message"
             },
             {
               "kind" : "text",
@@ -122,16 +96,12 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo8CacheKeya",
-              "text" : "CacheKey"
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
             },
             {
               "kind" : "text",
-              "text" : ") "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "throws"
+              "text" : ")"
             }
           ]
         }
@@ -150,7 +120,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/deleterecords(matching:)"
+        "\/documentation\/apollosqlite\/sqliteerror\/execution(message:)"
       ],
       "traits" : [
         {
@@ -204,14 +174,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteError": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -219,30 +189,30 @@
     },
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "SQLiteError"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "SQLiteError"
     }
   ],
   "role" : "symbol",
-  "title" : "SQLiteDotSwiftDatabase",
+  "title" : "SQLiteError",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+  "url" : "\/documentation\/apollosqlite\/sqliteerror"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/deleteRecords(matching:)": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteError/execution(message:)": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "func"
+      "text" : "case"
     },
     {
       "kind" : "text",
@@ -250,7 +220,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "deleteRecords"
+      "text" : "execution"
     },
     {
       "kind" : "text",
@@ -258,7 +228,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "matching"
+      "text" : "message"
     },
     {
       "kind" : "text",
@@ -266,24 +236,20 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo8CacheKeya",
-      "text" : "CacheKey"
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
     },
     {
       "kind" : "text",
-      "text" : ") "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "throws"
+      "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/deleteRecords(matching:)",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError\/execution(message:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "deleteRecords(matching:)",
+  "title" : "SQLiteError.execution(message:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/deleterecords(matching:)"
+  "url" : "\/documentation\/apollosqlite\/sqliteerror\/execution(message:)"
 }
 }
 }

@@ -5,7 +5,7 @@
       "type" : "text"
     },
     {
-      "code" : "SQLiteDatabase.idColumnName",
+      "code" : "SQLiteDatabase.addOrUpdate(records:)",
       "type" : "codeVoice"
     },
     {
@@ -17,31 +17,21 @@
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/SQLiteDatabase-Implementations"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/idColumnName"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/addOrUpdate(records:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "extendedModule" : "ApolloSQLite",
-    "externalID" : "s:12ApolloSQLite0B8DatabasePAAE12idColumnNameSSvpZ::SYNTHESIZED::s:12ApolloSQLite0B16DotSwiftDatabaseC",
+    "externalID" : "s:12ApolloSQLite0aB8DatabaseC11addOrUpdate7recordsySaySS8cacheKey_SS12recordStringtG_tKF",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "static"
-      },
-      {
-        "kind" : "text",
-        "text" : " "
-      },
-      {
-        "kind" : "keyword",
-        "text" : "var"
+        "text" : "func"
       },
       {
         "kind" : "text",
@@ -49,7 +39,32 @@
       },
       {
         "kind" : "identifier",
-        "text" : "idColumnName"
+        "text" : "addOrUpdate"
+      },
+      {
+        "kind" : "text",
+        "text" : "("
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "records"
+      },
+      {
+        "kind" : "text",
+        "text" : ": [(cacheKey"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:6Apollo8CacheKeya",
+        "text" : "CacheKey"
+      },
+      {
+        "kind" : "text",
+        "text" : ", recordString"
       },
       {
         "kind" : "text",
@@ -59,6 +74,14 @@
         "kind" : "typeIdentifier",
         "preciseIdentifier" : "s:SS",
         "text" : "String"
+      },
+      {
+        "kind" : "text",
+        "text" : ")]) "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "throws"
       }
     ],
     "modules" : [
@@ -67,9 +90,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Type Property",
-    "symbolKind" : "property",
-    "title" : "idColumnName"
+    "roleHeading" : "Instance Method",
+    "symbolKind" : "method",
+    "title" : "addOrUpdate(records:)"
   },
   "primaryContentSections" : [
     {
@@ -84,15 +107,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "static"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "var"
+              "text" : "func"
             },
             {
               "kind" : "text",
@@ -100,7 +115,32 @@
             },
             {
               "kind" : "identifier",
-              "text" : "idColumnName"
+              "text" : "addOrUpdate"
+            },
+            {
+              "kind" : "text",
+              "text" : "("
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "records"
+            },
+            {
+              "kind" : "text",
+              "text" : ": [(cacheKey"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo8CacheKeya",
+              "text" : "CacheKey"
+            },
+            {
+              "kind" : "text",
+              "text" : ", recordString"
             },
             {
               "kind" : "text",
@@ -113,15 +153,11 @@
             },
             {
               "kind" : "text",
-              "text" : " { "
+              "text" : ")]) "
             },
             {
               "kind" : "keyword",
-              "text" : "get"
-            },
-            {
-              "kind" : "text",
-              "text" : " }"
+              "text" : "throws"
             }
           ]
         }
@@ -140,7 +176,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/idcolumnname"
+        "\/documentation\/apollosqlite\/apollosqlitedatabase\/addorupdate(records:)"
       ],
       "traits" : [
         {
@@ -194,7 +230,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase": {
   "abstract" : [
 
   ],
@@ -209,49 +245,30 @@
     },
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "ApolloSQLiteDatabase"
     }
   ],
   "role" : "symbol",
-  "title" : "SQLiteDotSwiftDatabase",
+  "title" : "ApolloSQLiteDatabase",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/SQLiteDatabase-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/SQLiteDatabase-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "SQLiteDatabase Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/sqlitedatabase-implementations"
-},
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/idColumnName": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/ApolloSQLiteDatabase/addOrUpdate(records:)": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "var"
+      "text" : "func"
     },
     {
       "kind" : "text",
@@ -259,7 +276,32 @@
     },
     {
       "kind" : "identifier",
-      "text" : "idColumnName"
+      "text" : "addOrUpdate"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "records"
+    },
+    {
+      "kind" : "text",
+      "text" : ": [(cacheKey"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo8CacheKeya",
+      "text" : "CacheKey"
+    },
+    {
+      "kind" : "text",
+      "text" : ", recordString"
     },
     {
       "kind" : "text",
@@ -269,14 +311,22 @@
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "s:SS",
       "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ")]) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/idColumnName",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/ApolloSQLiteDatabase\/addOrUpdate(records:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "idColumnName",
+  "title" : "addOrUpdate(records:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/idcolumnname"
+  "url" : "\/documentation\/apollosqlite\/apollosqlitedatabase\/addorupdate(records:)"
 }
 }
 }

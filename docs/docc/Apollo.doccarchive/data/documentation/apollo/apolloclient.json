@@ -115,8 +115,8 @@
   "topicSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(networkTransport:store:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(networkTransport:store:sendEnhancedClientAwareness:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:sendEnhancedClientAwareness:)"
       ],
       "title" : "Initializers"
     },
@@ -266,7 +266,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclient\/apolloclientprotocol-implementations"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient/init(networkTransport:store:)": {
+"doc://Apollo/documentation/Apollo/ApolloClient/init(networkTransport:store:sendEnhancedClientAwareness:)": {
   "abstract" : [
     {
       "text" : "Creates a client with the specified network transport and store.",
@@ -314,17 +314,34 @@
     },
     {
       "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "sendEnhancedClientAwareness"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(networkTransport:store:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(networkTransport:store:sendEnhancedClientAwareness:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(networkTransport:store:)",
+  "title" : "init(networkTransport:store:sendEnhancedClientAwareness:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/init(networktransport:store:)"
+  "url" : "\/documentation\/apollo\/apolloclient\/init(networktransport:store:sendenhancedclientawareness:)"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient/init(url:)": {
+"doc://Apollo/documentation/Apollo/ApolloClient/init(url:sendEnhancedClientAwareness:)": {
   "abstract" : [
     {
       "text" : "Creates a client with a ",
@@ -371,15 +388,32 @@
     },
     {
       "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "sendEnhancedClientAwareness"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:sendEnhancedClientAwareness:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(url:)",
+  "title" : "init(url:sendEnhancedClientAwareness:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/init(url:)"
+  "url" : "\/documentation\/apollo\/apolloclient\/init(url:sendenhancedclientawareness:)"
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/store": {
   "abstract" : [

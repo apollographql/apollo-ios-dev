@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Designated Initializer",
+      "text" : "Designated initializer",
       "type" : "text"
     }
   ],
@@ -9,17 +9,17 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest"
+        "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequest"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:)"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequest\/init(operation:graphQLEndpoint:contextIdentifier:clientName:clientVersion:additionalHeaders:cachePolicy:context:autoPersistQueries:useGETForQueries:useGETForPersistedQueryRetry:requestBodyCreator:sendEnhancedClientAwareness:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo13UploadRequestC15graphQLEndpoint9operation10clientName0G7Version17additionalHeaders5files14manualBoundary7context18requestBodyCreatorACyxG10Foundation3URLV_xS2SSDyS2SGSayAA11GraphQLFileVGSSSgAA0C7Context_pSgAA0cqR0_ptcfc",
+    "externalID" : "s:6Apollo11JSONRequestC9operation15graphQLEndpoint17contextIdentifier10clientName0H7Version17additionalHeaders11cachePolicy0F018autoPersistQueries09useGETForQ00rS19PersistedQueryRetry18requestBodyCreator27sendEnhancedClientAwarenessACyxGx_10Foundation3URLVAR4UUIDVSgS2SSDyS2SGAA05CacheN0OAA14RequestContext_pSgS3bAA07RequestxY0_pSbtcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -28,6 +28,22 @@
       {
         "kind" : "text",
         "text" : "("
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "operation"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "text" : "Operation"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
       },
       {
         "kind" : "externalParam",
@@ -48,7 +64,7 @@
       },
       {
         "kind" : "externalParam",
-        "text" : "operation"
+        "text" : "contextIdentifier"
       },
       {
         "kind" : "text",
@@ -56,11 +72,12 @@
       },
       {
         "kind" : "typeIdentifier",
-        "text" : "Operation"
+        "preciseIdentifier" : "s:10Foundation4UUIDV",
+        "text" : "UUID"
       },
       {
         "kind" : "text",
-        "text" : ", "
+        "text" : "?, "
       },
       {
         "kind" : "externalParam",
@@ -124,24 +141,7 @@
       },
       {
         "kind" : "externalParam",
-        "text" : "files"
-      },
-      {
-        "kind" : "text",
-        "text" : ": ["
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo11GraphQLFileV",
-        "text" : "GraphQLFile"
-      },
-      {
-        "kind" : "text",
-        "text" : "], "
-      },
-      {
-        "kind" : "externalParam",
-        "text" : "manualBoundary"
+        "text" : "cachePolicy"
       },
       {
         "kind" : "text",
@@ -149,12 +149,12 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:SS",
-        "text" : "String"
+        "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+        "text" : "CachePolicy"
       },
       {
         "kind" : "text",
-        "text" : "?, "
+        "text" : ", "
       },
       {
         "kind" : "externalParam",
@@ -175,6 +175,57 @@
       },
       {
         "kind" : "externalParam",
+        "text" : "autoPersistQueries"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:Sb",
+        "text" : "Bool"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "useGETForQueries"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:Sb",
+        "text" : "Bool"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "useGETForPersistedQueryRetry"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:Sb",
+        "text" : "Bool"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
         "text" : "requestBodyCreator"
       },
       {
@@ -185,6 +236,23 @@
         "kind" : "typeIdentifier",
         "preciseIdentifier" : "s:6Apollo18RequestBodyCreatorP",
         "text" : "RequestBodyCreator"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "sendEnhancedClientAwareness"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:Sb",
+        "text" : "Bool"
       },
       {
         "kind" : "text",
@@ -199,7 +267,7 @@
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",
-    "title" : "init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:)"
+    "title" : "init(operation:graphQLEndpoint:contextIdentifier:clientName:clientVersion:additionalHeaders:cachePolicy:context:autoPersistQueries:useGETForQueries:useGETForPersistedQueryRetry:requestBodyCreator:sendEnhancedClientAwareness:)"
   },
   "primaryContentSections" : [
     {
@@ -222,6 +290,22 @@
             },
             {
               "kind" : "externalParam",
+              "text" : "operation"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Operation"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "externalParam",
               "text" : "graphQLEndpoint"
             },
             {
@@ -239,7 +323,7 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "operation"
+              "text" : "contextIdentifier"
             },
             {
               "kind" : "text",
@@ -247,11 +331,12 @@
             },
             {
               "kind" : "typeIdentifier",
-              "text" : "Operation"
+              "preciseIdentifier" : "s:10Foundation4UUIDV",
+              "text" : "UUID"
             },
             {
               "kind" : "text",
-              "text" : ", "
+              "text" : "? = nil, "
             },
             {
               "kind" : "externalParam",
@@ -315,38 +400,21 @@
             },
             {
               "kind" : "externalParam",
-              "text" : "files"
-            },
-            {
-              "kind" : "text",
-              "text" : ": ["
-            },
-            {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLFile",
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo11GraphQLFileV",
-              "text" : "GraphQLFile"
-            },
-            {
-              "kind" : "text",
-              "text" : "], "
-            },
-            {
-              "kind" : "externalParam",
-              "text" : "manualBoundary"
+              "text" : "cachePolicy"
             },
             {
               "kind" : "text",
               "text" : ": "
             },
             {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:SS",
-              "text" : "String"
+              "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+              "text" : "CachePolicy"
             },
             {
               "kind" : "text",
-              "text" : "? = nil, "
+              "text" : " = .default, "
             },
             {
               "kind" : "externalParam",
@@ -368,6 +436,57 @@
             },
             {
               "kind" : "externalParam",
+              "text" : "autoPersistQueries"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:Sb",
+              "text" : "Bool"
+            },
+            {
+              "kind" : "text",
+              "text" : " = false, "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "useGETForQueries"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:Sb",
+              "text" : "Bool"
+            },
+            {
+              "kind" : "text",
+              "text" : " = false, "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "useGETForPersistedQueryRetry"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:Sb",
+              "text" : "Bool"
+            },
+            {
+              "kind" : "text",
+              "text" : " = false, "
+            },
+            {
+              "kind" : "externalParam",
               "text" : "requestBodyCreator"
             },
             {
@@ -382,7 +501,24 @@
             },
             {
               "kind" : "text",
-              "text" : " = ApolloRequestBodyCreator())"
+              "text" : " = ApolloRequestBodyCreator(), "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "sendEnhancedClientAwareness"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:Sb",
+              "text" : "Bool"
+            },
+            {
+              "kind" : "text",
+              "text" : " = true)"
             }
           ]
         }
@@ -392,6 +528,20 @@
     {
       "kind" : "parameters",
       "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The GraphQL Operation to execute",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "operation"
+        },
         {
           "content" : [
             {
@@ -411,14 +561,22 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "The GraphQL Operation to execute",
+                  "text" : "[optional] A unique identifier for this request, to help with deduping cache hits for watchers. Defaults to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "nil",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
                   "type" : "text"
                 }
               ],
               "type" : "paragraph"
             }
           ],
-          "name" : "operation"
+          "name" : "contextIdentifier"
         },
         {
           "content" : [
@@ -469,7 +627,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "Any additional headers you wish to add by default to this request. Defaults to an empty dictionary.",
+                  "text" : "Any additional headers you wish to add by default to this request",
                   "type" : "text"
                 }
               ],
@@ -483,43 +641,29 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "The array of files to upload for all ",
+                  "text" : "The ",
                   "type" : "text"
                 },
                 {
-                  "code" : "Upload",
+                  "code" : "CachePolicy",
                   "type" : "codeVoice"
                 },
                 {
-                  "text" : " parameters in the mutation.",
+                  "text" : " to use for this request.",
                   "type" : "text"
                 }
               ],
               "type" : "paragraph"
             }
           ],
-          "name" : "files"
+          "name" : "cachePolicy"
         },
         {
           "content" : [
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] A manual boundary to pass in. A default boundary will be used otherwise. Defaults to nil.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "manualBoundary"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "[optional] A context that is being passed through the request chain. Should default to ",
+                  "text" : "[optional] A context that is being passed through the request chain. Defaults to ",
                   "type" : "text"
                 },
                 {
@@ -535,6 +679,128 @@
             }
           ],
           "name" : "context"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "",
+                  "type" : "text"
+                },
+                {
+                  "code" : "true",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " if Auto-Persisted Queries should be used. Defaults to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "false",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "autoPersistQueries"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "",
+                  "type" : "text"
+                },
+                {
+                  "code" : "true",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " if Queries should use ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "GET",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " instead of ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "POST",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " for HTTP requests. Defaults to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "false",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "useGETForQueries"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "",
+                  "type" : "text"
+                },
+                {
+                  "code" : "true",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " if when an Auto-Persisted query is retried, it should use ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "GET",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " instead of ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "POST",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " to send the query. Defaults to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "false",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "useGETForPersistedQueryRetry"
         },
         {
           "content" : [
@@ -580,7 +846,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/uploadrequest\/init(graphqlendpoint:operation:clientname:clientversion:additionalheaders:files:manualboundary:context:requestbodycreator:)"
+        "\/documentation\/apollo\/jsonrequest\/init(operation:graphqlendpoint:contextidentifier:clientname:clientversion:additionalheaders:cachepolicy:context:autopersistqueries:usegetforqueries:usegetforpersistedqueryretry:requestbodycreator:sendenhancedclientawareness:)"
       ],
       "traits" : [
         {
@@ -605,17 +871,17 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/GraphQLFile": {
+"doc://Apollo/documentation/Apollo/CachePolicy": {
   "abstract" : [
     {
-      "text" : "A file which can be uploaded to a GraphQL server",
+      "text" : "A cache policy that specifies whether results should be fetched from the server or loaded from the local cache.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "struct"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -623,21 +889,308 @@
     },
     {
       "kind" : "identifier",
-      "text" : "GraphQLFile"
+      "text" : "CachePolicy"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLFile",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "GraphQLFile"
+      "text" : "CachePolicy"
     }
   ],
   "role" : "symbol",
-  "title" : "GraphQLFile",
+  "title" : "CachePolicy",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlfile"
+  "url" : "\/documentation\/apollo\/cachepolicy"
+},
+"doc://Apollo/documentation/Apollo/JSONRequest": {
+  "abstract" : [
+    {
+      "text" : "A request which sends JSON related to a GraphQL operation.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "JSONRequest"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequest",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "JSONRequest"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "JSONRequest",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/jsonrequest"
+},
+"doc://Apollo/documentation/Apollo/JSONRequest/init(operation:graphQLEndpoint:contextIdentifier:clientName:clientVersion:additionalHeaders:cachePolicy:context:autoPersistQueries:useGETForQueries:useGETForPersistedQueryRetry:requestBodyCreator:sendEnhancedClientAwareness:)": {
+  "abstract" : [
+    {
+      "text" : "Designated initializer",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "graphQLEndpoint"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation3URLV",
+      "text" : "URL"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "contextIdentifier"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation4UUIDV",
+      "text" : "UUID"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "clientName"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "clientVersion"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "additionalHeaders"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : "], "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "cachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+      "text" : "CachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "context"
+    },
+    {
+      "kind" : "text",
+      "text" : ": (any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo14RequestContextP",
+      "text" : "RequestContext"
+    },
+    {
+      "kind" : "text",
+      "text" : ")?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "autoPersistQueries"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "useGETForQueries"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "useGETForPersistedQueryRetry"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestBodyCreator"
+    },
+    {
+      "kind" : "text",
+      "text" : ": any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo18RequestBodyCreatorP",
+      "text" : "RequestBodyCreator"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "sendEnhancedClientAwareness"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequest\/init(operation:graphQLEndpoint:contextIdentifier:clientName:clientVersion:additionalHeaders:cachePolicy:context:autoPersistQueries:useGETForQueries:useGETForPersistedQueryRetry:requestBodyCreator:sendEnhancedClientAwareness:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(operation:graphQLEndpoint:contextIdentifier:clientName:clientVersion:additionalHeaders:cachePolicy:context:autoPersistQueries:useGETForQueries:useGETForPersistedQueryRetry:requestBodyCreator:sendEnhancedClientAwareness:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/jsonrequest\/init(operation:graphqlendpoint:contextidentifier:clientname:clientversion:additionalheaders:cachepolicy:context:autopersistqueries:usegetforqueries:usegetforpersistedqueryretry:requestbodycreator:sendenhancedclientawareness:)"
 },
 "doc://Apollo/documentation/Apollo/RequestBodyCreator": {
   "abstract" : [
@@ -703,225 +1256,6 @@
   "title" : "RequestContext",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestcontext"
-},
-"doc://Apollo/documentation/Apollo/UploadRequest": {
-  "abstract" : [
-    {
-      "text" : "A request class allowing for a multipart-upload request.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "class"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "UploadRequest"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "UploadRequest"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "UploadRequest",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/uploadrequest"
-},
-"doc://Apollo/documentation/Apollo/UploadRequest/init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:)": {
-  "abstract" : [
-    {
-      "text" : "Designated Initializer",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "identifier",
-      "text" : "init"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "graphQLEndpoint"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:10Foundation3URLV",
-      "text" : "URL"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "clientName"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "clientVersion"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "additionalHeaders"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ["
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : " : "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : "], "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "files"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ["
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11GraphQLFileV",
-      "text" : "GraphQLFile"
-    },
-    {
-      "kind" : "text",
-      "text" : "], "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "manualBoundary"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : "?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "context"
-    },
-    {
-      "kind" : "text",
-      "text" : ": (any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo14RequestContextP",
-      "text" : "RequestContext"
-    },
-    {
-      "kind" : "text",
-      "text" : ")?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "requestBodyCreator"
-    },
-    {
-      "kind" : "text",
-      "text" : ": any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo18RequestBodyCreatorP",
-      "text" : "RequestBodyCreator"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:)",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/uploadrequest\/init(graphqlendpoint:operation:clientname:clientversion:additionalheaders:files:manualboundary:context:requestbodycreator:)"
 }
 }
 }

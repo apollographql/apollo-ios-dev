@@ -14,13 +14,13 @@
                 "type" : "groupMarker"
               },
               {
-                "path" : "\/documentation\/apollo\/apolloclient\/init(networktransport:store:)",
-                "title" : "init(networkTransport: any NetworkTransport, store: ApolloStore)",
+                "path" : "\/documentation\/apollo\/apolloclient\/init(networktransport:store:sendenhancedclientawareness:)",
+                "title" : "init(networkTransport: any NetworkTransport, store: ApolloStore, sendEnhancedClientAwareness: Bool)",
                 "type" : "init"
               },
               {
-                "path" : "\/documentation\/apollo\/apolloclient\/init(url:)",
-                "title" : "convenience init(url: URL)",
+                "path" : "\/documentation\/apollo\/apolloclient\/init(url:sendenhancedclientawareness:)",
+                "title" : "convenience init(url: URL, sendEnhancedClientAwareness: Bool)",
                 "type" : "init"
               },
               {
@@ -1038,8 +1038,8 @@
                 "type" : "groupMarker"
               },
               {
-                "path" : "\/documentation\/apollo\/jsonrequest\/init(operation:graphqlendpoint:contextidentifier:clientname:clientversion:additionalheaders:cachepolicy:context:autopersistqueries:usegetforqueries:usegetforpersistedqueryretry:requestbodycreator:)",
-                "title" : "init(operation: Operation, graphQLEndpoint: URL, contextIdentifier: UUID?, clientName: String, clientVersion: String, additionalHeaders: [String : String], cachePolicy: CachePolicy, context: (any RequestContext)?, autoPersistQueries: Bool, useGETForQueries: Bool, useGETForPersistedQueryRetry: Bool, requestBodyCreator: any RequestBodyCreator)",
+                "path" : "\/documentation\/apollo\/jsonrequest\/init(operation:graphqlendpoint:contextidentifier:clientname:clientversion:additionalheaders:cachepolicy:context:autopersistqueries:usegetforqueries:usegetforpersistedqueryretry:requestbodycreator:sendenhancedclientawareness:)",
+                "title" : "init(operation: Operation, graphQLEndpoint: URL, contextIdentifier: UUID?, clientName: String, clientVersion: String, additionalHeaders: [String : String], cachePolicy: CachePolicy, context: (any RequestContext)?, autoPersistQueries: Bool, useGETForQueries: Bool, useGETForPersistedQueryRetry: Bool, requestBodyCreator: any RequestBodyCreator, sendEnhancedClientAwareness: Bool)",
                 "type" : "init"
               },
               {
@@ -1376,8 +1376,8 @@
                 "type" : "groupMarker"
               },
               {
-                "path" : "\/documentation\/apollo\/requestchainnetworktransport\/init(interceptorprovider:endpointurl:additionalheaders:autopersistqueries:requestbodycreator:usegetforqueries:usegetforpersistedqueryretry:)",
-                "title" : "init(interceptorProvider: any InterceptorProvider, endpointURL: URL, additionalHeaders: [String : String], autoPersistQueries: Bool, requestBodyCreator: any RequestBodyCreator, useGETForQueries: Bool, useGETForPersistedQueryRetry: Bool)",
+                "path" : "\/documentation\/apollo\/requestchainnetworktransport\/init(interceptorprovider:endpointurl:additionalheaders:autopersistqueries:requestbodycreator:usegetforqueries:usegetforpersistedqueryretry:sendenhancedclientawareness:)",
+                "title" : "init(interceptorProvider: any InterceptorProvider, endpointURL: URL, additionalHeaders: [String : String], autoPersistQueries: Bool, requestBodyCreator: any RequestBodyCreator, useGETForQueries: Bool, useGETForPersistedQueryRetry: Bool, sendEnhancedClientAwareness: Bool)",
                 "type" : "init"
               },
               {
@@ -1798,8 +1798,8 @@
                 "type" : "groupMarker"
               },
               {
-                "path" : "\/documentation\/apollo\/uploadrequest\/init(graphqlendpoint:operation:clientname:clientversion:additionalheaders:files:manualboundary:context:requestbodycreator:)",
-                "title" : "init(graphQLEndpoint: URL, operation: Operation, clientName: String, clientVersion: String, additionalHeaders: [String : String], files: [GraphQLFile], manualBoundary: String?, context: (any RequestContext)?, requestBodyCreator: any RequestBodyCreator)",
+                "path" : "\/documentation\/apollo\/uploadrequest\/init(graphqlendpoint:operation:clientname:clientversion:additionalheaders:files:manualboundary:context:requestbodycreator:sendenhancedclientawareness:)",
+                "title" : "init(graphQLEndpoint: URL, operation: Operation, clientName: String, clientVersion: String, additionalHeaders: [String : String], files: [GraphQLFile], manualBoundary: String?, context: (any RequestContext)?, requestBodyCreator: any RequestBodyCreator, sendEnhancedClientAwareness: Bool)",
                 "type" : "init"
               },
               {
@@ -4193,6 +4193,22 @@
             "type" : "enum"
           },
           {
+            "children" : [
+              {
+                "title" : "Type Properties",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/constants\/apolloclientname",
+                "title" : "static let ApolloClientName: String",
+                "type" : "property"
+              },
+              {
+                "path" : "\/documentation\/apollo\/constants\/apolloclientversion",
+                "title" : "static let ApolloClientVersion: String",
+                "type" : "property"
+              }
+            ],
             "path" : "\/documentation\/apollo\/constants",
             "title" : "Constants",
             "type" : "enum"

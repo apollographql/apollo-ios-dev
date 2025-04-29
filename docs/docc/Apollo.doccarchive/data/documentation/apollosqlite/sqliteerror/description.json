@@ -5,7 +5,7 @@
       "type" : "text"
     },
     {
-      "code" : "SQLiteDatabase.keyColumnName",
+      "code" : "CustomStringConvertible.description",
       "type" : "codeVoice"
     },
     {
@@ -17,28 +17,18 @@
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/SQLiteDatabase-Implementations"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/keyColumnName"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError\/description"
   },
   "kind" : "symbol",
   "metadata" : {
-    "extendedModule" : "ApolloSQLite",
-    "externalID" : "s:12ApolloSQLite0B8DatabasePAAE13keyColumnNameSSvpZ::SYNTHESIZED::s:12ApolloSQLite0B16DotSwiftDatabaseC",
+    "externalID" : "s:12ApolloSQLite0B5ErrorO11descriptionSSvp",
     "fragments" : [
-      {
-        "kind" : "keyword",
-        "text" : "static"
-      },
-      {
-        "kind" : "text",
-        "text" : " "
-      },
       {
         "kind" : "keyword",
         "text" : "var"
@@ -49,7 +39,7 @@
       },
       {
         "kind" : "identifier",
-        "text" : "keyColumnName"
+        "text" : "description"
       },
       {
         "kind" : "text",
@@ -67,9 +57,9 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Type Property",
+    "roleHeading" : "Instance Property",
     "symbolKind" : "property",
-    "title" : "keyColumnName"
+    "title" : "description"
   },
   "primaryContentSections" : [
     {
@@ -84,14 +74,6 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "static"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "keyword",
               "text" : "var"
             },
             {
@@ -100,7 +82,7 @@
             },
             {
               "kind" : "identifier",
-              "text" : "keyColumnName"
+              "text" : "description"
             },
             {
               "kind" : "text",
@@ -140,7 +122,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/keycolumnname"
+        "\/documentation\/apollosqlite\/sqliteerror\/description"
       ],
       "traits" : [
         {
@@ -194,14 +176,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteError": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -209,46 +191,27 @@
     },
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "SQLiteError"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "SQLiteDotSwiftDatabase"
+      "text" : "SQLiteError"
     }
   ],
   "role" : "symbol",
-  "title" : "SQLiteDotSwiftDatabase",
+  "title" : "SQLiteError",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase"
+  "url" : "\/documentation\/apollosqlite\/sqliteerror"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/SQLiteDatabase-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/SQLiteDatabase-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "SQLiteDatabase Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/sqlitedatabase-implementations"
-},
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDotSwiftDatabase/keyColumnName": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteError/description": {
   "abstract" : [
 
   ],
   "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
     {
       "kind" : "keyword",
       "text" : "var"
@@ -259,7 +222,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "keyColumnName"
+      "text" : "description"
     },
     {
       "kind" : "text",
@@ -271,12 +234,12 @@
       "text" : "String"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDotSwiftDatabase\/keyColumnName",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError\/description",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "keyColumnName",
+  "title" : "description",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedotswiftdatabase\/keycolumnname"
+  "url" : "\/documentation\/apollosqlite\/sqliteerror\/description"
 }
 }
 }
