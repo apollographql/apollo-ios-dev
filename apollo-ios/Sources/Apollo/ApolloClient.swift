@@ -34,7 +34,7 @@ public class ApolloClient {
 
   public let store: ApolloStore
 
-  private let sendClientMetadataExtension: Bool
+  private let sendEnhancedClientAwareness: Bool
 
   public enum ApolloClientError: Error, LocalizedError, Hashable {
     case noUploadTransport
@@ -53,16 +53,16 @@ public class ApolloClient {
   ///   - networkTransport: A network transport used to send operations to a server.
   ///   - store: A store used as a local cache. Note that if the `NetworkTransport` or any of its dependencies takes
   ///   a store, you should make sure the same store is passed here so that it can be cleared properly.
-  ///   - sendClientMetadataExtension: Specifies whether client library metadata is sent in each request `extensions`
+  ///   - sendEnhancedClientAwareness: Specifies whether client library metadata is sent in each request `extensions`
   ///   key. Client library metadata is the Apollo iOS library name and version. Defaults to `true`.
   public init(
     networkTransport: any NetworkTransport,
     store: ApolloStore,
-    sendClientMetadataExtension: Bool = true
+    sendEnhancedClientAwareness: Bool = true
   ) {
     self.networkTransport = networkTransport
     self.store = store
-    self.sendClientMetadataExtension = sendClientMetadataExtension
+    self.sendEnhancedClientAwareness = sendEnhancedClientAwareness
   }
 
   /// Creates a client with a `RequestChainNetworkTransport` connecting to the specified URL.
@@ -70,20 +70,20 @@ public class ApolloClient {
   /// - Parameter url: The URL of a GraphQL server to connect to.
   public convenience init(
     url: URL,
-    sendClientMetadataExtension: Bool = true
+    sendEnhancedClientAwareness: Bool = true
   ) {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
     let provider = DefaultInterceptorProvider(store: store)
     let transport = RequestChainNetworkTransport(
       interceptorProvider: provider,
       endpointURL: url,
-      sendClientMetadataExtension: sendClientMetadataExtension
+      sendEnhancedClientAwareness: sendEnhancedClientAwareness
     )
 
     self.init(
       networkTransport: transport,
       store: store,
-      sendClientMetadataExtension: sendClientMetadataExtension
+      sendEnhancedClientAwareness: sendEnhancedClientAwareness
     )
   }
 }

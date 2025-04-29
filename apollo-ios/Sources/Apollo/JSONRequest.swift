@@ -12,7 +12,7 @@ open class JSONRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
   public let useGETForPersistedQueryRetry: Bool
   public let serializationFormat = JSONSerializationFormat.self
 
-  private let sendClientMetadataExtension: Bool
+  private let sendEnhancedClientAwareness: Bool
 
   public var isPersistedQueryRetry = false {
     didSet {
@@ -56,13 +56,13 @@ open class JSONRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
     useGETForQueries: Bool = false,
     useGETForPersistedQueryRetry: Bool = false,
     requestBodyCreator: any RequestBodyCreator = ApolloRequestBodyCreator(),
-    sendClientMetadataExtension: Bool = true
+    sendEnhancedClientAwareness: Bool = true
   ) {
     self.autoPersistQueries = autoPersistQueries
     self.useGETForQueries = useGETForQueries
     self.useGETForPersistedQueryRetry = useGETForPersistedQueryRetry
     self.requestBodyCreator = requestBodyCreator
-    self.sendClientMetadataExtension = sendClientMetadataExtension
+    self.sendEnhancedClientAwareness = sendEnhancedClientAwareness
 
     super.init(
       graphQLEndpoint: graphQLEndpoint,
@@ -152,8 +152,8 @@ open class JSONRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
       autoPersistQuery: autoPersistQueries
     )
 
-    if self.sendClientMetadataExtension {
-      addClientMetadataExtension(to: &body)
+    if self.sendEnhancedClientAwareness {
+      addEnhancedClientAwarenessExtension(to: &body)
     }
 
     return body

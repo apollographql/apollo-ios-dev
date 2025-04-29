@@ -57,7 +57,7 @@ class RequestClientMetadataTests : XCTestCase {
       graphQLEndpoint: TestURL.mockServer.url,
       clientName: "test-client",
       clientVersion: "test-client-version",
-      sendClientMetadataExtension: true
+      sendEnhancedClientAwareness: true
     )
 
     let urlRequest = try jsonRequest.toURLRequest()
@@ -90,7 +90,7 @@ class RequestClientMetadataTests : XCTestCase {
       graphQLEndpoint: TestURL.mockServer.url,
       clientName: "test-client",
       clientVersion: "test-client-version",
-      sendClientMetadataExtension: false
+      sendEnhancedClientAwareness: false
     )
 
     let urlRequest = try jsonRequest.toURLRequest()
@@ -153,7 +153,7 @@ class RequestClientMetadataTests : XCTestCase {
       clientName: "test-client",
       clientVersion: "test-client-version",
       files: [GraphQLFile(fieldName: "x", originalName: "y", data: "z".data(using: .utf8)!)],
-      sendClientMetadataExtension: true
+      sendEnhancedClientAwareness: true
     )
 
     let urlRequest = try uploadRequest.toURLRequest()
@@ -184,7 +184,7 @@ class RequestClientMetadataTests : XCTestCase {
       clientName: "test-client",
       clientVersion: "test-client-version",
       files: [GraphQLFile(fieldName: "x", originalName: "y", data: "z".data(using: .utf8)!)],
-      sendClientMetadataExtension: false
+      sendEnhancedClientAwareness: false
     )
 
     let urlRequest = try uploadRequest.toURLRequest()

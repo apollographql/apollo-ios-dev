@@ -11,7 +11,7 @@ open class UploadRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
   public let manualBoundary: String?
   public let serializationFormat = JSONSerializationFormat.self
 
-  private let sendClientMetadataExtension: Bool
+  private let sendEnhancedClientAwareness: Bool
 
   /// Designated Initializer
   ///
@@ -35,12 +35,12 @@ open class UploadRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
     manualBoundary: String? = nil,
     context: (any RequestContext)? = nil,
     requestBodyCreator: any RequestBodyCreator = ApolloRequestBodyCreator(),
-    sendClientMetadataExtension: Bool = true
+    sendEnhancedClientAwareness: Bool = true
   ) {
     self.requestBodyCreator = requestBodyCreator
     self.files = files
     self.manualBoundary = manualBoundary
-    self.sendClientMetadataExtension = sendClientMetadataExtension
+    self.sendEnhancedClientAwareness = sendEnhancedClientAwareness
 
     super.init(
       graphQLEndpoint: graphQLEndpoint,
@@ -96,8 +96,8 @@ open class UploadRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
     }
     fields["variables"] = variables
 
-    if self.sendClientMetadataExtension {
-      addClientMetadataExtension(to: &fields)
+    if self.sendEnhancedClientAwareness {
+      addEnhancedClientAwarenessExtension(to: &fields)
     }
 
     let operationData = try serializationFormat.serialize(value: fields)

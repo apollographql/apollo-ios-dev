@@ -42,7 +42,7 @@ open class RequestChainNetworkTransport: NetworkTransport {
   /// Defaults to an ``ApolloRequestBodyCreator`` initialized with the default configuration.
   public var requestBodyCreator: any RequestBodyCreator
 
-  private let sendClientMetadataExtension: Bool
+  private let sendEnhancedClientAwareness: Bool
 
   /// Designated initializer
   ///
@@ -59,7 +59,7 @@ open class RequestChainNetworkTransport: NetworkTransport {
   ///   advantage of a CDN. Defaults to `false`.
   ///   - useGETForPersistedQueryRetry: Pass `true` to use `GET` instead of `POST` for a retry of a persisted query.
   ///   Defaults to `false`.
-  ///   - sendClientMetadataExtension: Specifies whether client library metadata is sent in each request `extensions`
+  ///   - sendEnhancedClientAwareness: Specifies whether client library metadata is sent in each request `extensions`
   ///   key. Client library metadata is the Apollo iOS library name and version. Defaults to `true`.
   public init(
     interceptorProvider: any InterceptorProvider,
@@ -69,7 +69,7 @@ open class RequestChainNetworkTransport: NetworkTransport {
     requestBodyCreator: any RequestBodyCreator = ApolloRequestBodyCreator(),
     useGETForQueries: Bool = false,
     useGETForPersistedQueryRetry: Bool = false,
-    sendClientMetadataExtension: Bool = true
+    sendEnhancedClientAwareness: Bool = true
   ) {
     self.interceptorProvider = interceptorProvider
     self.endpointURL = endpointURL
@@ -79,7 +79,7 @@ open class RequestChainNetworkTransport: NetworkTransport {
     self.requestBodyCreator = requestBodyCreator
     self.useGETForQueries = useGETForQueries
     self.useGETForPersistedQueryRetry = useGETForPersistedQueryRetry
-    self.sendClientMetadataExtension = sendClientMetadataExtension
+    self.sendEnhancedClientAwareness = sendEnhancedClientAwareness
   }
   
   /// Constructs a GraphQL request for the given operation.
@@ -111,7 +111,7 @@ open class RequestChainNetworkTransport: NetworkTransport {
       useGETForQueries: self.useGETForQueries,
       useGETForPersistedQueryRetry: self.useGETForPersistedQueryRetry,
       requestBodyCreator: self.requestBodyCreator,
-      sendClientMetadataExtension: self.sendClientMetadataExtension
+      sendEnhancedClientAwareness: self.sendEnhancedClientAwareness
     )
 
     if Operation.operationType == .subscription {
@@ -194,7 +194,7 @@ extension RequestChainNetworkTransport: UploadingNetworkTransport {
         manualBoundary: manualBoundary,
         context: context,
         requestBodyCreator: self.requestBodyCreator,
-        sendClientMetadataExtension: self.sendClientMetadataExtension
+        sendEnhancedClientAwareness: self.sendEnhancedClientAwareness
       )
   }
   
