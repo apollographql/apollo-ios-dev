@@ -341,7 +341,65 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
   }
-  
+
+  func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriendListItem() throws {
+    // given
+    class GivenSelectionSet: MockSelectionSet {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero.self)
+      ]}
+      var hero: Hero { __data["hero"] }
+
+      class Hero: MockSelectionSet {
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+          .field("name", String.self),
+          .field("friends", [Friend?]?.self)
+        ]}
+        var friends: [Friend?]? { __data["friends"] }
+
+        class Friend: MockSelectionSet {
+          override class var __selections: [Selection] {[
+            .field("__typename", String.self),
+            .field("name", String.self)
+          ]}
+          var name: String { __data["name"] }
+        }
+      }
+    }
+
+    mergeRecordsIntoCache([
+      "QUERY_ROOT": ["hero": CacheReference("hero")],
+      "hero": [
+        "name": "R2-D2",
+        "__typename": "Droid",
+        "friends": [
+          CacheReference("hero.friends.0"),
+          NSNull(),
+        ]
+      ],
+      "hero.friends.0": ["__typename": "Human", "name": "Luke Skywalker"],
+    ])
+
+    // when
+    let query = MockQuery<GivenSelectionSet>()
+
+    loadFromStore(operation: query) { result in
+      // then
+      try XCTAssertSuccessResult(result) { graphQLResult in
+        XCTAssertEqual(graphQLResult.source, .cache)
+        XCTAssertNil(graphQLResult.errors)
+
+        let data = try XCTUnwrap(graphQLResult.data)
+        XCTAssertEqual(data.hero.name, "R2-D2")
+
+        XCTAssertEqual(data.hero.friends?.count, 2)
+        XCTAssertEqual(data.hero.friends![0]!.name, "Luke Skywalker")
+        XCTAssertNil(data.hero.friends![1]) // Null friend at position 2
+      }
+    }
+  }
+
   func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withFriendsNotInCache_throwsMissingValueError() throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
@@ -491,6 +549,133 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
         XCTAssertEqual(coordinateData?.name, "Millennium Falcon")
         XCTAssertEqual(coordinateData?.length, starshipLength)
         XCTAssertEqual(coordinateData?.coordinates, coordinates)
+      }
+    }
+  }
+
+  @MainActor func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriendListItem_usingRequestChain() throws {
+    // given
+    struct Types {
+      static let Hero = Object(typename: "Hero", implementedInterfaces: [])
+      static let Friend = Object(typename: "Friend", implementedInterfaces: [])
+    }
+
+    MockSchemaMetadata.stub_objectTypeForTypeName({
+      switch $0 {
+      case "Hero":
+        return Types.Hero
+      case "Friend":
+        return Types.Friend
+      default:
+        XCTFail()
+        return nil
+      }
+    })
+
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __parentType: any ParentType { Types.Hero }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("name", String.self),
+        .field("friends", [Friend?]?.self)
+      ]}
+
+      public var name: String? { __data["name"] }
+      public var friends: [Friend?]? { __data["friends"] }
+
+      convenience init(
+        name: String? = nil,
+        friends: [Friend?]? = nil
+      ) {
+        self.init(_dataDict: DataDict(
+          data: [
+            "__typename": Types.Hero.typename,
+            "name": name,
+            "friends": friends
+          ],
+          fulfilledFragments: [ObjectIdentifier(Self.self)]
+        ))
+      }
+
+      class Friend: MockSelectionSet {
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+        var name: String { __data["name"] }
+      }
+    }
+
+    // given
+    let client = MockURLSessionClient(
+      response: .mock(
+        url: TestURL.mockServer.url,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: nil
+      ),
+      data: """
+      {
+        "data": {
+          "__typename": "Hero",
+          "name": "R2-D2",
+          "friends": [
+            {
+              "__typename": "Friend",
+              "name": "Luke Skywalker"
+            },
+            null,
+            {
+              "__typename": "Friend",
+              "name": "Obi-Wan Kenobi"
+            }
+          ]
+        }
+      }
+      """.data(using: .utf8)
+    )
+
+    let requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
+      NetworkFetchInterceptor(client: client),
+      JSONResponseParsingInterceptor(),
+      CacheWriteInterceptor(store: self.store),
+    ])
+
+    let request = JSONRequest(
+      operation: MockQuery<Hero>(),
+      graphQLEndpoint: TestURL.mockServer.url,
+      clientName: "test-client",
+      clientVersion: "test-client-version"
+    )
+
+    let expectation = expectation(description: "Response received")
+
+    // when
+    requestChain?.kickoff(request: request) { result in
+      defer {
+        expectation.fulfill()
+      }
+
+      XCTAssertSuccessResult(result)
+    }
+
+    wait(for: [expectation], timeout: 2)
+
+    loadFromStore(operation: MockQuery<Hero>()) { result in
+      // then
+      try XCTAssertSuccessResult(result) { graphQLResult in
+        XCTAssertEqual(graphQLResult.source, .cache)
+        XCTAssertNil(graphQLResult.errors)
+
+        let data = try XCTUnwrap(graphQLResult.data)
+        XCTAssertEqual(data.name, "R2-D2")
+
+        XCTAssertEqual(data.friends?.count, 3)
+        XCTAssertEqual(data.friends![0]!.name, "Luke Skywalker")
+        XCTAssertNil(data.friends![1]) // Null friend at position 2
+        XCTAssertEqual(data.friends![2]!.name, "Obi-Wan Kenobi")
       }
     }
   }
