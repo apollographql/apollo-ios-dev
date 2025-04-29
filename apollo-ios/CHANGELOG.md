@@ -3,7 +3,7 @@
 ## v1.21.0
 
 ### New
-- **Enhanced Client Awareness ([#638](https://github.com/apollographql/apollo-ios-dev/pull/638)):** By default send Apollo iOS library name and version as metadata with each network request. 
+- **Enhanced Client Awareness ([#638](https://github.com/apollographql/apollo-ios-dev/pull/638)):** Apollo iOS now sends the library name and version as metadata in the `extensions` key of each request. This Enhanced Client Awareness metric is collected in GraphOS along with the existing Client Awareness and general operation metrics. 
 
 ### Improvement
 - **Removed SQLite.swift dependency ([#635](https://github.com/apollographql/apollo-ios-dev/pull/635)):** Removed the dependency on `SQLite.swift` and replaced it with direct interaction with the SQLite C API.
