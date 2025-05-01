@@ -31,10 +31,10 @@ public struct ResponseCodeInterceptor: ApolloInterceptor {
   /// Designated initializer
   public init() {}
   
-  public func intercept<Operation: GraphQLOperation>(
-    request: HTTPRequest<Operation>,
-    next: NextInterceptorFunction<Operation>
-  ) async throws -> InterceptorResultStream<Operation> {
+  public func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request.Operation> {
     return try await next(request).map { result in
 
       guard result.response.isSuccessful == true else {

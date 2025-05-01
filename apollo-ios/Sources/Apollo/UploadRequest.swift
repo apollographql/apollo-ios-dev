@@ -4,11 +4,29 @@ import ApolloAPI
 #endif
 
 /// A request class allowing for a multipart-upload request.
-open class UploadRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
-  
-  public let requestBodyCreator: any RequestBodyCreator
+public struct UploadRequest<Operation: GraphQLOperation>: GraphQLRequest {
+
+  /// The endpoint to make a GraphQL request to
+  public var graphQLEndpoint: URL
+
+  /// The GraphQL Operation to execute
+  public var operation: Operation
+
+  /// Any additional headers you wish to add to this request
+  public var additionalHeaders: [String: String] = [:]
+
+  /// The `CachePolicy` to use for this request.
+  public let cachePolicy: CachePolicy
+
+  /// [optional] A context that is being passed through the request chain.
+  public var context: (any RequestContext)?
+
+  public let requestBodyCreator: any JSONRequestBodyCreator
+
   public let files: [GraphQLFile]
+
   public let manualBoundary: String?
+
   public let serializationFormat = JSONSerializationFormat.self
 
   private let sendEnhancedClientAwareness: Bool
@@ -16,41 +34,42 @@ open class UploadRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
   /// Designated Initializer
   ///
   /// - Parameters:
-  ///   - graphQLEndpoint: The endpoint to make a GraphQL request to
   ///   - operation: The GraphQL Operation to execute
+  ///   - graphQLEndpoint: The endpoint to make a GraphQL request to
   ///   - clientName: The name of the client to send with the `"apollographql-client-name"` header
   ///   - clientVersion:  The version of the client to send with the `"apollographql-client-version"` header
-  ///   - additionalHeaders: Any additional headers you wish to add by default to this request. Defaults to an empty dictionary.
   ///   - files: The array of files to upload for all `Upload` parameters in the mutation.
   ///   - manualBoundary: [optional] A manual boundary to pass in. A default boundary will be used otherwise. Defaults to nil.
   ///   - context: [optional] A context that is being passed through the request chain. Should default to `nil`.
   ///   - requestBodyCreator: An object conforming to the `RequestBodyCreator` protocol to assist with creating the request body. Defaults to the provided `ApolloRequestBodyCreator` implementation.
   public init(
-    graphQLEndpoint: URL,
     operation: Operation,
-    clientName: String,
-    clientVersion: String,
-    additionalHeaders: [String: String] = [:],
+    graphQLEndpoint: URL,
+    clientName: String? = Self.defaultClientName,
+    clientVersion: String? = Self.defaultClientVersion,
     files: [GraphQLFile],
     manualBoundary: String? = nil,
     context: (any RequestContext)? = nil,
-    requestBodyCreator: any RequestBodyCreator = ApolloRequestBodyCreator(),
+    requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator(),
     sendEnhancedClientAwareness: Bool = true
   ) {
+    self.operation = operation
+    self.graphQLEndpoint = graphQLEndpoint
+    self.cachePolicy = .default
+    self.context = context
     self.requestBodyCreator = requestBodyCreator
     self.files = files
     self.manualBoundary = manualBoundary
-    self.sendEnhancedClientAwareness = sendEnhancedClientAwareness
 
-    super.init(
-      graphQLEndpoint: graphQLEndpoint,
-      operation: operation,
-      contentType: "multipart/form-data",
-      clientName: clientName,
-      clientVersion: clientVersion,
-      additionalHeaders: additionalHeaders,
-      context: context
-    )
+    self.addApolloClientHeaders(clientName: clientName, clientVersion: clientVersion)
+    
+    super.init(graphQLEndpoint: graphQLEndpoint,
+               operation: operation,
+               contentType: "multipart/form-data",
+               clientName: clientName,
+               clientVersion: clientVersion,
+               additionalHeaders: additionalHeaders,
+               context: context)
   }
   
   public override func toURLRequest() throws -> URLRequest {
@@ -100,7 +119,7 @@ open class UploadRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
       addEnhancedClientAwarenessExtension(to: &fields)
     }
 
-    let operationData = try serializationFormat.serialize(value: fields)
+    let operationData = try JSONSerializationFormat.serialize(value: fields)
     formData.appendPart(data: operationData, name: "operations")
 
     // If there are multiple files for the same field, make sure to include them with indexes for the field. If there are multiple files for different fields, just use the field name.
@@ -126,7 +145,7 @@ open class UploadRequest<Operation: GraphQLOperation>: HTTPRequest<Operation> {
     
     assert(sortedFiles.count == files.count, "Number of sorted files did not equal the number of incoming files - some field name has been left out.")
 
-    let mapData = try serializationFormat.serialize(value: map)
+    let mapData = try JSONSerializationFormat.serialize(value: map)
     formData.appendPart(data: mapData, name: "map")
 
     for (index, file) in sortedFiles.enumerated() {

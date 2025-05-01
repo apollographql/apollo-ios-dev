@@ -4,7 +4,6 @@ import ApolloAPI
 #endif
 
 #warning("TODO: Implement retrying based on catching error")
-#warning("TODO: add optional underlying error property to retry error")
 public struct RequestChainRetry: Swift.Error {
   public let underlyingError: (any Swift.Error)?
 
@@ -13,13 +12,14 @@ public struct RequestChainRetry: Swift.Error {
   }
 }
 
-struct RequestChain<Operation: GraphQLOperation>: Sendable {
+struct RequestChain<Request: GraphQLRequest>: Sendable {
 
   private let urlSession: any ApolloURLSession
   private let interceptors: [any ApolloInterceptor]
   private let cacheInterceptor: any CacheInterceptor
   private let errorInterceptor: (any ApolloErrorInterceptor)?
 
+  typealias Operation = Request.Operation
   typealias ResultStream = AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error>
 
   /// Creates a chain with the given interceptor array.
@@ -45,7 +45,7 @@ struct RequestChain<Operation: GraphQLOperation>: Sendable {
   /// - Parameters:
   ///   - request: The request to send.
   func kickoff(
-    request: HTTPRequest<Operation>
+    request: Request
   ) -> ResultStream where Operation: GraphQLQuery {
     return doInAsyncThrowingStream { continuation in
 
@@ -66,7 +66,7 @@ struct RequestChain<Operation: GraphQLOperation>: Sendable {
   }
 
   func kickoff(
-    request: HTTPRequest<Operation>
+    request: Request
   ) -> ResultStream {
     return doInAsyncThrowingStream { continuation in
 
@@ -88,11 +88,11 @@ struct RequestChain<Operation: GraphQLOperation>: Sendable {
   }
 
   private func kickoffRequestInterceptors(
-    for initialRequest: HTTPRequest<Operation>,
+    for initialRequest: Request,
     continuation: ResultStream.Continuation
   ) async throws {
 
-    var next: @Sendable (HTTPRequest<Operation>) async throws -> InterceptorResultStream<Operation> = { request in
+    var next: @Sendable (Request) async throws -> InterceptorResultStream<Operation> = { request in
       try await executeNetworkFetch(request: request)
     }
 
@@ -108,25 +108,25 @@ struct RequestChain<Operation: GraphQLOperation>: Sendable {
   }
 
   private func executeNetworkFetch(
-    request: HTTPRequest<Operation>
+    request: Request
   ) async throws -> InterceptorResultStream<Operation> {
     let urlRequest = try request.toURLRequest()
 
 
     return InterceptorResultStream(stream: AsyncThrowingStream { continuation in
       let task = Task {
-        let (bytes, response) = try await urlSession.bytes(for: urlRequest, delegate: nil)
+        let (chunks, response) = try await urlSession.chunks(for: urlRequest)
 
         guard let response = response as? HTTPURLResponse else {
           preconditionFailure()
 #warning("Throw error instead of precondition failure? Look into if it is possible for this to even occur.")
         }
 
-        for try await chunk in bytes.chunks {
+        for try await chunk in chunks {
           continuation.yield(
             InterceptorResult(
               response: response,
-              rawResponseChunk: chunk
+              rawResponseChunk: chunk as! Data
             )
           )
         }

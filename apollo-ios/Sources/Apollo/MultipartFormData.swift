@@ -31,6 +31,7 @@ public final class MultipartFormData {
 
   /// Convenience initializer which uses a pre-defined boundary
   public convenience init() {
+    #warning("TODO: Does this really need to be a UUID?")
     self.init(boundary: "apollo-ios.boundary.\(UUID().uuidString)")
   }
 

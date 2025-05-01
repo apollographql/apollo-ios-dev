@@ -8,7 +8,14 @@ extension URLSession.AsyncBytes {
 
 }
 
-public struct AsyncHTTPResponseChunkSequence: AsyncSequence {
+public protocol AsyncChunkSequence: AsyncSequence where Element == Data {
+  
+}
+
+/// An `AsyncSequence` of multipart reponse chunks. This sequence wraps a `URLSession.AsyncBytes`
+/// sequence. It uses the multipart boundary specified by the `HTTPURLResponse` to split the data
+/// into chunks as it is received.
+public struct AsyncHTTPResponseChunkSequence: AsyncChunkSequence {
   public typealias Element = Data
 
   private let bytes: URLSession.AsyncBytes

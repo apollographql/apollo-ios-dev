@@ -22,8 +22,7 @@ public struct DefaultCacheInterceptor: CacheInterceptor {
 
   public func readCacheData<Query: GraphQLQuery>(
     for query: Query
-  ) async throws -> GraphQLResult<Query.Data> {
-    try Task.checkCancellation()
+  ) async throws -> GraphQLResult<Query.Data> {    
     return try await store.load(query)
   }
 

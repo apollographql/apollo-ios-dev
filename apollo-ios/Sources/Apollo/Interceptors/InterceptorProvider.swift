@@ -5,7 +5,7 @@ import ApolloAPI
 // MARK: - Basic protocol
 
 /// A protocol to allow easy creation of an array of interceptors for a given operation.
-public protocol InterceptorProvider {
+public protocol InterceptorProvider: Sendable {
   
   func urlSession<Operation: GraphQLOperation>(for operation: Operation) -> any ApolloURLSession
 

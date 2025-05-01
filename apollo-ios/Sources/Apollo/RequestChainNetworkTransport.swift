@@ -6,7 +6,7 @@ import ApolloAPI
 #warning("TODO: Reconsider design of this. Should this be constructing the request? Do we even need it?")
 /// An implementation of `NetworkTransport` which creates a `RequestChain` object
 /// for each item sent through it.
-open class RequestChainNetworkTransport: NetworkTransport {
+public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
 
   /// The interceptor provider to use when constructing a request chain
   let interceptorProvider: any InterceptorProvider
@@ -20,8 +20,8 @@ open class RequestChainNetworkTransport: NetworkTransport {
   /// you should add that header in an interceptor instead.
   ///
   /// Defaults to an empty dictionary.
-  public private(set) var additionalHeaders: [String: String]
-  
+  public let additionalHeaders: [String: String]
+
   /// Set to `true` if Automatic Persisted Queries should be used to send a query hash instead of the full query body by default.
   public let autoPersistQueries: Bool
   
@@ -38,10 +38,10 @@ open class RequestChainNetworkTransport: NetworkTransport {
   /// Set to `true` to use `GET` instead of `POST` for a retry of a persisted query.
   public let useGETForPersistedQueryRetry: Bool
   
-  /// The `RequestBodyCreator` object used to build your `URLRequest`.
+  /// The `JSONRequestBodyCreator` object used to build your `URLRequest`'s JSON body.
   ///
-  /// Defaults to an ``ApolloRequestBodyCreator`` initialized with the default configuration.
-  public var requestBodyCreator: any RequestBodyCreator
+  /// Defaults to a ``DefaultRequestBodyCreator`` initialized with the default configuration.
+  public let requestBodyCreator: any JSONRequestBodyCreator
 
   private let sendEnhancedClientAwareness: Bool
 
@@ -50,16 +50,11 @@ open class RequestChainNetworkTransport: NetworkTransport {
   /// - Parameters:
   ///   - interceptorProvider: The interceptor provider to use when constructing a request chain
   ///   - endpointURL: The GraphQL endpoint URL to use
-  ///   - additionalHeaders: Any additional headers that should be automatically added to every request. Defaults to
-  ///   an empty dictionary.
-  ///   - autoPersistQueries: Pass `true` if Automatic Persisted Queries should be used to send a query hash instead
-  ///   of the full query body by default. Defaults to `false`.
-  ///   - requestBodyCreator: The `RequestBodyCreator` object to use to build your `URLRequest`. Defaults to the
-  ///   provided `ApolloRequestBodyCreator` implementation.
-  ///   - useGETForQueries: Pass `true` if you want to use `GET` instead of `POST` for queries, for example to take
-  ///   advantage of a CDN. Defaults to `false`.
-  ///   - useGETForPersistedQueryRetry: Pass `true` to use `GET` instead of `POST` for a retry of a persisted query.
-  ///   Defaults to `false`.
+  ///   - additionalHeaders: Any additional headers that should be automatically added to every request. Defaults to an empty dictionary.
+  ///   - autoPersistQueries: Pass `true` if Automatic Persisted Queries should be used to send a query hash instead of the full query body by default. Defaults to `false`.
+  ///   - requestBodyCreator: The `RequestBodyCreator` object to use to build your `URLRequest`. Defaults to the provided `ApolloRequestBodyCreator` implementation.
+  ///   - useGETForQueries: Pass `true` if you want to use `GET` instead of `POST` for queries, for example to take advantage of a CDN. Defaults to `false`.
+  ///   - useGETForPersistedQueryRetry: Pass `true` to use `GET` instead of `POST` for a retry of a persisted query. Defaults to `false`.
   ///   - sendEnhancedClientAwareness: Specifies whether client library metadata is sent in each request `extensions`
   ///   key. Client library metadata is the Apollo iOS library name and version. Defaults to `true`.
   public init(
@@ -67,7 +62,7 @@ open class RequestChainNetworkTransport: NetworkTransport {
     endpointURL: URL,
     additionalHeaders: [String: String] = [:],
     autoPersistQueries: Bool = false,
-    requestBodyCreator: any RequestBodyCreator = ApolloRequestBodyCreator(),
+    requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator(),
     useGETForQueries: Bool = false,
     useGETForPersistedQueryRetry: Bool = false,
     sendEnhancedClientAwareness: Bool = true
@@ -98,14 +93,13 @@ open class RequestChainNetworkTransport: NetworkTransport {
     cachePolicy: CachePolicy,
     contextIdentifier: UUID? = nil,
     context: (any RequestContext)? = nil
-  ) -> HTTPRequest<Operation> {
-    let request = JSONRequest(
+  ) -> JSONRequest<Operation> {
+    var request = JSONRequest(
       operation: operation,
       graphQLEndpoint: self.endpointURL,
       contextIdentifier: contextIdentifier,
       clientName: self.clientName,
       clientVersion: self.clientVersion,
-      additionalHeaders: self.additionalHeaders,
       cachePolicy: cachePolicy,
       context: context,
       autoPersistQueries: self.autoPersistQueries,
@@ -114,27 +108,11 @@ open class RequestChainNetworkTransport: NetworkTransport {
       requestBodyCreator: self.requestBodyCreator,
       sendEnhancedClientAwareness: self.sendEnhancedClientAwareness
     )
-
-    if Operation.operationType == .subscription {
-      request.addHeader(
-        name: "Accept",
-        value: "multipart/mixed;\(MultipartResponseSubscriptionParser.protocolSpec),application/graphql-response+json,application/json"
-      )
-
-    } else {
-      request.addHeader(
-        name: "Accept",
-        value: "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/graphql-response+json,application/json"
-      )
-    }
-
+    request.addHeaders(self.additionalHeaders)
     return request
   }
   
   // MARK: - NetworkTransport Conformance
-  
-  public var clientName = RequestChainNetworkTransport.defaultClientName
-  public var clientVersion = RequestChainNetworkTransport.defaultClientVersion
 
   public func send<Operation: GraphQLOperation>(
     operation: Operation,
@@ -142,20 +120,22 @@ open class RequestChainNetworkTransport: NetworkTransport {
     contextIdentifier: UUID?,
     context: (any RequestContext)?
   ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
-    let chain = makeChain(operation: operation)
     let request = self.constructRequest(
       for: operation,
       cachePolicy: cachePolicy,
       contextIdentifier: contextIdentifier,
       context: context)
-    
+
+    let chain = makeChain(for: request)
+
     return chain.kickoff(request: request)
   }
 
-  private func makeChain<Operation: GraphQLOperation>(
-    operation: Operation,
-  ) -> RequestChain<Operation> {
-    let chain = RequestChain<Operation>(
+  private func makeChain<Request: GraphQLRequest>(
+    for request: Request
+  ) -> RequestChain<Request> {
+    let operation = request.operation
+    let chain = RequestChain<Request>(
       urlSession: interceptorProvider.urlSession(for: operation),
       interceptors: interceptorProvider.interceptors(for: operation),
       cacheInterceptor: interceptorProvider.cacheInterceptor(for: operation),
@@ -182,20 +162,20 @@ extension RequestChainNetworkTransport: UploadingNetworkTransport {
     for operation: Operation,
     with files: [GraphQLFile],
     context: (any RequestContext)? = nil,
-    manualBoundary: String? = nil) -> HTTPRequest<Operation> {
-
-      UploadRequest(
-        graphQLEndpoint: self.endpointURL,
-        operation: operation,
-        clientName: self.clientName,
-        clientVersion: self.clientVersion,
-        additionalHeaders: self.additionalHeaders,
-        files: files,
-        manualBoundary: manualBoundary,
-        context: context,
-        requestBodyCreator: self.requestBodyCreator,
-        sendEnhancedClientAwareness: self.sendEnhancedClientAwareness
-      )
+    manualBoundary: String? = nil
+  ) -> UploadRequest<Operation> {
+    UploadRequest(
+      graphQLEndpoint: self.endpointURL,
+      operation: operation,
+      clientName: self.clientName,
+      clientVersion: self.clientVersion,
+      additionalHeaders: self.additionalHeaders,
+      files: files,
+      manualBoundary: manualBoundary,
+      context: context,
+      requestBodyCreator: self.requestBodyCreator,
+      sendEnhancedClientAwareness: self.sendEnhancedClientAwareness
+    )
   }
   
   public func upload<Operation: GraphQLOperation>(

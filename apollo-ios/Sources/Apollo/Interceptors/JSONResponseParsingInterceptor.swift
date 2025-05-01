@@ -17,15 +17,19 @@ public struct JSONResponseParsingInterceptor: ApolloInterceptor {
     }
   }
 
-  public func intercept<Operation: GraphQLOperation>(
-    request: HTTPRequest<Operation>,
-    next: NextInterceptorFunction<Operation>
-  ) async throws -> InterceptorResultStream<Operation> {
+  public func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request.Operation> {
 
-    let currentResult = CurrentResult<Operation>()
+    let currentResult = CurrentResult<Request.Operation>()
 
-    return try await next(request).compactMap { result -> InterceptorResult<Operation>? in
-      let parser = JSONResponseParser<Operation>(
+    if let request = request as? UploadRequest<Request.Operation> {
+
+    }
+
+    return try await next(request).compactMap { result -> InterceptorResult<Request.Operation>? in
+      let parser = JSONResponseParser<Request.Operation>(
         response: result.response,
         operationVariables: request.operation.__variables,
         includeCacheRecords: request.cachePolicy.shouldParsingIncludeCacheRecords
