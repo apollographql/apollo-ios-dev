@@ -4,7 +4,7 @@ import ApolloAPI
 #endif
 
 /// A network transport is responsible for sending GraphQL operations to a server.
-public protocol NetworkTransport: AnyObject {
+public protocol NetworkTransport: AnyObject, Sendable {
 
   /// Send a GraphQL operation to a server and return a response.
   ///
@@ -23,70 +23,6 @@ public protocol NetworkTransport: AnyObject {
     context: (any RequestContext)?
   ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error>
 
-  /// The name of the client to send as a header value.
-  var clientName: String { get }
-
-  /// The version of the client to send as a header value.
-  var clientVersion: String { get }
-}
-
-public extension NetworkTransport {
-
-  /// The field name for the Apollo Client Name header
-  static var headerFieldNameApolloClientName: String {
-    return "apollographql-client-name"
-  }
-
-  /// The field name for the Apollo Client Version header
-  static var headerFieldNameApolloClientVersion: String {
-    return "apollographql-client-version"
-  }
-
-  /// The default client name to use when setting up the `clientName` property
-  static var defaultClientName: String {
-    guard let identifier = Bundle.main.bundleIdentifier else {
-      return "apollo-ios-client"
-    }
-
-    return "\(identifier)-apollo-ios"
-  }
-
-  var clientName: String {
-    return Self.defaultClientName
-  }
-
-  /// The default client version to use when setting up the `clientVersion` property.
-  static var defaultClientVersion: String {
-    var version = String()
-    if let shortVersion = Bundle.main.shortVersion {
-      version.append(shortVersion)
-    }
-
-    if let buildNumber = Bundle.main.buildNumber {
-      if version.isEmpty {
-        version.append(buildNumber)
-      } else {
-        version.append("-\(buildNumber)")
-      }
-    }
-
-    if version.isEmpty {
-      version = "(unknown)"
-    }
-
-    return version
-  }
-
-  var clientVersion: String {
-    return Self.defaultClientVersion
-  }
-
-  /// Adds the Apollo client headers for this instance of `NetworkTransport` to the given request
-  /// - Parameter request: A mutable URLRequest to add the headers to.
-  func addApolloClientHeaders(to request: inout URLRequest) {
-    request.setValue(self.clientName, forHTTPHeaderField: Self.headerFieldNameApolloClientName)
-    request.setValue(self.clientVersion, forHTTPHeaderField: Self.headerFieldNameApolloClientVersion)
-  }
 }
 
 // MARK: -

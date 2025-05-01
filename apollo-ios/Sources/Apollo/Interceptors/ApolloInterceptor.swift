@@ -32,7 +32,7 @@ public struct InterceptorResult<Operation: GraphQLOperation>: Sendable, Equatabl
 #warning("TODO: Should this be Sendable or not?")
 public protocol ApolloInterceptor: Sendable {
 
-  typealias NextInterceptorFunction<Operation: GraphQLOperation> = @Sendable (HTTPRequest<Operation>) async throws -> InterceptorResultStream<Operation>
+  typealias NextInterceptorFunction<Request: GraphQLRequest> = @Sendable (Request) async throws -> InterceptorResultStream<Request.Operation>
 
   /// Called when this interceptor should do its work.
   ///
@@ -41,10 +41,10 @@ public protocol ApolloInterceptor: Sendable {
   ///   - request: The request, as far as it has been constructed
   ///   - response: [optional] The response, if received
   ///   - completion: The completion block to fire when data needs to be returned to the UI.
-  func intercept<Operation: GraphQLOperation>(
-    request: HTTPRequest<Operation>,
-    next: NextInterceptorFunction<Operation>
-  ) async throws -> InterceptorResultStream<Operation>
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request.Operation>
 
 }
 
