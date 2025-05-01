@@ -1,12 +1,16 @@
 import Foundation
 
 public protocol ApolloURLSession: Sendable {
-  func bytes(
-    for request: URLRequest,
-    delegate: (any URLSessionTaskDelegate)?
-  ) async throws -> (URLSession.AsyncBytes, URLResponse)
+  func chunks(
+    for request: URLRequest
+  ) async throws -> (any AsyncChunkSequence, URLResponse)
 
   func invalidateAndCancel()
 }
 
-extension URLSession: ApolloURLSession { }
+extension URLSession: ApolloURLSession {
+  public func chunks(for request: URLRequest) async throws -> (any AsyncChunkSequence, URLResponse) {
+    let (bytes, response) = try await bytes(for: request, delegate: nil)
+    return (bytes.chunks, response)
+  }
+}
