@@ -4,7 +4,7 @@ import Foundation
 #endif
 
 /// A request which sends JSON related to a GraphQL operation.
-public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, Hashable {
+public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPersistedQueryCompatibleRequest, Hashable {
 
   /// The endpoint to make a GraphQL request to
   public var graphQLEndpoint: URL
@@ -26,11 +26,18 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, Hashable
   
   public let requestBodyCreator: any JSONRequestBodyCreator
 
-#warning("TODO: change this to be a context configurable protocol")
-  public let autoPersistQueries: Bool
+  public var apqConfig: AutoPersistedQueryConfiguration
+
+  public var isPersistedQueryRetry: Bool = false
+
+  /// Set to  `true` if you want to use `GET` instead of `POST` for queries.
+  ///
+  /// This can improve performance if your GraphQL server uses a CDN (Content Delivery Network)
+  /// to cache the results of queries that rarely change.
+  ///
+  /// Mutation operations always use POST, even when this is `false`
   public let useGETForQueries: Bool
-  public let useGETForPersistedQueryRetry: Bool
-  public var isPersistedQueryRetry = false
+
   private let sendEnhancedClientAwareness: Bool
 
   /// Designated initializer
@@ -43,9 +50,10 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, Hashable
   ///   - clientVersion:  The version of the client to send with the `"apollographql-client-version"` header
   ///   - cachePolicy: The `CachePolicy` to use for this request.
   ///   - context: [optional] A context that is being passed through the request chain. Defaults to `nil`.
-  ///   - autoPersistQueries: `true` if Auto-Persisted Queries should be used. Defaults to `false`.
+  ///   - apqConfig: A configuration struct used by a `GraphQLRequest` to configure the usage of
+  ///   [Automatic Persisted Queries (APQs).](https://www.apollographql.com/docs/apollo-server/performance/apq) By default, APQs
+  ///   are disabled.
   ///   - useGETForQueries: `true` if Queries should use `GET` instead of `POST` for HTTP requests. Defaults to `false`.
-  ///   - useGETForPersistedQueryRetry: `true` if when an Auto-Persisted query is retried, it should use `GET` instead of `POST` to send the query. Defaults to `false`.
   ///   - requestBodyCreator: An object conforming to the `JSONRequestBodyCreator` protocol to assist with creating the request body. Defaults to the provided `DefaultRequestBodyCreator` implementation.
   public init(
     operation: Operation,
@@ -55,9 +63,8 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, Hashable
     clientVersion: String? = Self.defaultClientVersion,
     cachePolicy: CachePolicy = .default,
     context: (any RequestContext)? = nil,
-    autoPersistQueries: Bool = false,
+    apqConfig: AutoPersistedQueryConfiguration = .init(),
     useGETForQueries: Bool = false,
-    useGETForPersistedQueryRetry: Bool = false,
     requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator(),
     sendEnhancedClientAwareness: Bool = true
   ) {
@@ -68,9 +75,8 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, Hashable
     self.context = context
     self.requestBodyCreator = requestBodyCreator
 
-    self.autoPersistQueries = autoPersistQueries
+    self.apqConfig = apqConfig
     self.useGETForQueries = useGETForQueries
-    self.useGETForPersistedQueryRetry = useGETForPersistedQueryRetry
     self.sendEnhancedClientAwareness = sendEnhancedClientAwareness
 
     self.setupDefaultHeaders(
@@ -109,9 +115,10 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, Hashable
     switch Operation.operationType {
     case .query:
       if isPersistedQueryRetry {
-        useGetMethod = self.useGETForPersistedQueryRetry
+        useGetMethod = self.apqConfig.useGETForPersistedQueryRetry
       } else {
-        useGetMethod = self.useGETForQueries || (self.autoPersistQueries && self.useGETForPersistedQueryRetry)
+        useGetMethod = self.useGETForQueries ||
+        (self.apqConfig.autoPersistQueries && self.apqConfig.useGETForPersistedQueryRetry)
       }
     default:
       useGetMethod = false
@@ -154,16 +161,16 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, Hashable
         sendQueryDocument = true
         autoPersistQueries = true
       } else {
-        sendQueryDocument = !self.autoPersistQueries
-        autoPersistQueries = self.autoPersistQueries
+        sendQueryDocument = !self.apqConfig.autoPersistQueries
+        autoPersistQueries = self.apqConfig.autoPersistQueries
       }
     case .mutation:
       if isPersistedQueryRetry {
         sendQueryDocument = true
         autoPersistQueries = true
       } else {
-        sendQueryDocument = !self.autoPersistQueries
-        autoPersistQueries = self.autoPersistQueries
+        sendQueryDocument = !self.apqConfig.autoPersistQueries
+        autoPersistQueries = self.apqConfig.autoPersistQueries
       }
     default:
       sendQueryDocument = true
@@ -210,10 +217,9 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, Hashable
     lhs.additionalHeaders == rhs.additionalHeaders &&
     lhs.cachePolicy == rhs.cachePolicy &&
     lhs.contextIdentifier == rhs.contextIdentifier &&
-    lhs.autoPersistQueries == rhs.autoPersistQueries &&
-    lhs.useGETForQueries == rhs.useGETForQueries &&
-    lhs.useGETForPersistedQueryRetry == rhs.useGETForPersistedQueryRetry &&
+    lhs.apqConfig == rhs.apqConfig &&
     lhs.isPersistedQueryRetry == rhs.isPersistedQueryRetry &&
+    lhs.useGETForQueries == rhs.useGETForQueries &&
     type(of: lhs.requestBodyCreator) == type(of: rhs.requestBodyCreator)
   }
 
@@ -223,10 +229,9 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, Hashable
     hasher.combine(additionalHeaders)
     hasher.combine(cachePolicy)
     hasher.combine(contextIdentifier)
-    hasher.combine(autoPersistQueries)
-    hasher.combine(useGETForQueries)
-    hasher.combine(useGETForPersistedQueryRetry)
+    hasher.combine(apqConfig)
     hasher.combine(isPersistedQueryRetry)
+    hasher.combine(useGETForQueries)
     hasher.combine("\(type(of: requestBodyCreator))")
   }
 
