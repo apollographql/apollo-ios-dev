@@ -164,18 +164,19 @@ extension RequestChainNetworkTransport: UploadingNetworkTransport {
     context: (any RequestContext)? = nil,
     manualBoundary: String? = nil
   ) -> UploadRequest<Operation> {
-    UploadRequest(
-      graphQLEndpoint: self.endpointURL,
+    var request = UploadRequest(
       operation: operation,
+      graphQLEndpoint: self.endpointURL,
       clientName: self.clientName,
       clientVersion: self.clientVersion,
-      additionalHeaders: self.additionalHeaders,
       files: files,
-      manualBoundary: manualBoundary,
+      multipartBoundary: manualBoundary,
       context: context,
       requestBodyCreator: self.requestBodyCreator,
       sendEnhancedClientAwareness: self.sendEnhancedClientAwareness
     )
+    request.additionalHeaders = self.additionalHeaders
+    return request
   }
   
   public func upload<Operation: GraphQLOperation>(

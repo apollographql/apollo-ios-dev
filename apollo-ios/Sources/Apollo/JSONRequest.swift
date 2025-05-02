@@ -101,15 +101,7 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, Hashable
   }
 
   public func toURLRequest() throws -> URLRequest {
-    var request = URLRequest(url: self.graphQLEndpoint)
-
-    if let configContext = context as? any RequestContextTimeoutConfigurable {
-      request.timeoutInterval = configContext.requestTimeout
-    }
-
-    for (fieldName, value) in additionalHeaders {
-      request.addValue(value, forHTTPHeaderField: fieldName)
-    }
+    var request = createDefaultRequest()
 
     let useGetMethod: Bool
     let body = self.createBody()
