@@ -24,7 +24,38 @@ public protocol GraphQLRequest<Operation>: Sendable {
   func toURLRequest() throws -> URLRequest
 }
 
+// MARK: - Helper Functions
+
 extension GraphQLRequest {
+
+  /// Creates a default `URLRequest` for the receiver.
+  ///
+  /// This can be called within the implementation of `toURLRequest()` and the returned request
+  /// can then be modified as necessary before being returned.
+  ///
+  /// This function creates a `URLRequest` with the following behaviors:
+  /// - `url` set to the receiver's `graphQLEndpoint`
+  /// - `httpMethod` set to POST
+  /// - All header's from `additionalHeaders` added to `allHTTPHeaderFields`
+  /// - If the `context` conforms to `RequestContextTimeoutConfigurable`, the `timeoutInterval` is
+  /// set to the context's `requestTimeout`.
+  ///
+  /// - Returns: A `URLRequest` configured as described above.
+  public func createDefaultRequest() -> URLRequest {
+    var request = URLRequest(url: self.graphQLEndpoint)
+
+    request.httpMethod = GraphQLHTTPMethod.POST.rawValue
+
+    for (fieldName, value) in additionalHeaders {
+      request.addValue(value, forHTTPHeaderField: fieldName)
+    }
+
+    if let configContext = context as? any RequestContextTimeoutConfigurable {
+      request.timeoutInterval = configContext.requestTimeout
+    }
+
+    return request
+  }
 
   public mutating func addHeader(name: String, value: String) {
     self.additionalHeaders[name] = value
