@@ -3,7 +3,6 @@ import Foundation
 import ApolloAPI
 #endif
 
-#warning("TODO: Reconsider design of this. Should this be constructing the request? Do we even need it?")
 /// An implementation of `NetworkTransport` which creates a `RequestChain` object
 /// for each item sent through it.
 public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
@@ -16,15 +15,17 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
 
   /// Any additional HTTP headers that should be added to **every** request, such as an API key or a language setting.
   ///
-  /// If a header should only be added to _certain_ requests, or if its value might differ between requests,
-  /// you should add that header in an interceptor instead.
+  /// If a header should only be added to _certain_ requests, or if its value might differ between
+  /// requests, you should add that header in an interceptor instead.
   ///
   /// Defaults to an empty dictionary.
   public let additionalHeaders: [String: String]
 
-  /// Set to `true` if Automatic Persisted Queries should be used to send a query hash instead of the full query body by default.
-  public let autoPersistQueries: Bool
-  
+  /// A configuration struct used by a `GraphQLRequest` to configure the usage of
+  ///   [Automatic Persisted Queries (APQs).](https://www.apollographql.com/docs/apollo-server/performance/apq)
+  ///   By default, APQs are disabled.
+  public let apqConfig: AutoPersistedQueryConfiguration
+
   /// Set to  `true` if you want to use `GET` instead of `POST` for queries.
   ///
   /// This can improve performance if your GraphQL server uses a CDN (Content Delivery Network)
@@ -34,10 +35,7 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
   ///
   /// Defaults to `false`.
   public let useGETForQueries: Bool
-  
-  /// Set to `true` to use `GET` instead of `POST` for a retry of a persisted query.
-  public let useGETForPersistedQueryRetry: Bool
-  
+
   /// The `JSONRequestBodyCreator` object used to build your `URLRequest`'s JSON body.
   ///
   /// Defaults to a ``DefaultRequestBodyCreator`` initialized with the default configuration.
@@ -51,30 +49,29 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
   ///   - interceptorProvider: The interceptor provider to use when constructing a request chain
   ///   - endpointURL: The GraphQL endpoint URL to use
   ///   - additionalHeaders: Any additional headers that should be automatically added to every request. Defaults to an empty dictionary.
-  ///   - autoPersistQueries: Pass `true` if Automatic Persisted Queries should be used to send a query hash instead of the full query body by default. Defaults to `false`.
+  ///   - apqConfig: A configuration struct used by a `GraphQLRequest` to configure the usage of
+  ///   [Automatic Persisted Queries (APQs).](https://www.apollographql.com/docs/apollo-server/performance/apq) By default, APQs
+  ///   are disabled.
   ///   - requestBodyCreator: The `RequestBodyCreator` object to use to build your `URLRequest`. Defaults to the provided `ApolloRequestBodyCreator` implementation.
   ///   - useGETForQueries: Pass `true` if you want to use `GET` instead of `POST` for queries, for example to take advantage of a CDN. Defaults to `false`.
-  ///   - useGETForPersistedQueryRetry: Pass `true` to use `GET` instead of `POST` for a retry of a persisted query. Defaults to `false`.
   ///   - sendEnhancedClientAwareness: Specifies whether client library metadata is sent in each request `extensions`
   ///   key. Client library metadata is the Apollo iOS library name and version. Defaults to `true`.
   public init(
     interceptorProvider: any InterceptorProvider,
     endpointURL: URL,
     additionalHeaders: [String: String] = [:],
-    autoPersistQueries: Bool = false,
+    apqConfig: AutoPersistedQueryConfiguration = .init(),
     requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator(),
     useGETForQueries: Bool = false,
-    useGETForPersistedQueryRetry: Bool = false,
     sendEnhancedClientAwareness: Bool = true
   ) {
     self.interceptorProvider = interceptorProvider
     self.endpointURL = endpointURL
 
     self.additionalHeaders = additionalHeaders
-    self.autoPersistQueries = autoPersistQueries
+    self.apqConfig = apqConfig
     self.requestBodyCreator = requestBodyCreator
     self.useGETForQueries = useGETForQueries
-    self.useGETForPersistedQueryRetry = useGETForPersistedQueryRetry
     self.sendEnhancedClientAwareness = sendEnhancedClientAwareness
   }
   
@@ -88,7 +85,7 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
   ///   - contextIdentifier: [optional] A unique identifier for this request, to help with deduping cache hits for watchers. Should default to `nil`.
   ///   - context: [optional] A context that is being passed through the request chain. Should default to `nil`.
   /// - Returns: The constructed request.
-  open func constructRequest<Operation: GraphQLOperation>(
+  public func constructRequest<Operation: GraphQLOperation>(
     for operation: Operation,
     cachePolicy: CachePolicy,
     contextIdentifier: UUID? = nil,
@@ -102,9 +99,8 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
       clientVersion: self.clientVersion,
       cachePolicy: cachePolicy,
       context: context,
-      autoPersistQueries: self.autoPersistQueries,
+      apqConfig: self.apqConfig,
       useGETForQueries: self.useGETForQueries,
-      useGETForPersistedQueryRetry: self.useGETForPersistedQueryRetry,
       requestBodyCreator: self.requestBodyCreator,
       sendEnhancedClientAwareness: self.sendEnhancedClientAwareness
     )
@@ -185,7 +181,18 @@ extension RequestChainNetworkTransport: UploadingNetworkTransport {
     context: (any RequestContext)?
   ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
     let request = self.constructUploadRequest(for: operation, with: files, context: context)
-    let chain = makeChain(operation: operation)
+    let chain = makeChain(for: request)
     return chain.kickoff(request: request)
   }
+
+  // MARK: - Deprecations
+
+  /// Set to `true` if Automatic Persisted Queries should be used to send a query hash instead of
+  /// the full query body by default.
+  @available(*, deprecated, message: "Use apqConfig.autoPersistQueries instead.")
+  public var autoPersistQueries: Bool { apqConfig.autoPersistQueries }
+
+  /// Set to `true` to use `GET` instead of `POST` for a retry of a persisted query.
+  @available(*, deprecated, message: "Use apqConfig.useGETForPersistedQueryRetry instead.")
+  public var useGETForPersistedQueryRetry: Bool { apqConfig.useGETForPersistedQueryRetry }
 }

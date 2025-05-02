@@ -29,7 +29,7 @@ public struct InterceptorResult<Operation: GraphQLOperation>: Sendable, Equatabl
 
 /// A protocol to set up a chainable unit of networking work.
 #warning("Rename to RequestInterceptor? Or like Apollo Link?")
-#warning("TODO: Should this be Sendable or not?")
+#warning("Should this take `any GraphQLRequest<Operation> instead? Let interceptor swap out entire request? Probably can't initialize a new request currently since generic context won't know runtime type.")
 public protocol ApolloInterceptor: Sendable {
 
   typealias NextInterceptorFunction<Request: GraphQLRequest> = @Sendable (Request) async throws -> InterceptorResultStream<Request.Operation>
