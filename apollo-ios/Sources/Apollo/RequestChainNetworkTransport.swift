@@ -22,8 +22,8 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
   public let additionalHeaders: [String: String]
 
   /// A configuration struct used by a `GraphQLRequest` to configure the usage of
-  ///   [Automatic Persisted Queries (APQs).](https://www.apollographql.com/docs/apollo-server/performance/apq)
-  ///   By default, APQs are disabled.
+  /// [Automatic Persisted Queries (APQs).](https://www.apollographql.com/docs/apollo-server/performance/apq)
+  /// By default, APQs are disabled.
   public let apqConfig: AutoPersistedQueryConfiguration
 
   /// Set to  `true` if you want to use `GET` instead of `POST` for queries.
