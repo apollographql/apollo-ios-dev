@@ -4,10 +4,15 @@ import ApolloAPI
 #endif
 
 #warning("TODO: Implement retrying based on catching error")
-public struct RequestChainRetry: Swift.Error {
+public struct RequestChainRetry<Request: GraphQLRequest>: Swift.Error {
+  public let request: Request
   public let underlyingError: (any Swift.Error)?
 
-  public init(underlyingError: (any Error)? = nil) {
+  public init(
+    request: Request,
+    underlyingError: (any Error)? = nil
+  ) {
+    self.request = request
     self.underlyingError = underlyingError
   }
 }
