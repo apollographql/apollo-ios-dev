@@ -40,8 +40,8 @@ public struct AutomaticPersistedQueryInterceptor: ApolloInterceptor {
     request: Request,
     next: NextInterceptorFunction<Request>
   ) async throws -> InterceptorResultStream<Request.Operation> {
-    guard let jsonRequest = request as? JSONRequest,
-          jsonRequest.autoPersistQueries else {
+    guard let jsonRequest = request as? JSONRequest<Request.Operation>,
+          jsonRequest.apqConfig.autoPersistQueries else {
       // Not a request that handles APQs, continue along
       return try await next(request)
     }
@@ -71,16 +71,19 @@ public struct AutomaticPersistedQueryInterceptor: ApolloInterceptor {
 
       guard !jsonRequest.isPersistedQueryRetry else {
         // We already retried this and it didn't work.
-        throw APQError.persistedQueryRetryFailed(operationName: Operation.operationName)
+        throw APQError.persistedQueryRetryFailed(operationName: Request.Operation.operationName)
       }
 
-      if Operation.operationDocument.definition == nil {
-        throw APQError.persistedQueryNotFoundForPersistedOnlyQuery(operationName: Operation.operationName)
+      if Request.Operation.operationDocument.definition == nil {
+        throw APQError.persistedQueryNotFoundForPersistedOnlyQuery(
+          operationName: Request.Operation.operationName
+        )
       }
 
+      var jsonRequest = jsonRequest
       // We need to retry this query with the full body.
       jsonRequest.isPersistedQueryRetry = true
-      throw RequestChainRetry()
+      throw RequestChainRetry(request: jsonRequest)
     }
   }
 }
