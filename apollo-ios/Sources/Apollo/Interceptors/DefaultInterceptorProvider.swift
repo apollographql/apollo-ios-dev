@@ -4,7 +4,7 @@ import ApolloAPI
 #endif
 
 /// The default interceptor provider for typescript-generated code
-open class DefaultInterceptorProvider: InterceptorProvider {
+public final class DefaultInterceptorProvider: InterceptorProvider {
 
   private let session: any ApolloURLSession
   private let store: ApolloStore
@@ -38,7 +38,7 @@ open class DefaultInterceptorProvider: InterceptorProvider {
     session
   }
 
-  open func interceptors<Operation: GraphQLOperation>(
+  public func interceptors<Operation: GraphQLOperation>(
     for operation: Operation
   ) -> [any ApolloInterceptor] {
       return [
@@ -49,13 +49,13 @@ open class DefaultInterceptorProvider: InterceptorProvider {
     ]
   }
 
-  open func cacheInterceptor<Operation: GraphQLOperation>(
+  public func cacheInterceptor<Operation: GraphQLOperation>(
     for operation: Operation
   ) -> any CacheInterceptor {
     DefaultCacheInterceptor(store: self.store)
   }
 
-  open func errorInterceptor<Operation: GraphQLOperation>(
+  public func errorInterceptor<Operation: GraphQLOperation>(
     for operation: Operation
   ) -> (any ApolloErrorInterceptor)? {
     return nil
