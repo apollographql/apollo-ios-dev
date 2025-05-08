@@ -115,12 +115,9 @@ struct RequestChain<Request: GraphQLRequest>: Sendable {
   private func executeNetworkFetch(
     request: Request
   ) async throws -> InterceptorResultStream<Operation> {
-    let urlRequest = try request.toURLRequest()
-
-
     return InterceptorResultStream(stream: AsyncThrowingStream { continuation in
       let task = Task {
-        let (chunks, response) = try await urlSession.chunks(for: urlRequest)
+        let (chunks, response) = try await urlSession.chunks(for: request)
 
         guard let response = response as? HTTPURLResponse else {
           preconditionFailure()

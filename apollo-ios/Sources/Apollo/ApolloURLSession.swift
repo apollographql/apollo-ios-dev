@@ -1,16 +1,14 @@
 import Foundation
 
 public protocol ApolloURLSession: Sendable {
-  func chunks(
-    for request: URLRequest
-  ) async throws -> (any AsyncChunkSequence, URLResponse)
+  func chunks(for request: some GraphQLRequest) async throws -> (any AsyncChunkSequence, URLResponse)
 
   func invalidateAndCancel()
 }
 
 extension URLSession: ApolloURLSession {
-  public func chunks(for request: URLRequest) async throws -> (any AsyncChunkSequence, URLResponse) {
-    let (bytes, response) = try await bytes(for: request, delegate: nil)
+  public func chunks(for request: some GraphQLRequest) async throws -> (any AsyncChunkSequence, URLResponse) {
+    let (bytes, response) = try await bytes(for: request.toURLRequest(), delegate: nil)
     return (bytes.chunks, response)
   }
 }
