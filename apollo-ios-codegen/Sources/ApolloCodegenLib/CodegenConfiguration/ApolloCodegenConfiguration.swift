@@ -1434,30 +1434,39 @@ extension ApolloCodegenConfiguration.OperationsFileOutput {
 extension ApolloCodegenConfiguration {
   /// Determine whether the operations files are output to the schema types module.
   func shouldGenerateSelectionSetInitializers(for operation: IR.Operation) -> Bool {
-    guard experimentalFeatures.fieldMerging == .all else { return false }
+
+    // test with merging off and local cache mutation
+    // look for field merging test that turns off and do the opposite
 
     if operation.definition.isLocalCacheMutation {
       return true
 
-    } else if options.selectionSetInitializers.contains(.operations) {
-      return true
-
     } else {
-      return options.selectionSetInitializers.contains(definitionNamed: operation.definition.name)
+      guard experimentalFeatures.fieldMerging == .all else { return false }
+
+      if options.selectionSetInitializers.contains(.operations) {
+        return true
+
+      } else {
+        return options.selectionSetInitializers.contains(definitionNamed: operation.definition.name)
+      }
     }
   }
 
   /// Determine whether the operations files are output to the schema types module.
   func shouldGenerateSelectionSetInitializers(for fragment: IR.NamedFragment) -> Bool {
-    guard experimentalFeatures.fieldMerging == .all else { return false }
-
-    if options.selectionSetInitializers.contains(.namedFragments) { return true }
-
     if fragment.definition.isLocalCacheMutation {
       return true
-    }
 
-    return options.selectionSetInitializers.contains(definitionNamed: fragment.definition.name)
+    } else {
+      guard experimentalFeatures.fieldMerging == .all else { return false }
+
+      if options.selectionSetInitializers.contains(.namedFragments) {
+        return true
+      } else {
+        return options.selectionSetInitializers.contains(definitionNamed: fragment.definition.name)
+      }
+    }
   }
 }
 
