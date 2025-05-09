@@ -9,8 +9,8 @@ public struct ResponseCodeInterceptor: ApolloInterceptor {
   public var id: String = UUID().uuidString
 
   public struct ResponseCodeError: Error, LocalizedError {
-    let response: HTTPURLResponse
-    let responseChunk: Data
+    public let response: HTTPURLResponse
+    public let responseChunk: Data
 
     public var errorDescription: String? {
       return "Received a \(response.statusCode) error."

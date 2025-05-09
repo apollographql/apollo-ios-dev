@@ -16,7 +16,7 @@ public struct UploadRequest<Operation: GraphQLOperation>: GraphQLRequest {
   public var additionalHeaders: [String: String] = [:]
 
   /// The `CachePolicy` to use for this request.
-  public let cachePolicy: CachePolicy
+  public var cachePolicy: CachePolicy
 
   /// [optional] A context that is being passed through the request chain.
   public var context: (any RequestContext)?
