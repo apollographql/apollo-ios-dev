@@ -16,7 +16,7 @@ public protocol GraphQLRequest<Operation>: Sendable {
   var additionalHeaders: [String: String] { get set }
 
   /// The `CachePolicy` to use for this request.
-  var cachePolicy: CachePolicy { get }
+  var cachePolicy: CachePolicy { get set }
 
   /// [optional] A context that is being passed through the request chain.
   var context: (any RequestContext)? { get set }
