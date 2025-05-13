@@ -8,6 +8,7 @@ public protocol ApolloURLSession: Sendable {
 
 extension URLSession: ApolloURLSession {
   public func chunks(for request: some GraphQLRequest) async throws -> (any AsyncChunkSequence, URLResponse) {
+    try Task.checkCancellation()
     let (bytes, response) = try await bytes(for: request.toURLRequest(), delegate: nil)
     return (bytes.chunks, response)
   }
