@@ -56,7 +56,6 @@ struct MultipartResponseDeferParser: MultipartResponseSpecificationParser {
 
   static let protocolSpec: String = "deferSpec=20220824"
 
-  #warning("TODO: This returns after parsing the first dataLine. This seems like a bug? Do subsequent data lines get ignored?")
   static func parse(multipartChunk chunk: String) throws -> JSONObject? {
     for dataLine in chunk.components(separatedBy: Self.dataLineSeparator.description) {
       switch DataLine(dataLine.trimmingCharacters(in: .newlines)) {
