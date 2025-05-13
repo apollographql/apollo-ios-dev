@@ -64,7 +64,7 @@ public struct AsyncHTTPResponseChunkSequence: AsyncChunkSequence {
         }
       }
       
-      return buffer
+      return buffer.isEmpty ? nil: buffer
     }
   }
 }
