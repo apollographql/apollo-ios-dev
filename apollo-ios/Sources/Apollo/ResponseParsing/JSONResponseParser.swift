@@ -41,6 +41,7 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
 
   let response: HTTPURLResponse
   let operationVariables: Operation.Variables?
+  let multipartHeader: HTTPURLResponse.MultipartHeaderComponents
   let includeCacheRecords: Bool
 
   init(
@@ -49,6 +50,7 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
     includeCacheRecords: Bool
   ) {
     self.response = response
+    self.multipartHeader = response.multipartHeaderComponents
     self.operationVariables = operationVariables
     self.includeCacheRecords = includeCacheRecords
   }
@@ -62,8 +64,7 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
       return try await parseSingleResponse(data: dataChunk)
 
     case true:
-      let multipartHeader = response.multipartHeaderComponents
-      guard let boundary = multipartHeader.boundary else {
+      guard multipartHeader.boundary != nil else {
         throw Error.missingMultipartBoundary
       }
 
@@ -82,7 +83,7 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
         return nil
       }
 
-      if let incrementalParser = parser as? any IncrementalResponseSpecificationParser.Type {
+      if parser is any IncrementalResponseSpecificationParser.Type {
         return try await executeIncrementalResponses(fromParsedChunk: parsedChunk, mergingIncrementalItemsInto: existingResult)
 
       } else {
