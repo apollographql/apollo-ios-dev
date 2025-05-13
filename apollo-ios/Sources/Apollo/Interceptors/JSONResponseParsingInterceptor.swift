@@ -24,10 +24,6 @@ public struct JSONResponseParsingInterceptor: ApolloInterceptor {
 
     let currentResult = CurrentResult<Request.Operation>()
 
-    if let request = request as? UploadRequest<Request.Operation> {
-
-    }
-
     return try await next(request).compactMap { result -> InterceptorResult<Request.Operation>? in
       let parser = JSONResponseParser<Request.Operation>(
         response: result.response,

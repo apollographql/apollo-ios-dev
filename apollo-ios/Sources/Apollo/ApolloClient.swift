@@ -5,6 +5,7 @@ import ApolloAPI
 #endif
 
 /// A cache policy that specifies whether results should be fetched from the server or loaded from the local cache.
+#warning("TODO: rethink this API. Onlye valid for queries currently")
 public enum CachePolicy: Sendable, Hashable {
   /// Return data from the cache if available, else fetch results from the server.
   case returnCacheDataElseFetch
@@ -39,11 +40,14 @@ public class ApolloClient: ApolloClientProtocol, @unchecked Sendable {
 
   public enum ApolloClientError: Error, LocalizedError, Hashable {
     case noUploadTransport
+    case noSubscriptionTransport
 
     public var errorDescription: String? {
       switch self {
       case .noUploadTransport:
         return "Attempting to upload using a transport which does not support uploads. This is a developer error."
+      case .noSubscriptionTransport:
+        return "Attempting to begin a subscription using a transport which does not support subscriptions. This is a developer error."
       }
     }
   }
@@ -103,8 +107,8 @@ public class ApolloClient: ApolloClientProtocol, @unchecked Sendable {
   ) -> (any Cancellable) {    
     return awaitStreamInTask(
       {
-        try await self.networkTransport.send(
-          operation: query,
+        try self.networkTransport.send(
+          query: query,
           cachePolicy: cachePolicy,
           contextIdentifier: contextIdentifier,
           context: context
@@ -185,7 +189,7 @@ public class ApolloClient: ApolloClientProtocol, @unchecked Sendable {
     return awaitStreamInTask(
       {
         try await self.networkTransport.send(
-          operation: mutation,
+          mutation: mutation,
           cachePolicy: publishResultToStore ? .default : .fetchIgnoringCacheCompletely,
           contextIdentifier: contextIdentifier,
           context: context
@@ -214,7 +218,7 @@ public class ApolloClient: ApolloClientProtocol, @unchecked Sendable {
 
     return awaitStreamInTask(
       {
-        try await uploadingTransport.upload(
+        try uploadingTransport.upload(
           operation: operation,
           files: files,
           context: context
@@ -231,10 +235,18 @@ public class ApolloClient: ApolloClientProtocol, @unchecked Sendable {
     queue: DispatchQueue = .main,
     resultHandler: @escaping GraphQLResultHandler<Subscription.Data>
   ) -> any Cancellable {
+    guard let networkTransport = networkTransport as? (any SubscriptionNetworkTransport) else {
+      assertionFailure("Trying to subscribe without a subscription transport. Please make sure your network transport conforms to `SubscriptionNetworkTransport`.")
+      queue.async {
+        resultHandler(.failure(ApolloClientError.noSubscriptionTransport))
+      }
+      return EmptyCancellable()
+    }
+
     return awaitStreamInTask(
       {
-        try await self.networkTransport.send(
-          operation: subscription,
+        try networkTransport.send(
+          subscription: subscription,
           cachePolicy: .default,
           contextIdentifier: nil,
           context: context)
