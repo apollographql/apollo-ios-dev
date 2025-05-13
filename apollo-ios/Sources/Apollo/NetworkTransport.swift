@@ -16,12 +16,32 @@ public protocol NetworkTransport: AnyObject, Sendable {
   ///   - contextIdentifier:  [optional] A unique identifier for this request, to help with deduping cache hits for watchers. Defaults to `nil`.
   ///   - context: [optional] A context that is being passed through the request chain. Defaults to `nil`.
   /// - Returns: A stream of `GraphQLResult`s for each response.
-  func send<Operation: GraphQLOperation>(
-    operation: Operation,
+  func send<Query: GraphQLQuery>(
+    query: Query,
     cachePolicy: CachePolicy,
     contextIdentifier: UUID?,
     context: (any RequestContext)?
-  ) throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error>
+  ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error>
+
+  func send<Mutation: GraphQLMutation>(
+    mutation: Mutation,
+    cachePolicy: CachePolicy,
+    contextIdentifier: UUID?,
+    context: (any RequestContext)?
+  ) throws -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error>
+
+}
+
+// MARK: -
+
+public protocol SubscriptionNetworkTransport: NetworkTransport {
+
+  func send<Subscription: GraphQLSubscription>(
+    subscription: Subscription,
+    cachePolicy: CachePolicy,
+    contextIdentifier: UUID?,
+    context: (any RequestContext)?
+  ) throws -> AsyncThrowingStream<GraphQLResult<Subscription.Data>, any Error>
 
 }
 
@@ -37,9 +57,10 @@ public protocol UploadingNetworkTransport: NetworkTransport {
   ///   - files: An array of `GraphQLFile` objects to send.
   ///   - context: [optional] A context that is being passed through the request chain.
   /// - Returns: A stream of `GraphQLResult`s for each response.
+#warning("TODO: should support query and mutation as seperate functions")
   func upload<Operation: GraphQLOperation>(
     operation: Operation,
     files: [GraphQLFile],
     context: (any RequestContext)?
-  ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error>
+  ) throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error>
 }

@@ -1,6 +1,7 @@
 import Foundation
+
 #if !COCOAPODS
-import ApolloAPI
+  import ApolloAPI
 #endif
 
 /// An implementation of `NetworkTransport` which creates a `RequestChain` object
@@ -9,7 +10,7 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
 
   /// The interceptor provider to use when constructing a request chain
   let interceptorProvider: any InterceptorProvider
-  
+
   /// The GraphQL endpoint URL to use.
   public let endpointURL: URL
 
@@ -74,7 +75,7 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
     self.useGETForQueries = useGETForQueries
     self.sendEnhancedClientAwareness = sendEnhancedClientAwareness
   }
-  
+
   /// Constructs a GraphQL request for the given operation.
   ///
   /// Override this method if you need to use a custom subclass of `HTTPRequest`.
@@ -107,20 +108,39 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
     request.addHeaders(self.additionalHeaders)
     return request
   }
-  
+
   // MARK: - NetworkTransport Conformance
 
-  public func send<Operation: GraphQLOperation>(
-    operation: Operation,
+  public func send<Query: GraphQLQuery>(
+    query: Query,
     cachePolicy: CachePolicy,
     contextIdentifier: UUID? = nil,
     context: (any RequestContext)? = nil
-  ) throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+  ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error> {
     let request = self.constructRequest(
-      for: operation,
+      for: query,
       cachePolicy: cachePolicy,
       contextIdentifier: contextIdentifier,
-      context: context)
+      context: context
+    )
+
+    let chain = makeChain(for: request)
+
+    return chain.kickoff(request: request)
+  }
+
+  public func send<Mutation: GraphQLMutation>(
+    mutation: Mutation,
+    cachePolicy: CachePolicy,
+    contextIdentifier: UUID? = nil,
+    context: (any RequestContext)? = nil
+  ) throws -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error> {
+    let request = self.constructRequest(
+      for: mutation,
+      cachePolicy: cachePolicy,
+      contextIdentifier: contextIdentifier,
+      context: context
+    )
 
     let chain = makeChain(for: request)
 
@@ -139,11 +159,11 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
     )
     return chain
   }
-  
+
 }
 
 extension RequestChainNetworkTransport: UploadingNetworkTransport {
-  
+
   /// Constructs an uploading (ie, multipart) GraphQL request
   ///
   /// Override this method if you need to use a custom subclass of `HTTPRequest`.
@@ -152,7 +172,7 @@ extension RequestChainNetworkTransport: UploadingNetworkTransport {
   ///   - operation: The operation to create a request for
   ///   - files: The files you wish to upload
   ///   - context: [optional] A context that is being passed through the request chain. Should default to `nil`.
-  ///   - manualBoundary: [optional] A manually set boundary for your upload request. Defaults to nil. 
+  ///   - manualBoundary: [optional] A manually set boundary for your upload request. Defaults to nil.
   /// - Returns: The created request.
   public func constructUploadRequest<Operation: GraphQLOperation>(
     for operation: Operation,
@@ -174,12 +194,12 @@ extension RequestChainNetworkTransport: UploadingNetworkTransport {
     request.additionalHeaders = self.additionalHeaders
     return request
   }
-  
+
   public func upload<Operation: GraphQLOperation>(
     operation: Operation,
     files: [GraphQLFile],
     context: (any RequestContext)?
-  ) async throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+  ) throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
     let request = self.constructUploadRequest(for: operation, with: files, context: context)
     let chain = makeChain(for: request)
     return chain.kickoff(request: request)
