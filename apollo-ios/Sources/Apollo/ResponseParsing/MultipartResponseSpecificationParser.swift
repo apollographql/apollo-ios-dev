@@ -20,14 +20,6 @@ protocol MultipartResponseSpecificationParser {
 
 }
 
-/// A `MultipartResponseSpecificationParser` for a specification that provides incremental results
-/// should also conform to this protocol to parse the incremental items from the parsed response.
-protocol IncrementalResponseSpecificationParser {
-
-  static func parseIncrementalItems(from responseObject: JSONObject) throws -> IncrementalGraphQLResult
-
-}
-
 // MARK: - Multipart Parsing Helpers
 
 // In compliance with (RFC 1341 Multipart Content-Type)[https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html]
@@ -51,15 +43,18 @@ enum MultipartResponseParsing {
 
     mutating func next() -> Data? {
       guard !data.isEmpty else { return nil }
-      let seperatorIndex = data.firstRange(of: Self.DataLineSeparator)?.endIndex ?? data.endIndex
-      let lineEndIndex = seperatorIndex - Self.DataLineSeparator.count
-      let slice = data[..<lineEndIndex]
-      data.removeSubrange(..<seperatorIndex)
+      guard let separatorRange = data.firstRange(of: Self.DataLineSeparator) else {
+        return data
+      }
+
+      let slice = data[data.startIndex..<separatorRange.startIndex]
+      data.removeSubrange(data.startIndex..<separatorRange.endIndex)
       return slice
     }
   }
 
   enum ContentTypeDataLine {
+    #warning("TODO: handle Content-Type capitalized also.")
     private static let ContentTypeHeader: Data = "content-type: ".data(using: .utf8)!
 
     private static let ContentTypeApplicationJSON: Data = "application/json".data(using: .utf8)!
@@ -75,11 +70,11 @@ enum MultipartResponseParsing {
     /// Will return `.unknown` if the line is the line is a content type line, but the content type is not
     /// recognized.
     init?(_ line: Data) {
-      guard line.starts(with: Self.ContentTypeHeader) else {
+      guard let keyRange = line.firstRange(of: Self.ContentTypeHeader) else {
         return nil
       }
 
-      let value = line.suffix(from: Self.ContentTypeHeader.count)
+      let value = line[keyRange.endIndex...]
       switch value {
       case Self.ContentTypeApplicationJSON:
         self = .applicationJSON

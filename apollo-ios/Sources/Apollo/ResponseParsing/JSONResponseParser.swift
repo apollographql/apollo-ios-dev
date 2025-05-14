@@ -79,14 +79,17 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
         return nil
       }
 
-      if parser is any IncrementalResponseSpecificationParser.Type {
-        return try await executeIncrementalResponses(fromParsedChunk: parsedChunk, mergingIncrementalItemsInto: existingResult)
+      try Task.checkCancellation()
+
+      if let existingResult {
+        return try await executeIncrementalResponses(
+          fromParsedChunk: parsedChunk,
+          mergingIncrementalItemsInto: existingResult
+        )
 
       } else {
-        let response = try await parseSingleResponse(body: parsedChunk)
-        try Task.checkCancellation()
-
-        return response
+        // Parse initial chunk
+        return try await parseSingleResponse(body: parsedChunk)
       }
     }
   }
@@ -129,15 +132,8 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
 
   private func executeIncrementalResponses(
     fromParsedChunk chunk: JSONObject,
-    mergingIncrementalItemsInto existingResult: ParsedResult?
+    mergingIncrementalItemsInto existingResult: ParsedResult
   ) async throws -> ParsedResult {
-    try Task.checkCancellation()
-
-    guard let existingResult else {
-      // Parse initial incremental chunk
-      return try await parseSingleResponse(body: chunk)
-    }
-
     guard let incrementalItems = chunk["incremental"] as? [JSONObject] else {
       throw Error.couldNotParseIncrementalJSON(json: chunk)
     }
