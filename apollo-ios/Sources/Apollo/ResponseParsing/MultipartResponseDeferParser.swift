@@ -44,6 +44,11 @@ struct MultipartResponseDeferParser: MultipartResponseSpecificationParser {
     }
   }
 
+  static let SupportedContentTypes: [MultipartResponseParsing.ContentTypeDataLine] = [
+    .applicationJSON,
+    .applicationGraphQLResponseJSON
+  ]
+
   static let protocolSpec: String = "deferSpec=20220824"
 
   static func parse(multipartChunk chunk: Data) throws -> JSONObject? {
@@ -51,7 +56,7 @@ struct MultipartResponseDeferParser: MultipartResponseSpecificationParser {
     while let dataLine = dataLines.next() {
       switch DataLine(dataLine) {
       case let .contentHeader(contentType):
-        guard case .applicationJSON = contentType else {
+        guard SupportedContentTypes.contains(contentType) else {
           throw ParsingError.unsupportedContentType(type: contentType.valueString)
         }
 

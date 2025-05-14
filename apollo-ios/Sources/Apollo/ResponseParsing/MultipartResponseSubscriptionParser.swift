@@ -57,6 +57,11 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
     }
   }
 
+  static let SupportedContentTypes: [MultipartResponseParsing.ContentTypeDataLine] = [
+    .applicationJSON,
+    .applicationGraphQLResponseJSON
+  ]
+
   static let protocolSpec: String = "subscriptionSpec=1.0"
 
   static func parse(multipartChunk chunk: Data) throws -> JSONObject? {
@@ -68,7 +73,7 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
         break
 
       case let .contentHeader(contentType):
-        guard case .applicationJSON = contentType else {
+        guard SupportedContentTypes.contains(contentType) else {
           throw ParsingError.unsupportedContentType(type: contentType.valueString)
         }
 
