@@ -53,16 +53,26 @@ enum MultipartResponseParsing {
     }
   }
 
-  enum ContentTypeDataLine {
-    #warning("TODO: handle Content-Type capitalized also.")
-    private static let ContentTypeHeader: Data = "content-type: ".data(using: .utf8)!
-
-    private static let ContentTypeApplicationJSON: Data = "application/json".data(using: .utf8)!
-
-    private static let ContentTypeSeparator: Data = Data([0x3A]) // ":"
-
+  enum ContentTypeDataLine: Hashable {
     case applicationJSON
+    case applicationGraphQLResponseJSON
     case unknown(value: Data)
+
+    private enum Key {
+      static let AllowedValues: [Data] = [
+        "content-type".data(using: .utf8)!,
+        "Content-Type".data(using: .utf8)!
+      ]
+
+      static let Separator: Data = Data([0x3A, 0x20]) // ": "
+    }
+
+    private enum Value {
+      static let ApplicationJSON: Data = "application/json".data(using: .utf8)!
+      static let ApplicationGraphQLResponseJSON: Data = "application/graphql-response+json".data(using: .utf8)!
+    }
+
+    private static let DirectiveSeparator: Data = Data([0x3b, 0x20]) // "; "
 
     /// Initializes the content type if the line is a content type line.
     ///
@@ -70,23 +80,47 @@ enum MultipartResponseParsing {
     /// Will return `.unknown` if the line is the line is a content type line, but the content type is not
     /// recognized.
     init?(_ line: Data) {
-      guard let keyRange = line.firstRange(of: Self.ContentTypeHeader) else {
+      guard Self.isContentTypeLine(line),
+            let keySeparatorRange = line.firstRange(of: Self.Key.Separator) else {
         return nil
       }
 
-      let value = line[keyRange.endIndex...]
+      let valueRange: Range<Data.Index>
+      if let directiveSeparatorRange = line.firstRange(of: Self.DirectiveSeparator) {
+        valueRange = keySeparatorRange.endIndex..<directiveSeparatorRange.startIndex
+      } else {
+        valueRange = keySeparatorRange.endIndex..<line.endIndex
+      }
+
+      let value = line[valueRange]
       switch value {
-      case Self.ContentTypeApplicationJSON:
+      case Self.Value.ApplicationJSON:
         self = .applicationJSON
+
+      case Self.Value.ApplicationGraphQLResponseJSON:
+        self = .applicationGraphQLResponseJSON
+
       default:
         self = .unknown(value: value)
       }
     }
 
+    private static func isContentTypeLine(_ line: Data) -> Bool {
+      for key in Key.AllowedValues {
+        if line.starts(with: key) {
+          return true
+        }
+      }
+      return false
+    }
+
     var valueString: String {
       switch self {
       case .applicationJSON:
-        return String(data: Self.ContentTypeApplicationJSON, encoding: .utf8)!
+        return String(data: Self.Value.ApplicationJSON, encoding: .utf8)!
+
+      case .applicationGraphQLResponseJSON:
+        return String(data: Self.Value.ApplicationGraphQLResponseJSON, encoding: .utf8)!
 
       case .unknown(value: let value):
         return String(data: value, encoding: .utf8)!

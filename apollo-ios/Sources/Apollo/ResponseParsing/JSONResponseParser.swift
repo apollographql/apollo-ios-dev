@@ -9,7 +9,6 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
     case couldNotParseToJSON(data: Data)
     case missingMultipartBoundary
     case invalidMultipartProtocol
-    case couldNotParseIncrementalJSON(json: JSONObject)
 
     public var errorDescription: String? {
       switch self {
@@ -29,10 +28,7 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
         return "Missing multipart boundary in the response 'content-type' header."
 
       case .invalidMultipartProtocol:
-        return "Missing, or unknown, multipart specification protocol in the response 'content-type' header."
-
-      case let .couldNotParseIncrementalJSON(json):
-        return "Could not parse incremental values - got \(json)."
+        return "Missing, or unknown, multipart specification protocol in the response 'content-type' header."      
       }
     }
   }
@@ -81,10 +77,14 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
 
       try Task.checkCancellation()
 
-      if let existingResult {
+      if let incrementalItems = parsedChunk["incremental"] as? [JSONObject] {
+        guard let existingResult else {
+          throw IncrementalResponseError.missingExistingData
+        }
+
         return try await executeIncrementalResponses(
-          fromParsedChunk: parsedChunk,
-          mergingIncrementalItemsInto: existingResult
+          merging: incrementalItems,
+          into: existingResult
         )
 
       } else {
@@ -131,13 +131,9 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
   }
 
   private func executeIncrementalResponses(
-    fromParsedChunk chunk: JSONObject,
-    mergingIncrementalItemsInto existingResult: ParsedResult
+    merging incrementalItems: [JSONObject],
+    into existingResult: ParsedResult
   ) async throws -> ParsedResult {
-    guard let incrementalItems = chunk["incremental"] as? [JSONObject] else {
-      throw Error.couldNotParseIncrementalJSON(json: chunk)
-    }
-
     var currentResult = existingResult.0
     var currentCacheRecords = existingResult.1
 

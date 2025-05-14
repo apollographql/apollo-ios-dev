@@ -4,12 +4,15 @@ import ApolloAPI
 #endif
 
 public enum IncrementalResponseError: Error, LocalizedError, Equatable {
+  case missingExistingData
   case missingPath
   case missingLabel
   case missingDeferredSelectionSetType(String, String)
 
   public var errorDescription: String? {
     switch self {
+    case .missingExistingData:
+      return "Incremental response must be returned after initial response."
     case .missingPath:
       return "Incremental responses must have a 'path' key."
 
@@ -17,7 +20,7 @@ public enum IncrementalResponseError: Error, LocalizedError, Equatable {
       return "Incremental responses must have a 'label' key."
 
     case let .missingDeferredSelectionSetType(label, path):
-      return "The operation does not have a deferred selection set for label '\(label)' at field path '\(path)'."
+      return "The operation does not have a deferred selection set for label '\(label)' at field path '\(path)'."        
     }
   }
 }
