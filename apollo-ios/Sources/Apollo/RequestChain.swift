@@ -17,6 +17,23 @@ public struct RequestChainRetry<Request: GraphQLRequest>: Swift.Error {
   }
 }
 
+public enum RequestChainError: Swift.Error, LocalizedError {
+  case missingParsedResult
+  case noResults
+
+  public var errorDescription: String? {
+    switch self {
+    case .missingParsedResult:
+      return
+        "Request chain completed with no `parsedResult` value. A request chain must include an interceptor that parses the response data."
+    case .noResults:
+      return
+        "Request chain completed request with no results emitted. This can occur if the network returns a success response with no body content, or if an interceptor fails to pass on the emitted results"
+    }
+  }
+
+}
+
 struct RequestChain<Request: GraphQLRequest>: Sendable {
 
   private let urlSession: any ApolloURLSession
@@ -54,10 +71,13 @@ struct RequestChain<Request: GraphQLRequest>: Sendable {
   ) -> ResultStream where Operation: GraphQLQuery {
     return doInAsyncThrowingStream { continuation in
 
+      var didYieldCacheData = false
+
       if request.cachePolicy.shouldAttemptCacheRead {
         do {
           let cacheData = try await cacheInterceptor.readCacheData(for: request.operation)
           continuation.yield(cacheData)
+          didYieldCacheData = true
 
         } catch {
           if case .returnCacheDataDontFetch = request.cachePolicy {
@@ -66,7 +86,9 @@ struct RequestChain<Request: GraphQLRequest>: Sendable {
         }
       }
 
-      try await kickoffRequestInterceptors(for: request, continuation: continuation)
+      if request.cachePolicy.shouldFetchFromNetwork(hadSuccessfulCacheRead: didYieldCacheData) {
+        try await kickoffRequestInterceptors(for: request, continuation: continuation)
+      }
     }
   }
 
@@ -83,7 +105,13 @@ struct RequestChain<Request: GraphQLRequest>: Sendable {
   ) -> ResultStream {
     return AsyncThrowingStream { continuation in
       let task = Task {
-        try await body(continuation)
+        do {
+          try await body(continuation)
+          continuation.finish()
+
+        } catch {
+          continuation.finish(throwing: error)
+        }
       }
 
       continuation.onTermination = { _ in
@@ -96,9 +124,10 @@ struct RequestChain<Request: GraphQLRequest>: Sendable {
     for initialRequest: Request,
     continuation: ResultStream.Continuation
   ) async throws {
-
+    nonisolated(unsafe) var finalRequest: Request!
     var next: @Sendable (Request) async throws -> InterceptorResultStream<Operation> = { request in
-      try await executeNetworkFetch(request: request)
+      finalRequest = request
+      return try await executeNetworkFetch(request: request)
     }
 
     for interceptor in interceptors.reversed() {
@@ -109,38 +138,80 @@ struct RequestChain<Request: GraphQLRequest>: Sendable {
       }
     }
 
-    let result = try await next(initialRequest)
+    let resultStream = try await next(initialRequest)
+
+    var didEmitResult: Bool = false
+
+    for try await result in resultStream.getResults() {
+      guard let result = result.parsedResult else {
+        throw RequestChainError.missingParsedResult
+      }
+
+      try await writeToCacheIfNecessary(result: result, for: finalRequest)
+
+      didEmitResult = true
+      continuation.yield(result.result)
+    }
+
+    guard didEmitResult else {
+      continuation.finish(throwing: RequestChainError.noResults)
+      return
+    }
   }
 
   private func executeNetworkFetch(
     request: Request
   ) async throws -> InterceptorResultStream<Operation> {
-    return InterceptorResultStream(stream: AsyncThrowingStream { continuation in
-      let task = Task {
-        let (chunks, response) = try await urlSession.chunks(for: request)
+    return InterceptorResultStream(
+      stream: AsyncThrowingStream { continuation in
+        let task = Task {
+          do {
+            let (chunks, response) = try await urlSession.chunks(for: request)
 
-        guard let response = response as? HTTPURLResponse else {
-          preconditionFailure()
-#warning("Throw error instead of precondition failure? Look into if it is possible for this to even occur.")
+            guard let response = response as? HTTPURLResponse else {
+              preconditionFailure()
+#warning(
+              "Throw error instead of precondition failure? Look into if it is possible for this to even occur."
+              )
+            }
+
+            for try await chunk in chunks {
+              continuation.yield(
+                InterceptorResult(
+                  response: response,
+                  rawResponseChunk: chunk as! Data
+                )
+              )
+            }
+
+            continuation.finish()
+          } catch {
+            continuation.finish(throwing: error)
+          }
         }
 
-        for try await chunk in chunks {
-          continuation.yield(
-            InterceptorResult(
-              response: response,
-              rawResponseChunk: chunk as! Data
-            )
-          )
-        }
-
-        continuation.finish()
+        continuation.onTermination = { _ in task.cancel() }
       }
-
-      continuation.onTermination = { _ in task.cancel() }
-    })
+    )
   }
 
+  private func writeToCacheIfNecessary(
+    result: InterceptorResult<Request.Operation>.ParsedResult,
+    for request: Request
+  ) async throws {
+    guard let records = result.cacheRecords,
+      result.result.source == .server,
+      request.cachePolicy.shouldAttemptCacheWrite
+    else {
+      return
+    }
 
+    try await cacheInterceptor.writeCacheData(
+      cacheRecords: records,
+      for: request.operation,
+      with: result.result
+    )
+  }
 }
 
 fileprivate extension CachePolicy {
@@ -154,6 +225,34 @@ fileprivate extension CachePolicy {
         .returnCacheDataDontFetch,
         .returnCacheDataElseFetch:
       return true
+    }
+  }
+
+  var shouldAttemptCacheWrite: Bool {
+    switch self {
+    case .fetchIgnoringCacheCompletely,
+      .returnCacheDataDontFetch:
+      return false
+
+    case .fetchIgnoringCacheData,
+      .returnCacheDataElseFetch,
+      .returnCacheDataAndFetch:
+      return true
+    }
+  }
+
+  func shouldFetchFromNetwork(hadSuccessfulCacheRead: Bool) -> Bool {
+    switch self {
+    case .returnCacheDataDontFetch:
+      return false
+
+    case .fetchIgnoringCacheData,
+      .returnCacheDataAndFetch,
+      .fetchIgnoringCacheCompletely:
+      return true
+
+    case .returnCacheDataElseFetch:
+      return !hadSuccessfulCacheRead
     }
   }
 }

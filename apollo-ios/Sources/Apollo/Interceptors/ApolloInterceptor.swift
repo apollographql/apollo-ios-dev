@@ -63,12 +63,17 @@ public struct InterceptorResultStream<Operation: GraphQLOperation>: Sendable, ~C
 
     let newStream = AsyncThrowingStream { continuation in
       let task = Task {
-        for try await result in stream {
-          try Task.checkCancellation()
+        do {
+          for try await result in stream {
+            try Task.checkCancellation()
 
-          try await continuation.yield(transform(result))
+            try await continuation.yield(transform(result))
+          }
+          continuation.finish()
+          
+        } catch {
+          continuation.finish(throwing: error)
         }
-        continuation.finish()
       }
 
       continuation.onTermination = { _ in task.cancel() }
