@@ -98,10 +98,11 @@ public final class MultipartFormData {
   private func encode(bodyPart: BodyPart) throws -> Data {
     var encoded = Data()
 
-    encoded.append(try self.encode(string: "--\(self.boundary)\(MultipartResponseParsing.CRLF)"))
+    encoded.append(try self.encode(string: "--\(self.boundary)"))
+    encoded.append(MultipartResponseParsing.CRLF)
     encoded.append(try self.encode(string: bodyPart.headers()))
     encoded.append(self.encode(inputStream: bodyPart.inputStream, length: bodyPart.contentLength))
-    encoded.append(try self.encode(string: "\(MultipartResponseParsing.CRLF)"))
+    encoded.append(MultipartResponseParsing.CRLF)
 
     return encoded
   }
@@ -180,13 +181,13 @@ fileprivate struct BodyPart: Hashable {
     if let filename = self.filename {
       headers += "; filename=\"\(filename)\""
     }
-    headers += "\(MultipartResponseParsing.CRLF)"
+    headers += "\r\n"
 
     if let contentType = self.contentType {
-      headers += "Content-Type: \(contentType)\(MultipartResponseParsing.CRLF)"
+      headers += "Content-Type: \(contentType)\r\n"
     }
 
-    headers += "\(MultipartResponseParsing.CRLF)"
+    headers += "\r\n"
 
     return headers
   }

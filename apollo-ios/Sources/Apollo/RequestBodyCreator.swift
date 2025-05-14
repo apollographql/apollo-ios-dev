@@ -3,17 +3,26 @@ import ApolloAPI
 #endif
 
 public protocol JSONRequestBodyCreator: Sendable {
+  #warning("TODO: replace with version that takes request after rewriting websocket")
   /// Creates a `JSONEncodableDictionary` out of the passed-in operation
   ///
+  /// - Note: This function only exists for supporting the soon-to-be-replaced `WebSocketTransport`
+  /// from the `ApolloWebSocket` package. Once that package is re-written, this function will likely
+  /// be deprecated.
+  ///
   /// - Parameters:
-  ///   - request: The `GraphQLRequest` to create the JSON body for.
+  ///   - operation: The `GraphQLOperation` to create the JSON body for.
   ///   - sendQueryDocument: Whether or not to send the full query document. Should default to `true`.
   ///   - autoPersistQuery: Whether to use auto-persisted query information. Should default to `false`.
+  ///   - clientAwarenessMetadata: Metadata used by the
+  ///     [client awareness](https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation)
+  ///     feature of GraphOS Studio.
   /// - Returns: The created `JSONEncodableDictionary`
-  func requestBody<Request: GraphQLRequest>(
-    for request: Request,
+  func requestBody<Operation: GraphQLOperation>(
+    for operation: Operation,
     sendQueryDocument: Bool,
-    autoPersistQuery: Bool
+    autoPersistQuery: Bool,
+    clientAwarenessMetadata: ClientAwarenessMetadata
   ) -> JSONEncodableDictionary
 }
 
@@ -21,28 +30,49 @@ public protocol JSONRequestBodyCreator: Sendable {
 
 extension JSONRequestBodyCreator {
 
+  /// Creates a `JSONEncodableDictionary` out of the passed-in request
+  ///
+  /// - Parameters:
+  ///   - request: The `GraphQLRequest` to create the JSON body for.
+  ///   - sendQueryDocument: Whether or not to send the full query document. Should default to `true`.
+  ///   - autoPersistQuery: Whether to use auto-persisted query information. Should default to `false`.
+  /// - Returns: The created `JSONEncodableDictionary`
   public func requestBody<Request: GraphQLRequest>(
     for request: Request,
     sendQueryDocument: Bool,
     autoPersistQuery: Bool
   ) -> JSONEncodableDictionary {
+    self.requestBody(
+      for: request.operation,
+      sendQueryDocument: sendQueryDocument,
+      autoPersistQuery: autoPersistQuery,
+      clientAwarenessMetadata: request.clientAwarenessMetadata
+    )
+  }
+
+  public func requestBody<Operation: GraphQLOperation>(
+    for operation: Operation,
+    sendQueryDocument: Bool,
+    autoPersistQuery: Bool,
+    clientAwarenessMetadata: ClientAwarenessMetadata
+  ) -> JSONEncodableDictionary {
     var body: JSONEncodableDictionary = [
-      "operationName": Request.Operation.operationName,
+      "operationName": Operation.operationName,
     ]
 
-    if let variables = request.operation.__variables {
+    if let variables = operation.__variables {
       body["variables"] = variables._jsonEncodableObject
     }
 
     if sendQueryDocument {
-      guard let document = Request.Operation.definition?.queryDocument else {
+      guard let document = Operation.definition?.queryDocument else {
         preconditionFailure("To send query documents, Apollo types must be generated with `OperationDefinition`s.")
       }
       body["query"] = document
     }
 
     if autoPersistQuery {
-      guard let operationIdentifier = Request.Operation.operationIdentifier else {
+      guard let operationIdentifier = Operation.operationIdentifier else {
         preconditionFailure("To enable `autoPersistQueries`, Apollo types must be generated with operationIdentifiers")
       }
 
