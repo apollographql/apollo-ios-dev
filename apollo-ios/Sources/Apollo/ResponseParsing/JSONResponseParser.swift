@@ -75,11 +75,7 @@ public struct JSONResponseParser<Operation: GraphQLOperation>: Sendable {
         throw Error.invalidMultipartProtocol
       }
 
-      guard let chunkString = String(data: dataChunk, encoding: .utf8) else {
-        throw Error.couldNotParseToJSON(data: dataChunk)
-      }
-
-      guard let parsedChunk = try parser.parse(multipartChunk: chunkString) else {
+      guard let parsedChunk = try parser.parse(multipartChunk: dataChunk) else {
         return nil
       }
 
