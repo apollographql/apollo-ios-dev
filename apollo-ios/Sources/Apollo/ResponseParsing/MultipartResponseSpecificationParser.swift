@@ -10,19 +10,14 @@ protocol MultipartResponseSpecificationParser {
 
   /// Called to process each chunk in a multipart response.
   ///
-  /// - Parameter data: Response data for a single chunk of a multipart response as a `String`.
+  /// - Parameter data: Response data for a single chunk of a multipart response.
   /// - Returns: A ``JSONObject`` for the parsed chunk.
   ///            It is possible for parsing to succeed and return a `nil` data value.
   ///            This should only happen when the chunk was successfully parsed but there is no
   ///            action to take on the message, such as a heartbeat message. Successful results
   ///            with a `nil` data value will not be returned to the user.
-  static func parse(multipartChunk: String) throws -> JSONObject?
-  #warning("TODO: change this to take in Data? Better performance")
+  static func parse(multipartChunk: Data) throws -> JSONObject?
 
-}
-
-extension MultipartResponseSpecificationParser {
-  static var dataLineSeparator: StaticString { "\r\n\r\n" }
 }
 
 /// A `MultipartResponseSpecificationParser` for a specification that provides incremental results
@@ -30,5 +25,78 @@ extension MultipartResponseSpecificationParser {
 protocol IncrementalResponseSpecificationParser {
 
   static func parseIncrementalItems(from responseObject: JSONObject) throws -> IncrementalGraphQLResult
+
+}
+
+// MARK: - Multipart Parsing Helpers
+
+// In compliance with (RFC 1341 Multipart Content-Type)[https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html]
+enum MultipartResponseParsing {
+  /// Carriage Return Line Feed
+  static let CRLF: Data = Data([0x0D, 0x0A]) // "\r\n"
+
+  static let Delimeter: Data = CRLF + [0x2D, 0x2D] // "\r\n--"
+
+  /// The delimeter that signifies the end of a multipart response.
+  ///
+  /// This should immediately follow a Delimeter + Boundary.
+  static let CloseDelimeter: Data = Data([0x2D, 0x2D]) // "--"
+
+
+  struct DataLineIterator: IteratorProtocol {
+    /// A double carriage return. Used as the seperator between data lines within a multipart response chunk
+    private static let DataLineSeparator: Data = CRLF + CRLF // "\r\n\r\n"
+
+    var data: Data
+
+    mutating func next() -> Data? {
+      guard !data.isEmpty else { return nil }
+      let seperatorIndex = data.firstRange(of: Self.DataLineSeparator)?.endIndex ?? data.endIndex
+      let lineEndIndex = seperatorIndex - Self.DataLineSeparator.count
+      let slice = data[..<lineEndIndex]
+      data.removeSubrange(..<seperatorIndex)
+      return slice
+    }
+  }
+
+  enum ContentTypeDataLine {
+    private static let ContentTypeHeader: Data = "content-type: ".data(using: .utf8)!
+
+    private static let ContentTypeApplicationJSON: Data = "application/json".data(using: .utf8)!
+
+    private static let ContentTypeSeparator: Data = Data([0x3A]) // ":"
+
+    case applicationJSON
+    case unknown(value: Data)
+
+    /// Initializes the content type if the line is a content type line.
+    ///
+    /// Will return `nil` if the line is not a content type line.
+    /// Will return `.unknown` if the line is the line is a content type line, but the content type is not
+    /// recognized.
+    init?(_ line: Data) {
+      guard line.starts(with: Self.ContentTypeHeader) else {
+        return nil
+      }
+
+      let value = line.suffix(from: Self.ContentTypeHeader.count)
+      switch value {
+      case Self.ContentTypeApplicationJSON:
+        self = .applicationJSON
+      default:
+        self = .unknown(value: value)
+      }
+    }
+
+    var valueString: String {
+      switch self {
+      case .applicationJSON:
+        return String(data: Self.ContentTypeApplicationJSON, encoding: .utf8)!
+
+      case .unknown(value: let value):
+        return String(data: value, encoding: .utf8)!
+      }
+    }
+  }
 
 }

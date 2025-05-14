@@ -20,33 +20,23 @@ struct MultipartResponseDeferParser: MultipartResponseSpecificationParser {
         return "The payload data could not be parsed."
       }
     }
-  }
+  }  
 
   private enum DataLine {
-    case contentHeader(type: String)
+    case contentHeader(type: MultipartResponseParsing.ContentTypeDataLine)
     case json(object: JSONObject)
     case unknown
 
-    init(_ value: String) {
+    init(_ value: Data) {
       self = Self.parse(value)
     }
 
-    private static func parse(_ dataLine: String) -> DataLine {
-      var contentTypeHeader: StaticString { "content-type:" }
-
-      if dataLine.starts(with: contentTypeHeader.description) {
-        let contentType = (dataLine
-          .components(separatedBy: ":").last ?? dataLine
-        ).trimmingCharacters(in: .whitespaces)
-
+    private static func parse(_ dataLine: Data) -> DataLine {
+      if let contentType = MultipartResponseParsing.ContentTypeDataLine(dataLine) {
         return .contentHeader(type: contentType)
       }
 
-      #warning("TODO: do we really need to turn the string into data to turn it back into a JSONObject?")
-      if
-        let data = dataLine.data(using: .utf8),
-        let jsonObject = try? JSONSerializationFormat.deserialize(data: data) as JSONObject
-      {
+      if let jsonObject = try? JSONSerializationFormat.deserialize(data: dataLine) as JSONObject {
         return .json(object: jsonObject)
       }
 
@@ -56,23 +46,19 @@ struct MultipartResponseDeferParser: MultipartResponseSpecificationParser {
 
   static let protocolSpec: String = "deferSpec=20220824"
 
-  static func parse(multipartChunk chunk: String) throws -> JSONObject? {
-    for dataLine in chunk.components(separatedBy: Self.dataLineSeparator.description) {
-      switch DataLine(dataLine.trimmingCharacters(in: .newlines)) {
-      case let .contentHeader(type):
-        guard type == "application/json" else {
-          throw ParsingError.unsupportedContentType(type: type)
+  static func parse(multipartChunk chunk: Data) throws -> JSONObject? {
+    var dataLines = MultipartResponseParsing.DataLineIterator(data: chunk)
+    while let dataLine = dataLines.next() {
+      switch DataLine(dataLine) {
+      case let .contentHeader(contentType):
+        guard case .applicationJSON = contentType else {
+          throw ParsingError.unsupportedContentType(type: contentType.valueString)
         }
 
       case let .json(object):
         guard object.isPartialResponse || object.isIncrementalResponse else {
           throw ParsingError.cannotParsePayloadData
         }
-
-        guard let serialized: Data = try? JSONSerializationFormat.serialize(value: object) else {
-          throw ParsingError.cannotParsePayloadData
-        }
-
         return object
 
       case .unknown:

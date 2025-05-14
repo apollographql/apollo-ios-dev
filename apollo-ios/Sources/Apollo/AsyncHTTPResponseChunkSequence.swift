@@ -43,12 +43,7 @@ public struct AsyncHTTPResponseChunkSequence: AsyncChunkSequence {
 
     private let boundary: Data?
 
-    /// Carriage Return Line Feed
-    private static let CRLF: Data = Data([0x0D, 0x0A]) // "\r\n"
-
-    private static let Delimeter: Data = CRLF + [0x2D, 0x2D] // "\r\n--"
-
-    private static let CloseDelimeter: Data = Data([0x2D, 0x2D]) // "--"
+    private typealias Constants = MultipartResponseParsing
 
     init(
       _ underlyingIterator: URLSession.AsyncBytes.AsyncIterator,
@@ -57,7 +52,7 @@ public struct AsyncHTTPResponseChunkSequence: AsyncChunkSequence {
       self.underlyingIterator = underlyingIterator
 
       if let boundaryString = boundary?.data(using: .utf8) {
-        self.boundary = Self.Delimeter + boundaryString
+        self.boundary = Constants.Delimeter + boundaryString
       } else {
         self.boundary = nil
       }
@@ -87,19 +82,11 @@ public struct AsyncHTTPResponseChunkSequence: AsyncChunkSequence {
     }
 
     private func formatAsChunk(_ buffer: inout Data) {
-//      for _ in 0..<2 {
-//        if buffer.suffix(Self.CRLF.count) == Self.CRLF {
-//          buffer.removeLast(Self.CRLF.count)
-//        } else {
-//          break
-//        }
-//      }
-
-      if buffer.prefix(Self.CRLF.count) == Self.CRLF {
-        buffer.removeFirst(Self.CRLF.count)
+      if buffer.prefix(Constants.CRLF.count) == Constants.CRLF {
+        buffer.removeFirst(Constants.CRLF.count)
       }
 
-      if buffer == Self.CloseDelimeter {
+      if buffer == Constants.CloseDelimeter {
         buffer.removeAll()
       }
     }

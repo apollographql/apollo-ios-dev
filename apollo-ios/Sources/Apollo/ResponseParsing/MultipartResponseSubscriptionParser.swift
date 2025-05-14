@@ -30,35 +30,26 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
 
   private enum DataLine {
     case heartbeat
-    case contentHeader(type: String)
+    case contentHeader(type: MultipartResponseParsing.ContentTypeDataLine)
     case json(object: JSONObject)
     case unknown
 
-    init(_ value: String) {
+    init(_ value: Data) {
       self = Self.parse(value)
     }
 
-    private static func parse(_ dataLine: String) -> DataLine {
-      var contentTypeHeader: StaticString { "content-type:" }
-      var heartbeat: StaticString { "{}" }
+    static let HeartbeatMessage: Data = Data([0x7b, 0x7d]) // "{}"
 
-      if dataLine == heartbeat.description {
+    private static func parse(_ dataLine: Data) -> DataLine {
+      if dataLine == HeartbeatMessage {
         return .heartbeat
       }
 
-      if dataLine.lowercased().starts(with: contentTypeHeader.description) {
-        let contentType = (dataLine
-          .components(separatedBy: ":").last ?? dataLine
-        ).trimmingCharacters(in: .whitespaces)
-
+      if let contentType = MultipartResponseParsing.ContentTypeDataLine(dataLine) {
         return .contentHeader(type: contentType)
       }
 
-#warning("TODO: do we really need to turn the string into data to turn it back into a JSONObject?")
-      if
-        let data = dataLine.data(using: .utf8),
-        let jsonObject = try? JSONSerializationFormat.deserialize(data: data) as JSONObject
-      {
+      if let jsonObject = try? JSONSerializationFormat.deserialize(data: dataLine) as JSONObject {
         return .json(object: jsonObject)
       }
 
@@ -68,16 +59,17 @@ struct MultipartResponseSubscriptionParser: MultipartResponseSpecificationParser
 
   static let protocolSpec: String = "subscriptionSpec=1.0"
 
-  static func parse(multipartChunk chunk: String) throws -> JSONObject? {
-    for dataLine in chunk.components(separatedBy: Self.dataLineSeparator.description) {
-      switch DataLine(dataLine.trimmingCharacters(in: .newlines)) {
+  static func parse(multipartChunk chunk: Data) throws -> JSONObject? {
+    var dataLines = MultipartResponseParsing.DataLineIterator(data: chunk)
+    while let dataLine = dataLines.next() {
+      switch DataLine(dataLine) {
       case .heartbeat:
         // Periodically sent by the router - noop
         break
 
-      case let .contentHeader(type):
-        guard type == "application/json" else {
-          throw ParsingError.unsupportedContentType(type: type)
+      case let .contentHeader(contentType):
+        guard case .applicationJSON = contentType else {
+          throw ParsingError.unsupportedContentType(type: contentType.valueString)
         }
 
       case let .json(object):
