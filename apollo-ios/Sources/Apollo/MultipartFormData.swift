@@ -14,9 +14,6 @@ public final class MultipartFormData {
     }
   }
 
-  /// A Carriage Return Line Feed character, which will be seen as a newline on both unix and Windows servers.
-  static let CRLF = "\r\n"
-
   public let boundary: String
 
   private var bodyParts: [BodyPart]
@@ -101,10 +98,10 @@ public final class MultipartFormData {
   private func encode(bodyPart: BodyPart) throws -> Data {
     var encoded = Data()
 
-    encoded.append(try self.encode(string: "--\(self.boundary)\(MultipartFormData.CRLF)"))
+    encoded.append(try self.encode(string: "--\(self.boundary)\(MultipartResponseParsing.CRLF)"))
     encoded.append(try self.encode(string: bodyPart.headers()))
     encoded.append(self.encode(inputStream: bodyPart.inputStream, length: bodyPart.contentLength))
-    encoded.append(try self.encode(string: "\(MultipartFormData.CRLF)"))
+    encoded.append(try self.encode(string: "\(MultipartResponseParsing.CRLF)"))
 
     return encoded
   }
@@ -183,13 +180,13 @@ fileprivate struct BodyPart: Hashable {
     if let filename = self.filename {
       headers += "; filename=\"\(filename)\""
     }
-    headers += "\(MultipartFormData.CRLF)"
+    headers += "\(MultipartResponseParsing.CRLF)"
 
     if let contentType = self.contentType {
-      headers += "Content-Type: \(contentType)\(MultipartFormData.CRLF)"
+      headers += "Content-Type: \(contentType)\(MultipartResponseParsing.CRLF)"
     }
 
-    headers += "\(MultipartFormData.CRLF)"
+    headers += "\(MultipartResponseParsing.CRLF)"
 
     return headers
   }
