@@ -557,7 +557,7 @@ class RequestChainTests: XCTestCase {
       chain: any RequestChain,
       request: HTTPRequest<Operation>,
       response: HTTPResponse<Operation>?,
-      completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>
+      completion: @Sendable @escaping (Result<GraphQLResult<Operation.Data>, any Error>
     ) -> Void) {
       DispatchQueue.main.asyncAfter(wallDeadline: DispatchWallTime.now() + seconds) {
         chain.proceedAsync(
@@ -570,7 +570,7 @@ class RequestChainTests: XCTestCase {
     }
   }
 
-  func test__memory_management__givenQuery_whenCompleted_shouldNotHaveRetainCycle() throws {
+  func test__memory_management__givenQuery_whenCompleted_shouldNotHaveRetainCycle() async throws {
     // given
     let client = MockURLSessionClient(
       response: .mock(
@@ -595,7 +595,7 @@ class RequestChainTests: XCTestCase {
     ])
     weak var weakRequestChain: (any RequestChain)? = requestChain
 
-    let expectedData = try Hero(data: [
+    let expectedData = try await Hero(data: [
       "__typename": "Hero",
       "name": "R2-D2"
     ], variables: nil)
@@ -631,7 +631,7 @@ class RequestChainTests: XCTestCase {
     XCTAssertNil(weakRequestChain)
   }
 
-  func test__memory_management__givenSubscription_whenCancelled_shouldNotHaveRetainCycle() throws {
+  func test__memory_management__givenSubscription_whenCancelled_shouldNotHaveRetainCycle() async throws {
     // given
     let client = MockURLSessionClient(
       response: .mock(
@@ -675,7 +675,7 @@ class RequestChainTests: XCTestCase {
     ])
     weak var weakRequestChain: (any RequestChain)? = requestChain
 
-    let expectedData = try Hero(data: [
+    let expectedData = try await Hero(data: [
       "__typename": "Hero",
       "name": "R2-D2"
     ], variables: nil)
@@ -759,7 +759,7 @@ class RequestChainTests: XCTestCase {
     wait(for: [expectation], timeout: 1)
   }
 
-  func test__memory_management__givenQuery_whenCancelledAfterInterceptorChainFinished_shouldNotCrash() throws {
+  func test__memory_management__givenQuery_whenCancelledAfterInterceptorChainFinished_shouldNotCrash() async throws {
     // given
     let client = MockURLSessionClient(
       response: .mock(
@@ -787,7 +787,7 @@ class RequestChainTests: XCTestCase {
       endpointURL: TestURL.mockServer.url
     )
 
-    let expectedData = try Hero(data: [
+    let expectedData = try await Hero(data: [
       "__typename": "Hero",
       "name": "R2-D2"
     ], variables: nil)
@@ -814,7 +814,7 @@ class RequestChainTests: XCTestCase {
     }
   }
 
-  func test__memory_management__givenOperation_withEarlyInterceptorChainExit_success_shouldNotHaveRetainCycle() throws {
+  func test__memory_management__givenOperation_withEarlyInterceptorChainExit_success_shouldNotHaveRetainCycle() async throws {
     // given
     let store = ApolloStore(cache: InMemoryNormalizedCache(records: [
       "QUERY_ROOT": [
@@ -840,7 +840,7 @@ class RequestChainTests: XCTestCase {
     ])
     weak var weakRequestChain: (any RequestChain)? = requestChain
 
-    let expectedData = try Hero(data: [
+    let expectedData = try await Hero(data: [
       "__typename": "Hero",
       "name": "R2-D2"
     ], variables: nil)
@@ -929,7 +929,7 @@ class RequestChainTests: XCTestCase {
     XCTAssertNil(weakRequestChain)
   }
 
-  func test__memory_management__givenOperation_withEarlyAndFinalInterceptorChainExit_shouldNotHaveRetainCycle_andShouldNotCrash() throws {
+  func test__memory_management__givenOperation_withEarlyAndFinalInterceptorChainExit_shouldNotHaveRetainCycle_andShouldNotCrash() async throws {
     throw XCTSkip("Flaky test skipped in PR #386- must be refactored or fixed in a separate PR.")
 
     // given
@@ -964,7 +964,7 @@ class RequestChainTests: XCTestCase {
     ])
     weak var weakRequestChain: (any RequestChain)? = requestChain
 
-    let expectedData = try Hero(data: [
+    let expectedData = try await Hero(data: [
       "__typename": "Hero",
       "name": "R2-D2"
     ], variables: nil)
@@ -1002,7 +1002,7 @@ class RequestChainTests: XCTestCase {
     XCTAssertNil(weakRequestChain)
   }
 
-  func test__memory_management__givenOperation_whenRetryInterceptorChain_shouldNotHaveRetainCycle_andShouldNotCrash() throws {
+  func test__memory_management__givenOperation_whenRetryInterceptorChain_shouldNotHaveRetainCycle_andShouldNotCrash() async throws {
     // given
     let store = ApolloStore()
 
@@ -1027,7 +1027,7 @@ class RequestChainTests: XCTestCase {
     let expectation = expectation(description: "Response received")
     expectation.expectedFulfillmentCount = 2
 
-    let expectedData = try Hero(data: [
+    let expectedData = try await Hero(data: [
       "__typename": "Hero",
       "name": "Han Solo"
     ], variables: nil)
@@ -1093,7 +1093,7 @@ class RequestChainTests: XCTestCase {
       chain: any Apollo.RequestChain,
       request: Apollo.HTTPRequest<Operation>,
       response: Apollo.HTTPResponse<Operation>?,
-      completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
+      completion: @Sendable @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
     ) {
       expectation.fulfill()
 
@@ -1110,7 +1110,7 @@ class RequestChainTests: XCTestCase {
       chain: any Apollo.RequestChain,
       request: Apollo.HTTPRequest<Operation>,
       response: Apollo.HTTPResponse<Operation>?,
-      completion: @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
+      completion: @Sendable @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
     ) {
       expectation.fulfill()
 

@@ -15,7 +15,7 @@ public protocol ApolloClientProtocol: AnyObject {
   /// - Parameters:
   ///   - callbackQueue: The queue to fall back on. Should default to the main queue.
   ///   - completion: [optional] A completion closure to execute when clearing has completed. Should default to nil.
-  func clearCache(callbackQueue: DispatchQueue, completion: ((Result<Void, any Error>) -> Void)?)
+  func clearCache(callbackQueue: DispatchQueue, completion: (@Sendable (Result<Void, any Error>) -> Void)?)
 
   /// Fetches a query from the server or from the local cache, depending on the current contents of the cache and the specified cache policy.
   ///

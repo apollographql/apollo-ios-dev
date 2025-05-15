@@ -23,6 +23,7 @@ public protocol ApolloStoreSubscriber: AnyObject, Sendable {
 /// The `ApolloStore` class acts as a local cache for normalized GraphQL results.
 #warning("TODO: Docs. ReaderWriter usage; why you should not share a cache with 2 stores, etc.")
 public final class ApolloStore: Sendable {
+  #warning("TODO: remove queue")
   private let queue: DispatchQueue
   private let readerWriterLock = ReaderWriter()
 
@@ -35,7 +36,7 @@ public final class ApolloStore: Sendable {
 
   /// In order to comply with `Sendable` requirements, this unsafe property should
   /// only be accessed within a `readerWriterLock.write { }` block.
-  nonisolated(unsafe) fileprivate var subscribers: [any ApolloStoreSubscriber] = []
+  nonisolated(unsafe) private(set) var subscribers: [any ApolloStoreSubscriber] = []
 
   /// Designated initializer
   /// - Parameters:
@@ -119,7 +120,7 @@ public final class ApolloStore: Sendable {
   ///   - body: The body of the operation to perform
   public func withinReadWriteTransaction<T>(
     _ body: (ReadWriteTransaction) async throws -> T
-  ) async throws -> T {
+  ) async rethrows -> T {
     var value: T!
     try await readerWriterLock.write {
       value = try await body(ReadWriteTransaction(store: self))
@@ -161,6 +162,10 @@ public final class ApolloStore: Sendable {
   }
 
   // MARK: -
+  #warning("""
+  TODO: figure out how to prevent transaction from escaping closure scope.
+  Maybe explicitly mark non-sendable: https://forums.swift.org/t/what-does-available-unavailable-sendable-actually-do/65218
+  """)
   public class ReadTransaction {
     fileprivate let cache: any NormalizedCache
       
@@ -207,7 +212,7 @@ public final class ApolloStore: Sendable {
     ) async throws -> Accumulator.FinalResult {
       let object = try await loadObject(forKey: key).get()
 
-      return try executor.execute(
+      return try await executor.execute(
         selectionSet: type,
         on: object,
         withRootCacheReference: CacheReference(key),
@@ -218,7 +223,7 @@ public final class ApolloStore: Sendable {
     
     final func loadObject(forKey key: CacheKey) -> PossiblyDeferred<Record> {
       self.loader[key].map { record in
-        guard let record = record else { throw JSONDecodingError.missingValue }
+        guard let record = record else { return Record(key: key, [:]) }
         return record
       }
     }
@@ -292,7 +297,7 @@ public final class ApolloStore: Sendable {
 
       let executor = GraphQLExecutor(executionSource: SelectionSetModelExecutionSource())
 
-      let records = try executor.execute(
+      let records = try await executor.execute(
         selectionSet: SelectionSet.self,
         on: selectionSet.__data,
         withRootCacheReference: CacheReference(key),
@@ -448,7 +453,7 @@ public final class ApolloStore: Sendable {
       },
       callbackQueue: callbackQueue,
       completion: resultHandler
-    )    
+    )
   }
 
   @available(*, deprecated)

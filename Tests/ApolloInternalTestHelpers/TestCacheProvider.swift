@@ -37,7 +37,7 @@ extension CacheDependentTesting where Self: XCTestCase {
     return cache
   }
   
-  public func mergeRecordsIntoCache(_ records: RecordSet) {
-    _ = try! cache.merge(records: records)
+  public func mergeRecordsIntoCache(_ records: RecordSet) async {
+    _ = try! await cache.merge(records: records)
   }
 }

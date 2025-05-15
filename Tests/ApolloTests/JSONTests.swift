@@ -100,7 +100,7 @@ class JSONTests: XCTestCase {
     XCTAssertEqual(stringFromSerialized, #"{"aWeirdNull":null}"#)
   }
   
-  func testJSONConvertSelectionSetEncoding() throws {
+  func testJSONConvertSelectionSetEncoding() async throws {
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
       
@@ -117,11 +117,11 @@ class JSONTests: XCTestCase {
       "name": "Johnny Tsunami"
     ]
     
-    let converted = try JSONConverter.convert(Hero(data: expected))
+    let converted = try await JSONConverter.convert(Hero(data: expected))
     XCTAssertEqual(converted, expected)
   }
   
-  func testJSONConvertGraphQLResultEncoding() throws {
+  func testJSONConvertGraphQLResultEncoding() async throws {
     class MockData: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
@@ -150,7 +150,7 @@ class JSONTests: XCTestCase {
       ]
     ]
     
-    let heroData = try MockData(data: jsonObj)
+    let heroData = try await MockData(data: jsonObj)
 
     let result = GraphQLResult(
       data: heroData,

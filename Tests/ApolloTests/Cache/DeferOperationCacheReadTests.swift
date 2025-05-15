@@ -113,8 +113,8 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     client = nil
   }
 
-  func test__fetch__givenPartialAndIncrementalDataIsCached_returnsAllDeferredFragmentsAsFulfilled() throws {
-    mergeRecordsIntoCache([
+  func test__fetch__givenPartialAndIncrementalDataIsCached_returnsAllDeferredFragmentsAsFulfilled() async throws {
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal"),
       ],
@@ -156,8 +156,8 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__fetch__givenOnlyPartialDataIsCached_returnsAllDeferredFragmentsAsPending() throws {
-    mergeRecordsIntoCache([
+  func test__fetch__givenOnlyPartialDataIsCached_returnsAllDeferredFragmentsAsPending() async throws {
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal"),
       ],
@@ -194,8 +194,8 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__fetch__givenPartialAndSomeIncrementalDataIsCached_returnsCachedDeferredFragmentAsFulfilledAndUncachedDeferredFragmentsAsPending() throws {
-    mergeRecordsIntoCache([
+  func test__fetch__givenPartialAndSomeIncrementalDataIsCached_returnsCachedDeferredFragmentAsFulfilledAndUncachedDeferredFragmentsAsPending() async throws {
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal"),
       ],
@@ -232,8 +232,8 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__fetch__givenNestedIncrementalDataIsNotCached_returnsNestedDeferredFragmentsAsPending_otherDeferredFragmentsAsFulfilled() throws {
-    mergeRecordsIntoCache([
+  func test__fetch__givenNestedIncrementalDataIsNotCached_returnsNestedDeferredFragmentsAsPending_otherDeferredFragmentsAsFulfilled() async throws {
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal"),
       ],
@@ -275,8 +275,8 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__fetch__givenMissingValueInDeferredFragment_returnsDeferredFragmentAsPending_otherDeferredFragmentsAsFulfilled() throws {
-    mergeRecordsIntoCache([
+  func test__fetch__givenMissingValueInDeferredFragment_returnsDeferredFragmentAsPending_otherDeferredFragmentsAsFulfilled() async throws {
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal"),
       ],
@@ -317,8 +317,8 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__fetch__givenMissingValueInPartialData_shouldFailFetch() throws {
-    mergeRecordsIntoCache([
+  func test__fetch__givenMissingValueInPartialData_shouldFailFetch() async throws {
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal"),
       ],
