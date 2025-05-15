@@ -50,7 +50,7 @@ public class WebSocketTransport: @unchecked Sendable {
   private var queue: [Int: String] = [:]
 
   @Atomic
-  private var subscribers = [String: (Result<JSONObject, any Error>) -> Void]()
+  private var subscribers = [String: (Result<JSONObject, any Error>) async -> Void]()
   @Atomic
   private var subscriptions : [String: String] = [:]
   let processingQueue = DispatchQueue(label: "com.apollographql.WebSocketTransport")
@@ -187,8 +187,8 @@ public class WebSocketTransport: @unchecked Sendable {
     return websocket.write(ping: data, completion: completionHandler)
   }
 
-  private func processMessage(text: String) {
-    OperationMessage(serialized: text).parse { parseHandler in
+  private func processMessage(text: String) async {
+    await OperationMessage(serialized: text).parse { parseHandler in
       guard
         let type = parseHandler.type,
         let messageType = OperationMessage.Types(rawValue: type) else {
@@ -215,14 +215,14 @@ public class WebSocketTransport: @unchecked Sendable {
         // subscriber probably unsubscribed.
         if let responseHandler = subscribers[id] {
           if let payload = parseHandler.payload {
-            responseHandler(.success(payload))
+            await responseHandler(.success(payload))
           } else if let error = parseHandler.error {
-            responseHandler(.failure(error))
+            await responseHandler(.failure(error))
           } else {
             let websocketError = WebSocketError(payload: parseHandler.payload,
                                                 error: parseHandler.error,
                                                 kind: .neitherErrorNorPayloadReceived)
-            responseHandler(.failure(websocketError))
+            await responseHandler(.failure(websocketError))
           }
         }
       case .complete:
@@ -266,8 +266,10 @@ public class WebSocketTransport: @unchecked Sendable {
   }
 
   private func notifyErrorAllHandlers(_ error: any Error) {
-    for (_, handler) in subscribers {
-      handler(.failure(error))
+    Task {
+      for (_, handler) in subscribers {
+        await handler(.failure(error))
+      }
     }
   }
 
@@ -335,10 +337,13 @@ public class WebSocketTransport: @unchecked Sendable {
     self.websocket.delegate = nil
   }
 
-  func sendHelper<Operation: GraphQLOperation>(operation: Operation, resultHandler: @escaping @Sendable (_ result: Result<JSONObject, any Error>) -> Void) -> String? {
-    let body = config.requestBodyCreator.requestBody(for: operation,
-                                                     sendQueryDocument: true,
-                                                     autoPersistQuery: false)
+  func sendHelper<Operation: GraphQLOperation>(operation: Operation, resultHandler: @escaping @Sendable (_ result: Result<JSONObject, any Error>) async -> Void) -> String? {
+    let body = config.requestBodyCreator.requestBody(
+      for: operation,
+      sendQueryDocument: true,
+      autoPersistQuery: false,
+      clientAwarenessMetadata: config.clientAwarenessMetadata
+    )
     let identifier = config.operationMessageIdCreator.requestId()
 
     let messageType: OperationMessage.Types
@@ -450,49 +455,52 @@ extension WebSocketTransport: NetworkTransport {
     operation: Operation,
     cachePolicy: CachePolicy,
     contextIdentifier: UUID? = nil,
-    context: (any RequestContext)? = nil,
-    callbackQueue: DispatchQueue = .main,
-    completionHandler: @escaping @Sendable (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Cancellable {
-
-      @Sendable func callCompletion(with result: Result<GraphQLResult<Operation.Data>, any Error>) {
-        callbackQueue.async {
-          completionHandler(result)
-        }
-      }
-
-      if let error = self.error {
-        callCompletion(with: .failure(error))
-        return EmptyCancellable()
-      }
-
-      return WebSocketTask(self, operation) { [weak store, contextIdentifier] result in
-        Task {
-          do {
-            let jsonBody = try result.get()
-            let response = GraphQLResponse(operation: operation, body: jsonBody)
-            
-            if let store = store {
-              let (graphQLResult, parsedRecords) = try await response.parseResult()
-              guard let records = parsedRecords else {
-                callCompletion(with: .success(graphQLResult))
-                return
-              }
-              
-              try await store.publish(records: records, identifier: contextIdentifier)
-              
-              callCompletion(with: .success(graphQLResult))
-              
-            } else {
-              let graphQLResult = try await response.parseResultFast()
-              callCompletion(with: .success(graphQLResult))
-            }
-            
-          } catch {
-            callCompletion(with: .failure(error))
-          }
-        }        
+    context: (any RequestContext)? = nil
+  ) throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
+    if let error = self.error {
+      return AsyncThrowingStream.init {
+        throw error
       }
     }
+
+    #warning("TODO: stream never finishes. WebSocketTask does not report subscription termination.")
+    return AsyncThrowingStream { continuation in
+      let wsTask = WebSocketTask(self, operation) { [weak store, contextIdentifier] result in
+        do {
+          try Task.checkCancellation()
+          
+          let jsonBody = try result.get()
+          let response = GraphQLResponse(operation: operation, body: jsonBody)
+          
+          if let store = store {
+            let (graphQLResult, parsedRecords) = try await response.parseResult()
+            
+            try Task.checkCancellation()
+            
+            guard let records = parsedRecords else {
+              continuation.yield(graphQLResult)
+              return
+            }
+            
+            try await store.publish(records: records, identifier: contextIdentifier)
+            continuation.yield(graphQLResult)
+            
+          } else {
+            let graphQLResult = try await response.parseResultFast()
+            try Task.checkCancellation()
+            
+            continuation.yield(graphQLResult)
+          }
+        } catch {
+          continuation.finish(throwing: error)
+        }
+      }      
+
+      continuation.onTermination = {
+        _ in wsTask.cancel()
+      }
+    }
+  }
 }
 
 // MARK: - WebSocketDelegate implementation
@@ -593,7 +601,9 @@ extension WebSocketTransport: WebSocketClientDelegate {
   }
 
   public func websocketDidReceiveMessage(socket: any WebSocketClient, text: String) {
-    self.processMessage(text: text)
+    Task {
+      await self.processMessage(text: text)
+    }
   }
 
   public func websocketDidReceiveData(socket: any WebSocketClient, data: Data) {

@@ -74,7 +74,7 @@ struct RequestChain<Request: GraphQLRequest>: Sendable {
       }
     }
   }
-
+  
   func kickoff(
     request: Request
   ) -> ResultStream {
