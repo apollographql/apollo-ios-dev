@@ -2,6 +2,7 @@
 import ApolloAPI
 #endif
 
+#warning("TODO: kill")
 /// Represents a complete GraphQL response received from a server.
 public final class GraphQLResponse<Data: RootSelectionSet> {
   private let base: AnyGraphQLResponse
