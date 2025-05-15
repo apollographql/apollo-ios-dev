@@ -2,7 +2,7 @@ import Foundation
 
 /// Wrapper for a value protected by an `NSLock`
 @propertyWrapper
-public class Atomic<T> {
+public final class Atomic<T> {
   private let lock = NSLock()
   private var _value: T
 
@@ -32,12 +32,15 @@ public class Atomic<T> {
   ///
   /// - Parameter block: The block executed to mutate the value.
   /// - Returns: The value returned by the block.
+  @discardableResult
   public func mutate<U>(block: (inout T) -> U) -> U {
     lock.lock()
     defer { lock.unlock() }
     return block(&_value)
   }
 }
+
+extension Atomic: @unchecked Sendable where T: Sendable {}
 
 public extension Atomic where T : Numeric {
 

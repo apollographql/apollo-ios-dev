@@ -136,7 +136,7 @@ class NetworkResponseExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase {
     }
     """.data(using: .utf8)!
 
-    let deserialized = try JSONSerializationFormat.deserialize(data: data) as! JSONObject
+    let deserialized = try JSONSerializationFormat.deserialize(data: data) as JSONObject
     let objectData = subject.opaqueObjectDataWrapper(for: deserialized)
 
     // when
