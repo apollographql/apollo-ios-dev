@@ -71,7 +71,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     let query = MockQuery<GivenSelectionSet>()
 
     await mergeRecordsIntoCache([
-      "QUERY_ROOT": [:],
+      "QUERY_ROOT": ["test": "data"],
     ])
 
     // when

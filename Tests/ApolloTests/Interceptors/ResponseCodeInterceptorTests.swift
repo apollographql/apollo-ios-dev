@@ -18,6 +18,8 @@ class ResponseCodeInterceptorTests: XCTestCase, MockResponseProvider {
       endpointURL: TestURL.mockServer.url
     )
 
+    let query = MockQuery.mock()
+
     await Self.registerRequestHandler(for: TestURL.mockServer.url) { _ in
       return (
         HTTPURLResponse(
@@ -26,11 +28,13 @@ class ResponseCodeInterceptorTests: XCTestCase, MockResponseProvider {
           httpVersion: nil,
           headerFields: nil
         )!,
-        Data()
+            """
+            "invalid": {}            
+            """.data(using: .utf8)!
       )
     }
 
-    let responseStream = try network.send(query: MockQuery.mock(), cachePolicy: .fetchIgnoringCacheCompletely)
+    let responseStream = try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely)
     var responseIterator = responseStream.makeAsyncIterator()
 
     await expect {
@@ -39,11 +43,10 @@ class ResponseCodeInterceptorTests: XCTestCase, MockResponseProvider {
       throwError(
         errorType: JSONResponseParsingError.self,
         closure: { error in
-          guard case let .couldNotParseToJSON(data) = error else {
+          guard case .couldNotParseToJSON = error else {
             fail("wrong error")
             return
           }
-          expect(data).to(beEmpty())
         }
       )
     )

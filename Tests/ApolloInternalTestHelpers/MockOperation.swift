@@ -1,4 +1,5 @@
 import ApolloAPI
+import Foundation
 
 open class MockOperation<SelectionSet: RootSelectionSet>: GraphQLOperation, @unchecked Sendable {
   public typealias Data = SelectionSet
@@ -22,6 +23,14 @@ open class MockOperation<SelectionSet: RootSelectionSet>: GraphQLOperation, @unc
 open class MockQuery<SelectionSet: RootSelectionSet>: MockOperation<SelectionSet>, GraphQLQuery, @unchecked Sendable {
   public static func mock() -> MockQuery<MockSelectionSet> where SelectionSet == MockSelectionSet {
     MockQuery<MockSelectionSet>()
+  }
+
+  public var defaultResponseData: Foundation.Data {
+    return """
+    {
+      "data": {}
+    }
+    """.data(using: .utf8)!
   }
 }
 

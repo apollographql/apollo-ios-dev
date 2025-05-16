@@ -8,8 +8,7 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
 
   var session: MockURLSession!
   var sessionConfiguration: URLSessionConfiguration!
-
-  @MainActor
+  
   override func setUp() {
     super.setUp()
 

@@ -5,7 +5,6 @@ import ApolloAPI
 // An interceptor which blindly retries every time it receives a request. 
 class BlindRetryingTestInterceptor: ApolloInterceptor, @unchecked Sendable {
   var hitCount = 0
-  private(set) var hasBeenCancelled = false
 
   func intercept<Request: GraphQLRequest>(
     request: Request,

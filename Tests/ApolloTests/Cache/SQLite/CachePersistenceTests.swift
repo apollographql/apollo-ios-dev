@@ -230,16 +230,9 @@ class CachePersistenceTests: XCTestCase {
           case .success:
             XCTFail("This should have returned an error")
           case .failure(let error):
-            if let resultError = error as? GraphQLExecutionError {
-              switch resultError.underlying {
-              case .missingValue:
-                // Correct error!
-                break
-              default:
-                XCTFail("Unexpected JSON error: \(error)")
-              }
-            } else {
-              XCTFail("Unexpected error: \(error)")
+            guard case JSONDecodingError.missingValue = error else {
+              XCTFail("Unexpected JSON error: \(error)")
+              return
             }
           }
         }

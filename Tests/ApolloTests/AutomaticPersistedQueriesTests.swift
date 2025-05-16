@@ -29,7 +29,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
   }
 
   // MARK: - Mocks
-  final class HeroNameSelectionSet: MockSelectionSet {
+  final class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
     override class var __selections: [Selection] {
       [
         .field("hero", Hero.self, arguments: ["episode": .variable("episode")])
@@ -38,7 +38,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     var hero: Hero? { __data["hero"] }
 
-    final class Hero: MockSelectionSet {
+    final class Hero: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {
         [
           .field("__typename", String.self),
@@ -77,13 +77,26 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
     }
   }
 
-  fileprivate final class APQMockMutation: MockMutation<MockSelectionSet> {
+  fileprivate final class APQMockMutation: MockMutation<MockSelectionSet>, @unchecked Sendable {
     override class var operationDocument: OperationDocument {
       .init(
         operationIdentifier: "4a1250de93ebcb5cad5870acf15001112bf27bb963e8709555b5ff67a1405374",
         definition: .init("APQMockMutation - Operation Definition")
       )
     }
+  }
+
+  private func mockResponseData() -> Data {
+    """
+    {
+      "data": {
+        "hero": {
+          "__typename": "Hero",
+          "name": "Luke"
+        }
+      }
+    }
+    """.data(using: .utf8)!
   }
 
   // MARK: - Helper Methods
@@ -99,8 +112,16 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
     column: UInt = #column
   ) throws {
     let location = SourceLocation(fileID: fileID, filePath: file, line: line, column: column)
+    let httpBody: Data?
+
+    if let bodyStream = request.httpBodyStream {
+      httpBody = try Data(reading: bodyStream)
+    } else {
+      httpBody = request.httpBody
+    }
+
     guard
-      let httpBody = request.httpBody,
+      let httpBody = httpBody,
       let jsonBody = try? JSONSerializationFormat.deserialize(data: httpBody) as JSONObject
     else {
       fail(
@@ -275,20 +296,15 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       endpointURL: Self.endpoint
     )
 
-    let expectation = self.expectation(description: "Query sent")
     let query = MockHeroNameQuery()
     nonisolated(unsafe) var lastRequest: URLRequest?
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), Data())
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    for try await response in try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely) {
-      expectation.fulfill()
-    }
-
-    await self.fulfillment(of: [expectation], timeout: 1)
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -308,20 +324,15 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       endpointURL: Self.endpoint
     )
 
-    let expectation = self.expectation(description: "Query sent")
     let query = MockHeroNameQuery(episode: .some(.JEDI))
     nonisolated(unsafe) var lastRequest: URLRequest?
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), Data())
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    for try await response in try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely) {
-      expectation.fulfill()
-    }
-
-    await self.fulfillment(of: [expectation], timeout: 1)
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
@@ -341,20 +352,15 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       apqConfig: .init(autoPersistQueries: true)
     )
 
-    let expectation = self.expectation(description: "Query sent")
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
     nonisolated(unsafe) var lastRequest: URLRequest?
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), Data())
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    for try await response in try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely) {
-      expectation.fulfill()
-    }
-
-    await self.fulfillment(of: [expectation], timeout: 1)
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -375,20 +381,15 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       apqConfig: .init(autoPersistQueries: true)
     )
 
-    let expectation = self.expectation(description: "Mutation sent")
     let mutation = APQMockMutation()
     nonisolated(unsafe) var lastRequest: URLRequest?
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), Data())
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    for try await response in try network.send(mutation: mutation, cachePolicy: .fetchIgnoringCacheCompletely) {
-      expectation.fulfill()
-    }
-
-    await self.fulfillment(of: [expectation], timeout: 1)
+    _ = try await network.send(mutation: mutation, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -409,20 +410,15 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
     )
 
-    let expectation = self.expectation(description: "Query sent")
     let query = MockHeroNameQuery()
     nonisolated(unsafe) var lastRequest: URLRequest?
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), Data())
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    for try await response in try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely) {
-      expectation.fulfill()
-    }
-
-    await self.fulfillment(of: [expectation], timeout: 1)
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
@@ -441,20 +437,15 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
     )
 
-    let expectation = self.expectation(description: "Query sent")
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
     nonisolated(unsafe) var lastRequest: URLRequest?
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), Data())
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    for try await response in try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely) {
-      expectation.fulfill()
-    }
-
-    await self.fulfillment(of: [expectation], timeout: 1)
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -476,20 +467,15 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       useGETForQueries: true
     )
 
-    let expectation = self.expectation(description: "Query sent")
     let query = MockHeroNameQuery()
     nonisolated(unsafe) var lastRequest: URLRequest?
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), Data())
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    for try await response in try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely) {
-      expectation.fulfill()
-    }
-
-    await self.fulfillment(of: [expectation], timeout: 1)
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -510,20 +496,15 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       endpointURL: Self.endpoint
     )
 
-    let expectation = self.expectation(description: "Query sent")
     let query = MockHeroNameQuery()
     nonisolated(unsafe) var lastRequest: URLRequest?
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), Data())
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    for try await response in try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely) {
-      expectation.fulfill()
-    }
-
-    await self.fulfillment(of: [expectation], timeout: 1)
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -544,20 +525,15 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       apqConfig: .init(autoPersistQueries: true)
     )
 
-    let expectation = self.expectation(description: "Query sent")
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
     nonisolated(unsafe) var lastRequest: URLRequest?
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), Data())
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    for try await response in try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely) {
-      expectation.fulfill()
-    }
-
-    await self.fulfillment(of: [expectation], timeout: 1)
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -578,20 +554,15 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
     )
 
-    let expectation = self.expectation(description: "Query sent")
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
     nonisolated(unsafe) var lastRequest: URLRequest?
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), Data())
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    for try await response in try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely) {
-      expectation.fulfill()
-    }
-
-    await self.fulfillment(of: [expectation], timeout: 1)
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -612,20 +583,15 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
     )
 
-    let expectation = self.expectation(description: "Query sent")
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
     nonisolated(unsafe) var lastRequest: URLRequest?
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), Data())
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    for try await response in try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely) {
-      expectation.fulfill()
-    }
-
-    await self.fulfillment(of: [expectation], timeout: 1)
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -654,28 +620,46 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
 
-    await Self.registerRequestHandler(for: Self.endpoint) { _ in
+    nonisolated(unsafe) var requests: [URLRequest] = []
+
+    await Self.registerRequestHandler(for: Self.endpoint) { request in
+      requests.append(request)
+
       let response = HTTPURLResponse(
         url: TestURL.mockServer.url,
         statusCode: 200,
         httpVersion: nil,
         headerFields: nil
       )!
-      let data = try JSONSerialization.data(
-        withJSONObject: ["errors": [["message": "PersistedQueryNotFound"]]]
-      )
-      return (response, data)
+      if requests.count == 1 {
+        let data = try JSONSerialization.data(
+          withJSONObject: ["errors": [["message": "PersistedQueryNotFound"]]]
+        )
+        return (response, data)
+      } else {
+        return (response, self.mockResponseData())
+      }
     }
 
     // when
-    let expectation = expectation(description: "Query sent")
-    expectation.expectedFulfillmentCount = 2
-    for try await response in try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely) {
-      expectation.fulfill()
-    }
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
 
     // then
-    await self.fulfillment(of: [expectation], timeout: 1)
+    expect(requests.count).to(equal(2))
+
+    try self.validatePostBody(
+      with: requests[0],
+      operation: query,
+      queryDocument: false,
+      persistedQuery: true
+    )
+
+    try self.validatePostBody(
+      with: requests[1],
+      operation: query,
+      queryDocument: true,
+      persistedQuery: true
+    )
   }
 
   func
@@ -710,16 +694,42 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       return (response, data)
     }
 
-    // when
-    var networkIterator = try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely)
-      .makeAsyncIterator()
-
     await expect {
-      _ = try await networkIterator.next()
+      // when
+      _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+
+      //then
     }.to(throwError { error in
       let expectedError = AutomaticPersistedQueryInterceptor.APQError
         .persistedQueryNotFoundForPersistedOnlyQuery(operationName: "MockOperationName")
       expect(error as? AutomaticPersistedQueryInterceptor.APQError).to(equal(expectedError))
     })
   }
+}
+
+fileprivate extension Data {
+    init(reading input: InputStream) throws {
+        self.init()
+        input.open()
+        defer {
+            input.close()
+        }
+
+        let bufferSize = 1024
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+        defer {
+            buffer.deallocate()
+        }
+        while input.hasBytesAvailable {
+            let read = input.read(buffer, maxLength: bufferSize)
+            if read < 0 {
+                //Stream error occured
+                throw input.streamError!
+            } else if read == 0 {
+                //EOF
+                break
+            }
+            self.append(buffer, count: read)
+        }
+    }
 }
