@@ -36,12 +36,12 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
   }
   
   func test__fetch__givenCachePolicy_fetchIgnoringCacheData_onlyHitsNetwork() async throws {
-    class HeroNameSelectionSet: MockSelectionSet {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -91,12 +91,12 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
   }
   
   func test__fetch__givenCachePolicy_returnCacheDataAndFetch_hitsCacheFirstAndNetworkAfter() async throws {
-    class HeroNameSelectionSet: MockSelectionSet {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -158,12 +158,12 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
   }
   
   func test__fetch__givenCachePolicy_returnCacheDataElseFetch_givenDataIsCached_doesntHitNetwork() async throws {
-    class HeroNameSelectionSet: MockSelectionSet {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -203,12 +203,12 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
   }
   
   func test__fetch__givenCachePolicy_returnCacheDataElseFetch_givenNotAllDataIsCached_hitsNetwork() async throws {
-    class HeroNameAndAppearsInSelectionSet: MockSelectionSet {
+    class HeroNameAndAppearsInSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self),
@@ -259,12 +259,12 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
   }
   
   func test__fetch__givenCachePolicy_returnCacheDataDontFetch_givenDataIsCached_doesntHitNetwork() async throws {
-    class HeroNameSelectionSet: MockSelectionSet {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -300,12 +300,12 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
   }
   
   func test__fetch__givenCachePolicy_returnCacheDataDontFetch_givenNotAllDataIsCached_returnsError() async throws {
-    class HeroNameAndAppearsInSelectionSet: MockSelectionSet {
+    class HeroNameAndAppearsInSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self),
@@ -339,12 +339,12 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
   }
   
   func test__fetch_afterClearCache_givenCachePolicy_returnCacheDataDontFetch_throwsCacheMissError() async throws {
-    class HeroNameSelectionSet: MockSelectionSet {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)

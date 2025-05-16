@@ -9,13 +9,15 @@
 import Apollo
 import ApolloAPI
 
-struct TestCustomRequestBodyCreator: RequestBodyCreator {
+struct TestCustomRequestBodyCreator: JSONRequestBodyCreator {
 
   var stubbedRequestBody: JSONEncodableDictionary = ["TestCustomRequestBodyCreator": "TestBodyValue"]
 
   func requestBody<Operation: GraphQLOperation>(
     for operation: Operation,
-    sendQueryDocument: Bool, autoPersistQuery: Bool
+    sendQueryDocument: Bool,
+    autoPersistQuery: Bool,
+    clientAwarenessMetadata: ClientAwarenessMetadata
   ) -> JSONEncodableDictionary {
     stubbedRequestBody
   }

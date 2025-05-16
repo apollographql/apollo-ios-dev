@@ -6,7 +6,7 @@ import ApolloSQLite
 #endif
 import ApolloInternalTestHelpers
 
-class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
+class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, MockResponseProvider {
   var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
@@ -23,11 +23,12 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     store = ApolloStore(cache: cache)
   }
   
-  override func tearDownWithError() throws {
+  override func tearDown() async throws {
     cache = nil
     store = nil
-    
-    try super.tearDownWithError()
+
+    await Self.cleanUpRequestHandlers()
+    try await super.tearDown()
   }
   
   func testLoadingHeroNameQuery() async throws {
@@ -553,7 +554,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
 
-  @MainActor func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriendListItem_usingRequestChain() throws {
+  @MainActor func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriendListItem_usingRequestChain() async throws {
     // given
     struct Types {
       static let Hero = Object(typename: "Hero", implementedInterfaces: [])
@@ -609,14 +610,15 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
 
     // given
-    let client = MockURLSessionClient(
-      response: .mock(
-        url: TestURL.mockServer.url,
-        statusCode: 200,
-        httpVersion: nil,
-        headerFields: nil
-      ),
-      data: """
+    await Self.registerRequestHandler(for: TestURL.mockServer.url) { _ in
+      return (
+        .mock(
+          url: TestURL.mockServer.url,
+          statusCode: 200,
+          httpVersion: nil,
+          headerFields: nil
+        ),
+      """
       {
         "data": {
           "__typename": "Hero",
@@ -635,33 +637,29 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
         }
       }
       """.data(using: .utf8)
-    )
+      )
+    }
 
-    let requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
-      NetworkFetchInterceptor(client: client),
-      JSONResponseParsingInterceptor(),
-      CacheWriteInterceptor(store: self.store),
-    ])
+    let urlSession: MockURLSession = MockURLSession(responseProvider: Self.self)
+
+    let requestChain = RequestChain<JSONRequest<MockQuery<Hero>>>(
+      urlSession: urlSession,
+      interceptors: [
+        JSONResponseParsingInterceptor(),
+      ],
+      cacheInterceptor: DefaultCacheInterceptor(store: self.store),
+      errorInterceptor: nil
+    )
 
     let request = JSONRequest(
       operation: MockQuery<Hero>(),
-      graphQLEndpoint: TestURL.mockServer.url,
-      clientName: "test-client",
-      clientVersion: "test-client-version"
-    )
-
-    let expectation = expectation(description: "Response received")
+      graphQLEndpoint: TestURL.mockServer.url
+    )    
 
     // when
-    requestChain?.kickoff(request: request) { result in
-      defer {
-        expectation.fulfill()
-      }
+    let resultStream = requestChain.kickoff(request: request)
 
-      XCTAssertSuccessResult(result)
-    }
-
-    wait(for: [expectation], timeout: 2)
+    _ = try await resultStream.getAllValues()
 
     loadFromStore(operation: MockQuery<Hero>()) { result in
       // then

@@ -1735,6 +1735,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///     default is `false`. This can be used to avoid filename conflicts when operation type names match
   ///     schema type names.
   ///
+  @_disfavoredOverload
   @available(*, deprecated,
               renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:reduceGeneratedSchemaTypes:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
   )

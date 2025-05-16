@@ -1,6 +1,6 @@
 import ApolloAPI
 
-open class MockOperation<SelectionSet: RootSelectionSet>: GraphQLOperation {
+open class MockOperation<SelectionSet: RootSelectionSet>: GraphQLOperation, @unchecked Sendable {
   public typealias Data = SelectionSet
 
   open class var operationType: GraphQLOperationType { .query }
@@ -19,13 +19,13 @@ open class MockOperation<SelectionSet: RootSelectionSet>: GraphQLOperation {
 
 }
 
-open class MockQuery<SelectionSet: RootSelectionSet>: MockOperation<SelectionSet>, GraphQLQuery {
+open class MockQuery<SelectionSet: RootSelectionSet>: MockOperation<SelectionSet>, GraphQLQuery, @unchecked Sendable {
   public static func mock() -> MockQuery<MockSelectionSet> where SelectionSet == MockSelectionSet {
     MockQuery<MockSelectionSet>()
   }
 }
 
-open class MockMutation<SelectionSet: RootSelectionSet>: MockOperation<SelectionSet>, GraphQLMutation {
+open class MockMutation<SelectionSet: RootSelectionSet>: MockOperation<SelectionSet>, GraphQLMutation, @unchecked Sendable {
 
   public override class var operationType: GraphQLOperationType { .mutation }
 
@@ -34,7 +34,7 @@ open class MockMutation<SelectionSet: RootSelectionSet>: MockOperation<Selection
   }
 }
 
-open class MockSubscription<SelectionSet: RootSelectionSet>: MockOperation<SelectionSet>, GraphQLSubscription {
+open class MockSubscription<SelectionSet: RootSelectionSet>: MockOperation<SelectionSet>, GraphQLSubscription, @unchecked Sendable {
 
   public override class var operationType: GraphQLOperationType { .subscription }
 
@@ -46,7 +46,7 @@ open class MockSubscription<SelectionSet: RootSelectionSet>: MockOperation<Selec
 // MARK: - MockSelectionSets
 
 @dynamicMemberLookup
-open class AbstractMockSelectionSet<F, S: SchemaMetadata>: RootSelectionSet, Hashable {
+open class AbstractMockSelectionSet<F, S: SchemaMetadata>: RootSelectionSet, Hashable, @unchecked Sendable {
   public typealias Schema = S
   public typealias Fragments = F
 
@@ -78,17 +78,17 @@ open class AbstractMockSelectionSet<F, S: SchemaMetadata>: RootSelectionSet, Has
 
 public typealias MockSelectionSet = AbstractMockSelectionSet<NoFragments, MockSchemaMetadata>
 
-open class MockFragment: MockSelectionSet, Fragment {
+open class MockFragment: MockSelectionSet, Fragment, @unchecked Sendable {
   public typealias Schema = MockSchemaMetadata
 
   open class var fragmentDefinition: StaticString { "" }
 }
 
-open class MockTypeCase: MockSelectionSet, InlineFragment {
+open class MockTypeCase: MockSelectionSet, InlineFragment, @unchecked Sendable {
   public typealias RootEntityType = MockSelectionSet
 }
 
-open class ConcreteMockTypeCase<T: MockSelectionSet>: MockSelectionSet, InlineFragment {
+open class ConcreteMockTypeCase<T: MockSelectionSet>: MockSelectionSet, InlineFragment, @unchecked Sendable {
   public typealias RootEntityType = T
 }
 

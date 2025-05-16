@@ -1,6 +1,7 @@
 import Foundation
+
 #if !COCOAPODS
-import ApolloAPI
+  @_spi(Internal) import ApolloAPI
 #endif
 
 public enum IncrementalResponseError: Error, LocalizedError, Equatable {
@@ -20,7 +21,7 @@ public enum IncrementalResponseError: Error, LocalizedError, Equatable {
       return "Incremental responses must have a 'label' key."
 
     case let .missingDeferredSelectionSetType(label, path):
-      return "The operation does not have a deferred selection set for label '\(label)' at field path '\(path)'."        
+      return "The operation does not have a deferred selection set for label '\(label)' at field path '\(path)'."
     }
   }
 }
@@ -69,7 +70,8 @@ extension JSONResponseParser {
     }
 
     private func parseIncrementalResultIncludingCacheRecords()
-    async throws -> (IncrementalGraphQLResult, RecordSet?) {
+      async throws -> (IncrementalGraphQLResult, RecordSet?)
+    {
       let accumulator = zip(
         DataDictMapper(),
         ResultNormalizerFactory.networkResponseDataNormalizer(),
@@ -119,10 +121,12 @@ extension JSONResponseParser {
       let pathComponents: [PathComponent] = path.compactMap(PathComponent.init)
       let fieldPath = pathComponents.fieldPath
 
-      guard let selectionSetType = Operation.deferredSelectionSetType(
-        withLabel: label,
-        atFieldPath: fieldPath
-      ) as? (any Deferrable.Type) else {
+      guard
+        let selectionSetType = Operation.deferredSelectionSetType(
+          withLabel: label,
+          atFieldPath: fieldPath
+        ) as? (any Deferrable.Type)
+      else {
         throw IncrementalResponseError.missingDeferredSelectionSetType(label, fieldPath.joined(separator: "."))
       }
 

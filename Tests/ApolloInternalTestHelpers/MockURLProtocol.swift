@@ -1,5 +1,9 @@
 import Foundation
 
+public enum MockURLError: Swift.Error {
+  case requestNotHandled
+}
+
 public final class MockURLProtocol<RequestProvider: MockResponseProvider>: URLProtocol {
 
   override class public func canInit(with request: URLRequest) -> Bool {
@@ -17,7 +21,10 @@ public final class MockURLProtocol<RequestProvider: MockResponseProvider>: URLPr
       guard
         let url = self.request.url,
         let handler = await RequestProvider.requestHandler(for: url)
-      else { return }
+      else {
+        self.client?.urlProtocol(self, didFailWithError: MockURLError.requestNotHandled)
+        return
+      }
 
       do {
         defer {
