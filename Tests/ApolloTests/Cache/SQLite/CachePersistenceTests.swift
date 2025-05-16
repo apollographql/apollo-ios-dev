@@ -10,12 +10,12 @@ class CachePersistenceTests: XCTestCase {
 
   func testFetchAndPersist() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)

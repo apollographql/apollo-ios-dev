@@ -63,7 +63,7 @@ import Foundation
 /// ```
 public protocol MockResponseProvider {
   typealias MultiResponseHandler = @Sendable (URLRequest) async throws -> (HTTPURLResponse, AsyncThrowingStream<Data, any Error>?)
-  typealias SingleResponseHandler = @Sendable (URLRequest) async throws -> (HTTPURLResponse, Data?)
+  typealias SingleResponseHandler = @Sendable (URLRequest) async throws -> (response: HTTPURLResponse, Data?)
 }
 
 extension MockResponseProvider {
@@ -75,7 +75,16 @@ extension MockResponseProvider {
   public static func registerRequestHandler(for url: URL, handler: @escaping SingleResponseHandler) async {
     await requestStorage.registerRequestHandler(for: Self.self, url: url, handler: { request in
       let (response, data) = try await handler(request)
-      let stream = AsyncThrowingStream { data }
+      var didYieldData = false
+
+      let stream = AsyncThrowingStream<Data, any Error> {
+        if didYieldData {
+          return nil
+        }
+
+        didYieldData = true
+        return data
+      }
 
       return (response, stream)
     })

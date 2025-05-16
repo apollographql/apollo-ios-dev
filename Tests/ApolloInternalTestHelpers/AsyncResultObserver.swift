@@ -9,7 +9,7 @@ import XCTest
 public class AsyncResultObserver<Success, Failure> where Failure: Error {
   public typealias ResultHandler = (Result<Success, Failure>) throws -> Void
 
-  private class AsyncResultExpectation: XCTestExpectation {
+  private final class AsyncResultExpectation: XCTestExpectation {
     let file: StaticString
     let line: UInt
     let handler: ResultHandler

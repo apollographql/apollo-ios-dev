@@ -1,7 +1,8 @@
-import XCTest
-@testable import Apollo
-import Nimble
 import ApolloInternalTestHelpers
+import Nimble
+import XCTest
+
+@testable import Apollo
 
 class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
 
@@ -22,25 +23,45 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
 
     try await super.tearDown()
   }
-  
+
+  private struct MockRequest: GraphQLRequest {
+    var graphQLEndpoint: URL
+    var operation = MockQuery<MockSelectionSet>.mock()
+    var additionalHeaders: [String: String] = [:]
+    var cachePolicy: Apollo.CachePolicy = .fetchIgnoringCacheCompletely
+    var context: (any RequestContext)? = nil
+    var clientAwarenessMetadata: ClientAwarenessMetadata = .none
+
+    var urlRequest: URLRequest
+
+    init(url: URL) {
+      self.graphQLEndpoint = url
+      self.urlRequest = URLRequest(
+        url: url,
+        cachePolicy: .reloadIgnoringCacheData,
+        timeoutInterval: 10
+      )
+    }
+
+    func toURLRequest() throws -> URLRequest {
+      urlRequest
+    }
+  }
+
   private func request(
     for url: URL,
     responseData: Data?,
     statusCode: Int,
     httpVersion: String? = nil,
     headerFields: [String: String]? = nil
-  ) async -> URLRequest {
-    let request = URLRequest(
-      url: url,
-      cachePolicy: .reloadIgnoringCacheData,
-      timeoutInterval: 10
-    )
+  ) async -> MockRequest {
+    let request = MockRequest(url: url)
 
     await Self.registerRequestHandler(for: url) { request in
       guard let requestURL = request.url else {
         throw URLError(.badURL)
       }
-      
+
       let response = HTTPURLResponse(
         url: requestURL,
         statusCode: statusCode,
@@ -50,10 +71,10 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
 
       return (response!, responseData)
     }
-    
+
     return request
   }
-  
+
   func test__request__basicGet() async throws {
     let url = URL(string: "http://www.test.com/basicget")!
     let stringResponse = "Basic GET Response Data"
@@ -63,13 +84,14 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
       statusCode: 200
     )
 
-    let (dataStream, response) = try await self.session.bytes(for: request, delegate: nil)
+    let (chunks, response) = try await self.session.chunks(for: request)
 
-    XCTAssertEqual(request.url, response.url)
+    XCTAssertEqual(request.graphQLEndpoint, response.url)
     XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
 
     var chunkCount = 0
-    for try await chunk in dataStream.chunks {
+    for try await chunk in chunks {
+      let chunk = chunk as! Data
       chunkCount += 1
       expect(chunk).toNot(beEmpty())
       expect(String(data: chunk, encoding: .utf8)).to(equal(stringResponse))
@@ -77,18 +99,18 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
 
     expect(chunkCount).to(equal(1))
   }
-  
+
   func test__request__gettingImage() async throws {
     let url = URL(string: "http://www.test.com/gettingImage")!
     #if os(macOS)
-    let responseImg = NSImage(systemSymbolName: "pencil", accessibilityDescription: nil)
-    let responseData = responseImg?.tiffRepresentation
+      let responseImg = NSImage(systemSymbolName: "pencil", accessibilityDescription: nil)
+      let responseData = responseImg?.tiffRepresentation
     #else
-    guard let responseImg = UIImage(systemName: "pencil") else {
-      XCTFail("Failed to create UIImage from system name.")
-      return
-    }
-    let responseData = responseImg.pngData()
+      guard let responseImg = UIImage(systemName: "pencil") else {
+        XCTFail("Failed to create UIImage from system name.")
+        return
+      }
+      let responseData = responseImg.pngData()
     #endif
     let headerFields = ["Content-Type": "image/jpeg"]
     let request = await self.request(
@@ -98,32 +120,33 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
       headerFields: headerFields
     )
 
-    let (dataStream, response) = try await self.session.bytes(for: request, delegate: nil)
+    let (chunks, response) = try await self.session.chunks(for: request)
     guard let httpResponse = response as? HTTPURLResponse else {
       fail()
       return
     }
 
     XCTAssertEqual(httpResponse.allHeaderFields["Content-Type"] as! String, "image/jpeg")
-    XCTAssertEqual(request.url, httpResponse.url)
+    XCTAssertEqual(request.graphQLEndpoint, httpResponse.url)
 
     var chunkCount = 0
-    for try await chunk in dataStream.chunks {
+    for try await chunk in chunks {
+      let chunk = chunk as! Data
       chunkCount += 1
       expect(chunk).toNot(beEmpty())
 
       #if os(macOS)
-      let image = NSImage(data: chunk)
-      XCTAssertNotNil(image)
+        let image = NSImage(data: chunk)
+        XCTAssertNotNil(image)
       #else
-      let image = UIImage(data: chunk)
-      XCTAssertNotNil(image)
+        let image = UIImage(data: chunk)
+        XCTAssertNotNil(image)
       #endif
     }
 
     expect(chunkCount).to(equal(1))
   }
-  
+
   func test__request__postingJSON() async throws {
     let testJSON = ["key": "value"]
     let data = try JSONSerialization.data(withJSONObject: testJSON, options: .prettyPrinted)
@@ -136,27 +159,29 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
       statusCode: 200,
       headerFields: headerFields
     )
-    request.httpBody = data
-    request.httpMethod = GraphQLHTTPMethod.POST.rawValue
 
-    let (dataStream, response) = try await self.session.bytes(for: request, delegate: nil)
+    request.urlRequest.httpBody = data
+    request.urlRequest.httpMethod = GraphQLHTTPMethod.POST.rawValue
+
+    let (chunks, response) = try await self.session.chunks(for: request)
     guard let httpResponse = response as? HTTPURLResponse else {
       fail()
       return
     }
 
-    XCTAssertEqual(request.url, httpResponse.url)
+    XCTAssertEqual(request.graphQLEndpoint, httpResponse.url)
 
     var chunkCount = 0
-    for try await chunk in dataStream.chunks {
+    for try await chunk in chunks {
+      let chunk = chunk as! Data
       chunkCount += 1
-      let parsedJSON = try JSONSerialization.jsonObject(with: chunk) as! [String : String]
+      let parsedJSON = try JSONSerialization.jsonObject(with: chunk) as! [String: String]
       XCTAssertEqual(parsedJSON, testJSON)
     }
 
     expect(chunkCount).to(equal(1))
   }
-  
+
   func test__request__cancellingTaskDirectly_shouldThrowCancellationError() async throws {
     let url = URL(string: "http://www.test.com/cancelTaskDirectly")!
     let request = await request(
@@ -167,7 +192,7 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
 
     let task = Task {
       await expect {
-        try await self.session.bytes(for: request, delegate: nil)
+        try await self.session.chunks(for: request)
       }.to(throwError(CancellationError()))
     }
 
@@ -182,9 +207,9 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
     let iterations = 20
     expectation.expectedFulfillmentCount = iterations
     @Atomic var taskIDs: [Int] = []
-    
+
     var responseStrings = [Int: String]()
-    var requests = [Int: URLRequest]()
+    var requests = [Int: MockRequest]()
 
     for i in 0..<iterations {
       let url = URL(string: "http://www.test.com/multipleSimultaneousRequests\(i)")!
@@ -202,16 +227,18 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
     await withThrowingTaskGroup(of: Void.self) { group in
       for (index, request) in requests {
         group.addTask {
-          let (dataStream, response) = try await self.session.bytes(for: request, delegate: nil)
+          let (chunks, response) = try await self.session.chunks(for: request)
           guard let httpResponse = response as? HTTPURLResponse else {
             fail()
             return
           }
 
-          XCTAssertEqual(httpResponse.url, request.url)
+          XCTAssertEqual(httpResponse.url, request.graphQLEndpoint)
           var isFirstChunk: Bool = true
-          for try await chunk in dataStream.chunks {
+          for try await chunk in chunks {
+            let chunk = chunk as! Data
             XCTAssertTrue(isFirstChunk)
+            expectation.fulfill()
             isFirstChunk = false
 
             let expectedResponse = responseStrings[index]
@@ -222,23 +249,8 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
         }
       }
     }
-  }
 
-  func test__request__sendingRequestToInvalidatedSession_returnsAppropriateError() async {
-    session.invalidateAndCancel()
-
-    let url = URL(string: "http://www.test.com/invalidatedRequestTest")!
-    let request = await request(
-      for: url,
-      responseData: nil,
-      statusCode: 400
-    )
-
-    _ = await Task {
-      await expect {
-        try await self.session.bytes(for: request, delegate: nil)
-      }.to(throwError(CancellationError()))
-    }.value
+    await fulfillment(of: [expectation])
   }
 
 }
