@@ -70,7 +70,7 @@ class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting, MockRes
         }
         var request = request
         request.cachePolicy = .returnCacheDataDontFetch
-        throw RequestChainRetry(request: request, underlyingError: error)
+        throw RequestChainRetry(request: request)
       }
     }
 

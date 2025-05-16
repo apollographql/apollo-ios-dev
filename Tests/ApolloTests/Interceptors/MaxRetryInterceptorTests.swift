@@ -58,7 +58,7 @@ class MaxRetryInterceptorTests: XCTestCase {
 
     }.to(
       throwError(errorType: MaxRetryInterceptor.MaxRetriesError.self) { error in
-        expect(error.count).to(equal(testProvider.retryCount + 1))
+        expect(error.count).to(equal(testProvider.retryCount))
         expect(error.operationName).to(equal(MockQuery<MockSelectionSet>.operationName))
       })
   }
@@ -88,9 +88,7 @@ class MaxRetryInterceptorTests: XCTestCase {
     let operation = MockQuery.mock()
     let results = try network.send(query: operation, cachePolicy: .fetchIgnoringCacheCompletely)
 
-    for try await result in results {
-      expect(testInterceptor.timesRetryHasBeenCalled).to(equal(testInterceptor.timesToCallRetry))
-      return
-    }
+    await expect { try await results.getAllValues() }.to(throwError(RequestChainError.noResults))
+    expect(testInterceptor.timesRetryHasBeenCalled).to(equal(testInterceptor.timesToCallRetry))    
   }
 }
