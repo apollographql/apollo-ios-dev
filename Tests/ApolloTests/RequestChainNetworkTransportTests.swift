@@ -97,7 +97,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       endpointURL: serverUrl
     )
 
-    let resultStream = try transport.send(query: MockQuery.mock(), cachePolicy: .default)
+    let resultStream = try transport.send(query: MockQuery.mock(), cachePolicy: .fetchIgnoringCacheCompletely)
 
     await expect {
       try await resultStream.getAllValues()
@@ -117,7 +117,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       endpointURL: serverUrl
     )
 
-    let resultStream = try transport.send(query: MockQuery.mock(), cachePolicy: .default)
+    let resultStream = try transport.send(query: MockQuery.mock(), cachePolicy: .fetchIgnoringCacheCompletely)
 
     await expect {
       try await resultStream.getAllValues()
@@ -436,6 +436,53 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     task.cancel()
 
     await expect(cancellationInterceptor.hasBeenCancelled).toEventually(beTrue())
+  }
+
+  // MARK: - Retrying tests
+
+  func test__retryingTask__givenInterceptorThrowsRetryError_retriesWithRequestFromError() async throws {
+    await Self.registerRequestHandler(for: serverUrl) { request in
+      expect(request.allHTTPHeaderFields?["IsRetry"]).to(equal("true"))
+
+      return (
+        .mock(),
+        self.emptyResponseData()
+      )
+    }
+
+    class RetryingTestInterceptor: ApolloInterceptor, @unchecked Sendable {
+      func intercept<Request: GraphQLRequest>(
+        request: Request,
+        next: NextInterceptorFunction<Request>
+      ) async throws -> InterceptorResultStream<Request.Operation> {
+        if let isRetry = request.additionalHeaders["IsRetry"],
+           isRetry == "true" {
+          return try await next(request)
+        }
+
+        var request = request
+        request.addHeader(name: "IsRetry", value: "true")
+        throw RequestChainRetry(request: request)
+      }
+
+    }
+
+    let retryInterceptor = RetryingTestInterceptor()
+
+    let transport = RequestChainNetworkTransport(
+      interceptorProvider: MockProvider(
+        session: session,
+        interceptors: [
+          retryInterceptor,
+          JSONResponseParsingInterceptor(),
+        ]
+      ),
+      endpointURL: serverUrl
+    )
+
+    let responseStream = try transport.send(query: MockQuery.mock(), cachePolicy: .fetchIgnoringCacheCompletely)
+
+    await expect { try await responseStream.getAllValues().count }.to(equal(1))    
   }
 
 //  await Self.registerRequestHandler(for: serverUrl) { request in

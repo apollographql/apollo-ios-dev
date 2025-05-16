@@ -19,8 +19,7 @@ public final class MockURLProtocol<RequestProvider: MockResponseProvider>: URLPr
   override public func startLoading() {
     self.asyncTask = Task {
       guard
-        let url = self.request.url,
-        let handler = await RequestProvider.requestHandler(for: url)
+        let handler = await requestHandler(for: request.url)
       else {
         self.client?.urlProtocol(self, didFailWithError: MockURLError.requestNotHandled)
         return
@@ -52,7 +51,25 @@ public final class MockURLProtocol<RequestProvider: MockResponseProvider>: URLPr
       }
     }
   }
-  
+
+  private func requestHandler(for url: URL?) async -> MockResponseProvider.MultiResponseHandler? {
+    guard let url = url else { return nil }
+
+    if let handler = await RequestProvider.requestHandler(for: url) {
+      return handler
+    }
+
+    var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
+    urlComponents?.query = nil
+
+    if let urlWithoutQueryString = urlComponents?.string,
+       let urlWithoutQuery = URL(string: urlWithoutQueryString) {
+      return await RequestProvider.requestHandler(for: urlWithoutQuery)
+    }
+
+    return nil
+  }
+
   override public func stopLoading() {
     self.asyncTask?.cancel()
   }
