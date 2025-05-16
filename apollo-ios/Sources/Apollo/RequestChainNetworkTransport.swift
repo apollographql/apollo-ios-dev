@@ -14,8 +14,6 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
   /// The GraphQL endpoint URL to use.
   public let endpointURL: URL
 
-  /// Any additional HTTP headers that should be added to **every** request, such as an API key or a language setting.
-  ///
   /// If a header should only be added to _certain_ requests, or if its value might differ between
   /// requests, you should add that header in an interceptor instead.
   ///
@@ -42,7 +40,11 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
   /// Defaults to a ``DefaultRequestBodyCreator`` initialized with the default configuration.
   public let requestBodyCreator: any JSONRequestBodyCreator
 
-  private let sendEnhancedClientAwareness: Bool
+  /// Any additional HTTP headers that should be added to **every** request, such as an API key or a language setting.
+  ////// The telemetry metadata about the client. This is used by GraphOS Studio's
+  /// [client awareness](https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation)
+  /// feature.
+  public let clientAwarenessMetadata: ClientAwarenessMetadata
 
   /// Designated initializer
   ///
@@ -64,7 +66,7 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
     apqConfig: AutoPersistedQueryConfiguration = .init(),
     requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator(),
     useGETForQueries: Bool = false,
-    sendEnhancedClientAwareness: Bool = true
+    clientAwarenessMetadata: ClientAwarenessMetadata = ClientAwarenessMetadata()
   ) {
     self.interceptorProvider = interceptorProvider
     self.endpointURL = endpointURL
@@ -73,7 +75,7 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
     self.apqConfig = apqConfig
     self.requestBodyCreator = requestBodyCreator
     self.useGETForQueries = useGETForQueries
-    self.sendEnhancedClientAwareness = sendEnhancedClientAwareness
+    self.clientAwarenessMetadata = clientAwarenessMetadata
   }
 
   /// Constructs a GraphQL request for the given operation.
@@ -96,14 +98,12 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
       operation: operation,
       graphQLEndpoint: self.endpointURL,
       contextIdentifier: contextIdentifier,
-      clientName: self.clientName,
-      clientVersion: self.clientVersion,
       cachePolicy: cachePolicy,
       context: context,
       apqConfig: self.apqConfig,
       useGETForQueries: self.useGETForQueries,
       requestBodyCreator: self.requestBodyCreator,
-      sendEnhancedClientAwareness: self.sendEnhancedClientAwareness
+      clientAwarenessMetadata: self.clientAwarenessMetadata
     )
     request.addHeaders(self.additionalHeaders)
     return request
@@ -183,15 +183,13 @@ extension RequestChainNetworkTransport: UploadingNetworkTransport {
     var request = UploadRequest(
       operation: operation,
       graphQLEndpoint: self.endpointURL,
-      clientName: self.clientName,
-      clientVersion: self.clientVersion,
       files: files,
       multipartBoundary: manualBoundary,
       context: context,
       requestBodyCreator: self.requestBodyCreator,
-      sendEnhancedClientAwareness: self.sendEnhancedClientAwareness
+      clientAwarenessMetadata: self.clientAwarenessMetadata
     )
-    request.additionalHeaders = self.additionalHeaders
+    request.addHeaders(self.additionalHeaders)
     return request
   }
 
