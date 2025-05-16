@@ -6,28 +6,32 @@
 //  Copyright © 2019 Apollo GraphQL. All rights reserved.
 //
 
-import XCTest
-import Nimble
 import ApolloInternalTestHelpers
+import Nimble
+import XCTest
+
 @testable import Apollo
 @testable import ApolloAPI
 
 class RequestBodyCreatorTests: XCTestCase {
 
   func create<Operation: GraphQLOperation>(
-    with creator: any RequestBodyCreator,
+    with creator: any JSONRequestBodyCreator,
     for operation: Operation
   ) -> JSONEncodableDictionary {
-    creator.requestBody(for: operation,                        
-                        sendQueryDocument: true,
-                        autoPersistQuery: false)
+    creator.requestBody(
+      for: operation,
+      sendQueryDocument: true,
+      autoPersistQuery: false,
+      clientAwarenessMetadata: .none // Client awareness behavior tested in ClientAwarenessMetadataTests
+    )
   }
-  
+
   // MARK: - Tests
-  
+
   func testRequestBodyWithApolloRequestBodyCreator() {
     // given
-    class GivenMockOperation: MockOperation<MockSelectionSet> {
+    class GivenMockOperation: MockOperation<MockSelectionSet>, @unchecked Sendable {
       override class var operationName: String { "Test Operation Name" }
       override class var operationDocument: OperationDocument {
         .init(definition: .init("Test Query Document"))
@@ -37,7 +41,7 @@ class RequestBodyCreatorTests: XCTestCase {
     let operation = GivenMockOperation()
     operation.__variables = ["TestVar": 123]
 
-    let creator = ApolloRequestBodyCreator()
+    let creator = DefaultRequestBodyCreator()
 
     // when
     let actual = self.create(with: creator, for: operation)
@@ -75,7 +79,7 @@ class RequestBodyCreatorTests: XCTestCase {
       var _jsonValue: JSONValue { data }
     }
 
-    class GivenMockOperation: MockOperation<MockSelectionSet> {
+    class GivenMockOperation: MockOperation<MockSelectionSet>, @unchecked Sendable {
       override class var operationName: String { "Test Operation Name" }
       override class var operationDocument: OperationDocument {
         .init(definition: .init("Test Query Document"))
@@ -85,7 +89,7 @@ class RequestBodyCreatorTests: XCTestCase {
     let operation = GivenMockOperation()
     operation.__variables = ["TestVar": MockScalar("123")]
 
-    let creator = ApolloRequestBodyCreator()
+    let creator = DefaultRequestBodyCreator()
 
     // when
     let actual = self.create(with: creator, for: operation)
@@ -96,10 +100,11 @@ class RequestBodyCreatorTests: XCTestCase {
     expect(actual["query"]).to(equalJSONValue("Test Query Document"))
   }
 
-  #warning("""
-TODO: Test generated input objects converted to variables correctly.
-- nil variable value
-- null variable value
-""")
+  #warning(
+    """
+    TODO: Test generated input objects converted to variables correctly.
+    - nil variable value
+    - null variable value
+    """
+  )
 }
-

@@ -6,36 +6,28 @@
 //  Copyright © 2020 Apollo GraphQL. All rights reserved.
 //
 
-import Foundation
 import Apollo
 import ApolloAPI
+import Foundation
 
-class RetryToCountThenSucceedInterceptor: ApolloInterceptor {
+final class RetryToCountThenSucceedInterceptor: ApolloInterceptor {
   let timesToCallRetry: Int
-  var timesRetryHasBeenCalled = 0
+  nonisolated(unsafe) var timesRetryHasBeenCalled = 0
 
-  public var id: String = UUID().uuidString
-  
   init(timesToCallRetry: Int) {
     self.timesToCallRetry = timesToCallRetry
   }
-  
-  func interceptAsync<Operation: GraphQLOperation>(
-    chain: any RequestChain,
-    request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
+
+  func intercept<Request>(
+    request: Request,
+    next: (Request) async throws -> InterceptorResultStream<Request.Operation>
+  ) async throws -> InterceptorResultStream<Request.Operation> where Request: GraphQLRequest {
     if self.timesRetryHasBeenCalled < self.timesToCallRetry {
       self.timesRetryHasBeenCalled += 1
-      chain.retry(request: request,
-                  completion: completion)
+      throw RequestChainRetry(request: request)
+
     } else {
-      chain.proceedAsync(
-        request: request,
-        response: response,
-        interceptor: self,
-        completion: completion
-      )
+      return try await next(request)
     }
   }
 }

@@ -1,118 +1,98 @@
 import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
+import Nimble
 import XCTest
 
-class ResponseCodeInterceptorTests: XCTestCase {
-  func testResponseCodeInterceptorLetsAnyDataThroughWithValidResponseCode() {
-    class TestProvider: InterceptorProvider {
-      let mockClient: MockURLSessionClient = {
-        let client = MockURLSessionClient()
-        client.response = HTTPURLResponse(url: TestURL.mockServer.url,
-                                          statusCode: 200,
-                                          httpVersion: nil,
-                                          headerFields: nil)
-        client.data = Data()
-        return client
-      }()
+class ResponseCodeInterceptorTests: XCTestCase, MockResponseProvider {
 
-      func interceptors<Operation: GraphQLOperation>(
-        for operation: Operation
-      ) -> [any ApolloInterceptor] {
-        [
-          NetworkFetchInterceptor(client: self.mockClient),
-          ResponseCodeInterceptor(),
-          JSONResponseParsingInterceptor()
-        ]
-      }
-    }
-
-    let network = RequestChainNetworkTransport(interceptorProvider: TestProvider(),
-                                               endpointURL: TestURL.mockServer.url)
-
-    let expectation = self.expectation(description: "Request sent")
-
-    _ = network.send(operation: MockQuery.mock()) { result in
-      defer {
-        expectation.fulfill()
-      }
-
-      switch result {
-      case .success:
-        XCTFail("This should not have succeeded")
-      case .failure(let error):
-        switch error {
-        case JSONResponseParsingInterceptor.JSONResponseParsingError.couldNotParseToJSON(let data):
-          XCTAssertTrue(data.isEmpty)
-        default:
-          XCTFail("Unexpected error type: \(error.localizedDescription)")
-        }
-      }
-    }
-
-    self.wait(for: [expectation], timeout: 1)
+  override func tearDown() async throws {
+    await Self.cleanUpRequestHandlers()
+    try await super.tearDown()
   }
 
-  func testResponseCodeInterceptorDoesNotLetDataThroughWithInvalidResponseCode() {
-    class TestProvider: InterceptorProvider {
-      let mockClient: MockURLSessionClient = {
-        let client = MockURLSessionClient()
-        client.response = HTTPURLResponse(url: TestURL.mockServer.url,
-                                          statusCode: 401,
-                                          httpVersion: nil,
-                                          headerFields: nil)
-        let json = [
-          "data": [
-            "hero": [
-              "name": "Luke Skywalker",
-              "__typename": "Human"
-            ]
-          ]
-        ]
-        let data = try! JSONSerializationFormat.serialize(value: json)
-        client.data = data
-        return client
-      }()
+  func testResponseCodeInterceptorLetsAnyDataThroughWithValidResponseCode() async throws {
 
-      func interceptors<Operation: GraphQLOperation>(
-        for operation: Operation
-      ) -> [any ApolloInterceptor] {
-        [
-          NetworkFetchInterceptor(client: self.mockClient),
-          ResponseCodeInterceptor(),
-          JSONResponseParsingInterceptor(),
-        ]
-      }
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: Self.TestInterceptorProvider(),
+      endpointURL: TestURL.mockServer.url
+    )
+
+    await Self.registerRequestHandler(for: TestURL.mockServer.url) { _ in
+      return (
+        HTTPURLResponse(
+          url: TestURL.mockServer.url,
+          statusCode: 200,
+          httpVersion: nil,
+          headerFields: nil
+        )!,
+        Data()
+      )
     }
 
-    let network = RequestChainNetworkTransport(interceptorProvider: TestProvider(),
-                                               endpointURL: TestURL.mockServer.url)
+    let responseStream = try network.send(query: MockQuery.mock(), cachePolicy: .fetchIgnoringCacheCompletely)
+    var responseIterator = responseStream.makeAsyncIterator()
 
-    let expectation = self.expectation(description: "Request sent")
+    await expect {
+      try await responseIterator.next()
+    }.to(
+      throwError(
+        errorType: JSONResponseParsingError.self,
+        closure: { error in
+          guard case let .couldNotParseToJSON(data) = error else {
+            fail("wrong error")
+            return
+          }
+          expect(data).to(beEmpty())
+        }
+      )
+    )
+  }
 
-    _ = network.send(operation: MockQuery.mock()) { result in
-      defer {
-        expectation.fulfill()
-      }
+  func testResponseCodeInterceptorDoesNotLetDataThroughWithInvalidResponseCode() async throws {
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: Self.TestInterceptorProvider(),
+      endpointURL: TestURL.mockServer.url
+    )
 
-      switch result {
-      case .success:
-        XCTFail("This should not have succeeded")
-      case .failure(let error):
-        switch error {
-        case ResponseCodeInterceptor.ResponseCodeError.invalidResponseCode(response: let response, let rawData):
-          XCTAssertEqual(response?.statusCode, 401)
+    await Self.registerRequestHandler(for: TestURL.mockServer.url) { _ in
+      let json = [
+        "data": [
+          "hero": [
+            "name": "Luke Skywalker",
+            "__typename": "Human",
+          ]
+        ]
+      ]
+      let data = try! JSONSerializationFormat.serialize(value: json)
 
-          guard
-            let data = rawData,
-            let dataString = String(bytes: data, encoding: .utf8) else {
+      return (
+        HTTPURLResponse(
+          url: TestURL.mockServer.url,
+          statusCode: 401,
+          httpVersion: nil,
+          headerFields: nil
+        )!,
+        data
+      )
+    }
+
+    let responseStream = try network.send(query: MockQuery.mock(), cachePolicy: .fetchIgnoringCacheCompletely)
+    var responseIterator = responseStream.makeAsyncIterator()
+
+    await expect {
+      try await responseIterator.next()
+    }.to(
+      throwError(
+        errorType: ResponseCodeInterceptor.ResponseCodeError.self,
+        closure: { error in
+          guard let dataString = String(bytes: error.responseChunk, encoding: .utf8) else {
             XCTFail("Incorrect data returned with error")
             return
           }
-          
+
           guard
-            let castError = error as? ResponseCodeInterceptor.ResponseCodeError,
-            let dataEntry = castError.graphQLError?["data"] as? JSONObject,
+            let dataEntry = error.graphQLError?["data"] as? JSONObject,
             let heroEntry = dataEntry["hero"] as? JSONObject,
             let typeName = heroEntry["__typename"] as? String,
             let heroName = heroEntry["name"] as? String
@@ -120,82 +100,55 @@ class ResponseCodeInterceptorTests: XCTestCase {
             XCTFail("Invalid GraphQL Error")
             return
           }
-          XCTAssertEqual("GraphQL Error", castError.graphQLError?.description)
+          XCTAssertEqual("GraphQL Error", error.graphQLError?.description)
           XCTAssertEqual("Human", typeName)
           XCTAssertEqual("Luke Skywalker", heroName)
-          
+
           XCTAssertEqual(dataString, "{\"data\":{\"hero\":{\"__typename\":\"Human\",\"name\":\"Luke Skywalker\"}}}")
-        default:
-          XCTFail("Unexpected error type: \(error.localizedDescription)")
         }
-      }
-    }
-    
-    self.wait(for: [expectation], timeout: 1)
+      )
+    )
   }
-  
-  func testResponseCodeInterceptorDoesNotHaveGraphQLError() {
-    class TestProvider: InterceptorProvider {
-      let mockClient: MockURLSessionClient = {
-        let client = MockURLSessionClient()
-        client.response = HTTPURLResponse(url: TestURL.mockServer.url,
-                                          statusCode: 401,
-                                          httpVersion: nil,
-                                          headerFields: nil)
-        client.data = "Not a GraphQL Error".data(using: .utf8)
-        return client
-      }()
-      
-      func interceptors<Operation: GraphQLOperation>(
-        for operation: Operation
-      ) -> [any ApolloInterceptor] {
-        [
-          NetworkFetchInterceptor(client: self.mockClient),
-          ResponseCodeInterceptor(),
-          JSONResponseParsingInterceptor(),
-        ]
-      }
+
+  func testResponseCodeInterceptorDoesNotHaveGraphQLError() async throws {
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: Self.TestInterceptorProvider(),
+      endpointURL: TestURL.mockServer.url
+    )
+
+    await Self.registerRequestHandler(for: TestURL.mockServer.url) { _ in
+      return (
+        HTTPURLResponse(
+          url: TestURL.mockServer.url,
+          statusCode: 401,
+          httpVersion: nil,
+          headerFields: nil
+        )!,
+        "Not a GraphQL Error".data(using: .utf8)
+      )
     }
-    
-    let network = RequestChainNetworkTransport(interceptorProvider: TestProvider(),
-                                               endpointURL: TestURL.mockServer.url)
-    
-    let expectation = self.expectation(description: "Request sent")
-    
-    _ = network.send(operation: MockQuery.mock()) { result in
-      defer {
-        expectation.fulfill()
-      }
-      
-      switch result {
-      case .success:
-        XCTFail("This should not have succeeded")
-      case .failure(let error):
-        switch error {
-        case ResponseCodeInterceptor.ResponseCodeError.invalidResponseCode(response: let response, let rawData):
-          XCTAssertEqual(response?.statusCode, 401)
-          
-          guard
-            let data = rawData,
-            let dataString = String(bytes: data, encoding: .utf8) else {
+
+    let responseStream = try network.send(query: MockQuery.mock(), cachePolicy: .fetchIgnoringCacheCompletely)
+    var responseIterator = responseStream.makeAsyncIterator()
+
+    await expect {
+      try await responseIterator.next()
+    }.to(
+      throwError(
+        errorType: ResponseCodeInterceptor.ResponseCodeError.self,
+        closure: { error in
+          XCTAssertEqual(error.response.statusCode, 401)
+
+          guard let dataString = String(bytes: error.responseChunk, encoding: .utf8) else {
             XCTFail("Incorrect data returned with error")
             return
           }
-          
-          guard let castError = error as? ResponseCodeInterceptor.ResponseCodeError else {
-            XCTFail("It should be a ResponseCodeError")
-            return
-          }
-          
-          XCTAssertNil(castError.graphQLError)
-          
+
+          XCTAssertNil(error.graphQLError)
+
           XCTAssertEqual(dataString, "Not a GraphQL Error")
-        default:
-          XCTFail("Unexpected error type: \(error.localizedDescription)")
         }
-      }
-    }
-    
-    self.wait(for: [expectation], timeout: 1)
+      )
+    )
   }
 }

@@ -12,7 +12,7 @@ class MaxRetryInterceptorTests: XCTestCase {
     try await super.tearDown()
   }
 
-  class TestProvider: InterceptorProvider, MockResponseProvider {
+  final class TestProvider: InterceptorProvider, MockResponseProvider {
     let testInterceptor: any ApolloInterceptor
     let retryCount: Int
 
@@ -50,7 +50,7 @@ class MaxRetryInterceptorTests: XCTestCase {
                                                endpointURL: TestURL.mockServer.url)
 
     let operation = MockQuery.mock()
-    let results = try network.send(operation: operation, cachePolicy: .fetchIgnoringCacheCompletely)
+    let results = try network.send(query: operation, cachePolicy: .fetchIgnoringCacheCompletely)
 
     await expect {
       var iterator = results.makeAsyncIterator()
@@ -86,7 +86,7 @@ class MaxRetryInterceptorTests: XCTestCase {
                                                endpointURL: TestURL.mockServer.url)
 
     let operation = MockQuery.mock()
-    let results = try network.send(operation: operation, cachePolicy: .fetchIgnoringCacheCompletely)
+    let results = try network.send(query: operation, cachePolicy: .fetchIgnoringCacheCompletely)
 
     for try await result in results {
       expect(testInterceptor.timesRetryHasBeenCalled).to(equal(testInterceptor.timesToCallRetry))
