@@ -1434,10 +1434,6 @@ extension ApolloCodegenConfiguration.OperationsFileOutput {
 extension ApolloCodegenConfiguration {
   /// Determine whether the operations files are output to the schema types module.
   func shouldGenerateSelectionSetInitializers(for operation: IR.Operation) -> Bool {
-
-    // test with merging off and local cache mutation
-    // look for field merging test that turns off and do the opposite
-
     if operation.definition.isLocalCacheMutation {
       return true
 
