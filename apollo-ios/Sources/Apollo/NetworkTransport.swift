@@ -13,20 +13,17 @@ public protocol NetworkTransport: AnyObject, Sendable {
   /// - Parameters:
   ///   - operation: The operation to send.
   ///   - cachePolicy: The `CachePolicy` to use making this request.
-  ///   - contextIdentifier:  [optional] A unique identifier for this request, to help with deduping cache hits for watchers. Defaults to `nil`.
   ///   - context: [optional] A context that is being passed through the request chain. Defaults to `nil`.
   /// - Returns: A stream of `GraphQLResult`s for each response.
   func send<Query: GraphQLQuery>(
     query: Query,
     cachePolicy: CachePolicy,
-    contextIdentifier: UUID?,
     context: (any RequestContext)?
   ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error>
 
   func send<Mutation: GraphQLMutation>(
     mutation: Mutation,
     cachePolicy: CachePolicy,
-    contextIdentifier: UUID?,
     context: (any RequestContext)?
   ) throws -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error>
 
@@ -39,7 +36,6 @@ public protocol SubscriptionNetworkTransport: NetworkTransport {
   func send<Subscription: GraphQLSubscription>(
     subscription: Subscription,
     cachePolicy: CachePolicy,
-    contextIdentifier: UUID?,
     context: (any RequestContext)?
   ) throws -> AsyncThrowingStream<GraphQLResult<Subscription.Data>, any Error>
 

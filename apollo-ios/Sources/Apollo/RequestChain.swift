@@ -97,7 +97,7 @@ struct RequestChain<Request: GraphQLRequest>: Sendable {
     request: Request
   ) -> ResultStream {
     return doInAsyncThrowingStream { continuation in
-      try await kickoffRequestInterceptors(for: request, continuation: continuation)
+
     }
   }
 

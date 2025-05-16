@@ -34,8 +34,7 @@ public struct DefaultCacheInterceptor: CacheInterceptor {
     cacheRecords: RecordSet,
     for operation: Operation,
     with result: GraphQLResult<Operation.Data>
-  ) async throws {
-    #warning("TODO: need to pass through context identifier. Can we use task local values?")
+  ) async throws {    
     try await store.publish(records: cacheRecords)
   }
   

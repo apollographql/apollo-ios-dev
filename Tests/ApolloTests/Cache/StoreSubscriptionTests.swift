@@ -19,15 +19,15 @@ class StoreSubscriptionTests: XCTestCase {
 
   // MARK: - Tests
 
-  func testSubscriberIsNotifiedOfStoreUpdate() throws {
+  func testSubscriberIsNotifiedOfStoreUpdate() async throws {
     let cacheKeyChangeExpectation = XCTestExpectation(description: "Subscriber is notified of cache key change")
     let expectedChangeKeySet: Set<String> = ["QUERY_ROOT.__typename", "QUERY_ROOT.name"]
     let subscriber = SimpleSubscriber(cacheKeyChangeExpectation, expectedChangeKeySet)
 
     store.subscribe(subscriber)
-    addTeardownBlock { self.store.unsubscribe(subscriber) }
+    addTeardownBlock { [store] in store!.unsubscribe(subscriber) }
 
-    store.publish(
+    try await store.publish(
       records: [
         "QUERY_ROOT": [
           "__typename": "Hero",
@@ -36,7 +36,7 @@ class StoreSubscriptionTests: XCTestCase {
       ]
     )
 
-    wait(for: [cacheKeyChangeExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [cacheKeyChangeExpectation], timeout: Self.defaultWaitTimeout)
   }
 
   func testUnsubscribeRemovesSubscriberFromApolloStore() throws {
@@ -50,7 +50,7 @@ class StoreSubscriptionTests: XCTestCase {
   }
 
   /// Fufills the provided expectation when all expected keys have been observed.
-  internal class SimpleSubscriber: ApolloStoreSubscriber {
+  internal actor SimpleSubscriber: ApolloStoreSubscriber {
     private let expectation: XCTestExpectation
     private var changeSet: Set<String>
 
@@ -59,12 +59,18 @@ class StoreSubscriptionTests: XCTestCase {
       self.changeSet = changeSet
     }
 
-    func store(_ store: ApolloStore,
-               didChangeKeys changedKeys: Set<CacheKey>,
-               contextIdentifier: UUID?) {
-      changeSet.subtract(changedKeys)
-      if (changeSet.isEmpty) {
-        expectation.fulfill()
+    func isolatedDo(_ block: @escaping (isolated SimpleSubscriber) -> Void) {
+      block(self)
+    }
+
+    nonisolated func store(_ store: ApolloStore, didChangeKeys changedKeys: Set<CacheKey>) {
+      Task {
+        await self.isolatedDo {
+          $0.changeSet.subtract(changedKeys)
+          if ($0.changeSet.isEmpty) {
+            $0.expectation.fulfill()
+          }
+        }
       }
     }
   }
