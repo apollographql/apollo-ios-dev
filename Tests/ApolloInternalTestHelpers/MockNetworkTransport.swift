@@ -19,13 +19,11 @@ public final class MockNetworkTransport: NetworkTransport {
   public func send<Query>(
     query: Query,
     cachePolicy: CachePolicy,
-    contextIdentifier: UUID?,
     context: (any RequestContext)?
   ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error> where Query: GraphQLQuery {
     try requestChainTransport.send(
       query: query,
       cachePolicy: cachePolicy,
-      contextIdentifier: contextIdentifier,
       context: context
     )
   }
@@ -33,13 +31,11 @@ public final class MockNetworkTransport: NetworkTransport {
   public func send<Mutation>(
     mutation: Mutation,
     cachePolicy: CachePolicy,
-    contextIdentifier: UUID?,
     context: (any RequestContext)?
   ) throws -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error> where Mutation: GraphQLMutation {
     try requestChainTransport.send(
       mutation: mutation,
       cachePolicy: cachePolicy,
-      contextIdentifier: contextIdentifier,
       context: context
     )
   }

@@ -16,10 +16,7 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
   public var additionalHeaders: [String: String] = [:]
 
   /// The `CachePolicy` to use for this request.
-  public var cachePolicy: CachePolicy
-
-  /// [optional] A unique identifier for this request, to help with deduping cache hits for watchers.
-  public let contextIdentifier: UUID?
+  public var cachePolicy: CachePolicy  
 
   /// [optional] A context that is being passed through the request chain.
   public var context: (any RequestContext)?
@@ -48,7 +45,6 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
   /// - Parameters:
   ///   - operation: The GraphQL Operation to execute
   ///   - graphQLEndpoint: The endpoint to make a GraphQL request to
-  ///   - contextIdentifier:  [optional] A unique identifier for this request, to help with deduping cache hits for watchers. Defaults to `nil`.
   ///   - clientName: The name of the client to send with the `"apollographql-client-name"` header
   ///   - clientVersion:  The version of the client to send with the `"apollographql-client-version"` header
   ///   - cachePolicy: The `CachePolicy` to use for this request.
@@ -61,7 +57,6 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
   public init(
     operation: Operation,
     graphQLEndpoint: URL,
-    contextIdentifier: UUID? = nil,
     cachePolicy: CachePolicy = .default,
     context: (any RequestContext)? = nil,
     apqConfig: AutoPersistedQueryConfiguration = .init(),
@@ -71,7 +66,6 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
   ) {
     self.operation = operation
     self.graphQLEndpoint = graphQLEndpoint
-    self.contextIdentifier = contextIdentifier
     self.cachePolicy = cachePolicy
     self.context = context
     self.requestBodyCreator = requestBodyCreator
@@ -206,7 +200,6 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
     lhs.operation == rhs.operation &&
     lhs.additionalHeaders == rhs.additionalHeaders &&
     lhs.cachePolicy == rhs.cachePolicy &&
-    lhs.contextIdentifier == rhs.contextIdentifier &&
     lhs.apqConfig == rhs.apqConfig &&
     lhs.isPersistedQueryRetry == rhs.isPersistedQueryRetry &&
     lhs.useGETForQueries == rhs.useGETForQueries &&
@@ -218,7 +211,6 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
     hasher.combine(operation)
     hasher.combine(additionalHeaders)
     hasher.combine(cachePolicy)
-    hasher.combine(contextIdentifier)
     hasher.combine(apqConfig)
     hasher.combine(isPersistedQueryRetry)
     hasher.combine(useGETForQueries)
@@ -239,7 +231,6 @@ extension JSONRequest: CustomDebugStringConvertible {
     debugStrings.append("]")
     debugStrings.append("Cache Policy: \(self.cachePolicy)")
     debugStrings.append("Operation: \(self.operation)")
-    debugStrings.append("Context identifier: \(String(describing: self.contextIdentifier))")
     return debugStrings.joined(separator: "\n\t")
   }
 }

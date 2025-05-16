@@ -3,7 +3,7 @@ import Foundation
 import ApolloAPI
 #endif
 
-public typealias DidChangeKeysFunc = (Set<CacheKey>, UUID?) -> Void
+public typealias DidChangeKeysFunc = (Set<CacheKey>) -> Void
 
 /// The `ApolloStoreSubscriber` provides a means to observe changes to items in the ApolloStore.
 /// This protocol is available for advanced use cases only. Most users will prefer using `ApolloClient.watch(query:)`.
@@ -14,10 +14,7 @@ public protocol ApolloStoreSubscriber: AnyObject, Sendable {
   /// - Parameters:
   ///   - store: The store which made the changes
   ///   - changedKeys: The list of changed keys
-  ///   - contextIdentifier: [optional] A unique identifier for the request that kicked off this change, to assist in de-duping cache hits for watchers.
-  func store(_ store: ApolloStore,
-             didChangeKeys changedKeys: Set<CacheKey>,
-             contextIdentifier: UUID?)
+  func store(_ store: ApolloStore, didChangeKeys changedKeys: Set<CacheKey>)
 }
 
 /// The `ApolloStore` class acts as a local cache for normalized GraphQL results.
@@ -47,9 +44,9 @@ public final class ApolloStore: Sendable {
     self.queue = DispatchQueue(label: "com.apollographql.ApolloStore", attributes: .concurrent)
   }
 
-  fileprivate func didChangeKeys(_ changedKeys: Set<CacheKey>, identifier: UUID?) {
+  fileprivate func didChangeKeys(_ changedKeys: Set<CacheKey>) {
     for subscriber in self.subscribers {
-      subscriber.store(self, didChangeKeys: changedKeys, contextIdentifier: identifier)
+      subscriber.store(self, didChangeKeys: changedKeys)
     }
   }
 
@@ -63,14 +60,10 @@ public final class ApolloStore: Sendable {
   /// Merges a `RecordSet` into the normalized cache.
   /// - Parameters:
   ///   - records: The records to be merged into the cache.
-  ///   - identifier: [optional] A unique identifier for the operation. All `ApolloStoreSubcriber`
-  ///   will have this identifier provided to the `contextIdentifier` parameter when receiving
-  ///   `store(_:didChangeKeys:contextIdentifier)` events for this change.
-  ///   This is used to assist in de-duping cache hits for `GraphQLQueryWatcher`.
-  public func publish(records: RecordSet, identifier: UUID? = nil) async throws {
+  public func publish(records: RecordSet) async throws {
     try await readerWriterLock.write {
       let changedKeys = try await self.cache.merge(records: records)
-      self.didChangeKeys(changedKeys, identifier: identifier)
+      self.didChangeKeys(changedKeys)
     }
   }
 
@@ -312,7 +305,7 @@ public final class ApolloStore: Sendable {
       loader.removeAll()
 
       if let didChangeKeysFunc = self.updateChangedKeysFunc {
-        didChangeKeysFunc(changedKeys, nil)
+        didChangeKeysFunc(changedKeys)
       }
     }
     
@@ -374,7 +367,7 @@ public final class ApolloStore: Sendable {
   ///   - callbackQueue: The queue to call the completion block on.
   ///                    Defaults to `DispatchQueue.main`.
   ///   - completion: [optional] A completion block to call after records are merged into the cache.
-  @available(*, deprecated, renamed: "publish(records:identifier:)")
+  @available(*, deprecated, renamed: "publish(records:)")
   public func publish(
     records: RecordSet,
     identifier: UUID? = nil,
@@ -383,7 +376,7 @@ public final class ApolloStore: Sendable {
   ) {
     performInTask(
       {
-        try await self.publish(records: records, identifier: identifier)
+        try await self.publish(records: records)
       },
       callbackQueue: callbackQueue,
       completion: completion
