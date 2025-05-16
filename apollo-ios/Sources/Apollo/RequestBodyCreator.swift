@@ -2,6 +2,11 @@
 import ApolloAPI
 #endif
 
+public struct DefaultRequestBodyCreator: JSONRequestBodyCreator {
+  // Internal init methods cannot be used in public methods
+  public init() { }
+}
+
 public protocol JSONRequestBodyCreator: Sendable {
   #warning("TODO: replace with version that takes request after rewriting websocket")
   /// Creates a `JSONEncodableDictionary` out of the passed-in operation
@@ -24,6 +29,7 @@ public protocol JSONRequestBodyCreator: Sendable {
     autoPersistQuery: Bool,
     clientAwarenessMetadata: ClientAwarenessMetadata
   ) -> JSONEncodableDictionary
+
 }
 
 // MARK: - Default Implementation
@@ -81,13 +87,10 @@ extension JSONRequestBodyCreator {
       ]
     }
 
+    clientAwarenessMetadata.applyExtension(to: &body)
+
     return body
   }
-}
-
-public struct DefaultRequestBodyCreator: JSONRequestBodyCreator {
-  // Internal init methods cannot be used in public methods
-  public init() { }
 }
 
 // MARK: - Deprecations

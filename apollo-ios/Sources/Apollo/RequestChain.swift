@@ -4,13 +4,17 @@ import Foundation
   import ApolloAPI
 #endif
 
+#warning("TODO: Implement retrying based on catching error")
 public struct RequestChainRetry<Request: GraphQLRequest>: Swift.Error {
   public let request: Request
+  public let underlyingError: (any Swift.Error)?
 
   public init(
     request: Request,
+    underlyingError: (any Error)? = nil
   ) {
     self.request = request
+    self.underlyingError = underlyingError
   }
 }
 
@@ -66,8 +70,22 @@ struct RequestChain<Request: GraphQLRequest>: Sendable {
   func kickoff(
     request: Request
   ) -> ResultStream where Operation: GraphQLQuery {
-    return doInRetryingAsyncThrowingStream(request: request) { request, continuation in
-      let didYieldCacheData = try await handleCacheRead(request: request, continuation: continuation)
+    return doInAsyncThrowingStream { continuation in
+
+      var didYieldCacheData = false
+
+      if request.cachePolicy.shouldAttemptCacheRead {
+        do {
+          let cacheData = try await cacheInterceptor.readCacheData(for: request.operation)
+          continuation.yield(cacheData)
+          didYieldCacheData = true
+
+        } catch {
+          if case .returnCacheDataDontFetch = request.cachePolicy {
+            throw error
+          }
+        }
+      }
 
       if request.cachePolicy.shouldFetchFromNetwork(hadSuccessfulCacheRead: didYieldCacheData) {
         try await kickoffRequestInterceptors(for: request, continuation: continuation)
@@ -78,65 +96,27 @@ struct RequestChain<Request: GraphQLRequest>: Sendable {
   func kickoff(
     request: Request
   ) -> ResultStream {
-    return doInRetryingAsyncThrowingStream(request: request) { request, continuation in
-      try await kickoffRequestInterceptors(for: request, continuation: continuation)
+    return doInAsyncThrowingStream { continuation in
+
     }
   }
 
-  private func doInRetryingAsyncThrowingStream(
-    request: Request,
-    _ body: @escaping @Sendable (Request, ResultStream.Continuation) async throws -> Void
+  private func doInAsyncThrowingStream(
+    _ body: @escaping @Sendable (ResultStream.Continuation) async throws -> Void
   ) -> ResultStream {
     return AsyncThrowingStream { continuation in
       let task = Task {
         do {
-          try await doHandlingRetries(request: request) { request in
-            try await body(request, continuation)
-          }
-
+          try await body(continuation)
+          continuation.finish()
         } catch {
           continuation.finish(throwing: error)
         }
-
-        continuation.finish()
       }
 
       continuation.onTermination = { _ in
         task.cancel()
       }
-    }
-  }
-
-  private func doHandlingRetries(
-    request: Request,
-    _ body: @escaping @Sendable (Request) async throws -> Void
-  ) async throws {
-    do {
-      try await body(request)
-
-    } catch let error as RequestChainRetry<Request> {
-      try await self.doHandlingRetries(request: error.request, body)
-    }
-  }
-
-  private func handleCacheRead(
-    request: Request,
-    continuation: ResultStream.Continuation
-  ) async throws -> Bool where Operation: GraphQLQuery {
-    guard request.cachePolicy.shouldAttemptCacheRead else {
-      return false
-    }
-
-    do {
-      let cacheData = try await cacheInterceptor.readCacheData(for: request.operation)
-      continuation.yield(cacheData)
-      return true
-
-    } catch {
-      if case .returnCacheDataDontFetch = request.cachePolicy {
-        throw error
-      }
-      return false
     }
   }
 
@@ -174,7 +154,8 @@ struct RequestChain<Request: GraphQLRequest>: Sendable {
     }
 
     guard didEmitResult else {
-      throw RequestChainError.noResults
+      continuation.finish(throwing: RequestChainError.noResults)
+      return
     }
   }
 

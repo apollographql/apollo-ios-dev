@@ -36,8 +36,6 @@ public class ApolloClient: ApolloClientProtocol, @unchecked Sendable {
 
   public let store: ApolloStore
 
-  private let sendEnhancedClientAwareness: Bool
-
   public enum ApolloClientError: Error, LocalizedError, Hashable {
     case noUploadTransport
     case noSubscriptionTransport
@@ -62,12 +60,10 @@ public class ApolloClient: ApolloClientProtocol, @unchecked Sendable {
   ///   key. Client library metadata is the Apollo iOS library name and version. Defaults to `true`.
   public init(
     networkTransport: any NetworkTransport,
-    store: ApolloStore,
-    sendEnhancedClientAwareness: Bool = true
+    store: ApolloStore
   ) {
     self.networkTransport = networkTransport
     self.store = store
-    self.sendEnhancedClientAwareness = sendEnhancedClientAwareness
   }
 
   /// Creates a client with a `RequestChainNetworkTransport` connecting to the specified URL.
@@ -75,20 +71,19 @@ public class ApolloClient: ApolloClientProtocol, @unchecked Sendable {
   /// - Parameter url: The URL of a GraphQL server to connect to.
   public convenience init(
     url: URL,
-    sendEnhancedClientAwareness: Bool = true
+    clientAwarenessMetadata: ClientAwarenessMetadata = ClientAwarenessMetadata()
   ) {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
     let provider = DefaultInterceptorProvider(store: store)
     let transport = RequestChainNetworkTransport(
       interceptorProvider: provider,
       endpointURL: url,
-      sendEnhancedClientAwareness: sendEnhancedClientAwareness
+      clientAwarenessMetadata: clientAwarenessMetadata
     )
 
     self.init(
       networkTransport: transport,
-      store: store,
-      sendEnhancedClientAwareness: sendEnhancedClientAwareness
+      store: store      
     )
   }
 

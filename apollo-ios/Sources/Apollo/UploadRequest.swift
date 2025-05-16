@@ -29,15 +29,16 @@ public struct UploadRequest<Operation: GraphQLOperation>: GraphQLRequest {
 
   public let serializationFormat = JSONSerializationFormat.self
 
-  private let sendEnhancedClientAwareness: Bool
+  /// The telemetry metadata about the client. This is used by GraphOS Studio's
+  /// [client awareness](https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation)
+  /// feature.
+  public var clientAwarenessMetadata: ClientAwarenessMetadata
 
   /// Designated Initializer
   ///
   /// - Parameters:
   ///   - operation: The GraphQL Operation to execute
   ///   - graphQLEndpoint: The endpoint to make a GraphQL request to
-  ///   - clientName: The name of the client to send with the `"apollographql-client-name"` header
-  ///   - clientVersion:  The version of the client to send with the `"apollographql-client-version"` header
   ///   - files: The array of files to upload for all `Upload` parameters in the mutation.
   ///   - multipartBoundary: [optional] A boundary to use for the multipart request.
   ///   - context: [optional] A context that is being passed through the request chain. Should default to `nil`.
@@ -45,13 +46,11 @@ public struct UploadRequest<Operation: GraphQLOperation>: GraphQLRequest {
   public init(
     operation: Operation,
     graphQLEndpoint: URL,
-    clientName: String? = Self.defaultClientName,
-    clientVersion: String? = Self.defaultClientVersion,
     files: [GraphQLFile],
     multipartBoundary: String? = nil,
     context: (any RequestContext)? = nil,
     requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator(),
-    sendEnhancedClientAwareness: Bool = true
+    clientAwarenessMetadata: ClientAwarenessMetadata = ClientAwarenessMetadata()
   ) {
     self.operation = operation
     self.graphQLEndpoint = graphQLEndpoint
@@ -60,8 +59,8 @@ public struct UploadRequest<Operation: GraphQLOperation>: GraphQLRequest {
     self.requestBodyCreator = requestBodyCreator
     self.files = files
     self.multipartBoundary = multipartBoundary ?? "apollo-ios.boundary.\(UUID().uuidString)"
+    self.clientAwarenessMetadata = clientAwarenessMetadata
 
-    self.addApolloClientHeaders(clientName: clientName, clientVersion: clientVersion)
     self.addHeader(name: "Content-Type", value: "multipart/form-data; boundary=\(self.multipartBoundary)")
   }
   
@@ -98,11 +97,7 @@ public struct UploadRequest<Operation: GraphQLOperation>: GraphQLRequest {
         variables.updateValue(NSNull(), forKey: fieldName)
       }
     }
-    fields["variables"] = variables
-
-    if self.sendEnhancedClientAwareness {
-      addEnhancedClientAwarenessExtension(to: &fields)
-    }
+    fields["variables"] = variables    
 
     let operationData = try JSONSerializationFormat.serialize(value: fields)
     formData.appendPart(data: operationData, name: "operations")

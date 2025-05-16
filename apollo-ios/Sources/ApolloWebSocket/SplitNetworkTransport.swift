@@ -16,26 +16,6 @@ public final class SplitNetworkTransport: Sendable {
   private let uploadingNetworkTransport: any UploadingNetworkTransport
   private let webSocketNetworkTransport: any SubscriptionNetworkTransport
 
-  public var clientName: String {
-    let httpName = self.uploadingNetworkTransport.clientName
-    let websocketName = self.webSocketNetworkTransport.clientName
-    if httpName == websocketName {
-      return httpName
-    } else {
-      return "SPLIT_HTTPNAME_\(httpName)_WEBSOCKETNAME_\(websocketName)"
-    }
-  }
-
-  public var clientVersion: String {
-    let httpVersion = self.uploadingNetworkTransport.clientVersion
-    let websocketVersion = self.webSocketNetworkTransport.clientVersion
-    if httpVersion == websocketVersion {
-      return httpVersion
-    } else {
-      return "SPLIT_HTTPVERSION_\(httpVersion)_WEBSOCKETVERSION_\(websocketVersion)"
-    }
-  }
-
   /// Designated initializer
   ///
   /// - Parameters:

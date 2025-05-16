@@ -38,7 +38,10 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
   /// Mutation operations always use POST, even when this is `false`
   public let useGETForQueries: Bool
 
-  private let sendEnhancedClientAwareness: Bool
+  /// The telemetry metadata about the client. This is used by GraphOS Studio's
+  /// [client awareness](https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation)
+  /// feature.
+  public var clientAwarenessMetadata: ClientAwarenessMetadata
 
   /// Designated initializer
   ///
@@ -59,14 +62,12 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
     operation: Operation,
     graphQLEndpoint: URL,
     contextIdentifier: UUID? = nil,
-    clientName: String? = Self.defaultClientName,
-    clientVersion: String? = Self.defaultClientVersion,
     cachePolicy: CachePolicy = .default,
     context: (any RequestContext)? = nil,
     apqConfig: AutoPersistedQueryConfiguration = .init(),
     useGETForQueries: Bool = false,
     requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator(),
-    sendEnhancedClientAwareness: Bool = true
+    clientAwarenessMetadata: ClientAwarenessMetadata = ClientAwarenessMetadata()
   ) {
     self.operation = operation
     self.graphQLEndpoint = graphQLEndpoint
@@ -77,20 +78,13 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
 
     self.apqConfig = apqConfig
     self.useGETForQueries = useGETForQueries
-    self.sendEnhancedClientAwareness = sendEnhancedClientAwareness
+    self.clientAwarenessMetadata = clientAwarenessMetadata
 
-    self.setupDefaultHeaders(
-      clientName: clientName,
-      clientVersion: clientVersion
-    )
+    self.setupDefaultHeaders()
   }
 
-  private mutating func setupDefaultHeaders(
-    clientName: String? = Self.defaultClientName,
-    clientVersion: String? = Self.defaultClientVersion
-  ) {
-    self.addHeader(name: "Content-Type", value: "application/json")
-    self.addApolloClientHeaders(clientName: clientName, clientVersion: clientVersion)
+  private mutating func setupDefaultHeaders() {
+    self.addHeader(name: "Content-Type", value: "application/json")    
 
     if Operation.operationType == .subscription {
       self.addHeader(
@@ -181,11 +175,7 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
       for: self,
       sendQueryDocument: sendQueryDocument,
       autoPersistQuery: autoPersistQueries
-    )
-
-    if self.sendEnhancedClientAwareness {
-      addEnhancedClientAwarenessExtension(to: &body)
-    }
+    )    
 
     return body
   }
