@@ -95,7 +95,6 @@ public class ApolloClient: ApolloClientProtocol, @unchecked Sendable {
   @discardableResult public func fetch<Query: GraphQLQuery>(
     query: Query,
     cachePolicy: CachePolicy = .default,
-    contextIdentifier: UUID? = nil,
     context: (any RequestContext)? = nil,
     queue: DispatchQueue = .main,
     resultHandler: GraphQLResultHandler<Query.Data>? = nil
@@ -105,7 +104,6 @@ public class ApolloClient: ApolloClientProtocol, @unchecked Sendable {
         try self.networkTransport.send(
           query: query,
           cachePolicy: cachePolicy,
-          contextIdentifier: contextIdentifier,
           context: context
         )
       },
@@ -176,17 +174,15 @@ public class ApolloClient: ApolloClientProtocol, @unchecked Sendable {
   public func perform<Mutation: GraphQLMutation>(
     mutation: Mutation,
     publishResultToStore: Bool = true,
-    contextIdentifier: UUID? = nil,
     context: (any RequestContext)? = nil,
     queue: DispatchQueue = .main,
     resultHandler: GraphQLResultHandler<Mutation.Data>? = nil
   ) -> (any Cancellable) {
     return awaitStreamInTask(
       {
-        try await self.networkTransport.send(
+        try self.networkTransport.send(
           mutation: mutation,
           cachePolicy: publishResultToStore ? .default : .fetchIgnoringCacheCompletely,
-          contextIdentifier: contextIdentifier,
           context: context
         )
       },
@@ -243,7 +239,6 @@ public class ApolloClient: ApolloClientProtocol, @unchecked Sendable {
         try networkTransport.send(
           subscription: subscription,
           cachePolicy: .default,
-          contextIdentifier: nil,
           context: context)
       },
       callbackQueue: queue,

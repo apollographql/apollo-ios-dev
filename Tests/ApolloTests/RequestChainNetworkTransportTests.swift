@@ -97,7 +97,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       endpointURL: serverUrl
     )
 
-    let resultStream = try transport.send(query: MockQuery.mock(), cachePolicy: .fetchIgnoringCacheCompletely)
+    let resultStream = try transport.send(query: MockQuery.mock(), cachePolicy: .default)
 
     await expect {
       try await resultStream.getAllValues()
@@ -117,7 +117,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       endpointURL: serverUrl
     )
 
-    let resultStream = try transport.send(query: MockQuery.mock(), cachePolicy: .fetchIgnoringCacheCompletely)
+    let resultStream = try transport.send(query: MockQuery.mock(), cachePolicy: .default)
 
     await expect {
       try await resultStream.getAllValues()

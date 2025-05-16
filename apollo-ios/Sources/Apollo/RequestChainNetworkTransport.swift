@@ -84,20 +84,17 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
   ///
   /// - Parameters:
   ///   - operation: The operation to create the request for
-  ///   - cachePolicy: The `CachePolicy` to use when creating the request
-  ///   - contextIdentifier: [optional] A unique identifier for this request, to help with deduping cache hits for watchers. Should default to `nil`.
+  ///   - cachePolicy: The `CachePolicy` to use when creating the request  
   ///   - context: [optional] A context that is being passed through the request chain. Should default to `nil`.
   /// - Returns: The constructed request.
   public func constructRequest<Operation: GraphQLOperation>(
     for operation: Operation,
     cachePolicy: CachePolicy,
-    contextIdentifier: UUID? = nil,
     context: (any RequestContext)? = nil
   ) -> JSONRequest<Operation> {
     var request = JSONRequest(
       operation: operation,
       graphQLEndpoint: self.endpointURL,
-      contextIdentifier: contextIdentifier,
       cachePolicy: cachePolicy,
       context: context,
       apqConfig: self.apqConfig,
@@ -114,13 +111,11 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
   public func send<Query: GraphQLQuery>(
     query: Query,
     cachePolicy: CachePolicy,
-    contextIdentifier: UUID? = nil,
     context: (any RequestContext)? = nil
   ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error> {
     let request = self.constructRequest(
       for: query,
       cachePolicy: cachePolicy,
-      contextIdentifier: contextIdentifier,
       context: context
     )
 
@@ -132,13 +127,11 @@ public final class RequestChainNetworkTransport: NetworkTransport, Sendable {
   public func send<Mutation: GraphQLMutation>(
     mutation: Mutation,
     cachePolicy: CachePolicy,
-    contextIdentifier: UUID? = nil,
     context: (any RequestContext)? = nil
   ) throws -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error> {
     let request = self.constructRequest(
       for: mutation,
       cachePolicy: cachePolicy,
-      contextIdentifier: contextIdentifier,
       context: context
     )
 

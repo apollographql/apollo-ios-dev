@@ -434,34 +434,30 @@ extension WebSocketTransport: SubscriptionNetworkTransport {
   public func send<Query: GraphQLQuery>(
     query: Query,
     cachePolicy: CachePolicy,
-    contextIdentifier: UUID?,
     context: (any RequestContext)?
   ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error> {
-    try send(operation: query, cachePolicy: cachePolicy, contextIdentifier: contextIdentifier, context: context)
+    try send(operation: query, cachePolicy: cachePolicy, context: context)
   }
 
   public func send<Mutation: GraphQLMutation>(
     mutation: Mutation,
     cachePolicy: CachePolicy,
-    contextIdentifier: UUID?,
     context: (any RequestContext)?
   ) throws -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error> {
-    try send(operation: mutation, cachePolicy: cachePolicy, contextIdentifier: contextIdentifier, context: context)
+    try send(operation: mutation, cachePolicy: cachePolicy, context: context)
   }
 
   public func send<Subscription: GraphQLSubscription>(
     subscription: Subscription,
     cachePolicy: CachePolicy,
-    contextIdentifier: UUID?,
     context: (any RequestContext)?
   ) throws -> AsyncThrowingStream<GraphQLResult<Subscription.Data>, any Error> {
-    try send(operation: subscription, cachePolicy: cachePolicy, contextIdentifier: contextIdentifier, context: context)
+    try send(operation: subscription, cachePolicy: cachePolicy, context: context)
   }
 
   private func send<Operation: GraphQLOperation>(
     operation: Operation,
     cachePolicy: CachePolicy,
-    contextIdentifier: UUID? = nil,
     context: (any RequestContext)? = nil
   ) throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
     if let error = self.error {
@@ -472,7 +468,7 @@ extension WebSocketTransport: SubscriptionNetworkTransport {
 
     #warning("TODO: stream never finishes. WebSocketTask does not report subscription termination.")
     return AsyncThrowingStream { continuation in
-      let wsTask = WebSocketTask(self, operation) { [weak store, contextIdentifier] result in
+      let wsTask = WebSocketTask(self, operation) { [weak store] result in
         do {
           try Task.checkCancellation()
           
@@ -489,7 +485,7 @@ extension WebSocketTransport: SubscriptionNetworkTransport {
               return
             }
             
-            try await store.publish(records: records, identifier: contextIdentifier)
+            try await store.publish(records: records)
             continuation.yield(graphQLResult)
             
           } else {
