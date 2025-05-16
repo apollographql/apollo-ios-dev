@@ -62,29 +62,7 @@ public class WebSocketTransport: @unchecked Sendable {
     set { config.$reconnect.mutate { $0 = newValue } }
   }
 
-  /// - NOTE: Setting this won't override immediately if the socket is still connected, only on reconnection.
-  public var clientName: String {
-    get { config.clientName }
-    set {
-      config.clientName = newValue
-      self.addApolloClientHeaders(to: &self.websocket.request)
-    }
-  }
-
-  /// - NOTE: Setting this won't override immediately if the socket is still connected, only on reconnection.
-  public var clientVersion: String {
-    get { config.clientVersion }
-    set {
-      config.clientVersion = newValue
-      self.addApolloClientHeaders(to: &self.websocket.request)
-    }
-  }
-
-  public struct Configuration {
-    /// The client name to use for this client. Defaults to `Self.defaultClientName`
-    public fileprivate(set) var clientName: String
-    /// The client version to use for this client. Defaults to `Self.defaultClientVersion`.
-    public fileprivate(set) var clientVersion: String
+  public struct Configuration: Sendable {
     /// Whether to auto reconnect when websocket looses connection. Defaults to true.
     @Atomic public var reconnect: Bool
     /// How long to wait before attempting to reconnect. Defaults to half a second.
@@ -98,25 +76,26 @@ public class WebSocketTransport: @unchecked Sendable {
     /// [optional]The payload to send on connection. Defaults to an empty `JSONEncodableDictionary`.
     public fileprivate(set) var connectingPayload: JSONEncodableDictionary?
     /// The `RequestBodyCreator` to use when serializing requests. Defaults to an `ApolloRequestBodyCreator`.
-    public let requestBodyCreator: any RequestBodyCreator
+    public let requestBodyCreator: any JSONRequestBodyCreator
     /// The `OperationMessageIdCreator` used to generate a unique message identifier per request.
     /// Defaults to `ApolloSequencedOperationMessageIdCreator`.
     public let operationMessageIdCreator: any OperationMessageIdCreator
+    /// The telemetry metadata about the client. This is used by GraphOS Studio's
+    /// [client awareness](https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation)
+    /// feature.
+    public let clientAwarenessMetadata: ClientAwarenessMetadata
 
     /// The designated initializer
     public init(
-      clientName: String = WebSocketTransport.defaultClientName,
-      clientVersion: String = WebSocketTransport.defaultClientVersion,
       reconnect: Bool = true,
       reconnectionInterval: TimeInterval = 0.5,
       allowSendingDuplicates: Bool = true,
       connectOnInit: Bool = true,
       connectingPayload: JSONEncodableDictionary? = [:],
-      requestBodyCreator: any RequestBodyCreator = ApolloRequestBodyCreator(),
-      operationMessageIdCreator: any OperationMessageIdCreator = ApolloSequencedOperationMessageIdCreator()
+      requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator(),
+      operationMessageIdCreator: any OperationMessageIdCreator = ApolloSequencedOperationMessageIdCreator(),
+      clientAwarenessMetadata: ClientAwarenessMetadata = ClientAwarenessMetadata()
     ) {
-      self.clientName = clientName
-      self.clientVersion = clientVersion
       self._reconnect = Atomic(wrappedValue: reconnect)
       self.reconnectionInterval = reconnectionInterval
       self.allowSendingDuplicates = allowSendingDuplicates
@@ -124,6 +103,7 @@ public class WebSocketTransport: @unchecked Sendable {
       self.connectingPayload = connectingPayload
       self.requestBodyCreator = requestBodyCreator
       self.operationMessageIdCreator = operationMessageIdCreator
+      self.clientAwarenessMetadata = clientAwarenessMetadata
     }
   }
 
@@ -166,7 +146,7 @@ public class WebSocketTransport: @unchecked Sendable {
     self.store = store
     self.config = config
 
-    self.addApolloClientHeaders(to: &self.websocket.request)
+    config.clientAwarenessMetadata.applyHeaders(to: &self.websocket.request)
 
     self.websocket.delegate = self
     // Keep the assignment of the callback queue before attempting to connect. There is the
@@ -337,7 +317,11 @@ public class WebSocketTransport: @unchecked Sendable {
     self.websocket.delegate = nil
   }
 
+<<<<<<< HEAD
   func sendHelper<Operation: GraphQLOperation>(operation: Operation, resultHandler: @escaping @Sendable (_ result: Result<JSONObject, any Error>) async -> Void) -> String? {
+=======
+  func sendHelper<Operation: GraphQLOperation>(operation: Operation, resultHandler: @escaping @Sendable (_ result: Result<JSONObject, any Error>) -> Void) -> String? {
+>>>>>>> b42f6fc6 (Apply Client awarness configuration to other network transports)
     let body = config.requestBodyCreator.requestBody(
       for: operation,
       sendQueryDocument: true,
@@ -450,8 +434,35 @@ extension URLRequest {
 
 // MARK: - NetworkTransport conformance
 
-extension WebSocketTransport: NetworkTransport {
-  public func send<Operation: GraphQLOperation>(
+extension WebSocketTransport: SubscriptionNetworkTransport {
+  public func send<Query: GraphQLQuery>(
+    query: Query,
+    cachePolicy: CachePolicy,
+    contextIdentifier: UUID?,
+    context: (any RequestContext)?
+  ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error> {
+    try send(operation: query, cachePolicy: cachePolicy, contextIdentifier: contextIdentifier, context: context)
+  }
+
+  public func send<Mutation: GraphQLMutation>(
+    mutation: Mutation,
+    cachePolicy: CachePolicy,
+    contextIdentifier: UUID?,
+    context: (any RequestContext)?
+  ) throws -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error> {
+    try send(operation: mutation, cachePolicy: cachePolicy, contextIdentifier: contextIdentifier, context: context)
+  }
+
+  public func send<Subscription: GraphQLSubscription>(
+    subscription: Subscription,
+    cachePolicy: CachePolicy,
+    contextIdentifier: UUID?,
+    context: (any RequestContext)?
+  ) throws -> AsyncThrowingStream<GraphQLResult<Subscription.Data>, any Error> {
+    try send(operation: subscription, cachePolicy: cachePolicy, contextIdentifier: contextIdentifier, context: context)
+  }
+
+  private func send<Operation: GraphQLOperation>(
     operation: Operation,
     cachePolicy: CachePolicy,
     contextIdentifier: UUID? = nil,
@@ -608,6 +619,21 @@ extension WebSocketTransport: WebSocketClientDelegate {
 
   public func websocketDidReceiveData(socket: any WebSocketClient, data: Data) {
     self.processMessage(data: data)
+  }
+
+}
+
+// MARK: - Deprecations
+extension WebSocketTransport {
+
+  @available(*, deprecated, renamed: "config.clientAwarenessMetadata.clientApplicationName")
+  public var clientName: String {
+    config.clientAwarenessMetadata.clientApplicationName ?? ""
+  }
+
+  @available(*, deprecated, renamed: "config.clientAwarenessMetadata.clientApplicationVersion")
+  public var clientVersion: String {
+    config.clientAwarenessMetadata.clientApplicationVersion ?? ""
   }
 
 }
