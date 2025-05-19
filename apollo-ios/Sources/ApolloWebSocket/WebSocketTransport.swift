@@ -486,7 +486,7 @@ extension WebSocketTransport: NetworkTransport {
                 completionHandler(.success(graphQLResult))
 
               case let .failure(error):
-                callCompletion(with: .failure(error))
+                completionHandler(.failure(error))
               }
             }
 
