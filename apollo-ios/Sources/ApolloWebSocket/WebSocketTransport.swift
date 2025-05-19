@@ -454,7 +454,7 @@ extension WebSocketTransport: NetworkTransport {
     callbackQueue: DispatchQueue = .main,
     completionHandler: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) -> any Cancellable {
     
-      func callCompletion(with result: Result<GraphQLResult<Operation.Data>, any Error>) {
+    func callCompletion(with result: Result<GraphQLResult<Operation.Data>, any Error>) {
       callbackQueue.async {
         completionHandler(result)
       }
