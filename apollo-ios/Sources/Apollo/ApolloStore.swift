@@ -7,7 +7,7 @@ public typealias DidChangeKeysFunc = (Set<CacheKey>, UUID?) -> Void
 
 /// The `ApolloStoreSubscriber` provides a means to observe changes to items in the ApolloStore.
 /// This protocol is available for advanced use cases only. Most users will prefer using `ApolloClient.watch(query:)`.
-public protocol ApolloStoreSubscriber: AnyObject {
+public protocol ApolloStoreSubscriber: AnyObject, Sendable {
   
   /// A callback that can be received by subscribers when keys are changed within the database
   ///
@@ -21,7 +21,8 @@ public protocol ApolloStoreSubscriber: AnyObject {
 }
 
 /// The `ApolloStore` class acts as a local cache for normalized GraphQL results.
-public class ApolloStore {
+#warning("TODO: temp @unchecked Sendable to move forward; is not yet thread safe")
+public class ApolloStore: @unchecked Sendable {
   private let cache: any NormalizedCache
   private let queue: DispatchQueue
 
@@ -178,16 +179,16 @@ public class ApolloStore {
     resultHandler: @escaping GraphQLResultHandler<Operation.Data>
   ) {
     withinReadTransaction({ transaction in
-      let (data, dependentKeys) = try transaction.readObject(
+      let (dataDict, dependentKeys) = try transaction.readObject(
         ofType: Operation.Data.self,
         withKey: CacheReference.rootCacheReference(for: Operation.operationType).key,
         variables: operation.__variables,
-        accumulator: zip(GraphQLSelectionSetMapper<Operation.Data>(),
+        accumulator: zip(DataDictMapper(),
                          GraphQLDependencyTracker())
       )
       
       return GraphQLResult(
-        data: data,
+        data: Operation.Data(_dataDict: dataDict),
         extensions: nil,
         errors: nil,
         source:.cache,
@@ -229,12 +230,13 @@ public class ApolloStore {
       withKey key: CacheKey,
       variables: GraphQLOperation.Variables? = nil
     ) throws -> SelectionSet {
-      return try self.readObject(
+      let dataDict = try self.readObject(
         ofType: type,
         withKey: key,
         variables: variables,
-        accumulator: GraphQLSelectionSetMapper<SelectionSet>()
+        accumulator: DataDictMapper()
       )
+      return type.init(_dataDict: dataDict)
     }
 
     func readObject<SelectionSet: RootSelectionSet, Accumulator: GraphQLResultAccumulator>(
@@ -289,14 +291,15 @@ public class ApolloStore {
       variables: GraphQLOperation.Variables? = nil,
       _ body: (inout SelectionSet) throws -> Void
     ) throws {
-      var object = try readObject(
+      let dataDict = try readObject(
         ofType: type,
         withKey: key,
         variables: variables,
-        accumulator: GraphQLSelectionSetMapper<SelectionSet>(
+        accumulator: DataDictMapper(
           handleMissingValues: .allowForOptionalFields
         )
       )
+      var object = SelectionSet(_dataDict: dataDict)
 
       try body(&object)
       try write(selectionSet: object, withKey: key, variables: variables)

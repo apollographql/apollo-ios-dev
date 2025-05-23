@@ -48,7 +48,7 @@ class WebSocketTransportTests: XCTestCase {
     let exp = expectation(description: "Waiting for reconnect")
 
     mockWebSocketDelegate.didReceiveMessage = { message in
-      let json = try? JSONSerializationFormat.deserialize(data: message.data(using: .utf8)!) as? JSONObject
+      let json = try? JSONSerializationFormat.deserialize(data: message.data(using: .utf8)!) as JSONObject
       guard let payload = json?["payload"] as? JSONObject, (json?["type"] as? String) == "connection_init" else {
         return
       }

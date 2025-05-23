@@ -56,9 +56,10 @@ public struct OperationDefinition: Sendable {
 /// A unique identifier used as a key to map a deferred selection set type to an incremental
 /// response label and path.
 public struct DeferredFragmentIdentifier: Hashable {
-  let label: String
-  let fieldPath: [String]
+  public let label: String
+  public let fieldPath: [String]
 
+  @inlinable
   public init(label: String, fieldPath: [String]) {
     self.label = label
     self.fieldPath = fieldPath
@@ -67,7 +68,7 @@ public struct DeferredFragmentIdentifier: Hashable {
 
 // MARK: - GraphQLOperation
 
-public protocol GraphQLOperation: AnyObject, Hashable {
+public protocol GraphQLOperation: Sendable, Hashable {
   typealias Variables = [String: any GraphQLOperationVariableValue]
 
   static var operationName: String { get }
@@ -88,12 +89,12 @@ public extension GraphQLOperation {
     return nil
   }
 
-  static func deferredSelectionSetType<T: GraphQLOperation>(
-    for operation: T.Type,
+  @inlinable
+  static func deferredSelectionSetType(
     withLabel label: String,
     atFieldPath fieldPath: [String]
   ) -> (any SelectionSet.Type)? {
-    return T.deferredFragments?[DeferredFragmentIdentifier(label: label, fieldPath: fieldPath)]
+    return Self.deferredFragments?[DeferredFragmentIdentifier(label: label, fieldPath: fieldPath)]
   }
 
   static var hasDeferredFragments: Bool {
@@ -109,7 +110,13 @@ public extension GraphQLOperation {
   }
 
   static func ==(lhs: Self, rhs: Self) -> Bool {
-    lhs.__variables?._jsonEncodableValue?._jsonValue == rhs.__variables?._jsonEncodableValue?._jsonValue
+    switch (lhs.__variables, rhs.__variables) {
+    case (.none, .none): return true
+    case (.some, .none), (.none, .some): return false
+    case let (.some(lhsVariables), .some(rhsVariables)):
+      return AnyHashable(lhsVariables._jsonEncodableObject._jsonValue) ==
+      AnyHashable(rhsVariables._jsonEncodableObject._jsonValue)
+    }
   }
 }
 

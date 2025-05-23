@@ -1,6 +1,6 @@
 import Foundation
 #if !COCOAPODS
-import ApolloAPI
+@_spi(Internal) import ApolloAPI
 #endif
 
 @_spi(Execution)
@@ -413,31 +413,29 @@ public final class GraphQLExecutor<Source: GraphQLExecutionSource> {
     asType returnType: Selection.Field.OutputType,
     accumulator: Accumulator
   ) -> PossiblyDeferred<Accumulator.PartialResult> {
-    guard let value else {
+    switch (value.asNullable, returnType) {
+    case (.none, _):
       return PossiblyDeferred { try accumulator.acceptMissingValue(info: fieldInfo) }
-    }
 
-    if value is NSNull && returnType.isNullable {
+    case (.null, .nonNull):
+      return .immediate(.failure(JSONDecodingError.nullValue))
+
+    case (.null, _):
       return PossiblyDeferred { try accumulator.acceptNullValue(info: fieldInfo) }
-    }
 
-    switch returnType {
-    case .nonNull where value is NSNull:
-        return .immediate(.failure(JSONDecodingError.nullValue))
-
-    case let .nonNull(innerType):
+    case let (.some(value), .nonNull(innerType)):
       return complete(fields: fieldInfo,
                       withValue: value,
                       asType: innerType,
                       accumulator: accumulator)
 
-    case .scalar:
+    case let (.some(value), .scalar):
       return PossiblyDeferred { try accumulator.accept(scalar: value, info: fieldInfo) }
 
-    case .customScalar:
+    case let (.some(value), .customScalar):
       return PossiblyDeferred { try accumulator.accept(customScalar: value, info: fieldInfo) }
 
-    case .list(let innerType):
+    case let (.some(value), .list(innerType)):
       guard let array = value as? [JSONValue] else {
         return PossiblyDeferred { throw JSONDecodingError.wrongType }
       }
@@ -473,8 +471,9 @@ public final class GraphQLExecutor<Source: GraphQLExecutionSource> {
       return lazilyEvaluateAll(completedArray).map {
         try accumulator.accept(list: $0, info: fieldInfo)
       }
-    case let .object(rootSelectionSetType):
-      guard let object = value as? Source.RawObjectData else {
+
+    case let (.some(value), .object(rootSelectionSetType)):
+      guard let object = value as! AnyHashable as? Source.RawObjectData else {
         return PossiblyDeferred { throw JSONDecodingError.wrongType }
       }
 

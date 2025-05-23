@@ -82,9 +82,9 @@ class SelectionSetTests: XCTestCase {
     expect(actual.name).to(beNil())
   }
 
-  func test__selection_givenOptionalField_givenNilValue__returnsNil() {
+  func test__selection_givenOptionalField_givenNilValue__returnsNil() throws {
     // given
-    class Hero: MockSelectionSet {
+    final class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
       override class var __selections: [Selection] {[
@@ -98,10 +98,10 @@ class SelectionSetTests: XCTestCase {
     let object: JSONObject = [
       "__typename": "Human",
       "name": String?.none
-    ]
+    ] 
 
     // when
-    let actual = try! Hero(data: object)
+    let actual = try Hero(data: object)
 
     // then
     expect(actual.name).to(beNil())
@@ -111,7 +111,7 @@ class SelectionSetTests: XCTestCase {
 
   func test__selection__nestedArrayOfScalar_nonNull_givenValue__returnsValue() {
     // given
-    class Hero: MockSelectionSet {
+    final class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
 
       override class var __selections: [Selection] {[
@@ -161,7 +161,7 @@ class SelectionSetTests: XCTestCase {
 
     let object: JSONObject = [
       "__typename": "Human",
-      "friend": friendData
+      "friend": friendData as JSONValue
     ]
 
     let expected = try! Hero.Friend(data: friendData)
@@ -190,7 +190,7 @@ class SelectionSetTests: XCTestCase {
 
     let object: JSONObject = [
       "__typename": "Human",
-      "friend": friendData
+      "friend": friendData as JSONValue
     ]
 
     let expected = try! Hero(data: friendData, variables: nil)
@@ -241,7 +241,7 @@ class SelectionSetTests: XCTestCase {
 
     let object: JSONObject = [
       "__typename": "Human",
-      "friend": DataDict._NullValue
+      "friend": NSNull()
     ]
 
     // when
@@ -271,9 +271,9 @@ class SelectionSetTests: XCTestCase {
       "friends": [
         [
           "__typename": "Human",
-          "friends": []
-        ]
-      ]
+          "friends": [] as JSONValue
+        ] as JSONValue
+      ] as JSONValue
     ]
 
     let expected = try! Hero(
@@ -309,9 +309,9 @@ class SelectionSetTests: XCTestCase {
       "friends": [
         [
           "__typename": "Human",
-          "friends": []
-        ]
-      ]
+          "friends": [] as JSONValue
+        ] as JSONValue
+      ] as JSONValue
     ]
 
     let expected = try! Hero(
@@ -345,10 +345,10 @@ class SelectionSetTests: XCTestCase {
     let object: JSONObject = [
       "__typename": "Human",
       "friends": [
-        Hero?.none,
+        Hero?.none as Any,
         ["__typename": "Human", "friends": []],
-        Hero?.none
-      ]
+        Hero?.none as Any
+      ] as JSONValue
     ]
 
     let expected = try! Hero(
@@ -385,8 +385,8 @@ class SelectionSetTests: XCTestCase {
         [
           "__typename": "Human",
           "friends": []
-        ]
-      ]
+        ] as JSONValue
+      ] as JSONValue
     ]
 
     let expected = try! Hero(
@@ -449,8 +449,8 @@ class SelectionSetTests: XCTestCase {
         [
           "__typename": "Human",
           "nestedList": [[]]
-        ]
-      ]]
+        ] as JSONValue
+      ]] as JSONValue
     ]
 
     let expected = try! Hero(
@@ -488,7 +488,7 @@ class SelectionSetTests: XCTestCase {
           "__typename": "Human",
           "nestedList": [[]]
         ]
-      ]]
+      ]] as JSONValue
     ]
 
     let expected = try! Hero(
@@ -521,16 +521,16 @@ class SelectionSetTests: XCTestCase {
 
     let nestedObjectData: JSONObject = [
       "__typename": "Human",
-      "nestedList": [[]]
+      "nestedList": [[]] as JSONValue
     ]
 
     let object: JSONObject = [
       "__typename": "Human",
       "nestedList": [
-        [Hero]?.none,
+        [Hero]?.none as JSONValue,
         [nestedObjectData],
-        [Hero]?.none,
-      ]
+        [Hero]?.none as JSONValue,
+      ] as JSONValue
     ]
 
     let expectedItem = try! Hero(data: nestedObjectData, variables: nil)
@@ -560,9 +560,9 @@ class SelectionSetTests: XCTestCase {
       "nestedList": [[
         [
           "__typename": "Human",
-          "nestedList": [[]]
+          "nestedList": [[]] 
         ]
-      ]]
+      ]] as JSONValue
     ]
     
     let expected = try! Hero(
@@ -600,7 +600,7 @@ class SelectionSetTests: XCTestCase {
           "__typename": "Human",
           "nestedList": [[]]
         ]
-      ]]
+      ]] as JSONValue
     ]
 
     let expected = try! Hero(
@@ -1474,20 +1474,12 @@ class SelectionSetTests: XCTestCase {
       return
     }
     expect(nameValue).to(beNil())
-    
-    if DataDict._AnyHashableCanBeCoerced {
-      guard let nameValue = nameValue as? String? else {
-        fail("name should be Optional.some(Optional.none).")
-        return
-      }
-      expect(nameValue).to(beNil())
-    } else {
-      guard let nameValue = nameValue.base as? String? else {
-        fail("name should be Optional.some(Optional.none).")
-        return
-      }
-      expect(nameValue).to(beNil())
+
+    guard let nameValue = nameValue as? String? else {
+      fail("name should be Optional.some(Optional.none).")
+      return
     }
+    expect(nameValue).to(beNil())
   }
 
   @MainActor
@@ -1557,20 +1549,11 @@ class SelectionSetTests: XCTestCase {
     }
     expect(childValue).to(beNil())
 
-    if DataDict._AnyHashableCanBeCoerced {
-      guard let childValue = childValue as? Hero.Child? else {
-        fail("child should be Optional.some(Optional.none).")
-        return
-      }
-      expect(childValue).to(beNil())
-
-    } else {
-      guard let childValue = childValue.base as? Hero.Child? else {
-        fail("child should be Optional.some(Optional.none).")
-        return
-      }
-      expect(childValue).to(beNil())
+    guard let childValue = childValue as? Hero.Child? else {
+      fail("child should be Optional.some(Optional.none).")
+      return
     }
+    expect(childValue).to(beNil())
   }
 
   @MainActor

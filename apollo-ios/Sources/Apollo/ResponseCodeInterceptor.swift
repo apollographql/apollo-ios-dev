@@ -38,8 +38,10 @@ public struct ResponseCodeInterceptor: ApolloInterceptor {
       switch self {
       case .invalidResponseCode(_, let rawData):
         if let jsonRawData = rawData,
-           let jsonData = try? JSONSerialization.jsonObject(with: jsonRawData, options: .allowFragments) as? JSONObject {
-          return GraphQLError(jsonData)
+           let jsonData = try? (JSONSerialization.jsonObject(with: jsonRawData, options: .allowFragments) as! JSONValue),
+           let jsonObject = try? JSONObject(_jsonValue: jsonData)
+        {
+          return GraphQLError(jsonObject)
         }
         return nil
       }
@@ -53,9 +55,8 @@ public struct ResponseCodeInterceptor: ApolloInterceptor {
     chain: any RequestChain,
     request: HTTPRequest<Operation>,
     response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
-    
-    
+    completion: @escaping GraphQLResultHandler<Operation.Data>
+  ) {
     guard response?.httpResponse.isSuccessful == true else {
       let error = ResponseCodeError.invalidResponseCode(
         response: response?.httpResponse,

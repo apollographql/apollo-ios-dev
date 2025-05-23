@@ -3,11 +3,12 @@ import Foundation
 import ApolloAPI
 #endif
 
+#warning("TODO: remove unchecked when making interceptor functions async.")
 /// An interceptor to enforce a maximum number of retries of any `HTTPRequest`
-public class MaxRetryInterceptor: ApolloInterceptor {
-  
+public class MaxRetryInterceptor: ApolloInterceptor, @unchecked Sendable {
+
   private let maxRetries: Int
-  private var hitCount = 0
+  @Atomic private var hitCount = 0
 
   public var id: String = UUID().uuidString
   
@@ -33,7 +34,8 @@ public class MaxRetryInterceptor: ApolloInterceptor {
     chain: any RequestChain,
     request: HTTPRequest<Operation>,
     response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
+    completion: @escaping GraphQLResultHandler<Operation.Data>
+  ) {
     guard self.hitCount <= self.maxRetries else {
       let error = RetryError.hitMaxRetryCount(
         count: self.maxRetries,
@@ -50,7 +52,7 @@ public class MaxRetryInterceptor: ApolloInterceptor {
       return
     }
     
-    self.hitCount += 1
+      self.$hitCount.mutate { $0 += 1 } 
     chain.proceedAsync(
       request: request,
       response: response,

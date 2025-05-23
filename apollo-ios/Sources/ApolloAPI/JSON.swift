@@ -1,17 +1,24 @@
 /// Represents a value in a ``JSONObject``
 ///
-/// Making ``JSONValue`` an `AnyHashable` enables comparing ``JSONObject``s
-/// in `Equatable` conformances.
-public typealias JSONValue = AnyHashable
+/// - precondition: A `JSONValue` must be values types that are valid for JSON
+/// serialization and must be both `Hashable` and `Sendable`. This typealias does not validate
+/// that the its values are valid JSON. It functions only as an indicator of the semantic intentions
+/// of the underlying value.
+public typealias JSONValue = any Sendable & Hashable
 
 /// Represents a JSON Dictionary
+///
+/// - precondition: A `JSONObject` must only contain values types that are valid for JSON
+/// serialization and must be both `Hashable` and `Sendable`. This typealias does not validate
+/// that the its values are valid JSON. It functions only as an indicator of the semantic intentions
+/// of the underlying value.
 public typealias JSONObject = [String: JSONValue]
 
 /// Represents a Dictionary that can be converted into a ``JSONObject``
 ///
 /// To convert to a ``JSONObject``:
 /// ```swift
-/// dictionary.compactMapValues { $0.jsonValue }
+/// dictionary.mapValues { $0.jsonValue }
 /// ```
 public typealias JSONEncodableDictionary = [String: any JSONEncodable]
 
@@ -19,7 +26,7 @@ public typealias JSONEncodableDictionary = [String: any JSONEncodable]
 ///
 /// This is used to interoperate between the type-safe Swift models and the `JSON` in a
 /// GraphQL network response/request or the `NormalizedCache`.
-public protocol JSONDecodable: AnyHashableConvertible {
+public protocol JSONDecodable: Sendable {
 
   /// Intializes the conforming type from a ``JSONValue``.
   ///
@@ -38,7 +45,7 @@ public protocol JSONDecodable: AnyHashableConvertible {
 ///
 /// This is used to interoperate between the type-safe Swift models and the `JSON` in a
 /// GraphQL network response/request or the `NormalizedCache`.
-public protocol JSONEncodable {
+public protocol JSONEncodable: Sendable {
 
   /// Converts the type into a ``JSONValue`` that can be sent in a GraphQL network request or
   /// stored in the `NormalizedCache`.
