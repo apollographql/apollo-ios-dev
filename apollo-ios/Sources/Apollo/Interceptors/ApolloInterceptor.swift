@@ -8,11 +8,11 @@ public struct InterceptorResult<Operation: GraphQLOperation>: Sendable, Equatabl
 
   public let response: HTTPURLResponse
 
-  /// This is the data for a single chunk of the response bondy.
+  /// This is the data for a single chunk of the response body.
   ///
   /// If this is not a multipart response, this will include the data for the entire response body.
   ///
-  /// If this is a multipart response, the response chunk will only one chunk.
+  /// If this is a multipart response, the response chunk will only be one chunk.
   /// The `InterceptorResultStream` will return multiple results – one for each multipart chunk.
   public let rawResponseChunk: Data
 

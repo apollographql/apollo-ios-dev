@@ -65,7 +65,7 @@ extension GraphQLRequest {
     self.additionalHeaders.merge(headers) { (_, new) in new }
   }
 
-  /// A helper method that dds the Apollo client headers to the given request
+  /// A helper method that adds the Apollo client headers to the given request
   /// These header values are used for telemetry to track the source of client requests.
   ///
   /// This should be called during setup of any implementation of `GraphQLRequest` to provide these
