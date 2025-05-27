@@ -104,24 +104,6 @@ public enum ApolloTarget {
   }
     
     public var deploymentTargets: DeploymentTargets {
-        switch self {
-        case .animalKingdomAPI,
-             .apolloWrapper,
-             .gitHubAPI,
-             .starWarsAPI,
-             .subscriptionAPI,
-             .uploadAPI:
-            return DeploymentTargets(macOS: "10.15")
-        case .apolloInternalTestHelpers,
-             .apolloPerformanceTests,             
-             .apolloTests,
-             .apolloPaginationTests:
-            return DeploymentTargets(macOS: "12.0")
-        case .apolloCodegenInternalTestHelpers,
-             .apolloCodegenLibWrapper,
-             .apolloCodegenTests,
-             .codegenCLITests:
-          return DeploymentTargets(macOS: "12.0")
-        }
+      return DeploymentTargets(macOS: "12.0")        
     }
 }

@@ -16,8 +16,8 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     _ selectionSet: S.Type,
     with variables: GraphQLOperation.Variables? = nil,
     from object: JSONObject
-  ) throws -> RecordSet {
-    return try GraphQLExecutor_ResultNormalizer_FromResponse_Tests.executor.execute(
+  ) async throws -> RecordSet {
+    return try await GraphQLExecutor_ResultNormalizer_FromResponse_Tests.executor.execute(
       selectionSet: selectionSet,
       on: object,
       withRootCacheReference: CacheReference.RootQuery,
@@ -28,7 +28,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
 
   // MARK: - Tests
 
-  func test__execute__givenObjectWithNoCacheKey_normalizesRecordToPathFromQueryRoot() throws {
+  func test__execute__givenObjectWithNoCacheKey_normalizesRecordToPathFromQueryRoot() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -47,7 +47,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
@@ -57,7 +57,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertEqual(hero["name"] as? String, "R2-D2")
   }
   
-  func test__execute__givenObjectWithNoCacheKey_forFieldWithStringArgument_normalizesRecordToPathFromQueryRootIncludingArgument() throws {
+  func test__execute__givenObjectWithNoCacheKey_forFieldWithStringArgument_normalizesRecordToPathFromQueryRootIncludingArgument() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -78,7 +78,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, with: variables, from: object)
+    let records = try await normalizeRecords(GivenSelectionSet.self, with: variables, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero(episode:JEDI)"] as? CacheReference,
@@ -88,7 +88,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertEqual(hero["name"] as? String, "R2-D2")
   }
 
-  func test__execute__givenObjectWithNoCacheKey_forFieldWithEnumArgument_normalizesRecordToPathFromQueryRootIncludingArgument() throws {
+  func test__execute__givenObjectWithNoCacheKey_forFieldWithEnumArgument_normalizesRecordToPathFromQueryRootIncludingArgument() async throws {
     // given
     enum MockEnum: String, EnumType {
       case NEWHOPE
@@ -115,7 +115,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, with: variables, from: object)
+    let records = try await normalizeRecords(GivenSelectionSet.self, with: variables, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero(episode:EMPIRE)"] as? CacheReference,
@@ -125,7 +125,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertEqual(hero["name"] as? String, "R2-D2")
   }
 
-  func test__execute__givenObjectWithNoCacheKey_andNestedArrayOfObjectsWithNoCacheKey_normalizesRecordsToPathsFromQueryRoot() throws {
+  func test__execute__givenObjectWithNoCacheKey_andNestedArrayOfObjectsWithNoCacheKey_normalizesRecordsToPathsFromQueryRoot() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -159,7 +159,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
@@ -177,7 +177,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   }
 
   @MainActor
-  func test__execute__givenObjectWithCacheKey_andNestedArrayOfObjectsWithCacheKey_normalizesRecordsToIndividualReferences() throws {
+  func test__execute__givenObjectWithCacheKey_andNestedArrayOfObjectsWithCacheKey_normalizesRecordsToIndividualReferences() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -216,7 +216,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
@@ -239,7 +239,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertEqual(leia["name"] as? String, "Leia Organa")
   }
   
-  func test__execute__givenFieldForObjectWithNoCacheKey_andAliasedFieldForSameFieldName_normalizesRecordsForBothFieldsIntoOneRecord() throws {
+  func test__execute__givenFieldForObjectWithNoCacheKey_andAliasedFieldForSameFieldName_normalizesRecordsForBothFieldsIntoOneRecord() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -267,7 +267,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let hero = try XCTUnwrap(records["QUERY_ROOT.hero"])
@@ -277,7 +277,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   }
 
   @MainActor
-  func test__execute__givenDifferentAliasedFieldsOnTwoTypeCasesWithSameAlias_givenIsFirstType_hasRecordWithFieldValueUsingNonaliasedFieldName() throws {
+  func test__execute__givenDifferentAliasedFieldsOnTwoTypeCasesWithSameAlias_givenIsFirstType_hasRecordWithFieldValueUsingNonaliasedFieldName() async throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -325,7 +325,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let hero = try XCTUnwrap(records["QUERY_ROOT.hero"])
@@ -335,7 +335,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   }
 
   @MainActor
-  func test__execute__givenDifferentAliasedFieldsOnTwoTypeCasesWithSameAlias_givenIsSecondType_hasRecordWithFieldValueUsingNonaliasedFieldName() throws {
+  func test__execute__givenDifferentAliasedFieldsOnTwoTypeCasesWithSameAlias_givenIsSecondType_hasRecordWithFieldValueUsingNonaliasedFieldName() async throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -384,7 +384,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let hero = try XCTUnwrap(records["QUERY_ROOT.hero"])
@@ -394,7 +394,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   }
 
   @MainActor
-  func test__execute__givenSameFieldWithDifferentArgumentValueOnSameNestedFieldOnTwoTypeCases_givenIsFirstType_hasRecordForFieldNameWithFirstTypesArgument() throws {
+  func test__execute__givenSameFieldWithDifferentArgumentValueOnSameNestedFieldOnTwoTypeCases_givenIsFirstType_hasRecordForFieldNameWithFirstTypesArgument() async throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -458,7 +458,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let han = try XCTUnwrap(records["QUERY_ROOT.hero.friend"])
@@ -468,7 +468,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   }
 
   @MainActor
-  func test__execute__givenSameFieldWithDifferentArgumentValueOnSameNestedFieldOnTwoTypeCases_givenIsSecondType_hasRecordForFieldNameWithFirstTypesArgument() throws {
+  func test__execute__givenSameFieldWithDifferentArgumentValueOnSameNestedFieldOnTwoTypeCases_givenIsSecondType_hasRecordForFieldNameWithFirstTypesArgument() async throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -532,7 +532,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let luke = try XCTUnwrap(records["QUERY_ROOT.hero.friend"])
@@ -544,7 +544,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   // MARK: - @typePolicy Tests
 
   @MainActor
-  func test__execute__givenObjectOfTypeWithKeyFields_normalizesRecordsToReference() throws {
+  func test__execute__givenObjectOfTypeWithKeyFields_normalizesRecordsToReference() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -576,7 +576,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
@@ -584,7 +584,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   }
 
   @MainActor
-  func test__execute__givenObjectOfUnknownType_forInterfaceFieldWithKeyFields_normalizesRecordsToReference() throws {
+  func test__execute__givenObjectOfUnknownType_forInterfaceFieldWithKeyFields_normalizesRecordsToReference() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
@@ -614,7 +614,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,

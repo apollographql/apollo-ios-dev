@@ -1,26 +1,50 @@
-import XCTest
-@testable import Nimble
-@testable import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
+import XCTest
 
-class AutomaticPersistedQueriesTests: XCTestCase {
+@testable import Apollo
+@testable import Nimble
+
+class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   private static let endpoint = TestURL.mockServer.url
 
+  var mockSession: MockURLSession!
+  var store: ApolloStore!
+  var provider: DefaultInterceptorProvider!
+
+  override func setUp() async throws {
+    try await super.setUp()
+    self.mockSession = MockURLSession(responseProvider: Self.self)
+    self.store = ApolloStore(cache: NoCache())
+    self.provider = DefaultInterceptorProvider(session: mockSession, store: store)
+  }
+
+  override func tearDown() async throws {
+    await Self.cleanUpRequestHandlers()
+    self.mockSession = nil
+    self.store = nil
+    self.provider = nil
+    try await super.tearDown()
+  }
+
   // MARK: - Mocks
-  class HeroNameSelectionSet: MockSelectionSet {
-    override class var __selections: [Selection] {[
-      .field("hero", Hero.self, arguments: ["episode": .variable("episode")])
-    ]}
+  final class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
+    override class var __selections: [Selection] {
+      [
+        .field("hero", Hero.self, arguments: ["episode": .variable("episode")])
+      ]
+    }
 
     var hero: Hero? { __data["hero"] }
 
-    class Hero: MockSelectionSet {
-      override class var __selections: [Selection] {[
-        .field("__typename", String.self),
-        .field("name", String.self),
-      ]}
+    final class Hero: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] {
+        [
+          .field("__typename", String.self),
+          .field("name", String.self),
+        ]
+      }
 
       var name: String { __data["name"] }
     }
@@ -32,7 +56,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
     case EMPIRE
   }
 
-  fileprivate class MockHeroNameQuery: MockQuery<HeroNameSelectionSet> {
+  fileprivate class MockHeroNameQuery: MockQuery<HeroNameSelectionSet>, @unchecked Sendable {
     override class var operationDocument: OperationDocument {
       .init(
         operationIdentifier: "f6e76545cd03aa21368d9969cb39447f6e836a16717823281803778e7805d671",
@@ -40,7 +64,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       )
     }
 
-    var episode: GraphQLNullable<MockEnum> {
+    nonisolated(unsafe) var episode: GraphQLNullable<MockEnum> {
       didSet {
         self.__variables = ["episode": episode]
       }
@@ -53,13 +77,26 @@ class AutomaticPersistedQueriesTests: XCTestCase {
     }
   }
 
-  fileprivate class APQMockMutation: MockMutation<MockSelectionSet> {
+  fileprivate final class APQMockMutation: MockMutation<MockSelectionSet>, @unchecked Sendable {
     override class var operationDocument: OperationDocument {
       .init(
         operationIdentifier: "4a1250de93ebcb5cad5870acf15001112bf27bb963e8709555b5ff67a1405374",
         definition: .init("APQMockMutation - Operation Definition")
       )
     }
+  }
+
+  private func mockResponseData() -> Data {
+    """
+    {
+      "data": {
+        "hero": {
+          "__typename": "Hero",
+          "name": "Luke"
+        }
+      }
+    }
+    """.data(using: .utf8)!
   }
 
   // MARK: - Helper Methods
@@ -75,23 +112,32 @@ class AutomaticPersistedQueriesTests: XCTestCase {
     column: UInt = #column
   ) throws {
     let location = SourceLocation(fileID: fileID, filePath: file, line: line, column: column)
+    let httpBody: Data?
+
+    if let bodyStream = request.httpBodyStream {
+      httpBody = try Data(reading: bodyStream)
+    } else {
+      httpBody = request.httpBody
+    }
+
     guard
-      let httpBody = request.httpBody,
-      let jsonBody = try? JSONSerializationFormat.deserialize(data: httpBody) as JSONObject else {
+      let httpBody = httpBody,
+      let jsonBody = try? JSONSerializationFormat.deserialize(data: httpBody) as JSONObject
+    else {
       fail(
         "httpBody invalid",
         location: location
       )
       return
     }
-    
+
     let queryString = jsonBody["query"] as? String
     if queryDocument {
       expect(file: file, line: line, queryString)
-      .to(equal(O.definition?.queryDocument))
+        .to(equal(O.definition?.queryDocument))
     }
-    
-    if let query = operation as? MockHeroNameQuery{
+
+    if let query = operation as? MockHeroNameQuery {
       if let variables = jsonBody["variables"] as? JSONObject {
 
         if let episode = query.episode.rawValue {
@@ -108,7 +154,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
         )
       }
     }
-    
+
     let ext = jsonBody["extensions"] as? JSONObject
     if persistedQuery {
       guard let ext = ext else {
@@ -118,7 +164,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
         )
         return
       }
-      
+
       guard let persistedQuery = ext["persistedQuery"] as? JSONObject else {
         fail(
           "persistedQuery is missing",
@@ -143,13 +189,12 @@ class AutomaticPersistedQueriesTests: XCTestCase {
         return
       }
 
-
       expect(file: file, line: line, version).to(equal(1))
 
       expect(file: file, line: line, sha256Hash).to(equal(O.operationIdentifier))
     }
   }
-  
+
   private func validateUrlParams(
     with request: URLRequest,
     query: MockHeroNameQuery,
@@ -178,7 +223,7 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       expect(file: file, line: line, queryString).to(beNil())
 
     }
-    
+
     if let variables = url.queryItemDictionary?["variables"] {
       let expectation = expect(file: file, line: line, variables)
       switch query.episode {
@@ -198,21 +243,21 @@ class AutomaticPersistedQueriesTests: XCTestCase {
         location: location
       )
     }
-    
+
     let ext = url.queryItemDictionary?["extensions"]
     if persistedQuery {
       guard
         let ext = ext,
         let data = ext.data(using: .utf8),
         let jsonBody = try? JSONSerializationFormat.deserialize(data: data) as JSONObject
-        else {
+      else {
         fail(
           "extensions json data should not be nil",
           location: location
         )
         return
       }
-      
+
       guard let persistedQuery = jsonBody["persistedQuery"] as? JSONObject else {
         fail(
           "persistedQuery is missing",
@@ -236,386 +281,455 @@ class AutomaticPersistedQueriesTests: XCTestCase {
         )
         return
       }
-      
+
       expect(file: file, line: line, version).to(equal(1))
 
       expect(file: file, line: line, sha256Hash).to(equal(MockHeroNameQuery.operationIdentifier))
     }
   }
 
-  
   // MARK: - Tests
-  
-  func testRequestBody() throws {
-    let mockClient = MockURLSessionClient()
-    let store = ApolloStore()
-    let provider = DefaultInterceptorProvider(client: mockClient, store: store)
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: Self.endpoint)
-    
-    let expectation = self.expectation(description: "Query sent")
+
+  func testRequestBody() async throws {
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: Self.endpoint
+    )
+
     let query = MockHeroNameQuery()
-    var lastRequest: URLRequest?
-    let _ = network.send(operation: query) { _ in
-      lastRequest = mockClient.lastRequest
-      expectation.fulfill()
+    nonisolated(unsafe) var lastRequest: URLRequest?
+
+    await Self.registerRequestHandler(for: Self.endpoint) {
+      lastRequest = $0
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
-    self.wait(for: [expectation], timeout: 1)
-    
+
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
-    
+
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
     XCTAssertEqual(request.httpMethod, "POST")
-    
-    try self.validatePostBody(with: request,
-                              operation: query,
-                              queryDocument: true)
+
+    try self.validatePostBody(
+      with: request,
+      operation: query,
+      queryDocument: true
+    )
   }
-  
-  func testRequestBodyWithVariable() throws {
-    let mockClient = MockURLSessionClient()
-    let store = ApolloStore()
-    let provider = DefaultInterceptorProvider(client: mockClient, store: store)
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: Self.endpoint)
-    
-    let expectation = self.expectation(description: "Query sent")
+
+  func testRequestBodyWithVariable() async throws {
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: Self.endpoint
+    )
+
     let query = MockHeroNameQuery(episode: .some(.JEDI))
-    var lastRequest: URLRequest?
-    let _ = network.send(operation: query) { _ in
-      lastRequest = mockClient.lastRequest
-      expectation.fulfill()
+    nonisolated(unsafe) var lastRequest: URLRequest?
+
+    await Self.registerRequestHandler(for: Self.endpoint) {
+      lastRequest = $0
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
-    self.wait(for: [expectation], timeout: 1)
-    
+
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
     XCTAssertEqual(request.httpMethod, "POST")
-    
-    try validatePostBody(with: request,
-                         operation: query,
-                         queryDocument: true)
+
+    try validatePostBody(
+      with: request,
+      operation: query,
+      queryDocument: true
+    )
   }
-  
-  
-  func testRequestBodyForAPQsWithVariable() throws {
-    let mockClient = MockURLSessionClient()
-    let store = ApolloStore()
-    let provider = DefaultInterceptorProvider(client: mockClient, store: store)
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: Self.endpoint,
-                                               autoPersistQueries: true)
-    
-    let expectation = self.expectation(description: "Query sent")
+
+  func testRequestBodyForAPQsWithVariable() async throws {
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: Self.endpoint,
+      apqConfig: .init(autoPersistQueries: true)
+    )
+
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
-    var lastRequest: URLRequest?
-    let _ = network.send(operation: query) { _ in
-      lastRequest = mockClient.lastRequest
-      expectation.fulfill()
+    nonisolated(unsafe) var lastRequest: URLRequest?
+
+    await Self.registerRequestHandler(for: Self.endpoint) {
+      lastRequest = $0
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
-    self.wait(for: [expectation], timeout: 1)
-    
+
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
-    
+
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
     XCTAssertEqual(request.httpMethod, "POST")
-    
-    try self.validatePostBody(with: request,
-                              operation: query,
-                              persistedQuery: true)
+
+    try self.validatePostBody(
+      with: request,
+      operation: query,
+      persistedQuery: true
+    )
   }
-  
-  func testMutationRequestBodyForAPQs() throws {
-    let mockClient = MockURLSessionClient()
-    let store = ApolloStore()
-    let provider = DefaultInterceptorProvider(client: mockClient, store: store)
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: Self.endpoint,
-                                               autoPersistQueries: true)
-    
-    let expectation = self.expectation(description: "Mutation sent")
+
+  func testMutationRequestBodyForAPQs() async throws {
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: Self.endpoint,
+      apqConfig: .init(autoPersistQueries: true)
+    )
+
     let mutation = APQMockMutation()
-    var lastRequest: URLRequest?
-    let _ = network.send(operation: mutation) { _ in
-      lastRequest = mockClient.lastRequest
-      expectation.fulfill()
+    nonisolated(unsafe) var lastRequest: URLRequest?
+
+    await Self.registerRequestHandler(for: Self.endpoint) {
+      lastRequest = $0
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
-    self.wait(for: [expectation], timeout: 1)
-    
+
+    _ = try await network.send(mutation: mutation, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
-    
+
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
     XCTAssertEqual(request.httpMethod, "POST")
 
-    try self.validatePostBody(with: request,
-                              operation: mutation,
-                              persistedQuery: true)
+    try self.validatePostBody(
+      with: request,
+      operation: mutation,
+      persistedQuery: true
+    )
   }
-  
-  func testQueryStringForAPQsUseGetMethod() throws {
-    let mockClient = MockURLSessionClient()
-    let store = ApolloStore()
-    let provider = DefaultInterceptorProvider(client: mockClient, store: store)
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: Self.endpoint,
-                                               autoPersistQueries: true,
-                                               useGETForPersistedQueryRetry: true)
 
-    let expectation = self.expectation(description: "Query sent")
+  func testQueryStringForAPQsUseGetMethod() async throws {
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: Self.endpoint,
+      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
+    )
+
     let query = MockHeroNameQuery()
-    var lastRequest: URLRequest?
-    let _ = network.send(operation: query) { _ in
-      lastRequest = mockClient.lastRequest
-      expectation.fulfill()
+    nonisolated(unsafe) var lastRequest: URLRequest?
+
+    await Self.registerRequestHandler(for: Self.endpoint) {
+      lastRequest = $0
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
-    self.wait(for: [expectation], timeout: 1)
-    
+
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
-    
-    try self.validateUrlParams(with: request,
-                               query: query,
-                               persistedQuery: true)
+
+    try self.validateUrlParams(
+      with: request,
+      query: query,
+      persistedQuery: true
+    )
   }
-  
-  func testQueryStringForAPQsUseGetMethodWithVariable() throws {
-    let mockClient = MockURLSessionClient()
-    let store = ApolloStore()
-    let provider = DefaultInterceptorProvider(client: mockClient, store: store)
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: Self.endpoint,
-                                               autoPersistQueries: true,
-                                               useGETForPersistedQueryRetry: true)
-    
-    let expectation = self.expectation(description: "Query sent")
+
+  func testQueryStringForAPQsUseGetMethodWithVariable() async throws {
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: Self.endpoint,
+      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
+    )
+
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
-    var lastRequest: URLRequest?
-    let _ = network.send(operation: query) { _ in
-      lastRequest = mockClient.lastRequest
-      expectation.fulfill()
+    nonisolated(unsafe) var lastRequest: URLRequest?
+
+    await Self.registerRequestHandler(for: Self.endpoint) {
+      lastRequest = $0
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
-    self.wait(for: [expectation], timeout: 1)
-    
+
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
-    
+
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
     XCTAssertEqual(request.httpMethod, "GET")
-    
-    try self.validateUrlParams(with: request,
-                               query: query,
-                               persistedQuery: true)
+
+    try self.validateUrlParams(
+      with: request,
+      query: query,
+      persistedQuery: true
+    )
   }
-  
-  func testUseGETForQueriesRequest() throws {
-    let mockClient = MockURLSessionClient()
-    let store = ApolloStore()
-    let provider = DefaultInterceptorProvider(client: mockClient, store: store)
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: Self.endpoint,
-                                               additionalHeaders: ["Authorization": "Bearer 1234"],
-                                               useGETForQueries: true)
-    
-    let expectation = self.expectation(description: "Query sent")
+
+  func testUseGETForQueriesRequest() async throws {
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: Self.endpoint,
+      additionalHeaders: ["Authorization": "Bearer 1234"],
+      useGETForQueries: true
+    )
+
     let query = MockHeroNameQuery()
-    var lastRequest: URLRequest?
-    let _ = network.send(operation: query) { _ in
-      lastRequest = mockClient.lastRequest
-      expectation.fulfill()
+    nonisolated(unsafe) var lastRequest: URLRequest?
+
+    await Self.registerRequestHandler(for: Self.endpoint) {
+      lastRequest = $0
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
-    self.wait(for: [expectation], timeout: 1)
-    
+
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
-    
+
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
     XCTAssertEqual(request.httpMethod, "GET")
     XCTAssertEqual(request.allHTTPHeaderFields!["Authorization"], "Bearer 1234")
-    
-    try self.validateUrlParams(with: request,
-                               query: query,
-                               queryDocument: true)
+
+    try self.validateUrlParams(
+      with: request,
+      query: query,
+      queryDocument: true
+    )
   }
-  
-  func testNotUseGETForQueriesRequest() throws {
-    let mockClient = MockURLSessionClient()
-    let store = ApolloStore()
-    let provider = DefaultInterceptorProvider(client: mockClient, store: store)
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: Self.endpoint)
-    
-    let expectation = self.expectation(description: "Query sent")
+
+  func testNotUseGETForQueriesRequest() async throws {
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: Self.endpoint
+    )
+
     let query = MockHeroNameQuery()
-    var lastRequest: URLRequest?
-    let _ = network.send(operation: query) { _ in
-      lastRequest = mockClient.lastRequest
-      expectation.fulfill()
+    nonisolated(unsafe) var lastRequest: URLRequest?
+
+    await Self.registerRequestHandler(for: Self.endpoint) {
+      lastRequest = $0
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
-    self.wait(for: [expectation], timeout: 1)
-    
+
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
-    
+
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
     XCTAssertEqual(request.httpMethod, "POST")
-    
-    try self.validatePostBody(with: request,
-                              operation: query,
-                              queryDocument: true)
+
+    try self.validatePostBody(
+      with: request,
+      operation: query,
+      queryDocument: true
+    )
   }
-  
-  func testNotUseGETForQueriesAPQsRequest() throws {
-    let mockClient = MockURLSessionClient()
-    let store = ApolloStore()
-    let provider = DefaultInterceptorProvider(client: mockClient, store: store)
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: Self.endpoint,
-                                               autoPersistQueries: true)
-    
-    let expectation = self.expectation(description: "Query sent")
+
+  func testNotUseGETForQueriesAPQsRequest() async throws {
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: Self.endpoint,
+      apqConfig: .init(autoPersistQueries: true)
+    )
+
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
-    var lastRequest: URLRequest?
-    let _ = network.send(operation: query) { _ in
-      lastRequest = mockClient.lastRequest
-      expectation.fulfill()
+    nonisolated(unsafe) var lastRequest: URLRequest?
+
+    await Self.registerRequestHandler(for: Self.endpoint) {
+      lastRequest = $0
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
-    self.wait(for: [expectation], timeout: 1)
-    
+
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
-    
+
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
     XCTAssertEqual(request.httpMethod, "POST")
-    
-    try self.validatePostBody(with: request,
-                              operation: query,
-                              persistedQuery: true)
+
+    try self.validatePostBody(
+      with: request,
+      operation: query,
+      persistedQuery: true
+    )
   }
-  
-  func testUseGETForQueriesAPQsRequest() throws {
-    let mockClient = MockURLSessionClient()
-    let store = ApolloStore()
-    let provider = DefaultInterceptorProvider(client: mockClient, store: store)
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: Self.endpoint,
-                                               autoPersistQueries: true,
-                                               useGETForQueries: true)
-    
-    let expectation = self.expectation(description: "Query sent")
+
+  func testUseGETForQueriesAPQsRequest() async throws {
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: Self.endpoint,
+      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
+    )
+
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
-    var lastRequest: URLRequest?
-    let _ = network.send(operation: query) { _ in
-      lastRequest = mockClient.lastRequest
-      expectation.fulfill()
+    nonisolated(unsafe) var lastRequest: URLRequest?
+
+    await Self.registerRequestHandler(for: Self.endpoint) {
+      lastRequest = $0
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
-    self.wait(for: [expectation], timeout: 1)
-    
+
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
-    
+
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
     XCTAssertEqual(request.httpMethod, "GET")
-    
-    try self.validateUrlParams(with: request,
-                               query: query,
-                               persistedQuery: true)
+
+    try self.validateUrlParams(
+      with: request,
+      query: query,
+      persistedQuery: true
+    )
   }
-  
-  func testNotUseGETForQueriesAPQsGETRequest() throws {
-    let mockClient = MockURLSessionClient()
-    let store = ApolloStore()
-    let provider = DefaultInterceptorProvider(client: mockClient, store: store)
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: Self.endpoint,
-                                               autoPersistQueries: true,
-                                               useGETForPersistedQueryRetry: true)
-    
-    let expectation = self.expectation(description: "Query sent")
+
+  func testNotUseGETForQueriesAPQsGETRequest() async throws {
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: Self.endpoint,
+      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
+    )
+
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
-    var lastRequest: URLRequest?
-    let _ = network.send(operation: query) { _ in
-      lastRequest = mockClient.lastRequest
-      expectation.fulfill()
+    nonisolated(unsafe) var lastRequest: URLRequest?
+
+    await Self.registerRequestHandler(for: Self.endpoint) {
+      lastRequest = $0
+      return (HTTPURLResponse.mock(), self.mockResponseData())
     }
-    self.wait(for: [expectation], timeout: 2)
-    
+
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
-    
+
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
     XCTAssertEqual(request.httpMethod, "GET")
-    
-    try self.validateUrlParams(with: request,
-                               query: query,
-                               persistedQuery: true)
+
+    try self.validateUrlParams(
+      with: request,
+      query: query,
+      persistedQuery: true
+    )
   }
 
   // MARK: Persisted Query Retrying Tests
 
-  func test__retryPersistedQuery__givenOperation_automaticallyPersisted_PersistedQueryNotFoundResponseError_retriesQueryWithFullDocument() throws {
+  func
+    test__retryPersistedQuery__givenOperation_automaticallyPersisted_PersistedQueryNotFoundResponseError_retriesQueryWithFullDocument()
+    async throws
+  {
     // given
-    let mockClient = MockURLSessionClient()
-    let store = ApolloStore()
-    let provider = DefaultInterceptorProvider(client: mockClient, store: store)
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: Self.endpoint,
-                                               autoPersistQueries: true)
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: Self.endpoint,
+      apqConfig: .init(autoPersistQueries: true)
+    )
 
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
 
-    mockClient.response = HTTPURLResponse(url: TestURL.mockServer.url,
-                                          statusCode: 200,
-                                          httpVersion: nil,
-                                          headerFields: nil)
+    nonisolated(unsafe) var requests: [URLRequest] = []
 
-    mockClient.data = try JSONSerialization.data(
-      withJSONObject: ["errors": [["message": "PersistedQueryNotFound"]]]
-    )
+    await Self.registerRequestHandler(for: Self.endpoint) { request in
+      requests.append(request)
+
+      let response = HTTPURLResponse(
+        url: TestURL.mockServer.url,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: nil
+      )!
+      if requests.count == 1 {
+        let data = try JSONSerialization.data(
+          withJSONObject: ["errors": [["message": "PersistedQueryNotFound"]]]
+        )
+        return (response, data)
+      } else {
+        return (response, self.mockResponseData())
+      }
+    }
 
     // when
-    let _ = network.send(operation: query) { _ in }
+    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
 
     // then
-    expect(mockClient.requestCount).toEventually(equal(2))
+    expect(requests.count).to(equal(2))
+
+    try self.validatePostBody(
+      with: requests[0],
+      operation: query,
+      queryDocument: false,
+      persistedQuery: true
+    )
+
+    try self.validatePostBody(
+      with: requests[1],
+      operation: query,
+      queryDocument: true,
+      persistedQuery: true
+    )
   }
 
-  func test__retryPersistedQuery__givenOperation_persistedOperationsOnly_PersistedQueryNotFoundResponseError_doesNotRetryAndThrows_persistedQueryNotFoundForPersistedOnlyQuery_error() throws {
+  func
+    test__retryPersistedQuery__givenOperation_persistedOperationsOnly_PersistedQueryNotFoundResponseError_doesNotRetryAndThrows_persistedQueryNotFoundForPersistedOnlyQuery_error()
+    async throws
+  {
     // given
-    class MockPersistedOnlyQuery: MockHeroNameQuery {
+    final class MockPersistedOnlyQuery: MockHeroNameQuery {
       override class var operationDocument: OperationDocument {
         .init(operationIdentifier: "12345")
       }
     }
 
-    let mockClient = MockURLSessionClient()
-    let store = ApolloStore()
-    let provider = DefaultInterceptorProvider(client: mockClient, store: store)
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: Self.endpoint,
-                                               autoPersistQueries: true)
+    let network = RequestChainNetworkTransport(
+      interceptorProvider: provider,
+      endpointURL: Self.endpoint,
+      apqConfig: .init(autoPersistQueries: true)
+    )
 
     let query = MockPersistedOnlyQuery(episode: .some(.EMPIRE))
 
-    mockClient.response = HTTPURLResponse(url: TestURL.mockServer.url,
-                                          statusCode: 200,
-                                          httpVersion: nil,
-                                          headerFields: nil)
-
-    mockClient.data = try JSONSerialization.data(
-      withJSONObject: ["errors": [["message": "PersistedQueryNotFound"]]]
-    )
-
-    let expectation = self.expectation(description: "Query failed")
-
-    // when
-    let _ = network.send(operation: query) { result in
-      // then
-      switch result {
-      case .success:
-        fail("Expected failure result")
-      case .failure(let error):
-        let expectedError = AutomaticPersistedQueryInterceptor.APQError
-          .persistedQueryNotFoundForPersistedOnlyQuery(operationName: "MockOperationName")
-        expect(error as? AutomaticPersistedQueryInterceptor.APQError).to(equal(expectedError))
-        
-        expectation.fulfill()
-      }
+    await Self.registerRequestHandler(for: Self.endpoint) { _ in
+      let response = HTTPURLResponse(
+        url: TestURL.mockServer.url,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: nil
+      )!
+      let data = try JSONSerialization.data(
+        withJSONObject: ["errors": [["message": "PersistedQueryNotFound"]]]
+      )
+      return (response, data)
     }
 
-    self.wait(for: [expectation], timeout: 2)
+    await expect {
+      // when
+      _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+
+      //then
+    }.to(throwError { error in
+      let expectedError = AutomaticPersistedQueryInterceptor.APQError
+        .persistedQueryNotFoundForPersistedOnlyQuery(operationName: "MockOperationName")
+      expect(error as? AutomaticPersistedQueryInterceptor.APQError).to(equal(expectedError))
+    })
   }
+}
+
+fileprivate extension Data {
+    init(reading input: InputStream) throws {
+        self.init()
+        input.open()
+        defer {
+            input.close()
+        }
+
+        let bufferSize = 1024
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+        defer {
+            buffer.deallocate()
+        }
+        while input.hasBytesAvailable {
+            let read = input.read(buffer, maxLength: bufferSize)
+            if read < 0 {
+                //Stream error occured
+                throw input.streamError!
+            } else if read == 0 {
+                //EOF
+                break
+            }
+            self.append(buffer, count: read)
+        }
+    }
 }

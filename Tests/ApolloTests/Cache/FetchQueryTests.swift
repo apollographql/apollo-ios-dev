@@ -35,13 +35,13 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     try super.tearDownWithError()
   }
   
-  func test__fetch__givenCachePolicy_fetchIgnoringCacheData_onlyHitsNetwork() throws {
-    class HeroNameSelectionSet: MockSelectionSet {
+  func test__fetch__givenCachePolicy_fetchIgnoringCacheData_onlyHitsNetwork() async throws {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -51,7 +51,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameSelectionSet>()
     
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -87,16 +87,16 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     
     client.fetch(query: query, cachePolicy: .fetchIgnoringCacheData, resultHandler: resultObserver.handler)
     
-    wait(for: [serverRequestExpectation, fetchResultFromServerExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [serverRequestExpectation, fetchResultFromServerExpectation], timeout: Self.defaultWaitTimeout)
   }
   
-  func test__fetch__givenCachePolicy_returnCacheDataAndFetch_hitsCacheFirstAndNetworkAfter() throws {
-    class HeroNameSelectionSet: MockSelectionSet {
+  func test__fetch__givenCachePolicy_returnCacheDataAndFetch_hitsCacheFirstAndNetworkAfter() async throws {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -106,7 +106,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameSelectionSet>()
     
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -154,16 +154,16 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     
     client.fetch(query: query, cachePolicy: .returnCacheDataAndFetch, resultHandler: resultObserver.handler)
     
-    wait(for: [fetchResultFromCacheExpectation, serverRequestExpectation, fetchResultFromServerExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation, serverRequestExpectation, fetchResultFromServerExpectation], timeout: Self.defaultWaitTimeout)
   }
   
-  func test__fetch__givenCachePolicy_returnCacheDataElseFetch_givenDataIsCached_doesntHitNetwork() throws {
-    class HeroNameSelectionSet: MockSelectionSet {
+  func test__fetch__givenCachePolicy_returnCacheDataElseFetch_givenDataIsCached_doesntHitNetwork() async throws {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -173,7 +173,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameSelectionSet>()
     
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
       "QUERY_ROOT.hero": [
         "name": "R2-D2",
@@ -199,16 +199,16 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
                  cachePolicy: .returnCacheDataElseFetch,
                  resultHandler: resultObserver.handler)
     
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
   
-  func test__fetch__givenCachePolicy_returnCacheDataElseFetch_givenNotAllDataIsCached_hitsNetwork() throws {
-    class HeroNameAndAppearsInSelectionSet: MockSelectionSet {
+  func test__fetch__givenCachePolicy_returnCacheDataElseFetch_givenNotAllDataIsCached_hitsNetwork() async throws {
+    class HeroNameAndAppearsInSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self),
@@ -219,7 +219,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameAndAppearsInSelectionSet>()
     
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -255,16 +255,16 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     
     client.fetch(query: query, cachePolicy: .returnCacheDataAndFetch, resultHandler: resultObserver.handler)
     
-    wait(for: [serverRequestExpectation, fetchResultFromServerExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [serverRequestExpectation, fetchResultFromServerExpectation], timeout: Self.defaultWaitTimeout)
   }
   
-  func test__fetch__givenCachePolicy_returnCacheDataDontFetch_givenDataIsCached_doesntHitNetwork() throws {
-    class HeroNameSelectionSet: MockSelectionSet {
+  func test__fetch__givenCachePolicy_returnCacheDataDontFetch_givenDataIsCached_doesntHitNetwork() async throws {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -274,7 +274,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameSelectionSet>()
     
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -296,16 +296,16 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     
     client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
     
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
   
-  func test__fetch__givenCachePolicy_returnCacheDataDontFetch_givenNotAllDataIsCached_returnsError() throws {
-    class HeroNameAndAppearsInSelectionSet: MockSelectionSet {
+  func test__fetch__givenCachePolicy_returnCacheDataDontFetch_givenNotAllDataIsCached_returnsError() async throws {
+    class HeroNameAndAppearsInSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self),
@@ -316,7 +316,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameAndAppearsInSelectionSet>()
     
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -334,17 +334,17 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     client.fetch(query: query,
                  cachePolicy: .returnCacheDataDontFetch,
                  resultHandler: resultObserver.handler)
-    
-    wait(for: [cacheMissResultExpectation], timeout: Self.defaultWaitTimeout)
+
+    await fulfillment(of: [cacheMissResultExpectation], timeout: Self.defaultWaitTimeout)
   }
   
-  func test__fetch_afterClearCache_givenCachePolicy_returnCacheDataDontFetch_throwsCacheMissError() throws {
-    class HeroNameSelectionSet: MockSelectionSet {
+  func test__fetch_afterClearCache_givenCachePolicy_returnCacheDataDontFetch_throwsCacheMissError() async throws {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -354,7 +354,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameSelectionSet>()
     
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -378,31 +378,29 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     
     client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
     
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
 
-    runActivity("Clear the cache") { _ in
-      let cacheClearedExpectation = expectation(description: "Cache cleared")
-      client.clearCache { result in
-        XCTAssertSuccessResult(result)
-        cacheClearedExpectation.fulfill()
-      }
-
-      wait(for: [cacheClearedExpectation], timeout: Self.defaultWaitTimeout)
+    // Clear the cache
+    let cacheClearedExpectation = expectation(description: "Cache cleared")
+    client.clearCache { result in
+      XCTAssertSuccessResult(result)
+      cacheClearedExpectation.fulfill()
     }
 
-    runActivity("Fetch from cache and expect cache miss failure") { _ in
-      let cacheMissResultExpectation = resultObserver.expectation(description: "Received cache miss error") { result in
-        // TODO: We should check for a specific error type once we've defined a cache miss error.
-        XCTAssertThrowsError(try result.get())
-      }
+    await fulfillment(of: [cacheClearedExpectation], timeout: Self.defaultWaitTimeout)
 
-      client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
-
-      wait(for: [cacheMissResultExpectation], timeout: Self.defaultWaitTimeout)
+    // Fetch from cache and expect cache miss failure
+    let cacheMissResultExpectation = resultObserver.expectation(description: "Received cache miss error") { result in
+      // TODO: We should check for a specific error type once we've defined a cache miss error.
+      XCTAssertThrowsError(try result.get())
     }
+
+    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
+
+    await fulfillment(of: [cacheMissResultExpectation], timeout: Self.defaultWaitTimeout)
   }
   
-  func testCompletionHandlerIsCalledOnTheSpecifiedQueue() {
+  func testCompletionHandlerIsCalledOnTheSpecifiedQueue() async {
     let queue = DispatchQueue(label: "label")
     
     let key = DispatchSpecificKey<Void>()
@@ -426,6 +424,6 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
                  cachePolicy: .fetchIgnoringCacheData,
                  queue: queue, resultHandler: resultObserver.handler)
     
-    wait(for: [serverRequestExpectation, fetchResultExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [serverRequestExpectation, fetchResultExpectation], timeout: Self.defaultWaitTimeout)
   }
 }

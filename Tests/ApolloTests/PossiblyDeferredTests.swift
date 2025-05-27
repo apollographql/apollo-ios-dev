@@ -1,4 +1,5 @@
 import XCTest
+import Nimble
 @_spi(Execution) @testable import Apollo
 import ApolloInternalTestHelpers
 
@@ -6,21 +7,21 @@ private struct TestError: Error {}
 private struct OtherTestError: Error {}
 
 class PossiblyDeferredTests: XCTestCase {
-  func testImmediateSuccess() throws {
+  func testImmediateSuccess() async {
     let possiblyDeferred = PossiblyDeferred.immediate(.success("foo"))
-    
-    XCTAssertEqual(try possiblyDeferred.get(), "foo")
+
+    await expect { try await possiblyDeferred.get() }.to(equal("foo"))
   }
   
-  func testImmediateFailure() {
+  func testImmediateFailure() async {
     let possiblyDeferred = PossiblyDeferred<String>.immediate(.failure(TestError()))
     
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is TestError)
-    }
+    })
   }
   
-  func testDeferredSuccess() {
+  func testDeferredSuccess() async {
     var numberOfInvocations = 0
     
     let possiblyDeferred = PossiblyDeferred.deferred { () -> String in
@@ -29,11 +30,11 @@ class PossiblyDeferredTests: XCTestCase {
     }
     
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertEqual(try possiblyDeferred.get(), "foo")
+    await expect { try await possiblyDeferred.get() }.to(equal("foo"))
     XCTAssertEqual(numberOfInvocations, 1)
   }
   
-  func testDeferredFailure() {
+  func testDeferredFailure() async {
     var numberOfInvocations = 0
     
     let possiblyDeferred = PossiblyDeferred.deferred { () -> String in
@@ -42,15 +43,15 @@ class PossiblyDeferredTests: XCTestCase {
     }
     
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is TestError)
-    }
+    })
     XCTAssertEqual(numberOfInvocations, 1)
   }
   
   // MARK: - Map
   
-  func testMapOverImmediateSuccessIsImmediate() {
+  func testMapOverImmediateSuccessIsImmediate() async {
     var numberOfInvocations = 0
     
     let possiblyDeferred = PossiblyDeferred.immediate(.success("foo"))
@@ -60,11 +61,11 @@ class PossiblyDeferredTests: XCTestCase {
       }
     
     XCTAssertEqual(numberOfInvocations, 1)
-    XCTAssertEqual(try possiblyDeferred.get(), "foobar")
+    await expect { try await possiblyDeferred.get() }.to(equal("foobar"))
     XCTAssertEqual(numberOfInvocations, 1)
   }
   
-  func testMapOverDeferredSuccessIsDeferred() {
+  func testMapOverDeferredSuccessIsDeferred() async {
     var numberOfInvocations = 0
     
     let possiblyDeferred = PossiblyDeferred.deferred { "foo" }
@@ -74,11 +75,11 @@ class PossiblyDeferredTests: XCTestCase {
       }
     
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertEqual(try possiblyDeferred.get(), "foobar")
+    await expect { try await possiblyDeferred.get() }.to(equal("foobar"))
     XCTAssertEqual(numberOfInvocations, 1)
   }
   
-  func testMapOverImmediateFailureIsNotInvoked() {
+  func testMapOverImmediateFailureIsNotInvoked() async {
     var numberOfInvocations = 0
     
     let possiblyDeferred = PossiblyDeferred<String>.immediate(.failure(TestError()))
@@ -88,13 +89,13 @@ class PossiblyDeferredTests: XCTestCase {
       }
     
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is TestError)
-    }
+    })
     XCTAssertEqual(numberOfInvocations, 0)
   }
   
-  func testMapOverDeferredFailureIsNotInvoked() {
+  func testMapOverDeferredFailureIsNotInvoked() async {
     var numberOfInvocations = 0
     
     let possiblyDeferred = PossiblyDeferred<String>.deferred { throw TestError() }
@@ -104,64 +105,64 @@ class PossiblyDeferredTests: XCTestCase {
       }
     
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is TestError)
-    }
+    })
     XCTAssertEqual(numberOfInvocations, 0)
   }
   
-  func testMapPropagatesError() {
+  func testMapPropagatesError() async {
     let possiblyDeferred = PossiblyDeferred<String>.deferred { throw TestError() }
       .map { _ in "foo" }
     
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is TestError)
-    }
+    })
   }
   
-  func testErrorThrownFromMapIsPropagated() {
+  func testErrorThrownFromMapIsPropagated() async {
     let possiblyDeferred = PossiblyDeferred.deferred { "foo" }
       .map { _ in throw TestError() }
     
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is TestError)
-    }
+    })
   }
   
   // MARK: - Flat map
   
-  func testImmediateFlatMapOverImmediateSuccessIsImmediate() {
+  func testImmediateFlatMapOverImmediateSuccessIsImmediate() async {
     var numberOfInvocations = 0
     
-    let possiblyDeferred = PossiblyDeferred.immediate(.success("foo"))
+    let possiblyDeferred = await PossiblyDeferred.immediate(.success("foo"))
       .flatMap { value -> PossiblyDeferred<String> in
         numberOfInvocations += 1
         return .immediate(.success(value + "bar"))
       }
     
     XCTAssertEqual(numberOfInvocations, 1)
-    XCTAssertEqual(try possiblyDeferred.get(), "foobar")
+    await expect { try await possiblyDeferred.get() }.to(equal("foobar"))
     XCTAssertEqual(numberOfInvocations, 1)
   }
   
-  func testImmediateFlatMapOverDeferredSuccessIsDeferred() {
+  func testImmediateFlatMapOverDeferredSuccessIsDeferred() async {
     var numberOfInvocations = 0
     
-    let possiblyDeferred = PossiblyDeferred.deferred { "foo" }
+    let possiblyDeferred = await PossiblyDeferred.deferred { "foo" }
       .flatMap { value -> PossiblyDeferred<String> in
         numberOfInvocations += 1
         return .immediate(.success(value + "bar"))
       }
     
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertEqual(try possiblyDeferred.get(), "foobar")
+    await expect { try await possiblyDeferred.get() }.to(equal("foobar"))
     XCTAssertEqual(numberOfInvocations, 1)
   }
   
-  func testDeferredFlatMapOverImmediateSuccessIsDeferred() {
+  func testDeferredFlatMapOverImmediateSuccessIsDeferred() async {
     var numberOfInvocations = 0
     
-    let possiblyDeferred = PossiblyDeferred.immediate(.success("foo"))
+    let possiblyDeferred = await PossiblyDeferred.immediate(.success("foo"))
       .flatMap { value -> PossiblyDeferred<String> in
         return .deferred {
           numberOfInvocations += 1
@@ -170,133 +171,133 @@ class PossiblyDeferredTests: XCTestCase {
       }
     
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertEqual(try possiblyDeferred.get(), "foobar")
+    await expect { try await possiblyDeferred.get() }.to(equal("foobar"))
     XCTAssertEqual(numberOfInvocations, 1)
   }
   
-  func testDeferredFlatMapOverDeferredSuccessIsDeferred() {
+  func testDeferredFlatMapOverDeferredSuccessIsDeferred() async {
     var numberOfInvocations = 0
     
-    let possiblyDeferred = PossiblyDeferred.deferred { "foo" }
+    let possiblyDeferred = await PossiblyDeferred.deferred { "foo" }
       .flatMap { value -> PossiblyDeferred<String> in
         numberOfInvocations += 1
         return .deferred { value + "bar" }
       }
     
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertEqual(try possiblyDeferred.get(), "foobar")
+    await expect { try await possiblyDeferred.get() }.to(equal("foobar"))
     XCTAssertEqual(numberOfInvocations, 1)
   }
   
-  func testImmediateFlatMapOverImmediateFailureIsNotInvoked() {
+  func testImmediateFlatMapOverImmediateFailureIsNotInvoked() async {
     var numberOfInvocations = 0
     
-    let possiblyDeferred = PossiblyDeferred<String>.immediate(.failure(TestError()))
+    let possiblyDeferred = await PossiblyDeferred<String>.immediate(.failure(TestError()))
       .flatMap { value -> PossiblyDeferred<String> in
         numberOfInvocations += 1
         return .immediate(.success(value + "bar"))
       }
     
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is TestError)
-    }
+    })
     XCTAssertEqual(numberOfInvocations, 0)
   }
   
-  func testImmediateFlatMapOverDeferredFailureIsNotInvoked() {
+  func testImmediateFlatMapOverDeferredFailureIsNotInvoked() async {
     var numberOfInvocations = 0
     
-    let possiblyDeferred = PossiblyDeferred<String>.deferred { throw TestError() }
+    let possiblyDeferred = await PossiblyDeferred<String>.deferred { throw TestError() }
       .flatMap { value -> PossiblyDeferred<String> in
         numberOfInvocations += 1
         return .immediate(.success(value + "bar"))
       }
     
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is TestError)
-    }
+    })
     XCTAssertEqual(numberOfInvocations, 0)
   }
   
-  func testDeferredFlatMapOverImmediateFailureIsNotInvoked() {
+  func testDeferredFlatMapOverImmediateFailureIsNotInvoked() async {
     var numberOfInvocations = 0
     
-    let possiblyDeferred = PossiblyDeferred<String>.immediate(.failure(TestError()))
+    let possiblyDeferred = await PossiblyDeferred<String>.immediate(.failure(TestError()))
       .flatMap { value -> PossiblyDeferred<String> in
         numberOfInvocations += 1
         return .immediate(.success(value + "bar"))
       }
     
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is TestError)
-    }
+    })
     XCTAssertEqual(numberOfInvocations, 0)
   }
   
-  func testDeferredFlatMapOverDeferredFailureIsNotInvoked() {
+  func testDeferredFlatMapOverDeferredFailureIsNotInvoked() async {
     var numberOfInvocations = 0
     
-    let possiblyDeferred = PossiblyDeferred<String>.deferred { throw TestError() }
+    let possiblyDeferred = await PossiblyDeferred<String>.deferred { throw TestError() }
       .flatMap { value -> PossiblyDeferred<String> in
         numberOfInvocations += 1
         return .immediate(.success(value + "bar"))
       }
     
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is TestError)
-    }
+    })
     XCTAssertEqual(numberOfInvocations, 0)
   }
   
-  func testFlatMapPropagatesError() {
-    let possiblyDeferred = PossiblyDeferred<String>.deferred { throw TestError() }
+  func testFlatMapPropagatesError() async {
+    let possiblyDeferred = await PossiblyDeferred<String>.deferred { throw TestError() }
       .flatMap { _ in .immediate(.success("foo")) }
     
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is TestError)
-    }
+    })
   }
   
-  func testErrorReturnedFromFlatMapIsPropagated() {
-    let possiblyDeferred = PossiblyDeferred.deferred { "foo" }
+  func testErrorReturnedFromFlatMapIsPropagated() async {
+    let possiblyDeferred = await PossiblyDeferred.deferred { "foo" }
       .flatMap { _ -> PossiblyDeferred<String> in .immediate(.failure(TestError())) }
     
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is TestError)
-    }
+    })
   }
 
   // MARK: - Map error
   
-  func testMapErrorOverImmediateFailure() {
+  func testMapErrorOverImmediateFailure() async {
     let possiblyDeferred = PossiblyDeferred<String>.immediate(.failure(TestError()))
       .mapError { error in
         XCTAssert(error is TestError)
         return OtherTestError()
       }
     
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is OtherTestError)
-    }
+    })
   }
   
-  func testMapErrorOverDeferredFailure() {
+  func testMapErrorOverDeferredFailure() async {
     let possiblyDeferred = PossiblyDeferred<String>.deferred { throw TestError() }
       .mapError { error in
         XCTAssert(error is TestError)
         return OtherTestError()
       }
     
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is OtherTestError)
-    }
+    })
   }
   
-  func testMapErrorOverMapOverImmediateFailure() {
+  func testMapErrorOverMapOverImmediateFailure() async {
     let possiblyDeferred = PossiblyDeferred<String>.immediate(.failure(TestError()))
       .map { _ in "foo" }
       .mapError { error in
@@ -304,12 +305,12 @@ class PossiblyDeferredTests: XCTestCase {
         return OtherTestError()
       }
     
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is OtherTestError)
-    }
+    })
   }
   
-  func testMapErrorOverMapOverDeferredFailure() {
+  func testMapErrorOverMapOverDeferredFailure() async {
     let possiblyDeferred = PossiblyDeferred<String>.deferred { throw TestError() }
       .map { _ in "foo" }
       .mapError { error in
@@ -317,12 +318,12 @@ class PossiblyDeferredTests: XCTestCase {
         return OtherTestError()
       }
     
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is OtherTestError)
-    }
+    })
   }
   
-  func testMapErrorOverMapThrowingErrorOverImmediateSuccess() {
+  func testMapErrorOverMapThrowingErrorOverImmediateSuccess() async {
     let possiblyDeferred = PossiblyDeferred.immediate(.success("foo"))
       .map { value -> String in
         throw TestError()
@@ -332,12 +333,12 @@ class PossiblyDeferredTests: XCTestCase {
         return OtherTestError()
       }
     
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is OtherTestError)
-    }
+    })
   }
   
-  func testMapErrorOverMapThrowingErrorOverDeferredSuccess() {
+  func testMapErrorOverMapThrowingErrorOverDeferredSuccess() async {
     let possiblyDeferred = PossiblyDeferred.deferred { "foo" }
       .map { value -> String in
         throw TestError()
@@ -347,14 +348,14 @@ class PossiblyDeferredTests: XCTestCase {
         return OtherTestError()
       }
     
-    XCTAssertThrowsError(try possiblyDeferred.get()) { error in
+    await expect { try await possiblyDeferred.get() }.to(throwError { error in
       XCTAssert(error is OtherTestError)
-    }
+    })
   }
   
   // MARK: - Lazily evaluate all
   
-  func testLazilyEvaluateAllIsDeferred() throws {
+  func testLazilyEvaluateAllIsDeferred() async throws {
     let possiblyDeferreds: [PossiblyDeferred<String>] = [.deferred { "foo" }, .deferred { "bar" }]
 
     var numberOfInvocations = 0
@@ -366,11 +367,11 @@ class PossiblyDeferredTests: XCTestCase {
     }
 
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertEqual(try deferred.get(), "foobar")
+    await expect { try await deferred.get() }.to(equal("foobar"))
     XCTAssertEqual(numberOfInvocations, 1)
   }
 
-  func testLazilyEvaluateAllFailsWhenAnyOfTheElementsFails() throws {
+  func testLazilyEvaluateAllFailsWhenAnyOfTheElementsFails() async throws {
     let possiblyDeferreds: [PossiblyDeferred<String>] = [.deferred { "foo" }, .deferred { throw TestError() }]
 
     var numberOfInvocations = 0
@@ -382,9 +383,9 @@ class PossiblyDeferredTests: XCTestCase {
     }
 
     XCTAssertEqual(numberOfInvocations, 0)
-    XCTAssertThrowsError(try deferred.get()) { error in
+    await expect { try await deferred.get() }.to(throwError { error in
       XCTAssert(error is TestError)
-    }
+    })
     XCTAssertEqual(numberOfInvocations, 0)
   }
 }

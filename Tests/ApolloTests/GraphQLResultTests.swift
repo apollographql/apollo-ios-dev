@@ -46,9 +46,9 @@ final class GraphQLResultTests: XCTestCase {
 
   // MARK: JSON conversion tests
 
-  func test__result__givenResponseWithData_convertsToJSON() throws {
+  func test__result__givenResponseWithData_convertsToJSON() async throws {
     // given
-    let heroData = try MockHeroQuery.Data(data: [
+    let heroData = try await MockHeroQuery.Data(data: [
       "hero": [
         "name": "Luke Skywalker",
         "__typename": "Human"
@@ -78,9 +78,9 @@ final class GraphQLResultTests: XCTestCase {
     XCTAssertEqual(convertedJSON, expectedJSON)
   }
   
-  func test__result__givenResponseWithNullData_convertsToJSON() throws {
+  func test__result__givenResponseWithNullData_convertsToJSON() async throws {
     // given
-    let heroData = try MockHeroQuery.Data(data: [
+    let heroData = try await MockHeroQuery.Data(data: [
       "hero": NSNull()
     ])
 
@@ -154,16 +154,16 @@ final class GraphQLResultTests: XCTestCase {
 
   // MARK: Incremental merging tests
 
-  func test__merging__givenIncrementalData_shouldMergeData() throws {
+  func test__merging__givenIncrementalData_shouldMergeData() async throws {
     // given
-    let resultData = try MockHeroQuery.Data(data: [
+    let resultData = try await MockHeroQuery.Data(data: [
       "hero": [
         "__typename": "Human",
         "name": "Luke Skywalker",
       ]
     ])
 
-    let incrementalData = try MockHeroQuery.Data.Hero.DeferredFriends(
+    let incrementalData = try await MockHeroQuery.Data.Hero.DeferredFriends(
       data: [
         "friends": [
           "Obi-Wan Kenobi",
