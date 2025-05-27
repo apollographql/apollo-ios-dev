@@ -223,7 +223,7 @@ public final class ApolloStore: Sendable {
     
     final func loadObject(forKey key: CacheKey) -> PossiblyDeferred<Record> {
       self.loader[key].map { record in
-        guard let record = record else { return Record(key: key, [:]) }
+        guard let record = record else { throw JSONDecodingError.missingValue }
         return record
       }
     }
