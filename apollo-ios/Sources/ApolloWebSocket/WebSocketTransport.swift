@@ -317,11 +317,7 @@ public class WebSocketTransport: @unchecked Sendable {
     self.websocket.delegate = nil
   }
 
-<<<<<<< HEAD
   func sendHelper<Operation: GraphQLOperation>(operation: Operation, resultHandler: @escaping @Sendable (_ result: Result<JSONObject, any Error>) async -> Void) -> String? {
-=======
-  func sendHelper<Operation: GraphQLOperation>(operation: Operation, resultHandler: @escaping @Sendable (_ result: Result<JSONObject, any Error>) -> Void) -> String? {
->>>>>>> b42f6fc6 (Apply Client awarness configuration to other network transports)
     let body = config.requestBodyCreator.requestBody(
       for: operation,
       sendQueryDocument: true,
