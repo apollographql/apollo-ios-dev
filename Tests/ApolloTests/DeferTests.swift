@@ -42,7 +42,22 @@ final class DeferTests: XCTestCase, MockResponseProvider {
     }
   }
 
-  private final class TVShowQuery: MockQuery<TVShowQuery.Data>, @unchecked Sendable {
+  private struct TVShowQuery: GraphQLQuery, @unchecked Sendable {
+    static var operationName: String { "TVShowQuery" }
+
+    static var operationDocument: OperationDocument {
+      .init(definition: .init("Mock Operation Definition"))
+    }
+
+    static var responseFormat: IncrementalDeferredResponseFormat {
+      IncrementalDeferredResponseFormat(deferredFragments: [
+        .init(label: "deferredGenres", fieldPath: ["show"]): Data.Show.DeferredGenres.self,
+        .init(label: "deferredFriend", fieldPath: ["show", "characters"]): Data.Show.Character.DeferredFriend.self,
+      ])
+    }
+
+    public var __variables: Variables?
+
     final class Data: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {
         [
@@ -118,14 +133,6 @@ final class DeferTests: XCTestCase, MockResponseProvider {
         }
       }
     }
-
-    override class var deferredFragments: [DeferredFragmentIdentifier: any SelectionSet.Type]? {
-      [
-        DeferredFragmentIdentifier(label: "deferredGenres", fieldPath: ["show"]): Data.Show.DeferredGenres.self,
-        DeferredFragmentIdentifier(label: "deferredFriend", fieldPath: ["show", "characters"]): Data.Show.Character
-          .DeferredFriend.self,
-      ]
-    }
   }
 
   let defaultTimeout = 0.5
@@ -185,7 +192,7 @@ final class DeferTests: XCTestCase, MockResponseProvider {
 
     let response = results.first
     let data = response?.data
-    
+
     expect(data?.__data._fulfilledFragments).to(
       equal([
         ObjectIdentifier(TVShowQuery.Data.self)

@@ -431,7 +431,21 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
     }
   }
 
-  final class AnimalQuery: MockQuery<AnimalQuery.AnAnimal>, @unchecked Sendable {
+  struct AnimalQuery: GraphQLQuery, @unchecked Sendable {
+    static var operationName: String { "AnimalQuery" }
+
+    static var operationDocument: OperationDocument {
+      .init(definition: .init("Mock Operation Definition"))
+    }
+
+    static var responseFormat: IncrementalDeferredResponseFormat {
+      IncrementalDeferredResponseFormat(deferredFragments: [
+        DeferredFragmentIdentifier(label: "deferredGenus", fieldPath: ["animal"]): AnAnimal.Animal.DeferredGenus.self,
+        DeferredFragmentIdentifier(label: "deferredFriend", fieldPath: ["animal"]): AnAnimal.Animal.DeferredFriend.self,
+      ])
+    }
+
+    typealias Data = AnAnimal
     final class AnAnimal: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
@@ -497,13 +511,6 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
           }
         }
       }
-    }
-
-    override class var deferredFragments: [DeferredFragmentIdentifier: any SelectionSet.Type]? {
-      [
-        DeferredFragmentIdentifier(label: "deferredGenus", fieldPath: ["animal"]): AnAnimal.Animal.DeferredGenus.self,
-        DeferredFragmentIdentifier(label: "deferredFriend", fieldPath: ["animal"]): AnAnimal.Animal.DeferredFriend.self,
-      ]
     }
   }
 }
