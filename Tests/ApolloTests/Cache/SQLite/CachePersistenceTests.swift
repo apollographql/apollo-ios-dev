@@ -10,12 +10,12 @@ class CachePersistenceTests: XCTestCase {
 
   func testFetchAndPersist() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -215,35 +215,28 @@ class CachePersistenceTests: XCTestCase {
       }
 
       client.clearCache(completion: { result in
+        defer { cacheClearExpectation.fulfill() }
         switch result {
         case .success:
           break
         case .failure(let error):
           XCTFail("Error clearing cache: \(error)")
         }
-        cacheClearExpectation.fulfill()
-      })
 
-      client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch) { innerResult in
-        defer { emptyCacheExpectation.fulfill() }
+        client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch) { innerResult in
+          defer { emptyCacheExpectation.fulfill() }
 
-        switch innerResult {
-        case .success:
-          XCTFail("This should have returned an error")
-        case .failure(let error):
-          if let resultError = error as? JSONDecodingError {
-            switch resultError {
-            case .missingValue:
-              // Correct error!
-              break
-            default:
+          switch innerResult {
+          case .success:
+            XCTFail("This should have returned an error")
+          case .failure(let error):
+            guard case JSONDecodingError.missingValue = error else {
               XCTFail("Unexpected JSON error: \(error)")
+              return
             }
-          } else {
-            XCTFail("Unexpected error: \(error)")
           }
         }
-      }
+      })
     }
 
     await fulfillment(

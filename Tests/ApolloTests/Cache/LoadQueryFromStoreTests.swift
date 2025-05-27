@@ -6,7 +6,7 @@ import ApolloSQLite
 #endif
 import ApolloInternalTestHelpers
 
-class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
+class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, MockResponseProvider {
   var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
@@ -23,14 +23,15 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     store = ApolloStore(cache: cache)
   }
   
-  override func tearDownWithError() throws {
+  override func tearDown() async throws {
     cache = nil
     store = nil
-    
-    try super.tearDownWithError()
+
+    await Self.cleanUpRequestHandlers()
+    try await super.tearDown()
   }
   
-  func testLoadingHeroNameQuery() throws {
+  func testLoadingHeroNameQuery() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -45,7 +46,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -65,7 +66,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingHeroNameQueryWithVariable() throws {
+  func testLoadingHeroNameQueryWithVariable() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -80,7 +81,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero(episode:JEDI)": CacheReference("hero(episode:JEDI)")],
       "hero(episode:JEDI)": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -101,7 +102,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingHeroNameQueryWithMissingName_throwsMissingValueError() throws {
+  func testLoadingHeroNameQueryWithMissingName_throwsMissingValueError() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -116,7 +117,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid"]
     ])
@@ -137,7 +138,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingHeroNameQueryWithNullName_throwsNullValueError() throws {
+  func testLoadingHeroNameQueryWithNullName_throwsNullValueError() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -152,7 +153,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid", "name": NSNull()]
     ])
@@ -173,7 +174,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingHeroAndFriendsNamesQueryWithoutIDs() throws {
+  func testLoadingHeroAndFriendsNamesQueryWithoutIDs() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -199,7 +200,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -232,7 +233,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingHeroAndFriendsNamesQueryWithIDs() throws {
+  func testLoadingHeroAndFriendsNamesQueryWithIDs() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -258,7 +259,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -291,7 +292,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriends() throws {
+  func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriends() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -317,7 +318,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -342,7 +343,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
 
-  func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriendListItem() throws {
+  func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriendListItem() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -368,7 +369,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -376,7 +377,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
         "friends": [
           CacheReference("hero.friends.0"),
           NSNull(),
-        ]
+        ] as JSONValue
       ],
       "hero.friends.0": ["__typename": "Human", "name": "Luke Skywalker"],
     ])
@@ -399,8 +400,8 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
   }
-
-  func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withFriendsNotInCache_throwsMissingValueError() throws {
+  
+  func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withFriendsNotInCache_throwsMissingValueError() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -426,7 +427,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -447,7 +448,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingWithBadCacheSerialization() throws {
+  func testLoadingWithBadCacheSerialization() async throws {
     // given
     class GivenSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -473,7 +474,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -507,7 +508,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
   
-  func testLoadingQueryWithFloats() throws {
+  func testLoadingQueryWithFloats() async throws {
     // given
     let starshipLength: Float = 1234.5
     let coordinates: [[Double]] = [[38.857150, -94.798464]]
@@ -527,7 +528,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
     
-    mergeRecordsIntoCache([
+    await mergeRecordsIntoCache([
       "QUERY_ROOT": ["starshipCoordinates": CacheReference("starshipCoordinates")],
       "starshipCoordinates": ["__typename": "Starship",
                               "name": "Millennium Falcon",
@@ -553,7 +554,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
 
-  @MainActor func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriendListItem_usingRequestChain() throws {
+  @MainActor func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriendListItem_usingRequestChain() async throws {
     // given
     struct Types {
       static let Hero = Object(typename: "Hero", implementedInterfaces: [])
@@ -609,14 +610,15 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
 
     // given
-    let client = MockURLSessionClient(
-      response: .mock(
-        url: TestURL.mockServer.url,
-        statusCode: 200,
-        httpVersion: nil,
-        headerFields: nil
-      ),
-      data: """
+    await Self.registerRequestHandler(for: TestURL.mockServer.url) { _ in
+      return (
+        .mock(
+          url: TestURL.mockServer.url,
+          statusCode: 200,
+          httpVersion: nil,
+          headerFields: nil
+        ),
+      """
       {
         "data": {
           "__typename": "Hero",
@@ -635,33 +637,29 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
         }
       }
       """.data(using: .utf8)
-    )
+      )
+    }
 
-    let requestChain: (any RequestChain)? = InterceptorRequestChain(interceptors: [
-      NetworkFetchInterceptor(client: client),
-      JSONResponseParsingInterceptor(),
-      CacheWriteInterceptor(store: self.store),
-    ])
+    let urlSession: MockURLSession = MockURLSession(responseProvider: Self.self)
+
+    let requestChain = RequestChain<JSONRequest<MockQuery<Hero>>>(
+      urlSession: urlSession,
+      interceptors: [
+        JSONResponseParsingInterceptor(),
+      ],
+      cacheInterceptor: DefaultCacheInterceptor(store: self.store),
+      errorInterceptor: nil
+    )
 
     let request = JSONRequest(
       operation: MockQuery<Hero>(),
-      graphQLEndpoint: TestURL.mockServer.url,
-      clientName: "test-client",
-      clientVersion: "test-client-version"
-    )
-
-    let expectation = expectation(description: "Response received")
+      graphQLEndpoint: TestURL.mockServer.url
+    )    
 
     // when
-    requestChain?.kickoff(request: request) { result in
-      defer {
-        expectation.fulfill()
-      }
+    let resultStream = requestChain.kickoff(request: request)
 
-      XCTAssertSuccessResult(result)
-    }
-
-    wait(for: [expectation], timeout: 2)
+    _ = try await resultStream.getAllValues()
 
     loadFromStore(operation: MockQuery<Hero>()) { result in
       // then

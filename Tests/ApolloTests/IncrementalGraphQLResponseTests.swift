@@ -64,17 +64,17 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
 
   // MARK: - Parsing Tests
 
-  func test__parsing__givenBodyWithMissingLabel_shouldThrow() throws {
+  func test__parsing__givenBodyWithMissingLabel_shouldThrow() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: ["path": ["something"]])
 
     // when + then
-    expect(try subject.parseIncrementalResult(withCachePolicy: .default)).to(
+    await expect { try await subject.parseIncrementalResult(withCachePolicy: .default) }.to(
       throwError(IncrementalGraphQLResponse<DeferredQuery>.ResponseError.missingLabel)
     )
   }
 
-  func test__parsing__givenValidIncrementalBody_withMissingDeferredSelectionSet_shouldThrow() throws {
+  func test__parsing__givenValidIncrementalBody_withMissingDeferredSelectionSet_shouldThrow() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deliberatelyMissing",
@@ -85,15 +85,16 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when + then
-    expect(try subject.parseIncrementalResult(withCachePolicy: .default)).to(throwError(
-      IncrementalGraphQLResponse<DeferredQuery>.ResponseError.missingDeferredSelectionSetType(
-        "deliberatelyMissing",
-        "one.two.three"
-      )
-    ))
+    await expect { try await subject.parseIncrementalResult(withCachePolicy: .default) }.to(
+      throwError(
+        IncrementalGraphQLResponse<DeferredQuery>.ResponseError.missingDeferredSelectionSetType(
+          "deliberatelyMissing",
+          "one.two.three"
+        )
+      ))
   }
 
-  func test__parsing__givenIncrementalBody_shouldSucceed() throws {
+  func test__parsing__givenIncrementalBody_shouldSucceed() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -104,19 +105,19 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let result = try subject.parseIncrementalResult(withCachePolicy: .default)
+    let result = try await subject.parseIncrementalResult(withCachePolicy: .default)
 
     // then
     expect(result.0.label).to(equal("deferredFriend"))
     expect(result.0.path).to(equal([PathComponent("animal")]))
-    expect(result.0.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
+    await expect(result.0.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
       equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
     )
   }
 
   // MARK: Parsing Tests (Extensions)
 
-  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyFetchIgnoringCacheCompletely_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyFetchIgnoringCacheCompletely_extensionShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -125,13 +126,13 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheCompletely)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheCompletely)
 
     // then
     expect(result.extensions).to(equal([:]))
   }
 
-  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyFetchIgnoringCacheData_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyFetchIgnoringCacheData_extensionShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -140,13 +141,13 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheData)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheData)
 
     // then
     expect(result.extensions).to(equal([:]))
   }
 
-  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataAndFetch_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataAndFetch_extensionShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -155,13 +156,13 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .returnCacheDataAndFetch)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataAndFetch)
 
     // then
     expect(result.extensions).to(equal([:]))
   }
 
-  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataDontFetch_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataDontFetch_extensionShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -170,13 +171,13 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .returnCacheDataDontFetch)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataDontFetch)
 
     // then
     expect(result.extensions).to(equal([:]))
   }
 
-  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataElseFetch_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataElseFetch_extensionShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -185,13 +186,13 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .returnCacheDataElseFetch)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataElseFetch)
 
     // then
     expect(result.extensions).to(equal([:]))
   }
 
-  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyDefault_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyDefault_extensionShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -200,13 +201,13 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .default)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
 
     // then
     expect(result.extensions).to(equal([:]))
   }
 
-  func test__parsing__givenExtensionWithChildValue_extensionShouldNotBeNil() throws {
+  func test__parsing__givenExtensionWithChildValue_extensionShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -215,13 +216,13 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .default)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
 
     // then
     expect(result.extensions?["parentKey"]).to(equal(["childKey": "someValue"]))
   }
 
-  func test__parsing__givenMissingExtensions_extensionShouldBeNil() throws {
+  func test__parsing__givenMissingExtensions_extensionShouldBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -229,7 +230,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .default)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
 
     // then
     expect(result.extensions).to(beNil())
@@ -237,7 +238,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
 
   // MARK: Parsing Tests (Errors)
 
-  func test__parsing__givenErrorWithMessage_usingCachePolicyFetchIgnoringCacheCompletely_errorMessageShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithMessage_usingCachePolicyFetchIgnoringCacheCompletely_errorMessageShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -250,13 +251,13 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheCompletely)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheCompletely)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
   }
 
-  func test__parsing__givenErrorWithMessage_usingCachePolicyFetchIgnoringCacheData_errorMessageShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithMessage_usingCachePolicyFetchIgnoringCacheData_errorMessageShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -269,13 +270,13 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheData)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheData)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
   }
 
-  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataAndFetch_errorMessageShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataAndFetch_errorMessageShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -288,13 +289,13 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .returnCacheDataAndFetch)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataAndFetch)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
   }
 
-  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataDontFetch_errorMessageShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataDontFetch_errorMessageShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -307,13 +308,13 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .returnCacheDataDontFetch)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataDontFetch)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
   }
 
-  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataElseFetch_errorMessageShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataElseFetch_errorMessageShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -326,13 +327,13 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .returnCacheDataElseFetch)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataElseFetch)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
   }
 
-  func test__parsing__givenErrorWithMessage_usingCachePolicyDefault_errorMessageShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithMessage_usingCachePolicyDefault_errorMessageShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -345,13 +346,13 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .default)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
   }
 
-  func test__parsing__givenErrorWithLocation_usingCachePolicyDefault_errorLocationShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithLocation_usingCachePolicyDefault_errorLocationShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -367,7 +368,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .default)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
@@ -375,7 +376,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     expect(result.errors?.first?.locations?.first?.column).to(equal(2))
   }
 
-  func test__parsing__givenErrorWithPath_usingCachePolicyDefault_errorPathShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithPath_usingCachePolicyDefault_errorPathShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -389,7 +390,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .default)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
@@ -397,7 +398,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     expect(result.errors?.first?.path?[1]).to(equal(.index(1)))
   }
 
-  func test__parsing__givenErrorWithCustomKey_usingCachePolicyDefault_errorCustomKeyShouldNotBeNil() throws {
+  func test__parsing__givenErrorWithCustomKey_usingCachePolicyDefault_errorCustomKeyShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -411,14 +412,14 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .default)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
 
     // then
     expect(result.errors?.first?.message).to(equal("Some error"))
     expect(result.errors?.first?["userMessage"] as? String).to(equal("Some message"))
   }
 
-  func test__parsing__givenMultipleErrors_shouldReturnAllErrors() throws {
+  func test__parsing__givenMultipleErrors_shouldReturnAllErrors() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -434,7 +435,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .default)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
 
     // then
     expect(result.errors?[0].message).to(equal("Some error"))
@@ -443,7 +444,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
 
   // MARK: - Cache RecordSet Tests
 
-  func test__parsing__givenCachePolicyFetchIgnoringCacheCompletely_cacheRecordSetShouldBeNil() throws {
+  func test__parsing__givenCachePolicyFetchIgnoringCacheCompletely_cacheRecordSetShouldBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -454,16 +455,16 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, recordSet) = try subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheCompletely)
+    let (result, recordSet) = try await subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheCompletely)
 
     // then
-    expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
+    await expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
       equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
     )
     expect(recordSet).to(beNil())
   }
 
-  func test__parsing__givenCachePolicyFetchIgnoringCacheData_cacheRecordSetShouldNotBeNil() throws {
+  func test__parsing__givenCachePolicyFetchIgnoringCacheData_cacheRecordSetShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -474,10 +475,10 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, recordSet) = try subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheData)
+    let (result, recordSet) = try await subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheData)
 
     // then
-    expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
+    await expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
       equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
     )
     expect(recordSet).to(equal(RecordSet(records: [
@@ -487,7 +488,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])))
   }
 
-  func test__parsing__givenCachePolicyReturnCacheDataAndFetch_cacheRecordSetShouldNotBeNil() throws {
+  func test__parsing__givenCachePolicyReturnCacheDataAndFetch_cacheRecordSetShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -498,10 +499,10 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, recordSet) = try subject.parseIncrementalResult(withCachePolicy: .returnCacheDataAndFetch)
+    let (result, recordSet) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataAndFetch)
 
     // then
-    expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
+    await expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
       equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
     )
     expect(recordSet).to(equal(RecordSet(records: [
@@ -511,7 +512,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])))
   }
 
-  func test__parsing__givenCachePolicyReturnCacheDataDontFetch_cacheRecordSetShouldNotBeNil() throws {
+  func test__parsing__givenCachePolicyReturnCacheDataDontFetch_cacheRecordSetShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -522,10 +523,10 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, recordSet) = try subject.parseIncrementalResult(withCachePolicy: .returnCacheDataDontFetch)
+    let (result, recordSet) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataDontFetch)
 
     // then
-    expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
+    await expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
       equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
     )
     expect(recordSet).to(equal(RecordSet(records: [
@@ -535,7 +536,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])))
   }
 
-  func test__parsing__givenCachePolicyReturnCacheDataElseFetch_cacheRecordSetShouldNotBeNil() throws {
+  func test__parsing__givenCachePolicyReturnCacheDataElseFetch_cacheRecordSetShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -546,10 +547,10 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, recordSet) = try subject.parseIncrementalResult(withCachePolicy: .returnCacheDataElseFetch)
+    let (result, recordSet) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataElseFetch)
 
     // then
-    expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
+    await expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
       equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
     )
     expect(recordSet).to(equal(RecordSet(records: [
@@ -559,7 +560,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])))
   }
 
-  func test__parsing__givenCachePolicyDefault_cacheRecordSetShouldNotBeNil() throws {
+  func test__parsing__givenCachePolicyDefault_cacheRecordSetShouldNotBeNil() async throws {
     // given
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: [
       "label": "deferredFriend",
@@ -570,10 +571,10 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     ])
 
     // when
-    let (result, recordSet) = try subject.parseIncrementalResult(withCachePolicy: .default)
+    let (result, recordSet) = try await subject.parseIncrementalResult(withCachePolicy: .default)
 
     // then
-    expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
+    await expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
       equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
     )
     expect(recordSet).to(equal(RecordSet(records: [
@@ -585,7 +586,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
 
   // MARK: Cache Reference Tests
 
-  func test__cacheReference__givenIncrementalBody_whenParsed_shouldAppendPathToRootCacheReference() throws {
+  func test__cacheReference__givenIncrementalBody_whenParsed_shouldAppendPathToRootCacheReference() async throws {
     // given
     let jsonObject: JSONObject = [
       "label": "deferredFriend",
@@ -598,7 +599,7 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
     let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: jsonObject)
 
     // when + then
-    let (result, _) = try subject.parseIncrementalResult(withCachePolicy: .default)
+    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
 
     expect(result.dependentKeys).to(equal([CacheKey("QUERY_ROOT.animal.friend")]))
   }

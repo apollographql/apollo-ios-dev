@@ -6,7 +6,8 @@ import XCTest
 
 @testable import ApolloPagination
 
-final class AsyncGraphQLQueryPagerCoordinatorTests: XCTestCase, CacheDependentTesting {
+final class AsyncGraphQLQueryPagerCoordinatorTests:
+  XCTestCase, CacheDependentTesting, MockResponseProvider {
   private typealias ReverseQuery = MockQuery<Mocks.Hero.ReverseFriendsQuery>
   private typealias ForwardQuery = MockQuery<Mocks.Hero.FriendsQuery>
 
