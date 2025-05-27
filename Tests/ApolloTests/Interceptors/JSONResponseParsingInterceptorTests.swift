@@ -1,75 +1,147 @@
-import Apollo
+@testable import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
 import XCTest
+import Nimble
 
 class JSONResponseParsingInterceptorTests: XCTestCase {
-  func testJSONResponseParsingInterceptorFailsWhenNoResponse() {
-    let provider = MockInterceptorProvider([
-      JSONResponseParsingInterceptor()
-    ])
 
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: TestURL.mockServer.url)
+  var subject: JSONResponseParsingInterceptor!
 
-    let expectation = self.expectation(description: "Request sent")
-
-    _ = network.send(operation: MockQuery.mock()) { result in
-      defer {
-        expectation.fulfill()
-      }
-
-      switch result {
-      case .success:
-        XCTFail("This should not have succeeded")
-      case .failure(let error):
-        switch error {
-        case JSONResponseParsingInterceptor.JSONResponseParsingError.noResponseToParse:
-          // This is what we want
-          break
-        default:
-          XCTFail("Unexpected error type: \(error.localizedDescription)")
-        }
-      }
-    }
-
-    self.wait(for: [expectation], timeout: 1)
+  override func setUp() {
+    super.setUp()
+    subject = JSONResponseParsingInterceptor()
   }
 
-  func testJSONResponseParsingInterceptorFailsWithEmptyData() {
-    let client = MockURLSessionClient(
-      response: .mock(),
-      data: Data()
-    )
-    
-    let provider = MockInterceptorProvider([
-      NetworkFetchInterceptor(client: client),
-      JSONResponseParsingInterceptor(),
-    ])
+  override func tearDown() {
+    super.tearDown()
+    subject = nil
+  }
 
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: TestURL.mockServer.url)
+  func test__intercept__callsNextWithSameRequest() async throws {
+    let expectedRequest = JSONRequest.mock(operation: MockOperation<MockSelectionSet>())
 
-    let expectation = self.expectation(description: "Request sent")
+    nonisolated(unsafe) var nextCalled = false
+    _ = try await subject.intercept(request: expectedRequest) { request in
+      nextCalled = true
 
-    _ = network.send(operation: MockQuery.mock()) { result in
-      defer {
-        expectation.fulfill()
-      }
-
-      switch result {
-      case .success:
-        XCTFail("This should not have succeeded")
-      case .failure(let error):
-        switch error {
-        case JSONResponseParsingInterceptor.JSONResponseParsingError.couldNotParseToJSON(let data):
-          XCTAssertTrue(data.isEmpty)
-        default:
-          XCTFail("Unexpected error type: \(error.localizedDescription)")
-        }
-      }
+      expect(request).to(equal(expectedRequest))
+      return InterceptorResultStream(stream: .init(unfolding: { return nil }))
     }
 
-    self.wait(for: [expectation], timeout: 1)
+    await expect(nextCalled).toEventually(beTrue())
+  }
+
+  func test__intercept__givenEmptyResponse_throwsParsingError() async throws {
+    let expectedRequest = JSONRequest.mock(operation: MockOperation<MockSelectionSet>())
+
+    await expect {
+      _ = try await self.subject.intercept(request: expectedRequest) { request in
+        return InterceptorResultStream(stream: .init(unfolding: {
+          return .init(response: .mock(), rawResponseChunk: Data())
+        }))
+      }.getResults().getAllValues()
+    }.to(throwError(
+      JSONResponseParsingError.couldNotParseToJSON(data: Data())
+    ))
+  }
+
+  // Multipart Header Error Tests
+
+  func test__error__givenResponse_withMissingMultipartBoundaryHeader_shouldReturnError() async throws {
+    let subject = JSONResponseParsingInterceptor()
+
+    let resultStream = try await subject.intercept(
+      request: JSONRequest<MockSubscription<MockSelectionSet>>.mock(operation: MockSubscription.mock())
+    ) { _ in
+      let mockResult = InterceptorResult<MockSubscription<MockSelectionSet>>(
+        response: .mock(headerFields: ["Content-Type": "multipart/mixed"]),
+        rawResponseChunk: Data()
+      )
+
+      return InterceptorResultStream(
+        stream: .init(unfolding: {
+          return mockResult
+        })
+      )
+    }.getResults()
+
+    // when
+    await expect { try await resultStream.getAllValues() }
+    // then
+      .to(throwError(JSONResponseParsingError.missingMultipartBoundary))
+  }
+
+  func test__error__givenResponse_withMissingMultipartProtocolSpecifier_shouldReturnError() async throws {
+    let subject = JSONResponseParsingInterceptor()
+
+    let resultStream = try await subject.intercept(
+      request: JSONRequest<MockSubscription<MockSelectionSet>>.mock(operation: MockSubscription.mock())
+    ) { _ in
+      let mockResult = InterceptorResult<MockSubscription<MockSelectionSet>>(
+        response: .mock(headerFields: ["Content-Type": "multipart/mixed;boundary=\"graphql\""]),
+        rawResponseChunk: Data()
+      )
+
+      return InterceptorResultStream(
+        stream: .init(unfolding: {
+          return mockResult
+        })
+      )
+    }.getResults()
+
+    // when
+    await expect { try await resultStream.getAllValues() }
+    // then
+      .to(throwError(JSONResponseParsingError.invalidMultipartProtocol))
+  }
+
+  func test__error__givenResponse_withUnknownMultipartProtocolSpecifier_shouldReturnError() async throws {
+    let subject = JSONResponseParsingInterceptor()
+
+    let resultStream = try await subject.intercept(
+      request: JSONRequest<MockSubscription<MockSelectionSet>>.mock(operation: MockSubscription.mock())
+    ) { _ in
+      let mockResult = InterceptorResult<MockSubscription<MockSelectionSet>>(
+        response: .mock(headerFields: ["Content-Type": "multipart/mixed;boundary=\"graphql\";unknownSpec=0"]),
+        rawResponseChunk: Data()
+      )
+
+      return InterceptorResultStream(
+        stream: .init(unfolding: {
+          return mockResult
+        })
+      )
+    }.getResults()
+
+    // when
+    await expect { try await resultStream.getAllValues() }
+    // then
+      .to(throwError(JSONResponseParsingError.invalidMultipartProtocol))
+  }
+
+  func test__error__givenResponse_withInvalidData_shouldReturnError() async throws {
+    let subject = JSONResponseParsingInterceptor()
+    let invalidData = "🙃".data(using: .unicode)!
+
+    let resultStream = try await subject.intercept(
+      request: JSONRequest<MockSubscription<MockSelectionSet>>.mock(operation: MockSubscription.mock())
+    ) { _ in
+      let mockResult = InterceptorResult<MockSubscription<MockSelectionSet>>(
+        response: .mock(),
+        rawResponseChunk: invalidData
+      )
+
+      return InterceptorResultStream(
+        stream: .init(unfolding: {
+          return mockResult
+        })
+      )
+    }.getResults()
+
+    // when
+    await expect { try await resultStream.getAllValues() }
+    // then
+      .to(throwError(JSONResponseParsingError.couldNotParseToJSON(data: invalidData)))
   }
 }

@@ -302,7 +302,7 @@ class TestMockTests: XCTestCase {
   func test___selectionSetMockData__givenCustomScalarField__convertsObjectToDictWithCustomScalarIntact() throws {
     // given
     let mock = Mock<Dog>()
-    let customScalar = MockCustomScalar(value: 12)
+    let customScalar = MockCustomScalar<Int>(value: 12)
 
     // when
     mock.customScalar = customScalar
@@ -343,9 +343,9 @@ class TestMockTests: XCTestCase {
 
   // MARK: - Selection Set Conversion Tests
 
-  func test__convertToSelectionSet_givenSelectionSetWithVariableForInclusionCondition_isTrue_canAccessConditionalField() throws {
+  func test__convertToSelectionSet_givenSelectionSetWithVariableForInclusionCondition_isTrue_canAccessConditionalField() async throws {
     // given
-    class Animal: TestMockSchema.MockSelectionSet {
+    final class Animal: TestMockSchema.MockSelectionSet {
       override class var __parentType: any ParentType { TestMockSchema.Interfaces.Animal }
       override class var __selections: [Selection] {[
         .include(if: "a", .inlineFragment(IfA.self)),
@@ -353,7 +353,7 @@ class TestMockTests: XCTestCase {
 
       var ifA: IfA? { _asInlineFragment() }
 
-      class IfA: TestMockSchema.ConcreteMockTypeCase<Animal> {
+      final class IfA: TestMockSchema.ConcreteMockTypeCase<Animal> {
         override class var __parentType: any ParentType { TestMockSchema.Interfaces.Animal }
         override class var __selections: [Selection] {[
           .field("species", String.self),
@@ -367,15 +367,15 @@ class TestMockTests: XCTestCase {
     let dog = Mock<Dog>()
     dog.species = "Canine"
 
-    let selectionSet = Animal.from(dog, withVariables: ["a": true])
+    let selectionSet = await Animal.from(dog, withVariables: ["a": true])
 
     // then
     expect(selectionSet.ifA?.species).to(equal("Canine"))
   }
 
-  func test__convertToSelectionSet_givenSelectionSetWithVariableForInclusionCondition_isFalse_canNotAccessConditionalField() throws {
+  func test__convertToSelectionSet_givenSelectionSetWithVariableForInclusionCondition_isFalse_canNotAccessConditionalField() async throws {
     // given
-    class Animal: TestMockSchema.MockSelectionSet {
+    final class Animal: TestMockSchema.MockSelectionSet {
       override class var __parentType: any ParentType { TestMockSchema.Interfaces.Animal }
       override class var __selections: [Selection] {[
         .include(if: "a", .inlineFragment(IfA.self)),
@@ -383,7 +383,7 @@ class TestMockTests: XCTestCase {
 
       var ifA: IfA? { _asInlineFragment() }
 
-      class IfA: TestMockSchema.ConcreteMockTypeCase<Animal> {
+      final class IfA: TestMockSchema.ConcreteMockTypeCase<Animal> {
         override class var __parentType: any ParentType { TestMockSchema.Interfaces.Animal }
         override class var __selections: [Selection] {[
           .field("species", String.self),
@@ -397,15 +397,15 @@ class TestMockTests: XCTestCase {
     let dog = Mock<Dog>()
     dog.species = "Canine"
 
-    let selectionSet = Animal.from(dog, withVariables: ["a": false])
+    let selectionSet = await Animal.from(dog, withVariables: ["a": false])
 
     // then
     expect(selectionSet.ifA).to(beNil())
   }
 
-  func test__convertToSelectionSet_givenSelectionSetWithTypeCondition_canConvert_canAccessConditionalField() throws {
+  func test__convertToSelectionSet_givenSelectionSetWithTypeCondition_canConvert_canAccessConditionalField() async throws {
     // given
-    class Animal: TestMockSchema.MockSelectionSet {
+    final class Animal: TestMockSchema.MockSelectionSet {
       override class var __parentType: any ParentType { TestMockSchema.Interfaces.Animal }
       override class var __selections: [Selection] {[
         .inlineFragment(AsDog.self),
@@ -413,7 +413,7 @@ class TestMockTests: XCTestCase {
 
       var asDog: AsDog? { _asInlineFragment() }
 
-      class AsDog: TestMockSchema.ConcreteMockTypeCase<Animal> {
+      final class AsDog: TestMockSchema.ConcreteMockTypeCase<Animal> {
         override class var __parentType: any ParentType { TestMockSchema.Types.Dog }
         override class var __selections: [Selection] {[
           .field("species", String.self),
@@ -427,15 +427,15 @@ class TestMockTests: XCTestCase {
     let dog = Mock<Dog>()
     dog.species = "Canine"
 
-    let selectionSet = Animal.from(dog)
+    let selectionSet = await Animal.from(dog)
 
     // then
     expect(selectionSet.asDog?.species).to(equal("Canine"))
   }
 
-  func test__convertToSelectionSet_givenSelectionSetWithTypeCondition_canNotConvert_canNotAccessConditionalField() throws {
+  func test__convertToSelectionSet_givenSelectionSetWithTypeCondition_canNotConvert_canNotAccessConditionalField() async throws {
     // given
-    class Animal: TestMockSchema.MockSelectionSet {
+    final class Animal: TestMockSchema.MockSelectionSet {
       override class var __parentType: any ParentType { TestMockSchema.Interfaces.Animal }
       override class var __selections: [Selection] {[
         .inlineFragment(AsDog.self),
@@ -443,7 +443,7 @@ class TestMockTests: XCTestCase {
 
       var asDog: AsDog? { _asInlineFragment() }
 
-      class AsDog: TestMockSchema.ConcreteMockTypeCase<Animal> {
+      final class AsDog: TestMockSchema.ConcreteMockTypeCase<Animal> {
         override class var __parentType: any ParentType { TestMockSchema.Types.Dog }
         override class var __selections: [Selection] {[
           .field("species", String.self),
@@ -457,15 +457,15 @@ class TestMockTests: XCTestCase {
     let cat = Mock<Cat>()
     cat.species = "Feline"
 
-    let selectionSet = Animal.from(cat)
+    let selectionSet = await Animal.from(cat)
 
     // then
     expect(selectionSet.asDog).to(beNil())
   }
 
-  func test__convertToSelectionSet_givenRequiredFieldNotInitialized_doesNotThrow() throws {
+  func test__convertToSelectionSet_givenRequiredFieldNotInitialized_doesNotThrow() async throws {
     // given
-    class Animal: TestMockSchema.MockSelectionSet {
+    final class Animal: TestMockSchema.MockSelectionSet {
       override class var __parentType: any ParentType { TestMockSchema.Interfaces.Animal }
       override class var __selections: [Selection] {[
         .field("species", String.self),
@@ -477,15 +477,15 @@ class TestMockTests: XCTestCase {
     // when
     let dog = Mock<Dog>()
 
-    let selectionSet = Animal.from(dog)
+    let selectionSet = await Animal.from(dog)
 
     // then
     expect(selectionSet.__data._data["species"]).to(beNil())
   }
 
-  func test__convertToSelectionSet__givenGraphQLEnumField__canAccessField() throws {
+  func test__convertToSelectionSet__givenGraphQLEnumField__canAccessField() async throws {
     // given
-    class Animal: TestMockSchema.MockSelectionSet {
+    final class Animal: TestMockSchema.MockSelectionSet {
       override class var __parentType: any ParentType { TestMockSchema.Interfaces.Animal }
       override class var __selections: [Selection] {[
         .field("speciesType", GraphQLEnum<Species>.self),
@@ -498,15 +498,15 @@ class TestMockTests: XCTestCase {
     mock.speciesType = GraphQLEnum(Species.canine)
 
     // when
-    let selectionSet = Animal.from(mock)
+    let selectionSet = await Animal.from(mock)
 
     // then
     expect(selectionSet.speciesType).to(equal(.case(.canine)))
   }
 
-  func test__convertToSelectionSet__setNestedListOfObjectsField__canAccessField() throws {
+  func test__convertToSelectionSet__setNestedListOfObjectsField__canAccessField() async throws {
     // given
-    class Animal: TestMockSchema.MockSelectionSet {
+    final class Animal: TestMockSchema.MockSelectionSet {
       override class var __parentType: any ParentType { TestMockSchema.Interfaces.Animal }
       override class var __selections: [Selection] {[
         .field("nestedListOfObjects", [[CatData]].self),
@@ -514,7 +514,7 @@ class TestMockTests: XCTestCase {
 
       var nestedListOfObjects: [[CatData]] { __data["nestedListOfObjects"] }
 
-      class CatData: TestMockSchema.MockSelectionSet {
+      final class CatData: TestMockSchema.MockSelectionSet {
         override class var __parentType: any ParentType { TestMockSchema.Types.Cat }
         override class var __selections: [Selection] {[
           .field("species", String.self),
@@ -529,7 +529,7 @@ class TestMockTests: XCTestCase {
     mock.nestedListOfObjects = [[cat1, cat2, cat3]]
 
     // when
-    let selectionSet = Animal.from(mock)
+    let selectionSet = await Animal.from(mock)
 
     // then
     expect(selectionSet.nestedListOfObjects.count).to(equal(1))
@@ -542,7 +542,7 @@ class TestMockTests: XCTestCase {
 // MARK: Generated Schema
 enum TestMockSchema: SchemaMetadata {
   typealias MockSelectionSet = AbstractMockSelectionSet<NoFragments, TestMockSchema>
-  open class ConcreteMockTypeCase<T: MockSelectionSet>: MockSelectionSet, InlineFragment {
+  open class ConcreteMockTypeCase<T: MockSelectionSet>: MockSelectionSet, InlineFragment, @unchecked Sendable {
     public typealias RootEntityType = T
   }
 
@@ -660,7 +660,7 @@ enum Species: String, EnumType {
   case feline
 }
 
-struct MockCustomScalar<T: Hashable>: CustomScalarType, Hashable {
+struct MockCustomScalar<T: Hashable & Sendable>: CustomScalarType, Hashable {
   let value: T
 
   init(value: T) {

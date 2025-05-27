@@ -41,15 +41,20 @@ public class MockGraphQLServer {
     }
   }
 
-  public var customDelay: DispatchTimeInterval?
-  public typealias RequestHandler<Operation: GraphQLOperation> = (HTTPRequest<Operation>) -> JSONObject
+  public typealias RequestHandler<Operation: GraphQLOperation> = (any GraphQLRequest<Operation>) ->
+    JSONObject
 
-  private class RequestExpectation<Operation: GraphQLOperation>: XCTestExpectation {
+  private class RequestExpectation<Operation: GraphQLOperation>: XCTestExpectation, @unchecked Sendable {
     let file: StaticString
     let line: UInt
     let handler: RequestHandler<Operation>
 
-    init(description: String, file: StaticString = #filePath, line: UInt = #line, handler: @escaping RequestHandler<Operation>) {
+    init(
+      description: String,
+      file: StaticString = #filePath,
+      line: UInt = #line,
+      handler: @escaping RequestHandler<Operation>
+    ) {
       self.file = file
       self.line = line
       self.handler = handler
@@ -60,14 +65,16 @@ public class MockGraphQLServer {
 
   private let queue = DispatchQueue(label: "com.apollographql.MockGraphQLServer")
 
-  public init() { }
+  public init() {}
 
   // Since RequestExpectation is generic over a specific GraphQLOperation, we can't store these in the dictionary
   // directly. Moreover, there is no way to specify the type relationship that holds between the key and value.
   // To work around this, we store values as Any and use a generic subscript as a type-safe way to access them.
   private var requestExpectations: [AnyHashable: Any] = [:]
 
-  private subscript<Operation: GraphQLOperation>(_ operationType: Operation.Type) -> RequestExpectation<Operation>? {
+  private subscript<Operation: GraphQLOperation>(_ operationType: Operation.Type)
+    -> RequestExpectation<Operation>?
+  {
     get {
       requestExpectations[ObjectIdentifier(operationType)] as! RequestExpectation<Operation>?
     }
@@ -77,7 +84,9 @@ public class MockGraphQLServer {
     }
   }
 
-  private subscript<Operation: GraphQLOperation>(_ operationType: Operation) -> RequestExpectation<Operation>? {
+  private subscript<Operation: GraphQLOperation>(_ operationType: Operation) -> RequestExpectation<
+    Operation
+  >? {
     get {
       requestExpectations[operationType] as! RequestExpectation<Operation>?
     }
@@ -87,9 +96,19 @@ public class MockGraphQLServer {
     }
   }
 
-  public func expect<Operation: GraphQLOperation>(_ operationType: Operation.Type, file: StaticString = #filePath, line: UInt = #line, requestHandler: @escaping (HTTPRequest<Operation>) -> JSONObject) -> XCTestExpectation {
+  public func expect<Operation: GraphQLOperation>(
+    _ operationType: Operation.Type,
+    file: StaticString = #filePath,
+    line: UInt = #line,
+    requestHandler: @escaping RequestHandler<Operation>
+  ) -> XCTestExpectation {
     return queue.sync {
-      let expectation = RequestExpectation<Operation>(description: "Served request for \(String(describing: operationType))", file: file, line: line, handler: requestHandler)
+      let expectation = RequestExpectation<Operation>(
+        description: "Served request for \(String(describing: operationType))",
+        file: file,
+        line: line,
+        handler: requestHandler
+      )
       expectation.assertForOverFulfill = true
 
       self[operationType] = expectation
@@ -98,9 +117,19 @@ public class MockGraphQLServer {
     }
   }
 
-  public func expect<Operation: GraphQLOperation>(_ operation: Operation, file: StaticString = #filePath, line: UInt = #line, requestHandler: @escaping (HTTPRequest<Operation>) -> JSONObject) -> XCTestExpectation {
+  public func expect<Operation: GraphQLOperation>(
+    _ operation: Operation,
+    file: StaticString = #filePath,
+    line: UInt = #line,
+    requestHandler: @escaping RequestHandler<Operation>
+  ) -> XCTestExpectation {
     return queue.sync {
-      let expectation = RequestExpectation<Operation>(description: "Served request for \(String(describing: operation.self))", file: file, line: line, handler: requestHandler)
+      let expectation = RequestExpectation<Operation>(
+        description: "Served request for \(String(describing: operation.self))",
+        file: file,
+        line: line,
+        handler: requestHandler
+      )
       expectation.assertForOverFulfill = true
 
       self[operation] = expectation
@@ -109,21 +138,76 @@ public class MockGraphQLServer {
     }
   }
 
-  func serve<Operation>(request: HTTPRequest<Operation>, completionHandler: @escaping (Result<JSONObject, any Error>) -> Void) where Operation: GraphQLOperation {
+  func serve<Operation>(
+    request: any GraphQLRequest<Operation>
+  ) async throws -> JSONObject where Operation: GraphQLOperation {
     let operationType = type(of: request.operation)
 
     if let expectation = self[request.operation] ?? self[operationType] {
       // Dispatch after a small random delay to spread out concurrent requests and simulate somewhat real-world conditions.
-      queue.asyncAfter(deadline: .now() + (customDelay ?? .milliseconds(Int.random(in: 10...50)))) {
-        completionHandler(.success(expectation.handler(request)))
-        expectation.fulfill()
-      }
+      try await Task.sleep(nanoseconds: UInt64.random(in: 10...50) * 1_000_000)
+      expectation.fulfill()
+      return expectation.handler(request)
 
     } else {
-      queue.async {
-        completionHandler(.failure(ServerError.unexpectedRequest(String(describing: operationType))))
-      }
+      throw ServerError.unexpectedRequest(String(describing: operationType))
+    }
+  }
+}
+
+public struct MockGraphQLServerSession: ApolloURLSession {
+
+  nonisolated(unsafe) let server: MockGraphQLServer
+
+  init(server: MockGraphQLServer) {
+    self.server = server
+  }
+
+  public func chunks(for request: some GraphQLRequest) async throws -> (any AsyncChunkSequence, URLResponse) {
+    let (stream, continuation) = MockAsyncChunkSequence.makeStream()
+    do {
+      let body = try await server.serve(request: request)
+      let data = try JSONSerializationFormat.serialize(value: body)
+      continuation.yield(data)
+      continuation.finish()
+
+    } catch {
+      continuation.finish(throwing: error)
     }
 
+    let httpResponse = HTTPURLResponse(
+      url: TestURL.mockServer.url,
+      statusCode: 200,
+      httpVersion: nil,
+      headerFields: nil
+    )!
+    return (stream, httpResponse)
+  }
+
+  public func invalidateAndCancel() {
+  }
+
+}
+
+
+public struct MockAsyncChunkSequence: AsyncChunkSequence {
+  public typealias UnderlyingStream = AsyncThrowingStream<Data, any Error>
+
+  public typealias AsyncIterator = UnderlyingStream.AsyncIterator
+
+  public typealias Element = Data
+
+  let underlying: UnderlyingStream
+
+  public func makeAsyncIterator() -> UnderlyingStream.AsyncIterator {
+    underlying.makeAsyncIterator()
+  }
+
+  public static func makeStream() -> (
+    stream: MockAsyncChunkSequence,
+    continuation: UnderlyingStream.Continuation
+  ) {
+    let (s, c) = UnderlyingStream.makeStream(of: Data.self)
+    return (Self.init(underlying: s), c)
   }
 }

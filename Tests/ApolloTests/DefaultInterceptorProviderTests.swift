@@ -33,12 +33,12 @@ class DefaultInterceptorProviderTests: XCTestCase {
   
   func testLoading() {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    final class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      final class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -65,12 +65,12 @@ class DefaultInterceptorProviderTests: XCTestCase {
 
   func testInitialLoadFromNetworkAndSecondaryLoadFromCache() {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    final class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      final class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -82,8 +82,10 @@ class DefaultInterceptorProviderTests: XCTestCase {
       DefaultInterceptorProviderTests.mockData
     }
     initialLoadExpectation.assertForOverFulfill = false
+    let fetchCompleteExpectation = self.expectation(description: "fetch complete")
 
     client.fetch(query: MockQuery<GivenSelectionSet>()) { result in
+      defer { fetchCompleteExpectation.fulfill() }
       switch result {
       case .success(let graphQLResult):
         XCTAssertEqual(graphQLResult.source, .server)
@@ -93,11 +95,11 @@ class DefaultInterceptorProviderTests: XCTestCase {
       }
     }
 
-    self.wait(for: [initialLoadExpectation], timeout: 10)
+    self.wait(for: [initialLoadExpectation, fetchCompleteExpectation], timeout: 10)
 
     let secondLoadExpectation = self.expectation(description: "loaded with default client")
 
-    client.fetch(query: MockQuery<GivenSelectionSet>()) { result in
+    client.fetch(query: MockQuery<GivenSelectionSet>(), cachePolicy: .returnCacheDataElseFetch) { result in
       switch result {
       case .success(let graphQLResult):
         XCTAssertEqual(graphQLResult.source, .cache)
@@ -112,74 +114,5 @@ class DefaultInterceptorProviderTests: XCTestCase {
     self.wait(for: [secondLoadExpectation], timeout: 10)
   }
 
-  func test__interceptors__givenOperationWithoutDeferredFragments_shouldUseJSONParsingInterceptor() throws {
-    // given
-    class GivenSelectionSet: MockSelectionSet {
-      override class var __selections: [Selection] { [
-        .field("hero", Hero.self)
-      ]}
 
-      class Hero: MockSelectionSet {
-        override class var __selections: [Selection] {[
-          .field("__typename", String.self),
-          .field("name", String.self)
-        ]}
-      }
-    }
-
-    // when
-    let actual = DefaultInterceptorProvider(client: URLSessionClient(), store: client.store)
-      .interceptors(for: MockQuery<GivenSelectionSet>())
-
-    // then
-    XCTAssertTrue(actual.contains { interceptor in
-      interceptor is JSONResponseParsingInterceptor
-    })
-    XCTAssertFalse(actual.contains { interceptor in
-      interceptor is IncrementalJSONResponseParsingInterceptor
-    })
-  }
-
-  func test__interceptors__givenOperationWithDeferredFragments_shouldUseIncrementalJSONParsingInterceptor() throws {
-    // given
-    class DeferredQuery: MockQuery<DeferredQuery.Animal> {
-      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata> {
-        override class var __selections: [Selection] {[
-          .deferred(DeferredName.self, label: "deferredName"),
-        ]}
-
-        struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
-            __data = _dataDict
-            _deferredName = Deferred(_dataDict: _dataDict)
-          }
-
-          @Deferred var deferredName: DeferredName?
-        }
-
-        class DeferredName: MockTypeCase {
-          override class var __selections: [Selection] {[
-            .field("name", String.self),
-          ]}
-        }
-      }
-
-      override class var deferredFragments: [DeferredFragmentIdentifier : any SelectionSet.Type]? {[
-        DeferredFragmentIdentifier(label: "deferredName", fieldPath: []): Animal.DeferredName.self,
-      ]}
-    }
-
-    // when
-    let actual = DefaultInterceptorProvider(client: URLSessionClient(), store: client.store)
-      .interceptors(for: DeferredQuery())
-
-    // then
-    XCTAssertTrue(actual.contains { interceptor in
-      interceptor is IncrementalJSONResponseParsingInterceptor
-    })
-    XCTAssertFalse(actual.contains { interceptor in
-      interceptor is JSONResponseParsingInterceptor
-    })
-  }
 }

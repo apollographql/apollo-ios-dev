@@ -2,29 +2,12 @@ import Apollo
 import ApolloAPI
 import Foundation
 
-extension HTTPResponse {
-  public static func mock(
-    statusCode: Int = 200,
-    headerFields: [String : String] = [:],
-    data: Data = Data()
-  ) -> HTTPResponse {
-    return HTTPResponse(
-      response: .mock(
-        statusCode: statusCode,
-        headerFields: headerFields
-      ),
-      rawData: data,
-      parsedResponse: nil
-    )
-  }
-}
-
 extension HTTPURLResponse {
   public static func mock(
     url: URL = TestURL.mockServer.url,
     statusCode: Int = 200,
     httpVersion: String? = nil,
-    headerFields: [String : String]? = nil
+    headerFields: [String: String]? = nil
   ) -> HTTPURLResponse {
     return HTTPURLResponse(
       url: url,
@@ -32,5 +15,15 @@ extension HTTPURLResponse {
       httpVersion: httpVersion,
       headerFields: headerFields
     )!
+  }
+
+  public static func deferResponseMock(
+    url: URL = TestURL.mockServer.url,
+    boundary: String = "graphql"
+  ) -> HTTPURLResponse {
+    .mock(
+      url: url,
+      headerFields: ["Content-Type": "multipart/mixed;boundary=\(boundary);deferSpec=20220824"]
+    )
   }
 }

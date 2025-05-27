@@ -76,7 +76,8 @@ extension GraphQLOperation {
     ApolloRequestBodyCreator().requestBody(
       for: self,
       sendQueryDocument: true,
-      autoPersistQuery: false
+      autoPersistQuery: false,
+      clientAwarenessMetadata: .none
     )
   }
 }

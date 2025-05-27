@@ -31,9 +31,7 @@ class RequestContextTimeoutTests: XCTestCase {
   func test__jsonRequest__withoutRequestConfigurationContext_doesNotConfigureRequestTimeout() throws {
     let jsonRequest = JSONRequest(
       operation: MockQuery<Hero>(),
-      graphQLEndpoint: TestURL.mockServer.url,
-      clientName: "test-client",
-      clientVersion: "test-client-version"
+      graphQLEndpoint: TestURL.mockServer.url
     )
 
     let urlRequest = try jsonRequest.toURLRequest()
@@ -45,8 +43,6 @@ class RequestContextTimeoutTests: XCTestCase {
     let jsonRequest = JSONRequest(
       operation: MockQuery<Hero>(),
       graphQLEndpoint: TestURL.mockServer.url,
-      clientName: "test-client",
-      clientVersion: "test-client-version",
       context: twoMinuteTimeout
     )
 
@@ -59,10 +55,8 @@ class RequestContextTimeoutTests: XCTestCase {
 
   func test__uploadRequest__withoutRequestConfigurationContext_doesNotConfigureRequestTimeout() throws {
     let uploadRequest = UploadRequest(
-      graphQLEndpoint: TestURL.mockServer.url,
       operation: MockQuery<Hero>(),
-      clientName: "test-client",
-      clientVersion: "test-client-version",
+      graphQLEndpoint: TestURL.mockServer.url,
       files: [GraphQLFile(fieldName: "x", originalName: "y", data: "z".data(using: .utf8)!)]
     )
 
@@ -73,10 +67,8 @@ class RequestContextTimeoutTests: XCTestCase {
 
   func test__uploadRequest__givenRequestConfigurationContext_shouldConfigureRequestTimeout() throws {
     let uploadRequest = UploadRequest(
+      operation: MockQuery<Hero>(),      
       graphQLEndpoint: TestURL.mockServer.url,
-      operation: MockQuery<Hero>(),
-      clientName: "test-client",
-      clientVersion: "test-client-version",
       files: [GraphQLFile(fieldName: "x", originalName: "y", data: "z".data(using: .utf8)!)],
       context: twoMinuteTimeout
     )

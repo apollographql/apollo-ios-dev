@@ -28,12 +28,12 @@ struct AnyGraphQLResponse {
   >(
     selectionSet: Data.Type,
     with accumulator: Accumulator
-  ) throws -> Accumulator.FinalResult? {
+  ) async throws -> Accumulator.FinalResult? {
     guard let dataEntry = body["data"] as? JSONObject else {
       return nil
     }
 
-    return try executor.execute(
+    return try await executor.execute(
       selectionSet: Data.self,
       on: dataEntry,
       withRootCacheReference: rootKey,
@@ -51,12 +51,12 @@ struct AnyGraphQLResponse {
     selectionSet: any Deferrable.Type,
     in operation: Operation.Type,
     with accumulator: Accumulator
-  ) throws -> Accumulator.FinalResult? {
+  ) async throws -> Accumulator.FinalResult? {
     guard let dataEntry = body["data"] as? JSONObject else {
       return nil
     }
 
-    return try executor.execute(
+    return try await executor.execute(
       selectionSet: selectionSet,
       in: Operation.self,
       on: dataEntry,

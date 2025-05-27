@@ -1,7 +1,11 @@
 import Foundation
 
-public class MockURLProtocol<RequestProvider: MockRequestProvider>: URLProtocol {
-  
+public enum MockURLError: Swift.Error {
+  case requestNotHandled
+}
+
+public final class MockURLProtocol<RequestProvider: MockResponseProvider>: URLProtocol {
+
   override class public func canInit(with request: URLRequest) -> Bool {
     return true
   }
@@ -9,48 +13,65 @@ public class MockURLProtocol<RequestProvider: MockRequestProvider>: URLProtocol 
   override class public func canonicalRequest(for request: URLRequest) -> URLRequest {
     return request
   }
-  
-  override public func startLoading() {
-    guard
-      let url = self.request.url,
-      let handler = RequestProvider.requestHandlers[url]
-    else { return }
 
-    DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in: 0.0...0.25)) {
-      defer {
-        RequestProvider.requestHandlers.removeValue(forKey: url)
+  private var asyncTask: Task<Void, any Error>?
+
+  override public func startLoading() {
+    self.asyncTask = Task {
+      guard
+        let handler = await requestHandler(for: request.url)
+      else {
+        self.client?.urlProtocol(self, didFailWithError: MockURLError.requestNotHandled)
+        return
       }
-      
+
       do {
-        let result = try handler(self.request)
-        
-        switch result {
-        case let .success((response, data)):
-          self.client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-          
-          if let data = data {
-            self.client?.urlProtocol(self, didLoad: data)
-          }
-          
+        defer {
           self.client?.urlProtocolDidFinishLoading(self)
-        case let .failure(error):
-          self.client?.urlProtocol(self, didFailWithError: error)
         }
-        
+
+        let (response, dataStream) = try await handler(self.request)
+
+        try Task.checkCancellation()
+
+        self.client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+
+        guard let dataStream else {
+          return
+        }
+
+        for try await data in dataStream {
+          try Task.checkCancellation()
+
+          self.client?.urlProtocol(self, didLoad: data)
+        }
+
       } catch {
         self.client?.urlProtocol(self, didFailWithError: error)
       }
     }
   }
-  
+
+  private func requestHandler(for url: URL?) async -> MockResponseProvider.MultiResponseHandler? {
+    guard let url = url else { return nil }
+
+    if let handler = await RequestProvider.requestHandler(for: url) {
+      return handler
+    }
+
+    var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
+    urlComponents?.query = nil
+
+    if let urlWithoutQueryString = urlComponents?.string,
+       let urlWithoutQuery = URL(string: urlWithoutQueryString) {
+      return await RequestProvider.requestHandler(for: urlWithoutQuery)
+    }
+
+    return nil
+  }
+
   override public func stopLoading() {
+    self.asyncTask?.cancel()
   }
   
-}
-
-public protocol MockRequestProvider {
-  typealias MockRequestHandler = ((URLRequest) throws -> Result<(HTTPURLResponse, Data?), any Error>)
-  
-  // Dictionary of mock request handlers where the `key` is the URL of the request.
-  static var requestHandlers: [URL: MockRequestHandler] { get set }
 }
