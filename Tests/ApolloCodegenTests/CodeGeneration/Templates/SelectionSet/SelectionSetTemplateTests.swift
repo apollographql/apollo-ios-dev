@@ -12657,7 +12657,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      #warning("Argument 'name' of field 'friend' is deprecated. Reason: 'Someone broke it.'"),
+      #warning("Argument 'name' of field 'friend' is deprecated. Reason: 'Someone broke it.'")
       #warning("Argument 'species' of field 'friend' is deprecated. Reason: 'Who cares?'")
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
@@ -12707,7 +12707,7 @@ class SelectionSetTemplateTests: XCTestCase {
     """
 
     let expected = """
-      #warning("Argument 'name' of field 'friend' is deprecated. Reason: 'Someone broke it.'"),
+      #warning("Argument 'name' of field 'friend' is deprecated. Reason: 'Someone broke it.'")
       #warning("Argument 'species' of field 'species' is deprecated. Reason: 'Redundant'")
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
