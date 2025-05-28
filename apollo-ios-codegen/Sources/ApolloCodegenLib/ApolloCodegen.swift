@@ -303,7 +303,7 @@ public class ApolloCodegen {
     ///
     /// Local cache mutations require some codegen options to be overridden to generate valid objects. 
     /// This context overrides only the necessary properties, copying all other values from the user-provided `context`.
-    private lazy var cacheMutationContext: ConfigurationContext = {
+    lazy var cacheMutationContext: ConfigurationContext = {
       ConfigurationContext(
         config: ApolloCodegenConfiguration(
           schemaNamespace: self.config.schemaNamespace,
