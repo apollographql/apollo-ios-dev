@@ -299,7 +299,11 @@ public class ApolloCodegen {
     let mergeNamedFragmentFields = config.experimentalFeatures.fieldMerging.options
       .contains(.namedFragments)
 
-    lazy var cacheMutationContext: ConfigurationContext = {
+    /// A `ConfigurationContext` to use when generated local cache mutations.
+    ///
+    /// Local cache mutations require some codegen options to be overridden to generate valid objects. 
+    /// This context overrides only the necessary properties, copying all other values from the user-provided `context`.
+    private lazy var cacheMutationContext: ConfigurationContext = {
       ConfigurationContext(
         config: ApolloCodegenConfiguration(
           schemaNamespace: self.config.schemaNamespace,
