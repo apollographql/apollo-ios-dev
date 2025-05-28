@@ -295,7 +295,7 @@ struct SelectionSetTemplate {
       \(if: deprecatedArguments != nil && !deprecatedArguments.unsafelyUnwrapped.isEmpty, """
       \(deprecatedArguments.unsafelyUnwrapped.map { """
         \(field: $0.field, argument: $0.arg, warningReason: $0.reason)
-        """})
+        """}, separator: "\n")
       """)
       \(selectionsTemplate)
       """
