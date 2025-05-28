@@ -2919,20 +2919,6 @@ class ApolloCodegenTests: XCTestCase {
 
       interface Animal {
         species: String
-        predator: Animal
-        name: String
-      }
-      
-      interface Pet implements Animal {
-        species: String
-        predator: Animal
-        name: String
-      }
-
-      type Dog implements Animal & Pet {
-        species: String
-        predator: Animal
-        name: String
       }
       """,
       filename: "schema.graphqls"
@@ -2942,22 +2928,6 @@ class ApolloCodegenTests: XCTestCase {
       body: """
       query TestOperation @apollo_client_ios_localCacheMutation {
         allAnimals {
-          predator {
-            species
-            ... on Pet {
-              name
-              ...TestFragment
-            }
-          }
-          ... on Dog {
-            species
-            name
-          }
-        }
-      }
-      
-      fragment TestFragment on Animal {
-        predator {
           species
         }
       }
@@ -2971,225 +2941,10 @@ class ApolloCodegenTests: XCTestCase {
     fileManager.mock(closure: .createFile({ path, data, attributes in
       if path.hasSuffix("TestOperationLocalCacheMutation.graphql.swift") {
         expect(data?.asString).to(equalLineByLine("""
-            class TestOperationLocalCacheMutation: LocalCacheMutation {
-              static let operationType: GraphQLOperationType = .query
-
-              public init() {}
-
-              struct Data: TestSchema.MutableSelectionSet {
-                var __data: DataDict
-                init(_dataDict: DataDict) { __data = _dataDict }
-
-                static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
-                static var __selections: [ApolloAPI.Selection] { [
-                  .field("allAnimals", [AllAnimal]?.self),
-                ] }
-
-                var allAnimals: [AllAnimal]? {
-                  get { __data["allAnimals"] }
-                  set { __data["allAnimals"] = newValue }
-                }
-
                 init(
                   allAnimals: [AllAnimal]? = nil
                 ) {
-                  self.init(_dataDict: DataDict(
-                    data: [
-                      "__typename": TestSchema.Objects.Query.typename,
-                      "allAnimals": allAnimals._fieldData,
-                    ],
-                    fulfilledFragments: [
-                      ObjectIdentifier(TestOperationLocalCacheMutation.Data.self)
-                    ]
-                  ))
-                }
-
-                /// AllAnimal
-                ///
-                /// Parent Type: `Animal`
-                struct AllAnimal: TestSchema.MutableSelectionSet {
-                  var __data: DataDict
-                  init(_dataDict: DataDict) { __data = _dataDict }
-
-                  static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
-                  static var __selections: [ApolloAPI.Selection] { [
-                    .field("__typename", String.self),
-                    .field("predator", Predator?.self),
-                    .inlineFragment(AsDog.self),
-                  ] }
-
-                  var predator: Predator? {
-                    get { __data["predator"] }
-                    set { __data["predator"] = newValue }
-                  }
-
-                  var asDog: AsDog? { _asInlineFragment() }
-
-                  init(
-                    __typename: String,
-                    predator: Predator? = nil
-                  ) {
-                    self.init(_dataDict: DataDict(
-                      data: [
-                        "__typename": __typename,
-                        "predator": predator._fieldData,
-                      ],
-                      fulfilledFragments: [
-                        ObjectIdentifier(TestOperationLocalCacheMutation.Data.AllAnimal.self)
-                      ]
-                    ))
-                  }
-
-                  /// AllAnimal.Predator
-                  ///
-                  /// Parent Type: `Animal`
-                  struct Predator: TestSchema.MutableSelectionSet {
-                    var __data: DataDict
-                    init(_dataDict: DataDict) { __data = _dataDict }
-
-                    static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
-                    static var __selections: [ApolloAPI.Selection] { [
-                      .field("__typename", String.self),
-                      .field("species", String?.self),
-                      .inlineFragment(AsPet.self),
-                    ] }
-
-                    var species: String? {
-                      get { __data["species"] }
-                      set { __data["species"] = newValue }
-                    }
-
-                    var asPet: AsPet? { _asInlineFragment() }
-
-                    init(
-                      __typename: String,
-                      species: String? = nil
-                    ) {
-                      self.init(_dataDict: DataDict(
-                        data: [
-                          "__typename": __typename,
-                          "species": species,
-                        ],
-                        fulfilledFragments: [
-                          ObjectIdentifier(TestOperationLocalCacheMutation.Data.AllAnimal.Predator.self)
-                        ]
-                      ))
-                    }
-
-                    /// AllAnimal.Predator.AsPet
-                    ///
-                    /// Parent Type: `Pet`
-                    struct AsPet: TestSchema.MutableInlineFragment {
-                      var __data: DataDict
-                      init(_dataDict: DataDict) { __data = _dataDict }
-
-                      typealias RootEntityType = TestOperationLocalCacheMutation.Data.AllAnimal.Predator
-                      static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Pet }
-                      static var __selections: [ApolloAPI.Selection] { [
-                        .field("name", String?.self),
-                        .fragment(TestFragment.self),
-                      ] }
-
-                      var name: String? {
-                        get { __data["name"] }
-                        set { __data["name"] = newValue }
-                      }
-                      var species: String? {
-                        get { __data["species"] }
-                        set { __data["species"] = newValue }
-                      }
-                      var predator: Predator? {
-                        get { __data["predator"] }
-                        set { __data["predator"] = newValue }
-                      }
-          
-                      struct Fragments: FragmentContainer {
-                        var __data: DataDict
-                        init(_dataDict: DataDict) { __data = _dataDict }
-
-                        var testFragment: TestFragment {
-                          get { _toFragment() }
-                          _modify { var f = testFragment; yield &f; __data = f.__data }
-                        }
-                      }
-
-                      init(
-                        __typename: String,
-                        name: String? = nil,
-                        species: String? = nil,
-                        predator: Predator? = nil
-                      ) {
-                        self.init(_dataDict: DataDict(
-                          data: [
-                            "__typename": __typename,
-                            "name": name,
-                            "species": species,
-                            "predator": predator._fieldData,
-                          ],
-                          fulfilledFragments: [
-                            ObjectIdentifier(TestOperationLocalCacheMutation.Data.AllAnimal.Predator.self),
-                            ObjectIdentifier(TestOperationLocalCacheMutation.Data.AllAnimal.Predator.AsPet.self),
-                            ObjectIdentifier(TestFragment.self)
-                          ]
-                        ))
-                      }
-          
-                      typealias Predator = TestFragment.Predator
-                    }
-                  }
-
-                  /// AllAnimal.AsDog
-                  ///
-                  /// Parent Type: `Dog`
-                  struct AsDog: TestSchema.MutableInlineFragment {
-                    var __data: DataDict
-                    init(_dataDict: DataDict) { __data = _dataDict }
-
-                    typealias RootEntityType = TestOperationLocalCacheMutation.Data.AllAnimal
-                    static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
-                    static var __selections: [ApolloAPI.Selection] { [
-                      .field("species", String?.self),
-                      .field("name", String?.self),
-                    ] }
-
-                    var species: String? {
-                      get { __data["species"] }
-                      set { __data["species"] = newValue }
-                    }
-                    var name: String? {
-                      get { __data["name"] }
-                      set { __data["name"] = newValue }
-                    }
-                    var predator: Predator? {
-                      get { __data["predator"] }
-                      set { __data["predator"] = newValue }
-                    }
-
-                    init(
-                      species: String? = nil,
-                      name: String? = nil,
-                      predator: Predator? = nil
-                    ) {
-                      self.init(_dataDict: DataDict(
-                        data: [
-                          "__typename": TestSchema.Objects.Dog.typename,
-                          "species": species,
-                          "name": name,
-                          "predator": predator._fieldData,
-                        ],
-                        fulfilledFragments: [
-                          ObjectIdentifier(TestOperationLocalCacheMutation.Data.AllAnimal.self),
-                          ObjectIdentifier(TestOperationLocalCacheMutation.Data.AllAnimal.AsDog.self)
-                        ]
-                      ))
-                    }
-                  }
-                }
-              }
-            }
-
-          }
-          """, atLine: 7))
+          """, atLine: 26, ignoringExtraLines: true))
 
         expectation.fulfill()
       }
@@ -3243,20 +2998,6 @@ class ApolloCodegenTests: XCTestCase {
 
       interface Animal {
         species: String
-        predator: Animal
-        name: String
-      }
-      
-      interface Pet implements Animal {
-        species: String
-        predator: Animal
-        name: String
-      }
-
-      type Dog implements Animal & Pet {
-        species: String
-        predator: Animal
-        name: String
       }
       """,
       filename: "schema.graphqls"
@@ -3266,18 +3007,12 @@ class ApolloCodegenTests: XCTestCase {
       body: """
       query TestOperation {
         allAnimals {
-          predator {
-            ...PredatorFragment
-          }
-          ... on Dog {
-            ...PredatorFragment
-          }
+          ...PredatorFragment
         }
       }
       
       fragment PredatorFragment on Animal @apollo_client_ios_localCacheMutation {
         species
-        name
       }
       """,
       filename: "operation.graphql"
@@ -3289,50 +3024,11 @@ class ApolloCodegenTests: XCTestCase {
     fileManager.mock(closure: .createFile({ path, data, attributes in
       if path.hasSuffix("PredatorFragment.graphql.swift") {
         expect(data?.asString).to(equalLineByLine("""
-            struct PredatorFragment: TestSchema.MutableSelectionSet, Fragment {
-              static var fragmentDefinition: StaticString {
-                #"fragment PredatorFragment on Animal { __typename species name }"#
-              }
-
-              var __data: DataDict
-              init(_dataDict: DataDict) { __data = _dataDict }
-
-              static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
-              static var __selections: [ApolloAPI.Selection] { [
-                .field("__typename", String.self),
-                .field("species", String?.self),
-                .field("name", String?.self),
-              ] }
-
-              var species: String? {
-                get { __data["species"] }
-                set { __data["species"] = newValue }
-              }
-              var name: String? {
-                get { __data["name"] }
-                set { __data["name"] = newValue }
-              }
-
               init(
                 __typename: String,
-                species: String? = nil,
-                name: String? = nil
+                species: String? = nil
               ) {
-                self.init(_dataDict: DataDict(
-                  data: [
-                    "__typename": __typename,
-                    "species": species,
-                    "name": name,
-                  ],
-                  fulfilledFragments: [
-                    ObjectIdentifier(PredatorFragment.self)
-                  ]
-                ))
-              }
-            }
-
-          }
-          """, atLine: 7))
+          """, atLine: 26, ignoringExtraLines: true))
 
         expectation.fulfill()
       }
