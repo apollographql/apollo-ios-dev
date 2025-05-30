@@ -102,6 +102,12 @@
   "topicSections" : [
     {
       "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/cache"
+      ],
+      "title" : "Instance Properties"
+    },
+    {
+      "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/removeObject(for:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/removeObjects(matching:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/update(_:_:)",
@@ -244,6 +250,40 @@
   "title" : "ApolloStore.ReadWriteTransaction",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction"
+},
+"doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/cache": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "cache"
+    },
+    {
+      "kind" : "text",
+      "text" : ": any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15NormalizedCacheP",
+      "text" : "NormalizedCache"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/cache",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "cache",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/cache"
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/removeObject(for:)": {
   "abstract" : [

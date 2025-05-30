@@ -9,17 +9,17 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ReadOnlyNormalizedCache"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache\/loadRecords(forKeys:)"
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/ReadOnlyNormalizedCache\/loadRecords(forKeys:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo15NormalizedCacheP11loadRecords7forKeysSDySSAA6RecordVGShySSG_tKF",
+    "externalID" : "s:6Apollo23ReadOnlyNormalizedCacheP11loadRecords7forKeysSDySSAA6RecordVGShySSG_tKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -112,14 +112,6 @@
             "macOS"
           ],
           "tokens" : [
-            {
-              "kind" : "keyword",
-              "text" : "override"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
             {
               "kind" : "keyword",
               "text" : "func"
@@ -255,7 +247,7 @@
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollo\/normalizedcache\/loadrecords(forkeys:)"
+        "\/documentation\/apollo\/readonlynormalizedcache\/loadrecords(forkeys:)"
       ],
       "traits" : [
         {
@@ -314,9 +306,28 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/cachekey"
 },
-"doc://Apollo/documentation/Apollo/NormalizedCache": {
+"doc://Apollo/documentation/Apollo/ReadOnlyNormalizedCache": {
   "abstract" : [
-
+    {
+      "text" : "A read-only view of a ",
+      "type" : "text"
+    },
+    {
+      "code" : "NormalizedCache",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " for use within a ",
+      "type" : "text"
+    },
+    {
+      "code" : "ReadTransaction",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -329,23 +340,23 @@
     },
     {
       "kind" : "identifier",
-      "text" : "NormalizedCache"
+      "text" : "ReadOnlyNormalizedCache"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ReadOnlyNormalizedCache",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "NormalizedCache"
+      "text" : "ReadOnlyNormalizedCache"
     }
   ],
   "role" : "symbol",
-  "title" : "NormalizedCache",
+  "title" : "ReadOnlyNormalizedCache",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/normalizedcache"
+  "url" : "\/documentation\/apollo\/readonlynormalizedcache"
 },
-"doc://Apollo/documentation/Apollo/NormalizedCache/loadRecords(forKeys:)": {
+"doc://Apollo/documentation/Apollo/ReadOnlyNormalizedCache/loadRecords(forKeys:)": {
   "abstract" : [
     {
       "text" : "Loads records corresponding to the given keys.",
@@ -422,13 +433,13 @@
       "text" : "]"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache\/loadRecords(forKeys:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ReadOnlyNormalizedCache\/loadRecords(forKeys:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
   "title" : "loadRecords(forKeys:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/normalizedcache\/loadrecords(forkeys:)"
+  "url" : "\/documentation\/apollo\/readonlynormalizedcache\/loadrecords(forkeys:)"
 },
 "doc://Apollo/documentation/Apollo/Record": {
   "abstract" : [
