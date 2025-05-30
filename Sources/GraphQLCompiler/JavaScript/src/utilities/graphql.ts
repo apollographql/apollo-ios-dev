@@ -59,6 +59,18 @@ export function isMetaFieldName(name: string) {
   return name.startsWith("__");
 }
 
+export function containsLocalCacheMutationDirective(directives: readonly DirectiveNode[] | undefined): boolean {
+  if (!directives) return false
+
+  for (const directive of directives) {
+    if (directive.name.value == directive_apollo_client_ios_localCacheMutation.name.value) {
+      return true
+    }
+  }
+
+  return false
+}
+
 const typenameField: FieldNode = {
   kind: Kind.FIELD,
   name: { kind: Kind.NAME, value: "__typename" },
