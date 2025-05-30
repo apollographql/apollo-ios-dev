@@ -149,7 +149,8 @@ public extension CompilationResult.FragmentDefinition {
       directives: nil,
       referencedFragments: [],
       source: source,
-      filePath: path
+      filePath: path,
+      overrideAsLocalCacheMutation: false
     )
   }
 }
