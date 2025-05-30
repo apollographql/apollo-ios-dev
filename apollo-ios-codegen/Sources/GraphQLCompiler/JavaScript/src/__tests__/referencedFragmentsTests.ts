@@ -184,3 +184,114 @@ describe("operation with referencedFragments on child entity selection sets", ()
   });
 
 });
+
+describe("local cache mutation operation with referenced fragments", () => {
+  const schemaSDL: string =
+`type Query {
+  allAnimals: [Animal!]
+}
+
+interface Animal {
+  species: String!
+  friend: Animal!
+}`;
+
+  const schema: GraphQLSchema = loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
+
+  const documentString: string =
+`query Test @apollo_client_ios_localCacheMutation {
+  allAnimals {
+    ...SpeciesFragment
+  }
+}
+
+fragment SpeciesFragment on Animal {
+  species
+  ...FriendFragment
+}
+
+fragment FriendFragment on Animal {
+  friend {
+    species
+  }
+}`;
+
+  const document: DocumentNode = parseOperationDocument(
+    new Source(documentString, "Test Query", { line: 1, column: 1 })
+  );
+
+  it("should flag the referenced fragments as being local cache mutations too.", () => {
+    const compilationResult: CompilationResult = compileDocument(schema, document, false, false, emptyValidationOptions);
+
+    const speciesFragment: FragmentDefinition = compilationResult.fragments.find(function (element) {
+      return element.name == 'SpeciesFragment'
+    }) as FragmentDefinition
+    const friendFragment: FragmentDefinition = compilationResult.fragments.find(function (element) {
+      return element.name == 'FriendFragment'
+    }) as FragmentDefinition
+
+    expect(speciesFragment.overrideAsLocalCacheMutation).toBeTruthy();
+    expect(friendFragment.overrideAsLocalCacheMutation).toBeTruthy();
+  });
+});
+
+describe("local cache mutation fragment with referenced fragments", () => {
+  const schemaSDL: string =
+`type Query {
+  allAnimals: [Animal!]
+}
+
+interface Animal {
+  name: String!
+  species: String!
+  friend: Animal!
+}`;
+
+  const schema: GraphQLSchema = loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
+
+  const documentString: string =
+`query Test {
+  allAnimals {
+    ...NameFragment
+    ...SpeciesFragment
+  }
+}
+
+fragment NameFragment on Animal {
+  name
+}
+
+fragment SpeciesFragment on Animal @apollo_client_ios_localCacheMutation {
+  species
+  ...FriendFragment
+}
+
+fragment FriendFragment on Animal {
+  friend {
+    species
+  }
+}`;
+
+  const document: DocumentNode = parseOperationDocument(
+    new Source(documentString, "Test Query", { line: 1, column: 1 })
+  );
+
+  it("should only flag the cache mutation referenced fragment as being local cache mutation.", () => {
+    const compilationResult: CompilationResult = compileDocument(schema, document, false, false, emptyValidationOptions);
+    
+    const nameFragment: FragmentDefinition = compilationResult.fragments.find(function (element) {
+      return element.name == 'NameFragment'
+    }) as FragmentDefinition
+    const speciesFragment: FragmentDefinition = compilationResult.fragments.find(function (element) {
+      return element.name == 'SpeciesFragment'
+    }) as FragmentDefinition
+    const friendFragment: FragmentDefinition = compilationResult.fragments.find(function (element) {
+      return element.name == 'FriendFragment'
+    }) as FragmentDefinition
+
+    expect(nameFragment.overrideAsLocalCacheMutation).toBeFalsy();
+    expect(speciesFragment.overrideAsLocalCacheMutation).toBeFalsy();
+
+    expect(friendFragment.overrideAsLocalCacheMutation).toBeTruthy();
+  });
+});
