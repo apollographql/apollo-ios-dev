@@ -2904,4 +2904,172 @@ class ApolloCodegenTests: XCTestCase {
 
   }
 
+  // MARK: - Local Cache Mutation + Field Merging Integration Tests
+  //
+  // These are integration tests because the codegen test wrapper infrastructure does not support overriding config
+  // values during the test.
+
+  func test__fileRendering__givenLocalCacheMutationQuery_whenSelectionSetInitializersEmpty_andFileMergingNone_shouldGenerateFullSelectionSetInitializers() async throws {
+    // given
+    try createFile(
+      body: """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        species: String
+      }
+      """,
+      filename: "schema.graphqls"
+    )
+
+    try createFile(
+      body: """
+      query TestOperation @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
+      }
+      """,
+      filename: "operation.graphql"
+    )
+
+    let fileManager = MockApolloFileManager(strict: false)
+    let expectation = expectation(description: "Received local cache mutation file data.")
+
+    fileManager.mock(closure: .createFile({ path, data, attributes in
+      if path.hasSuffix("TestOperationLocalCacheMutation.graphql.swift") {
+        expect(data?.asString).to(equalLineByLine("""
+                init(
+                  allAnimals: [AllAnimal]? = nil
+                ) {
+          """, atLine: 26, ignoringExtraLines: true))
+
+        expectation.fulfill()
+      }
+
+      return true
+    }))
+
+    // when
+    let config = ApolloCodegen.ConfigurationContext(
+      config: ApolloCodegenConfiguration.mock(
+        input: .init(
+          schemaSearchPaths: [directoryURL.appendingPathComponent("schema.graphqls").path],
+          operationSearchPaths: [directoryURL.appendingPathComponent("operation.graphql").path]
+        ),
+        // Apollo codegen should override the next two value to force the generation of selection set initializers
+        // and perform all file merging for the local cache mutation.
+        options: .init(selectionSetInitializers: []),
+        experimentalFeatures: .init(fieldMerging: .none)
+      ),
+      rootURL: nil
+    )
+
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
+    let compilationResult = try await subject.compileGraphQLResult()
+    let ir = IRBuilder(compilationResult: compilationResult)
+
+    try await subject.generateFiles(
+      compilationResult: compilationResult,
+      ir: ir,
+      fileManager: fileManager
+    )
+
+    // then
+    expect(fileManager.allClosuresCalled).to(beTrue())
+
+    await fulfillment(of: [expectation], timeout: 1)
+  }
+
+  func test__fileRendering__givenLocalCacheMutationFragment_whenSelectionSetInitializersEmpty_andFileMergingNone_shouldGenerateFullSelectionSetInitializers() async throws {
+    // given
+    try createFile(
+      body: """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        species: String
+      }
+      """,
+      filename: "schema.graphqls"
+    )
+
+    try createFile(
+      body: """
+      query TestOperation {
+        allAnimals {
+          ...PredatorFragment
+        }
+      }
+      
+      fragment PredatorFragment on Animal @apollo_client_ios_localCacheMutation {
+        species
+      }
+      """,
+      filename: "operation.graphql"
+    )
+
+    let fileManager = MockApolloFileManager(strict: false)
+    let expectation = expectation(description: "Received local cache mutation file data.")
+
+    fileManager.mock(closure: .createFile({ path, data, attributes in
+      if path.hasSuffix("PredatorFragment.graphql.swift") {
+        expect(data?.asString).to(equalLineByLine("""
+              init(
+                __typename: String,
+                species: String? = nil
+              ) {
+          """, atLine: 26, ignoringExtraLines: true))
+
+        expectation.fulfill()
+      }
+
+      return true
+    }))
+
+    // when
+    let config = ApolloCodegen.ConfigurationContext(
+      config: ApolloCodegenConfiguration.mock(
+        input: .init(
+          schemaSearchPaths: [directoryURL.appendingPathComponent("schema.graphqls").path],
+          operationSearchPaths: [directoryURL.appendingPathComponent("operation.graphql").path]
+        ),
+        // Apollo codegen should override the next two value to force the generation of selection set initializers
+        // and perform all file merging for the local cache mutation.
+        options: .init(selectionSetInitializers: []),
+        experimentalFeatures: .init(fieldMerging: .none)
+      ),
+      rootURL: nil
+    )
+
+    let subject = ApolloCodegen(
+      config: config,
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
+    let compilationResult = try await subject.compileGraphQLResult()
+    let ir = IRBuilder(compilationResult: compilationResult)
+
+    try await subject.generateFiles(
+      compilationResult: compilationResult,
+      ir: ir,
+      fileManager: fileManager
+    )
+
+    // then
+    expect(fileManager.allClosuresCalled).to(beTrue())
+
+    await fulfillment(of: [expectation], timeout: 1)
+  }
+
 }
