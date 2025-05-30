@@ -201,6 +201,15 @@
               {
                 "children" : [
                   {
+                    "title" : "Instance Properties",
+                    "type" : "groupMarker"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/apollostore\/readtransaction\/readonlycache",
+                    "title" : "var readOnlyCache: any ReadOnlyNormalizedCache",
+                    "type" : "property"
+                  },
+                  {
                     "title" : "Instance Methods",
                     "type" : "groupMarker"
                   },
@@ -221,6 +230,15 @@
               },
               {
                 "children" : [
+                  {
+                    "title" : "Instance Properties",
+                    "type" : "groupMarker"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/cache",
+                    "title" : "var cache: any NormalizedCache",
+                    "type" : "property"
+                  },
                   {
                     "title" : "Instance Methods",
                     "type" : "groupMarker"
@@ -2140,6 +2158,22 @@
             ],
             "path" : "\/documentation\/apollo\/normalizedcache",
             "title" : "NormalizedCache",
+            "type" : "protocol"
+          },
+          {
+            "children" : [
+              {
+                "title" : "Instance Methods",
+                "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/readonlynormalizedcache\/loadrecords(forkeys:)",
+                "title" : "func loadRecords(forKeys: Set<CacheKey>) throws -> [CacheKey : Record]",
+                "type" : "method"
+              }
+            ],
+            "path" : "\/documentation\/apollo\/readonlynormalizedcache",
+            "title" : "ReadOnlyNormalizedCache",
             "type" : "protocol"
           },
           {
