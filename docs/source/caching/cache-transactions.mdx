@@ -48,6 +48,8 @@ A [`LocalCacheMutation`](https://www.apollographql.com/docs/ios/docc/documentati
 
 When a query or fragment with this directive is defined, the code generation engine will generate a mutable model that can be used with a [`ReadWriteTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readwritetransaction) to write data to the cache.
 
+> Any fragments referenced within a local cache mutation operation will also be generated as mutable. This will happen regardless of whether they are defined with the `@apollo_client_ios_localCacheMutation` directive or not. Code generation does this so that _all_ data related to the local cache mutation is mutable.
+
 > Your query definitions can also define variables for these operations to mutate cache data for fields with input arguments. For more information see our [operation argument documentation](./../fetching/operation-arguments).
 
 <CodeColumns>
