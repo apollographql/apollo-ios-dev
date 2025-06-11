@@ -1951,14 +1951,14 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         .field("name", String.self),
         .field("id", String.self),
         .field("__typename", String.self),
-//        .include(if: !"skip", [
+        .include(if: !"skip", [
           .field("birthday", String.self)
-//        ])
+        ])
       ]}
     }
 
     let watchedQuery = MockQuery<HeroSelectionSet>()
-    watchedQuery.__variables?["skip"] = false
+    watchedQuery.__variables = ["skip": false]
     
     let resultObserver = makeResultObserver(for: watchedQuery)
     
@@ -2025,7 +2025,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       let otherFetchCompletedExpectation = expectation(description: "Other fetch completed")
 
       var mockSub = MockSubscription<HeroSelectionSet>()
-      mockSub.__variables?["skip"] = true
+      mockSub.__variables = ["skip": true]
       let subject = webSocketClient.subscribe(subscription: mockSub) { result in
         defer { otherFetchCompletedExpectation.fulfill() }
         XCTAssertSuccessResult(result)
@@ -2036,7 +2036,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         "id": "1",
         "payload": [
           "data": [
-            "name": "Artoo",
+            "name": "C3PO",
             "__typename": "Droid",
             "id": "2"
           ]
