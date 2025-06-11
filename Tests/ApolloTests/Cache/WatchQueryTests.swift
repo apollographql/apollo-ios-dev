@@ -1947,20 +1947,26 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
   
   @MainActor
   func testWatchedQueryGetsUpdatedFromSubscriptionWithSkipDirective() throws {
-    class HeroSelectionSet: MockSelectionSet {
-      override class var __selections: [Selection] { [
-        .field("name", String.self),
-        .field("id", String.self),
-        .field("__typename", String.self),
-        .include(if: !"skip", [
-          .field("birthday", String.self)
-        ])
-      ]}
+    class ParentSelectionSet: MockSelectionSet {
+      override class var __selections: [Selection] {[
+          .field("hero", Hero.self)
+        ]}
+      
+      class Hero: MockSelectionSet {
+        override class var __selections: [Selection] { [
+          .field("name", String.self),
+          .field("id", String.self),
+          .field("__typename", String.self),
+          .include(if: !"skip", [
+            .field("birthday", String.self)
+          ])
+        ]}
+      }
     }
 
     MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
     
-    let watchedQuery = MockQuery<HeroSelectionSet>()
+    let watchedQuery = MockQuery<ParentSelectionSet>()
     watchedQuery.__variables = ["skip": false]
     
     let resultObserver = makeResultObserver(for: watchedQuery)
@@ -1972,13 +1978,15 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     
     runActivity("Initial fetch from server") { _ in
       let serverRequestExpectation =
-        server.expect(MockQuery<HeroSelectionSet>.self) { request in
+        server.expect(MockQuery<ParentSelectionSet>.self) { request in
         [
           "data": [
-            "name": "R2-D2",
-            "__typename": "Droid",
-            "id": "2",
-            "birthday": "1BBY"
+            "hero" : [
+              "name": "R2-D2",
+              "__typename": "Droid",
+              "id": "2",
+              "birthday": "1BBY"
+            ]
           ]
         ]
       }
@@ -1991,8 +1999,8 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
           XCTAssertNil(graphQLResult.errors)
           
           let data = try XCTUnwrap(graphQLResult.data)
-          XCTAssertEqual(data.name, "R2-D2")
-          XCTAssertEqual(data.birthday, "1BBY")
+          XCTAssertEqual(data.hero?.name, "R2-D2")
+          XCTAssertEqual(data.hero?.birthday, "1BBY")
         }
       }
       
@@ -2002,16 +2010,18 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     }
     
     runActivity("Fetch overlapping query from server") { _ in
-      let serverRequestExpectation =
-        server.expect(MockSubscription<HeroSelectionSet>.self) { request in
-        [
-          "data": [
-            "name": "C3PO",
-            "__typename": "Droid",
-            "id": "2"
-          ]
-        ]
-      }
+//      let serverRequestExpectation =
+//        server.expect(MockSubscription<ParentSelectionSet>.self) { request in
+//        [
+//          "data": [
+//            "hero": [
+//              "name": "C3PO",
+//              "__typename": "Droid",
+//              "id": "2"
+//            ]
+//          ]
+//        ]
+//      }
       
       let updatedWatcherResultExpectation = resultObserver.expectation(
         description: "Watcher received updated result from cache"
@@ -2027,7 +2037,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       
       let otherFetchCompletedExpectation = expectation(description: "Other fetch completed")
 
-      var mockSub = MockSubscription<HeroSelectionSet>()
+      var mockSub = MockSubscription<ParentSelectionSet>()
       mockSub.__variables = ["skip": true]
       let subject = webSocketClient.subscribe(subscription: mockSub) { result in
         defer { otherFetchCompletedExpectation.fulfill() }
@@ -2039,15 +2049,17 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         "id": "1",
         "payload": [
           "data": [
-            "name": "C3PO",
-            "__typename": "Droid",
-            "id": "2"
+            "hero": [
+              "name": "C3PO",
+              "__typename": "Droid",
+              "id": "2"
+            ]
           ]
         ]
       ]
       webSocketTransport.write(message: message)
       
-      wait(for: [/*serverRequestExpectation, */otherFetchCompletedExpectation, updatedWatcherResultExpectation], timeout: 5)
+      wait(for: [otherFetchCompletedExpectation, updatedWatcherResultExpectation], timeout: 5)
       subject.cancel()
     }
   }
