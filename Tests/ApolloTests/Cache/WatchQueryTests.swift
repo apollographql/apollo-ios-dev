@@ -3,6 +3,7 @@ import Nimble
 @testable import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
+@testable import ApolloWebSocket
 
 class WatchQueryTests: XCTestCase, CacheDependentTesting {
   
@@ -16,6 +17,9 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
   var server: MockGraphQLServer!
   var client: ApolloClient!
   
+  var webSocketClient: ApolloClient!
+  var webSocketTransport: WebSocketTransport!
+  
   override func setUp() async throws {
     try await super.setUp()
 
@@ -26,12 +30,21 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     let networkTransport = MockNetworkTransport(server: server, store: store)
     
     client = ApolloClient(networkTransport: networkTransport, store: store)
+    
+    let websocket = MockWebSocket(
+      request:URLRequest(url: TestURL.mockServer.url),
+      protocol: .graphql_ws
+    )
+    webSocketTransport = WebSocketTransport(websocket: websocket, store: store)
+    webSocketClient = ApolloClient(networkTransport: webSocketTransport, store: store)
   }
   
   override func tearDownWithError() throws {
     cache = nil
     server = nil
     client = nil
+    webSocketClient = nil
+    webSocketTransport = nil
     
     try super.tearDownWithError()
   }
@@ -1931,4 +1944,109 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       XCTAssertTrueEventually(weakWatcher == nil, message: "Watcher was not released.")
     }
   }
+  
+  func testWatchedQueryGetsUpdatedFromSubscriptionWithSkipDirective() throws {
+    class HeroSelectionSet: MockSelectionSet {
+      override class var __selections: [Selection] { [
+        .field("name", String.self),
+        .field("id", String.self),
+        .field("__typename", String.self),
+//        .include(if: !"skip", [
+          .field("birthday", String.self)
+//        ])
+      ]}
+    }
+
+    let watchedQuery = MockQuery<HeroSelectionSet>()
+    watchedQuery.__variables?["skip"] = false
+    
+    let resultObserver = makeResultObserver(for: watchedQuery)
+    
+    let watcher = GraphQLQueryWatcher(client: client,
+                                      query: watchedQuery,
+                                      resultHandler: resultObserver.handler)
+    addTeardownBlock { watcher.cancel() }
+    
+    runActivity("Initial fetch from server") { _ in
+      let serverRequestExpectation =
+        server.expect(MockQuery<HeroSelectionSet>.self) { request in
+        [
+          "data": [
+            "name": "R2-D2",
+            "__typename": "Droid",
+            "id": "2",
+            "birthday": "1BBY"
+          ]
+        ]
+      }
+      
+      let initialWatcherResultExpectation = resultObserver.expectation(
+        description: "Watcher received initial result from server"
+      ) { result in
+        try XCTAssertSuccessResult(result) { graphQLResult in
+          XCTAssertEqual(graphQLResult.source, .server)
+          XCTAssertNil(graphQLResult.errors)
+          
+          let data = try XCTUnwrap(graphQLResult.data)
+          XCTAssertEqual(data.name, "R2-D2")
+          XCTAssertEqual(data.birthday, "1BBY")
+        }
+      }
+      
+      watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+      
+      wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
+    }
+    
+    runActivity("Fetch overlapping query from server") { _ in
+      let serverRequestExpectation =
+        server.expect(MockSubscription<HeroSelectionSet>.self) { request in
+        [
+          "data": [
+            "name": "Artoo",
+            "__typename": "Droid",
+            "id": "2"
+          ]
+        ]
+      }
+      
+      let updatedWatcherResultExpectation = resultObserver.expectation(
+        description: "Watcher received updated result from cache"
+      ) { result in
+        try XCTAssertSuccessResult(result) { graphQLResult in
+          XCTAssertEqual(graphQLResult.source, .cache)
+          XCTAssertNil(graphQLResult.errors)
+          
+          let data = try XCTUnwrap(graphQLResult.data)
+          XCTAssertEqual(data.hero?.name, "Artoo")
+        }
+      }
+      
+      let otherFetchCompletedExpectation = expectation(description: "Other fetch completed")
+
+      var mockSub = MockSubscription<HeroSelectionSet>()
+      mockSub.__variables?["skip"] = true
+      let subject = webSocketClient.subscribe(subscription: mockSub) { result in
+        defer { otherFetchCompletedExpectation.fulfill() }
+        XCTAssertSuccessResult(result)
+      }
+      
+      let message : JSONEncodableDictionary = [
+        "type": "data",
+        "id": "1",
+        "payload": [
+          "data": [
+            "name": "Artoo",
+            "__typename": "Droid",
+            "id": "2"
+          ]
+        ]
+      ]
+      webSocketTransport.write(message: message)
+      
+      wait(for: [serverRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation], timeout: 5)
+      subject.cancel()
+    }
+  }
+  
 }
