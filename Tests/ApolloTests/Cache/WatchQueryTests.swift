@@ -1949,8 +1949,11 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
   func testWatchedQueryGetsUpdatedFromSubscriptionWithSkipDirective() throws {
     class ParentSelectionSet: MockSelectionSet {
       override class var __selections: [Selection] {[
-          .field("hero", Hero.self)
-        ]}
+        .field("hero", [Hero].self),
+        .field("id", String.self)
+      ]}
+      
+      var hero: [Hero] { __data["hero"] }
       
       class Hero: MockSelectionSet {
         override class var __selections: [Selection] { [
@@ -1981,11 +1984,14 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         server.expect(MockQuery<ParentSelectionSet>.self) { request in
         [
           "data": [
+            "id": 1,
             "hero" : [
-              "name": "R2-D2",
-              "__typename": "Droid",
-              "id": "2",
-              "birthday": "1BBY"
+              [
+                "name": "R2-D2",
+                "__typename": "Droid",
+                "id": "2",
+                "birthday": "1BBY"
+              ]
             ]
           ]
         ]
@@ -1999,8 +2005,8 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
           XCTAssertNil(graphQLResult.errors)
           
           let data = try XCTUnwrap(graphQLResult.data)
-          XCTAssertEqual(data.hero?.name, "R2-D2")
-          XCTAssertEqual(data.hero?.birthday, "1BBY")
+          XCTAssertEqual(data.hero.first?.name, "R2-D2")
+          XCTAssertEqual(data.hero.first?.birthday, "1BBY")
         }
       }
       
@@ -2031,7 +2037,8 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
           XCTAssertNil(graphQLResult.errors)
           
           let data = try XCTUnwrap(graphQLResult.data)
-          XCTAssertEqual(data.hero?.name, "C3PO")
+          XCTAssertEqual(data.hero.first?.name, "C3PO")
+          XCTAssertEqual(data.hero.last?.name, "BB8")
         }
       }
       
@@ -2049,10 +2056,18 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         "id": "1",
         "payload": [
           "data": [
+            "id": 1,
             "hero": [
-              "name": "C3PO",
-              "__typename": "Droid",
-              "id": "2"
+              [
+                "name": "C3PO",
+                "__typename": "Droid",
+                "id": "2"
+              ],
+              [
+                "name": "BB8",
+                "__typename": "Droid",
+                "id": "3"
+              ]
             ]
           ]
         ]
