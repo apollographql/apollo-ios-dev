@@ -27,12 +27,16 @@ class MockObjectTemplateTests: XCTestCase {
     schemaNamespace: String = "TestSchema",
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackage(),
     testMocks: ApolloCodegenConfiguration.TestMockFileOutput = .swiftPackage(),
-    warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude
+    warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude,
+    requireNonOptionalMockFields: Bool = false
   ) {
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       output: .mock(moduleType: moduleType, testMocks: testMocks),
-      options: .init(warningsOnDeprecatedUsage: warningsOnDeprecatedUsage)
+      options: .init(
+        warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
+        requireNonOptionalMockFields: requireNonOptionalMockFields
+      )
     )
     ir = IRBuilder.mock(compilationResult: .mock())
 
@@ -484,9 +488,9 @@ class MockObjectTemplateTests: XCTestCase {
       convenience init(
         customScalar: TestSchema.CustomScalar? = nil,
         customScalarList: [TestSchema.CustomScalar]? = nil,
-        customScalarOptionalList: [TestSchema.CustomScalar]? = nil,
+        customScalarOptionalList: [TestSchema.CustomScalar?]? = nil,
         enumList: [GraphQLEnum<TestSchema.EnumType>]? = nil,
-        enumOptionalList: [GraphQLEnum<TestSchema.EnumType>]? = nil,
+        enumOptionalList: [GraphQLEnum<TestSchema.EnumType>?]? = nil,
         enumType: GraphQLEnum<TestSchema.EnumType>? = nil,
         interface: (any AnyMock)? = nil,
         interfaceList: [(any AnyMock)]? = nil,
@@ -499,8 +503,8 @@ class MockObjectTemplateTests: XCTestCase {
         optionalString: String? = nil,
         string: String? = nil,
         stringList: [String]? = nil,
-        stringNestedList: [[String]]? = nil,
-        stringOptionalList: [String]? = nil,
+        stringNestedList: [[String]?]? = nil,
+        stringOptionalList: [String?]? = nil,
         union: (any AnyMock)? = nil,
         unionList: [(any AnyMock)]? = nil,
         unionNestedList: [[(any AnyMock)]]? = nil,
@@ -544,7 +548,112 @@ class MockObjectTemplateTests: XCTestCase {
       ignoringExtraLines: false)
     )
   }
-  
+
+  func test__render__givenSchemaType_generatesConvenienceInitializerWithRequiredFields() {
+    // given
+    let Cat: GraphQLType = .entity(GraphQLObjectType.mock("Cat"))
+    let Animal: GraphQLType = .entity(GraphQLInterfaceType.mock("Animal"))
+    let Pet: GraphQLType = .entity(GraphQLUnionType.mock("Pet"))
+
+    buildSubject(
+      fields: [
+        "string": .mock("string", type: .nonNull(.string())),
+        "stringList": .mock("stringList", type: .list(.nonNull(.string()))),
+        "stringNestedList": .mock("stringNestedList", type: .list(.list(.nonNull(.string())))),
+        "stringOptionalList": .mock("stringOptionalList", type: .list(.string())),
+        "customScalar": .mock("customScalar", type: .nonNull(.scalar(.mock(name: "CustomScalar")))),
+        "customScalarList": .mock("customScalarList", type: .list(.nonNull(.scalar(.mock(name: "CustomScalar"))))),
+        "customScalarOptionalList": .mock("customScalarOptionalList", type: .list(.scalar(.mock(name: "CustomScalar")))),
+        "optionalString": .mock("optionalString", type: .string()),
+        "object": .mock("object", type: Cat),
+        "objectList": .mock("objectList", type: .list(.nonNull(Cat))),
+        "objectNestedList": .mock("objectNestedList", type: .list(.nonNull(.list(.nonNull(Cat))))),
+        "objectOptionalList": .mock("objectOptionalList", type: .list(Cat)),
+        "interface": .mock("interface", type: Animal),
+        "interfaceList": .mock("interfaceList", type: .list(.nonNull(Animal))),
+        "interfaceNestedList": .mock("interfaceNestedList", type: .list(.nonNull(.list(.nonNull(Animal))))),
+        "interfaceOptionalList": .mock("interfaceOptionalList", type: .list(Animal)),
+        "union": .mock("union", type: Pet),
+        "unionList": .mock("unionList", type: .list(.nonNull(Pet))),
+        "unionNestedList": .mock("unionNestedList", type: .list(.nonNull(.list(.nonNull(Pet))))),
+        "unionOptionalList": .mock("unionOptionalList", type: .list(Pet)),
+        "enumType": .mock("enumType", type: .enum(.mock(name: "enumType"))),
+        "enumList": .mock("enumList", type: .list(.nonNull(.enum(.mock(name: "enumType"))))),
+        "enumOptionalList": .mock("enumOptionalList", type: .list(.enum(.mock(name: "enumType"))))
+      ],
+      moduleType: .swiftPackage(),
+      requireNonOptionalMockFields: true
+    )
+
+    let expected = """
+    }
+
+    public extension Mock where O == Dog {
+      convenience init(
+        customScalar: TestSchema.CustomScalar,
+        customScalarList: [TestSchema.CustomScalar]? = nil,
+        customScalarOptionalList: [TestSchema.CustomScalar?]? = nil,
+        enumList: [GraphQLEnum<TestSchema.EnumType>]? = nil,
+        enumOptionalList: [GraphQLEnum<TestSchema.EnumType>?]? = nil,
+        enumType: GraphQLEnum<TestSchema.EnumType>? = nil,
+        interface: (any AnyMock)? = nil,
+        interfaceList: [(any AnyMock)]? = nil,
+        interfaceNestedList: [[(any AnyMock)]]? = nil,
+        interfaceOptionalList: [(any AnyMock)?]? = nil,
+        object: Mock<Cat>? = nil,
+        objectList: [Mock<Cat>]? = nil,
+        objectNestedList: [[Mock<Cat>]]? = nil,
+        objectOptionalList: [Mock<Cat>?]? = nil,
+        optionalString: String? = nil,
+        string: String,
+        stringList: [String]? = nil,
+        stringNestedList: [[String]?]? = nil,
+        stringOptionalList: [String?]? = nil,
+        union: (any AnyMock)? = nil,
+        unionList: [(any AnyMock)]? = nil,
+        unionNestedList: [[(any AnyMock)]]? = nil,
+        unionOptionalList: [(any AnyMock)?]? = nil
+      ) {
+        self.init()
+        _setScalar(customScalar, for: \\.customScalar)
+        _setScalarList(customScalarList, for: \\.customScalarList)
+        _setScalarList(customScalarOptionalList, for: \\.customScalarOptionalList)
+        _setScalarList(enumList, for: \\.enumList)
+        _setScalarList(enumOptionalList, for: \\.enumOptionalList)
+        _setScalar(enumType, for: \\.enumType)
+        _setEntity(interface, for: \\.interface)
+        _setList(interfaceList, for: \\.interfaceList)
+        _setList(interfaceNestedList, for: \\.interfaceNestedList)
+        _setList(interfaceOptionalList, for: \\.interfaceOptionalList)
+        _setEntity(object, for: \\.object)
+        _setList(objectList, for: \\.objectList)
+        _setList(objectNestedList, for: \\.objectNestedList)
+        _setList(objectOptionalList, for: \\.objectOptionalList)
+        _setScalar(optionalString, for: \\.optionalString)
+        _setScalar(string, for: \\.string)
+        _setScalarList(stringList, for: \\.stringList)
+        _setScalarList(stringNestedList, for: \\.stringNestedList)
+        _setScalarList(stringOptionalList, for: \\.stringOptionalList)
+        _setEntity(union, for: \\.union)
+        _setList(unionList, for: \\.unionList)
+        _setList(unionNestedList, for: \\.unionNestedList)
+        _setList(unionOptionalList, for: \\.unionOptionalList)
+      }
+    }
+
+    """
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(
+      expected,
+      atLine: 8 + self.subject.fields.count,
+      ignoringExtraLines: false)
+    )
+  }
+
+
   func test__render__givenSchemaTypeWithoutFields_doesNotgenerateConvenienceInitializer() {
     // given
     buildSubject(moduleType: .swiftPackage())

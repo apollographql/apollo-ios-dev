@@ -15,14 +15,27 @@ struct MockObjectTemplate: TemplateRenderer {
 
   let target: TemplateTarget = .testMockFile
 
-  typealias TemplateField = (
-    responseKey: String,
-    propertyName: String,
-    initializerParameterName: String?,
-    type: GraphQLType,
-    mockType: String,
-    deprecationReason: String?
-  )
+  struct TemplateField {
+    let responseKey: String
+    let propertyName: String
+    let initializerParameterName: String?
+    let type: GraphQLType
+    let mockType: String
+    let deprecationReason: String?
+    let config: ApolloCodegen.ConfigurationContext
+
+    var isOptional: Bool {
+      mockType.hasSuffix("?")
+    }
+
+    var forceOptionality: Bool {
+      !mockType.hasSuffix("?") && !config.options.requireNonOptionalMockFields
+    }
+
+    var defaultInitializer : String? {
+      return isOptional || forceOptionality ? " = nil" : nil
+    }
+  }
 
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
@@ -31,13 +44,14 @@ struct MockObjectTemplate: TemplateRenderer {
     let fields: [TemplateField] = fields
       .sorted { $0.0 < $1.0 }
       .map {
-         (
+         TemplateField(
           responseKey: $0.0,
           propertyName: $0.0.asTestMockFieldPropertyName,
           initializerParameterName: $0.0.asTestMockInitializerParameterName,
           type: $0.1,
           mockType: mockTypeName(for: $0.1),
-          deprecationReason: $0.deprecationReason
+          deprecationReason: $0.deprecationReason,
+          config: config
          )
       }
 
@@ -66,7 +80,7 @@ struct MockObjectTemplate: TemplateRenderer {
         \(conflictingFieldNameProperties(fields))
         convenience init(
           \(fields.map { """
-            \($0.propertyName)\(ifLet: $0.initializerParameterName, {" \($0)"}): \($0.mockType)? = nil
+            \($0.propertyName)\(ifLet: $0.initializerParameterName, {" \($0)"}): \($0.mockType)\(if: $0.forceOptionality, "?")\(ifLet: $0.defaultInitializer, { "\($0)" })
             """ }, separator: ",\n")
         ) {
           self.init()
@@ -134,15 +148,19 @@ struct MockObjectTemplate: TemplateRenderer {
       case .scalar,
           .enum,
           .inputObject:
-        return type.rendered(as: .testMockField(forceNonNull: true), config: config.config)
+        return TemplateString(
+          "\(type.rendered(as: .testMockField(forceNonNull: true),config: config.config))\(if: !forceNonNull, "?")"
+        ).description
       case .nonNull(let graphQLType):
         return nameReplacement(for: graphQLType, forceNonNull: true)
       case .list(let graphQLType):
-        return "[\(nameReplacement(for: graphQLType, forceNonNull: false))]"
+        return TemplateString(
+          "[\(nameReplacement(for: graphQLType, forceNonNull: false))]\(if: !forceNonNull, "?")"
+        ).description
       }
     }
 
-    return nameReplacement(for: type, forceNonNull: true)
+    return nameReplacement(for: type, forceNonNull: false)
   }
   
 }

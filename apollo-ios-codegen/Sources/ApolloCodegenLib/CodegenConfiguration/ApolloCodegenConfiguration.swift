@@ -696,6 +696,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     /// avoid filename conflicts when operation type names match schema type names.
     public let appendSchemaTypeFilenameSuffix: Bool
 
+    /// Makes non-optional mock fields required for generated mock objects, even if they are have not been fetched
+    /// for the operation, allowing potential failures to occur at build time rather than run-time.  Defaults to
+    /// `false`
+    public let requireNonOptionalMockFields: Bool
+
     /// Default property values
     public struct Default {
       public static let additionalInflectionRules: [InflectionRule] = []
@@ -712,6 +717,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       public static let pruneGeneratedFiles: Bool = true
       public static let markOperationDefinitionsAsFinal: Bool = false
       public static let appendSchemaTypeFilenameSuffix: Bool = false
+      public static let requireNonOptionalMockFields: Bool = false
     }
 
     /// Designated initializer.
@@ -752,7 +758,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       conversionStrategies: ConversionStrategies = Default.conversionStrategies,
       pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
       markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
-      appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix
+      appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix,
+      requireNonOptionalMockFields: Bool = Default.requireNonOptionalMockFields
     ) {
       self.additionalInflectionRules = additionalInflectionRules
       self.deprecatedEnumCases = deprecatedEnumCases
@@ -767,6 +774,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       self.pruneGeneratedFiles = pruneGeneratedFiles
       self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
       self.appendSchemaTypeFilenameSuffix = appendSchemaTypeFilenameSuffix
+      self.requireNonOptionalMockFields = requireNonOptionalMockFields
     }
 
     // MARK: Codable
@@ -787,6 +795,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case pruneGeneratedFiles
       case markOperationDefinitionsAsFinal
       case appendSchemaTypeFilenameSuffix
+      case requireNonOptionalMockFields
     }
 
     public init(from decoder: any Decoder) throws {
@@ -862,6 +871,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         Bool.self,
         forKey: .appendSchemaTypeFilenameSuffix
       ) ?? Default.appendSchemaTypeFilenameSuffix
+
+      requireNonOptionalMockFields = try values.decodeIfPresent(
+        Bool.self,
+        forKey: .requireNonOptionalMockFields
+      ) ?? Default.requireNonOptionalMockFields
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -1755,7 +1769,8 @@ extension ApolloCodegenConfiguration.OutputOptions {
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
     markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
-    appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix
+    appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix,
+    requireNonOptionalMockFields: Bool = Default.requireNonOptionalMockFields
   ) {
     self.additionalInflectionRules = additionalInflectionRules
     self.deprecatedEnumCases = deprecatedEnumCases
@@ -1770,6 +1785,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.pruneGeneratedFiles = pruneGeneratedFiles
     self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
     self.appendSchemaTypeFilenameSuffix = appendSchemaTypeFilenameSuffix
+    self.requireNonOptionalMockFields = requireNonOptionalMockFields
   }
   
   /// Deprecated initializer.
@@ -1807,7 +1823,8 @@ extension ApolloCodegenConfiguration.OutputOptions {
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
+    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
+    requireNonOptionalMockFields: Bool = Default.requireNonOptionalMockFields
   ) {
     self.additionalInflectionRules = additionalInflectionRules
     self.deprecatedEnumCases = deprecatedEnumCases
@@ -1822,6 +1839,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.schemaCustomization = Default.schemaCustomization
     self.appendSchemaTypeFilenameSuffix = Default.appendSchemaTypeFilenameSuffix
     self.reduceGeneratedSchemaTypes = Default.reduceGeneratedSchemaTypes
+    self.requireNonOptionalMockFields = Default.requireNonOptionalMockFields
   }
   
   /// Deprecated initializer.
@@ -1859,7 +1877,8 @@ extension ApolloCodegenConfiguration.OutputOptions {
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
+    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
+    requireNonOptionalMockFields: Bool = Default.requireNonOptionalMockFields
   ) {
     self.additionalInflectionRules = additionalInflectionRules
     self.deprecatedEnumCases = deprecatedEnumCases
@@ -1874,6 +1893,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.schemaCustomization = Default.schemaCustomization
     self.appendSchemaTypeFilenameSuffix = Default.appendSchemaTypeFilenameSuffix
     self.reduceGeneratedSchemaTypes = Default.reduceGeneratedSchemaTypes
+    self.requireNonOptionalMockFields = Default.requireNonOptionalMockFields
   }
 
   /// Whether the generated operations should use Automatic Persisted Queries.
