@@ -93,7 +93,7 @@ public final class GraphQLScalarType: GraphQLNamedType, DefaultMockValueProvidin
     case "Boolean":
       return "false"
     default:
-      return "\"\""
+      return "try! .init(_jsonValue: \"\")"
     }
   }
 

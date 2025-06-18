@@ -590,7 +590,7 @@ class MockObjectTemplateTests: XCTestCase {
 
     public extension Mock where O == Dog {
       convenience init(
-        customScalar: TestSchema.CustomScalar = "",
+        customScalar: TestSchema.CustomScalar = try! .init(_jsonValue: ""),
         customScalarList: [TestSchema.CustomScalar]? = nil,
         customScalarOptionalList: [TestSchema.CustomScalar?]? = nil,
         enumList: [GraphQLEnum<TestSchema.EnumType>] = [.foo],
