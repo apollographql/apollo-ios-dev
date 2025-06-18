@@ -54,6 +54,26 @@ public indirect enum GraphQLType: Sendable, Hashable {
     if case .nonNull = self { return false }
     return true
   }
+
+  public var defaultMockValue: String {
+    switch self {
+    case let .list(innerType):
+      return "[\(innerType.defaultMockValue)]"
+    case let .nonNull(innerType):
+      return innerType.defaultMockValue
+    case let .entity(compositeType):
+      guard let defaultMockingType = compositeType as? any DefaultMockValueProviding else {
+        fatalError("Composite type does not provide a default mock object")
+      }
+      return defaultMockingType.defaultMockValue
+    case let .scalar(scalarType):
+      return scalarType.defaultMockValue
+    case let .`enum`(enumType):
+      return enumType.defaultMockValue
+    case .inputObject:
+      fatalError("InputObjects aren't mocked")
+    }
+  }
 }
 
 extension GraphQLType: CustomDebugStringConvertible {
