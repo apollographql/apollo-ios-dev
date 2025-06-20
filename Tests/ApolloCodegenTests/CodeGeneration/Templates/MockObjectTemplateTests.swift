@@ -27,16 +27,12 @@ class MockObjectTemplateTests: XCTestCase {
     schemaNamespace: String = "TestSchema",
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackage(),
     testMocks: ApolloCodegenConfiguration.TestMockFileOutput = .swiftPackage(),
-    warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude,
-    defaultParametersForRequiredFields: Bool = false
+    warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude
   ) {
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       output: .mock(moduleType: moduleType, testMocks: testMocks),
-      options: .init(
-        warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
-        defaultParametersForRequiredFields: defaultParametersForRequiredFields
-      )
+      options: .init(warningsOnDeprecatedUsage: warningsOnDeprecatedUsage)
     )
     ir = IRBuilder.mock(compilationResult: .mock())
 
@@ -486,7 +482,7 @@ class MockObjectTemplateTests: XCTestCase {
 
     public extension Mock where O == Dog {
       convenience init(
-        customScalar: TestSchema.CustomScalar? = nil,
+        customScalar: TestSchema.CustomScalar = try! .init(_jsonValue: ""),
         customScalarList: [TestSchema.CustomScalar]? = nil,
         customScalarOptionalList: [TestSchema.CustomScalar?]? = nil,
         enumList: [GraphQLEnum<TestSchema.EnumType>]? = nil,
@@ -501,7 +497,7 @@ class MockObjectTemplateTests: XCTestCase {
         objectNestedList: [[Mock<Cat>]]? = nil,
         objectOptionalList: [Mock<Cat>?]? = nil,
         optionalString: String? = nil,
-        string: String? = nil,
+        string: String = "",
         stringList: [String]? = nil,
         stringNestedList: [[String]?]? = nil,
         stringOptionalList: [String?]? = nil,
@@ -558,31 +554,23 @@ class MockObjectTemplateTests: XCTestCase {
     buildSubject(
       fields: [
         "string": .mock("string", type: .nonNull(.string())),
-        "stringList": .mock("stringList", type: .list(.nonNull(.string()))),
-        "stringNestedList": .mock("stringNestedList", type: .list(.list(.nonNull(.string())))),
-        "stringOptionalList": .mock("stringOptionalList", type: .list(.string())),
+        "stringList": .mock("stringList", type: .nonNull(.list(.nonNull(.string())))),
+        "stringNestedList": .mock("stringNestedList", type: .nonNull(.list(.nonNull(.list(.nonNull(.string())))))),
         "customScalar": .mock("customScalar", type: .nonNull(.scalar(.mock(name: "CustomScalar")))),
-        "customScalarList": .mock("customScalarList", type: .list(.nonNull(.scalar(.mock(name: "CustomScalar"))))),
-        "customScalarOptionalList": .mock("customScalarOptionalList", type: .list(.scalar(.mock(name: "CustomScalar")))),
-        "optionalString": .mock("optionalString", type: .string()),
+        "customScalarList": .mock("customScalarList", type: .nonNull(.list(.nonNull(.scalar(.mock(name: "CustomScalar")))))),
         "object": .mock("object", type: .nonNull(Cat)),
-        "objectList": .mock("objectList", type: .list(.nonNull(Cat))),
-        "objectNestedList": .mock("objectNestedList", type: .list(.nonNull(.list(.nonNull(Cat))))),
-        "objectOptionalList": .mock("objectOptionalList", type: .list(Cat)),
+        "objectList": .mock("objectList", type: .nonNull(.list(.nonNull(Cat)))),
+        "objectNestedList": .mock("objectNestedList", type: .nonNull(.list(.nonNull(.list(.nonNull(Cat)))))),
         "interface": .mock("interface", type: .nonNull(Animal)),
-        "interfaceList": .mock("interfaceList", type: .list(.nonNull(Animal))),
-        "interfaceNestedList": .mock("interfaceNestedList", type: .list(.nonNull(.list(.nonNull(Animal))))),
-        "interfaceOptionalList": .mock("interfaceOptionalList", type: .list(Animal)),
+        "interfaceList": .mock("interfaceList", type: .nonNull(.list(.nonNull(Animal)))),
+        "interfaceNestedList": .mock("interfaceNestedList", type: .nonNull(.list(.nonNull(.list(.nonNull(Animal)))))),
         "union": .mock("union", type: .nonNull(Pet)),
-        "unionList": .mock("unionList", type: .list(.nonNull(Pet))),
-        "unionNestedList": .mock("unionNestedList", type: .list(.nonNull(.list(.nonNull(Pet))))),
-        "unionOptionalList": .mock("unionOptionalList", type: .list(Pet)),
+        "unionList": .mock("unionList", type: .nonNull(.list(.nonNull(Pet)))),
+        "unionNestedList": .mock("unionNestedList", type: .nonNull(.list(.nonNull(.list(.nonNull(Pet)))))),
         "enumType": .mock("enumType", type: .nonNull(.enum(.mock(name: "enumType", values: ["foo", "bar"])))),
         "enumList": .mock("enumList", type: .nonNull(.list(.nonNull(.enum(.mock(name: "enumType", values: ["foo", "bar"])))))),
-        "enumOptionalList": .mock("enumOptionalList", type: .list(.enum(.mock(name: "enumType"))))
       ],
-      moduleType: .swiftPackage(),
-      defaultParametersForRequiredFields: true
+      moduleType: .swiftPackage()
     )
 
     let expected = """
@@ -591,53 +579,39 @@ class MockObjectTemplateTests: XCTestCase {
     public extension Mock where O == Dog {
       convenience init(
         customScalar: TestSchema.CustomScalar = try! .init(_jsonValue: ""),
-        customScalarList: [TestSchema.CustomScalar]? = nil,
-        customScalarOptionalList: [TestSchema.CustomScalar?]? = nil,
-        enumList: [GraphQLEnum<TestSchema.EnumType>] = [.foo],
-        enumOptionalList: [GraphQLEnum<TestSchema.EnumType>?]? = nil,
+        customScalarList: [TestSchema.CustomScalar] = [],
+        enumList: [GraphQLEnum<TestSchema.EnumType>] = [],
         enumType: GraphQLEnum<TestSchema.EnumType> = .foo,
-        interface: (any AnyMock) = Duck(),
-        interfaceList: [(any AnyMock)]? = nil,
-        interfaceNestedList: [[(any AnyMock)]]? = nil,
-        interfaceOptionalList: [(any AnyMock)?]? = nil,
-        object: Mock<Cat> = Cat(),
-        objectList: [Mock<Cat>]? = nil,
-        objectNestedList: [[Mock<Cat>]]? = nil,
-        objectOptionalList: [Mock<Cat>?]? = nil,
-        optionalString: String? = nil,
+        interface: (any AnyMock) = Mock<Duck>(),
+        interfaceList: [(any AnyMock)] = [],
+        interfaceNestedList: [[(any AnyMock)]] = [],
+        object: Mock<Cat> = Mock<Cat>(),
+        objectList: [Mock<Cat>] = [],
+        objectNestedList: [[Mock<Cat>]] = [],
         string: String = "",
-        stringList: [String]? = nil,
-        stringNestedList: [[String]?]? = nil,
-        stringOptionalList: [String?]? = nil,
-        union: (any AnyMock) = Goldfish(),
-        unionList: [(any AnyMock)]? = nil,
-        unionNestedList: [[(any AnyMock)]]? = nil,
-        unionOptionalList: [(any AnyMock)?]? = nil
+        stringList: [String] = [],
+        stringNestedList: [[String]] = [],
+        union: (any AnyMock) = Mock<Goldfish>(),
+        unionList: [(any AnyMock)] = [],
+        unionNestedList: [[(any AnyMock)]] = []
       ) {
         self.init()
         _setScalar(customScalar, for: \\.customScalar)
         _setScalarList(customScalarList, for: \\.customScalarList)
-        _setScalarList(customScalarOptionalList, for: \\.customScalarOptionalList)
         _setScalarList(enumList, for: \\.enumList)
-        _setScalarList(enumOptionalList, for: \\.enumOptionalList)
         _setScalar(enumType, for: \\.enumType)
         _setEntity(interface, for: \\.interface)
         _setList(interfaceList, for: \\.interfaceList)
         _setList(interfaceNestedList, for: \\.interfaceNestedList)
-        _setList(interfaceOptionalList, for: \\.interfaceOptionalList)
         _setEntity(object, for: \\.object)
         _setList(objectList, for: \\.objectList)
         _setList(objectNestedList, for: \\.objectNestedList)
-        _setList(objectOptionalList, for: \\.objectOptionalList)
-        _setScalar(optionalString, for: \\.optionalString)
         _setScalar(string, for: \\.string)
         _setScalarList(stringList, for: \\.stringList)
         _setScalarList(stringNestedList, for: \\.stringNestedList)
-        _setScalarList(stringOptionalList, for: \\.stringOptionalList)
         _setEntity(union, for: \\.union)
         _setList(unionList, for: \\.unionList)
         _setList(unionNestedList, for: \\.unionNestedList)
-        _setList(unionOptionalList, for: \\.unionOptionalList)
       }
     }
 
@@ -741,61 +715,61 @@ class MockObjectTemplateTests: XCTestCase {
 
     public extension Mock where O == Dog {
       convenience init(
-        `Any`: String? = nil,
-        `Protocol`: String? = nil,
-        `Self`: String? = nil,
-        `Type`: String? = nil,
-        `as`: String? = nil,
-        `associatedtype`: String? = nil,
-        `break`: String? = nil,
-        `case`: String? = nil,
-        `catch`: String? = nil,
-        `class`: String? = nil,
-        `continue`: String? = nil,
-        `default`: String? = nil,
-        `defer`: String? = nil,
-        `deinit`: String? = nil,
-        `do`: String? = nil,
-        `else`: String? = nil,
-        `enum`: String? = nil,
-        `extension`: String? = nil,
-        `fallthrough`: String? = nil,
-        `false`: String? = nil,
-        `fileprivate`: String? = nil,
-        `for`: String? = nil,
-        `func`: String? = nil,
-        `guard`: String? = nil,
-        `if`: String? = nil,
-        `import`: String? = nil,
-        `in`: String? = nil,
-        `init`: String? = nil,
-        `inout`: String? = nil,
-        `internal`: String? = nil,
-        `is`: String? = nil,
-        `let`: String? = nil,
-        `nil`: String? = nil,
-        `operator`: String? = nil,
-        `precedencegroup`: String? = nil,
-        `private`: String? = nil,
-        `protocol`: String? = nil,
-        `public`: String? = nil,
-        `repeat`: String? = nil,
-        `rethrows`: String? = nil,
-        `return`: String? = nil,
-        `self` self_value: String? = nil,
-        `static`: String? = nil,
-        `struct`: String? = nil,
-        `subscript`: String? = nil,
-        `super`: String? = nil,
-        `switch`: String? = nil,
-        `throw`: String? = nil,
-        `throws`: String? = nil,
-        `true`: String? = nil,
-        `try`: String? = nil,
-        `typealias`: String? = nil,
-        `var`: String? = nil,
-        `where`: String? = nil,
-        `while`: String? = nil
+        `Any`: String = "",
+        `Protocol`: String = "",
+        `Self`: String = "",
+        `Type`: String = "",
+        `as`: String = "",
+        `associatedtype`: String = "",
+        `break`: String = "",
+        `case`: String = "",
+        `catch`: String = "",
+        `class`: String = "",
+        `continue`: String = "",
+        `default`: String = "",
+        `defer`: String = "",
+        `deinit`: String = "",
+        `do`: String = "",
+        `else`: String = "",
+        `enum`: String = "",
+        `extension`: String = "",
+        `fallthrough`: String = "",
+        `false`: String = "",
+        `fileprivate`: String = "",
+        `for`: String = "",
+        `func`: String = "",
+        `guard`: String = "",
+        `if`: String = "",
+        `import`: String = "",
+        `in`: String = "",
+        `init`: String = "",
+        `inout`: String = "",
+        `internal`: String = "",
+        `is`: String = "",
+        `let`: String = "",
+        `nil`: String = "",
+        `operator`: String = "",
+        `precedencegroup`: String = "",
+        `private`: String = "",
+        `protocol`: String = "",
+        `public`: String = "",
+        `repeat`: String = "",
+        `rethrows`: String = "",
+        `return`: String = "",
+        `self` self_value: String = "",
+        `static`: String = "",
+        `struct`: String = "",
+        `subscript`: String = "",
+        `super`: String = "",
+        `switch`: String = "",
+        `throw`: String = "",
+        `throws`: String = "",
+        `true`: String = "",
+        `try`: String = "",
+        `typealias`: String = "",
+        `var`: String = "",
+        `where`: String = "",
+        `while`: String = ""
       ) {
         self.init()
         _setScalar(`Any`, for: \\.`Any`)
@@ -1039,7 +1013,7 @@ class MockObjectTemplateTests: XCTestCase {
 
       public extension Mock where O == \(keyword.firstUppercased)_Object {
         convenience init(
-          string: String? = nil
+          string: String = ""
         ) {
           self.init()
           _setScalar(string, for: \\.string)

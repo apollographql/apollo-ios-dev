@@ -19,10 +19,6 @@ protocol GraphQLSchemaType: JavaScriptReferencedObject {
 
 }
 
-public protocol DefaultMockValueProviding {
-  var defaultMockValue: String { get }
-}
-
 public class GraphQLNamedType: 
   JavaScriptReferencedObject, @unchecked Sendable, Hashable, CustomDebugStringConvertible, GraphQLNamedItem {
   public let name: GraphQLName
@@ -68,7 +64,7 @@ public class GraphQLNamedType:
   }
 }
 
-public final class GraphQLScalarType: GraphQLNamedType, DefaultMockValueProviding {
+public final class GraphQLScalarType: GraphQLNamedType {
   public let specifiedByURL: String?
 
   public var isCustomScalar: Bool {
@@ -79,21 +75,6 @@ public final class GraphQLScalarType: GraphQLNamedType, DefaultMockValueProvidin
       return false
     default:
       return true
-    }
-  }
-
-  public var defaultMockValue: String {
-    switch name.schemaName {
-    case "String", "ID":
-      return "\"\""
-    case "Int":
-      return "0"
-    case "Float":
-      return "0.0"
-    case "Boolean":
-      return "false"
-    default:
-      return "try! .init(_jsonValue: \"\")"
     }
   }
 
@@ -114,7 +95,7 @@ public final class GraphQLScalarType: GraphQLNamedType, DefaultMockValueProvidin
 
 }
 
-public final class GraphQLEnumType: GraphQLNamedType, DefaultMockValueProviding {
+public final class GraphQLEnumType: GraphQLNamedType {
   public private(set) var values: [GraphQLEnumValue]!
 
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
@@ -123,11 +104,6 @@ public final class GraphQLEnumType: GraphQLNamedType, DefaultMockValueProviding 
 
   override func finalize(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
     self.values = try! bridge.invokeMethod("getValues", on: jsValue)
-  }
-
-  public var defaultMockValue: String {
-    guard let first = values.first else { return "" }
-    return ".\(first.name)"
   }
 
   /// Initializer to be used for creating mock objects in tests only.
@@ -257,7 +233,7 @@ public extension GraphQLInterfaceImplementingType {
   }
 }
 
-public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImplementingType, DefaultMockValueProviding {
+public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImplementingType {
 
   public private(set) var fields: [String: GraphQLField]!
 
@@ -292,16 +268,12 @@ public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImpl
   public override var debugDescription: String {
     "Object - \(name)"
   }
-
-  public var defaultMockValue: String {
-    return "\(name)()"
-  }
 }
 
 public class GraphQLAbstractType: GraphQLCompositeType {
 }
 
-public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceImplementingType, DefaultMockValueProviding {
+public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceImplementingType {
 
   public private(set) var fields: [String: GraphQLField]!
 
@@ -341,16 +313,9 @@ public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceIm
   public override var debugDescription: String {
     "Interface - \(name)"
   }
-
-  public var defaultMockValue: String {
-    guard let implementingObject = implementingObjects.first else {
-      fatalError("Cannot provide a default value for interface \(name) because no types conform to it.")
-    }
-    return "\(implementingObject.name)()"
-  }
 }
 
-public final class GraphQLUnionType: GraphQLAbstractType, DefaultMockValueProviding {
+public final class GraphQLUnionType: GraphQLAbstractType {
   public let types: [GraphQLObjectType]
 
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
@@ -371,13 +336,6 @@ public final class GraphQLUnionType: GraphQLAbstractType, DefaultMockValueProvid
 
   public override var debugDescription: String {
     "Union - \(name)"
-  }
-
-  public var defaultMockValue: String {
-    guard let implementingType = types.first else {
-      fatalError("Cannot provide a default value for empty union \(name)")
-    }
-    return "\(implementingType.name)()"
   }
 }
 

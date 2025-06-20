@@ -696,10 +696,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     /// avoid filename conflicts when operation type names match schema type names.
     public let appendSchemaTypeFilenameSuffix: Bool
 
-    /// Provides default values for non-null mock fields, preventing test failures due to optional fields becoming
-    /// required.  Defaults to `false`
-    public let defaultParametersForRequiredFields: Bool
-
     /// Default property values
     public struct Default {
       public static let additionalInflectionRules: [InflectionRule] = []
@@ -716,7 +712,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       public static let pruneGeneratedFiles: Bool = true
       public static let markOperationDefinitionsAsFinal: Bool = false
       public static let appendSchemaTypeFilenameSuffix: Bool = false
-      public static let defaultParametersForRequiredFields: Bool = false
     }
 
     /// Designated initializer.
@@ -758,7 +753,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
       markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
       appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix,
-      defaultParametersForRequiredFields: Bool = Default.defaultParametersForRequiredFields
     ) {
       self.additionalInflectionRules = additionalInflectionRules
       self.deprecatedEnumCases = deprecatedEnumCases
@@ -773,7 +767,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       self.pruneGeneratedFiles = pruneGeneratedFiles
       self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
       self.appendSchemaTypeFilenameSuffix = appendSchemaTypeFilenameSuffix
-      self.defaultParametersForRequiredFields = defaultParametersForRequiredFields
     }
 
     // MARK: Codable
@@ -794,7 +787,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case pruneGeneratedFiles
       case markOperationDefinitionsAsFinal
       case appendSchemaTypeFilenameSuffix
-      case defaultParametersForRequiredFields
     }
 
     public init(from decoder: any Decoder) throws {
@@ -870,11 +862,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         Bool.self,
         forKey: .appendSchemaTypeFilenameSuffix
       ) ?? Default.appendSchemaTypeFilenameSuffix
-
-      defaultParametersForRequiredFields = try values.decodeIfPresent(
-        Bool.self,
-        forKey: .defaultParametersForRequiredFields
-      ) ?? Default.defaultParametersForRequiredFields
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -1768,8 +1755,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
     markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
-    appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix,
-    defaultParametersForRequiredFields: Bool = Default.defaultParametersForRequiredFields
+    appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix
   ) {
     self.additionalInflectionRules = additionalInflectionRules
     self.deprecatedEnumCases = deprecatedEnumCases
@@ -1784,7 +1770,6 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.pruneGeneratedFiles = pruneGeneratedFiles
     self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
     self.appendSchemaTypeFilenameSuffix = appendSchemaTypeFilenameSuffix
-    self.defaultParametersForRequiredFields = defaultParametersForRequiredFields
   }
   
   /// Deprecated initializer.
@@ -1822,8 +1807,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
-    defaultParametersForRequiredFields: Bool = Default.defaultParametersForRequiredFields
+    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
   ) {
     self.additionalInflectionRules = additionalInflectionRules
     self.deprecatedEnumCases = deprecatedEnumCases
@@ -1838,7 +1822,6 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.schemaCustomization = Default.schemaCustomization
     self.appendSchemaTypeFilenameSuffix = Default.appendSchemaTypeFilenameSuffix
     self.reduceGeneratedSchemaTypes = Default.reduceGeneratedSchemaTypes
-    self.defaultParametersForRequiredFields = Default.defaultParametersForRequiredFields
   }
   
   /// Deprecated initializer.
@@ -1876,8 +1859,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
-    defaultParametersForRequiredFields: Bool = Default.defaultParametersForRequiredFields
+    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
   ) {
     self.additionalInflectionRules = additionalInflectionRules
     self.deprecatedEnumCases = deprecatedEnumCases
@@ -1892,7 +1874,6 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.schemaCustomization = Default.schemaCustomization
     self.appendSchemaTypeFilenameSuffix = Default.appendSchemaTypeFilenameSuffix
     self.reduceGeneratedSchemaTypes = Default.reduceGeneratedSchemaTypes
-    self.defaultParametersForRequiredFields = Default.defaultParametersForRequiredFields
   }
 
   /// Whether the generated operations should use Automatic Persisted Queries.
