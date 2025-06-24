@@ -752,7 +752,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       conversionStrategies: ConversionStrategies = Default.conversionStrategies,
       pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
       markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
-      appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix,
+      appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix
     ) {
       self.additionalInflectionRules = additionalInflectionRules
       self.deprecatedEnumCases = deprecatedEnumCases
