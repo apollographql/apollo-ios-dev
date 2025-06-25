@@ -1,25 +1,25 @@
 import GraphQLCompiler
 
-public protocol DefaultMockValueProviding {
-  var defaultMockValue: String { get }
+protocol DefaultMockValueProviding {
+  func defaultMockValue(config: ApolloCodegen.ConfigurationContext) -> String
 }
 
 extension GraphQLType {
-  public var defaultMockValue: String {
+  func defaultMockValue(config: ApolloCodegen.ConfigurationContext) -> String {
     switch self {
     case let .list(innerType):
       return "[]"
     case let .nonNull(innerType):
-      return innerType.defaultMockValue
+      return innerType.defaultMockValue(config: config)
     case let .entity(compositeType):
       guard let defaultMockingType = compositeType as? any DefaultMockValueProviding else {
         fatalError("Composite type does not provide a default mock object")
       }
-      return defaultMockingType.defaultMockValue
+      return defaultMockingType.defaultMockValue(config: config)
     case let .scalar(scalarType):
-      return scalarType.defaultMockValue
+      return scalarType.defaultMockValue(config: config)
     case let .`enum`(enumType):
-      return enumType.defaultMockValue
+      return enumType.defaultMockValue(config: config)
     case .inputObject:
       fatalError("InputObjects aren't mocked")
     }
@@ -27,7 +27,7 @@ extension GraphQLType {
 }
 
 extension GraphQLScalarType: DefaultMockValueProviding {
-  public var defaultMockValue: String {
+  func defaultMockValue(config: ApolloCodegen.ConfigurationContext) -> String {
     switch name.schemaName {
     case "String", "ID":
       return "\"\""
@@ -44,22 +44,22 @@ extension GraphQLScalarType: DefaultMockValueProviding {
 }
 
 extension GraphQLEnumType: DefaultMockValueProviding {
-  public var defaultMockValue: String {
+  func defaultMockValue(config: ApolloCodegen.ConfigurationContext) -> String {
     guard let first = values.first else {
       fatalError("Cannot provide a default value for caseless enum \(name)")
     }
-    return ".\(first.name)"
+    return ".\(first.render(as: .enumCase, config: config))"
   }
 }
 
 extension GraphQLObjectType: DefaultMockValueProviding {
-  public var defaultMockValue: String {
+  func defaultMockValue(config: ApolloCodegen.ConfigurationContext) -> String {
     return "Mock<\(name)>()"
   }
 }
 
 extension GraphQLInterfaceType: DefaultMockValueProviding {
-  public var defaultMockValue: String {
+  func defaultMockValue(config: ApolloCodegen.ConfigurationContext) -> String {
     guard let implementingObject = implementingObjects.first else {
       fatalError("Cannot provide a default value for interface \(name) because no types conform to it.")
     }
@@ -68,7 +68,7 @@ extension GraphQLInterfaceType: DefaultMockValueProviding {
 }
 
 extension GraphQLUnionType: DefaultMockValueProviding {
-  public var defaultMockValue: String {
+  func defaultMockValue(config: ApolloCodegen.ConfigurationContext) -> String {
     guard let implementingType = types.first else {
       fatalError("Cannot provide a default value for empty union \(name)")
     }
