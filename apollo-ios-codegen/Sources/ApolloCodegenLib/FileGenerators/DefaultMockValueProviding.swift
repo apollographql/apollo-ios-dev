@@ -48,7 +48,7 @@ extension GraphQLEnumType: DefaultMockValueProviding {
     guard let first = values.first else {
       fatalError("Cannot provide a default value for caseless enum \(name)")
     }
-    return ".\(first.render(as: .enumCase, config: config))"
+    return ".case(.\(first.render(as: .enumCase, config: config)))"
   }
 }
 
