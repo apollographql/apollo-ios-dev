@@ -1629,6 +1629,7 @@ extension ApolloCodegenConfiguration {
   ///  - options: Rules and options to customize the generated code.
   ///  - experimentalFeatures: Allows users to enable experimental features.
   @available(*, deprecated, renamed: "init(schemaNamespace:input:output:options:experimentalFeatures:schemaDownload:operationManifest:)")
+  @_disfavoredOverload
   public init(
     schemaName: String,
     input: FileInput,
@@ -1698,6 +1699,7 @@ extension ApolloCodegenConfiguration.FileOutput {
   ///  - operationIdentifiersPath: An absolute location to an operation id JSON map file
   ///  for use with APQ registration. Defaults to `nil`.
   @available(*, deprecated, renamed: "init(schemaTypes:operations:testMocks:)")
+  @_disfavoredOverload
   public init(
     schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput,
     operations: ApolloCodegenConfiguration.OperationsFileOutput = Default.operations,
@@ -1743,6 +1745,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   @available(*, deprecated,
               renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:reduceGeneratedSchemaTypes:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
   )
+  @_disfavoredOverload
   public init(
     additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
     deprecatedEnumCases: ApolloCodegenConfiguration.Composition = Default.deprecatedEnumCases,
@@ -1796,6 +1799,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   @available(*, deprecated,
               renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
   )
+  @_disfavoredOverload
   public init(
     additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
     queryStringLiteralFormat: QueryStringLiteralFormat = .singleLine,
@@ -1848,6 +1852,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   @available(*, deprecated,
               renamed: "init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:)"
   )
+  @_disfavoredOverload
   public init(
     additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
     queryStringLiteralFormat: QueryStringLiteralFormat,
