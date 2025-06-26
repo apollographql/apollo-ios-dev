@@ -7,7 +7,7 @@ protocol DefaultMockValueProviding {
 extension GraphQLType {
   func defaultMockValue(config: ApolloCodegen.ConfigurationContext) -> String {
     switch self {
-    case let .list(innerType):
+    case .list:
       return "[]"
     case let .nonNull(innerType):
       return innerType.defaultMockValue(config: config)
