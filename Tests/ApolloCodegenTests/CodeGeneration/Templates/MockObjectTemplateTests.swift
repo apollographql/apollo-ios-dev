@@ -581,7 +581,7 @@ class MockObjectTemplateTests: XCTestCase {
         customScalar: TestSchema.CustomScalar = try! .init(_jsonValue: ""),
         customScalarList: [TestSchema.CustomScalar] = [],
         enumList: [GraphQLEnum<TestSchema.EnumType>] = [],
-        enumType: GraphQLEnum<TestSchema.EnumType> = .foo,
+        enumType: GraphQLEnum<TestSchema.EnumType> = .case(.foo),
         interface: (any AnyMock) = Mock<Duck>(),
         interfaceList: [(any AnyMock)] = [],
         interfaceNestedList: [[(any AnyMock)]] = [],
