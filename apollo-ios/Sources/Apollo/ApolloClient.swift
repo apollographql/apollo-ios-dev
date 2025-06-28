@@ -5,43 +5,20 @@ import Foundation
   import ApolloAPI
 #endif
 
-/// A cache policy that specifies whether results should be fetched from the server or loaded from the local cache.
-#warning("TODO: rethink this API. Only valid for queries currently")
-public enum CachePolicy: Sendable, Hashable {
-  /// Return data from the cache if available, else fetch results from the server.
-  case cacheFirst
-  /// Attempt to fetch results from the server, if failed, return data from the cache if available.
-  case networkFirst
-  ///  Fetch results from the server, do not attempt to read data from the cache.
-  case networkOnly
-  /// Return data from the cache if available, and always fetch results from the server.
-  case cacheAndNetwork  // seperate function?
+public struct RequestConfiguration: Sendable {
+  public var requestTimeout: TimeInterval?
+  public var writeResultsToCache: Bool
 
-  /// Return data from the cache if available, else return an error.
-  case cacheOnly  // replace with separate function?
-
-  ///  Always fetch results from the server, and don't store these in the cache.
-  //  case fetchIgnoringCacheCompletely
-
-  #warning("TODO: this unsafe is not properly made atomic. Fix this")
-  //  /// The current default cache policy.
-  //  nonisolated(unsafe) public static var `default`: CachePolicy = .cacheFirst
+  public init(
+    requestTimeout: TimeInterval? = nil,
+    writeResultsToCache: Bool = true
+  ) {
+    self.requestTimeout = requestTimeout
+    self.writeResultsToCache = writeResultsToCache
+  }
 }
 
-/// A handler for operation results.
-///
-/// - Parameters:
-///   - result: The result of a performed operation. Will have a `GraphQLResult` with any parsed data and any GraphQL errors on `success`, and an `Error` on `failure`.
-public typealias GraphQLResultHandler<Data: RootSelectionSet> = @Sendable (Result<GraphQLResult<Data>, any Error>) ->
-  Void
-
-struct RequestConfigurationContext {
-  @TaskLocal static var taskLocal: RequestConfigurationContext = .init()
-
-  var requestTimeout: Int32 = 30
-  var writeResultsToCache: Bool = true
-}
-
+// MARK: -
 /// The `ApolloClient` class implements the core API for Apollo by conforming to `ApolloClientProtocol`.
 public final class ApolloClient: ApolloClientProtocol, Sendable {
 
@@ -49,8 +26,7 @@ public final class ApolloClient: ApolloClientProtocol, Sendable {
 
   public let store: ApolloStore
 
-  #warning("TODO: unit test usage")
-  public let defaultCachePolicy: CachePolicy
+  public let defaultRequestConfiguration: RequestConfiguration
 
   public enum ApolloClientError: Error, LocalizedError, Hashable {
     case noResults
@@ -76,52 +52,84 @@ public final class ApolloClient: ApolloClientProtocol, Sendable {
   ///   - networkTransport: A network transport used to send operations to a server.
   ///   - store: A store used as a local cache. Note that if the `NetworkTransport` or any of its dependencies takes
   ///   a store, you should make sure the same store is passed here so that it can be cleared properly.
-  ///   - defaultCachePolicy: TODO
+  ///   - clientAwarenessMetadata: Metadata used by the
+  ///     [client awareness](https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation)
+  ///     feature of GraphOS Studio.
   public init(
     networkTransport: any NetworkTransport,
     store: ApolloStore,
-    defaultCachePolicy: CachePolicy = .cacheFirst
+    defaultRequestConfiguration: RequestConfiguration = RequestConfiguration(),
+    clientAwarenessMetadata: ClientAwarenessMetadata = ClientAwarenessMetadata()
   ) {
     self.networkTransport = networkTransport
     self.store = store
-    self.defaultCachePolicy = defaultCachePolicy
+    self.defaultRequestConfiguration = defaultRequestConfiguration
+    self.context = ClientContext(clientAwarenessMetadata: clientAwarenessMetadata)
   }
 
   /// Creates a client with a `RequestChainNetworkTransport` connecting to the specified URL.
   ///
-  /// - Parameter url: The URL of a GraphQL server to connect to.
+  /// - Parameters:
+  ///   - url: The URL of a GraphQL server to connect to.
+  ///   - clientAwarenessMetadata: Metadata used by the
+  ///     [client awareness](https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation)
+  ///     feature of GraphOS Studio.
   public convenience init(
     url: URL,
-    defaultCachePolicy: CachePolicy = .cacheFirst,
+    defaultRequestConfiguration: RequestConfiguration = RequestConfiguration(),
     clientAwarenessMetadata: ClientAwarenessMetadata = ClientAwarenessMetadata()
   ) {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
     let provider = DefaultInterceptorProvider()
     let transport = RequestChainNetworkTransport(
+      urlSession: URLSession(configuration: .default),
       interceptorProvider: provider,
-      endpointURL: url,
-      clientAwarenessMetadata: clientAwarenessMetadata
+      store: store,
+      endpointURL: url
     )
 
     self.init(
       networkTransport: transport,
       store: store,
-      defaultCachePolicy: defaultCachePolicy
+      defaultRequestConfiguration: defaultRequestConfiguration
     )
   }
 
+  /// Clears the `NormalizedCache` of the client's `ApolloStore`.
   public func clearCache() async throws {
     try await self.store.clearCache()
   }
 
+  // MARK: - Fetch Query
+
+  // MARK: Fetch Query w/Fetch Behavior
+
   public func fetch<Query: GraphQLQuery>(
     query: Query,
-    cachePolicy: CachePolicy? = nil,
+    fetchBehavior: FetchBehavior = FetchBehavior.CacheElseNetwork,
+    requestConfiguration: RequestConfiguration? = nil
+  ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error> {
+    return try doInClientContext {
+      return try self.networkTransport.send(
+        query: query,
+        fetchBehavior: fetchBehavior,
+        requestConfiguration: requestConfiguration ?? self.defaultRequestConfiguration
+      )
+    }
+  }
+
+  // MARK: Single Response Format
+
+  public func fetch<Query: GraphQLQuery>(
+    query: Query,
+    cachePolicy: CachePolicy.Query.SingleResponse,
+    requestConfiguration: RequestConfiguration? = nil
   ) async throws -> GraphQLResult<Query.Data>
   where Query.ResponseFormat == SingleResponseFormat {
-    for try await result in try self.networkTransport.send(
+    for try await result in try fetch(
       query: query,
-      cachePolicy: cachePolicy ?? self.defaultCachePolicy,
+      fetchBehavior: cachePolicy.toFetchBehavior(),
+      requestConfiguration: requestConfiguration
     ) {
       return result
     }
@@ -130,121 +138,410 @@ public final class ApolloClient: ApolloClientProtocol, Sendable {
 
   public func fetch<Query: GraphQLQuery>(
     query: Query,
-    cachePolicy: CachePolicy? = nil
+    cachePolicy: CachePolicy.Query.CacheThenNetwork,
+    requestConfiguration: RequestConfiguration? = nil
   ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error>
-  where Query.ResponseFormat == IncrementalDeferredResponseFormat {
-    return try self.networkTransport.send(
+  where Query.ResponseFormat == SingleResponseFormat {
+    return try fetch(
       query: query,
-      cachePolicy: cachePolicy ?? self.defaultCachePolicy
+      fetchBehavior: FetchBehavior.CacheThenNetwork,
+      requestConfiguration: requestConfiguration
     )
   }
 
-  /// Watches a query by first fetching an initial result from the server or from the local cache, depending on the current contents of the cache and the specified cache policy. After the initial fetch, the returned query watcher object will get notified whenever any of the data the query result depends on changes in the local cache, and calls the result handler again with the new result.
+  // MARK: Incremental Response Format
+
+  public func fetch<Query: GraphQLQuery>(
+    query: Query,
+    cachePolicy: CachePolicy.Query.SingleResponse,
+    requestConfiguration: RequestConfiguration? = nil
+  ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error>
+  where Query.ResponseFormat == IncrementalDeferredResponseFormat {
+    return try fetch(
+      query: query,
+      fetchBehavior: cachePolicy.toFetchBehavior(),
+      requestConfiguration: requestConfiguration
+    )
+  }
+
+  public func fetch<Query: GraphQLQuery>(
+    query: Query,
+    cachePolicy: CachePolicy.Query.CacheThenNetwork,
+    requestConfiguration: RequestConfiguration? = nil
+  ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error>
+  where Query.ResponseFormat == IncrementalDeferredResponseFormat {
+    return try fetch(
+      query: query,
+      fetchBehavior: cachePolicy.toFetchBehavior(),
+      requestConfiguration: requestConfiguration
+    )
+  }
+
+  // MARK: Cache Only
+
+  public func fetch<Query: GraphQLQuery>(
+    query: Query,
+    cachePolicy: CachePolicy.Query.CacheOnly,
+    requestConfiguration: RequestConfiguration? = nil
+  ) async throws -> GraphQLResult<Query.Data> {
+    for try await result in try fetch(
+      query: query,
+      fetchBehavior: cachePolicy.toFetchBehavior(),
+      requestConfiguration: requestConfiguration
+    ) {
+      return result
+    }
+    throw ApolloClientError.noResults
+  }
+
+  // MARK: - Watch Query
+
+  // MARK: Watch Query w/Fetch Behavior
+
+  /// Watches a query by first fetching an initial result from the server or from the local cache, depending on the
+  /// current contents of the cache and the specified cache policy. After the initial fetch, the returned query
+  /// watcher object will get notified whenever any of the data the query result depends on changes in the local cache,
+  /// and calls the result handler again with the new result.
   ///
   /// - Parameters:
   ///   - query: The query to fetch.
-  ///   - cachePolicy: A cache policy that specifies when results should be fetched from the server or from the local cache.
+  ///   - fetchBehavior: A ``FetchBehavior`` that specifies when results should be fetched from the server or from the
+  ///   local cache.
+  ///   - requestConfiguration: A ``RequestConfiguration`` to use for the watcher's initial fetch. If `nil` the
+  ///   client's `defaultRequestConfiguration` will be used.
   ///   - refetchOnFailedUpdates: Should the watcher perform a network fetch when it's watched
-  ///     objects have changed, but reloading them from the cache fails. Should default to `true`.
-  ///   - context: [optional] A context that is being passed through the request chain. Should default to `nil`.
-  ///   - callbackQueue: A dispatch queue on which the result handler will be called. Should default to the main queue.
-  ///   - resultHandler: [optional] A closure that is called when query results are available or when an error occurs.
+  ///   objects have changed, but reloading them from the cache fails. Defaults to `true`.
+  ///   - resultHandler: A closure that is called when query results are available or when an error occurs.
   /// - Returns: A query watcher object that can be used to control the watching behavior.
   public func watch<Query: GraphQLQuery>(
     query: Query,
-    cachePolicy: CachePolicy? = nil,
+    fetchBehavior: FetchBehavior = FetchBehavior.CacheElseNetwork,
+    requestConfiguration: RequestConfiguration? = nil,
     refetchOnFailedUpdates: Bool = true,
-    callbackQueue: DispatchQueue = .main,
-    resultHandler: @escaping GraphQLResultHandler<Query.Data>
+    resultHandler: @escaping GraphQLQueryWatcher<Query>.ResultHandler
   ) -> GraphQLQueryWatcher<Query> {
     let watcher = GraphQLQueryWatcher(
       client: self,
       query: query,
       refetchOnFailedUpdates: refetchOnFailedUpdates,
-      callbackQueue: callbackQueue,
       resultHandler: resultHandler
     )
-    watcher.fetch(cachePolicy: cachePolicy ?? self.defaultCachePolicy)
+    Task {
+      await watcher.fetch(fetchBehavior: fetchBehavior, requestConfiguration: requestConfiguration)
+    }
     return watcher
   }
 
-  @discardableResult
-  public func perform<Mutation: GraphQLMutation>(
-    mutation: Mutation,
-    publishResultToStore: Bool = true,
-    queue: DispatchQueue = .main,
-    resultHandler: GraphQLResultHandler<Mutation.Data>? = nil
-  ) -> (any Cancellable) {
-    return awaitStreamInTask(
-      {
-        try self.networkTransport.send(
-          mutation: mutation,
-          cachePolicy: publishResultToStore ? self.defaultCachePolicy : .networkOnly,  // TODO: should be NoCache
-        )
-      },
-      callbackQueue: queue,
-      completion: resultHandler
+  // MARK: Watch Query - CachePolicy Overloads
+
+  /// Watches a query by first fetching an initial result from the server or from the local cache, depending on the
+  /// current contents of the cache and the specified cache policy. After the initial fetch, the returned query
+  /// watcher object will get notified whenever any of the data the query result depends on changes in the local cache,
+  /// and calls the result handler again with the new result.
+  ///
+  /// - Parameters:
+  ///   - query: The query to fetch.
+  ///   - cachePolicy: A cache policy that specifies when results should be fetched from the server or from the
+  ///   local cache.
+  ///   - requestConfiguration: A ``RequestConfiguration`` to use for the watcher's initial fetch. If `nil` the
+  ///   client's `defaultRequestConfiguration` will be used.
+  ///   - refetchOnFailedUpdates: Should the watcher perform a network fetch when it's watched
+  ///   objects have changed, but reloading them from the cache fails. Defaults to `true`.
+  ///   - resultHandler: A closure that is called when query results are available or when an error occurs.
+  /// - Returns: A query watcher object that can be used to control the watching behavior.
+  public func watch<Query: GraphQLQuery>(
+    query: Query,
+    cachePolicy: CachePolicy.Query.SingleResponse,
+    requestConfiguration: RequestConfiguration? = nil,
+    refetchOnFailedUpdates: Bool = true,
+    resultHandler: @escaping GraphQLQueryWatcher<Query>.ResultHandler
+  ) -> GraphQLQueryWatcher<Query> {
+    return self.watch(
+      query: query,
+      fetchBehavior: cachePolicy.toFetchBehavior(),
+      requestConfiguration: requestConfiguration,
+      refetchOnFailedUpdates: refetchOnFailedUpdates,
+      resultHandler: resultHandler
     )
   }
 
-  @discardableResult
+  /// Watches a query by first fetching an initial result from the server or from the local cache, depending on the
+  /// current contents of the cache and the specified cache policy. After the initial fetch, the returned query
+  /// watcher object will get notified whenever any of the data the query result depends on changes in the local cache,
+  /// and calls the result handler again with the new result.
+  ///
+  /// - Parameters:
+  ///   - query: The query to fetch.
+  ///   - cachePolicy: A cache policy that specifies when results should be fetched from the server or from the
+  ///   local cache.
+  ///   - requestConfiguration: A ``RequestConfiguration`` to use for the watcher's initial fetch. If `nil` the
+  ///   client's `defaultRequestConfiguration` will be used.
+  ///   - refetchOnFailedUpdates: Should the watcher perform a network fetch when it's watched
+  ///   objects have changed, but reloading them from the cache fails. Defaults to `true`.
+  ///   - resultHandler: A closure that is called when query results are available or when an error occurs.
+  /// - Returns: A query watcher object that can be used to control the watching behavior.
+  public func watch<Query: GraphQLQuery>(
+    query: Query,
+    cachePolicy: CachePolicy.Query.CacheThenNetwork,
+    requestConfiguration: RequestConfiguration? = nil,
+    refetchOnFailedUpdates: Bool = true,
+    resultHandler: @escaping GraphQLQueryWatcher<Query>.ResultHandler
+  ) -> GraphQLQueryWatcher<Query> {
+    return self.watch(
+      query: query,
+      fetchBehavior: cachePolicy.toFetchBehavior(),
+      requestConfiguration: requestConfiguration,
+      refetchOnFailedUpdates: refetchOnFailedUpdates,
+      resultHandler: resultHandler
+    )
+  }
+
+  /// Watches a query by first fetching an initial result from the server or from the local cache, depending on the
+  /// current contents of the cache and the specified cache policy. After the initial fetch, the returned query
+  /// watcher object will get notified whenever any of the data the query result depends on changes in the local cache,
+  /// and calls the result handler again with the new result.
+  ///
+  /// - Parameters:
+  ///   - query: The query to fetch.
+  ///   - cachePolicy: A cache policy that specifies when results should be fetched from the server or from the
+  ///   local cache.
+  ///   - requestConfiguration: A ``RequestConfiguration`` to use for the watcher's initial fetch. If `nil` the
+  ///   client's `defaultRequestConfiguration` will be used.
+  ///   - refetchOnFailedUpdates: Should the watcher perform a network fetch when it's watched
+  ///   objects have changed, but reloading them from the cache fails. Defaults to `true`.
+  ///   - resultHandler: A closure that is called when query results are available or when an error occurs.
+  /// - Returns: A query watcher object that can be used to control the watching behavior.
+  public func watch<Query: GraphQLQuery>(
+    query: Query,
+    cachePolicy: CachePolicy.Query.CacheOnly,
+    requestConfiguration: RequestConfiguration? = nil,
+    refetchOnFailedUpdates: Bool = true,
+    resultHandler: @escaping GraphQLQueryWatcher<Query>.ResultHandler
+  ) -> GraphQLQueryWatcher<Query> {
+    return self.watch(
+      query: query,
+      fetchBehavior: cachePolicy.toFetchBehavior(),
+      requestConfiguration: requestConfiguration,
+      refetchOnFailedUpdates: refetchOnFailedUpdates,
+      resultHandler: resultHandler
+    )
+  }
+
+  // MARK: - Perform Mutation
+
+  /// Performs a mutation by sending it to the server.
+  ///
+  /// Mutations always need to send their mutation data to the server, so there is no `cachePolicy` or `fetchBehavior`
+  /// parameter.
+  ///
+  /// - Parameters:
+  ///   - mutation: The mutation to perform.
+  ///   - requestConfiguration: A ``RequestConfiguration`` to use for the watcher's initial fetch. If `nil` the
+  ///   client's `defaultRequestConfiguration` will be used.
+  public func perform<Mutation: GraphQLMutation>(
+    mutation: Mutation,
+    requestConfiguration: RequestConfiguration? = nil
+  ) async throws -> GraphQLResult<Mutation.Data>
+  where Mutation.ResponseFormat == SingleResponseFormat {
+    for try await result in try self.sendMutation(
+      mutation: mutation,
+      requestConfiguration: requestConfiguration
+    ) {
+      return result
+    }
+    throw ApolloClientError.noResults
+  }
+
+  /// Performs a mutation by sending it to the server.
+  ///
+  /// Mutations always need to send their mutation data to the server, so there is no `cachePolicy` or `fetchBehavior`
+  /// parameter.
+  ///
+  /// - Parameters:
+  ///   - mutation: The mutation to perform.
+  ///   - requestConfiguration: A ``RequestConfiguration`` to use for the watcher's initial fetch. If `nil` the
+  ///   client's `defaultRequestConfiguration` will be used.
+  public func perform<Mutation: GraphQLMutation>(
+    mutation: Mutation,
+    requestConfiguration: RequestConfiguration? = nil
+  ) throws -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error>
+  where Mutation.ResponseFormat == IncrementalDeferredResponseFormat {
+    return try sendMutation(mutation: mutation, requestConfiguration: requestConfiguration)
+  }
+
+  public func sendMutation<Mutation: GraphQLMutation>(
+    mutation: Mutation,
+    requestConfiguration: RequestConfiguration?
+  ) throws -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error> {
+    return try doInClientContext {
+      return try self.networkTransport.send(
+        mutation: mutation,
+        requestConfiguration: requestConfiguration ?? defaultRequestConfiguration
+      )
+    }
+  }
+
+  // MARK: - Upload Operation
+
+  /// Uploads the given files with the given operation.
+  ///
+  /// - Parameters:
+  ///   - operation: The operation to send
+  ///   - files: An array of `GraphQLFile` objects to send.
+  ///   - requestConfiguration: A ``RequestConfiguration`` to use for the watcher's initial fetch. If `nil` the
+  ///   client's `defaultRequestConfiguration` will be used.
+  ///
+  ///   - Note: An error will be thrown If your `networkTransport` does not also conform to `UploadingNetworkTransport`.
   public func upload<Operation: GraphQLOperation>(
     operation: Operation,
     files: [GraphQLFile],
-    queue: DispatchQueue = .main,
-    resultHandler: GraphQLResultHandler<Operation.Data>? = nil
-  ) -> (any Cancellable) {
+    requestConfiguration: RequestConfiguration? = nil
+  ) async throws -> GraphQLResult<Operation.Data>
+  where Operation.ResponseFormat == SingleResponseFormat {
+    for try await result in try self.sendUpload(
+      operation: operation,
+      files: files,
+      requestConfiguration: requestConfiguration
+    ) {
+      return result
+    }
+    throw ApolloClientError.noResults
+  }
+
+  /// Uploads the given files with the given operation.
+  ///
+  /// - Parameters:
+  ///   - operation: The operation to send
+  ///   - files: An array of `GraphQLFile` objects to send.
+  ///   - requestConfiguration: A ``RequestConfiguration`` to use for the watcher's initial fetch. If `nil` the
+  ///   client's `defaultRequestConfiguration` will be used.
+  ///
+  ///   - Note: An error will be thrown If your `networkTransport` does not also conform to `UploadingNetworkTransport`.
+  public func upload<Operation: GraphQLOperation>(
+    operation: Operation,
+    files: [GraphQLFile],
+    requestConfiguration: RequestConfiguration? = nil
+  ) throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error>
+  where Operation.ResponseFormat == IncrementalDeferredResponseFormat {
+    return try self.sendUpload(
+      operation: operation,
+      files: files,
+      requestConfiguration: requestConfiguration
+    )
+  }
+
+  private func sendUpload<Operation: GraphQLOperation>(
+    operation: Operation,
+    files: [GraphQLFile],
+    requestConfiguration: RequestConfiguration?
+  ) throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error> {
     guard let uploadingTransport = self.networkTransport as? (any UploadingNetworkTransport) else {
       assertionFailure(
         "Trying to upload without an uploading transport. Please make sure your network transport conforms to `UploadingNetworkTransport`."
       )
-      queue.async {
-        resultHandler?(.failure(ApolloClientError.noUploadTransport))
-      }
-      return EmptyCancellable()
+      throw ApolloClientError.noUploadTransport
     }
 
-    return awaitStreamInTask(
-      {
-        try uploadingTransport.upload(
-          operation: operation,
-          files: files
-        )
-      },
-      callbackQueue: queue,
-      completion: resultHandler
-    )
+    return try doInClientContext {
+      return try uploadingTransport.upload(
+        operation: operation,
+        files: files,
+        requestConfiguration: requestConfiguration ?? defaultRequestConfiguration
+      )
+    }
   }
 
+  // MARK: - Subscription Operations
+
+  /// Subscribe to a subscription
+  ///
+  /// - Parameters:
+  ///   - subscription: The subscription to subscribe to.
+  ///   - cachePolicy: A cache policy that specifies when results should be fetched from the server or from the
+  ///   local cache.
   public func subscribe<Subscription: GraphQLSubscription>(
     subscription: Subscription,
-    queue: DispatchQueue = .main,
-    resultHandler: @escaping GraphQLResultHandler<Subscription.Data>
-  ) -> any Cancellable {
-    guard let networkTransport = networkTransport as? (any SubscriptionNetworkTransport) else {
+    cachePolicy: CachePolicy.Subscription = .cacheThenNetwork,
+    requestConfiguration: RequestConfiguration? = nil
+  ) async throws -> AsyncThrowingStream<GraphQLResult<Subscription.Data>, any Error> {
+    guard let subscriptionTransport = self.networkTransport as? (any SubscriptionNetworkTransport) else {
       assertionFailure(
         "Trying to subscribe without a subscription transport. Please make sure your network transport conforms to `SubscriptionNetworkTransport`."
       )
-      queue.async {
-        resultHandler(.failure(ApolloClientError.noSubscriptionTransport))
-      }
-      return EmptyCancellable()
+      throw ApolloClientError.noSubscriptionTransport
     }
 
-    return awaitStreamInTask(
-      {
-        try networkTransport.send(
+    return try doInClientContext {
+      return try subscriptionTransport
+        .send(
           subscription: subscription,
-          cachePolicy: self.defaultCachePolicy,  // TODO: should this just be networkOnly?
+          fetchBehavior: cachePolicy.toFetchBehavior(),
+          requestConfiguration: requestConfiguration ?? defaultRequestConfiguration
         )
-      },
-      callbackQueue: queue,
-      completion: resultHandler
-    )
+    }
+  }
+
+  // MARK: - ClientContext
+
+  @TaskLocal internal static var context: ClientContext?
+
+  private let context: ClientContext
+
+  struct ClientContext: Sendable {
+    /// The telemetry metadata about the client. This is used by GraphOS Studio's
+    /// [client awareness](https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation)
+    /// feature.
+    let clientAwarenessMetadata: ClientAwarenessMetadata
+  }
+
+  private func doInClientContext<T>(_ block: () throws -> T) rethrows -> T {
+    return try ApolloClient.$context.withValue(self.context) {
+      return try block()
+    }
   }
 }
 
 // MARK: - Deprecations
+
+/// A handler for operation results.
+///
+/// - Parameters:
+///   - result: The result of a performed operation. Will have a `GraphQLResult` with any parsed data and any GraphQL errors on `success`, and an `Error` on `failure`.
+@available(*, deprecated)
+public typealias GraphQLResultHandler<Data: RootSelectionSet> = @Sendable (Result<GraphQLResult<Data>, any Error>) ->
+  Void
+
+@available(*, deprecated)
+public enum CachePolicy_v1: Sendable, Hashable {
+  /// Return data from the cache if available, else fetch results from the server.
+  case returnCacheDataElseFetch
+  ///  Always fetch results from the server.
+  case fetchIgnoringCacheData
+  ///  Always fetch results from the server, and don't store these in the cache.
+  case fetchIgnoringCacheCompletely
+  /// Return data from the cache if available, else return an error.
+  case returnCacheDataDontFetch
+  /// Return data from the cache if available, and always fetch results from the server.
+  case returnCacheDataAndFetch
+
+  /// The current default cache policy.
+  nonisolated(unsafe) public static var `default`: CachePolicy_v1 = .returnCacheDataElseFetch
+
+  func toFetchBehavior() -> FetchBehavior {
+    switch self {
+    case .returnCacheDataElseFetch:
+      return FetchBehavior.CacheElseNetwork
+    case .fetchIgnoringCacheData:
+      return FetchBehavior.NetworkOnly
+    case .fetchIgnoringCacheCompletely:
+      return FetchBehavior.NetworkOnly
+    case .returnCacheDataDontFetch:
+      return FetchBehavior.CacheOnly
+    case .returnCacheDataAndFetch:
+      return FetchBehavior.CacheThenNetwork
+    }
+  }
+}
 
 extension ApolloClient {
 
@@ -254,21 +551,24 @@ extension ApolloClient {
     completion: (@Sendable (Result<Void, any Error>) -> Void)? = nil
   ) {
     self.store.clearCache(callbackQueue: callbackQueue, completion: completion)
-  }  
+  }
 
+  @_disfavoredOverload
   @available(*, deprecated)
   @discardableResult public func fetch<Query: GraphQLQuery>(
     query: Query,
-    cachePolicy: CachePolicy? = nil,
+    cachePolicy: CachePolicy_v1? = nil,
     context: (any RequestContext)? = nil,
     queue: DispatchQueue = .main,
     resultHandler: GraphQLResultHandler<Query.Data>? = nil
   ) -> (any Cancellable) {
+    let cachePolicy = cachePolicy ?? CachePolicy_v1.default
     return awaitStreamInTask(
       {
-        try self.networkTransport.send(
+        try self.fetch(
           query: query,
-          cachePolicy: cachePolicy ?? self.defaultCachePolicy
+          fetchBehavior: cachePolicy.toFetchBehavior(),
+          requestConfiguration: RequestConfiguration(writeResultsToCache: cachePolicy != .fetchIgnoringCacheCompletely)
         )
       },
       callbackQueue: queue,
@@ -313,20 +613,100 @@ extension ApolloClient {
   )
   public func watch<Query: GraphQLQuery>(
     query: Query,
-    cachePolicy: CachePolicy? = nil,
+    cachePolicy: CachePolicy_v1? = nil,
     context: (any RequestContext)? = nil,
     callbackQueue: DispatchQueue = .main,
     resultHandler: @escaping GraphQLResultHandler<Query.Data>
   ) -> GraphQLQueryWatcher<Query> {
-    let watcher = GraphQLQueryWatcher(
-      client: self,
+    let cachePolicy = cachePolicy ?? CachePolicy_v1.default
+    let config = RequestConfiguration(
+      requestTimeout: defaultRequestConfiguration.requestTimeout,
+      writeResultsToCache: cachePolicy == .fetchIgnoringCacheCompletely
+        ? false : defaultRequestConfiguration.writeResultsToCache
+    )
+    return self.watch(
       query: query,
-      context: context,
-      callbackQueue: callbackQueue,
+      fetchBehavior: cachePolicy.toFetchBehavior(),
+      requestConfiguration: config,
       resultHandler: resultHandler
     )
-    watcher.fetch(cachePolicy: cachePolicy ?? self.defaultCachePolicy)
-    return watcher
+  }
+
+  @discardableResult
+  @_disfavoredOverload
+  @available(
+    *,
+    deprecated,
+    renamed: "perform(mutation:requestConfiguration:)"
+  )
+  public func perform<Mutation: GraphQLMutation>(
+    mutation: Mutation,
+    publishResultToStore: Bool = true,
+    queue: DispatchQueue = .main,
+    resultHandler: GraphQLResultHandler<Mutation.Data>? = nil
+  ) -> (any Cancellable) {
+    let config = RequestConfiguration(
+      requestTimeout: defaultRequestConfiguration.requestTimeout,
+      writeResultsToCache: publishResultToStore
+    )
+
+    return awaitStreamInTask(
+      {
+        try self.networkTransport.send(
+          mutation: mutation,
+          requestConfiguration: config
+        )
+      },
+      callbackQueue: queue,
+      completion: resultHandler
+    )
+  }
+
+  @discardableResult
+  @_disfavoredOverload
+  @available(
+    *,
+    deprecated,
+    renamed: "upload(operation:files:requestConfiguration:)"
+  )
+  public func upload<Operation: GraphQLOperation>(
+    operation: Operation,
+    files: [GraphQLFile],
+    queue: DispatchQueue = .main,
+    resultHandler: GraphQLResultHandler<Operation.Data>? = nil
+  ) -> (any Cancellable) {
+    return awaitStreamInTask(
+      {
+        try self.sendUpload(
+          operation: operation,
+          files: files,
+          requestConfiguration: nil
+        )
+      },
+      callbackQueue: queue,
+      completion: resultHandler
+    )
+  }
+
+  @discardableResult
+  @_disfavoredOverload
+  @available(
+    *,
+    deprecated,
+    renamed: "subscribe(subscription:cachePolicy:requestConfiguration:)"
+  )
+  public func subscribe<Subscription: GraphQLSubscription>(
+    subscription: Subscription,
+    queue: DispatchQueue = .main,
+    resultHandler: @escaping GraphQLResultHandler<Subscription.Data>
+  ) -> any Cancellable {
+    return awaitStreamInTask(
+      {
+        try await self.subscribe(subscription: subscription)
+      },
+      callbackQueue: queue,
+      completion: resultHandler
+    )
   }
 
 }
