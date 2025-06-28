@@ -36,10 +36,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
         response: urlResponse,
         chunks: streamMocker.getStream()
       ),
-      for: JSONRequest.mock(operation: operation),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
       includeCacheRecords: false
     )
-    .getResults()
+    .getStream()
     .makeAsyncIterator()
 
     streamMocker.emit(
@@ -78,10 +78,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
         response: urlResponse,
         chunks: streamMocker.getStream()
       ),
-      for: JSONRequest.mock(operation: operation),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
       includeCacheRecords: false
     )
-    .getResults()
+    .getStream()
     .makeAsyncIterator()
 
     streamMocker.emit(
@@ -115,10 +115,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
         response: urlResponse,
         chunks: streamMocker.getStream()
       ),
-      for: JSONRequest.mock(operation: operation),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
       includeCacheRecords: false
     )
-    .getResults()
+    .getStream()
     .makeAsyncIterator()
 
     streamMocker.emit(
@@ -156,10 +156,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
         response: urlResponse,
         chunks: streamMocker.getStream()
       ),
-      for: JSONRequest.mock(operation: operation),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
       includeCacheRecords: false
     )
-    .getResults()
+    .getStream()
     .makeAsyncIterator()
 
     let responseChunk = """
@@ -194,10 +194,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
         response: urlResponse,
         chunks: streamMocker.getStream()
       ),
-      for: JSONRequest.mock(operation: operation),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
       includeCacheRecords: false
     )
-    .getResults()
+    .getStream()
     .makeAsyncIterator()
 
     let responseChunk = """
@@ -232,10 +232,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
         response: urlResponse,
         chunks: streamMocker.getStream()
       ),
-      for: JSONRequest.mock(operation: operation),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
       includeCacheRecords: false
     )
-    .getResults()
+    .getStream()
     .makeAsyncIterator()
 
     let responseChunk = """

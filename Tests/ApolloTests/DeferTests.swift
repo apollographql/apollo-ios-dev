@@ -28,7 +28,6 @@ final class DeferTests: XCTestCase, MockResponseProvider {
     try await super.tearDown()
   }
 
-
   private struct TVShowQuery: GraphQLQuery, @unchecked Sendable {
     static var operationName: String { "TVShowQuery" }
 
@@ -172,8 +171,12 @@ final class DeferTests: XCTestCase, MockResponseProvider {
         """.crlfFormattedData()
     )
 
-    let results = try await network.send(query: TVShowQuery(), cachePolicy: .fetchIgnoringCacheCompletely)
-      .getAllValues()
+    let results = try await network.send(
+      query: TVShowQuery(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+    .getAllValues()
 
     expect(results.count).to(equal(1))
 
@@ -302,7 +305,13 @@ final class DeferTests: XCTestCase, MockResponseProvider {
 
     var responseCount = 0
 
-    for try await response in try network.send(query: TVShowQuery(), cachePolicy: .fetchIgnoringCacheCompletely) {
+    let results = try network.send(
+      query: TVShowQuery(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    for try await response in results {
       responseCount += 1
 
       let data = response.data
@@ -423,7 +432,13 @@ final class DeferTests: XCTestCase, MockResponseProvider {
 
     var requestCount = 0
 
-    for try await response in try network.send(query: TVShowQuery(), cachePolicy: .fetchIgnoringCacheCompletely) {
+    let results = try network.send(
+      query: TVShowQuery(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    for try await response in results {
       requestCount += 1
 
       let data = response.data
@@ -589,7 +604,13 @@ final class DeferTests: XCTestCase, MockResponseProvider {
 
     var requestCount = 0
 
-    for try await response in try network.send(query: TVShowQuery(), cachePolicy: .fetchIgnoringCacheCompletely) {
+    let results = try network.send(
+      query: TVShowQuery(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    for try await response in results {
       requestCount += 1
 
       let data = response.data

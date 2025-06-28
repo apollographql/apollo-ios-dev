@@ -20,7 +20,7 @@ class DefaultInterceptorProviderTests: XCTestCase {
   override func setUp() {
     mockServer = MockGraphQLServer()
     let store = ApolloStore()
-    let networkTransport = MockNetworkTransport(server: mockServer, store: store)
+    let networkTransport = MockNetworkTransport(mockServer: mockServer, store: store)
     client = ApolloClient(networkTransport: networkTransport, store: store)
   }
 
@@ -31,7 +31,7 @@ class DefaultInterceptorProviderTests: XCTestCase {
     super.tearDown()
   }
   
-  func testLoading() {
+  func testLoading() async {
     // given
     final class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
@@ -46,7 +46,7 @@ class DefaultInterceptorProviderTests: XCTestCase {
       }
     }
 
-    let expectation = mockServer.expect(MockQuery<GivenSelectionSet>.self) { _ in
+    let expectation = await mockServer.expect(MockQuery<GivenSelectionSet>.self) { _ in
       DefaultInterceptorProviderTests.mockData
     }
 
@@ -60,10 +60,10 @@ class DefaultInterceptorProviderTests: XCTestCase {
       }
     }
 
-    self.wait(for: [expectation], timeout: 10)
+    await fulfillment(of: [expectation])
   }
 
-  func testInitialLoadFromNetworkAndSecondaryLoadFromCache() {
+  func testInitialLoadFromNetworkAndSecondaryLoadFromCache() async {
     // given
     final class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
@@ -78,7 +78,7 @@ class DefaultInterceptorProviderTests: XCTestCase {
       }
     }
 
-    let initialLoadExpectation = mockServer.expect(MockQuery<GivenSelectionSet>.self) { _ in
+    let initialLoadExpectation = await mockServer.expect(MockQuery<GivenSelectionSet>.self) { _ in
       DefaultInterceptorProviderTests.mockData
     }
     initialLoadExpectation.assertForOverFulfill = false
@@ -95,7 +95,7 @@ class DefaultInterceptorProviderTests: XCTestCase {
       }
     }
 
-    self.wait(for: [initialLoadExpectation, fetchCompleteExpectation], timeout: 10)
+    await fulfillment(of: [initialLoadExpectation, fetchCompleteExpectation])
 
     let secondLoadExpectation = self.expectation(description: "loaded with default client")
 
@@ -111,7 +111,7 @@ class DefaultInterceptorProviderTests: XCTestCase {
       secondLoadExpectation.fulfill()
     }
 
-    self.wait(for: [secondLoadExpectation], timeout: 10)
+    await fulfillment(of: [secondLoadExpectation], timeout: 10)
   }
 
 

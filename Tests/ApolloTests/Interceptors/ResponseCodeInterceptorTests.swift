@@ -12,9 +12,10 @@ class ResponseCodeInterceptorTests: XCTestCase, MockResponseProvider {
   }
 
   func testResponseCodeInterceptorLetsAnyDataThroughWithValidResponseCode() async throws {
-
     let network = RequestChainNetworkTransport(
-      interceptorProvider: Self.TestInterceptorProvider(),
+      urlSession: MockURLSession(responseProvider: Self.self),
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: .mock(),
       endpointURL: TestURL.mockServer.url
     )
 
@@ -34,7 +35,11 @@ class ResponseCodeInterceptorTests: XCTestCase, MockResponseProvider {
       )
     }
 
-    let responseStream = try network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely)
+    let responseStream = try network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration()
+    )
     var responseIterator = responseStream.makeAsyncIterator()
 
     await expect {
@@ -54,7 +59,9 @@ class ResponseCodeInterceptorTests: XCTestCase, MockResponseProvider {
 
   func testResponseCodeInterceptorDoesNotLetDataThroughWithInvalidResponseCode() async throws {
     let network = RequestChainNetworkTransport(
-      interceptorProvider: Self.TestInterceptorProvider(),
+      urlSession: MockURLSession(responseProvider: Self.self),
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: .mock(),
       endpointURL: TestURL.mockServer.url
     )
 
@@ -80,7 +87,11 @@ class ResponseCodeInterceptorTests: XCTestCase, MockResponseProvider {
       )
     }
 
-    let responseStream = try network.send(query: MockQuery.mock(), cachePolicy: .fetchIgnoringCacheCompletely)
+    let responseStream = try network.send(
+      query: MockQuery.mock(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration()
+    )
     var responseIterator = responseStream.makeAsyncIterator()
 
     await expect {
@@ -89,7 +100,7 @@ class ResponseCodeInterceptorTests: XCTestCase, MockResponseProvider {
       throwError(
         errorType: ResponseCodeInterceptor.ResponseCodeError.self,
         closure: { error in
-          guard let dataString = String(bytes: error.responseChunk, encoding: .utf8) else {
+          guard let dataString = String(bytes: error.chunk, encoding: .utf8) else {
             XCTFail("Incorrect data returned with error")
             return
           }
@@ -115,7 +126,9 @@ class ResponseCodeInterceptorTests: XCTestCase, MockResponseProvider {
 
   func testResponseCodeInterceptorDoesNotHaveGraphQLError() async throws {
     let network = RequestChainNetworkTransport(
-      interceptorProvider: Self.TestInterceptorProvider(),
+      urlSession: MockURLSession(responseProvider: Self.self),
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: .mock(),
       endpointURL: TestURL.mockServer.url
     )
 
@@ -131,7 +144,11 @@ class ResponseCodeInterceptorTests: XCTestCase, MockResponseProvider {
       )
     }
 
-    let responseStream = try network.send(query: MockQuery.mock(), cachePolicy: .fetchIgnoringCacheCompletely)
+    let responseStream = try network.send(
+      query: MockQuery.mock(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration()
+    )
     var responseIterator = responseStream.makeAsyncIterator()
 
     await expect {
@@ -142,7 +159,7 @@ class ResponseCodeInterceptorTests: XCTestCase, MockResponseProvider {
         closure: { error in
           XCTAssertEqual(error.response.statusCode, 401)
 
-          guard let dataString = String(bytes: error.responseChunk, encoding: .utf8) else {
+          guard let dataString = String(bytes: error.chunk, encoding: .utf8) else {
             XCTFail("Incorrect data returned with error")
             return
           }

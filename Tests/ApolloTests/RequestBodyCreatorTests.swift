@@ -22,8 +22,7 @@ class RequestBodyCreatorTests: XCTestCase {
     creator.requestBody(
       for: operation,
       sendQueryDocument: true,
-      autoPersistQuery: false,
-      clientAwarenessMetadata: .none // Client awareness behavior tested in ClientAwarenessMetadataTests
+      autoPersistQuery: false
     )
   }
 
@@ -31,7 +30,7 @@ class RequestBodyCreatorTests: XCTestCase {
 
   func testRequestBodyWithApolloRequestBodyCreator() {
     // given
-    class GivenMockOperation: MockOperation<MockSelectionSet>, @unchecked Sendable {
+    class GivenMockOperation: MockQuery<MockSelectionSet>, @unchecked Sendable {
       override class var operationName: String { "Test Operation Name" }
       override class var operationDocument: OperationDocument {
         .init(definition: .init("Test Query Document"))
@@ -79,7 +78,7 @@ class RequestBodyCreatorTests: XCTestCase {
       var _jsonValue: JSONValue { data }
     }
 
-    class GivenMockOperation: MockOperation<MockSelectionSet>, @unchecked Sendable {
+    class GivenMockOperation: MockQuery<MockSelectionSet>, @unchecked Sendable {
       override class var operationName: String { "Test Operation Name" }
       override class var operationDocument: OperationDocument {
         .init(definition: .init("Test Query Document"))

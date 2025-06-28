@@ -4,7 +4,7 @@ import Foundation
 
 public final class MockNetworkTransport: NetworkTransport {
   public let mockServer: MockGraphQLServer
-  let requestChainTransport: RequestChainNetworkTransport
+  public let requestChainTransport: RequestChainNetworkTransport
 
   public init(
     mockServer: MockGraphQLServer = MockGraphQLServer(),

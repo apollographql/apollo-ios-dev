@@ -103,28 +103,6 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     }.to(throwError(RequestChainError.noResults))
   }
 
-  func test_send_givenNoParsingInterceptor_throwsMissingParsedResultError() async throws {
-    await Self.registerRequestHandler(for: serverUrl) { request in
-      (
-        .mock(),
-        self.emptyResponseData()
-      )
-    }
-
-    let transport = RequestChainNetworkTransport(
-      urlSession: session,
-      interceptorProvider: MockProvider(interceptors: []),
-      store: .mock(),
-      endpointURL: serverUrl
-    )
-
-    let resultStream = try transport.send(query: MockQuery.mock(), cachePolicy: .fetchIgnoringCacheCompletely)
-
-    await expect {
-      try await resultStream.getAllValues()
-    }.to(throwError(RequestChainError.missingParsedResult))
-  }
-
   // MARK: - Cancellation tests
 
   func test__cancellingTask__propogatesTaskCancellationToInterceptors() async throws {

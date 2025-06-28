@@ -554,7 +554,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
     }
   }
 
-  @MainActor func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriendListItem_usingRequestChain() async throws {
+  @MainActor func testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriendListItem_usingRequestChain_loadsDataFromNetworkAndWritesToStore() async throws {
     // given
     struct Types {
       static let Hero = Object(typename: "Hero", implementedInterfaces: [])
@@ -573,7 +573,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
       }
     })
 
-    class Hero: MockSelectionSet {
+    class Hero: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Hero }
@@ -600,7 +600,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
         ))
       }
 
-      class Friend: MockSelectionSet {
+      class Friend: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -644,15 +644,13 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
 
     let requestChain = RequestChain<JSONRequest<MockQuery<Hero>>>(
       urlSession: urlSession,
-      interceptors: [
-        JSONResponseParsingInterceptor(),
-      ],
-      cacheInterceptor: DefaultCacheInterceptor(store: self.store),
-      errorInterceptor: nil
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store
     )
 
-    let request = JSONRequest(
+    let request = JSONRequest.mock(
       operation: MockQuery<Hero>(),
+      fetchBehavior: .NetworkOnly,
       graphQLEndpoint: TestURL.mockServer.url
     )    
 

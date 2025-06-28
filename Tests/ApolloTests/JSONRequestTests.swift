@@ -8,8 +8,9 @@ import XCTest
 class JSONRequestTests: XCTestCase {
 
   func test__init__givenSubscription_shouldAddMultipartAcceptHeader() {
-    let subject = JSONRequest(
+    let subject = JSONRequest.mock(
       operation: MockSubscription.mock(),
+      fetchBehavior: .NetworkOnly,
       graphQLEndpoint: TestURL.mockServer.url,
     )
 
@@ -22,8 +23,9 @@ class JSONRequestTests: XCTestCase {
   }
 
   func test__init__givenQuery_shouldAddMultipartAcceptHeader() {
-    let subject = JSONRequest(
+    let subject = JSONRequest.mock(
       operation: MockQuery.mock(),
+      fetchBehavior: .NetworkOnly,
       graphQLEndpoint: TestURL.mockServer.url,
     )
 
@@ -36,8 +38,9 @@ class JSONRequestTests: XCTestCase {
   }
 
   func test__init__givenMutation_shouldAddMultipartAcceptHeader() {
-    let subject = JSONRequest(
+    let subject = JSONRequest.mock(
       operation: MockQuery.mock(),
+      fetchBehavior: .NetworkOnly,
       graphQLEndpoint: TestURL.mockServer.url,
     )
 

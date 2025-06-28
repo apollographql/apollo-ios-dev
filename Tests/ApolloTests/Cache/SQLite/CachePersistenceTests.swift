@@ -31,11 +31,11 @@ class CachePersistenceTests: XCTestCase {
     let store = ApolloStore(cache: cache)
 
     let server = MockGraphQLServer()
-    let networkTransport = MockNetworkTransport(server: server, store: store)
+    let networkTransport = MockNetworkTransport(mockServer: server, store: store)
 
     let client = ApolloClient(networkTransport: networkTransport, store: store)
 
-    _ = server.expect(MockQuery<GivenSelectionSet>.self) { request in
+    _ = await server.expect(MockQuery<GivenSelectionSet>.self) { request in
       [
         "data": [
           "hero": [
@@ -87,12 +87,12 @@ class CachePersistenceTests: XCTestCase {
 
   func testFetchAndPersistWithPeriodArguments() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["text": .variable("term")])
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("name", String.self)
         ]}
@@ -109,11 +109,11 @@ class CachePersistenceTests: XCTestCase {
     let store = ApolloStore(cache: cache)
 
     let server = MockGraphQLServer()
-    let networkTransport = MockNetworkTransport(server: server, store: store)
+    let networkTransport = MockNetworkTransport(mockServer: server, store: store)
 
     let client = ApolloClient(networkTransport: networkTransport, store: store)
 
-    _ = server.expect(MockQuery<GivenSelectionSet>.self) { request in
+    _ = await server.expect(MockQuery<GivenSelectionSet>.self) { request in
       [
         "data": [
           "hero": [
@@ -185,11 +185,11 @@ class CachePersistenceTests: XCTestCase {
     let store = ApolloStore(cache: cache)
 
     let server = MockGraphQLServer()
-    let networkTransport = MockNetworkTransport(server: server, store: store)
+    let networkTransport = MockNetworkTransport(mockServer: server, store: store)
 
     let client = ApolloClient(networkTransport: networkTransport, store: store)
 
-    _ = server.expect(MockQuery<GivenSelectionSet>.self) { request in
+    _ = await server.expect(MockQuery<GivenSelectionSet>.self) { request in
       [
         "data": [
           "hero": [

@@ -22,8 +22,8 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     let store = ApolloStore(cache: cache)
     
     server = MockGraphQLServer()
-    let networkTransport = MockNetworkTransport(server: server, store: store)
-    
+    let networkTransport = MockNetworkTransport(mockServer: server, store: store)
+
     client = ApolloClient(networkTransport: networkTransport, store: store)
   }
   
@@ -60,7 +60,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     ])
     
     let serverRequestExpectation =
-      server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
       [
         "data": [
           "hero": [
@@ -115,7 +115,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     ])
     
     let serverRequestExpectation =
-      server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
       [
         "data": [
           "hero": [
@@ -228,7 +228,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     ])
     
     let serverRequestExpectation =
-      server.expect(MockQuery<HeroNameAndAppearsInSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroNameAndAppearsInSelectionSet>.self) { request in
       [
         "data": [
           "hero": [
@@ -408,7 +408,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     
     let query = MockQuery.mock()
 
-    let serverRequestExpectation = server.expect(MockQuery<MockSelectionSet>.self) { request in
+    let serverRequestExpectation = await server.expect(MockQuery<MockSelectionSet>.self) { request in
       ["data": [:] as JSONValue]
     }
     

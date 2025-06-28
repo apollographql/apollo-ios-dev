@@ -7,30 +7,6 @@ import XCTest
 
 class UploadRequestTests: XCTestCase {
 
-  var client: ApolloClient!
-
-  override func setUp() {
-    super.setUp()
-
-    client = {
-      let store = ApolloStore.mock()
-      let provider = DefaultInterceptorProvider(store: store)
-      let transport = RequestChainNetworkTransport(
-        interceptorProvider: provider,
-        endpointURL: URL(string: "http://www.test.com")!,
-        additionalHeaders: ["headerKey": "headerValue"]
-      )
-
-      return ApolloClient(networkTransport: transport, store: store)
-    }()
-  }
-
-  override func tearDown() {
-    client = nil
-
-    super.tearDown()
-  }
-
   func testSingleFileWithUploadRequest() throws {
     let alphaFileUrl = TestFileHelper.fileURLForFile(named: "a", extension: "txt")
 
@@ -42,12 +18,12 @@ class UploadRequestTests: XCTestCase {
     )
     let operation = UploadOneFileMutation(file: alphaFile.originalName)
 
-    let transport = try XCTUnwrap(self.client.networkTransport as? RequestChainNetworkTransport)
-
-    let uploadRequest = transport.constructUploadRequest(
-      for: operation,
-      with: [alphaFile],
-      manualBoundary: "TEST.BOUNDARY"
+    let uploadRequest = UploadRequest(
+      operation: operation,
+      graphQLEndpoint: TestURL.mockServer.url,
+      files: [alphaFile],
+      multipartBoundary: "TEST.BOUNDARY",
+      writeResultsToCache: false
     )
 
     let urlRequest = try uploadRequest.toURLRequest()
@@ -95,12 +71,13 @@ class UploadRequestTests: XCTestCase {
 
     let files = [alphaFile, betaFile]
     let operation = UploadMultipleFilesToTheSameParameterMutation(files: files.map { $0.originalName })
-    let transport = try XCTUnwrap(self.client.networkTransport as? RequestChainNetworkTransport)
 
-    let uploadRequest = transport.constructUploadRequest(
-      for: operation,
-      with: [alphaFile, betaFile],
-      manualBoundary: "TEST.BOUNDARY"
+    let uploadRequest = UploadRequest(
+      operation: operation,
+      graphQLEndpoint: TestURL.mockServer.url,
+      files: [alphaFile, betaFile],
+      multipartBoundary: "TEST.BOUNDARY",
+      writeResultsToCache: false
     )
 
     let urlRequest = try uploadRequest.toURLRequest()
@@ -164,13 +141,14 @@ class UploadRequestTests: XCTestCase {
       singleFile: alphaFile.originalName,
       multipleFiles: [betaFile, charlieFile].map { $0.originalName }
     )
-    let transport = try XCTUnwrap(self.client.networkTransport as? RequestChainNetworkTransport)
 
-    let uploadRequest = transport.constructUploadRequest(
-      for: operation,
-      with: [alphaFile, betaFile, charlieFile],
-      manualBoundary: "TEST.BOUNDARY"
-    )    
+    let uploadRequest = UploadRequest(
+      operation: operation,
+      graphQLEndpoint: TestURL.mockServer.url,
+      files: [alphaFile, betaFile, charlieFile],
+      multipartBoundary: "TEST.BOUNDARY",
+      writeResultsToCache: false
+    )        
 
     let urlRequest = try uploadRequest.toURLRequest()
     XCTAssertEqual(urlRequest.allHTTPHeaderFields?["headerKey"], "headerValue")

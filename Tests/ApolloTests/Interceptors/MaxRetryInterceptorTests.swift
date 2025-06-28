@@ -21,21 +21,11 @@ class MaxRetryInterceptorTests: XCTestCase {
       self.retryCount = retryCount
     }
 
-    func interceptors<Operation: GraphQLOperation>(
-      for operation: Operation
-    ) -> [any ApolloInterceptor] {
+    func graphQLInterceptors<Request>(for request: Request) -> [any ApolloInterceptor] where Request : GraphQLRequest {
       [
         MaxRetryInterceptor(maxRetriesAllowed: self.retryCount),
         self.testInterceptor
       ]
-    }
-
-    func urlSession<Operation: GraphQLOperation>(for operation: Operation) -> any ApolloURLSession {
-      MockURLSession(responseProvider: Self.self)
-    }
-
-    func cacheInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> any CacheInterceptor {
-      DefaultCacheInterceptor(store: ApolloStore(cache: NoCache()))
     }
   }
 
@@ -46,11 +36,21 @@ class MaxRetryInterceptorTests: XCTestCase {
       testInterceptor: BlindRetryingTestInterceptor(),
       retryCount: 15
     )
-    let network = RequestChainNetworkTransport(interceptorProvider: testProvider,
-                                               endpointURL: TestURL.mockServer.url)
+
+    let urlSession = MockURLSession(responseProvider: TestProvider.self)
+    let network = RequestChainNetworkTransport(
+      urlSession: urlSession,
+      interceptorProvider: testProvider,
+      store: .mock(),
+      endpointURL: TestURL.mockServer.url
+    )
 
     let operation = MockQuery.mock()
-    let results = try network.send(query: operation, cachePolicy: .fetchIgnoringCacheCompletely)
+    let results = try network.send(
+      query: operation,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration()
+    )
 
     await expect {
       var iterator = results.makeAsyncIterator()
@@ -82,11 +82,20 @@ class MaxRetryInterceptorTests: XCTestCase {
       )
     }
 
-    let network = RequestChainNetworkTransport(interceptorProvider: testProvider,
-                                               endpointURL: TestURL.mockServer.url)
+    let urlSession = MockURLSession(responseProvider: TestProvider.self)
+    let network = RequestChainNetworkTransport(
+      urlSession: urlSession,
+      interceptorProvider: testProvider,
+      store: .mock(),
+      endpointURL: TestURL.mockServer.url
+    )
 
     let operation = MockQuery.mock()
-    let results = try network.send(query: operation, cachePolicy: .fetchIgnoringCacheCompletely)
+    let results = try network.send(
+      query: operation,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration()
+    )
 
     await expect { try await results.getAllValues() }.to(throwError(RequestChainError.noResults))
     expect(testInterceptor.timesRetryHasBeenCalled).to(equal(testInterceptor.timesToCallRetry))    
