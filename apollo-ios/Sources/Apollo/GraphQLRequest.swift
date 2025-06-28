@@ -15,16 +15,18 @@ public protocol GraphQLRequest<Operation>: Sendable {
   /// Any additional headers you wish to add to this request.
   var additionalHeaders: [String: String] { get set }
 
-  /// The `CachePolicy` to use for this request.
-  var cachePolicy: CachePolicy { get set }
+  /// The ``FetchBehavior`` to use for this request.
+  /// Determines if fetching will include cache/network.
+  var fetchBehavior: FetchBehavior { get set }
 
-  /// [optional] A context that is being passed through the request chain.
-  var context: (any RequestContext)? { get set }
+  /// Determines if the results of a network fetch should be written to the local cache.
+  var writeResultsToCache: Bool { get set }
 
-  /// The telemetry metadata about the client. This is used by GraphOS Studio's
-  /// [client awareness](https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation)
-  /// feature.
-  var clientAwarenessMetadata: ClientAwarenessMetadata { get }
+  /// The timeout interval specifies the limit on the idle interval allotted to a request in the process of
+  /// loading. This timeout interval is measured in seconds.
+  ///
+  /// The value of this property will be set as the `timeoutInterval` on the `URLRequest` created for this GraphQL request.
+  var requestTimeout: TimeInterval? { get set }
 
   /// Converts the receiver into a `URLRequest` to be used for networking operations.
   ///
@@ -32,10 +34,6 @@ public protocol GraphQLRequest<Operation>: Sendable {
   /// default configuration. The implementation may then modify that request. See the documentation
   /// for ``GraphQLRequest/createDefaultRequest()`` for more information.
   func toURLRequest() throws -> URLRequest
-}
-
-public extension GraphQLRequest {
-  var clientAwarenessMetadata: ClientAwarenessMetadata { .init() }
 }
 
 // MARK: - Helper Functions
@@ -47,10 +45,9 @@ extension GraphQLRequest {
   /// This function creates a `URLRequest` with the following behaviors:
   /// - `url` set to the receiver's `graphQLEndpoint`
   /// - `httpMethod` set to POST
-  /// - Client awareness headers from `clientAwarenessMetadata` added to `allHTTPHeaderFields`
+  /// - Client awareness headers from `ApolloClient.clientAwarenessMetadata` added to `allHTTPHeaderFields`
   /// - All header's from `additionalHeaders` added to `allHTTPHeaderFields`
-  /// - If the `context` conforms to `RequestContextTimeoutConfigurable`, the `timeoutInterval` is
-  /// set to the context's `requestTimeout`.
+  /// - Sets the `timeoutInterval` to `requestTimeout` if not nil.
   ///
   /// - Note: This should be called within the implementation of `toURLRequest()` and the returned request
   /// can then be modified as necessary before being returned.
@@ -61,13 +58,16 @@ extension GraphQLRequest {
 
     request.httpMethod = GraphQLHTTPMethod.POST.rawValue
 
-    clientAwarenessMetadata.applyHeaders(to: &request)
+    if let clientAwarenessMetadata = ApolloClient.context?.clientAwarenessMetadata {
+      clientAwarenessMetadata.applyHeaders(to: &request)
+    }
+
     for (fieldName, value) in self.additionalHeaders {
       request.addValue(value, forHTTPHeaderField: fieldName)
     }
 
-    if let configContext = self.context as? any RequestContextTimeoutConfigurable {
-      request.timeoutInterval = configContext.requestTimeout
+    if let requestTimeout {
+      request.timeoutInterval = requestTimeout
     }
 
     return request
