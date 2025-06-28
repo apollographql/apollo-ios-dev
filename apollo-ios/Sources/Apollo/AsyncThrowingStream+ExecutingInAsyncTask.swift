@@ -1,8 +1,11 @@
 import Foundation
 
 extension AsyncThrowingStream where Failure == any Swift.Error {
-  static func executingInAsyncTask(_ block: @escaping @Sendable (Continuation) async throws -> Void) -> Self {
-    return AsyncThrowingStream { continuation in
+  static func executingInAsyncTask(
+    bufferingPolicy: AsyncThrowingStream<Element, Failure>.Continuation.BufferingPolicy = .unbounded,
+    _ block: @escaping @Sendable (Continuation) async throws -> Void
+  ) -> Self {
+    return AsyncThrowingStream(bufferingPolicy: bufferingPolicy) { continuation in
       let task = Task {
         do {
           try await block(continuation)
@@ -21,7 +24,7 @@ extension AsyncThrowingStream where Failure == any Swift.Error {
 extension AsyncThrowingStream.Continuation {
   func passthroughResults(
     of stream: AsyncThrowingStream<Element, Failure>
-  ) async throws {
+  ) async throws where Element: Sendable {
     for try await element in stream {
       self.yield(element)
     }
