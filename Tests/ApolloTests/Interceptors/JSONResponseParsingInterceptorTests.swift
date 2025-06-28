@@ -29,7 +29,7 @@ class JSONResponseParsingInterceptorTests: XCTestCase {
 
     // when
     await expect {
-      try await subject.parse(
+      try await self.subject.parse(
         response: HTTPResponse(
           response: .mock(),
           chunks: streamMocker.getStream()
@@ -58,9 +58,9 @@ class JSONResponseParsingInterceptorTests: XCTestCase {
 
     // when
     await expect {
-      try await subject.parse(
+      try await self.subject.parse(
         response: HTTPResponse(
-          response: .mock(),
+          response: urlResponse,
           chunks: streamMocker.getStream()
         ),
         for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
@@ -85,9 +85,9 @@ class JSONResponseParsingInterceptorTests: XCTestCase {
 
     // when
     await expect {
-      try await subject.parse(
+      try await self.subject.parse(
         response: HTTPResponse(
-          response: .mock(),
+          response: urlResponse,
           chunks: streamMocker.getStream()
         ),
         for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
@@ -112,9 +112,9 @@ class JSONResponseParsingInterceptorTests: XCTestCase {
 
     // when
     await expect {
-      try await subject.parse(
+      try await self.subject.parse(
         response: HTTPResponse(
-          response: .mock(),
+          response: urlResponse,
           chunks: streamMocker.getStream()
         ),
         for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
@@ -140,9 +140,9 @@ class JSONResponseParsingInterceptorTests: XCTestCase {
 
     // when
     await expect {
-      try await subject.parse(
+      try await self.subject.parse(
         response: HTTPResponse(
-          response: .mock(),
+          response: urlResponse,
           chunks: streamMocker.getStream()
         ),
         for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),

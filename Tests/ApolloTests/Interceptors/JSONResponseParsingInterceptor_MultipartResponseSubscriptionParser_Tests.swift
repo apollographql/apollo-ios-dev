@@ -299,7 +299,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    var resultStream = try await subject.parse(
+    let resultStream = try await subject.parse(
       response: HTTPResponse(
         response: urlResponse,
         chunks: streamMocker.getStream()
@@ -349,11 +349,11 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(2))
-    expect(results[0].parsedResult?.result.data?.ticker).to(equal(1))
-    expect(results[1].parsedResult?.result.data?.ticker).to(equal(2))
+    expect(results[0].result.data?.ticker).to(equal(1))
+    expect(results[1].result.data?.ticker).to(equal(2))
   }
 
   func test__parsing__givenCapitalizedContentType_shouldReturnSuccess() async throws {
@@ -364,7 +364,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    var resultStream = try await subject.parse(
+    let resultStream = try await subject.parse(
       response: HTTPResponse(
         response: urlResponse,
         chunks: streamMocker.getStream()
@@ -391,10 +391,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data?.ticker).to(equal(1))
+    expect(results[0].result.data?.ticker).to(equal(1))
   }
 
   func test__parsing__givenNullPayload_shouldIgnore() async throws {
@@ -405,7 +405,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    var resultStream = try await subject.parse(
+    let resultStream = try await subject.parse(
       response: HTTPResponse(
         response: urlResponse,
         chunks: streamMocker.getStream()
@@ -442,10 +442,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data?.ticker).to(equal(1))
+    expect(results[0].result.data?.ticker).to(equal(1))
   }
 
   func test__parsing__givenNullErrors_shouldIgnore() async throws {
@@ -456,7 +456,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    var resultStream = try await subject.parse(
+    let resultStream = try await subject.parse(
       response: HTTPResponse(
         response: urlResponse,
         chunks: streamMocker.getStream()
@@ -493,10 +493,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data?.ticker).to(equal(1))
+    expect(results[0].result.data?.ticker).to(equal(1))
   }
 
   func test__parsing__givenSingleChunk_shouldReturnSuccess() async throws {
@@ -507,7 +507,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    var resultStream = try await subject.parse(
+    let resultStream = try await subject.parse(
       response: HTTPResponse(
         response: urlResponse,
         chunks: streamMocker.getStream()
@@ -542,10 +542,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data).to(equal(expectedData))
+    expect(results[0].result.data).to(equal(expectedData))
   }
 
   func test__parsing__givenSingleChunk_withMultipleContentTypeDirectives_shouldReturnSuccess() async throws {
@@ -556,7 +556,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    var resultStream = try await subject.parse(
+    let resultStream = try await subject.parse(
       response: HTTPResponse(
         response: urlResponse,
         chunks: streamMocker.getStream()
@@ -591,10 +591,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data).to(equal(expectedData))
+    expect(results[0].result.data).to(equal(expectedData))
   }
 
   func test__parsing__givenSingleChunk_withGraphQLOverHTTPContentType_shouldReturnSuccess() async throws {
@@ -605,7 +605,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    var resultStream = try await subject.parse(
+    let resultStream = try await subject.parse(
       response: HTTPResponse(
         response: urlResponse,
         chunks: streamMocker.getStream()
@@ -640,10 +640,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data).to(equal(expectedData))
+    expect(results[0].result.data).to(equal(expectedData))
   }
 
   func test__parsing__givenSingleChunk_withDashBoundaryInMessageBody_shouldReturnSuccess() async throws {
@@ -655,7 +655,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       headerFields: ["Content-Type": "multipart/mixed;boundary=\(multipartBoundary);subscriptionSpec=1.0"]
     )
 
-    var resultStream = try await subject.parse(
+    let resultStream = try await subject.parse(
       response: HTTPResponse(
         response: urlResponse,
         chunks: streamMocker.getStream()
@@ -691,10 +691,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data).to(equal(expectedData))
+    expect(results[0].result.data).to(equal(expectedData))
   }
 
   func test__parsing__givenMultipleChunks_shouldReturnMultipleSuccesses() async throws {
@@ -705,7 +705,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    var resultStream = try await subject.parse(
+    let resultStream = try await subject.parse(
       response: HTTPResponse(
         response: urlResponse,
         chunks: streamMocker.getStream()
@@ -747,11 +747,11 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(2))
-    expect(results[0].parsedResult?.result.data?.ticker).to(equal(2))
-    expect(results[1].parsedResult?.result.data?.ticker).to(equal(3))
+    expect(results[0].result.data?.ticker).to(equal(2))
+    expect(results[1].result.data?.ticker).to(equal(3))
   }
 
   func test__parsing__givenPayloadAndUnknownKeys_shouldReturnSuccessAndIgnoreUnknownKeys() async throws {
@@ -762,7 +762,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    var resultStream = try await subject.parse(
+    let resultStream = try await subject.parse(
       response: HTTPResponse(
         response: urlResponse,
         chunks: streamMocker.getStream()
@@ -798,10 +798,10 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data).to(equal(expectedData))
+    expect(results[0].result.data).to(equal(expectedData))
   }
 
   func test__parsing__givenPayloadWithDataAndGraphQLError_shouldReturnSuccessWithDataAndGraphQLError() async throws {
@@ -812,7 +812,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    var resultStream = try await subject.parse(
+    let resultStream = try await subject.parse(
       response: HTTPResponse(
         response: urlResponse,
         chunks: streamMocker.getStream()
@@ -844,11 +844,11 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data?.ticker).to(equal(4))
-    expect(results[0].parsedResult?.result.errors).to(equal([GraphQLError("test error")]))
+    expect(results[0].result.data?.ticker).to(equal(4))
+    expect(results[0].result.errors).to(equal([GraphQLError("test error")]))
   }
 
   func test__parsing__givenPayloadWithNullDataAndGraphQLError_shouldReturnSuccessWithOnlyGraphQLError() async throws {
@@ -859,7 +859,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    var resultStream = try await subject.parse(
+    let resultStream = try await subject.parse(
       response: HTTPResponse(
         response: urlResponse,
         chunks: streamMocker.getStream()
@@ -888,11 +888,11 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data).to(beNil())
-    expect(results[0].parsedResult?.result.errors).to(equal([GraphQLError("test error")]))
+    expect(results[0].result.data).to(beNil())
+    expect(results[0].result.errors).to(equal([GraphQLError("test error")]))
   }
 
 }

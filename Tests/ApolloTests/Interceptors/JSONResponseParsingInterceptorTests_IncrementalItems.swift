@@ -56,7 +56,7 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
 
     // then
     let result1 = try await actualResultsIterator.next()
-    let graphQLResult = result1?.parsedResult?.result
+    let graphQLResult = result1?.result
     expect(graphQLResult?.data?.animal.species).to(equal("Canis Familiaris"))
     expect(graphQLResult?.data?.animal.fragments.deferredGenus?.genus).to(beNil())
     expect(graphQLResult?.data?.animal.fragments.deferredFriend?.friend).to(beNil())
@@ -80,7 +80,7 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
     )
 
     let result2 = try await actualResultsIterator.next()
-    let graphQLResult2 = result2?.parsedResult?.result
+    let graphQLResult2 = result2?.result
     expect(graphQLResult2?.data?.animal.species).to(equal("Canis Familiaris"))
     expect(graphQLResult2?.data?.animal.fragments.deferredGenus?.genus).to(equal("Canis"))
     expect(graphQLResult2?.data?.animal.fragments.deferredFriend?.friend).to(beNil())
@@ -121,7 +121,7 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
 
     // then
     let result1 = try await actualResultsIterator.next()
-    let graphQLResult = result1?.parsedResult?.result
+    let graphQLResult = result1?.result
     expect(graphQLResult?.data?.animal.species).to(equal("Canis Familiaris"))
     expect(graphQLResult?.data?.animal.fragments.deferredGenus?.genus).to(beNil())
     expect(graphQLResult?.data?.animal.fragments.deferredFriend?.friend).to(beNil())
@@ -158,7 +158,7 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
     )
 
     let result2 = try await actualResultsIterator.next()
-    let graphQLResult2 = result2?.parsedResult?.result
+    let graphQLResult2 = result2?.result
     expect(graphQLResult2?.data?.animal.species).to(equal("Canis Familiaris"))
     expect(graphQLResult2?.data?.animal.fragments.deferredGenus?.genus).to(equal("Canis"))
     expect(graphQLResult2?.data?.animal.fragments.deferredFriend?.friend.name).to(equal("Buster"))
@@ -202,7 +202,7 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
 
     // then
     let result1 = try await actualResultsIterator.next()
-    expect(result1?.parsedResult?.cacheRecords).to(
+    expect(result1?.cacheRecords).to(
       equal(
         RecordSet(records: [
           Record(
@@ -253,7 +253,7 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
     )
 
     let result2 = try await actualResultsIterator.next()
-    expect(result2?.parsedResult?.cacheRecords).to(
+    expect(result2?.cacheRecords).to(
       equal(
         RecordSet(records: [
           Record(
@@ -319,7 +319,7 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
 
     // then
     let result1 = try await actualResultsIterator.next()
-    expect(result1?.parsedResult?.cacheRecords).to(
+    expect(result1?.cacheRecords).to(
       equal(
         RecordSet(records: [
           Record(
@@ -359,7 +359,7 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
     )
 
     let result2 = try await actualResultsIterator.next()
-    expect(result2?.parsedResult?.cacheRecords).to(
+    expect(result2?.cacheRecords).to(
       equal(
         RecordSet(records: [
           Record(
@@ -402,7 +402,7 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
     )
 
     let result3 = try await actualResultsIterator.next()
-    expect(result3?.parsedResult?.cacheRecords).to(
+    expect(result3?.cacheRecords).to(
       equal(
         RecordSet(records: [
           Record(

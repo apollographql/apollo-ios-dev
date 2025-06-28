@@ -29,7 +29,6 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
     let urlResponse = HTTPURLResponse.mock(
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"]
     )
-    let chunkStream = streamMocker.getStream()
 
     var actualResultsIterator = try await subject.parse(
       response: HTTPResponse(
@@ -71,7 +70,6 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
     let urlResponse = HTTPURLResponse.mock(
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"]
     )
-    let chunkStream = streamMocker.getStream()
 
     var actualResultsIterator = try await subject.parse(
       response: HTTPResponse(
@@ -108,7 +106,6 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
     let urlResponse = HTTPURLResponse.mock(
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"]
     )
-    let chunkStream = streamMocker.getStream()
 
     var actualResultsIterator = try await subject.parse(
       response: HTTPResponse(
@@ -149,7 +146,6 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
     let urlResponse = HTTPURLResponse.mock(
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"]
     )
-    let chunkStream = streamMocker.getStream()
 
     var actualResultsIterator = try await subject.parse(
       response: HTTPResponse(
@@ -167,7 +163,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
 
       {
         "data" : {
-          "key" : "value"
+          "key" : "value1"
         },
         "hasNext": true
       }
@@ -177,7 +173,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
 
     let result1 = try await actualResultsIterator.next()
 
-    expect(result1?.rawResponseChunk).to(equal(responseChunk))
+    expect(result1?.result.data?.key).to(equal("value1"))
   }
 
   func test__intercept__givenSingleChunk_withMultipleContentTypeDirectives_shouldReturnSuccess() async throws {
@@ -205,7 +201,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
 
       {
         "data" : {
-          "key" : "value"
+          "key" : "value2"
         },
         "hasNext": true
       }
@@ -215,7 +211,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
 
     let result1 = try await actualResultsIterator.next()
 
-    expect(result1?.rawResponseChunk).to(equal(responseChunk))
+    expect(result1?.result.data?.key).to(equal("value2"))
   }
 
   func test__intercept__givenSingleChunk_withGraphQLOverHTTPContentType_shouldReturnSuccess() async throws {
@@ -243,7 +239,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
 
       {
         "data" : {
-          "key" : "value"
+          "key" : "value3"
         },
         "hasNext": true
       }          
@@ -253,7 +249,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
 
     let result1 = try await actualResultsIterator.next()
 
-    expect(result1?.rawResponseChunk).to(equal(responseChunk))
+    expect(result1?.result.data?.key).to(equal("value3"))
   }
 
 }

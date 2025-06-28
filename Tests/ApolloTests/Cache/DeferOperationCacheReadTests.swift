@@ -191,7 +191,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       resultHandler: resultObserver.handler
     )
 
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
   func test__fetch__givenPartialAndSomeIncrementalDataIsCached_returnsCachedDeferredFragmentAsFulfilledAndUncachedDeferredFragmentsAsPending() async throws {
@@ -229,7 +229,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       resultHandler: resultObserver.handler
     )
 
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
   func test__fetch__givenNestedIncrementalDataIsNotCached_returnsNestedDeferredFragmentsAsPending_otherDeferredFragmentsAsFulfilled() async throws {
@@ -272,7 +272,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       resultHandler: resultObserver.handler
     )
 
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
   func test__fetch__givenMissingValueInDeferredFragment_returnsDeferredFragmentAsPending_otherDeferredFragmentsAsFulfilled() async throws {
@@ -314,7 +314,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       resultHandler: resultObserver.handler
     )
 
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
   func test__fetch__givenMissingValueInPartialData_shouldFailFetch() async throws {
@@ -359,6 +359,6 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       resultHandler: resultObserver.handler
     )
 
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 }

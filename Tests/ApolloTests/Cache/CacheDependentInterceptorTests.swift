@@ -339,7 +339,7 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
       func intercept<Request: GraphQLRequest>(
         request: Request,
         next: NextInterceptorFunction<Request>
-      ) async throws -> InterceptorResultStream<GraphQLResponse<Request.Operation>> {
+      ) async throws -> InterceptorResultStream<Request> {
 
         do {
           return try await next(request)
