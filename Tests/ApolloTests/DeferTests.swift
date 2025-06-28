@@ -12,16 +12,12 @@ final class DeferTests: XCTestCase, MockResponseProvider {
   override func setUp() async throws {
     try await super.setUp()
     let session = MockURLSession(responseProvider: Self.self)
-
-    let provider = MockProvider(
-      interceptors: [
-        JSONResponseParsingInterceptor()
-      ],
-      urlSession: session
-    )
+    let store = ApolloStore.mock()
 
     self.network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: session,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: TestURL.mockServer.url
     )
   }
@@ -32,15 +28,6 @@ final class DeferTests: XCTestCase, MockResponseProvider {
     try await super.tearDown()
   }
 
-  private struct MockProvider: MockInterceptorProvider {
-    let interceptors: [any ApolloInterceptor]
-    let urlSession: MockURLSession
-
-    func interceptors<Operation>(for operation: Operation) -> [any ApolloInterceptor]
-    where Operation: GraphQLOperation {
-      return interceptors
-    }
-  }
 
   private struct TVShowQuery: GraphQLQuery, @unchecked Sendable {
     static var operationName: String { "TVShowQuery" }

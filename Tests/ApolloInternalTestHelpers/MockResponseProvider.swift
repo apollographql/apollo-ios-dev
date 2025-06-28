@@ -23,7 +23,6 @@ import Foundation
 ///   override func tearDown() async throws {
 ///     await Self.cleanUpRequestHandlers()
 ///     session = nil
-///     sessionConfiguration = nil
 ///
 ///     try await super.tearDown()
 ///   }

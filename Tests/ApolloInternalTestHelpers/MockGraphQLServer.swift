@@ -13,7 +13,7 @@ import XCTest
 /// A mock server should be configured to expect particular operation types, and invokes the passed in request handler when a request of that type comes in. Because the request allows access to `operation`, you can return different responses based on query variables for example:
 
 /// ```
-/// let serverExpectation = server.expect(HeroNameQuery.self) { request in
+/// let serverExpectation = await server.expect(HeroNameQuery.self) { request in
 ///   [
 ///     "data": [
 ///       "hero": [
@@ -29,7 +29,7 @@ import XCTest
 /// ```
 /// serverExpectation.expectedFulfillmentCount = numberOfFetches
 /// ```
-public class MockGraphQLServer {
+public actor MockGraphQLServer {
   enum ServerError: Error, CustomStringConvertible {
     case unexpectedRequest(String)
 
@@ -62,8 +62,6 @@ public class MockGraphQLServer {
       super.init(description: description)
     }
   }
-
-  private let queue = DispatchQueue(label: "com.apollographql.MockGraphQLServer")
 
   public init() {}
 
@@ -102,19 +100,17 @@ public class MockGraphQLServer {
     line: UInt = #line,
     requestHandler: @escaping RequestHandler<Operation>
   ) -> XCTestExpectation {
-    return queue.sync {
-      let expectation = RequestExpectation<Operation>(
-        description: "Served request for \(String(describing: operationType))",
-        file: file,
-        line: line,
-        handler: requestHandler
-      )
-      expectation.assertForOverFulfill = true
+    let expectation = RequestExpectation<Operation>(
+      description: "Served request for \(String(describing: operationType))",
+      file: file,
+      line: line,
+      handler: requestHandler
+    )
+    expectation.assertForOverFulfill = true
 
-      self[operationType] = expectation
+    self[operationType] = expectation
 
-      return expectation
-    }
+    return expectation
   }
 
   public func expect<Operation: GraphQLOperation>(
@@ -123,91 +119,30 @@ public class MockGraphQLServer {
     line: UInt = #line,
     requestHandler: @escaping RequestHandler<Operation>
   ) -> XCTestExpectation {
-    return queue.sync {
-      let expectation = RequestExpectation<Operation>(
-        description: "Served request for \(String(describing: operation.self))",
-        file: file,
-        line: line,
-        handler: requestHandler
-      )
-      expectation.assertForOverFulfill = true
+    let expectation = RequestExpectation<Operation>(
+      description: "Served request for \(String(describing: operation.self))",
+      file: file,
+      line: line,
+      handler: requestHandler
+    )
+    expectation.assertForOverFulfill = true
 
-      self[operation] = expectation
+    self[operation] = expectation
 
-      return expectation
-    }
+    return expectation
   }
 
-  func serve<Operation>(
-    request: any GraphQLRequest<Operation>
-  ) async throws -> JSONObject where Operation: GraphQLOperation {
-    let operationType = type(of: request.operation)
-
-    if let expectation = self[request.operation] ?? self[operationType] {
+  func serve<Operation: GraphQLOperation>(
+    request: some GraphQLRequest<Operation>
+  ) async throws -> JSONObject {
+    if let expectation = self[request.operation] ?? self[type(of: request.operation)] {
       // Dispatch after a small random delay to spread out concurrent requests and simulate somewhat real-world conditions.
       try await Task.sleep(nanoseconds: UInt64.random(in: 10...50) * 1_000_000)
       expectation.fulfill()
       return expectation.handler(request)
 
     } else {
-      throw ServerError.unexpectedRequest(String(describing: operationType))
+      throw ServerError.unexpectedRequest(String(describing: type(of: request.operation)))
     }
-  }
-}
-
-public struct MockGraphQLServerSession: ApolloURLSession {
-
-  nonisolated(unsafe) let server: MockGraphQLServer
-
-  init(server: MockGraphQLServer) {
-    self.server = server
-  }
-
-  public func chunks(for request: some GraphQLRequest) async throws -> (any AsyncChunkSequence, URLResponse) {
-    let (stream, continuation) = MockAsyncChunkSequence.makeStream()
-    do {
-      let body = try await server.serve(request: request)
-      let data = try JSONSerializationFormat.serialize(value: body)
-      continuation.yield(data)
-      continuation.finish()
-
-    } catch {
-      continuation.finish(throwing: error)
-    }
-
-    let httpResponse = HTTPURLResponse(
-      url: TestURL.mockServer.url,
-      statusCode: 200,
-      httpVersion: nil,
-      headerFields: nil
-    )!
-    return (stream, httpResponse)
-  }
-
-  public func invalidateAndCancel() {
-  }
-
-}
-
-
-public struct MockAsyncChunkSequence: AsyncChunkSequence {
-  public typealias UnderlyingStream = AsyncThrowingStream<Data, any Error>
-
-  public typealias AsyncIterator = UnderlyingStream.AsyncIterator
-
-  public typealias Element = Data
-
-  let underlying: UnderlyingStream
-
-  public func makeAsyncIterator() -> UnderlyingStream.AsyncIterator {
-    underlying.makeAsyncIterator()
-  }
-
-  public static func makeStream() -> (
-    stream: MockAsyncChunkSequence,
-    continuation: UnderlyingStream.Continuation
-  ) {
-    let (s, c) = UnderlyingStream.makeStream(of: Data.self)
-    return (Self.init(underlying: s), c)
   }
 }
