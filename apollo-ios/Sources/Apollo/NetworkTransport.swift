@@ -10,17 +10,19 @@ public protocol NetworkTransport: AnyObject, Sendable {
   ///
   /// - Parameters:
   ///   - operation: The operation to send.
-  ///   - cachePolicy: The `CachePolicy` to use making this request.
-  ///   - context: [optional] A context that is being passed through the request chain. Defaults to `nil`.
+  ///   - fetchBehavior: The `FetchBehavior` to use for this request.
+  ///                    Determines if fetching will include cache/network fetches.
+  ///   - requestConfiguration: A configuration used to configure per-request behaviors for this request
   /// - Returns: A stream of `GraphQLResult`s for each response.
   func send<Query: GraphQLQuery>(
     query: Query,
-    cachePolicy: CachePolicy
+    fetchBehavior: FetchBehavior,
+    requestConfiguration: RequestConfiguration
   ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error>
 
   func send<Mutation: GraphQLMutation>(
     mutation: Mutation,
-    cachePolicy: CachePolicy
+    requestConfiguration: RequestConfiguration
   ) throws -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error>
 
 }
@@ -31,7 +33,8 @@ public protocol SubscriptionNetworkTransport: NetworkTransport {
 
   func send<Subscription: GraphQLSubscription>(
     subscription: Subscription,
-    cachePolicy: CachePolicy
+    fetchBehavior: FetchBehavior,
+    requestConfiguration: RequestConfiguration
   ) throws -> AsyncThrowingStream<GraphQLResult<Subscription.Data>, any Error>
 
 }
@@ -46,11 +49,11 @@ public protocol UploadingNetworkTransport: NetworkTransport {
   /// - Parameters:
   ///   - operation: The operation to send
   ///   - files: An array of `GraphQLFile` objects to send.
-  ///   - context: [optional] A context that is being passed through the request chain.
+  ///   - requestConfiguration: A configuration used to configure per-request behaviors for this request
   /// - Returns: A stream of `GraphQLResult`s for each response.
-#warning("TODO: should support query and mutation as seperate functions")
   func upload<Operation: GraphQLOperation>(
     operation: Operation,
-    files: [GraphQLFile]
+    files: [GraphQLFile],
+    requestConfiguration: RequestConfiguration
   ) throws -> AsyncThrowingStream<GraphQLResult<Operation.Data>, any Error>
 }
