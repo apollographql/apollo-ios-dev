@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
+public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
   public static let operationName: String = "IssuesAndCommentsForRepository"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(

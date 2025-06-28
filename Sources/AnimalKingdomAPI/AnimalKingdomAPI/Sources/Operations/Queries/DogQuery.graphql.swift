@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class DogQuery: GraphQLQuery {
+public struct DogQuery: GraphQLQuery {
   public static let operationName: String = "DogQuery"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(

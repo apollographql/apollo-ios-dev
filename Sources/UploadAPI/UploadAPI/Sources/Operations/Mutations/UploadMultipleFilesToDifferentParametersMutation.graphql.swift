@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class UploadMultipleFilesToDifferentParametersMutation: GraphQLMutation {
+public struct UploadMultipleFilesToDifferentParametersMutation: GraphQLMutation {
   public static let operationName: String = "UploadMultipleFilesToDifferentParameters"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(

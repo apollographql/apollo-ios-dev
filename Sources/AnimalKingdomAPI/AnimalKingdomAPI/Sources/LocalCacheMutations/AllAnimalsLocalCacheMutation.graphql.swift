@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class AllAnimalsLocalCacheMutation: LocalCacheMutation {
+public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
   public static let operationType: GraphQLOperationType = .query
 
   public init() {}

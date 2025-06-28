@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
+public struct HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
   public static let operationName: String = "HeroFriendsOfFriendsNames"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "513b65fa459185f88540be8d60cdeefb69fd6c82a21b804214337558aa6ecb0b",

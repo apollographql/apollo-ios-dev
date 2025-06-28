@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class HeroDetailsInlineConditionalInclusionQuery: GraphQLQuery {
+public struct HeroDetailsInlineConditionalInclusionQuery: GraphQLQuery {
   public static let operationName: String = "HeroDetailsInlineConditionalInclusion"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "e251576f8c1cfcd442f44d2fbe5fd4b425a36ddd41fb4b6c1019c501ac6ac5bc",

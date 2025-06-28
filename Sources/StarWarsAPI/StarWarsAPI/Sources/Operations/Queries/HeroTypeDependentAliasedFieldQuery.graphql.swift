@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
+public struct HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
   public static let operationName: String = "HeroTypeDependentAliasedField"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "5b1ed6a84e96a4e48a3cad675ebb46020bce176f47361d097d8a0a824b7b8452",

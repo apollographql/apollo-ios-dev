@@ -64,7 +64,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             inputObjects: .none
           ),
           pruneGeneratedFiles: false,
-          markOperationDefinitionsAsFinal: true,
           appendSchemaTypeFilenameSuffix: true
         ),
         experimentalFeatures: .init(
@@ -117,8 +116,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "camelCase",
             "inputObjects" : "none"
           },
-          "deprecatedEnumCases" : "exclude",
-          "markOperationDefinitionsAsFinal" : true,
+          "deprecatedEnumCases" : "exclude",          
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1293,8 +1291,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "idiomatic",
             "inputObjects" : "camelCase"
           },
-          "deprecatedEnumCases" : "include",
-          "markOperationDefinitionsAsFinal" : false,
+          "deprecatedEnumCases" : "include",          
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1391,8 +1388,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "idiomatic",
             "inputObjects" : "camelCase"
           },
-          "deprecatedEnumCases" : "include",
-          "markOperationDefinitionsAsFinal" : false,
+          "deprecatedEnumCases" : "include",          
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1487,7 +1483,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "camelCase"
           },
           "deprecatedEnumCases" : "include",
-          "markOperationDefinitionsAsFinal" : false,
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1584,8 +1579,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "idiomatic",
             "inputObjects" : "camelCase"
           },
-          "deprecatedEnumCases" : "include",
-          "markOperationDefinitionsAsFinal" : false,
+          "deprecatedEnumCases" : "include",          
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1680,7 +1674,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "camelCase"
           },
           "deprecatedEnumCases" : "include",
-          "markOperationDefinitionsAsFinal" : false,
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1783,8 +1776,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "idiomatic",
             "inputObjects" : "camelCase"
           },
-          "deprecatedEnumCases" : "include",
-          "markOperationDefinitionsAsFinal" : false,
+          "deprecatedEnumCases" : "include",          
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1891,8 +1883,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "idiomatic",
             "inputObjects" : "camelCase"
           },
-          "deprecatedEnumCases" : "include",
-          "markOperationDefinitionsAsFinal" : false,
+          "deprecatedEnumCases" : "include",          
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -2000,7 +1991,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "camelCase"
           },
           "deprecatedEnumCases" : "include",
-          "markOperationDefinitionsAsFinal" : false,
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -2107,8 +2097,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "idiomatic",
             "inputObjects" : "camelCase"
           },
-          "deprecatedEnumCases" : "include",
-          "markOperationDefinitionsAsFinal" : false,
+          "deprecatedEnumCases" : "include",          
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -2215,8 +2204,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "idiomatic",
             "inputObjects" : "camelCase"
           },
-          "deprecatedEnumCases" : "include",
-          "markOperationDefinitionsAsFinal" : false,
+          "deprecatedEnumCases" : "include",          
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -2324,7 +2312,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "camelCase"
           },
           "deprecatedEnumCases" : "include",
-          "markOperationDefinitionsAsFinal" : false,
           "operationDocumentFormat" : [
             "definition"
           ],

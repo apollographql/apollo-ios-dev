@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class ReviewAddedSubscription: GraphQLSubscription {
+public struct ReviewAddedSubscription: GraphQLSubscription {
   public static let operationName: String = "ReviewAdded"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "2a05903b49a3b665eeb8f7a24240623aff77f1555e006f11bca604540c7cdba8",

@@ -105,26 +105,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
-  }
-
-  func test__generate_givenQuery_configIncludesMarkOperationDefinitionsAsFinal_generatesFinalQueryDefinitions() async throws {
-    // given
-    let expected =
-    """
-    final class TestOperationQuery: GraphQLQuery {
-      static let operationName: String = "TestOperation"
-    """
-
-    config = .mock(options: .init(markOperationDefinitionsAsFinal: true))
-
-    // when
-    try await buildSubjectAndOperation()
-
-    let actual = renderSubject()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
-  }
+  }  
 
   func test__generate__givenQueryWithNameEndingInQuery_generatesQueryOperationWithoutDoubledTypeSuffix() async throws {
     // given

@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class SameHeroTwiceQuery: GraphQLQuery {
+public struct SameHeroTwiceQuery: GraphQLQuery {
   public static let operationName: String = "SameHeroTwice"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "3d960acb3caffc4e42701ccada8535b1a5640f0cc46966b6a12830c755ff46d8",

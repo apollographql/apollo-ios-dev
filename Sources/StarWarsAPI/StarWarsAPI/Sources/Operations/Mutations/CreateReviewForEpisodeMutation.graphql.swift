@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class CreateReviewForEpisodeMutation: GraphQLMutation {
+public struct CreateReviewForEpisodeMutation: GraphQLMutation {
   public static let operationName: String = "CreateReviewForEpisode"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "3edcd1f17839f43db021eccbe2ecd41ad7dcb1ba6cd4b7e9897afb4162e4c223",

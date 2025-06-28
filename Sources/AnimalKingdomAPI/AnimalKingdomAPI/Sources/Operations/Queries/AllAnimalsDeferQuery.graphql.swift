@@ -3,11 +3,11 @@
 
 @_exported import ApolloAPI
 
-public struct AllAnimalsQuery: GraphQLQuery {
-  public static let operationName: String = "AllAnimalsQuery"
+public struct AllAnimalsDeferQuery: GraphQLQuery {
+  public static let operationName: String = "AllAnimalsDeferQuery"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
-      #"query AllAnimalsQuery { allAnimals { __typename id height { __typename feet inches } ...HeightInMeters ...WarmBloodedDetails species skinCovering ... on Pet { ...PetDetails ...WarmBloodedDetails ... on Animal { height { __typename relativeSize centimeters } } } ... on Cat { isJellicle } ... on ClassroomPet { ... on Bird { wingspan } } ... on Dog { favoriteToy birthdate } predators { __typename species ... on WarmBlooded { predators { __typename species } ...WarmBloodedDetails laysEggs } } } }"#,
+      #"query AllAnimalsDeferQuery { allAnimals { __typename id height { __typename feet inches } ...HeightInMeters ...WarmBloodedDetails species skinCovering ... on Pet { ...PetDetails ...WarmBloodedDetails ... on Animal @defer(label: "deferredPetAnimal") { height { __typename relativeSize centimeters } } } ... on Cat @defer(label: "deferredCat") { isJellicle } ... on ClassroomPet { ... on Bird { wingspan } } ... on Dog @defer(label: "deferredDog") { favoriteToy birthdate } predators { __typename species ... on WarmBlooded { predators { __typename species } ...WarmBloodedDetails laysEggs } } } }"#,
       fragments: [HeightInMeters.self, PetDetails.self, WarmBloodedDetails.self]
     ))
 
@@ -33,7 +33,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
           "allAnimals": allAnimals._fieldData,
         ],
         fulfilledFragments: [
-          ObjectIdentifier(AllAnimalsQuery.Data.self)
+          ObjectIdentifier(AllAnimalsDeferQuery.Data.self)
         ]
       ))
     }
@@ -98,7 +98,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
             "predators": predators._fieldData,
           ],
           fulfilledFragments: [
-            ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.self)
+            ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.self)
           ]
         ))
       }
@@ -134,7 +134,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
               "meters": meters,
             ],
             fulfilledFragments: [
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.Height.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Height.self),
               ObjectIdentifier(HeightInMeters.Height.self)
             ]
           ))
@@ -169,7 +169,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
               "species": species,
             ],
             fulfilledFragments: [
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.Predator.self)
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Predator.self)
             ]
           ))
         }
@@ -181,7 +181,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
           public let __data: DataDict
           public init(_dataDict: DataDict) { __data = _dataDict }
 
-          public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal.Predator
+          public typealias RootEntityType = AllAnimalsDeferQuery.Data.AllAnimal.Predator
           public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
           public static var __selections: [ApolloAPI.Selection] { [
             .field("predators", [Predator].self),
@@ -221,8 +221,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
                 "height": height._fieldData,
               ],
               fulfilledFragments: [
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.Predator.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.Predator.AsWarmBlooded.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Predator.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Predator.AsWarmBlooded.self),
                 ObjectIdentifier(WarmBloodedDetails.self),
                 ObjectIdentifier(HeightInMeters.self)
               ]
@@ -254,7 +254,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
                   "species": species,
                 ],
                 fulfilledFragments: [
-                  ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.Predator.AsWarmBlooded.Predator.self)
+                  ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Predator.AsWarmBlooded.Predator.self)
                 ]
               ))
             }
@@ -271,7 +271,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
+        public typealias RootEntityType = AllAnimalsDeferQuery.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
         public static var __selections: [ApolloAPI.Selection] { [
           .fragment(WarmBloodedDetails.self),
@@ -312,8 +312,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
               "bodyTemperature": bodyTemperature,
             ],
             fulfilledFragments: [
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.self),
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsWarmBlooded.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsWarmBlooded.self),
               ObjectIdentifier(WarmBloodedDetails.self),
               ObjectIdentifier(HeightInMeters.self)
             ]
@@ -346,8 +346,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
                 "meters": meters,
               ],
               fulfilledFragments: [
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsWarmBlooded.Height.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.Height.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsWarmBlooded.Height.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Height.self),
                 ObjectIdentifier(HeightInMeters.Height.self)
               ]
             ))
@@ -362,16 +362,16 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
+        public typealias RootEntityType = AllAnimalsDeferQuery.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
         public static var __selections: [ApolloAPI.Selection] { [
-          .field("height", Height.self),
           .inlineFragment(AsWarmBlooded.self),
+          .deferred(DeferredPetAnimal.self, label: "deferredPetAnimal"),
           .fragment(PetDetails.self),
         ] }
 
-        public var height: Height { __data["height"] }
         public var id: AnimalKingdomAPI.ID { __data["id"] }
+        public var height: Height { __data["height"] }
         public var species: String { __data["species"] }
         public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
         public var predators: [Predator] { __data["predators"] }
@@ -381,18 +381,23 @@ public struct AllAnimalsQuery: GraphQLQuery {
 
         public var asWarmBlooded: AsWarmBlooded? { _asInlineFragment() }
 
+
         public struct Fragments: FragmentContainer {
           public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _deferredPetAnimal = Deferred(_dataDict: _dataDict)
+          }
 
           public var petDetails: PetDetails { _toFragment() }
           public var heightInMeters: HeightInMeters { _toFragment() }
+          @Deferred public var deferredPetAnimal: DeferredPetAnimal?
         }
 
         public init(
           __typename: String,
-          height: Height,
           id: AnimalKingdomAPI.ID,
+          height: Height,
           species: String,
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
           predators: [Predator],
@@ -403,8 +408,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
           self.init(_dataDict: DataDict(
             data: [
               "__typename": __typename,
-              "height": height._fieldData,
               "id": id,
+              "height": height._fieldData,
               "species": species,
               "skinCovering": skinCovering,
               "predators": predators._fieldData,
@@ -413,9 +418,13 @@ public struct AllAnimalsQuery: GraphQLQuery {
               "owner": owner._fieldData,
             ],
             fulfilledFragments: [
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.self),
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.self),
-              ObjectIdentifier(PetDetails.self)
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.self),
+              ObjectIdentifier(PetDetails.self),
+              ObjectIdentifier(HeightInMeters.self)
+            ],
+            deferredFragments: [
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.DeferredPetAnimal.self)
             ]
           ))
         }
@@ -428,21 +437,12 @@ public struct AllAnimalsQuery: GraphQLQuery {
           public init(_dataDict: DataDict) { __data = _dataDict }
 
           public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
-          public static var __selections: [ApolloAPI.Selection] { [
-            .field("__typename", String.self),
-            .field("relativeSize", GraphQLEnum<AnimalKingdomAPI.RelativeSize>.self),
-            .field("centimeters", Double.self),
-          ] }
 
-          public var relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize> { __data["relativeSize"] }
-          public var centimeters: Double { __data["centimeters"] }
           public var feet: Int { __data["feet"] }
           public var inches: Int? { __data["inches"] }
           public var meters: Int { __data["meters"] }
 
           public init(
-            relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize>,
-            centimeters: Double,
             feet: Int,
             inches: Int? = nil,
             meters: Int
@@ -450,15 +450,13 @@ public struct AllAnimalsQuery: GraphQLQuery {
             self.init(_dataDict: DataDict(
               data: [
                 "__typename": AnimalKingdomAPI.Objects.Height.typename,
-                "relativeSize": relativeSize,
-                "centimeters": centimeters,
                 "feet": feet,
                 "inches": inches,
                 "meters": meters,
               ],
               fulfilledFragments: [
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.Height.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.Height.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.Height.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Height.self),
                 ObjectIdentifier(HeightInMeters.Height.self)
               ]
             ))
@@ -474,7 +472,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
           public let __data: DataDict
           public init(_dataDict: DataDict) { __data = _dataDict }
 
-          public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
+          public typealias RootEntityType = AllAnimalsDeferQuery.Data.AllAnimal
           public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
           public static var __selections: [ApolloAPI.Selection] { [
             .fragment(WarmBloodedDetails.self),
@@ -525,9 +523,9 @@ public struct AllAnimalsQuery: GraphQLQuery {
                 "owner": owner._fieldData,
               ],
               fulfilledFragments: [
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
                 ObjectIdentifier(WarmBloodedDetails.self),
                 ObjectIdentifier(HeightInMeters.self),
                 ObjectIdentifier(PetDetails.self)
@@ -547,15 +545,11 @@ public struct AllAnimalsQuery: GraphQLQuery {
             public var feet: Int { __data["feet"] }
             public var inches: Int? { __data["inches"] }
             public var meters: Int { __data["meters"] }
-            public var relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize> { __data["relativeSize"] }
-            public var centimeters: Double { __data["centimeters"] }
 
             public init(
               feet: Int,
               inches: Int? = nil,
-              meters: Int,
-              relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize>,
-              centimeters: Double
+              meters: Int
             ) {
               self.init(_dataDict: DataDict(
                 data: [
@@ -563,14 +557,121 @@ public struct AllAnimalsQuery: GraphQLQuery {
                   "feet": feet,
                   "inches": inches,
                   "meters": meters,
-                  "relativeSize": relativeSize,
-                  "centimeters": centimeters,
                 ],
                 fulfilledFragments: [
-                  ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.Height.self),
-                  ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.Height.self),
-                  ObjectIdentifier(HeightInMeters.Height.self),
-                  ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.Height.self)
+                  ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.AsWarmBlooded.Height.self),
+                  ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Height.self),
+                  ObjectIdentifier(HeightInMeters.Height.self)
+                ]
+              ))
+            }
+          }
+
+          public typealias Owner = PetDetails.Owner
+        }
+
+        /// AllAnimal.AsPet.DeferredPetAnimal
+        ///
+        /// Parent Type: `Pet`
+        public struct DeferredPetAnimal: AnimalKingdomAPI.InlineFragment, Identifiable {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) { __data = _dataDict }
+
+          public typealias RootEntityType = AllAnimalsDeferQuery.Data.AllAnimal
+          public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
+          public static var __selections: [ApolloAPI.Selection] { [
+            .field("height", Height.self),
+          ] }
+
+          public var height: Height { __data["height"] }
+          public var id: AnimalKingdomAPI.ID { __data["id"] }
+          public var species: String { __data["species"] }
+          public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
+          public var predators: [Predator] { __data["predators"] }
+          public var humanName: String? { __data["humanName"] }
+          public var favoriteToy: String { __data["favoriteToy"] }
+          public var owner: Owner? { __data["owner"] }
+
+          public struct Fragments: FragmentContainer {
+            public let __data: DataDict
+            public init(_dataDict: DataDict) { __data = _dataDict }
+
+            public var heightInMeters: HeightInMeters { _toFragment() }
+            public var petDetails: PetDetails { _toFragment() }
+          }
+
+          public init(
+            __typename: String,
+            height: Height,
+            id: AnimalKingdomAPI.ID,
+            species: String,
+            skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
+            predators: [Predator],
+            humanName: String? = nil,
+            favoriteToy: String,
+            owner: Owner? = nil
+          ) {
+            self.init(_dataDict: DataDict(
+              data: [
+                "__typename": __typename,
+                "height": height._fieldData,
+                "id": id,
+                "species": species,
+                "skinCovering": skinCovering,
+                "predators": predators._fieldData,
+                "humanName": humanName,
+                "favoriteToy": favoriteToy,
+                "owner": owner._fieldData,
+              ],
+              fulfilledFragments: [
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.DeferredPetAnimal.self),
+                ObjectIdentifier(PetDetails.self)
+              ]
+            ))
+          }
+
+          /// AllAnimal.AsPet.DeferredPetAnimal.Height
+          ///
+          /// Parent Type: `Height`
+          public struct Height: AnimalKingdomAPI.SelectionSet {
+            public let __data: DataDict
+            public init(_dataDict: DataDict) { __data = _dataDict }
+
+            public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
+            public static var __selections: [ApolloAPI.Selection] { [
+              .field("__typename", String.self),
+              .field("relativeSize", GraphQLEnum<AnimalKingdomAPI.RelativeSize>.self),
+              .field("centimeters", Double.self),
+            ] }
+
+            public var relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize> { __data["relativeSize"] }
+            public var centimeters: Double { __data["centimeters"] }
+            public var feet: Int { __data["feet"] }
+            public var inches: Int? { __data["inches"] }
+            public var meters: Int { __data["meters"] }
+
+            public init(
+              relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize>,
+              centimeters: Double,
+              feet: Int,
+              inches: Int? = nil,
+              meters: Int
+            ) {
+              self.init(_dataDict: DataDict(
+                data: [
+                  "__typename": AnimalKingdomAPI.Objects.Height.typename,
+                  "relativeSize": relativeSize,
+                  "centimeters": centimeters,
+                  "feet": feet,
+                  "inches": inches,
+                  "meters": meters,
+                ],
+                fulfilledFragments: [
+                  ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.DeferredPetAnimal.Height.self),
+                  ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Height.self),
+                  ObjectIdentifier(HeightInMeters.Height.self)
                 ]
               ))
             }
@@ -587,13 +688,12 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
+        public typealias RootEntityType = AllAnimalsDeferQuery.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Cat }
         public static var __selections: [ApolloAPI.Selection] { [
-          .field("isJellicle", Bool.self),
+          .deferred(DeferredCat.self, label: "deferredCat"),
         ] }
 
-        public var isJellicle: Bool { __data["isJellicle"] }
         public var id: AnimalKingdomAPI.ID { __data["id"] }
         public var height: Height { __data["height"] }
         public var species: String { __data["species"] }
@@ -606,15 +706,18 @@ public struct AllAnimalsQuery: GraphQLQuery {
 
         public struct Fragments: FragmentContainer {
           public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _deferredCat = Deferred(_dataDict: _dataDict)
+          }
 
           public var heightInMeters: HeightInMeters { _toFragment() }
           public var warmBloodedDetails: WarmBloodedDetails { _toFragment() }
           public var petDetails: PetDetails { _toFragment() }
+          @Deferred public var deferredCat: DeferredCat?
         }
 
         public init(
-          isJellicle: Bool,
           id: AnimalKingdomAPI.ID,
           height: Height,
           species: String,
@@ -628,7 +731,6 @@ public struct AllAnimalsQuery: GraphQLQuery {
           self.init(_dataDict: DataDict(
             data: [
               "__typename": AnimalKingdomAPI.Objects.Cat.typename,
-              "isJellicle": isJellicle,
               "id": id,
               "height": height._fieldData,
               "species": species,
@@ -640,14 +742,17 @@ public struct AllAnimalsQuery: GraphQLQuery {
               "owner": owner._fieldData,
             ],
             fulfilledFragments: [
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.self),
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsCat.self),
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsWarmBlooded.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsCat.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsWarmBlooded.self),
               ObjectIdentifier(WarmBloodedDetails.self),
               ObjectIdentifier(HeightInMeters.self),
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.self),
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
               ObjectIdentifier(PetDetails.self)
+            ],
+            deferredFragments: [
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsCat.DeferredCat.self)
             ]
           ))
         }
@@ -664,15 +769,11 @@ public struct AllAnimalsQuery: GraphQLQuery {
           public var feet: Int { __data["feet"] }
           public var inches: Int? { __data["inches"] }
           public var meters: Int { __data["meters"] }
-          public var relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize> { __data["relativeSize"] }
-          public var centimeters: Double { __data["centimeters"] }
 
           public init(
             feet: Int,
             inches: Int? = nil,
-            meters: Int,
-            relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize>,
-            centimeters: Double
+            meters: Int
           ) {
             self.init(_dataDict: DataDict(
               data: [
@@ -680,20 +781,127 @@ public struct AllAnimalsQuery: GraphQLQuery {
                 "feet": feet,
                 "inches": inches,
                 "meters": meters,
-                "relativeSize": relativeSize,
-                "centimeters": centimeters,
               ],
               fulfilledFragments: [
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsCat.Height.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.Height.self),
-                ObjectIdentifier(HeightInMeters.Height.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.Height.self)
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsCat.Height.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Height.self),
+                ObjectIdentifier(HeightInMeters.Height.self)
               ]
             ))
           }
         }
 
         public typealias Owner = PetDetails.Owner
+
+        /// AllAnimal.AsCat.DeferredCat
+        ///
+        /// Parent Type: `Cat`
+        public struct DeferredCat: AnimalKingdomAPI.InlineFragment, Identifiable {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) { __data = _dataDict }
+
+          public typealias RootEntityType = AllAnimalsDeferQuery.Data.AllAnimal
+          public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Cat }
+          public static var __selections: [ApolloAPI.Selection] { [
+            .field("isJellicle", Bool.self),
+          ] }
+
+          public var isJellicle: Bool { __data["isJellicle"] }
+          public var id: AnimalKingdomAPI.ID { __data["id"] }
+          public var height: Height { __data["height"] }
+          public var species: String { __data["species"] }
+          public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
+          public var predators: [Predator] { __data["predators"] }
+          public var bodyTemperature: Int { __data["bodyTemperature"] }
+          public var humanName: String? { __data["humanName"] }
+          public var favoriteToy: String { __data["favoriteToy"] }
+          public var owner: Owner? { __data["owner"] }
+
+          public struct Fragments: FragmentContainer {
+            public let __data: DataDict
+            public init(_dataDict: DataDict) { __data = _dataDict }
+
+            public var heightInMeters: HeightInMeters { _toFragment() }
+            public var warmBloodedDetails: WarmBloodedDetails { _toFragment() }
+            public var petDetails: PetDetails { _toFragment() }
+          }
+
+          public init(
+            isJellicle: Bool,
+            id: AnimalKingdomAPI.ID,
+            height: Height,
+            species: String,
+            skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
+            predators: [Predator],
+            bodyTemperature: Int,
+            humanName: String? = nil,
+            favoriteToy: String,
+            owner: Owner? = nil
+          ) {
+            self.init(_dataDict: DataDict(
+              data: [
+                "__typename": AnimalKingdomAPI.Objects.Cat.typename,
+                "isJellicle": isJellicle,
+                "id": id,
+                "height": height._fieldData,
+                "species": species,
+                "skinCovering": skinCovering,
+                "predators": predators._fieldData,
+                "bodyTemperature": bodyTemperature,
+                "humanName": humanName,
+                "favoriteToy": favoriteToy,
+                "owner": owner._fieldData,
+              ],
+              fulfilledFragments: [
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsCat.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsCat.DeferredCat.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsWarmBlooded.self),
+                ObjectIdentifier(WarmBloodedDetails.self),
+                ObjectIdentifier(HeightInMeters.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
+                ObjectIdentifier(PetDetails.self)
+              ]
+            ))
+          }
+
+          /// AllAnimal.AsCat.DeferredCat.Height
+          ///
+          /// Parent Type: `Height`
+          public struct Height: AnimalKingdomAPI.SelectionSet {
+            public let __data: DataDict
+            public init(_dataDict: DataDict) { __data = _dataDict }
+
+            public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
+
+            public var feet: Int { __data["feet"] }
+            public var inches: Int? { __data["inches"] }
+            public var meters: Int { __data["meters"] }
+
+            public init(
+              feet: Int,
+              inches: Int? = nil,
+              meters: Int
+            ) {
+              self.init(_dataDict: DataDict(
+                data: [
+                  "__typename": AnimalKingdomAPI.Objects.Height.typename,
+                  "feet": feet,
+                  "inches": inches,
+                  "meters": meters,
+                ],
+                fulfilledFragments: [
+                  ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsCat.DeferredCat.Height.self),
+                  ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Height.self),
+                  ObjectIdentifier(HeightInMeters.Height.self)
+                ]
+              ))
+            }
+          }
+
+          public typealias Owner = PetDetails.Owner
+        }
       }
 
       /// AllAnimal.AsClassroomPet
@@ -703,7 +911,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
+        public typealias RootEntityType = AllAnimalsDeferQuery.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Unions.ClassroomPet }
         public static var __selections: [ApolloAPI.Selection] { [
           .inlineFragment(AsBird.self),
@@ -742,8 +950,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
               "predators": predators._fieldData,
             ],
             fulfilledFragments: [
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.self),
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsClassroomPet.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsClassroomPet.self),
               ObjectIdentifier(HeightInMeters.self)
             ]
           ))
@@ -775,8 +983,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
                 "meters": meters,
               ],
               fulfilledFragments: [
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsClassroomPet.Height.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.Height.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsClassroomPet.Height.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Height.self),
                 ObjectIdentifier(HeightInMeters.Height.self)
               ]
             ))
@@ -790,7 +998,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
           public let __data: DataDict
           public init(_dataDict: DataDict) { __data = _dataDict }
 
-          public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
+          public typealias RootEntityType = AllAnimalsDeferQuery.Data.AllAnimal
           public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Bird }
           public static var __selections: [ApolloAPI.Selection] { [
             .field("wingspan", Double.self),
@@ -843,14 +1051,14 @@ public struct AllAnimalsQuery: GraphQLQuery {
                 "owner": owner._fieldData,
               ],
               fulfilledFragments: [
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsClassroomPet.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsClassroomPet.AsBird.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsWarmBlooded.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsClassroomPet.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsClassroomPet.AsBird.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsWarmBlooded.self),
                 ObjectIdentifier(WarmBloodedDetails.self),
                 ObjectIdentifier(HeightInMeters.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
                 ObjectIdentifier(PetDetails.self)
               ]
             ))
@@ -868,15 +1076,11 @@ public struct AllAnimalsQuery: GraphQLQuery {
             public var feet: Int { __data["feet"] }
             public var inches: Int? { __data["inches"] }
             public var meters: Int { __data["meters"] }
-            public var relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize> { __data["relativeSize"] }
-            public var centimeters: Double { __data["centimeters"] }
 
             public init(
               feet: Int,
               inches: Int? = nil,
-              meters: Int,
-              relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize>,
-              centimeters: Double
+              meters: Int
             ) {
               self.init(_dataDict: DataDict(
                 data: [
@@ -884,14 +1088,11 @@ public struct AllAnimalsQuery: GraphQLQuery {
                   "feet": feet,
                   "inches": inches,
                   "meters": meters,
-                  "relativeSize": relativeSize,
-                  "centimeters": centimeters,
                 ],
                 fulfilledFragments: [
-                  ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsClassroomPet.AsBird.Height.self),
-                  ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.Height.self),
-                  ObjectIdentifier(HeightInMeters.Height.self),
-                  ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.Height.self)
+                  ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsClassroomPet.AsBird.Height.self),
+                  ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Height.self),
+                  ObjectIdentifier(HeightInMeters.Height.self)
                 ]
               ))
             }
@@ -908,15 +1109,12 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
+        public typealias RootEntityType = AllAnimalsDeferQuery.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Dog }
         public static var __selections: [ApolloAPI.Selection] { [
-          .field("favoriteToy", String.self),
-          .field("birthdate", AnimalKingdomAPI.CustomDate?.self),
+          .deferred(DeferredDog.self, label: "deferredDog"),
         ] }
 
-        public var favoriteToy: String { __data["favoriteToy"] }
-        public var birthdate: AnimalKingdomAPI.CustomDate? { __data["birthdate"] }
         public var id: AnimalKingdomAPI.ID { __data["id"] }
         public var height: Height { __data["height"] }
         public var species: String { __data["species"] }
@@ -924,20 +1122,23 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public var predators: [Predator] { __data["predators"] }
         public var bodyTemperature: Int { __data["bodyTemperature"] }
         public var humanName: String? { __data["humanName"] }
+        public var favoriteToy: String { __data["favoriteToy"] }
         public var owner: Owner? { __data["owner"] }
 
         public struct Fragments: FragmentContainer {
           public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _deferredDog = Deferred(_dataDict: _dataDict)
+          }
 
           public var heightInMeters: HeightInMeters { _toFragment() }
           public var warmBloodedDetails: WarmBloodedDetails { _toFragment() }
           public var petDetails: PetDetails { _toFragment() }
+          @Deferred public var deferredDog: DeferredDog?
         }
 
         public init(
-          favoriteToy: String,
-          birthdate: AnimalKingdomAPI.CustomDate? = nil,
           id: AnimalKingdomAPI.ID,
           height: Height,
           species: String,
@@ -945,13 +1146,12 @@ public struct AllAnimalsQuery: GraphQLQuery {
           predators: [Predator],
           bodyTemperature: Int,
           humanName: String? = nil,
+          favoriteToy: String,
           owner: Owner? = nil
         ) {
           self.init(_dataDict: DataDict(
             data: [
               "__typename": AnimalKingdomAPI.Objects.Dog.typename,
-              "favoriteToy": favoriteToy,
-              "birthdate": birthdate,
               "id": id,
               "height": height._fieldData,
               "species": species,
@@ -959,17 +1159,21 @@ public struct AllAnimalsQuery: GraphQLQuery {
               "predators": predators._fieldData,
               "bodyTemperature": bodyTemperature,
               "humanName": humanName,
+              "favoriteToy": favoriteToy,
               "owner": owner._fieldData,
             ],
             fulfilledFragments: [
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.self),
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsDog.self),
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsWarmBlooded.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsDog.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsWarmBlooded.self),
               ObjectIdentifier(WarmBloodedDetails.self),
               ObjectIdentifier(HeightInMeters.self),
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.self),
-              ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.self),
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
               ObjectIdentifier(PetDetails.self)
+            ],
+            deferredFragments: [
+              ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsDog.DeferredDog.self)
             ]
           ))
         }
@@ -986,15 +1190,11 @@ public struct AllAnimalsQuery: GraphQLQuery {
           public var feet: Int { __data["feet"] }
           public var inches: Int? { __data["inches"] }
           public var meters: Int { __data["meters"] }
-          public var relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize> { __data["relativeSize"] }
-          public var centimeters: Double { __data["centimeters"] }
 
           public init(
             feet: Int,
             inches: Int? = nil,
-            meters: Int,
-            relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize>,
-            centimeters: Double
+            meters: Int
           ) {
             self.init(_dataDict: DataDict(
               data: [
@@ -1002,21 +1202,146 @@ public struct AllAnimalsQuery: GraphQLQuery {
                 "feet": feet,
                 "inches": inches,
                 "meters": meters,
-                "relativeSize": relativeSize,
-                "centimeters": centimeters,
               ],
               fulfilledFragments: [
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsDog.Height.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.Height.self),
-                ObjectIdentifier(HeightInMeters.Height.self),
-                ObjectIdentifier(AllAnimalsQuery.Data.AllAnimal.AsPet.Height.self)
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsDog.Height.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Height.self),
+                ObjectIdentifier(HeightInMeters.Height.self)
               ]
             ))
           }
         }
 
         public typealias Owner = PetDetails.Owner
+
+        /// AllAnimal.AsDog.DeferredDog
+        ///
+        /// Parent Type: `Dog`
+        public struct DeferredDog: AnimalKingdomAPI.InlineFragment, Identifiable {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) { __data = _dataDict }
+
+          public typealias RootEntityType = AllAnimalsDeferQuery.Data.AllAnimal
+          public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Dog }
+          public static var __selections: [ApolloAPI.Selection] { [
+            .field("favoriteToy", String.self),
+            .field("birthdate", AnimalKingdomAPI.CustomDate?.self),
+          ] }
+
+          public var favoriteToy: String { __data["favoriteToy"] }
+          public var birthdate: AnimalKingdomAPI.CustomDate? { __data["birthdate"] }
+          public var id: AnimalKingdomAPI.ID { __data["id"] }
+          public var height: Height { __data["height"] }
+          public var species: String { __data["species"] }
+          public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
+          public var predators: [Predator] { __data["predators"] }
+          public var bodyTemperature: Int { __data["bodyTemperature"] }
+          public var humanName: String? { __data["humanName"] }
+          public var owner: Owner? { __data["owner"] }
+
+          public struct Fragments: FragmentContainer {
+            public let __data: DataDict
+            public init(_dataDict: DataDict) { __data = _dataDict }
+
+            public var heightInMeters: HeightInMeters { _toFragment() }
+            public var warmBloodedDetails: WarmBloodedDetails { _toFragment() }
+            public var petDetails: PetDetails { _toFragment() }
+          }
+
+          public init(
+            favoriteToy: String,
+            birthdate: AnimalKingdomAPI.CustomDate? = nil,
+            id: AnimalKingdomAPI.ID,
+            height: Height,
+            species: String,
+            skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
+            predators: [Predator],
+            bodyTemperature: Int,
+            humanName: String? = nil,
+            owner: Owner? = nil
+          ) {
+            self.init(_dataDict: DataDict(
+              data: [
+                "__typename": AnimalKingdomAPI.Objects.Dog.typename,
+                "favoriteToy": favoriteToy,
+                "birthdate": birthdate,
+                "id": id,
+                "height": height._fieldData,
+                "species": species,
+                "skinCovering": skinCovering,
+                "predators": predators._fieldData,
+                "bodyTemperature": bodyTemperature,
+                "humanName": humanName,
+                "owner": owner._fieldData,
+              ],
+              fulfilledFragments: [
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsDog.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsDog.DeferredDog.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsWarmBlooded.self),
+                ObjectIdentifier(WarmBloodedDetails.self),
+                ObjectIdentifier(HeightInMeters.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.self),
+                ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self),
+                ObjectIdentifier(PetDetails.self)
+              ]
+            ))
+          }
+
+          /// AllAnimal.AsDog.DeferredDog.Height
+          ///
+          /// Parent Type: `Height`
+          public struct Height: AnimalKingdomAPI.SelectionSet {
+            public let __data: DataDict
+            public init(_dataDict: DataDict) { __data = _dataDict }
+
+            public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
+
+            public var feet: Int { __data["feet"] }
+            public var inches: Int? { __data["inches"] }
+            public var meters: Int { __data["meters"] }
+
+            public init(
+              feet: Int,
+              inches: Int? = nil,
+              meters: Int
+            ) {
+              self.init(_dataDict: DataDict(
+                data: [
+                  "__typename": AnimalKingdomAPI.Objects.Height.typename,
+                  "feet": feet,
+                  "inches": inches,
+                  "meters": meters,
+                ],
+                fulfilledFragments: [
+                  ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.AsDog.DeferredDog.Height.self),
+                  ObjectIdentifier(AllAnimalsDeferQuery.Data.AllAnimal.Height.self),
+                  ObjectIdentifier(HeightInMeters.Height.self)
+                ]
+              ))
+            }
+          }
+
+          public typealias Owner = PetDetails.Owner
+        }
       }
     }
   }
+  
+  // MARK: - Deferred Fragment Metadata
+
+  public typealias ResponseFormat = IncrementalDeferredResponseFormat
+  enum DeferredFragmentIdentifiers {
+    static let deferredPetAnimal = DeferredFragmentIdentifier(label: "deferredPetAnimal", fieldPath: ["allAnimals"])
+    static let deferredCat = DeferredFragmentIdentifier(label: "deferredCat", fieldPath: ["allAnimals"])
+    static let deferredDog = DeferredFragmentIdentifier(label: "deferredDog", fieldPath: ["allAnimals"])
+  }
+
+  public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+    deferredFragments: [
+        DeferredFragmentIdentifiers.deferredPetAnimal: Data.AllAnimal.AsPet.DeferredPetAnimal.self,
+        DeferredFragmentIdentifiers.deferredCat: Data.AllAnimal.AsCat.DeferredCat.self,
+        DeferredFragmentIdentifiers.deferredDog: Data.AllAnimal.AsDog.DeferredDog.self,
+    ]
+  )    
 }

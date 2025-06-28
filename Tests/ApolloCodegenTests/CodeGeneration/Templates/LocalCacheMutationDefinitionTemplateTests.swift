@@ -270,26 +270,6 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate_givenQuery_configIncludesMarkOperationDefinitionsAsFinal_generatesFinalLocalCacheMutation() async throws {
-    // given
-    let expected =
-    """
-    final class TestOperationLocalCacheMutation: LocalCacheMutation {
-      static let operationType: GraphQLOperationType = .query
-    """
-
-    config = .mock(options: .init(markOperationDefinitionsAsFinal: true))
-
-    // when
-    try await buildSubjectAndOperation()
-
-    let actual = renderSubject()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
-  }
-
-
   func test__generate__givenQueryWithLowercasing_generatesCorrectlyCasedLocalCacheMutation() async throws {
     // given
     schemaSDL = """

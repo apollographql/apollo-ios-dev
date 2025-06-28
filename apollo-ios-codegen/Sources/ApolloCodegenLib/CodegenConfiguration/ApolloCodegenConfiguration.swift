@@ -690,8 +690,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     ///
     ///  Defaults to `true`.
     public let pruneGeneratedFiles: Bool
-    /// Whether generated GraphQL operation and local cache mutation class types will be marked as `final`.
-    public let markOperationDefinitionsAsFinal: Bool
     /// `true` will add a filename suffix matching the schema type, the default is `false`. This can be used to
     /// avoid filename conflicts when operation type names match schema type names.
     public let appendSchemaTypeFilenameSuffix: Bool
@@ -710,7 +708,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       public static let warningsOnDeprecatedUsage: Composition = .include
       public static let conversionStrategies: ConversionStrategies = .init()
       public static let pruneGeneratedFiles: Bool = true
-      public static let markOperationDefinitionsAsFinal: Bool = false
       public static let appendSchemaTypeFilenameSuffix: Bool = false
     }
 
@@ -734,8 +731,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     ///   - conversionStrategies: Rules for how to convert the names of values from the schema in
     ///     generated code.
     ///   - pruneGeneratedFiles: Whether unused generated files will be automatically deleted.
-    ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation
-    ///     class types will be marked as `final`.
     ///   - appendSchemaTypeFilenameSuffix: `true` will add a filename suffix matching the schema type, the
     ///     default is `false`. This can be used to avoid filename conflicts when operation type names match
     ///     schema type names.
@@ -751,7 +746,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       warningsOnDeprecatedUsage: Composition = Default.warningsOnDeprecatedUsage,
       conversionStrategies: ConversionStrategies = Default.conversionStrategies,
       pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-      markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
       appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix
     ) {
       self.additionalInflectionRules = additionalInflectionRules
@@ -765,7 +759,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
       self.conversionStrategies = conversionStrategies
       self.pruneGeneratedFiles = pruneGeneratedFiles
-      self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
       self.appendSchemaTypeFilenameSuffix = appendSchemaTypeFilenameSuffix
     }
 
@@ -785,7 +778,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case warningsOnDeprecatedUsage
       case conversionStrategies
       case pruneGeneratedFiles
-      case markOperationDefinitionsAsFinal
       case appendSchemaTypeFilenameSuffix
     }
 
@@ -853,11 +845,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         forKey: .pruneGeneratedFiles
       ) ?? Default.pruneGeneratedFiles
 
-      markOperationDefinitionsAsFinal = try values.decodeIfPresent(
-        Bool.self,
-        forKey: .markOperationDefinitionsAsFinal
-      ) ?? Default.markOperationDefinitionsAsFinal
-
       appendSchemaTypeFilenameSuffix = try values.decodeIfPresent(
         Bool.self,
         forKey: .appendSchemaTypeFilenameSuffix
@@ -878,7 +865,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       try container.encode(self.warningsOnDeprecatedUsage, forKey: .warningsOnDeprecatedUsage)
       try container.encode(self.conversionStrategies, forKey: .conversionStrategies)
       try container.encode(self.pruneGeneratedFiles, forKey: .pruneGeneratedFiles)
-      try container.encode(self.markOperationDefinitionsAsFinal, forKey: .markOperationDefinitionsAsFinal)
       try container.encode(self.appendSchemaTypeFilenameSuffix, forKey: .appendSchemaTypeFilenameSuffix)
     }
   }
@@ -1750,7 +1736,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
+    markOperationDefinitionsAsFinal: Bool = false,
     appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix
   ) {
     self.additionalInflectionRules = additionalInflectionRules
@@ -1764,7 +1750,6 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
     self.conversionStrategies = conversionStrategies
     self.pruneGeneratedFiles = pruneGeneratedFiles
-    self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
     self.appendSchemaTypeFilenameSuffix = appendSchemaTypeFilenameSuffix
   }
   
@@ -1803,7 +1788,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
+    markOperationDefinitionsAsFinal: Bool = false
   ) {
     self.additionalInflectionRules = additionalInflectionRules
     self.deprecatedEnumCases = deprecatedEnumCases
@@ -1814,7 +1799,6 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
     self.conversionStrategies = conversionStrategies
     self.pruneGeneratedFiles = pruneGeneratedFiles
-    self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
     self.schemaCustomization = Default.schemaCustomization
     self.appendSchemaTypeFilenameSuffix = Default.appendSchemaTypeFilenameSuffix
     self.reduceGeneratedSchemaTypes = Default.reduceGeneratedSchemaTypes
@@ -1855,7 +1839,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
+    markOperationDefinitionsAsFinal: Bool = false
   ) {
     self.additionalInflectionRules = additionalInflectionRules
     self.deprecatedEnumCases = deprecatedEnumCases
@@ -1866,7 +1850,6 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
     self.conversionStrategies = conversionStrategies
     self.pruneGeneratedFiles = pruneGeneratedFiles
-    self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
     self.schemaCustomization = Default.schemaCustomization
     self.appendSchemaTypeFilenameSuffix = Default.appendSchemaTypeFilenameSuffix
     self.reduceGeneratedSchemaTypes = Default.reduceGeneratedSchemaTypes

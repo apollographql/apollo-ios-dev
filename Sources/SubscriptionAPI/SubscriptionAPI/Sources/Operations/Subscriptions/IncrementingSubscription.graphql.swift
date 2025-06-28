@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class IncrementingSubscription: GraphQLSubscription {
+public struct IncrementingSubscription: GraphQLSubscription {
   public static let operationName: String = "Incrementing"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(

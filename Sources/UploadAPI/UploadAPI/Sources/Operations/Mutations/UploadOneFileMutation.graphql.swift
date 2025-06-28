@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class UploadOneFileMutation: GraphQLMutation {
+public struct UploadOneFileMutation: GraphQLMutation {
   public static let operationName: String = "UploadOneFile"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(

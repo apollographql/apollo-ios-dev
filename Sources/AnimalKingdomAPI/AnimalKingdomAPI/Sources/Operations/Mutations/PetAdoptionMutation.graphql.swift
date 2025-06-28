@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class PetAdoptionMutation: GraphQLMutation {
+public struct PetAdoptionMutation: GraphQLMutation {
   public static let operationName: String = "PetAdoptionMutation"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(

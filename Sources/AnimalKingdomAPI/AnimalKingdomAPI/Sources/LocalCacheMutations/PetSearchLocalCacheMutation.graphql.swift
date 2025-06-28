@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class PetSearchLocalCacheMutation: LocalCacheMutation {
+public struct PetSearchLocalCacheMutation: LocalCacheMutation {
   public static let operationType: GraphQLOperationType = .query
 
   public var filters: GraphQLNullable<PetSearchFilters>

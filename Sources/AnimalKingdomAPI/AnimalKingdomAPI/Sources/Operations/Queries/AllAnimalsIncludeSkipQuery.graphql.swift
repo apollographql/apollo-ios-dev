@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class AllAnimalsIncludeSkipQuery: GraphQLQuery {
+public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
   public static let operationName: String = "AllAnimalsIncludeSkipQuery"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(

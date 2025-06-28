@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class CreateReviewWithNullFieldMutation: GraphQLMutation {
+public struct CreateReviewWithNullFieldMutation: GraphQLMutation {
   public static let operationName: String = "CreateReviewWithNullField"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "3857a03e0db1698622249dcc09b2de36dd56e0360fd053ffc1b9204b3b67f52c",

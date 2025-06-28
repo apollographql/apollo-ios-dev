@@ -54,7 +54,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
   private func OperationDeclaration() -> TemplateString {
     return """
     \(accessControlModifier(for: .parent))\
-    \(classDefinitionKeywords) \(operation.generatedDefinitionName): \
+    struct \(operation.generatedDefinitionName): \
     \(operation.definition.operationType.renderedProtocolName) {
       \(accessControlModifier(for: .member))\
     static let operationName: String = "\(operation.definition.name)"

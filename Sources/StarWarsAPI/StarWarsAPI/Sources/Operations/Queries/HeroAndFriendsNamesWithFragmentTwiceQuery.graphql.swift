@@ -3,7 +3,7 @@
 
 @_exported import ApolloAPI
 
-public class HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
+public struct HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
   public static let operationName: String = "HeroAndFriendsNamesWithFragmentTwice"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "fb791b8d40d4a404b65a51886a29493d8e43053e14552d112f248565a11c893f",
