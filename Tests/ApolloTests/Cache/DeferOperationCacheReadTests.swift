@@ -4,8 +4,8 @@ import ApolloAPI
 import ApolloInternalTestHelpers
 import Nimble
 
-fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
-  class AnAnimal: MockSelectionSet {
+fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal>, @unchecked Sendable {
+  class AnAnimal: MockSelectionSet, @unchecked Sendable {
     typealias Schema = MockSchemaMetadata
     
     override class var __selections: [Selection] {[
@@ -14,7 +14,7 @@ fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
     
     var animal: Animal { __data["animal"] }
     
-    class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata> {
+    class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .field("species", String.self),
@@ -36,7 +36,7 @@ fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
         @Deferred var deferredFriend: DeferredFriend?
       }
       
-      class DeferredGenus: MockTypeCase {
+      class DeferredGenus: MockTypeCase, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("genus", String.self),
         ]}
@@ -44,14 +44,14 @@ fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
         var genus: String { __data["genus"] }
       }
       
-      class DeferredFriend: MockTypeCase {
+      class DeferredFriend: MockTypeCase, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("friend", Friend.self),
         ]}
         
         var friend: Friend { __data["friend"] }
         
-        class Friend: AbstractMockSelectionSet<Friend.Fragments, MockSchemaMetadata> {
+        class Friend: AbstractMockSelectionSet<Friend.Fragments, MockSchemaMetadata>, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("name", String.self),
             .deferred(DeferredFriendSpecies.self, label: "deferredFriendSpecies"),
@@ -69,7 +69,7 @@ fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
             @Deferred var deferredFriendSpecies: DeferredFriendSpecies?
           }
 
-          class DeferredFriendSpecies: MockTypeCase {
+          class DeferredFriendSpecies: MockTypeCase, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("species", String.self),
             ]}
@@ -100,7 +100,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     let store = ApolloStore(cache: cache)
 
     server = MockGraphQLServer()
-    let networkTransport = MockNetworkTransport(server: server, store: store)
+    let networkTransport = MockNetworkTransport(mockServer: server, store: store)
 
     client = ApolloClient(networkTransport: networkTransport, store: store)
   }
@@ -191,7 +191,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       resultHandler: resultObserver.handler
     )
 
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
   func test__fetch__givenPartialAndSomeIncrementalDataIsCached_returnsCachedDeferredFragmentAsFulfilledAndUncachedDeferredFragmentsAsPending() async throws {
@@ -229,7 +229,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       resultHandler: resultObserver.handler
     )
 
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
   func test__fetch__givenNestedIncrementalDataIsNotCached_returnsNestedDeferredFragmentsAsPending_otherDeferredFragmentsAsFulfilled() async throws {
@@ -272,7 +272,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       resultHandler: resultObserver.handler
     )
 
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
   func test__fetch__givenMissingValueInDeferredFragment_returnsDeferredFragmentAsPending_otherDeferredFragmentsAsFulfilled() async throws {
@@ -314,7 +314,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       resultHandler: resultObserver.handler
     )
 
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
   func test__fetch__givenMissingValueInPartialData_shouldFailFetch() async throws {
@@ -359,6 +359,6 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       resultHandler: resultObserver.handler
     )
 
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 }

@@ -22,29 +22,34 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
   // MARK: - Error tests
 
   func test__error__givenIncorrectContentType_shouldReturnError() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<MockSelectionSet>>()
+    let operation = MockSubscription<MockSelectionSet>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    var actualResultsIterator = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription.mock())
-    ) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
+    )
+
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
-        ),
-        dataChunk: """
-          content-type: test/custom
+      """
+      content-type: test/custom
 
-          {
-            "data" : {
-              "key" : "value"
-            }
-          }          
-          """.crlfFormattedData()
-      )
+      {
+        "data" : {
+          "key" : "value"
+        }
+      }          
+      """.crlfFormattedData()
     )
 
     await expect {
@@ -57,31 +62,36 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
   }
 
   func test__error__givenTransportError_shouldReturnError() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<MockSelectionSet>>()
+    let operation = MockSubscription<MockSelectionSet>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    var actualResultsIterator = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription.mock())
-    ) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
+    )
+
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
-        ),
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
+      {
+        "errors" : [
           {
-            "errors" : [
-              {
-                "message" : "forced test failure!"
-              }
-            ]
-          }          
-          """.crlfFormattedData()
-      )
+            "message" : "forced test failure!"
+          }
+        ]
+      }          
+      """.crlfFormattedData()
     )
 
     await expect {
@@ -94,32 +104,37 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
   }
 
   func test__error__givenTransportErrorWithNullPayload_shouldReturnError() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<MockSelectionSet>>()
+    let operation = MockSubscription<MockSelectionSet>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    var actualResultsIterator = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription.mock())
-    ) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
+    )
+
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
-        ),
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
+      {
+        "payload": null,
+        "errors" : [
           {
-            "payload": null,
-            "errors" : [
-              {
-                "message" : "forced test failure!"
-              }
-            ]
+            "message" : "forced test failure!"
           }
-          """.crlfFormattedData()
-      )
+        ]
+      }
+      """.crlfFormattedData()
     )
 
     await expect {
@@ -132,37 +147,42 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
   }
 
   func test__error__givenTransportErrorWithValidPayload_errorShouldTakePrecendenceAndReturnError() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<MockSelectionSet>>()
+    let operation = MockSubscription<MockSelectionSet>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    var actualResultsIterator = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription.mock())
-    ) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
+    )
+
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
-        ),
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 1
-              }
-            },
-            "errors" : [
-              {
-                "message" : "forced test failure!"
-              }
-            ]
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
           }
-          """.crlfFormattedData()
-      )
+        },
+        "errors" : [
+          {
+            "message" : "forced test failure!"
+          }
+        ]
+      }
+      """.crlfFormattedData()
     )
 
     await expect {
@@ -175,35 +195,40 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
   }
 
   func test__error__givenTransportErrorIncludingUnknownKeys_shouldReturnErrorWithMessageOnly() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<MockSelectionSet>>()
+    let operation = MockSubscription<MockSelectionSet>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    var actualResultsIterator = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription.mock())
-    ) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
+    )
+
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
-        ),
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
+      {
+        "errors" : [
           {
-            "errors" : [
-              {
-                "message" : "forced test failure!",
-                "path": [
-                  "hello"
-                ],
-                "foo": "bar"
-              }
-            ]
+            "message" : "forced test failure!",
+            "path": [
+              "hello"
+            ],
+            "foo": "bar"
           }
-          """.crlfFormattedData()
-      )
+        ]
+      }
+      """.crlfFormattedData()
     )
 
     await expect {
@@ -216,25 +241,30 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
   }
 
   func test__error__givenMalformedJSON_shouldReturnError() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<MockSelectionSet>>()
+    let operation = MockSubscription<MockSelectionSet>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    var actualResultsIterator = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription.mock())
-    ) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
+    )
+
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
-        ),
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
-          not_a_valid_json_object
-          """.crlfFormattedData()
-      )
+      not_a_valid_json_object
+      """.crlfFormattedData()
     )
 
     await expect {
@@ -262,242 +292,244 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
   }
 
   func test__parsing__givenHeartbeat_shouldIgnore() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<Time>>()
+    let operation = MockSubscription<Time>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    let resultStream = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription<Time>())
-    ) { _ in
-      streamMocker.getStream()
-    }
-
-    let response: HTTPURLResponse = .mock(
+    let urlResponse = HTTPURLResponse.mock(
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    streamMocker.emit(
-      response: .mock(
-        response: response,
-        dataChunk: """
-          content-type: application/json
+    let resultStream = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 1
-              }
-            }
-          }                    
-          """.crlfFormattedData()
-      )
+    streamMocker.emit(
+      """
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
+          }
+        }
+      }                    
+      """.crlfFormattedData()
     )
 
     streamMocker.emit(
-      response: .mock(
-        response: response,
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
-          {}         
-          """.crlfFormattedData()
-      )
+      {}         
+      """.crlfFormattedData()
     )
 
     streamMocker.emit(
-      response: .mock(
-        response: response,
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 2
-              }
-            }
-          }          
-          """.crlfFormattedData()
-      )
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 2
+          }
+        }
+      }          
+      """.crlfFormattedData()
     )
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(2))
-    expect(results[0].parsedResult?.result.data?.ticker).to(equal(1))
-    expect(results[1].parsedResult?.result.data?.ticker).to(equal(2))
+    expect(results[0].result.data?.ticker).to(equal(1))
+    expect(results[1].result.data?.ticker).to(equal(2))
   }
 
   func test__parsing__givenCapitalizedContentType_shouldReturnSuccess() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<Time>>()
+    let operation = MockSubscription<Time>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    let resultStream = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription<Time>())
-    ) { _ in
-      streamMocker.getStream()
-    }
-
-    let response: HTTPURLResponse = .mock(
+    let urlResponse = HTTPURLResponse.mock(
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    streamMocker.emit(
-      response: .mock(
-        response: response,
-        dataChunk: """
-          Content-Type: application/json
+    let resultStream = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 1
-              }
-            }
+    streamMocker.emit(
+      """
+      Content-Type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
           }
-          """.crlfFormattedData()
-      )
+        }
+      }
+      """.crlfFormattedData()
     )
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data?.ticker).to(equal(1))
+    expect(results[0].result.data?.ticker).to(equal(1))
   }
 
   func test__parsing__givenNullPayload_shouldIgnore() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<Time>>()
+    let operation = MockSubscription<Time>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    let resultStream = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription<Time>())
-    ) { _ in
-      streamMocker.getStream()
-    }
-
-    let response: HTTPURLResponse = .mock(
+    let urlResponse = HTTPURLResponse.mock(
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    streamMocker.emit(
-      response: .mock(
-        response: response,
-        dataChunk: """
-          content-type: application/json
+    let resultStream = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
 
-          {
-            "payload": null
-          }
-          """.crlfFormattedData()
-      )
+    streamMocker.emit(
+      """
+      content-type: application/json
+
+      {
+        "payload": null
+      }
+      """.crlfFormattedData()
     )
 
     streamMocker.emit(
-      response: .mock(
-        response: response,
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 1
-              }
-            }
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
           }
-          """.crlfFormattedData()
-      )
+        }
+      }
+      """.crlfFormattedData()
     )
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data?.ticker).to(equal(1))
+    expect(results[0].result.data?.ticker).to(equal(1))
   }
 
   func test__parsing__givenNullErrors_shouldIgnore() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<Time>>()
+    let operation = MockSubscription<Time>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    let resultStream = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription<Time>())
-    ) { _ in
-      streamMocker.getStream()
-    }
-    let response: HTTPURLResponse = .mock(
+    let urlResponse = HTTPURLResponse.mock(
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    streamMocker.emit(
-      response: .mock(
-        response: response,
-        dataChunk: """
-          content-type: application/json
-
-          {
-            "errors": null
-          }
-          """.crlfFormattedData()
-      )
+    let resultStream = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
     )
-    streamMocker.emit(
-      response: .mock(
-        response: response,
-        dataChunk: """
-          content-type: application/json
+    .getStream()
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 1
-              }
-            }
+    streamMocker.emit(
+      """
+      content-type: application/json
+
+      {
+        "errors": null
+      }
+      """.crlfFormattedData()
+    )
+
+    streamMocker.emit(
+      """
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
           }
-          """.crlfFormattedData()
-      )
+        }
+      }
+      """.crlfFormattedData()
     )
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data?.ticker).to(equal(1))
+    expect(results[0].result.data?.ticker).to(equal(1))
   }
 
   func test__parsing__givenSingleChunk_shouldReturnSuccess() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<Time>>()
+    let operation = MockSubscription<Time>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    let resultStream = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription<Time>())
-    ) { _ in
-      streamMocker.getStream()
-    }
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
+    )
+
+    let resultStream = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
-        ),
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 1
-              }
-            }
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
           }
-          """.crlfFormattedData()
-      )
+        }
+      }
+      """.crlfFormattedData()
     )
 
     let expectedData = try await Time(
@@ -510,39 +542,43 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data).to(equal(expectedData))
+    expect(results[0].result.data).to(equal(expectedData))
   }
 
   func test__parsing__givenSingleChunk_withMultipleContentTypeDirectives_shouldReturnSuccess() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<Time>>()
+    let operation = MockSubscription<Time>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    let resultStream = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription<Time>())
-    ) { _ in
-      streamMocker.getStream()
-    }
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
+    )
+
+    let resultStream = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
-        ),
-        dataChunk: """
-          content-type: application/json; charset=utf-8
+      """
+      content-type: application/json; charset=utf-8
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 1
-              }
-            }
-          }          
-          """.crlfFormattedData()
-      )
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
+          }
+        }
+      }          
+      """.crlfFormattedData()
     )
 
     let expectedData = try await Time(
@@ -555,39 +591,43 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data).to(equal(expectedData))
+    expect(results[0].result.data).to(equal(expectedData))
   }
 
   func test__parsing__givenSingleChunk_withGraphQLOverHTTPContentType_shouldReturnSuccess() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<Time>>()
+    let operation = MockSubscription<Time>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    let resultStream = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription<Time>())
-    ) { _ in
-      streamMocker.getStream()
-    }
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
+    )
+
+    let resultStream = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
-        ),
-        dataChunk: """
-          content-type: application/graphql-response+json
+      """
+      content-type: application/graphql-response+json
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 1
-              }
-            }
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
           }
-          """.crlfFormattedData()
-      )
+        }
+      }
+      """.crlfFormattedData()
     )
 
     let expectedData = try await Time(
@@ -600,42 +640,45 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data).to(equal(expectedData))
+    expect(results[0].result.data).to(equal(expectedData))
   }
 
   func test__parsing__givenSingleChunk_withDashBoundaryInMessageBody_shouldReturnSuccess() async throws {
     let multipartBoundary = "-"
+    let operation = MockSubscription<Time>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    let streamMocker = InterceptorResponseMocker<MockSubscription<Time>>()
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=\(multipartBoundary);subscriptionSpec=1.0"]
+    )
 
-    let resultStream = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription<Time>())
-    ) { _ in
-      streamMocker.getStream()
-    }
+    let resultStream = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=\(multipartBoundary);subscriptionSpec=1.0"]
-        ),
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 1,
-                "description": "lots\(multipartBoundary)of-\(multipartBoundary)similar--\(multipartBoundary)boundaries---\(multipartBoundary)in----\(multipartBoundary)this-----\(multipartBoundary)string"
-              }
-            }
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1,
+            "description": "lots\(multipartBoundary)of-\(multipartBoundary)similar--\(multipartBoundary)boundaries---\(multipartBoundary)in----\(multipartBoundary)this-----\(multipartBoundary)string"
           }
-          """.crlfFormattedData()
-      )
+        }
+      }
+      """.crlfFormattedData()
     )
 
     let expectedData = try await Time(
@@ -648,96 +691,101 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data).to(equal(expectedData))
+    expect(results[0].result.data).to(equal(expectedData))
   }
 
   func test__parsing__givenMultipleChunks_shouldReturnMultipleSuccesses() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<Time>>()
+    let operation = MockSubscription<Time>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    let resultStream = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription<Time>())
-    ) { _ in
-      streamMocker.getStream()
-    }
-    let response: HTTPURLResponse = .mock(
+    let urlResponse = HTTPURLResponse.mock(
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
     )
 
-    streamMocker.emit(
-      response: .mock(
-        response: response,
-        dataChunk: """
-          content-type: application/json
-
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 2
-              }
-            }
-          }
-          """.crlfFormattedData()
-      )
+    let resultStream = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
     )
-    streamMocker.emit(
-      response: .mock(
-        response: response,
-        dataChunk: """
-          content-type: application/json
+    .getStream()
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 3
-              }
-            }
+    streamMocker.emit(
+      """
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 2
           }
-          """.crlfFormattedData()
-      )
+        }
+      }
+      """.crlfFormattedData()
+    )
+
+    streamMocker.emit(
+      """
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 3
+          }
+        }
+      }
+      """.crlfFormattedData()
     )
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(2))
-    expect(results[0].parsedResult?.result.data?.ticker).to(equal(2))
-    expect(results[1].parsedResult?.result.data?.ticker).to(equal(3))
+    expect(results[0].result.data?.ticker).to(equal(2))
+    expect(results[1].result.data?.ticker).to(equal(3))
   }
 
   func test__parsing__givenPayloadAndUnknownKeys_shouldReturnSuccessAndIgnoreUnknownKeys() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<Time>>()
+    let operation = MockSubscription<Time>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    let resultStream = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription<Time>())
-    ) { _ in
-      streamMocker.getStream()
-    }
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
+    )
+
+    let resultStream = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
-        ),
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
-          {
-            "foo": "bar",
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 1
-              }
-            }
+      {
+        "foo": "bar",
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
           }
-          """.crlfFormattedData()
-      )
+        }
+      }
+      """.crlfFormattedData()
     )
 
     let expectedData = try await Time(
@@ -750,93 +798,101 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data).to(equal(expectedData))
+    expect(results[0].result.data).to(equal(expectedData))
   }
 
   func test__parsing__givenPayloadWithDataAndGraphQLError_shouldReturnSuccessWithDataAndGraphQLError() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<Time>>()
+    let operation = MockSubscription<Time>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    let resultStream = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription<Time>())
-    ) { _ in
-      streamMocker.getStream()
-    }
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
+    )
+
+    let resultStream = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
-        ),
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
-          {
-            "payload": {
-              "data": {
-                "__typename": "Time",
-                "ticker": 4
-              },
-              "errors": [
-                {
-                  "message": "test error"
-                }
-              ]
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 4
+          },
+          "errors": [
+            {
+              "message": "test error"
             }
-          }
-          """.crlfFormattedData()
-      )
+          ]
+        }
+      }
+      """.crlfFormattedData()
     )
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data?.ticker).to(equal(4))
-    expect(results[0].parsedResult?.result.errors).to(equal([GraphQLError("test error")]))
+    expect(results[0].result.data?.ticker).to(equal(4))
+    expect(results[0].result.errors).to(equal([GraphQLError("test error")]))
   }
 
   func test__parsing__givenPayloadWithNullDataAndGraphQLError_shouldReturnSuccessWithOnlyGraphQLError() async throws {
-    let streamMocker = InterceptorResponseMocker<MockSubscription<Time>>()
+    let operation = MockSubscription<Time>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    let resultStream = try await subject.intercept(
-      request: JSONRequest.mock(operation: MockSubscription<Time>())
-    ) { _ in
-      streamMocker.getStream()
-    }
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
+    )
+
+    let resultStream = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
-        ),
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
-          {
-            "payload": {
-              "data": null,
-              "errors": [
-                {
-                  "message": "test error"
-                }
-              ]
+      {
+        "payload": {
+          "data": null,
+          "errors": [
+            {
+              "message": "test error"
             }
-          }
-          """.crlfFormattedData()
-      )
+          ]
+        }
+      }
+      """.crlfFormattedData()
     )
 
     streamMocker.finish()
 
-    let results = try await resultStream.getResults().getAllValues()
+    let results = try await resultStream.getAllValues()
 
     expect(results.count).to(equal(1))
-    expect(results[0].parsedResult?.result.data).to(beNil())
-    expect(results[0].parsedResult?.result.errors).to(equal([GraphQLError("test error")]))
+    expect(results[0].result.data).to(beNil())
+    expect(results[0].result.errors).to(equal([GraphQLError("test error")]))
   }
 
 }

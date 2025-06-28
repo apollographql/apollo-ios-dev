@@ -12,16 +12,12 @@ final class DeferTests: XCTestCase, MockResponseProvider {
   override func setUp() async throws {
     try await super.setUp()
     let session = MockURLSession(responseProvider: Self.self)
-
-    let provider = MockProvider(
-      interceptors: [
-        JSONResponseParsingInterceptor()
-      ],
-      urlSession: session
-    )
+    let store = ApolloStore.mock()
 
     self.network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: session,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: TestURL.mockServer.url
     )
   }
@@ -30,16 +26,6 @@ final class DeferTests: XCTestCase, MockResponseProvider {
     await Self.cleanUpRequestHandlers()
     self.network = nil
     try await super.tearDown()
-  }
-
-  private struct MockProvider: MockInterceptorProvider {
-    let interceptors: [any ApolloInterceptor]
-    let urlSession: MockURLSession
-
-    func interceptors<Operation>(for operation: Operation) -> [any ApolloInterceptor]
-    where Operation: GraphQLOperation {
-      return interceptors
-    }
   }
 
   private struct TVShowQuery: GraphQLQuery, @unchecked Sendable {
@@ -185,8 +171,12 @@ final class DeferTests: XCTestCase, MockResponseProvider {
         """.crlfFormattedData()
     )
 
-    let results = try await network.send(query: TVShowQuery(), cachePolicy: .fetchIgnoringCacheCompletely)
-      .getAllValues()
+    let results = try await network.send(
+      query: TVShowQuery(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+    .getAllValues()
 
     expect(results.count).to(equal(1))
 
@@ -315,7 +305,13 @@ final class DeferTests: XCTestCase, MockResponseProvider {
 
     var responseCount = 0
 
-    for try await response in try network.send(query: TVShowQuery(), cachePolicy: .fetchIgnoringCacheCompletely) {
+    let results = try network.send(
+      query: TVShowQuery(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    for try await response in results {
       responseCount += 1
 
       let data = response.data
@@ -436,7 +432,13 @@ final class DeferTests: XCTestCase, MockResponseProvider {
 
     var requestCount = 0
 
-    for try await response in try network.send(query: TVShowQuery(), cachePolicy: .fetchIgnoringCacheCompletely) {
+    let results = try network.send(
+      query: TVShowQuery(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    for try await response in results {
       requestCount += 1
 
       let data = response.data
@@ -602,7 +604,13 @@ final class DeferTests: XCTestCase, MockResponseProvider {
 
     var requestCount = 0
 
-    for try await response in try network.send(query: TVShowQuery(), cachePolicy: .fetchIgnoringCacheCompletely) {
+    let results = try network.send(
+      query: TVShowQuery(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    for try await response in results {
       requestCount += 1
 
       let data = response.data

@@ -1,5 +1,6 @@
 @_spi(Internal) import ApolloAPI
 import ApolloInternalTestHelpers
+import Foundation
 import Nimble
 import XCTest
 
@@ -22,28 +23,35 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
   // MARK: - Error tests
 
   func test__intercept__givenChunk_withIncorrectContentType_shouldThrowError() async throws {
-    let streamMocker = InterceptorResponseMocker<MockQuery<MockSelectionSet>>()
+    let operation = MockQuery<MockSelectionSet>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    var actualResultsIterator = try await subject.intercept(request: JSONRequest.mock(operation: .mock())) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"]
+    )
+
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
-        ),
-        dataChunk: """
-          content-type: test/custom
+      """
+      content-type: test/custom
 
-          {
-            "data" : {
-              "key" : "value"
-            },
-            "hasNext": true
-          }          
-          """.crlfFormattedData()
-      )
+      {
+        "data" : {
+          "key" : "value"
+        },
+        "hasNext": true
+      }          
+      """.crlfFormattedData()
     )
 
     await expect {
@@ -56,23 +64,30 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
   }
 
   func test__intercept__givenUnrecognizableChunk_shouldThrowError() async throws {
-    let streamMocker = InterceptorResponseMocker<MockQuery<MockSelectionSet>>()
+    let operation = MockQuery<MockSelectionSet>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    var actualResultsIterator = try await subject.intercept(request: JSONRequest.mock(operation: .mock())) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"]
+    )
+
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
-        ),
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
-          not_a_valid_json_object
-          """.crlfFormattedData()
-      )
+      not_a_valid_json_object
+      """.crlfFormattedData()
     )
 
     await expect {
@@ -85,25 +100,32 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
   }
 
   func test__intercept__givenChunk_withMissingPartialOrIncrementalData_shouldThrowError() async throws {
-    let streamMocker = InterceptorResponseMocker<MockQuery<MockSelectionSet>>()
+    let operation = MockQuery<MockSelectionSet>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    var actualResultsIterator = try await subject.intercept(request: JSONRequest.mock(operation: .mock())) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"]
+    )
+
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
-        ),
-        dataChunk: """
-          content-type: application/json
+      """
+      content-type: application/json
 
-          {
-            "key": "value"
-          }
-          """.crlfFormattedData()
-      )
+      {
+        "key": "value"
+      }
+      """.crlfFormattedData()
     )
 
     await expect {
@@ -118,99 +140,116 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
   // MARK: Parsing tests
 
   func test__intercept__givenSingleChunk_shouldReturnSuccess() async throws {
-    let streamMocker = InterceptorResponseMocker<MockQuery<MockSelectionSet>>()
+    let operation = MockQuery<MockSelectionSet>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    var actualResultsIterator = try await subject.intercept(request: JSONRequest.mock(operation: .mock())) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"]
+    )
+
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     let responseChunk = """
-    content-type: application/json
-    
-    {
-      "data" : {
-        "key" : "value"
-      },
-      "hasNext": true
-    }
-    """.crlfFormattedData()
+      content-type: application/json
 
-    streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
-        ),
-        dataChunk: responseChunk
-      )
-    )
+      {
+        "data" : {
+          "key" : "value1"
+        },
+        "hasNext": true
+      }
+      """.crlfFormattedData()
+
+    streamMocker.emit(responseChunk)
 
     let result1 = try await actualResultsIterator.next()
 
-    expect(result1?.rawResponseChunk).to(equal(responseChunk))
+    expect(result1?.result.data?.key).to(equal("value1"))
   }
 
   func test__intercept__givenSingleChunk_withMultipleContentTypeDirectives_shouldReturnSuccess() async throws {
-    let streamMocker = InterceptorResponseMocker<MockQuery<MockSelectionSet>>()
+    let operation = MockQuery<MockSelectionSet>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    var actualResultsIterator = try await subject.intercept(request: JSONRequest.mock(operation: .mock())) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"]
+    )
+    let chunkStream = streamMocker.getStream()
+
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     let responseChunk = """
-    Content-Type: application/json; charset=utf-8
+      Content-Type: application/json; charset=utf-8
 
-    {
-      "data" : {
-        "key" : "value"
-      },
-      "hasNext": true
-    }
-    """.crlfFormattedData()
+      {
+        "data" : {
+          "key" : "value2"
+        },
+        "hasNext": true
+      }
+      """.crlfFormattedData()
 
-    streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
-        ),
-        dataChunk: responseChunk
-      )
-    )
+    streamMocker.emit(responseChunk)
 
     let result1 = try await actualResultsIterator.next()
 
-    expect(result1?.rawResponseChunk).to(equal(responseChunk))
+    expect(result1?.result.data?.key).to(equal("value2"))
   }
 
   func test__intercept__givenSingleChunk_withGraphQLOverHTTPContentType_shouldReturnSuccess() async throws {
-    let streamMocker = InterceptorResponseMocker<MockQuery<MockSelectionSet>>()
+    let operation = MockQuery<MockSelectionSet>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    var actualResultsIterator = try await subject.intercept(request: JSONRequest.mock(operation: .mock())) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"]
+    )
+    let chunkStream = streamMocker.getStream()
+
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     let responseChunk = """
-    content-type: application/graphql-response+json
+      content-type: application/graphql-response+json
 
-    {
-      "data" : {
-        "key" : "value"
-      },
-      "hasNext": true
-    }          
-    """.crlfFormattedData()
+      {
+        "data" : {
+          "key" : "value3"
+        },
+        "hasNext": true
+      }          
+      """.crlfFormattedData()
 
-    streamMocker.emit(
-      response: .mock(
-        response: .mock(
-          headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"],
-        ),
-        dataChunk: responseChunk
-      )
-    )
+    streamMocker.emit(responseChunk)
 
     let result1 = try await actualResultsIterator.next()
 
-    expect(result1?.rawResponseChunk).to(equal(responseChunk))
+    expect(result1?.result.data?.key).to(equal("value3"))
   }
 
 }

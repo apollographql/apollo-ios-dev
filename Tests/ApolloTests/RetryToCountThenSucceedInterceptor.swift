@@ -18,13 +18,13 @@ final class RetryToCountThenSucceedInterceptor: ApolloInterceptor {
     self.timesToCallRetry = timesToCallRetry
   }
 
-  func intercept<Request>(
+  func intercept<Request: GraphQLRequest>(
     request: Request,
-    next: (Request) async throws -> InterceptorResultStream<Request.Operation>
-  ) async throws -> InterceptorResultStream<Request.Operation> where Request: GraphQLRequest {
+    next: (Request) async throws -> InterceptorResultStream<Request>
+  ) async throws -> InterceptorResultStream<Request> {
     if self.timesRetryHasBeenCalled < self.timesToCallRetry {
       self.timesRetryHasBeenCalled += 1
-      throw RequestChainRetry(request: request)
+      throw RequestChain.Retry(request: request)
 
     } else {
       return try await next(request)

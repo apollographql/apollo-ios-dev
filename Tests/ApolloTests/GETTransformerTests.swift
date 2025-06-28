@@ -28,7 +28,7 @@ class GETTransformerTests: XCTestCase {
   }
 
   func test__createGetURL__queryWithSingleParameterAndVariable_encodesURL() {
-    final class GivenMockOperation: MockOperation<MockSelectionSet>, @unchecked Sendable {
+    final class GivenMockOperation: MockQuery<MockSelectionSet>, @unchecked Sendable {
       override class var operationName: String { "TestOpName" }
       override class var operationDocument: OperationDocument {
         .init(
@@ -52,8 +52,7 @@ class GETTransformerTests: XCTestCase {
     let body = requestBodyCreator.requestBody(
       for: operation,
       sendQueryDocument: true,
-      autoPersistQuery: false,
-      clientAwarenessMetadata: .none
+      autoPersistQuery: false
     )
 
     let transformer = GraphQLGETTransformer(body: body, url: Self.url)
@@ -67,7 +66,7 @@ class GETTransformerTests: XCTestCase {
   }
 
   func test__createGetURL__query_withEnumParameterAndVariable_encodesURL() {
-    class GivenMockOperation: MockOperation<MockSelectionSet>, @unchecked Sendable {
+    class GivenMockOperation: MockQuery<MockSelectionSet>, @unchecked Sendable {
       override class var operationName: String { "TestOpName" }
       override class var operationDocument: OperationDocument {
         .init(
@@ -91,8 +90,7 @@ class GETTransformerTests: XCTestCase {
     let body = requestBodyCreator.requestBody(
       for: operation,
       sendQueryDocument: true,
-      autoPersistQuery: false,
-      clientAwarenessMetadata: .none
+      autoPersistQuery: false
     )
 
     let transformer = GraphQLGETTransformer(body: body, url: Self.url)
@@ -106,7 +104,7 @@ class GETTransformerTests: XCTestCase {
   }
 
   func test__createGetURL__queryWithMoreThanOneParameter_withIncludeDirective_encodesURL() throws {
-    class GivenMockOperation: MockOperation<MockSelectionSet>, @unchecked Sendable {
+    class GivenMockOperation: MockQuery<MockSelectionSet>, @unchecked Sendable {
       override class var operationName: String { "TestOpName" }
       override class var operationDocument: OperationDocument {
         .init(
@@ -130,8 +128,7 @@ class GETTransformerTests: XCTestCase {
     let body = requestBodyCreator.requestBody(
       for: operation,
       sendQueryDocument: true,
-      autoPersistQuery: false,
-      clientAwarenessMetadata: .none
+      autoPersistQuery: false
     )
 
     let transformer = GraphQLGETTransformer(body: body, url: Self.url)
@@ -145,7 +142,7 @@ class GETTransformerTests: XCTestCase {
   }
 
   func test__createGetURL__queryWith2DParameter_encodesURL_withBodyComponentsInAlphabeticalOrder() throws {
-    class GivenMockOperation: MockOperation<MockSelectionSet>, @unchecked Sendable {
+    class GivenMockOperation: MockQuery<MockSelectionSet>, @unchecked Sendable {
       override class var operationName: String { "TestOpName" }
       override class var operationDocument: OperationDocument {
         .init(
@@ -185,7 +182,7 @@ class GETTransformerTests: XCTestCase {
     ]
 
     let body: JSONEncodableDictionary = [
-      "query": MockOperation<MockSelectionSet>.definition?.queryDocument,
+      "query": MockQuery<MockSelectionSet>.definition?.queryDocument,
       "extensions": extensions,
     ]
 
@@ -205,7 +202,7 @@ class GETTransformerTests: XCTestCase {
     ]
 
     let body: JSONEncodableDictionary = [
-      "query": MockOperation<MockSelectionSet>.definition?.queryDocument,
+      "query": MockQuery<MockSelectionSet>.definition?.queryDocument,
       "extensions": extensions,
     ]
 
@@ -219,7 +216,7 @@ class GETTransformerTests: XCTestCase {
   }
 
   func test__createGetURL__queryWithPersistedQueryID_withoutQueryParameter_encodesURL() throws {
-    class GivenMockOperation: MockOperation<MockSelectionSet>, @unchecked Sendable {
+    class GivenMockOperation: MockQuery<MockSelectionSet>, @unchecked Sendable {
       override class var operationName: String { "TestOpName" }
       override class var operationDocument: OperationDocument {
         .init(operationIdentifier: "4d465fbc6e3731d01102504850")
@@ -250,7 +247,7 @@ class GETTransformerTests: XCTestCase {
   }
 
   func test__createGetURL__queryWithNullValueForVariable_encodesVariableWithNull() {
-    class GivenMockOperation: MockOperation<MockSelectionSet>, @unchecked Sendable {
+    class GivenMockOperation: MockQuery<MockSelectionSet>, @unchecked Sendable {
       override class var operationName: String { "TestOpName" }
       override class var operationDocument: OperationDocument {
         .init(
@@ -274,8 +271,7 @@ class GETTransformerTests: XCTestCase {
     let body = requestBodyCreator.requestBody(
       for: operation,
       sendQueryDocument: true,
-      autoPersistQuery: false,
-      clientAwarenessMetadata: .none
+      autoPersistQuery: false
     )
 
     let transformer = GraphQLGETTransformer(body: body, url: Self.url)
@@ -296,7 +292,7 @@ class GETTransformerTests: XCTestCase {
     ]
 
     let body: JSONEncodableDictionary = [
-      "query": MockOperation<MockSelectionSet>.definition?.queryDocument,
+      "query": MockQuery<MockSelectionSet>.definition?.queryDocument,
       "extensions": extensions,
     ]
 

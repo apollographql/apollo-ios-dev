@@ -1,6 +1,7 @@
 import Foundation
+
 #if !COCOAPODS
-import ApolloAPI
+  import ApolloAPI
 #endif
 
 /// A network transport is responsible for sending GraphQL operations to a server.
@@ -29,7 +30,7 @@ public protocol NetworkTransport: AnyObject, Sendable {
 
 // MARK: -
 
-public protocol SubscriptionNetworkTransport: NetworkTransport {
+public protocol SubscriptionNetworkTransport {
 
   func send<Subscription: GraphQLSubscription>(
     subscription: Subscription,
@@ -42,7 +43,7 @@ public protocol SubscriptionNetworkTransport: NetworkTransport {
 // MARK: -
 
 /// A network transport which can also handle uploads of files.
-public protocol UploadingNetworkTransport: NetworkTransport {
+public protocol UploadingNetworkTransport {
 
   /// Uploads the given files with the given operation.
   ///

@@ -4,32 +4,310 @@ import ApolloInternalTestHelpers
 import Nimble
 import XCTest
 
-class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting, MockResponseProvider {
+class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting, MockResponseProvider {
   var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
   }
 
   var cache: (any NormalizedCache)!
   var store: ApolloStore!
+  var session: MockURLSession!
 
   override func setUp() async throws {
     try await super.setUp()
 
     cache = try await makeNormalizedCache()
     store = ApolloStore(cache: cache)
+    session = MockURLSession(responseProvider: Self.self)
   }
 
   override func tearDown() async throws {
     await Self.cleanUpRequestHandlers()
+    session = nil
     cache = nil
     store = nil
 
     try await super.tearDown()
   }
 
-  #warning("Decide if we are going to implement error interceptor and then reenable this test.")
-  func testChangingCachePolicyInErrorInterceptorWorks() async throws {
-    throw XCTSkip()
+  // MARK: - Tests
+  #warning("TODO: Refactor these tests")
+  //
+  //  func test__send__ErrorInterceptorGetsCalledAfterAnErrorIsReceived() {
+  //    class ErrorInterceptor: ApolloErrorInterceptor {
+  //      var error: (any Error)? = nil
+  //
+  //      func handleErrorAsync<Operation: GraphQLOperation>(
+  //        error: any Error,
+  //          chain: any RequestChain,
+  //          request: HTTPRequest<Operation>,
+  //          response: HTTPResponse<Operation>?,
+  //          completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
+  //
+  //        self.error = error
+  //        completion(.failure(error))
+  //      }
+  //    }
+  //
+  //    class TestProvider: InterceptorProvider {
+  //      let errorInterceptor = ErrorInterceptor()
+  //      func interceptors<Operation: GraphQLOperation>(
+  //        for operation: Operation
+  //      ) -> [any ApolloInterceptor] {
+  //        return [
+  //          // An interceptor which will error without a response
+  //          AutomaticPersistedQueryInterceptor()
+  //        ]
+  //      }
+  //
+  //      func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
+  //        return self.errorInterceptor
+  //      }
+  //    }
+  //
+  //    let provider = TestProvider()
+  //    let transport = RequestChainNetworkTransport(interceptorProvider: provider,
+  //                                                 endpointURL: TestURL.mockServer.url,
+  //                                                 autoPersistQueries: true)
+  //
+  //    let expectation = self.expectation(description: "Hero name query complete")
+  //    _ = transport.send(operation: MockQuery.mock()) { result in
+  //      defer {
+  //        expectation.fulfill()
+  //      }
+  //      switch result {
+  //      case .success:
+  //        XCTFail("This should not have succeeded")
+  //      case .failure(let error):
+  //        switch error {
+  //        case AutomaticPersistedQueryInterceptor.APQError.noParsedResponse:
+  //          // This is what we want.
+  //          break
+  //        default:
+  //          XCTFail("Unexpected error: \(error)")
+  //        }
+  //      }
+  //    }
+  //
+  //    self.wait(for: [expectation], timeout: 1)
+  //
+  //    switch provider.errorInterceptor.error {
+  //    case .some(let error):
+  //      switch error {
+  //      case AutomaticPersistedQueryInterceptor.APQError.noParsedResponse:
+  //        // Again, this is what we expect.
+  //        break
+  //      default:
+  //        XCTFail("Unexpected error on the interceptor: \(error)")
+  //      }
+  //    case .none:
+  //      XCTFail("Error interceptor did not receive an error!")
+  //    }
+  //  }
+  //
+  //  func test__upload__ErrorInterceptorGetsCalledAfterAnErrorIsReceived() throws {
+  //    class ErrorInterceptor: ApolloErrorInterceptor {
+  //      var error: (any Error)? = nil
+  //
+  //      func handleErrorAsync<Operation: GraphQLOperation>(
+  //        error: any Error,
+  //          chain: any RequestChain,
+  //          request: HTTPRequest<Operation>,
+  //          response: HTTPResponse<Operation>?,
+  //          completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
+  //
+  //        self.error = error
+  //        completion(.failure(error))
+  //      }
+  //    }
+  //
+  //    class TestProvider: InterceptorProvider {
+  //      let errorInterceptor = ErrorInterceptor()
+  //      func interceptors<Operation: GraphQLOperation>(
+  //        for operation: Operation
+  //      ) -> [any ApolloInterceptor] {
+  //        return [
+  //          // An interceptor which will error without a response
+  //          ResponseCodeInterceptor()
+  //        ]
+  //      }
+  //
+  //      func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
+  //        return self.errorInterceptor
+  //      }
+  //    }
+  //
+  //    let provider = TestProvider()
+  //    let transport = RequestChainNetworkTransport(interceptorProvider: provider,
+  //                                                 endpointURL: TestURL.mockServer.url,
+  //                                                 autoPersistQueries: true)
+  //
+  //    let fileURL = TestFileHelper.fileURLForFile(named: "a", extension: "txt")
+  //    let file = try GraphQLFile(
+  //      fieldName: "file",
+  //      originalName: "a.txt",
+  //      fileURL: fileURL
+  //    )
+  //
+  //    let expectation = self.expectation(description: "Hero name query complete")
+  //    _ = transport.upload(operation: MockQuery.mock(), files: [file], context: nil) { result in
+  //      defer {
+  //        expectation.fulfill()
+  //      }
+  //      switch result {
+  //      case .success:
+  //        XCTFail("This should not have succeeded")
+  //      case .failure(let error):
+  //        switch error {
+  //        case ResponseCodeInterceptor.ResponseCodeError.invalidResponseCode:
+  //          // This is what we want.
+  //          break
+  //        default:
+  //          XCTFail("Unexpected error: \(error)")
+  //        }
+  //      }
+  //    }
+  //
+  //    self.wait(for: [expectation], timeout: 1)
+  //
+  //    switch provider.errorInterceptor.error {
+  //    case .some(let error):
+  //      switch error {
+  //      case ResponseCodeInterceptor.ResponseCodeError.invalidResponseCode:
+  //        // Again, this is what we expect.
+  //        break
+  //      default:
+  //        XCTFail("Unexpected error on the interceptor: \(error)")
+  //      }
+  //    case .none:
+  //      XCTFail("Error interceptor did not receive an error!")
+  //    }
+  //  }
+  //
+  //  func testErrorInterceptorGetsCalledInDefaultInterceptorProviderSubclass() {
+  //    class ErrorInterceptor: ApolloErrorInterceptor {
+  //      var error: (any Error)? = nil
+  //
+  //      func handleErrorAsync<Operation: GraphQLOperation>(
+  //        error: any Error,
+  //        chain: any RequestChain,
+  //        request: HTTPRequest<Operation>,
+  //        response: HTTPResponse<Operation>?,
+  //        completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
+  //
+  //        self.error = error
+  //        completion(.failure(error))
+  //      }
+  //    }
+  //
+  //    class TestProvider: DefaultInterceptorProvider {
+  //      let errorInterceptor = ErrorInterceptor()
+  //
+  //      override func interceptors<Operation: GraphQLOperation>(
+  //        for operation: Operation
+  //      ) -> [any ApolloInterceptor] {
+  //        return [
+  //          // An interceptor which will error without a response
+  //          AutomaticPersistedQueryInterceptor()
+  //        ]
+  //      }
+  //
+  //      override func additionalErrorInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> (any ApolloErrorInterceptor)? {
+  //        return self.errorInterceptor
+  //      }
+  //    }
+  //
+  //    let provider = TestProvider(store: ApolloStore())
+  //    let transport = RequestChainNetworkTransport(interceptorProvider: provider,
+  //                                                 endpointURL: TestURL.mockServer.url,
+  //                                                 autoPersistQueries: true)
+  //
+  //    let expectation = self.expectation(description: "Hero name query complete")
+  //    _ = transport.send(operation: MockQuery.mock()) { result in
+  //      defer {
+  //        expectation.fulfill()
+  //      }
+  //      switch result {
+  //      case .success:
+  //        XCTFail("This should not have succeeded")
+  //      case .failure(let error):
+  //        switch error {
+  //        case AutomaticPersistedQueryInterceptor.APQError.noParsedResponse:
+  //          // This is what we want.
+  //          break
+  //        default:
+  //          XCTFail("Unexpected error: \(error)")
+  //        }
+  //      }
+  //    }
+  //
+  //    self.wait(for: [expectation], timeout: 1)
+  //
+  //    switch provider.errorInterceptor.error {
+  //    case .some(let error):
+  //      switch error {
+  //      case AutomaticPersistedQueryInterceptor.APQError.noParsedResponse:
+  //        // Again, this is what we expect.
+  //        break
+  //      default:
+  //        XCTFail("Unexpected error on the interceptor: \(error)")
+  //      }
+  //    case .none:
+  //      XCTFail("Error interceptor did not receive an error!")
+  //    }
+  //  }
+  //
+  //  func test__error__givenGraphqlError_withoutData_shouldReturnError() {
+  //    // given
+  //    let client = MockURLSessionClient(
+  //      response: .mock(
+  //        url: TestURL.mockServer.url,
+  //        statusCode: 200,
+  //        httpVersion: nil,
+  //        headerFields: nil
+  //      ),
+  //      data: """
+  //      {
+  //        "errors": [{
+  //          "message": "Bad request, could not start execution!"
+  //        }]
+  //      }
+  //      """.data(using: .utf8)
+  //    )
+  //
+  //    let interceptorProvider = DefaultInterceptorProvider(client: client, store: ApolloStore())
+  //    let interceptors = interceptorProvider.interceptors(for: MockQuery.mock())
+  //    let requestChain = InterceptorRequestChain(interceptors: interceptors)
+  //
+  //    let expectation = expectation(description: "Response received")
+  //
+  //    let request = JSONRequest(
+  //      operation: MockQuery<Hero>(),
+  //      graphQLEndpoint: TestURL.mockServer.url,
+  //      clientName: "test-client",
+  //      clientVersion: "test-client-version"
+  //    )
+  //
+  //    // when + then
+  //    requestChain.kickoff(request: request) { result in
+  //      defer {
+  //        expectation.fulfill()
+  //      }
+  //
+  //      switch (result) {
+  //      case let .success(data):
+  //        XCTAssertEqual(data.errors, [
+  //          GraphQLError("Bad request, could not start execution!")
+  //        ])
+  //      case let .failure(error):
+  //        XCTFail("Unexpected failure result - \(error)")
+  //      }
+  //    }
+  //
+  //    wait(for: [expectation], timeout: 1)
+  //  }
+
+  func test__interceptor__changingFetchBehaviorOnFailureAndRetrying_fetchBehaviorIsChanged() async throws {
     // given
     final class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {
@@ -61,7 +339,7 @@ class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting, MockRes
       func intercept<Request: GraphQLRequest>(
         request: Request,
         next: NextInterceptorFunction<Request>
-      ) async throws -> InterceptorResultStream<GraphQLResponse<Request.Operation>> {
+      ) async throws -> InterceptorResultStream<Request> {
 
         do {
           return try await next(request)
@@ -72,34 +350,24 @@ class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting, MockRes
             throw error
           }
           var request = request
-          request.fetchBehavior = FetchBehavior(
-            shouldAttemptCacheRead: true,
-            shouldAttemptCacheWrite: true,
-            shouldAttemptNetworkFetch: .never
-          )
+          request.fetchBehavior = FetchBehavior.CacheOnly
 
           throw RequestChain.Retry(request: request)
         }
       }
     }
 
-    struct TestProvider: MockInterceptorProvider {
-      let store: ApolloStore
-      let urlSession: MockURLSession = MockURLSession(responseProvider: CacheDependentInterceptorTests.self)
-
-      init(store: ApolloStore) {
-        self.store = store
-      }
-
+    struct TestProvider: InterceptorProvider {
       let errorInterceptor = RerouteToCacheErrorInterceptor()
 
-      func interceptors<Operation>(for operation: Operation) -> [any ApolloInterceptor]
-      where Operation: GraphQLOperation {
-        [self.errorInterceptor]
-      }      
+      func graphQLInterceptors<Request>(for request: Request) -> [any ApolloInterceptor] where Request : GraphQLRequest {
+        DefaultInterceptorProvider.shared.graphQLInterceptors(for: request) + [
+          errorInterceptor
+        ]
+      }
     }
 
-    await CacheDependentInterceptorTests.registerRequestHandler(for: TestURL.mockServer.url) { _ in
+    await Self.registerRequestHandler(for: TestURL.mockServer.url) { _ in
       return (
         HTTPURLResponse(
           url: TestURL.mockServer.url,
@@ -111,9 +379,11 @@ class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting, MockRes
       )
     }
 
-    let testProvider = TestProvider(store: self.store)
+    let testProvider = TestProvider()
     let network = RequestChainNetworkTransport(
+      urlSession: session,
       interceptorProvider: testProvider,
+      store: store,
       endpointURL: TestURL.mockServer.url
     )
 
@@ -122,7 +392,8 @@ class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting, MockRes
     // Send the initial request ignoring cache data so it doesn't initially get the data from the cache.
     for try await response in try network.send(
       query: MockQuery<GivenSelectionSet>(),
-      cachePolicy: .fetchIgnoringCacheData
+      fetchBehavior: FetchBehavior.NetworkOnly,
+      requestConfiguration: RequestConfiguration()
     ) {
       responseCount += 1
 
@@ -150,6 +421,5 @@ class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting, MockRes
     default:
       XCTFail("Unexpected error on the additional error handler: \(handledError)")
     }
-
   }
 }

@@ -3,37 +3,124 @@ import ApolloAPI
 import Foundation
 
 public final class MockNetworkTransport: NetworkTransport {
-  let requestChainTransport: RequestChainNetworkTransport
+  public let mockServer: MockGraphQLServer
+  public let requestChainTransport: RequestChainNetworkTransport
 
   public init(
-    server: MockGraphQLServer = MockGraphQLServer(),
+    mockServer: MockGraphQLServer = MockGraphQLServer(),
     store: ApolloStore
   ) {
-    let session = MockGraphQLServerSession(server: server)
+    self.mockServer = mockServer
+    let session = MockSession(server: mockServer)
     self.requestChainTransport = RequestChainNetworkTransport(
-      interceptorProvider: DefaultInterceptorProvider(session: session, store: store),
+      urlSession: session,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: TestURL.mockServer.url
     )
   }
 
-  public func send<Query>(
+  public func send<Query: GraphQLQuery>(
     query: Query,
-    cachePolicy: CachePolicy,
-  ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error> where Query: GraphQLQuery {
+    fetchBehavior: FetchBehavior,
+    requestConfiguration: RequestConfiguration
+  ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error> {
     try requestChainTransport.send(
       query: query,
-      cachePolicy: cachePolicy
+      fetchBehavior: fetchBehavior,
+      requestConfiguration: requestConfiguration
     )
   }
 
-  public func send<Mutation>(
+  public func send<Mutation: GraphQLMutation>(
     mutation: Mutation,
-    cachePolicy: CachePolicy,
-  ) throws -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error> where Mutation: GraphQLMutation {
+    requestConfiguration: RequestConfiguration
+  ) throws -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error> {
     try requestChainTransport.send(
       mutation: mutation,
-      cachePolicy: cachePolicy
+      requestConfiguration: requestConfiguration
     )
+  }
+
+
+  private struct MockInterceptorProvider: InterceptorProvider {
+    func graphQLInterceptors<Request: GraphQLRequest>(for request: Request) -> [any ApolloInterceptor] {
+      return DefaultInterceptorProvider.shared.graphQLInterceptors(for: request) + [TaskLocalRequestInterceptor()]
+    }
+  }
+
+  fileprivate struct TaskLocalRequestInterceptor: ApolloInterceptor {
+    @TaskLocal static var currentRequest: (any GraphQLRequest)? = nil
+
+    func intercept<Request>(
+      request: Request,
+      next: (Request) async throws -> InterceptorResultStream<Request>
+    ) async throws -> InterceptorResultStream<Request> {
+      return try await TaskLocalRequestInterceptor.$currentRequest.withValue(request) {
+        return try await next(request)
+      }
+    }
+  }
+
+  fileprivate struct MockSession: ApolloURLSession {
+
+    let server: MockGraphQLServer
+
+    init(server: MockGraphQLServer) {
+      self.server = server
+    }
+
+    func chunks(for request: URLRequest) async throws -> (any AsyncChunkSequence, URLResponse) {
+      guard let graphQLRequest = TaskLocalRequestInterceptor.currentRequest else {
+        throw MockGraphQLServer.ServerError.unexpectedRequest(request.description)
+      }
+
+      let (stream, continuation) = MockAsyncChunkSequence.makeStream()
+      do {
+        let body = try await server.serve(request: graphQLRequest)
+        let data = try JSONSerializationFormat.serialize(value: body)
+        continuation.yield(data)
+        continuation.finish()
+
+      } catch {
+        continuation.finish(throwing: error)
+      }
+
+      let httpResponse = HTTPURLResponse(
+        url: TestURL.mockServer.url,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: nil
+      )!
+      return (stream, httpResponse)
+    }
+
+    public func invalidateAndCancel() {
+    }
+
   }
 
 }
+
+public struct MockAsyncChunkSequence: AsyncChunkSequence {
+  public typealias UnderlyingStream = AsyncThrowingStream<Data, any Error>
+
+  public typealias AsyncIterator = UnderlyingStream.AsyncIterator
+
+  public typealias Element = Data
+
+  let underlying: UnderlyingStream
+
+  public func makeAsyncIterator() -> UnderlyingStream.AsyncIterator {
+    underlying.makeAsyncIterator()
+  }
+
+  public static func makeStream() -> (
+    stream: MockAsyncChunkSequence,
+    continuation: UnderlyingStream.Continuation
+  ) {
+    let (s, c) = UnderlyingStream.makeStream(of: Data.self)
+    return (Self.init(underlying: s), c)
+  }
+}
+

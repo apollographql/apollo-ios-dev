@@ -23,37 +23,18 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
     try await super.tearDown()
   }
 
-  private struct MockRequest: GraphQLRequest {
-    var graphQLEndpoint: URL
-    var operation = MockQuery<MockSelectionSet>.mock()
-    var additionalHeaders: [String: String] = [:]
-    var cachePolicy: Apollo.CachePolicy = .fetchIgnoringCacheCompletely
-    var clientAwarenessMetadata: ClientAwarenessMetadata = .none
-
-    var urlRequest: URLRequest
-
-    init(url: URL) {
-      self.graphQLEndpoint = url
-      self.urlRequest = URLRequest(
-        url: url,
-        cachePolicy: .reloadIgnoringCacheData,
-        timeoutInterval: 10
-      )
-    }
-
-    func toURLRequest() throws -> URLRequest {
-      urlRequest
-    }
-  }
-
   private func request(
     for url: URL,
     responseData: Data?,
     statusCode: Int,
     httpVersion: String? = nil,
     headerFields: [String: String]? = nil
-  ) async -> MockRequest {
-    let request = MockRequest(url: url)
+  ) async -> URLRequest {
+    let request = URLRequest(
+      url: url,
+      cachePolicy: .reloadIgnoringCacheData,
+      timeoutInterval: 10
+    )
 
     await Self.registerRequestHandler(for: url) { request in
       guard let requestURL = request.url else {
@@ -84,7 +65,7 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
 
     let (chunks, response) = try await self.session.chunks(for: request)
 
-    XCTAssertEqual(request.graphQLEndpoint, response.url)
+    XCTAssertEqual(request.url, response.url)
     XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
 
     var chunkCount = 0
@@ -125,7 +106,7 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
     }
 
     XCTAssertEqual(httpResponse.allHeaderFields["Content-Type"] as! String, "image/jpeg")
-    XCTAssertEqual(request.graphQLEndpoint, httpResponse.url)
+    XCTAssertEqual(request.url, httpResponse.url)
 
     var chunkCount = 0
     for try await chunk in chunks {
@@ -158,8 +139,8 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
       headerFields: headerFields
     )
 
-    request.urlRequest.httpBody = data
-    request.urlRequest.httpMethod = GraphQLHTTPMethod.POST.rawValue
+    request.httpBody = data
+    request.httpMethod = GraphQLHTTPMethod.POST.rawValue
 
     let (chunks, response) = try await self.session.chunks(for: request)
     guard let httpResponse = response as? HTTPURLResponse else {
@@ -167,7 +148,7 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
       return
     }
 
-    XCTAssertEqual(request.graphQLEndpoint, httpResponse.url)
+    XCTAssertEqual(request.url, httpResponse.url)
 
     var chunkCount = 0
     for try await chunk in chunks {
@@ -207,7 +188,7 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
     @Atomic var taskIDs: [Int] = []
 
     var responseStrings = [Int: String]()
-    var requests = [Int: MockRequest]()
+    var requests = [Int: URLRequest]()
 
     for i in 0..<iterations {
       let url = URL(string: "http://www.test.com/multipleSimultaneousRequests\(i)")!
@@ -231,7 +212,7 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
             return
           }
 
-          XCTAssertEqual(httpResponse.url, request.graphQLEndpoint)
+          XCTAssertEqual(httpResponse.url, request.url)
           var isFirstChunk: Bool = true
           for try await chunk in chunks {
             let chunk = chunk as! Data

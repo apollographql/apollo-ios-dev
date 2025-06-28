@@ -23,60 +23,64 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
 
   func test__intercept__givenSingleIncrementalResult_shouldMergeResult() async throws {
     // given
-    let streamMocker = InterceptorResponseMocker<AnimalQuery>()
+    let operation = AnimalQuery()
+    let streamMocker = AsyncStreamMocker<Data>()
+
+    let urlResponse = HTTPURLResponse.deferResponseMock()
 
     // when
-    var actualResultsIterator = try await subject.intercept(request: JSONRequest.mock(operation: AnimalQuery())) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     streamMocker.emit(
-      response: .mock(
-        response: .deferResponseMock(),
-        dataChunk: """
-          {
-            "data": {
-              "animal": {
-                "__typename": "Animal",
-                "species": "Canis Familiaris"
-              }
-            },
-            "hasNext": true
+      """
+      {
+        "data": {
+          "animal": {
+            "__typename": "Animal",
+            "species": "Canis Familiaris"
           }
-          """.data(using: .utf8)!
-      )
+        },
+        "hasNext": true
+      }
+      """.data(using: .utf8)!
     )
 
     // then
     let result1 = try await actualResultsIterator.next()
-    let graphQLResult = result1?.parsedResult?.result
+    let graphQLResult = result1?.result
     expect(graphQLResult?.data?.animal.species).to(equal("Canis Familiaris"))
     expect(graphQLResult?.data?.animal.fragments.deferredGenus?.genus).to(beNil())
     expect(graphQLResult?.data?.animal.fragments.deferredFriend?.friend).to(beNil())
 
     // when
     streamMocker.emit(
-      response: .mock(
-        response: .deferResponseMock(),
-        dataChunk: """
-          {
-            "incremental": [{
-              "label": "deferredGenus",
-              "data": {
-                "genus": "Canis"
-              },
-              "path": [
-                "animal"
-              ]
-            }],
-            "hasNext": false
-          }
-          """.data(using: .utf8)!
-      )
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "data": {
+            "genus": "Canis"
+          },
+          "path": [
+            "animal"
+          ]
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
     )
 
     let result2 = try await actualResultsIterator.next()
-    let graphQLResult2 = result2?.parsedResult?.result
+    let graphQLResult2 = result2?.result
     expect(graphQLResult2?.data?.animal.species).to(equal("Canis Familiaris"))
     expect(graphQLResult2?.data?.animal.fragments.deferredGenus?.genus).to(equal("Canis"))
     expect(graphQLResult2?.data?.animal.fragments.deferredFriend?.friend).to(beNil())
@@ -84,73 +88,77 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
 
   func test__intercept__givenMultipleIncrementalResultsInSingleResponse_shouldMergeResults() async throws {
     // given
-    let streamMocker = InterceptorResponseMocker<AnimalQuery>()
+    let operation = AnimalQuery()
+    let streamMocker = AsyncStreamMocker<Data>()
+
+    let urlResponse = HTTPURLResponse.deferResponseMock()
 
     // when
-    var actualResultsIterator = try await subject.intercept(request: JSONRequest.mock(operation: AnimalQuery())) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     streamMocker.emit(
-      response: .mock(
-        response: .deferResponseMock(),
-        dataChunk: """
-          {
-            "data": {
-              "animal": {
-                "__typename": "Animal",
-                "species": "Canis Familiaris"
-              }
-            },
-            "hasNext": true
+      """
+      {
+        "data": {
+          "animal": {
+            "__typename": "Animal",
+            "species": "Canis Familiaris"
           }
-          """.data(using: .utf8)!
-      )
+        },
+        "hasNext": true
+      }
+      """.data(using: .utf8)!
     )
 
     // then
     let result1 = try await actualResultsIterator.next()
-    let graphQLResult = result1?.parsedResult?.result
+    let graphQLResult = result1?.result
     expect(graphQLResult?.data?.animal.species).to(equal("Canis Familiaris"))
     expect(graphQLResult?.data?.animal.fragments.deferredGenus?.genus).to(beNil())
     expect(graphQLResult?.data?.animal.fragments.deferredFriend?.friend).to(beNil())
 
     // when
     streamMocker.emit(
-      response: .mock(
-        response: .deferResponseMock(),
-        dataChunk: """
+      """
+      {
+        "incremental": [
           {
-            "incremental": [
-              {
-                "label": "deferredGenus",
-                "data": {
-                  "genus": "Canis"
-                },
-                "path": [
-                  "animal"
-                ]
-              },
-              {
-                "label": "deferredFriend",
-                "data": {
-                  "friend": {
-                    "name": "Buster"
-                  }
-                },
-                "path": [
-                  "animal"
-                ]
+            "label": "deferredGenus",
+            "data": {
+              "genus": "Canis"
+            },
+            "path": [
+              "animal"
+            ]
+          },
+          {
+            "label": "deferredFriend",
+            "data": {
+              "friend": {
+                "name": "Buster"
               }
-            ],
-            "hasNext": false
+            },
+            "path": [
+              "animal"
+            ]
           }
-          """.data(using: .utf8)!
-      )
+        ],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
     )
 
     let result2 = try await actualResultsIterator.next()
-    let graphQLResult2 = result2?.parsedResult?.result
+    let graphQLResult2 = result2?.result
     expect(graphQLResult2?.data?.animal.species).to(equal("Canis Familiaris"))
     expect(graphQLResult2?.data?.animal.fragments.deferredGenus?.genus).to(equal("Canis"))
     expect(graphQLResult2?.data?.animal.fragments.deferredFriend?.friend.name).to(equal("Buster"))
@@ -161,33 +169,40 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
     async throws
   {
     // given
-    let streamMocker = InterceptorResponseMocker<AnimalQuery>()
+    let operation = AnimalQuery()
+    let streamMocker = AsyncStreamMocker<Data>()
+
+    let urlResponse = HTTPURLResponse.deferResponseMock()
 
     // when
-    var actualResultsIterator = try await subject.intercept(request: JSONRequest.mock(operation: AnimalQuery())) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     streamMocker.emit(
-      response: .mock(
-        response: .deferResponseMock(),
-        dataChunk: """
-          {
-            "data": {
-              "animal": {
-                "__typename": "Animal",
-                "species": "Canis Familiaris"
-              }
-            },
-            "hasNext": true
+      """
+      {
+        "data": {
+          "animal": {
+            "__typename": "Animal",
+            "species": "Canis Familiaris"
           }
-          """.data(using: .utf8)!
-      )
+        },
+        "hasNext": true
+      }
+      """.data(using: .utf8)!
     )
 
     // then
     let result1 = try await actualResultsIterator.next()
-    expect(result1?.parsedResult?.cacheRecords).to(
+    expect(result1?.cacheRecords).to(
       equal(
         RecordSet(records: [
           Record(
@@ -208,40 +223,37 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
     )
 
     streamMocker.emit(
-      response: .mock(
-        response: .deferResponseMock(),
-        dataChunk: """
+      """
+      {
+        "incremental": [
           {
-            "incremental": [
-              {
-                "label": "deferredGenus",
-                "data": {
-                  "genus": "Canis"
-                },
-                "path": [
-                  "animal"
-                ]
-              },
-              {
-                "label": "deferredFriend",
-                "data": {
-                  "friend": {
-                    "name": "Buster"
-                  }
-                },
-                "path": [
-                  "animal"
-                ]
+            "label": "deferredGenus",
+            "data": {
+              "genus": "Canis"
+            },
+            "path": [
+              "animal"
+            ]
+          },
+          {
+            "label": "deferredFriend",
+            "data": {
+              "friend": {
+                "name": "Buster"
               }
-            ],
-            "hasNext": false
+            },
+            "path": [
+              "animal"
+            ]
           }
-          """.data(using: .utf8)!
-      )
+        ],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
     )
 
     let result2 = try await actualResultsIterator.next()
-    expect(result2?.parsedResult?.cacheRecords).to(
+    expect(result2?.cacheRecords).to(
       equal(
         RecordSet(records: [
           Record(
@@ -274,34 +286,40 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
     async throws
   {
     // given
-    let subject = JSONResponseParsingInterceptor()
-    let streamMocker = InterceptorResponseMocker<AnimalQuery>()
+    let operation = AnimalQuery()
+    let streamMocker = AsyncStreamMocker<Data>()
+
+    let urlResponse = HTTPURLResponse.deferResponseMock()
 
     // when
-    var actualResultsIterator = try await subject.intercept(request: JSONRequest.mock(operation: AnimalQuery())) { _ in
-      streamMocker.getStream()
-    }.getResults().makeAsyncIterator()
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+    .makeAsyncIterator()
 
     streamMocker.emit(
-      response: .mock(
-        response: .deferResponseMock(),
-        dataChunk: """
-          {
-            "data": {
-              "animal": {
-                "__typename": "Animal",
-                "species": "Canis Familiaris"
-              }
-            },
-            "hasNext": true
+      """
+      {
+        "data": {
+          "animal": {
+            "__typename": "Animal",
+            "species": "Canis Familiaris"
           }
-          """.data(using: .utf8)!
-      )
+        },
+        "hasNext": true
+      }
+      """.data(using: .utf8)!
     )
 
     // then
     let result1 = try await actualResultsIterator.next()
-    expect(result1?.parsedResult?.cacheRecords).to(
+    expect(result1?.cacheRecords).to(
       equal(
         RecordSet(records: [
           Record(
@@ -322,29 +340,26 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
     )
 
     streamMocker.emit(
-      response: .mock(
-        response: .deferResponseMock(),
-        dataChunk: """
+      """
+      {
+        "incremental": [
           {
-            "incremental": [
-              {
-                "label": "deferredGenus",
-                "data": {
-                  "genus": "Canis"
-                },
-                "path": [
-                  "animal"
-                ]
-              }
-            ],
-            "hasNext": true
+            "label": "deferredGenus",
+            "data": {
+              "genus": "Canis"
+            },
+            "path": [
+              "animal"
+            ]
           }
-          """.data(using: .utf8)!
-      )
+        ],
+        "hasNext": true
+      }
+      """.data(using: .utf8)!
     )
 
     let result2 = try await actualResultsIterator.next()
-    expect(result2?.parsedResult?.cacheRecords).to(
+    expect(result2?.cacheRecords).to(
       equal(
         RecordSet(records: [
           Record(
@@ -366,31 +381,28 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
     )
 
     streamMocker.emit(
-      response: .mock(
-        response: .deferResponseMock(),
-        dataChunk: """
+      """
+      {
+        "incremental": [
           {
-            "incremental": [
-              {
-                "label": "deferredFriend",
-                "data": {
-                  "friend": {
-                    "name": "Buster"
-                  }
-                },
-                "path": [
-                  "animal"
-                ]
+            "label": "deferredFriend",
+            "data": {
+              "friend": {
+                "name": "Buster"
               }
-            ],
-            "hasNext": false
+            },
+            "path": [
+              "animal"
+            ]
           }
-          """.data(using: .utf8)!
-      )
+        ],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
     )
 
     let result3 = try await actualResultsIterator.next()
-    expect(result3?.parsedResult?.cacheRecords).to(
+    expect(result3?.cacheRecords).to(
       equal(
         RecordSet(records: [
           Record(

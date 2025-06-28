@@ -23,8 +23,8 @@ class StoreSubscriptionTests: XCTestCase {
     let expectedChangeKeySet: Set<String> = ["QUERY_ROOT.__typename", "QUERY_ROOT.name"]
     let subscriber = SimpleSubscriber(expectedChangeKeySet)
 
-    store.subscribe(subscriber)
-    addTeardownBlock { [store] in store!.unsubscribe(subscriber) }
+    let subscriptionToken = store.subscribe(subscriber)
+    addTeardownBlock { [store] in store!.unsubscribe(subscriptionToken) }
 
     try await store.publish(
       records: [
@@ -41,9 +41,11 @@ class StoreSubscriptionTests: XCTestCase {
   func testUnsubscribeRemovesSubscriberFromApolloStore() throws {
     let subscriber = SimpleSubscriber([])
 
-    store.subscribe(subscriber)
+    for _ in 0..<10 {
+      let subscriptionToken = store.subscribe(subscriber)
 
-    store.unsubscribe(subscriber)
+      store.unsubscribe(subscriptionToken)
+    }
 
     expect(self.store.subscribers).toEventually(beEmpty())
   }

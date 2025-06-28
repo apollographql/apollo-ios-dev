@@ -6,10 +6,10 @@ import XCTest
 ///
 /// By default, expectations returned from `AsyncResultObserver` only expect to be called once, which is similar to how other built-in expectations work. Unexpected fulfillments will result in test failures. Usually this is what you want, and you add additional expectations with their own assertions if you expect further results.
 /// If multiple fulfillments of a single expectation are expected however, you can use the standard `expectedFulfillmentCount` property to change that.
-public class AsyncResultObserver<Success, Failure> where Failure: Error {
-  public typealias ResultHandler = (Result<Success, Failure>) throws -> Void
+public final class AsyncResultObserver<Success: Sendable, Failure: Swift.Error> {
+  public typealias ResultHandler = @Sendable (Result<Success, Failure>) throws -> Void
 
-  private final class AsyncResultExpectation: XCTestExpectation {
+  private final class AsyncResultExpectation: XCTestExpectation, @unchecked Sendable {
     let file: StaticString
     let line: UInt
     let handler: ResultHandler
@@ -47,8 +47,8 @@ public class AsyncResultObserver<Success, Failure> where Failure: Error {
     
     return expectation
   }
-  
-  public func handler(_ result: Result<Success, Failure>) {
+
+  @Sendable public func handler(_ result: Result<Success, Failure>) {
     guard let expectation = expectations.first else {
       XCTFail("Unexpected result received by handler", file: file, line: line)
       return

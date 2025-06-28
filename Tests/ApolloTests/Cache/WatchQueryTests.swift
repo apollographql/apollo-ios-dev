@@ -24,7 +24,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     let store = ApolloStore(cache: cache)
 
     server = MockGraphQLServer()
-    let networkTransport = MockNetworkTransport(server: server, store: store)
+    let networkTransport = MockNetworkTransport(mockServer: server, store: store)
 
     client = ApolloClient(networkTransport: networkTransport, store: store)
   }
@@ -66,7 +66,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-      server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
+    await server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -90,7 +90,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         }
       }
 
-    watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],
@@ -99,7 +99,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Refetch from server
     let refetchServerRequestExpectation =
-      server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
+    await server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -122,7 +122,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.refetch()
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [refetchServerRequestExpectation, refetchedWatcherResultExpectation],
@@ -157,7 +157,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-      server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
+    await server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -180,7 +180,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],
@@ -189,7 +189,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Fetch same query from server returning changed data
     let refetchServerRequestExpectation =
-      server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
+    await server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -256,7 +256,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-      server.expect(MockQuery<GivenMockSelectionSet>.self) { request in
+    await server.expect(MockQuery<GivenMockSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -279,7 +279,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],
@@ -288,7 +288,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Fetch same query from server with different argument
     let secondServerRequestExpectation =
-      server.expect(MockQuery<GivenMockSelectionSet>.self) { request in
+    await server.expect(MockQuery<GivenMockSelectionSet>.self) { request in
         expect(request.operation.__variables?["episode"] as? String).to(equal("JEDI"))
 
         return [
@@ -357,7 +357,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     addTeardownBlock { watcher.cancel() }
 
     // Initial fetch from server") { _ in
-    let serverRequestExpectation = server.expect(MockQuery<GivenSelectionSet>.self) { request in
+    let serverRequestExpectation = await server.expect(MockQuery<GivenSelectionSet>.self) { request in
       expect(request.operation.__variables?["episode"] as? String).to(equal("EMPIRE"))
       return [
         "data": [
@@ -382,7 +382,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],
@@ -390,7 +390,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     )
 
     // Fetch same query from server with different argument but returning same object with changed data
-    let secondServerRequestExpectation = server.expect(MockQuery<GivenSelectionSet>.self) { request in
+    let secondServerRequestExpectation = await server.expect(MockQuery<GivenSelectionSet>.self) { request in
       expect(request.operation.__variables?["episode"] as? String).to(equal("JEDI"))
       return [
         "data": [
@@ -495,7 +495,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-      server.expect(MockQuery<HeroAndFriendsNameSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNameSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -525,7 +525,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],
@@ -534,7 +534,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Fetch overlapping query from server
     let secondServerRequestExpectation =
-      server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -657,7 +657,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     addTeardownBlock { watcher.cancel() }
 
     // Initial fetch from server
-    let serverRequestExpectation = server.expect(MockQuery<HeroAndFriendsNameSelectionSet>.self) { request in
+    let serverRequestExpectation = await server.expect(MockQuery<HeroAndFriendsNameSelectionSet>.self) { request in
       [
         "data": [
           "hero": [
@@ -688,7 +688,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],
@@ -697,7 +697,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Fetch other query with list of updated keys from server
     let secondServerRequestExpectation =
-      server.expect(MockQuery<HeroAndFriendsIdsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsIdsSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -826,7 +826,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-      server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -857,7 +857,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],
@@ -866,7 +866,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Fetch other query with list of updated keys from server
     let secondServerRequestExpectation =
-      server.expect(MockQuery<HeroAndFriendsIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsIDsSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -884,7 +884,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
 
     let refetchServerRequestExpectation =
-      server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1022,7 +1022,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-      server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1053,7 +1053,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],
@@ -1062,7 +1062,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Fetch other query with list of updated keys from server
     let secondServerRequestExpectation =
-      server.expect(MockQuery<HeroAndFriendsIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsIDsSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1170,7 +1170,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-      server.expect(MockQuery<HeroAndFriendsNamesSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNamesSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1202,7 +1202,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],
@@ -1237,7 +1237,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
   @MainActor
   func
-    testWatchedQuery_givenCachePolicyReturnCacheDataDontFetch_doesNotRefetchFromServerAfterOtherQueryUpdatesListWithIncompleteObject()
+    testWatchedQuery_givenFetchBehavior_CacheOnly_doesNotRefetchFromServerAfterOtherQueryUpdatesListWithIncompleteObject()
     async throws
   {
     // given
@@ -1411,12 +1411,14 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.fetch(cachePolicy: .returnCacheDataDontFetch)
+    await watcher.fetch(fetchBehavior: .CacheOnly)
 
     await fulfillment(of: [initialWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
 
     // Fetch other query with list of updated keys from server
-    let secondServerRequestExpectation = server.expect(MockQuery<HeroAndFriendsIDsOnlySelectionSet>.self) { request in
+    let secondServerRequestExpectation = await server.expect(
+      MockQuery<HeroAndFriendsIDsOnlySelectionSet>.self
+    ) { request in
       [
         "data": [
           "hero": [
@@ -1478,7 +1480,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-      server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1501,7 +1503,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],
@@ -1511,7 +1513,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     // Fetch same query concurrently 10 times
     let numberOfFetches = 10
     let secondServerRequestExpectation =
-      server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1595,7 +1597,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-      server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1618,7 +1620,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],
@@ -1628,7 +1630,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     // Fetch same query concurrently 10 times
     let numberOfFetches = 10
     let secondServerRequestExpectation =
-      server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1761,7 +1763,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     addTeardownBlock { watcher.cancel() }
 
     // Initial fetch from server
-    let serverRequestExpectation = server.expect(HeroAndFriendsNamesWithIDsQuery.self) { request in
+    let serverRequestExpectation = await server.expect(HeroAndFriendsNamesWithIDsQuery.self) { request in
       [
         "data": [
           "hero": [
@@ -1805,7 +1807,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],
@@ -1907,7 +1909,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-      server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1951,7 +1953,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],
@@ -1960,7 +1962,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Fetch other query from server
     let secondServerRequestExpectation =
-      server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -2077,7 +2079,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-      server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -2121,7 +2123,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    watcher!.fetch(cachePolicy: .fetchIgnoringCacheData)
+    await watcher!.fetch(fetchBehavior: .NetworkOnly)
 
     await fulfillment(
       of: [serverRequestExpectation, initialWatcherResultExpectation],

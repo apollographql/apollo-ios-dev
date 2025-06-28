@@ -11,20 +11,17 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   var mockSession: MockURLSession!
   var store: ApolloStore!
-  var provider: DefaultInterceptorProvider!
 
   override func setUp() async throws {
     try await super.setUp()
     self.mockSession = MockURLSession(responseProvider: Self.self)
     self.store = ApolloStore(cache: NoCache())
-    self.provider = DefaultInterceptorProvider(session: mockSession, store: store)
   }
 
   override func tearDown() async throws {
     await Self.cleanUpRequestHandlers()
     self.mockSession = nil
     self.store = nil
-    self.provider = nil
     try await super.tearDown()
   }
 
@@ -292,7 +289,9 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   func testRequestBody() async throws {
     let network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: Self.endpoint
     )
 
@@ -304,7 +303,11 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -320,7 +323,9 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   func testRequestBodyWithVariable() async throws {
     let network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: Self.endpoint
     )
 
@@ -332,7 +337,11 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
@@ -347,7 +356,9 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   func testRequestBodyForAPQsWithVariable() async throws {
     let network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: Self.endpoint,
       apqConfig: .init(autoPersistQueries: true)
     )
@@ -360,7 +371,11 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -376,7 +391,9 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   func testMutationRequestBodyForAPQs() async throws {
     let network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: Self.endpoint,
       apqConfig: .init(autoPersistQueries: true)
     )
@@ -389,7 +406,10 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    _ = try await network.send(mutation: mutation, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+    _ = try await network.send(
+      mutation: mutation,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -405,7 +425,9 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   func testQueryStringForAPQsUseGetMethod() async throws {
     let network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: Self.endpoint,
       apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
     )
@@ -418,7 +440,11 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
@@ -432,7 +458,9 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   func testQueryStringForAPQsUseGetMethodWithVariable() async throws {
     let network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: Self.endpoint,
       apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
     )
@@ -445,7 +473,11 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -461,7 +493,9 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   func testUseGETForQueriesRequest() async throws {
     let network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: Self.endpoint,
       additionalHeaders: ["Authorization": "Bearer 1234"],
       useGETForQueries: true
@@ -475,7 +509,11 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -492,8 +530,11 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   func testNotUseGETForQueriesRequest() async throws {
     let network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
-      endpointURL: Self.endpoint
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
+      endpointURL: Self.endpoint,
+      useGETForQueries: false
     )
 
     let query = MockHeroNameQuery()
@@ -504,7 +545,11 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -520,9 +565,12 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   func testNotUseGETForQueriesAPQsRequest() async throws {
     let network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: Self.endpoint,
-      apqConfig: .init(autoPersistQueries: true)
+      apqConfig: .init(autoPersistQueries: true),
+      useGETForQueries: false
     )
 
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
@@ -533,7 +581,11 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -549,9 +601,12 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   func testUseGETForQueriesAPQsRequest() async throws {
     let network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: Self.endpoint,
-      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
+      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true),
+      useGETForQueries: true
     )
 
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
@@ -562,7 +617,11 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -578,9 +637,12 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   func testNotUseGETForQueriesAPQsGETRequest() async throws {
     let network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: Self.endpoint,
-      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
+      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true),
+      useGETForQueries: false
     )
 
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
@@ -591,7 +653,11 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
       return (HTTPURLResponse.mock(), self.mockResponseData())
     }
 
-    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
 
@@ -613,9 +679,11 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
   {
     // given
     let network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: Self.endpoint,
-      apqConfig: .init(autoPersistQueries: true)
+      apqConfig: .init(autoPersistQueries: true),
     )
 
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
@@ -642,7 +710,11 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
     }
 
     // when
-    _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
 
     // then
     expect(requests.count).to(equal(2))
@@ -667,17 +739,19 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
     async throws
   {
     // given
-    final class MockPersistedOnlyQuery: MockHeroNameQuery {
+    final class MockPersistedOnlyQuery: MockHeroNameQuery, @unchecked Sendable {
       override class var operationDocument: OperationDocument {
         .init(operationIdentifier: "12345")
       }
     }
 
     let network = RequestChainNetworkTransport(
-      interceptorProvider: provider,
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
       endpointURL: Self.endpoint,
-      apqConfig: .init(autoPersistQueries: true)
-    )
+      apqConfig: .init(autoPersistQueries: true),
+    )    
 
     let query = MockPersistedOnlyQuery(episode: .some(.EMPIRE))
 
@@ -696,40 +770,46 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     await expect {
       // when
-      _ = try await network.send(query: query, cachePolicy: .fetchIgnoringCacheCompletely).getAllValues()
+      _ = try await network.send(
+        query: query,
+        fetchBehavior: .NetworkOnly,
+        requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+      ).getAllValues()
 
       //then
-    }.to(throwError { error in
-      let expectedError = AutomaticPersistedQueryInterceptor.APQError
-        .persistedQueryNotFoundForPersistedOnlyQuery(operationName: "MockOperationName")
-      expect(error as? AutomaticPersistedQueryInterceptor.APQError).to(equal(expectedError))
-    })
+    }.to(
+      throwError { error in
+        let expectedError = AutomaticPersistedQueryInterceptor.APQError
+          .persistedQueryNotFoundForPersistedOnlyQuery(operationName: "MockOperationName")
+        expect(error as? AutomaticPersistedQueryInterceptor.APQError).to(equal(expectedError))
+      }
+    )
   }
 }
 
 fileprivate extension Data {
-    init(reading input: InputStream) throws {
-        self.init()
-        input.open()
-        defer {
-            input.close()
-        }
-
-        let bufferSize = 1024
-        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
-        defer {
-            buffer.deallocate()
-        }
-        while input.hasBytesAvailable {
-            let read = input.read(buffer, maxLength: bufferSize)
-            if read < 0 {
-                //Stream error occured
-                throw input.streamError!
-            } else if read == 0 {
-                //EOF
-                break
-            }
-            self.append(buffer, count: read)
-        }
+  init(reading input: InputStream) throws {
+    self.init()
+    input.open()
+    defer {
+      input.close()
     }
+
+    let bufferSize = 1024
+    let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+    defer {
+      buffer.deallocate()
+    }
+    while input.hasBytesAvailable {
+      let read = input.read(buffer, maxLength: bufferSize)
+      if read < 0 {
+        //Stream error occured
+        throw input.streamError!
+      } else if read == 0 {
+        //EOF
+        break
+      }
+      self.append(buffer, count: read)
+    }
+  }
 }

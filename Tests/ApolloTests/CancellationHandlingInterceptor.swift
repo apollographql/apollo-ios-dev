@@ -13,10 +13,10 @@ import Foundation
 final class CancellationTestingInterceptor: ApolloInterceptor {
   private(set) nonisolated(unsafe) var hasBeenCancelled = false
 
-  func intercept<Request>(
+  func intercept<Request: GraphQLRequest>(
     request: Request,
-    next: (Request) async throws -> InterceptorResultStream<Request.Operation>
-  ) async throws -> InterceptorResultStream<Request.Operation> where Request: GraphQLRequest {
+    next: (Request) async throws -> InterceptorResultStream<Request>
+  ) async throws -> InterceptorResultStream<Request> {
     do {
       try Task.checkCancellation()
       return try await next(request)

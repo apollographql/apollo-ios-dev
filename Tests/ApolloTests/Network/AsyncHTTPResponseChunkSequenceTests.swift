@@ -29,11 +29,11 @@ class AsyncHTTPResponseChunkSequenceTests: XCTestCase, MockResponseProvider {
     statusCode: Int,
     httpVersion: String? = nil,
     headerFields: [String: String]? = nil
-  ) async -> JSONRequest<MockQuery<MockSelectionSet>> {
-    let request = JSONRequest(
-      operation: MockQuery.mock(),
-      graphQLEndpoint: url,
-      cachePolicy: .fetchIgnoringCacheCompletely
+  ) async -> URLRequest {
+    let request = URLRequest(
+      url: url,
+      cachePolicy: .reloadIgnoringCacheData,
+      timeoutInterval: 10
     )
 
     await Self.registerRequestHandler(for: url) { request in
@@ -191,7 +191,7 @@ class AsyncHTTPResponseChunkSequenceTests: XCTestCase, MockResponseProvider {
       return
     }
 
-    XCTAssertEqual(httpResponse.url, request.graphQLEndpoint)
+    XCTAssertEqual(httpResponse.url, request.url)
     XCTAssertTrue(httpResponse.isSuccessful)
     XCTAssertTrue(httpResponse.isMultipart)
 
@@ -223,7 +223,7 @@ class AsyncHTTPResponseChunkSequenceTests: XCTestCase, MockResponseProvider {
       return
     }
 
-    XCTAssertEqual(httpResponse.url, request.graphQLEndpoint)
+    XCTAssertEqual(httpResponse.url, request.url)
     XCTAssertTrue(httpResponse.isSuccessful)
     XCTAssertTrue(httpResponse.isMultipart)
 
@@ -258,7 +258,7 @@ class AsyncHTTPResponseChunkSequenceTests: XCTestCase, MockResponseProvider {
       return
     }
 
-    XCTAssertEqual(httpResponse.url, request.graphQLEndpoint)
+    XCTAssertEqual(httpResponse.url, request.url)
     XCTAssertTrue(httpResponse.isSuccessful)
     XCTAssertTrue(httpResponse.isMultipart)
 
@@ -290,7 +290,7 @@ class AsyncHTTPResponseChunkSequenceTests: XCTestCase, MockResponseProvider {
       return
     }
 
-    XCTAssertEqual(httpResponse.url, request.graphQLEndpoint)
+    XCTAssertEqual(httpResponse.url, request.url)
     XCTAssertTrue(httpResponse.isSuccessful)
     XCTAssertTrue(httpResponse.isMultipart)
 

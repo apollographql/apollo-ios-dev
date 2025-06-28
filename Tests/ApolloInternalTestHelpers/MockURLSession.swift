@@ -13,7 +13,7 @@ public struct MockURLSession: ApolloURLSession {
   }
 
   public func chunks(
-    for request: some GraphQLRequest
+    for request: URLRequest
   ) async throws -> (any AsyncChunkSequence, URLResponse) {
     try await session.chunks(for: request)
   }
