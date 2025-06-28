@@ -1,7 +1,7 @@
 import Foundation
 
 #if !COCOAPODS
-  @_spi(Internal) import ApolloAPI
+@_spi(Internal) import ApolloAPI
 #endif
 
 public enum IncrementalResponseError: Error, LocalizedError, Equatable {
@@ -28,13 +28,13 @@ public enum IncrementalResponseError: Error, LocalizedError, Equatable {
 
 extension JSONResponseParser {
   /// Represents an incremental GraphQL response received from a server.
-  struct IncrementalResponseExecutionHandler {
+  struct IncrementalResponseExecutionHandler<Operation: GraphQLOperation> {
 
     private let base: BaseResponseExecutionHandler
 
     init(
       responseBody: JSONObject,
-      operationVariables: Operation.Variables?
+      operationVariables: GraphQLOperation.Variables?
     ) throws {
       guard let path = responseBody["path"] as? [JSONValue] else {
         throw IncrementalResponseError.missingPath
@@ -120,13 +120,10 @@ extension JSONResponseParser {
 
       let pathComponents: [PathComponent] = path.compactMap(PathComponent.init)
       let fieldPath = pathComponents.fieldPath
-
-      guard
-        let selectionSetType = Operation.deferredSelectionSetType(
-          withLabel: label,
-          atFieldPath: fieldPath
-        ) as? (any Deferrable.Type)
-      else {
+      let fragmentIdentifier = DeferredFragmentIdentifier(label: label, fieldPath: fieldPath)
+      
+      guard let deferredResponseFormat = Operation.responseFormat as? IncrementalDeferredResponseFormat,
+            let selectionSetType = deferredResponseFormat.deferredFragments[fragmentIdentifier] as? (any Deferrable.Type) else {
         throw IncrementalResponseError.missingDeferredSelectionSetType(label, fieldPath.joined(separator: "."))
       }
 

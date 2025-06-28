@@ -55,22 +55,31 @@ class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting, MockRes
     ])
 
     /// This interceptor will reroute anything that fails with a response code error to retry hitting only the cache
-    final class RerouteToCacheErrorInterceptor: ApolloErrorInterceptor {
+    final class RerouteToCacheErrorInterceptor: ApolloInterceptor {
       nonisolated(unsafe) var handledError: (any Error)?
 
-      func intercept<Request>(
-        error: any Error,
+      func intercept<Request: GraphQLRequest>(
         request: Request,
-        result: InterceptorResult<Request.Operation>?
-      ) async throws -> GraphQLResult<Request.Operation.Data> where Request: GraphQLRequest {
-        self.handledError = error
+        next: NextInterceptorFunction<Request>
+      ) async throws -> InterceptorResultStream<GraphQLResponse<Request.Operation>> {
 
-        guard error is ResponseCodeInterceptor.ResponseCodeError else {
-          throw error
+        do {
+          return try await next(request)
+
+        } catch {
+          self.handledError = error
+          guard error is ResponseCodeInterceptor.ResponseCodeError else {
+            throw error
+          }
+          var request = request
+          request.fetchBehavior = FetchBehavior(
+            shouldAttemptCacheRead: true,
+            shouldAttemptCacheWrite: true,
+            shouldAttemptNetworkFetch: .never
+          )
+
+          throw RequestChain.Retry(request: request)
         }
-        var request = request
-        request.cachePolicy = .returnCacheDataDontFetch
-        throw RequestChainRetry(request: request)
       }
     }
 
@@ -86,13 +95,8 @@ class CacheDependentInterceptorTests: XCTestCase, CacheDependentTesting, MockRes
 
       func interceptors<Operation>(for operation: Operation) -> [any ApolloInterceptor]
       where Operation: GraphQLOperation {
-        []
-      }
-
-      func errorInterceptor<Operation>(for operation: Operation) -> (any ApolloErrorInterceptor)?
-      where Operation: GraphQLOperation {
-        self.errorInterceptor
-      }
+        [self.errorInterceptor]
+      }      
     }
 
     await CacheDependentInterceptorTests.registerRequestHandler(for: TestURL.mockServer.url) { _ in

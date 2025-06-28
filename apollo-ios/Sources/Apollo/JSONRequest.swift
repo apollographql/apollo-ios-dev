@@ -1,6 +1,7 @@
 import Foundation
+
 #if !COCOAPODS
-@_spi(Internal) import ApolloAPI
+  @_spi(Internal) import ApolloAPI
 #endif
 
 /// A request which sends JSON related to a GraphQL operation.
@@ -15,12 +16,18 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
   /// Any additional headers you wish to add to this request
   public var additionalHeaders: [String: String] = [:]
 
-  /// The `CachePolicy` to use for this request.
-  public var cachePolicy: CachePolicy  
+  /// The `FetchBehavior` to use for this request. Determines if fetching will include cache/network.
+  public var fetchBehavior: FetchBehavior
 
-  /// [optional] A context that is being passed through the request chain.
-  public var context: (any RequestContext)?
-  
+  /// Determines if the results of a network fetch should be written to the local cache.
+  public var writeResultsToCache: Bool
+
+  /// The timeout interval specifies the limit on the idle interval allotted to a request in the process of
+  /// loading. This timeout interval is measured in seconds.
+  ///
+  /// The value of this property will be set as the `timeoutInterval` on the `URLRequest` created for this GraphQL request.
+  public var requestTimeout: TimeInterval?
+
   public let requestBodyCreator: any JSONRequestBodyCreator
 
   public var apqConfig: AutoPersistedQueryConfiguration
@@ -35,11 +42,6 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
   /// Mutation operations always use POST, even when this is `false`
   public let useGETForQueries: Bool
 
-  /// The telemetry metadata about the client. This is used by GraphOS Studio's
-  /// [client awareness](https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation)
-  /// feature.
-  public var clientAwarenessMetadata: ClientAwarenessMetadata
-
   /// Designated initializer
   ///
   /// - Parameters:
@@ -48,7 +50,6 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
   ///   - clientName: The name of the client to send with the `"apollographql-client-name"` header
   ///   - clientVersion:  The version of the client to send with the `"apollographql-client-version"` header
   ///   - cachePolicy: The `CachePolicy` to use for this request.
-  ///   - context: [optional] A context that is being passed through the request chain. Defaults to `nil`.
   ///   - apqConfig: A configuration struct used by a `GraphQLRequest` to configure the usage of
   ///   [Automatic Persisted Queries (APQs).](https://www.apollographql.com/docs/apollo-server/performance/apq) By default, APQs
   ///   are disabled.
@@ -57,39 +58,41 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
   public init(
     operation: Operation,
     graphQLEndpoint: URL,
-    cachePolicy: CachePolicy = .default,
-    context: (any RequestContext)? = nil,
+    fetchBehavior: FetchBehavior,
+    writeResultsToCache: Bool,
+    requestTimeout: TimeInterval?,
     apqConfig: AutoPersistedQueryConfiguration = .init(),
     useGETForQueries: Bool = false,
-    requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator(),
-    clientAwarenessMetadata: ClientAwarenessMetadata = ClientAwarenessMetadata()
+    requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator()
   ) {
     self.operation = operation
     self.graphQLEndpoint = graphQLEndpoint
-    self.cachePolicy = cachePolicy
-    self.context = context
+    self.requestTimeout = requestTimeout
     self.requestBodyCreator = requestBodyCreator
 
+    self.fetchBehavior = fetchBehavior
+    self.writeResultsToCache = writeResultsToCache
     self.apqConfig = apqConfig
     self.useGETForQueries = useGETForQueries
-    self.clientAwarenessMetadata = clientAwarenessMetadata
 
     self.setupDefaultHeaders()
   }
 
   private mutating func setupDefaultHeaders() {
-    self.addHeader(name: "Content-Type", value: "application/json")    
+    self.addHeader(name: "Content-Type", value: "application/json")
 
     if Operation.operationType == .subscription {
       self.addHeader(
         name: "Accept",
-        value: "multipart/mixed;\(MultipartResponseSubscriptionParser.protocolSpec),application/graphql-response+json,application/json"
+        value:
+          "multipart/mixed;\(MultipartResponseSubscriptionParser.protocolSpec),application/graphql-response+json,application/json"
       )
 
     } else {
       self.addHeader(
         name: "Accept",
-        value: "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/graphql-response+json,application/json"
+        value:
+          "multipart/mixed;\(MultipartResponseDeferParser.protocolSpec),application/graphql-response+json,application/json"
       )
     }
   }
@@ -105,22 +108,21 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
       if isPersistedQueryRetry {
         useGetMethod = self.apqConfig.useGETForPersistedQueryRetry
       } else {
-        useGetMethod = self.useGETForQueries ||
-        (self.apqConfig.autoPersistQueries && self.apqConfig.useGETForPersistedQueryRetry)
+        useGetMethod =
+          self.useGETForQueries || (self.apqConfig.autoPersistQueries && self.apqConfig.useGETForPersistedQueryRetry)
       }
     default:
       useGetMethod = false
     }
-    
+
     let httpMethod: GraphQLHTTPMethod = useGetMethod ? .GET : .POST
-    
+
     switch httpMethod {
     case .GET:
       let transformer = GraphQLGETTransformer(body: body, url: self.graphQLEndpoint)
       if let urlForGet = transformer.createGetURL() {
         request.url = urlForGet
         request.httpMethod = GraphQLHTTPMethod.GET.rawValue
-        request.cachePolicy = requestCachePolicy
 
         // GET requests shouldn't have a content-type since they do not provide actual content.
         request.allHTTPHeaderFields?.removeValue(forKey: "Content-Type")
@@ -135,7 +137,7 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
         throw GraphQLHTTPRequestError.serializedBodyMessageError
       }
     }
-    
+
     return request
   }
 
@@ -164,30 +166,14 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
       sendQueryDocument = true
       autoPersistQueries = false
     }
-    
-    var body = self.requestBodyCreator.requestBody(
-      for: self,
+
+    let body = self.requestBodyCreator.requestBody(
+      for: self.operation,
       sendQueryDocument: sendQueryDocument,
       autoPersistQuery: autoPersistQueries
-    )    
+    )
 
     return body
-  }
-
-  /// Convert the Apollo iOS cache policy into a matching cache policy for URLRequest.
-  private var requestCachePolicy: URLRequest.CachePolicy {
-    switch cachePolicy {
-    case .returnCacheDataElseFetch:
-      return .useProtocolCachePolicy
-    case .fetchIgnoringCacheData:
-      return .reloadIgnoringLocalCacheData
-    case .fetchIgnoringCacheCompletely:
-      return .reloadIgnoringLocalAndRemoteCacheData
-    case .returnCacheDataDontFetch:
-      return .returnCacheDataDontLoad
-    case .returnCacheDataAndFetch:
-      return .reloadRevalidatingCacheData
-    }
   }
 
   // MARK: - Equtable/Hashable Conformance
@@ -196,21 +182,25 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
     lhs: JSONRequest<Operation>,
     rhs: JSONRequest<Operation>
   ) -> Bool {
-    lhs.graphQLEndpoint == rhs.graphQLEndpoint &&
-    lhs.operation == rhs.operation &&
-    lhs.additionalHeaders == rhs.additionalHeaders &&
-    lhs.cachePolicy == rhs.cachePolicy &&
-    lhs.apqConfig == rhs.apqConfig &&
-    lhs.isPersistedQueryRetry == rhs.isPersistedQueryRetry &&
-    lhs.useGETForQueries == rhs.useGETForQueries &&
-    type(of: lhs.requestBodyCreator) == type(of: rhs.requestBodyCreator)
+    lhs.graphQLEndpoint == rhs.graphQLEndpoint
+      && lhs.operation == rhs.operation
+      && lhs.additionalHeaders == rhs.additionalHeaders
+      && lhs.fetchBehavior == rhs.fetchBehavior
+      && lhs.writeResultsToCache == rhs.writeResultsToCache
+      && lhs.requestTimeout == rhs.requestTimeout
+      && lhs.apqConfig == rhs.apqConfig
+      && lhs.isPersistedQueryRetry == rhs.isPersistedQueryRetry
+      && lhs.useGETForQueries == rhs.useGETForQueries
+      && type(of: lhs.requestBodyCreator) == type(of: rhs.requestBodyCreator)
   }
 
   public func hash(into hasher: inout Hasher) {
     hasher.combine(graphQLEndpoint)
     hasher.combine(operation)
     hasher.combine(additionalHeaders)
-    hasher.combine(cachePolicy)
+    hasher.combine(fetchBehavior)
+    hasher.combine(writeResultsToCache)
+    hasher.combine(requestTimeout)
     hasher.combine(apqConfig)
     hasher.combine(isPersistedQueryRetry)
     hasher.combine(useGETForQueries)
@@ -229,7 +219,8 @@ extension JSONRequest: CustomDebugStringConvertible {
       debugStrings.append("\t\(key): \(value),")
     }
     debugStrings.append("]")
-    debugStrings.append("Cache Policy: \(self.cachePolicy)")
+    debugStrings.append("Fetch Behavior: \(self.fetchBehavior)")
+    debugStrings.append("Write Results to Cache: \(self.writeResultsToCache)")
     debugStrings.append("Operation: \(self.operation)")
     return debugStrings.joined(separator: "\n\t")
   }

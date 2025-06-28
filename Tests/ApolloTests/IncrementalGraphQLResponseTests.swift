@@ -6,13 +6,24 @@ import Nimble
 
 final class IncrementalGraphQLResponseTests: XCTestCase {
 
-  class DeferredQuery: MockQuery<DeferredQuery.Data> {
-    class Data: MockSelectionSet {
+  class DeferredQuery: GraphQLQuery, @unchecked Sendable {
+    static var operationName: String { "DeferredQuery" }
+
+    static var operationDocument: ApolloAPI.OperationDocument { .init(definition: .init("Mock Operation Definition")) }
+
+    static var responseFormat: IncrementalDeferredResponseFormat {
+      IncrementalDeferredResponseFormat(deferredFragments: [
+        DeferredFragmentIdentifier(label: "deferredFriend", fieldPath: ["animal"]): Data.Animal.DeferredFriend.self,
+        // Data.Animal.DeliberatelyMissing is intentionally not here for error testing
+      ])
+    }
+
+    class Data: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("animal", Animal.self),
       ]}
 
-      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata> {
+      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata>, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self),
@@ -33,24 +44,19 @@ final class IncrementalGraphQLResponseTests: XCTestCase {
           @Deferred var deliberatelyMissing: DeliberatelyMissing?
         }
 
-        class DeferredFriend: MockTypeCase {
+        class DeferredFriend: MockTypeCase, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("friend", String.self),
           ]}
         }
 
-        class DeliberatelyMissing: MockTypeCase {
+        class DeliberatelyMissing: MockTypeCase, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("key", String.self),
           ]}
         }
       }
     }
-
-    override class var deferredFragments: [DeferredFragmentIdentifier : any SelectionSet.Type]? {[
-      DeferredFragmentIdentifier(label: "deferredFriend", fieldPath: ["animal"]): Data.Animal.DeferredFriend.self,
-      // Data.Animal.DeliberatelyMissing is intentionally not here for error testing
-    ]}
   }
 
   // MARK: - Initialization Tests

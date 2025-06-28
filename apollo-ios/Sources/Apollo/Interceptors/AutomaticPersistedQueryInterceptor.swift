@@ -6,14 +6,11 @@ import ApolloAPI
 public struct AutomaticPersistedQueryInterceptor: ApolloInterceptor {
 
   public enum APQError: LocalizedError, Equatable {
-    case noParsedResponse
     case persistedQueryNotFoundForPersistedOnlyQuery(operationName: String)
     case persistedQueryRetryFailed(operationName: String)
 
     public var errorDescription: String? {
-      switch self {
-      case .noParsedResponse:
-        return "The Automatic Persisted Query Interceptor was called before a response was received. Double-check the order of your interceptors."
+      switch self {      
       case .persistedQueryRetryFailed(let operationName):
         return "Persisted query retry failed for operation \"\(operationName)\"."
 
@@ -39,7 +36,7 @@ public struct AutomaticPersistedQueryInterceptor: ApolloInterceptor {
   public func intercept<Request: GraphQLRequest>(
     request: Request,
     next: NextInterceptorFunction<Request>
-  ) async throws -> InterceptorResultStream<Request.Operation> {
+  ) async throws -> InterceptorResultStream<GraphQLResponse<Request.Operation>> {
     guard let jsonRequest = request as? JSONRequest<Request.Operation>,
           jsonRequest.apqConfig.autoPersistQueries else {
       // Not a request that handles APQs, continue along
@@ -48,25 +45,22 @@ public struct AutomaticPersistedQueryInterceptor: ApolloInterceptor {
 
     let isInitialResult = IsInitialResult()
 
-    return try await next(request).map { result in
-
-      guard await isInitialResult.get() else {
-        return result
+    return try await next(request).map { response in
+#warning("TODO: Test if cache returns result, then server returns failed result, APQ retry still occurs")
+      guard response.result.source == .server,
+            await isInitialResult.get() else {
+        return response
       }
 
-      guard let parsedResult = result.parsedResult else {
-        throw APQError.noParsedResponse
-      }
-
-      guard let errors = parsedResult.result.errors else {
+      guard let errors = response.result.errors else {
         // No errors were returned so no retry is necessary, continue along.
-        return result
+        return response
       }
 
       let errorMessages = errors.compactMap { $0.message }
       guard errorMessages.contains("PersistedQueryNotFound") else {
         // The errors were not APQ errors, continue along.
-        return result
+        return response
       }
 
       guard !jsonRequest.isPersistedQueryRetry else {
@@ -83,7 +77,9 @@ public struct AutomaticPersistedQueryInterceptor: ApolloInterceptor {
       var jsonRequest = jsonRequest
       // We need to retry this query with the full body.
       jsonRequest.isPersistedQueryRetry = true
-      throw RequestChainRetry(request: jsonRequest)
+      jsonRequest.fetchBehavior = FetchBehavior.NetworkOnly
+
+      throw RequestChain.Retry(request: jsonRequest)
     }
   }
 }

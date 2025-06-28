@@ -1,38 +1,28 @@
-import Foundation
 import Combine
+import Foundation
+
 #if !COCOAPODS
-import ApolloAPI
+  import ApolloAPI
 #endif
 
-public struct InterceptorResult<Operation: GraphQLOperation>: Sendable, Equatable {
-
-  public let response: HTTPURLResponse
-
-  /// This is the data for a single chunk of the response body.
-  ///
-  /// If this is not a multipart response, this will include the data for the entire response body.
-  ///
-  /// If this is a multipart response, the response chunk will only be one chunk.
-  /// The `InterceptorResultStream` will return multiple results – one for each multipart chunk.
-  public let rawResponseChunk: Data
-
-  public var parsedResult: ParsedResult?
-
-  public struct ParsedResult: Sendable, Equatable {
-    public let result: GraphQLResult<Operation.Data>
-    public let cacheRecords: RecordSet?
-  }
-
+public protocol ResponseParsingInterceptor: Sendable {
+  func parse<Request: GraphQLRequest>(
+    response: consuming HTTPResponse,
+    for request: Request,
+    includeCacheRecords: Bool
+  ) async throws -> InterceptorResultStream<GraphQLResponse<Request.Operation>>
 }
 
-#warning("TODO: Wrap RequestChain apis in SPI?")
+public struct GraphQLResponse<Operation: GraphQLOperation>: Sendable, Hashable {
+  public let result: GraphQLResult<Operation.Data>
+  public let cacheRecords: RecordSet?
+}
 
 /// A protocol to set up a chainable unit of networking work.
-#warning("Rename to RequestInterceptor? Or like Apollo Link?")
-#warning("Should this take `any GraphQLRequest<Operation> instead? Let interceptor swap out entire request? Probably can't initialize a new request currently since generic context won't know runtime type.")
 public protocol ApolloInterceptor: Sendable {
 
-  typealias NextInterceptorFunction<Request: GraphQLRequest> = @Sendable (Request) async throws -> InterceptorResultStream<Request.Operation>
+  typealias NextInterceptorFunction<Request: GraphQLRequest> = @Sendable (Request) async throws ->
+    InterceptorResultStream<GraphQLResponse<Request.Operation>>
 
   /// Called when this interceptor should do its work.
   ///
@@ -44,73 +34,33 @@ public protocol ApolloInterceptor: Sendable {
   func intercept<Request: GraphQLRequest>(
     request: Request,
     next: NextInterceptorFunction<Request>
-  ) async throws -> InterceptorResultStream<Request.Operation>
+  ) async throws -> InterceptorResultStream<GraphQLResponse<Request.Operation>>
 
 }
 
-public struct InterceptorResultStream<Operation: GraphQLOperation>: Sendable, ~Copyable {
+public struct HTTPResponse: Sendable, ~Copyable {
+  public let response: HTTPURLResponse
 
-  private let stream: AsyncThrowingStream<InterceptorResult<Operation>, any Error>
+  public let chunks: InterceptorResultStream<Data>
 
-  init(stream: AsyncThrowingStream<InterceptorResult<Operation>, any Error>) {
-    self.stream = stream
-  }
-
-  public consuming func map(
-    _ transform: @escaping @Sendable (InterceptorResult<Operation>) async throws -> InterceptorResult<Operation>
-  ) async throws -> InterceptorResultStream<Operation> {
-    let stream = self.stream
-
-    let newStream = AsyncThrowingStream { continuation in
-      let task = Task {
-        do {
-          for try await result in stream {
-            try Task.checkCancellation()
-
-            try await continuation.yield(transform(result))
-          }
-          continuation.finish()
-          
-        } catch {
-          continuation.finish(throwing: error)
-        }
-      }
-
-      continuation.onTermination = { _ in task.cancel() }
+  public consuming func mapChunks(
+    _ transform: @escaping @Sendable (HTTPURLResponse, Data) async throws -> (Data)
+  ) async throws -> HTTPResponse {
+    let response = self.response
+    let stream = try await chunks.map { chunk in
+      return try await transform(response, chunk)
     }
-    return Self.init(stream: newStream)
+    return HTTPResponse(response: response, chunks: stream)
   }
+}
 
-  public consuming func compactMap(
-    _ transform: @escaping @Sendable (InterceptorResult<Operation>) async throws -> InterceptorResult<Operation>?
-  ) async throws -> InterceptorResultStream<Operation> {
-    let stream = self.stream
+public protocol HTTPInterceptor: Sendable {
 
-    let newStream = AsyncThrowingStream { continuation in
-      let task = Task {
-        do {
-          for try await result in stream {
-            try Task.checkCancellation()
+  typealias NextHTTPInterceptorFunction = @Sendable (URLRequest) async throws -> HTTPResponse
 
-            guard let newResult = try await transform(result) else {
-              continue
-            }
-
-            continuation.yield(newResult)
-          }
-          continuation.finish()
-        } catch {
-          continuation.finish(throwing: error)
-        }
-      }
-
-      continuation.onTermination = { _ in task.cancel() }
-    }
-    return Self.init(stream: newStream)
-  }
-
-  public consuming func getResults() -> AsyncThrowingStream<InterceptorResult<Operation>, any Error> {
-    return stream
-  }
+  func intercept(
+    request: URLRequest,    
+    next: NextHTTPInterceptorFunction
+  ) async throws -> HTTPResponse
 
 }

@@ -28,7 +28,6 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
     var operation = MockQuery<MockSelectionSet>.mock()
     var additionalHeaders: [String: String] = [:]
     var cachePolicy: Apollo.CachePolicy = .fetchIgnoringCacheCompletely
-    var context: (any RequestContext)? = nil
     var clientAwarenessMetadata: ClientAwarenessMetadata = .none
 
     var urlRequest: URLRequest
