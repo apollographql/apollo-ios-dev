@@ -360,8 +360,8 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
     struct TestProvider: InterceptorProvider {
       let errorInterceptor = RerouteToCacheErrorInterceptor()
 
-      func graphQLInterceptors<Request>(for request: Request) -> [any ApolloInterceptor] where Request : GraphQLRequest {
-        DefaultInterceptorProvider.shared.graphQLInterceptors(for: request) + [
+      func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any ApolloInterceptor] {
+        DefaultInterceptorProvider.shared.graphQLInterceptors(for: operation) + [
           errorInterceptor
         ]
       }
