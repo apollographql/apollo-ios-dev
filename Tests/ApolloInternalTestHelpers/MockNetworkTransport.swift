@@ -14,7 +14,7 @@ public final class MockNetworkTransport: NetworkTransport {
     let session = MockSession(server: mockServer)
     self.requestChainTransport = RequestChainNetworkTransport(
       urlSession: session,
-      interceptorProvider: DefaultInterceptorProvider.shared,
+      interceptorProvider: MockInterceptorProvider(),
       store: store,
       endpointURL: TestURL.mockServer.url
     )
@@ -54,10 +54,10 @@ public final class MockNetworkTransport: NetworkTransport {
 
     func intercept<Request>(
       request: Request,
-      next: (Request) async throws -> InterceptorResultStream<Request>
+      next: (Request) async -> InterceptorResultStream<Request>
     ) async throws -> InterceptorResultStream<Request> {
       return try await TaskLocalRequestInterceptor.$currentRequest.withValue(request) {
-        return try await next(request)
+        return await next(request)
       }
     }
   }

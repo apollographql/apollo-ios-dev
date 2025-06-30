@@ -305,7 +305,140 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
   //    }
   //
   //    wait(for: [expectation], timeout: 1)
-  //  }
+  //  }  
+
+  func test__errorInterceptor__givenNextInterceptorThrowsBeforeCallingNext__mapErrorIsCalledWithThrownError()
+    async throws
+  {
+    // given
+    actor ErrorInterceptor: ApolloInterceptor {
+      nonisolated(unsafe) var handledError: (any Error)?
+
+      func intercept<Request>(
+        request: Request,
+        next: (Request) async -> InterceptorResultStream<Request>
+      ) async throws -> InterceptorResultStream<Request> where Request: GraphQLRequest {
+        return await next(request).mapErrors { error in
+          self.handledError = error
+
+          throw error
+        }
+      }
+    }
+
+    struct ThrowErrorInterceptor: HTTPInterceptor {
+      func intercept(
+        request: URLRequest,
+        next: (URLRequest) async throws -> HTTPResponse
+      ) async throws -> HTTPResponse {
+        throw TestError()
+      }
+    }
+
+    struct TestProvider: InterceptorProvider {
+      let errorInterceptor = ErrorInterceptor()
+
+      func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any ApolloInterceptor] {
+        return [
+          errorInterceptor
+        ]
+      }
+
+      func httpInterceptors<Operation>(for operation: Operation) -> [any HTTPInterceptor] where Operation : GraphQLOperation {
+        return [
+          ThrowErrorInterceptor()
+        ]
+      }
+    }
+
+    let testProvider = TestProvider()
+    let network = RequestChainNetworkTransport(
+      urlSession: session,
+      interceptorProvider: testProvider,
+      store: store,
+      endpointURL: TestURL.mockServer.url
+    )
+
+    // when
+    let resultStream = try network.send(
+      query: MockQuery<MockSelectionSet>(),
+      fetchBehavior: FetchBehavior.NetworkOnly,
+      requestConfiguration: RequestConfiguration()
+    )
+
+    await expect {
+      try await resultStream.getAllValues()
+    }.to(throwError(TestError()))
+
+    expect(testProvider.errorInterceptor.handledError as? TestError).toNot(beNil())
+  }
+
+
+  func test__errorInterceptor__givenHTTPInterceptorThrowsBeforeCallingNext__mapErrorIsCalledWithThrownError()
+    async throws
+  {
+    // given
+    actor ErrorInterceptor: ApolloInterceptor {
+      nonisolated(unsafe) var handledError: (any Error)?
+
+      func intercept<Request>(
+        request: Request,
+        next: (Request) async -> InterceptorResultStream<Request>
+      ) async throws -> InterceptorResultStream<Request> where Request: GraphQLRequest {
+        return await next(request).mapErrors { error in
+          self.handledError = error
+
+          throw error
+        }
+      }
+    }
+
+    struct ThrowErrorInterceptor: HTTPInterceptor {
+      func intercept(
+        request: URLRequest,
+        next: (URLRequest) async throws -> HTTPResponse
+      ) async throws -> HTTPResponse {
+        throw TestError()
+      }
+    }
+
+    struct TestProvider: InterceptorProvider {
+      let errorInterceptor = ErrorInterceptor()
+
+      func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any ApolloInterceptor] {
+        return [
+          errorInterceptor
+        ]
+      }
+
+      func httpInterceptors<Operation>(for operation: Operation) -> [any HTTPInterceptor] where Operation : GraphQLOperation {
+        return [
+          ThrowErrorInterceptor()
+        ]
+      }
+    }
+
+    let testProvider = TestProvider()
+    let network = RequestChainNetworkTransport(
+      urlSession: session,
+      interceptorProvider: testProvider,
+      store: store,
+      endpointURL: TestURL.mockServer.url
+    )
+
+    // when
+    let resultStream = try network.send(
+      query: MockQuery<MockSelectionSet>(),
+      fetchBehavior: FetchBehavior.NetworkOnly,
+      requestConfiguration: RequestConfiguration()
+    )
+
+    await expect {
+      try await resultStream.getAllValues()
+    }.to(throwError(TestError()))
+
+    expect(testProvider.errorInterceptor.handledError as? TestError).toNot(beNil())
+  }
 
   func test__interceptor__changingFetchBehaviorOnFailureAndRetrying_fetchBehaviorIsChanged() async throws {
     // given
@@ -340,11 +473,7 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
         request: Request,
         next: NextInterceptorFunction<Request>
       ) async throws -> InterceptorResultStream<Request> {
-
-        do {
-          return try await next(request)
-
-        } catch {
+        return await next(request).mapErrors { error in
           self.handledError = error
           guard error is ResponseCodeInterceptor.ResponseCodeError else {
             throw error
@@ -375,7 +504,13 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
           httpVersion: nil,
           headerFields: nil
         )!,
-        Data()
+        """
+        {
+          "errors": [{
+            "message": "Bad request, could not start execution!"
+          }]
+        }
+        """.data(using: .utf8)
       )
     }
 

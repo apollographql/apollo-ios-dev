@@ -8,7 +8,7 @@ class BlindRetryingTestInterceptor: ApolloInterceptor, @unchecked Sendable {
 
   func intercept<Request: GraphQLRequest>(
     request: Request,
-    next: (Request) async throws -> InterceptorResultStream<Request>
+    next: (Request) async -> InterceptorResultStream<Request>
   ) async throws -> InterceptorResultStream<Request> {
     self.hitCount += 1
     throw RequestChain.Retry(request: request)
