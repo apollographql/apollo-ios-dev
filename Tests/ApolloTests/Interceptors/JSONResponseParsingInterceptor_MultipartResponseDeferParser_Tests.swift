@@ -20,10 +20,18 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
     subject = nil
   }
 
+  final class ParsingMockSelectionSet: MockSelectionSet, @unchecked Sendable {
+    override class var __selections: [Selection] {
+      [
+        .field("key", String?.self)
+      ]
+    }
+  }
+
   // MARK: - Error tests
 
   func test__intercept__givenChunk_withIncorrectContentType_shouldThrowError() async throws {
-    let operation = MockQuery<MockSelectionSet>()
+    let operation = MockQuery<ParsingMockSelectionSet>()
     let streamMocker = AsyncStreamMocker<Data>()
 
     let urlResponse = HTTPURLResponse.mock(
@@ -64,7 +72,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
   }
 
   func test__intercept__givenUnrecognizableChunk_shouldThrowError() async throws {
-    let operation = MockQuery<MockSelectionSet>()
+    let operation = MockQuery<ParsingMockSelectionSet>()
     let streamMocker = AsyncStreamMocker<Data>()
 
     let urlResponse = HTTPURLResponse.mock(
@@ -100,7 +108,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
   }
 
   func test__intercept__givenChunk_withMissingPartialOrIncrementalData_shouldThrowError() async throws {
-    let operation = MockQuery<MockSelectionSet>()
+    let operation = MockQuery<ParsingMockSelectionSet>()
     let streamMocker = AsyncStreamMocker<Data>()
 
     let urlResponse = HTTPURLResponse.mock(
@@ -140,7 +148,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
   // MARK: Parsing tests
 
   func test__intercept__givenSingleChunk_shouldReturnSuccess() async throws {
-    let operation = MockQuery<MockSelectionSet>()
+    let operation = MockQuery<ParsingMockSelectionSet>()
     let streamMocker = AsyncStreamMocker<Data>()
 
     let urlResponse = HTTPURLResponse.mock(
@@ -177,7 +185,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
   }
 
   func test__intercept__givenSingleChunk_withMultipleContentTypeDirectives_shouldReturnSuccess() async throws {
-    let operation = MockQuery<MockSelectionSet>()
+    let operation = MockQuery<ParsingMockSelectionSet>()
     let streamMocker = AsyncStreamMocker<Data>()
 
     let urlResponse = HTTPURLResponse.mock(
@@ -215,7 +223,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
   }
 
   func test__intercept__givenSingleChunk_withGraphQLOverHTTPContentType_shouldReturnSuccess() async throws {
-    let operation = MockQuery<MockSelectionSet>()
+    let operation = MockQuery<ParsingMockSelectionSet>()
     let streamMocker = AsyncStreamMocker<Data>()
 
     let urlResponse = HTTPURLResponse.mock(

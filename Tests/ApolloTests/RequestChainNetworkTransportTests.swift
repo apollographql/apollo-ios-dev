@@ -35,7 +35,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
   struct MockProvider: InterceptorProvider {
     var interceptors: [any ApolloInterceptor]
 
-    func graphQLInterceptors<Request>(for request: Request) -> [any ApolloInterceptor] where Request: GraphQLRequest {
+    func graphQLInterceptors<Operation>(for operation: Operation) -> [any ApolloInterceptor] where Operation : GraphQLOperation {
       interceptors
     }
   }

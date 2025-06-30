@@ -21,7 +21,7 @@ class MaxRetryInterceptorTests: XCTestCase {
       self.retryCount = retryCount
     }
 
-    func graphQLInterceptors<Request>(for request: Request) -> [any ApolloInterceptor] where Request : GraphQLRequest {
+    func graphQLInterceptors<Operation>(for operation: Operation) -> [any ApolloInterceptor] where Operation : GraphQLOperation {
       [
         MaxRetryInterceptor(maxRetriesAllowed: self.retryCount),
         self.testInterceptor

@@ -107,10 +107,10 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
           "message": "Some error",
           "locations": [
             ["line": 1, "column": 2]
-          ],
+          ]
         ]
-      ] as JSONValue
-    ]
+      ]
+    ] as JSONObject
 
     // when
     let response: GraphQLResponse<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
@@ -239,7 +239,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
 
   func test__parsing__givenCachePolicyFetchIgnoringCacheData_cacheRecordSetShouldNotBeNil() async throws {
     // given
-    let parser = JSONResponseParser(response: .mock(), operationVariables: nil, includeCacheRecords: false)
+    let parser = JSONResponseParser(response: .mock(), operationVariables: nil, includeCacheRecords: true)
 
     let body = [
       "data": [
@@ -280,7 +280,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
 
   func test__parsing__givenCachePolicyReturnCacheDataAndFetch_cacheRecordSetShouldNotBeNil() async throws {
     // given
-    let parser = JSONResponseParser(response: .mock(), operationVariables: nil, includeCacheRecords: false)
+    let parser = JSONResponseParser(response: .mock(), operationVariables: nil, includeCacheRecords: true)
 
     let body = [
       "data": [
@@ -321,7 +321,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
 
   func test__parsing__givenCachePolicyReturnCacheDataDontFetch_cacheRecordSetShouldNotBeNil() async throws {
     // given
-    let parser = JSONResponseParser(response: .mock(), operationVariables: nil, includeCacheRecords: false)
+    let parser = JSONResponseParser(response: .mock(), operationVariables: nil, includeCacheRecords: true)
 
     let body = [
       "data": [
@@ -362,7 +362,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
 
   func test__parsing__givenCachePolicyReturnCacheDataElseFetch_cacheRecordSetShouldNotBeNil() async throws {
     // given
-    let parser = JSONResponseParser(response: .mock(), operationVariables: nil, includeCacheRecords: false)
+    let parser = JSONResponseParser(response: .mock(), operationVariables: nil, includeCacheRecords: true)
 
     let body = [
       "data": [
@@ -403,7 +403,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
 
   func test__parsing__givenCachePolicyDefault_cacheRecordSetShouldBeNil() async throws {
     // given
-    let parser = JSONResponseParser(response: .mock(), operationVariables: nil, includeCacheRecords: false)
+    let parser = JSONResponseParser(response: .mock(), operationVariables: nil, includeCacheRecords: true)
 
     let body = [
       "data": [

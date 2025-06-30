@@ -23,7 +23,7 @@ class StoreSubscriptionTests: XCTestCase {
     let expectedChangeKeySet: Set<String> = ["QUERY_ROOT.__typename", "QUERY_ROOT.name"]
     let subscriber = SimpleSubscriber(expectedChangeKeySet)
 
-    let subscriptionToken = store.subscribe(subscriber)
+    let subscriptionToken = await store.subscribe(subscriber)
     addTeardownBlock { [store] in store!.unsubscribe(subscriptionToken) }
 
     try await store.publish(
@@ -35,22 +35,21 @@ class StoreSubscriptionTests: XCTestCase {
       ]
     )
 
-    await expect { await subscriber.changeSet }.toEventually(beEmpty())
+    await expect { await subscriber.changeSet }.toEventually(beEmpty(), timeout: .seconds(2))
   }
 
-  func testUnsubscribeRemovesSubscriberFromApolloStore() throws {
+  func testUnsubscribeRemovesSubscriberFromApolloStore() async throws {
     let subscriber = SimpleSubscriber([])
 
     for _ in 0..<10 {
-      let subscriptionToken = store.subscribe(subscriber)
+      let subscriptionToken = await store.subscribe(subscriber)
 
       store.unsubscribe(subscriptionToken)
     }
 
-    expect(self.store.subscribers).toEventually(beEmpty())
+    await expect(self.store.subscribers).toEventually(beEmpty())
   }
 
-  /// Fufills the provided expectation when all expected keys have been observed.
   internal actor SimpleSubscriber: ApolloStoreSubscriber {
     var changeSet: Set<String>
 
@@ -63,7 +62,7 @@ class StoreSubscriptionTests: XCTestCase {
     }
 
     nonisolated func store(_ store: ApolloStore, didChangeKeys changedKeys: Set<CacheKey>) {
-      Task {
+      Task(priority: .high) {
         await self.isolatedDo {
           $0.changeSet.subtract(changedKeys)
         }
