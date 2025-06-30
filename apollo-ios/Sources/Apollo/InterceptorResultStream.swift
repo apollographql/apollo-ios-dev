@@ -16,15 +16,16 @@ import Foundation
 /// When a stream reaches it's final consumer, `getStream()` may be called to return the
 /// underlying `AsyncThrowingStream`. The caller is then responsible for ensuring the stream
 /// is only awaited by a single consumer.
-public struct NonCopyableAsyncThrowingStream<T: Sendable>: Sendable, ~Copyable {
+public struct NonCopyableAsyncThrowingStream<Element: Sendable>: Sendable, ~Copyable {
 
-  private let stream: AsyncThrowingStream<T, any Error>
+  private let stream: AsyncThrowingStream<Element, any Error>
 
-  public init(stream: AsyncThrowingStream<T, any Error>) {
+#warning("Maybe these shouldn't be public inits. Easy to create bugs when creating your own stream")
+  public init(stream: AsyncThrowingStream<Element, any Error>) {
     self.stream = stream
   }
 
-  public init<S: AsyncSequence & Sendable>(stream wrapped: sending S) where S.Element == T {
+  public init<S: AsyncSequence & Sendable>(stream wrapped: sending S) where S.Element == Element {
     self.stream = AsyncThrowingStream.executingInAsyncTask { [wrapped] continuation in
       for try await element in wrapped {
         continuation.yield(element)
@@ -32,9 +33,9 @@ public struct NonCopyableAsyncThrowingStream<T: Sendable>: Sendable, ~Copyable {
     }
   }
 
-  public consuming func map(
-    _ transform: @escaping @Sendable (T) async throws -> T
-  ) async throws -> NonCopyableAsyncThrowingStream<T> {
+  public consuming func map<ElementOfResult>(
+    _ transform: @escaping @Sendable (Element) async throws -> ElementOfResult
+  ) async -> NonCopyableAsyncThrowingStream<ElementOfResult> {
     let stream = self.stream
 
     let newStream = AsyncThrowingStream.executingInAsyncTask { continuation in
@@ -45,12 +46,12 @@ public struct NonCopyableAsyncThrowingStream<T: Sendable>: Sendable, ~Copyable {
       }
     }
 
-    return NonCopyableAsyncThrowingStream.init(stream: newStream)
+    return NonCopyableAsyncThrowingStream<ElementOfResult>.init(stream: newStream)
   }
 
-  public consuming func compactMap(
-    _ transform: @escaping @Sendable (T) async throws -> T?
-  ) async throws -> NonCopyableAsyncThrowingStream<T> {
+  public consuming func compactMap<ElementOfResult>(
+    _ transform: @escaping @Sendable (Element) async throws -> ElementOfResult?
+  ) async -> NonCopyableAsyncThrowingStream<ElementOfResult> {
     let stream = self.stream
 
     let newStream = AsyncThrowingStream.executingInAsyncTask { continuation in
@@ -65,7 +66,7 @@ public struct NonCopyableAsyncThrowingStream<T: Sendable>: Sendable, ~Copyable {
       }
     }
 
-    return NonCopyableAsyncThrowingStream.init(stream: newStream)
+    return NonCopyableAsyncThrowingStream<ElementOfResult>.init(stream: newStream)
   }
 
   /// Exposes the underlying `AsyncThrowingStream` for final consumption.
@@ -75,7 +76,7 @@ public struct NonCopyableAsyncThrowingStream<T: Sendable>: Sendable, ~Copyable {
   /// is only awaited by a single consumer.
   ///
   /// - Returns: The underlying `AsyncThrowingStream`
-  public consuming func getStream() -> AsyncThrowingStream<T, any Error> {
+  public consuming func getStream() -> AsyncThrowingStream<Element, any Error> {
     return stream
   }
 
@@ -83,8 +84,8 @@ public struct NonCopyableAsyncThrowingStream<T: Sendable>: Sendable, ~Copyable {
 
   #warning("TODO: Write unit tests for this. Docs: if return nil, error is supressed and stream finishes.")
   public consuming func mapErrors(
-    _ transform: @escaping @Sendable (any Error) async throws -> T?
-  ) async throws -> NonCopyableAsyncThrowingStream<T> {
+    _ transform: @escaping @Sendable (any Error) async throws -> Element?
+  ) async -> NonCopyableAsyncThrowingStream<Element> {
     let stream = self.stream
 
     let newStream = AsyncThrowingStream.executingInAsyncTask { continuation in
@@ -112,7 +113,7 @@ public struct NonCopyableAsyncThrowingStream<T: Sendable>: Sendable, ~Copyable {
 
 }
 
-#warning("Do we keep this? Helps make TaskLocalValues work, but extension on Swift standard lib type could conflict with other extensions")
+#warning("Do we keep this public? Helps make TaskLocalValues work, but extension on Swift standard lib type could conflict with other extensions")
 extension TaskLocal {
 
   @_disfavoredOverload

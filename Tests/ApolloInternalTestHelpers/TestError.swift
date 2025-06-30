@@ -1,6 +1,6 @@
 import Foundation
 
-public struct TestError: Error, CustomDebugStringConvertible {
+public struct TestError: Error, CustomDebugStringConvertible, Equatable {
   let message: String?
 
   public init(_ message: String? = nil) {
