@@ -1,4 +1,5 @@
 import {
+  containsLocalCacheMutationDirective,
   getFieldDef,
   isMetaFieldName,
   isNotNullOrUndefined,
@@ -229,18 +230,21 @@ export function compileToIR(
 
     addReferencedType(rootType)
 
+    const selectionSet = compileSelectionSet(operationDefinition.selectionSet, rootType, referencedFragments)
+    const referencedFragmentsArray = Array.from(referencedFragments.values())
+
+    if (containsLocalCacheMutationDirective(operationDefinition.directives)) {
+      overrideAsLocalCacheMutation(referencedFragmentsArray);
+    }
+
     return {
       name,
       operationType,
       variables,
       rootType,
-      selectionSet: compileSelectionSet(
-        operationDefinition.selectionSet,
-        rootType,
-        referencedFragments
-      ),
+      selectionSet: selectionSet,
       directives: directives,
-      referencedFragments: Array.from(referencedFragments.values()),
+      referencedFragments: referencedFragmentsArray,
       source,
       filePath
     };
@@ -267,19 +271,32 @@ export function compileToIR(
 
     addReferencedType(getNamedType(typeCondition));
 
+    const selectionSet = compileSelectionSet(fragmentDefinition.selectionSet, typeCondition, referencedFragments)
+    const referencedFragmentsArray = Array.from(referencedFragments.values())
+
+    if (containsLocalCacheMutationDirective(fragmentDefinition.directives)) {
+      overrideAsLocalCacheMutation(referencedFragmentsArray);
+    }
+
     return {
       name,
       filePath,
       source,
       typeCondition,
-      selectionSet: compileSelectionSet(
-        fragmentDefinition.selectionSet,
-        typeCondition,
-        referencedFragments
-      ),
+      selectionSet: selectionSet,
       directives: directives,
-      referencedFragments: Array.from(referencedFragments.values()),
+      referencedFragments: referencedFragmentsArray,
+      overrideAsLocalCacheMutation: false
     };
+  }
+
+  function overrideAsLocalCacheMutation(
+    fragments: ir.FragmentDefinition[]
+  ) {
+    fragments.forEach(element => {
+      element.overrideAsLocalCacheMutation = true
+      overrideAsLocalCacheMutation(element.referencedFragments)
+    });
   }
 
   function compileSelectionSet(

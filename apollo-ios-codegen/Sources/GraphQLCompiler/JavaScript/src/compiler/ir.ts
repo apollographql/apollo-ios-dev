@@ -42,6 +42,7 @@ export interface FragmentDefinition {
   referencedFragments: FragmentDefinition[];
   source: string;
   filePath?: string;
+  overrideAsLocalCacheMutation: boolean;
 }
 
 export interface SelectionSet {

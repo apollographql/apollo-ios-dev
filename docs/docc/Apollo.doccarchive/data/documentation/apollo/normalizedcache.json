@@ -68,7 +68,13 @@
             },
             {
               "kind" : "text",
-              "text" : " : AnyObject"
+              "text" : " : "
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ReadOnlyNormalizedCache",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo23ReadOnlyNormalizedCacheP",
+              "text" : "ReadOnlyNormalizedCache"
             }
           ]
         }
@@ -77,6 +83,14 @@
     }
   ],
   "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/ReadOnlyNormalizedCache"
+      ],
+      "kind" : "relationships",
+      "title" : "Inherits From",
+      "type" : "inheritsFrom"
+    },
     {
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/InMemoryNormalizedCache"
@@ -533,6 +547,56 @@
   "title" : "removeRecords(matching:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/normalizedcache\/removerecords(matching:)"
+},
+"doc://Apollo/documentation/Apollo/ReadOnlyNormalizedCache": {
+  "abstract" : [
+    {
+      "text" : "A read-only view of a ",
+      "type" : "text"
+    },
+    {
+      "code" : "NormalizedCache",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " for use within a ",
+      "type" : "text"
+    },
+    {
+      "code" : "ReadTransaction",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ReadOnlyNormalizedCache"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ReadOnlyNormalizedCache",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ReadOnlyNormalizedCache"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ReadOnlyNormalizedCache",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/readonlynormalizedcache"
 }
 }
 }

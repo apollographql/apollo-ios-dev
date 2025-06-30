@@ -299,34 +299,68 @@ public class ApolloCodegen {
     let mergeNamedFragmentFields = config.experimentalFeatures.fieldMerging.options
       .contains(.namedFragments)
 
+    /// A `ConfigurationContext` to use when generated local cache mutations.
+    ///
+    /// Local cache mutations require some codegen options to be overridden to generate valid objects. 
+    /// This context overrides only the necessary properties, copying all other values from the user-provided `context`.
+    lazy var cacheMutationContext: ConfigurationContext = {
+      ConfigurationContext(
+        config: ApolloCodegenConfiguration(
+          schemaNamespace: self.config.schemaNamespace,
+          input: self.config.input,
+          output: self.config.output,
+          options: self.config.options,
+          experimentalFeatures: ApolloCodegenConfiguration.ExperimentalFeatures(
+            fieldMerging: .all,
+            legacySafelistingCompatibleOperations: self.config.experimentalFeatures.legacySafelistingCompatibleOperations
+          ),
+          schemaDownload: self.config.schemaDownload,
+          operationManifest: self.config.operationManifest
+        ),
+        rootURL: self.config.rootURL
+      )
+    }()
+
     return try await nonFatalErrorCollectingTaskGroup() { group in
       for fragment in fragments {
+        let fragmentConfig = fragment.isLocalCacheMutation ? cacheMutationContext : self.config
+
         group.addTask {
           let irFragment = await ir.build(
             fragment: fragment,
-            mergingNamedFragmentFields: mergeNamedFragmentFields
+            mergingNamedFragmentFields: fragment.isLocalCacheMutation ? true : mergeNamedFragmentFields
           )
 
-          let errors = try await FragmentFileGenerator(irFragment: irFragment, config: self.config)
-            .generate(forConfig: self.config, fileManager: fileManager)
+          let errors = try await FragmentFileGenerator(
+            irFragment: irFragment,
+            config: fragmentConfig
+          ).generate(
+            forConfig: fragmentConfig,
+            fileManager: fileManager
+          )
           return (irFragment.name, errors)
         }
       }
 
       for operation in operations {
+        let operationConfig = operation.isLocalCacheMutation ? cacheMutationContext : self.config
+
         group.addTask {
           async let identifier = self.operationIdentifierFactory.identifier(for: operation)
 
           let irOperation = await ir.build(
             operation: operation,
-            mergingNamedFragmentFields: mergeNamedFragmentFields
+            mergingNamedFragmentFields: operation.isLocalCacheMutation ? true : mergeNamedFragmentFields
           )
 
           let errors = try await OperationFileGenerator(
             irOperation: irOperation,
             operationIdentifier: await identifier,
-            config: self.config
-          ).generate(forConfig: self.config, fileManager: fileManager)
+            config: operationConfig
+          ).generate(
+            forConfig: operationConfig,
+            fileManager: fileManager
+          )
           return (irOperation.name, errors)
         }
       }

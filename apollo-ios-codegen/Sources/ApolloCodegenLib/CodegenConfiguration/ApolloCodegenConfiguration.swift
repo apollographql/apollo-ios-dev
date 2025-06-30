@@ -1420,30 +1420,35 @@ extension ApolloCodegenConfiguration.OperationsFileOutput {
 extension ApolloCodegenConfiguration {
   /// Determine whether the operations files are output to the schema types module.
   func shouldGenerateSelectionSetInitializers(for operation: IR.Operation) -> Bool {
-    guard experimentalFeatures.fieldMerging == .all else { return false }
-
     if operation.definition.isLocalCacheMutation {
       return true
 
-    } else if options.selectionSetInitializers.contains(.operations) {
-      return true
-
     } else {
-      return options.selectionSetInitializers.contains(definitionNamed: operation.definition.name)
+      guard experimentalFeatures.fieldMerging == .all else { return false }
+
+      if options.selectionSetInitializers.contains(.operations) {
+        return true
+
+      } else {
+        return options.selectionSetInitializers.contains(definitionNamed: operation.definition.name)
+      }
     }
   }
 
   /// Determine whether the operations files are output to the schema types module.
   func shouldGenerateSelectionSetInitializers(for fragment: IR.NamedFragment) -> Bool {
-    guard experimentalFeatures.fieldMerging == .all else { return false }
-
-    if options.selectionSetInitializers.contains(.namedFragments) { return true }
-
     if fragment.definition.isLocalCacheMutation {
       return true
-    }
 
-    return options.selectionSetInitializers.contains(definitionNamed: fragment.definition.name)
+    } else {
+      guard experimentalFeatures.fieldMerging == .all else { return false }
+
+      if options.selectionSetInitializers.contains(.namedFragments) {
+        return true
+      } else {
+        return options.selectionSetInitializers.contains(definitionNamed: fragment.definition.name)
+      }
+    }
   }
 }
 
@@ -1610,6 +1615,7 @@ extension ApolloCodegenConfiguration {
   ///  - options: Rules and options to customize the generated code.
   ///  - experimentalFeatures: Allows users to enable experimental features.
   @available(*, deprecated, renamed: "init(schemaNamespace:input:output:options:experimentalFeatures:schemaDownload:operationManifest:)")
+  @_disfavoredOverload
   public init(
     schemaName: String,
     input: FileInput,
@@ -1679,6 +1685,7 @@ extension ApolloCodegenConfiguration.FileOutput {
   ///  - operationIdentifiersPath: An absolute location to an operation id JSON map file
   ///  for use with APQ registration. Defaults to `nil`.
   @available(*, deprecated, renamed: "init(schemaTypes:operations:testMocks:)")
+  @_disfavoredOverload
   public init(
     schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput,
     operations: ApolloCodegenConfiguration.OperationsFileOutput = Default.operations,
@@ -1777,6 +1784,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   @available(*, deprecated,
               renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
   )
+  @_disfavoredOverload
   public init(
     additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
     queryStringLiteralFormat: QueryStringLiteralFormat = .singleLine,
@@ -1828,6 +1836,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   @available(*, deprecated,
               renamed: "init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:)"
   )
+  @_disfavoredOverload
   public init(
     additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
     queryStringLiteralFormat: QueryStringLiteralFormat,

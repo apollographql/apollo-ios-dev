@@ -230,10 +230,14 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     public let filePath: String
 
     public var isLocalCacheMutation: Bool {
-      directives?.contains { $0.name == Constants.DirectiveNames.LocalCacheMutation } ?? false
+      overrideAsLocalCacheMutation || directives?.contains {
+        $0.name == Constants.DirectiveNames.LocalCacheMutation
+      } ?? false
     }
       
     public let moduleImports: OrderedSet<String>
+
+    public let overrideAsLocalCacheMutation: Bool
 
     init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
       self.name = jsValue["name"]
@@ -243,8 +247,11 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.referencedFragments = .fromJSValue(jsValue["referencedFragments"], bridge: bridge)
       self.source = jsValue["source"]
       self.filePath = jsValue["filePath"]
-      self.moduleImports = FragmentDefinition.getImportModuleNames(directives: directives, 
-                                                                   referencedFragments: referencedFragments)
+      self.moduleImports = FragmentDefinition.getImportModuleNames(
+        directives: directives,
+        referencedFragments: referencedFragments
+      )
+      self.overrideAsLocalCacheMutation = jsValue["overrideAsLocalCacheMutation"]
     }
 
     /// Initializer to be used for creating mock objects in tests only.
@@ -255,7 +262,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       directives: [Directive]?,
       referencedFragments: [FragmentDefinition],
       source: String,
-      filePath: String
+      filePath: String,
+      overrideAsLocalCacheMutation: Bool
     ) {
       self.name = name
       self.type = type
@@ -264,8 +272,11 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.referencedFragments = referencedFragments
       self.source = source
       self.filePath = filePath
-      self.moduleImports = FragmentDefinition.getImportModuleNames(directives: directives,
-                                                                   referencedFragments: referencedFragments)
+      self.moduleImports = FragmentDefinition.getImportModuleNames(
+        directives: directives,
+        referencedFragments: referencedFragments
+      )
+      self.overrideAsLocalCacheMutation = overrideAsLocalCacheMutation
     }
 
     public var debugDescription: String {
