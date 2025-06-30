@@ -641,15 +641,16 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
     }
 
     let urlSession: MockURLSession = MockURLSession(responseProvider: Self.self)
+    let operation = MockQuery<Hero>()
 
     let requestChain = RequestChain<JSONRequest<MockQuery<Hero>>>(
       urlSession: urlSession,
-      interceptorProvider: DefaultInterceptorProvider.shared,
+      interceptors: Interceptors(provider: DefaultInterceptorProvider.shared, operation: operation),
       store: store
     )
 
     let request = JSONRequest.mock(
-      operation: MockQuery<Hero>(),
+      operation: operation,
       fetchBehavior: .NetworkOnly,
       graphQLEndpoint: TestURL.mockServer.url
     )    
