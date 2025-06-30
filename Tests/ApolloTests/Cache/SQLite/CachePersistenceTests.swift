@@ -46,43 +46,21 @@ class CachePersistenceTests: XCTestCase {
       ]
     }
 
-    let networkExpectation = self.expectation(description: "Fetching query from network")
-    let newCacheExpectation = self.expectation(description: "Fetch query from new cache")
 
-    client.fetch(query: query, cachePolicy: .fetchIgnoringCacheData) { outerResult in
-      defer { networkExpectation.fulfill() }
+    let graphQLResult1 = try await client.fetch(query: query, cachePolicy: .networkOnly)
 
-      switch outerResult {
-      case .failure(let error):
-        XCTFail("Unexpected error: \(error)")
-        return
-      case .success(let graphQLResult):
-        XCTAssertEqual(graphQLResult.data?.hero?.name, "Luke Skywalker")
+    XCTAssertEqual(graphQLResult1.data?.hero?.name, "Luke Skywalker")
 
         // Do another fetch from cache to ensure that data is cached before creating new cache
-        client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch) { innerResult in
-          Task {
-            let (cache, _) = await SQLiteTestCacheProvider.makeNormalizedCache(fileURL: sqliteFileURL)
-            let newStore = ApolloStore(cache: cache)
-            let newClient = ApolloClient(networkTransport: networkTransport, store: newStore)
+    let _ = try await client.fetch(query: query, cachePolicy: .cacheOnly)
 
-            newClient.fetch(query: query, cachePolicy: .returnCacheDataDontFetch) { newClientResult in
-              defer { newCacheExpectation.fulfill() }
-              switch newClientResult {
-              case .success(let newClientGraphQLResult):
-                XCTAssertEqual(newClientGraphQLResult.data?.hero?.name, "Luke Skywalker")
-              case .failure(let error):
-                XCTFail("Unexpected error with new client: \(error)")
-              }
-              _ = newClient // Workaround for a bug - ensure that newClient is retained until this block is run
-            }
-          }
+    let (newCache, _) = await SQLiteTestCacheProvider.makeNormalizedCache(fileURL: sqliteFileURL)
+    let newStore = ApolloStore(cache: newCache)
+    let newClient = ApolloClient(networkTransport: networkTransport, store: newStore)
 
-        }
-      }
-    }
+    let newClientResult = try await newClient.fetch(query: query, cachePolicy: .cacheOnly)
 
-    await fulfillment(of: [networkExpectation, newCacheExpectation], timeout: 2)
+    XCTAssertEqual(newClientResult.data?.hero?.name, "Luke Skywalker")
   }
 
   func testFetchAndPersistWithPeriodArguments() async throws {

@@ -15,11 +15,11 @@ final class CancellationTestingInterceptor: ApolloInterceptor {
 
   func intercept<Request: GraphQLRequest>(
     request: Request,
-    next: (Request) async throws -> InterceptorResultStream<Request>
+    next: (Request) async -> InterceptorResultStream<Request>
   ) async throws -> InterceptorResultStream<Request> {
     do {
       try Task.checkCancellation()
-      return try await next(request)
+      return await next(request)
 
     } catch is CancellationError {
       self.hasBeenCancelled = true
