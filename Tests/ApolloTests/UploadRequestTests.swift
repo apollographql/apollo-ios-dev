@@ -18,13 +18,14 @@ class UploadRequestTests: XCTestCase {
     )
     let operation = UploadOneFileMutation(file: alphaFile.originalName)
 
-    let uploadRequest = UploadRequest(
+    var uploadRequest = UploadRequest(
       operation: operation,
       graphQLEndpoint: TestURL.mockServer.url,
       files: [alphaFile],
       multipartBoundary: "TEST.BOUNDARY",
       writeResultsToCache: false
     )
+    uploadRequest.additionalHeaders = ["headerKey": "headerValue"]
 
     let urlRequest = try uploadRequest.toURLRequest()
     XCTAssertEqual(urlRequest.allHTTPHeaderFields?["headerKey"], "headerValue")
@@ -36,7 +37,7 @@ class UploadRequestTests: XCTestCase {
       --TEST.BOUNDARY
       Content-Disposition: form-data; name="operations"
 
-      {"extensions":{"clientLibrary":{"name":"apollo-ios","version":"\(Constants.ApolloClientVersion)"}},"operationName":"UploadOneFile","query":"mutation UploadOneFile($file: Upload!) { singleUpload(file: $file) { __typename id path filename mimetype } }","variables":{"file":null}}
+      {"operationName":"UploadOneFile","query":"mutation UploadOneFile($file: Upload!) { singleUpload(file: $file) { __typename id path filename mimetype } }","variables":{"file":null}}
       --TEST.BOUNDARY
       Content-Disposition: form-data; name="map"
 
@@ -81,7 +82,6 @@ class UploadRequestTests: XCTestCase {
     )
 
     let urlRequest = try uploadRequest.toURLRequest()
-    XCTAssertEqual(urlRequest.allHTTPHeaderFields?["headerKey"], "headerValue")
 
     let multipartData = try uploadRequest.requestMultipartFormData()
     let actual = try multipartData.toTestString()
@@ -90,7 +90,7 @@ class UploadRequestTests: XCTestCase {
       --TEST.BOUNDARY
       Content-Disposition: form-data; name="operations"
 
-      {"extensions":{"clientLibrary":{"name":"apollo-ios","version":"\(Constants.ApolloClientVersion)"}},"operationName":"UploadMultipleFilesToTheSameParameter","query":"mutation UploadMultipleFilesToTheSameParameter($files: [Upload!]!) { multipleUpload(files: $files) { __typename id path filename mimetype } }","variables":{"files":[null,null]}}
+      {"operationName":"UploadMultipleFilesToTheSameParameter","query":"mutation UploadMultipleFilesToTheSameParameter($files: [Upload!]!) { multipleUpload(files: $files) { __typename id path filename mimetype } }","variables":{"files":[null,null]}}
       --TEST.BOUNDARY
       Content-Disposition: form-data; name="map"
 
@@ -151,7 +151,6 @@ class UploadRequestTests: XCTestCase {
     )        
 
     let urlRequest = try uploadRequest.toURLRequest()
-    XCTAssertEqual(urlRequest.allHTTPHeaderFields?["headerKey"], "headerValue")
 
     let multipartData = try uploadRequest.requestMultipartFormData()
     let actual = try multipartData.toTestString()
@@ -160,7 +159,7 @@ class UploadRequestTests: XCTestCase {
       --TEST.BOUNDARY
       Content-Disposition: form-data; name="operations"
 
-      {"extensions":{"clientLibrary":{"name":"apollo-ios","version":"\(Constants.ApolloClientVersion)"}},"operationName":"UploadMultipleFilesToDifferentParameters","query":"mutation UploadMultipleFilesToDifferentParameters($singleFile: Upload!, $multipleFiles: [Upload!]!) { multipleParameterUpload(singleFile: $singleFile, multipleFiles: $multipleFiles) { __typename id path filename mimetype } }","variables":{"multipleFiles":["b.txt","c.txt"],"secondField":null,"singleFile":"a.txt","uploads":null}}
+      {"operationName":"UploadMultipleFilesToDifferentParameters","query":"mutation UploadMultipleFilesToDifferentParameters($singleFile: Upload!, $multipleFiles: [Upload!]!) { multipleParameterUpload(singleFile: $singleFile, multipleFiles: $multipleFiles) { __typename id path filename mimetype } }","variables":{"multipleFiles":["b.txt","c.txt"],"secondField":null,"singleFile":"a.txt","uploads":null}}
       --TEST.BOUNDARY
       Content-Disposition: form-data; name="map"
 

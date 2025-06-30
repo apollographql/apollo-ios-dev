@@ -181,7 +181,7 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
         chunks: streamMocker.getStream()
       ),
       for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
+      includeCacheRecords: true
     )
     .getStream()
     .makeAsyncIterator()
@@ -298,7 +298,7 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
         chunks: streamMocker.getStream()
       ),
       for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
+      includeCacheRecords: true
     )
     .getStream()
     .makeAsyncIterator()
