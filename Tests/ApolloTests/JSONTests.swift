@@ -152,7 +152,7 @@ class JSONTests: XCTestCase {
     
     let heroData = try await MockData(data: jsonObj)
 
-    let result = GraphQLResult<MockQuery<MockData>>(
+    let result = GraphQLResponse<MockQuery<MockData>>(
       data: heroData,
       extensions: nil,
       errors: nil,

@@ -90,7 +90,7 @@ class ParsingPerformanceTests: XCTestCase {
     for query: Query,
     file: StaticString = #file,
     line: UInt = #line
-  ) throws -> GraphQLResponse<Query.Data> {
+  ) throws -> ParsedResult<Query.Data> {
     let bundle = Bundle(for: type(of: self))
 
     guard let url = bundle.url(forResource: Query.operationName, withExtension: "json") else {
@@ -102,6 +102,6 @@ class ParsingPerformanceTests: XCTestCase {
     let data = try Data(contentsOf: url)
     let body = try JSONSerialization.jsonObject(with: data, options: []) as! JSONObject
 
-    return GraphQLResponse(operation: query, body: body)
+    return ParsedResult(operation: query, body: body)
   }
 }

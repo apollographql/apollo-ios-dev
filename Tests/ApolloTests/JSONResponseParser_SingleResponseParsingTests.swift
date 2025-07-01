@@ -18,7 +18,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ]
 
     // when
-    let response: GraphQLResponse<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
 
     // then
@@ -35,7 +35,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ]
 
     // when
-    let response: GraphQLResponse<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
 
     // then
@@ -52,7 +52,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ] as JSONObject
 
     // when
-    let response: GraphQLResponse<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
 
     // then
@@ -68,7 +68,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ]
 
     // when
-    let response: GraphQLResponse<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
 
     // then
@@ -90,7 +90,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ]
 
     // when
-    let response: GraphQLResponse<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
 
     // then
@@ -113,7 +113,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ] as JSONObject
 
     // when
-    let response: GraphQLResponse<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
 
     // then
@@ -136,7 +136,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ]
 
     // when
-    let response: GraphQLResponse<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
 
     // then
@@ -159,7 +159,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ]
 
     // when
-    let response: GraphQLResponse<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
 
     // then
@@ -183,7 +183,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ]
 
     // when
-    let response: GraphQLResponse<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<MockSelectionSet>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
 
     // then
@@ -228,7 +228,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ]
 
     // when
-    let response: GraphQLResponse<MockQuery<HeroQueryRoot>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<HeroQueryRoot>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
     let recordSet = response.cacheRecords
 
@@ -251,7 +251,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ]
 
     // when
-    let response: GraphQLResponse<MockQuery<HeroQueryRoot>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<HeroQueryRoot>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
     let recordSet = response.cacheRecords
 
@@ -292,7 +292,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ]
 
     // when
-    let response: GraphQLResponse<MockQuery<HeroQueryRoot>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<HeroQueryRoot>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
     let recordSet = response.cacheRecords
 
@@ -333,7 +333,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ]
 
     // when
-    let response: GraphQLResponse<MockQuery<HeroQueryRoot>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<HeroQueryRoot>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
     let recordSet = response.cacheRecords
 
@@ -374,7 +374,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ]
 
     // when
-    let response: GraphQLResponse<MockQuery<HeroQueryRoot>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<HeroQueryRoot>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
     let recordSet = response.cacheRecords
 
@@ -415,7 +415,7 @@ class JSONResponseParser_SingleResponseParsingTests: XCTestCase {
     ]
 
     // when
-    let response: GraphQLResponse<MockQuery<HeroQueryRoot>> = try await parser.parseSingleResponse(body: body)
+    let response: ParsedResult<MockQuery<HeroQueryRoot>> = try await parser.parseSingleResponse(body: body)
     let result = response.result
     let recordSet = response.cacheRecords
 
