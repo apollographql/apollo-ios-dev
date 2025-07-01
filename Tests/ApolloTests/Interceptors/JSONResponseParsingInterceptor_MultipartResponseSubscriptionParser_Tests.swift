@@ -98,7 +98,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       try await actualResultsIterator.next()
     }.to(
       throwError(
-        MultipartResponseSubscriptionParser.ParsingError.irrecoverableError(message: "forced test failure!")
+        MultipartResponseSubscriptionParser.ParsingError.irrecoverableErrors([GraphQLError("forced test failure!")])
       )
     )
   }
@@ -141,7 +141,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       try await actualResultsIterator.next()
     }.to(
       throwError(
-        MultipartResponseSubscriptionParser.ParsingError.irrecoverableError(message: "forced test failure!")
+        MultipartResponseSubscriptionParser.ParsingError.irrecoverableErrors([GraphQLError("forced test failure!")])
       )
     )
   }
@@ -189,7 +189,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       try await actualResultsIterator.next()
     }.to(
       throwError(
-        MultipartResponseSubscriptionParser.ParsingError.irrecoverableError(message: "forced test failure!")
+        MultipartResponseSubscriptionParser.ParsingError.irrecoverableErrors([GraphQLError("forced test failure!")])
       )
     )
   }
@@ -235,7 +235,15 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       try await actualResultsIterator.next()
     }.to(
       throwError(
-        MultipartResponseSubscriptionParser.ParsingError.irrecoverableError(message: "forced test failure!")
+        MultipartResponseSubscriptionParser.ParsingError.irrecoverableErrors([
+          GraphQLError([
+            "message": "forced test failure!",
+            "path": [
+              "hello"
+            ],
+            "foo": "bar",
+          ])
+        ])
       )
     )
   }
