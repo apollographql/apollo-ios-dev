@@ -32,12 +32,12 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
   // MARK: - Read Query Tests
 
   func test_readQuery_givenQueryDataInCache_returnsData() async throws {
-    class HeroNameSelectionSet: MockSelectionSet {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -62,7 +62,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
   func test_readQuery_givenQueryDataDoesNotExist_throwsMissingValueError() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("name", String.self)
       ]}
@@ -90,12 +90,12 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       case JEDI
     }
 
-    class HeroNameSelectionSet: MockSelectionSet {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["episode": .variable("episode")])
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -129,12 +129,12 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       case PHANTOM_MENACE
     }
 
-    class HeroNameSelectionSet: MockSelectionSet {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["episode": .variable("episode")])
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -162,14 +162,14 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
   func test_readQuery_withCacheReferencesByCustomKey_resolvesReferences() async throws {
     // given
-    class HeroFriendsSelectionSet: MockSelectionSet {
+    class HeroFriendsSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
       var hero: Hero { __data["hero"] }
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("id", String.self),
@@ -179,7 +179,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
         var friends: [Friend] { __data["friends"] }
 
-        class Friend: MockSelectionSet {
+        class Friend: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
             .field("id", String.self),
@@ -231,7 +231,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     })
 
-    class GivenSelectionSet: MockFragment {
+    class GivenSelectionSet: MockFragment, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __selections: [Selection] { [
@@ -242,7 +242,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
       var asDroid: AsDroid? { _asInlineFragment() }
 
-      class AsDroid: MockTypeCase {
+      class AsDroid: MockTypeCase, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
         override class var __parentType: any ParentType { Types.Droid }
 
@@ -282,7 +282,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     })
 
-    class GivenSelectionSet: MockFragment {
+    class GivenSelectionSet: MockFragment, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __selections: [Selection] { [
@@ -293,7 +293,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
       var asDroid: AsDroid? { _asInlineFragment() }
 
-      class AsDroid: MockTypeCase {
+      class AsDroid: MockTypeCase, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
         override class var __parentType: any ParentType { Types.Droid }
 
@@ -373,10 +373,10 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     let graphQLResult = try await store.load(query)
 
     // then
-    XCTAssertEqual(graphQLResult.source, .cache)
-    XCTAssertNil(graphQLResult.errors)
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
 
-    let data = try XCTUnwrap(graphQLResult.data)
+    let data = try XCTUnwrap(graphQLResult?.data)
     XCTAssertEqual(data.hero.name, "Artoo")
   }
 
@@ -506,8 +506,8 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
   /// to successfully mutate the 'name' field, but the 'nickname' field should still be a cache miss.
   /// While reading an optional field to execute a cache mutation, this is fine, but while reading the
   /// omitted optional field to execute a fetch from the cache onto a immutable selection set for a
-  /// operation, this should throw a missing value error, indicating the cache miss.
-  func test_updateCacheMutationWithOptionalField_omittingOptionalField_updateNestedField_updatesObjectsMaintainingNilValue_throwsMissingValueErrorOnRead() async throws {
+  /// operation, this return nil, indicating the cache miss.
+  func test_updateCacheMutationWithOptionalField_omittingOptionalField_updateNestedField_updatesObjectsMaintainingNilValue_returnsNilOnRead() async throws {
     // given
     struct GivenSelectionSet: MockMutableRootSelectionSet {
       public var __data: DataDict = .empty()
@@ -561,9 +561,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     await expect {
       try await self.store.load(query)
-    }.to(throwError(
-      GraphQLExecutionError(path: ["hero", "nickname"], underlying: JSONDecodingError.missingValue)
-    ))
+    }.to(beNil())
   }
 
   func test_updateCacheMutationWithNonNullField_withNilValue_updateNestedField_throwsMissingValueOnInitialReadForUpdate() async throws {
@@ -669,10 +667,10 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     let mutation = MockMutation<GivenSelectionSet>()
 
     let graphQLResult = try await self.store.load(mutation)
-    XCTAssertEqual(graphQLResult.source, .cache)
-    XCTAssertNil(graphQLResult.errors)
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
 
-    let data = try XCTUnwrap(graphQLResult.data)
+    let data = try XCTUnwrap(graphQLResult?.data)
     XCTAssertEqual(data.hero.name, "Artoo")
   }
 
@@ -736,19 +734,19 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let graphQLResult1 = try await self.store.load(query)
 
-    XCTAssertEqual(graphQLResult1.source, .cache)
-    XCTAssertNil(graphQLResult1.errors)
+    XCTAssertEqual(graphQLResult1?.source, .cache)
+    XCTAssertNil(graphQLResult1?.errors)
 
-    let data1 = try XCTUnwrap(graphQLResult1.data)
+    let data1 = try XCTUnwrap(graphQLResult1?.data)
     XCTAssertEqual(data1.hero.name, "Artoo")
 
     query.__variables = ["episode": Episode.PHANTOM_MENACE]
     let graphQLResult2 = try await self.store.load(query)
 
-    XCTAssertEqual(graphQLResult2.source, .cache)
-    XCTAssertNil(graphQLResult2.errors)
+    XCTAssertEqual(graphQLResult2?.source, .cache)
+    XCTAssertNil(graphQLResult2?.errors)
 
-    let data2 = try XCTUnwrap(graphQLResult2.data)
+    let data2 = try XCTUnwrap(graphQLResult2?.data)
     XCTAssertEqual(data2.hero.name, "Qui-Gon Jinn")
   }
 
@@ -836,10 +834,10 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     let query = MockQuery<GivenSelectionSet>()
 
     let graphQLResult = try await self.store.load(query)
-    XCTAssertEqual(graphQLResult.source, .cache)
-    XCTAssertNil(graphQLResult.errors)
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
 
-    let data = try XCTUnwrap(graphQLResult.data)
+    let data = try XCTUnwrap(graphQLResult?.data)
     XCTAssertEqual(data.hero.asDroid?.primaryFunction, "Combat")
   }
 
@@ -956,10 +954,10 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     let query = MockQuery<GivenSelectionSet>()
 
     let graphQLResult = try await self.store.load(query)
-    XCTAssertEqual(graphQLResult.source, .cache)
-    XCTAssertNil(graphQLResult.errors)
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
 
-    let data = try XCTUnwrap(graphQLResult.data)
+    let data = try XCTUnwrap(graphQLResult?.data)
     XCTAssertEqual(data.hero.name, "Artoo")
     XCTAssertEqual(data.hero.fragments.givenFragment.asDroid?.primaryFunction, "Combat")
   }
@@ -1099,10 +1097,10 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let graphQLResult = try await self.store.load(query)
 
-    XCTAssertEqual(graphQLResult.source, .cache)
-    XCTAssertNil(graphQLResult.errors)
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
 
-    let data = try XCTUnwrap(graphQLResult.data)
+    let data = try XCTUnwrap(graphQLResult?.data)
     XCTAssertEqual(data.hero.name, "Artoo")
     XCTAssertEqual(data.hero.fragments.givenFragment?.asDroid?.primaryFunction, "Combat")
   }
@@ -1200,10 +1198,10 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let graphQLResult = try await self.store.load(query)
 
-    XCTAssertEqual(graphQLResult.source, .cache)
-    XCTAssertNil(graphQLResult.errors)
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
 
-    let data = try XCTUnwrap(graphQLResult.data)
+    let data = try XCTUnwrap(graphQLResult?.data)
     XCTAssertEqual(data.hero.name, "R2-D2")
     let friendsNames = data.hero.friends.compactMap { $0.name }
     XCTAssertEqual(friendsNames, ["Luke Skywalker", "Han Solo", "Leia Organa", "C-3PO"])
@@ -1260,10 +1258,10 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     let query = MockQuery<GivenSelectionSet>()
 
     let graphQLResult = try await self.store.load(query)
-    XCTAssertEqual(graphQLResult.source, .cache)
-    XCTAssertNil(graphQLResult.errors)
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
 
-    let data = try XCTUnwrap(graphQLResult.data)
+    let data = try XCTUnwrap(graphQLResult?.data)
     XCTAssertEqual(data.hero.type, .case(.droid))
   }
 
@@ -1315,10 +1313,10 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     let mutation = MockMutation<GivenSelectionSet>()
     let graphQLResult = try await self.store.load(mutation)
 
-    XCTAssertEqual(graphQLResult.source, .cache)
-    XCTAssertNil(graphQLResult.errors)
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
 
-    let data = try XCTUnwrap(graphQLResult.data)
+    let data = try XCTUnwrap(graphQLResult?.data)
     XCTAssertEqual(data.hero.name, "Artoo")
   }
 
@@ -1476,10 +1474,10 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     let query = MockQuery<GivenFragment>()
     let graphQLResult = try await self.store.load(query)
 
-    XCTAssertEqual(graphQLResult.source, .cache)
-    XCTAssertNil(graphQLResult.errors)
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
 
-    let data = try XCTUnwrap(graphQLResult.data)
+    let data = try XCTUnwrap(graphQLResult?.data)
     XCTAssertEqual(data.hero.name, "Artoo")
   }
 
@@ -1498,7 +1496,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     })
 
-    class Data: MockSelectionSet {
+    class Data: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Query }
@@ -1548,7 +1546,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     })
 
-    class Data: MockSelectionSet {
+    class Data: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Query }
@@ -1567,7 +1565,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
         ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
       }
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __parentType: any ParentType { Types.Human }
@@ -1580,7 +1578,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
         var ifA: IfA? { _asInlineFragment() }
         var ifB: IfB? { _asInlineFragment() }
 
-        class IfA: ConcreteMockTypeCase<Hero> {
+        class IfA: ConcreteMockTypeCase<Hero>, @unchecked Sendable {
           typealias Schema = MockSchemaMetadata
           override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
@@ -1608,7 +1606,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
             ]))
           }
 
-          class Friend: MockSelectionSet {
+          class Friend: MockSelectionSet, @unchecked Sendable {
             typealias Schema = MockSchemaMetadata
 
             override class var __parentType: any ParentType { Types.Human }
@@ -1631,7 +1629,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
           }
         }
 
-        class IfB: ConcreteMockTypeCase<Hero> {
+        class IfB: ConcreteMockTypeCase<Hero>, @unchecked Sendable {
           typealias Schema = MockSchemaMetadata
           override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
@@ -1688,7 +1686,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     })
 
-    class GivenQuery: MockSelectionSet {
+    class GivenQuery: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Query }
@@ -1707,7 +1705,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
         ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
       }
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __parentType: any ParentType { Types.Human }
@@ -1717,7 +1715,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
         var asCharacter: AsCharacter? { _asInlineFragment() }
 
-        class AsCharacter: ConcreteMockTypeCase<Hero> {
+        class AsCharacter: ConcreteMockTypeCase<Hero>, @unchecked Sendable {
           typealias Schema = MockSchemaMetadata
           override class var __parentType: any ParentType { Types.Character }
           override class var __selections: [Selection] {[
@@ -1827,7 +1825,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    class GivenQuery: MockSelectionSet {
+    class GivenQuery: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Query }
@@ -1843,7 +1841,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
         ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
       }
 
-      class IfA: ConcreteMockTypeCase<GivenQuery> {
+      class IfA: ConcreteMockTypeCase<GivenQuery>, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
         override class var __parentType: any ParentType { Types.Query }
         override class var __selections: [Selection] {[
@@ -1950,7 +1948,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    class GivenQuery: MockSelectionSet {
+    class GivenQuery: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Query }
@@ -1966,7 +1964,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
         ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
       }
 
-      class IfA: ConcreteMockTypeCase<GivenQuery> {
+      class IfA: ConcreteMockTypeCase<GivenQuery>, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
         override class var __parentType: any ParentType { Types.Query }
         override class var __selections: [Selection] {[
@@ -2124,14 +2122,14 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    class HeroFriendsSelectionSet: MockSelectionSet {
+    class HeroFriendsSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
       var hero: Hero { __data["hero"] }
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("id", String.self),
@@ -2141,7 +2139,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
         var friends: [Friend] { __data["friends"] }
 
-        class Friend: MockSelectionSet {
+        class Friend: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
             .field("id", String.self),
@@ -2153,10 +2151,10 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let query = MockQuery<HeroFriendsSelectionSet>()
     let graphQLResult = try await self.store.load(query)
-    XCTAssertEqual(graphQLResult.source, .cache)
-    XCTAssertNil(graphQLResult.errors)
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
 
-    let data = try XCTUnwrap(graphQLResult.data)
+    let data = try XCTUnwrap(graphQLResult?.data)
     XCTAssertEqual(data.hero.name, "R2-D2")
     let friendsNames: [String] = data.hero.friends.compactMap { $0.name }
     XCTAssertEqual(friendsNames, ["Luke Skywalker", "Han Solo", "Leia Organa", "C-3PO"])
@@ -2252,12 +2250,12 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
   func test_removeObjectsMatchingPattern_givenPatternNotMatchingKeyCase_deletesCaseInsensitiveMatchingRecords() async throws {
     // given
-    class HeroNameSelectionSet: MockSelectionSet {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
@@ -2309,14 +2307,14 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       case EMPIRE
     }
 
-    class HeroFriendsSelectionSet: MockSelectionSet {
+    class HeroFriendsSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["episode": .variable("episode")])
       ]}
 
       var hero: Hero { __data["hero"] }
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("id", String.self),
@@ -2326,7 +2324,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
         var friends: [Friend] { __data["friends"] }
 
-        class Friend: MockSelectionSet {
+        class Friend: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
             .field("id", String.self),
@@ -2419,12 +2417,12 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
   func test_readTransaction_readQuery_afterTransaction_releasesReadTransaction() async throws {
     // given
-    class HeroNameSelectionSet: MockSelectionSet {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)

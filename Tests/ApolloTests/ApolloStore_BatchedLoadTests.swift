@@ -104,9 +104,9 @@ class ApolloStore_BatchedLoadTests: XCTestCase {
     // when
     let graphQLResult = try await store.load(query)
 
-    XCTAssertNil(graphQLResult.errors)
+    XCTAssertNil(graphQLResult?.errors)
 
-    guard let data = graphQLResult.data else {
+    guard let data = graphQLResult?.data else {
       XCTFail("No data returned with result!")
       return
     }
@@ -178,9 +178,9 @@ class ApolloStore_BatchedLoadTests: XCTestCase {
         group.addTask {
           let graphQLResult = try await store.load(query)
 
-          XCTAssertNil(graphQLResult.errors)
+          XCTAssertNil(graphQLResult?.errors)
 
-          guard let data = graphQLResult.data else {
+          guard let data = graphQLResult?.data else {
             XCTFail("No data returned with query!")
             return
 
