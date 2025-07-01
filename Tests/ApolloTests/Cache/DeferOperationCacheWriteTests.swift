@@ -4,8 +4,8 @@ import ApolloAPI
 import ApolloInternalTestHelpers
 import Nimble
 
-fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
-  class AnAnimal: MockSelectionSet {
+fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal>, @unchecked Sendable {
+  class AnAnimal: MockSelectionSet, @unchecked Sendable {
     typealias Schema = MockSchemaMetadata
 
     override class var __selections: [Selection] {[
@@ -14,7 +14,7 @@ fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
 
     var animal: Animal { __data["animal"] }
 
-    class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata> {
+    class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .field("species", String.self),
@@ -36,7 +36,7 @@ fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
         @Deferred var deferredFriend: DeferredFriend?
       }
 
-      class DeferredGenus: MockTypeCase {
+      class DeferredGenus: MockTypeCase, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("genus", String.self),
         ]}
@@ -44,14 +44,14 @@ fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
         var genus: String { __data["genus"] }
       }
 
-      class DeferredFriend: MockTypeCase {
+      class DeferredFriend: MockTypeCase, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("friend", Friend.self),
         ]}
 
         var friend: Friend { __data["friend"] }
 
-        class Friend: AbstractMockSelectionSet<Friend.Fragments, MockSchemaMetadata> {
+        class Friend: AbstractMockSelectionSet<Friend.Fragments, MockSchemaMetadata>, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .deferred(DeferredFriendName.self, label: "deferredFriendName"),
           ]}
@@ -71,7 +71,7 @@ fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
   }
 }
 
-fileprivate class DeferredFriendName: MockFragment {
+fileprivate class DeferredFriendName: MockFragment, @unchecked Sendable {
   override class var __selections: [Selection] {[
     .field("name", String.self),
   ]}

@@ -190,8 +190,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
 
     let urlResponse = HTTPURLResponse.mock(
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"]
-    )
-    let chunkStream = streamMocker.getStream()
+    )    
 
     var actualResultsIterator = try await subject.parse(
       response: HTTPResponse(
@@ -229,7 +228,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseDeferParser_Tests: X
     let urlResponse = HTTPURLResponse.mock(
       headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;deferSpec=20220824"]
     )
-    let chunkStream = streamMocker.getStream()
+    _ = streamMocker.getStream()
 
     var actualResultsIterator = try await subject.parse(
       response: HTTPResponse(

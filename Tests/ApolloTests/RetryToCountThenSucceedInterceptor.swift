@@ -10,7 +10,7 @@ import Apollo
 import ApolloAPI
 import Foundation
 
-final class RetryToCountThenSucceedInterceptor: ApolloInterceptor {
+final class RetryToCountThenSucceedInterceptor: GraphQLInterceptor {
   let timesToCallRetry: Int
   nonisolated(unsafe) var timesRetryHasBeenCalled = 0
 

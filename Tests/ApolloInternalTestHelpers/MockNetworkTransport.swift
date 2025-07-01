@@ -44,12 +44,12 @@ public final class MockNetworkTransport: NetworkTransport {
 
 
   private struct MockInterceptorProvider: InterceptorProvider {
-    func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any ApolloInterceptor] {
+    func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any GraphQLInterceptor] {
       return DefaultInterceptorProvider.shared.graphQLInterceptors(for: operation) + [TaskLocalRequestInterceptor()]
     }
   }
 
-  fileprivate struct TaskLocalRequestInterceptor: ApolloInterceptor {
+  fileprivate struct TaskLocalRequestInterceptor: GraphQLInterceptor {
     @TaskLocal static var currentRequest: (any GraphQLRequest)? = nil
 
     func intercept<Request>(

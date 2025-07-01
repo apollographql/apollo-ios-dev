@@ -435,17 +435,12 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let query = MockQuery<GivenSelectionSet>()
 
-    loadFromStore(operation: query) { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
+    let response = try await self.store.load(query)
+    let data = try XCTUnwrap(response?.data)
 
-        let data = try XCTUnwrap(graphQLResult.data)
-        XCTAssertEqual(data.hero.name, "Artoo")
-        expect(data.hero.nickname).to(beNil())
-        expect(data.hero.hasNullValue(forKey: "nickname")).to(beTrue())
-      }
-    }
+    XCTAssertEqual(data.hero.name, "Artoo")
+    expect(data.hero.nickname).to(beNil())
+    expect(data.hero.hasNullValue(forKey: "nickname")).to(beTrue())
   }
 
   /// This test ensures the fix for issue [#2861](https://github.com/apollographql/apollo-ios/issues/2861)

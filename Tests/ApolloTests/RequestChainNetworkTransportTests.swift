@@ -33,9 +33,9 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
   }
 
   struct MockProvider: InterceptorProvider {
-    var interceptors: [any ApolloInterceptor]
+    var interceptors: [any GraphQLInterceptor]
 
-    func graphQLInterceptors<Operation>(for operation: Operation) -> [any ApolloInterceptor] where Operation : GraphQLOperation {
+    func graphQLInterceptors<Operation>(for operation: Operation) -> [any GraphQLInterceptor] where Operation : GraphQLOperation {
       interceptors
     }
   }
@@ -61,7 +61,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     var name: String { __data["name"] }
   }
 
-  struct DelayInterceptor: ApolloInterceptor {
+  struct DelayInterceptor: GraphQLInterceptor {
     let nanoseconds: UInt64
 
     init(_ nanoseconds: UInt64) {
@@ -73,7 +73,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       next: NextInterceptorFunction<Request>
     ) async throws -> InterceptorResultStream<Request> {
       try await Task.sleep(nanoseconds: nanoseconds)
-      return try await next(request)
+      return await next(request)
     }
 
   }
@@ -146,7 +146,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
   // MARK: - Retrying tests
 
   func test__retryingTask__givenInterceptorThrowsRetryError_retriesWithRequestFromError() async throws {
-    class RetryingTestInterceptor: ApolloInterceptor, @unchecked Sendable {
+    class RetryingTestInterceptor: GraphQLInterceptor, @unchecked Sendable {
       func intercept<Request: GraphQLRequest>(
         request: Request,
         next: NextInterceptorFunction<Request>
@@ -154,7 +154,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
         if let isRetry = request.additionalHeaders["IsRetry"],
           isRetry == "true"
         {
-          return try await next(request)
+          return await next(request)
         }
 
         var request = request

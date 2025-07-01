@@ -13,15 +13,15 @@ class MaxRetryInterceptorTests: XCTestCase {
   }
 
   final class TestProvider: InterceptorProvider, MockResponseProvider {
-    let testInterceptor: any ApolloInterceptor
+    let testInterceptor: any GraphQLInterceptor
     let retryCount: Int
 
-    init(testInterceptor: any ApolloInterceptor, retryCount: Int) {
+    init(testInterceptor: any GraphQLInterceptor, retryCount: Int) {
       self.testInterceptor = testInterceptor
       self.retryCount = retryCount
     }
 
-    func graphQLInterceptors<Operation>(for operation: Operation) -> [any ApolloInterceptor] where Operation : GraphQLOperation {
+    func graphQLInterceptors<Operation>(for operation: Operation) -> [any GraphQLInterceptor] where Operation : GraphQLOperation {
       [
         MaxRetryInterceptor(maxRetriesAllowed: self.retryCount),
         self.testInterceptor
