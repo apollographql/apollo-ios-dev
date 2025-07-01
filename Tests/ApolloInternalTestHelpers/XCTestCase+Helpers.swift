@@ -40,6 +40,7 @@ import Apollo
 import ApolloAPI
 
 public extension XCTestCase {
+  #warning("TODO: See if we can delete this when we refactor all of the tests.")
   /// Make  an `AsyncResultObserver` for receiving results of the specified GraphQL operation.
   func makeResultObserver<Operation: GraphQLOperation>(for operation: Operation, file: StaticString = #filePath, line: UInt = #line) -> AsyncResultObserver<GraphQLResponse<Operation>, any Error> {
     return AsyncResultObserver(testCase: self, file: file, line: line)
@@ -53,21 +54,4 @@ public protocol StoreLoading {
 
 public extension StoreLoading {
   static var defaultWaitTimeout: TimeInterval { 1.0 }
-}
-
-extension StoreLoading where Self: XCTestCase {
-  public func loadFromStore<Operation: GraphQLOperation>(
-    operation: Operation,
-    file: StaticString = #filePath,
-    line: UInt = #line,
-    resultHandler: @escaping AsyncResultObserver<GraphQLResponse<Operation>, any Error>.ResultHandler
-  ) {
-    let resultObserver = makeResultObserver(for: operation, file: file, line: line)
-        
-    let expectation = resultObserver.expectation(description: "Loaded query from store", file: file, line: line, resultHandler: resultHandler)
-    
-    store.load(operation, resultHandler: resultObserver.handler)
-    
-    wait(for: [expectation], timeout: Self.defaultWaitTimeout)
-  }
 }

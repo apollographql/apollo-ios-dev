@@ -311,7 +311,7 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
     async throws
   {
     // given
-    actor ErrorInterceptor: ApolloInterceptor {
+    actor ErrorInterceptor: GraphQLInterceptor {
       nonisolated(unsafe) var handledError: (any Error)?
 
       func intercept<Request>(
@@ -338,7 +338,7 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
     struct TestProvider: InterceptorProvider {
       let errorInterceptor = ErrorInterceptor()
 
-      func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any ApolloInterceptor] {
+      func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any GraphQLInterceptor] {
         return [
           errorInterceptor
         ]
@@ -378,7 +378,7 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
     async throws
   {
     // given
-    actor ErrorInterceptor: ApolloInterceptor {
+    actor ErrorInterceptor: GraphQLInterceptor {
       nonisolated(unsafe) var handledError: (any Error)?
 
       func intercept<Request>(
@@ -405,7 +405,7 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
     struct TestProvider: InterceptorProvider {
       let errorInterceptor = ErrorInterceptor()
 
-      func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any ApolloInterceptor] {
+      func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any GraphQLInterceptor] {
         return [
           errorInterceptor
         ]
@@ -466,7 +466,7 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
     ])
 
     /// This interceptor will reroute anything that fails with a response code error to retry hitting only the cache
-    final class RerouteToCacheErrorInterceptor: ApolloInterceptor {
+    final class RerouteToCacheErrorInterceptor: GraphQLInterceptor {
       nonisolated(unsafe) var handledError: (any Error)?
 
       func intercept<Request: GraphQLRequest>(
@@ -489,7 +489,7 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
     struct TestProvider: InterceptorProvider {
       let errorInterceptor = RerouteToCacheErrorInterceptor()
 
-      func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any ApolloInterceptor] {
+      func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any GraphQLInterceptor] {
         DefaultInterceptorProvider.shared.graphQLInterceptors(for: operation) + [
           errorInterceptor
         ]

@@ -3,7 +3,7 @@ import ApolloAPI
 import Foundation
 
 // An interceptor which blindly retries every time it receives a request.
-class BlindRetryingTestInterceptor: ApolloInterceptor, @unchecked Sendable {
+class BlindRetryingTestInterceptor: GraphQLInterceptor, @unchecked Sendable {
   var hitCount = 0
 
   func intercept<Request: GraphQLRequest>(

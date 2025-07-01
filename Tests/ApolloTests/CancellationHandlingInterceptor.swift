@@ -2,7 +2,7 @@ import Apollo
 import ApolloAPI
 import Foundation
 
-final class CancellationTestingInterceptor: ApolloInterceptor {
+final class CancellationTestingInterceptor: GraphQLInterceptor {
   private(set) nonisolated(unsafe) var hasBeenCancelled = false
 
   func intercept<Request: GraphQLRequest>(

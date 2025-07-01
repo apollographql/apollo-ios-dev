@@ -30,14 +30,14 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
 
   // MARK: - Mocks
 
-  class GivenSelectionSet: MockSelectionSet {
+  class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
     override class var __selections: [Selection] {[
       .field("hero", Hero?.self)
     ]}
 
     var hero: Hero? { __data["hero"] }
 
-    class Hero: MockSelectionSet {
+    class Hero: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .field("name", String.self),
@@ -46,7 +46,7 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
 
       var friends: [Friend]? { __data["friends"] }
 
-      class Friend: MockSelectionSet {
+      class Friend: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self),

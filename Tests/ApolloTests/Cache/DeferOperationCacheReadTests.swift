@@ -153,7 +153,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       resultHandler: resultObserver.handler
     )
 
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
   func test__fetch__givenOnlyPartialDataIsCached_returnsAllDeferredFragmentsAsPending() async throws {
