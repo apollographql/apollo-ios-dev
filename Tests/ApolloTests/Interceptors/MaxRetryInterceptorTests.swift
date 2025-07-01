@@ -97,7 +97,7 @@ class MaxRetryInterceptorTests: XCTestCase {
       requestConfiguration: RequestConfiguration()
     )
 
-    await expect { try await results.getAllValues() }.to(throwError(RequestChainError.noResults))
+    await expect { try await results.getAllValues() }.to(throwError(ApolloClient.Error.noResults))
     expect(testInterceptor.timesRetryHasBeenCalled).to(equal(testInterceptor.timesToCallRetry))    
   }
 }

@@ -1,4 +1,5 @@
 import XCTest
+import Nimble
 @testable import Apollo
 import ApolloAPI
 @testable import ApolloSQLite
@@ -60,7 +61,7 @@ class CachePersistenceTests: XCTestCase {
 
     let newClientResult = try await newClient.fetch(query: query, cachePolicy: .cacheOnly)
 
-    XCTAssertEqual(newClientResult.data?.hero?.name, "Luke Skywalker")
+    XCTAssertEqual(newClientResult?.data?.hero?.name, "Luke Skywalker")
   }
 
   func testFetchAndPersistWithPeriodArguments() async throws {
@@ -178,49 +179,14 @@ class CachePersistenceTests: XCTestCase {
       ]
     }
 
-    let networkExpectation = self.expectation(description: "Fetching query from network")
-    let emptyCacheExpectation = self.expectation(description: "Fetch query from empty cache")
-    let cacheClearExpectation = self.expectation(description: "cache cleared")
+    let firstResult = try await client.fetch(query: query, cachePolicy: .networkOnly)
 
-    client.fetch(query: query, cachePolicy: .fetchIgnoringCacheData) { outerResult in
-      defer { networkExpectation.fulfill() }
+    XCTAssertEqual(firstResult.data?.hero?.name, "Luke Skywalker")
 
-      switch outerResult {
-      case .failure(let error):
-        XCTFail("Unexpected failure: \(error)")
-      case .success(let graphQLResult):
-        XCTAssertEqual(graphQLResult.data?.hero?.name, "Luke Skywalker")
-      }
+    try await client.clearCache()
 
-      client.clearCache(completion: { result in
-        defer { cacheClearExpectation.fulfill() }
-        switch result {
-        case .success:
-          break
-        case .failure(let error):
-          XCTFail("Error clearing cache: \(error)")
-        }
-
-        client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch) { innerResult in
-          defer { emptyCacheExpectation.fulfill() }
-
-          switch innerResult {
-          case .success:
-            XCTFail("This should have returned an error")
-          case .failure(let error):
-            guard case JSONDecodingError.missingValue = error else {
-              XCTFail("Unexpected JSON error: \(error)")
-              return
-            }
-          }
-        }
-      })
-    }
-
-    await fulfillment(
-      of: [networkExpectation, emptyCacheExpectation, cacheClearExpectation],
-      timeout: 2
-    )
+    await expect { try await client.fetch(query: query, cachePolicy: .cacheOnly) }
+      .to(beNil())
   }
 
 }

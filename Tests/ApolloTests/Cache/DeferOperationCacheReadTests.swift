@@ -317,7 +317,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__fetch__givenMissingValueInPartialData_shouldFailFetch() async throws {
+  func test__fetch__givenMissingValueInPartialData_shouldReturnNil() async throws {
     await mergeRecordsIntoCache([
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal"),
@@ -335,30 +335,8 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     ])
 
     let query = AnimalQuery()
-    let resultObserver = makeResultObserver(for: query)
 
-    let fetchResultFromCacheExpectation = resultObserver.expectation(
-      description: "Received result from cache"
-    ) { result in
-      expect(result).to(beFailure { error in
-        guard let error = error as? GraphQLExecutionError else {
-          fail("Unexpected error - \(error)")
-          return
-        }
-
-        expect(error.path).to(equal(["animal", "species"]))
-        expect(error.underlying).to(matchError(JSONDecodingError.missingValue))
-      })
-
-
-    }
-
-    client.fetch(
-      query: query,
-      cachePolicy: .returnCacheDataDontFetch,
-      resultHandler: resultObserver.handler
-    )
-
-    await fulfillment(of: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await expect { try await self.client.fetch(query: query, cachePolicy: .cacheOnly) }
+      .to(beNil())
   }
 }

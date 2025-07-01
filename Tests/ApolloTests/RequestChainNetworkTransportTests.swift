@@ -100,7 +100,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
 
     await expect {
       try await resultStream.getAllValues()
-    }.to(throwError(RequestChainError.noResults))
+    }.to(throwError(ApolloClient.Error.noResults))
   }
 
   // MARK: - Cancellation tests
