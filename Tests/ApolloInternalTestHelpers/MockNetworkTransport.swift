@@ -24,7 +24,7 @@ public final class MockNetworkTransport: NetworkTransport {
     query: Query,
     fetchBehavior: FetchBehavior,
     requestConfiguration: RequestConfiguration
-  ) throws -> AsyncThrowingStream<GraphQLResult<Query.Data>, any Error> {
+  ) throws -> AsyncThrowingStream<GraphQLResult<Query>, any Error> {
     try requestChainTransport.send(
       query: query,
       fetchBehavior: fetchBehavior,
@@ -35,7 +35,7 @@ public final class MockNetworkTransport: NetworkTransport {
   public func send<Mutation: GraphQLMutation>(
     mutation: Mutation,
     requestConfiguration: RequestConfiguration
-  ) throws -> AsyncThrowingStream<GraphQLResult<Mutation.Data>, any Error> {
+  ) throws -> AsyncThrowingStream<GraphQLResult<Mutation>, any Error> {
     try requestChainTransport.send(
       mutation: mutation,
       requestConfiguration: requestConfiguration
