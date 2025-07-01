@@ -539,7 +539,7 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
       }
 
       expect(heroName).to(equal("R2-D2"))
-      expect(response.source).to(equal(GraphQLResult<GivenSelectionSet>.Source.cache))
+      expect(response.source).to(equal(GraphQLResponse<MockQuery<GivenSelectionSet>>.Source.cache))
     }
 
     expect(responseCount).to(equal(1))

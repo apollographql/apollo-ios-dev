@@ -101,7 +101,7 @@ class JSONTests: XCTestCase {
   }
   
   func testJSONConvertSelectionSetEncoding() async throws {
-    class Hero: MockSelectionSet {
+    class Hero: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
       
       override class var __selections: [Selection] {[
@@ -122,7 +122,7 @@ class JSONTests: XCTestCase {
   }
   
   func testJSONConvertGraphQLResultEncoding() async throws {
-    class MockData: MockSelectionSet {
+    class MockData: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __selections: [Selection] {[
@@ -131,7 +131,7 @@ class JSONTests: XCTestCase {
 
       var hero: Hero? { __data["hero"] }
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __selections: [Selection] {[
@@ -152,7 +152,7 @@ class JSONTests: XCTestCase {
     
     let heroData = try await MockData(data: jsonObj)
 
-    let result = GraphQLResult(
+    let result = GraphQLResponse<MockQuery<MockData>>(
       data: heroData,
       extensions: nil,
       errors: nil,

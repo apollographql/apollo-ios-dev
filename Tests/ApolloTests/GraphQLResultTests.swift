@@ -6,15 +6,15 @@ import ApolloInternalTestHelpers
 final class GraphQLResultTests: XCTestCase {
 
   // given
-  private class MockHeroQuery: MockQuery<MockHeroQuery.Data> {
-    class Data: MockSelectionSet {
+  private class MockHeroQuery: MockQuery<MockHeroQuery.Data>, @unchecked Sendable {
+    class Data: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero?.self)
       ]}
 
       public var hero: Hero? { __data["hero"] }
 
-      class Hero: AbstractMockSelectionSet<Hero.Fragments, MockSchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<Hero.Fragments, MockSchemaMetadata>, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self),
@@ -33,7 +33,7 @@ final class GraphQLResultTests: XCTestCase {
           @Deferred var deferredFriends: DeferredFriends?
         }
 
-        class DeferredFriends: MockTypeCase {
+        class DeferredFriends: MockTypeCase, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("friends", [String].self)
           ]}
@@ -56,7 +56,7 @@ final class GraphQLResultTests: XCTestCase {
     ])
 
     // when
-    let result = GraphQLResult(
+    let result = GraphQLResponse<MockHeroQuery>(
       data: heroData,
       extensions: nil,
       errors: nil,
@@ -85,7 +85,7 @@ final class GraphQLResultTests: XCTestCase {
     ])
 
     // when
-    let result = GraphQLResult(
+    let result = GraphQLResponse<MockHeroQuery>(
       data: heroData,
       extensions: nil,
       errors: nil,
@@ -121,7 +121,7 @@ final class GraphQLResultTests: XCTestCase {
     ])
 
     // when
-    let result = GraphQLResult<MockHeroQuery.Data>(
+    let result = GraphQLResponse<MockHeroQuery>(
       data: nil,
       extensions: nil,
       errors: [error],
@@ -174,7 +174,7 @@ final class GraphQLResultTests: XCTestCase {
     )
 
     // when
-    let result = GraphQLResult(
+    let result = GraphQLResponse<MockHeroQuery>(
       data: resultData,
       extensions: nil,
       errors: nil,
@@ -208,7 +208,7 @@ final class GraphQLResultTests: XCTestCase {
 
     // then
     XCTAssertEqual(merged.asJSONDictionary(), expected)
-    XCTAssertEqual(merged.source, GraphQLResult<MockHeroQuery.Data>.Source.server)
+    XCTAssertEqual(merged.source, GraphQLResponse<MockHeroQuery>.Source.server)
 
     XCTAssertNil(merged.extensions)
     XCTAssertNil(merged.errors)
@@ -217,7 +217,7 @@ final class GraphQLResultTests: XCTestCase {
 
   func test__merging__givenIncrementalErrors_shouldMergeErrors() throws {
     // given
-    let result = GraphQLResult<MockHeroQuery.Data>(
+    let result = GraphQLResponse<MockHeroQuery>(
       data: nil,
       extensions: nil,
       errors: [GraphQLError("Base Error")],
@@ -252,7 +252,7 @@ final class GraphQLResultTests: XCTestCase {
 
   func test__merging__givenIncrementalExtensions_shouldMergeExtensions() throws {
     // given
-    let result = GraphQLResult<MockHeroQuery.Data>(
+    let result = GraphQLResponse<MockHeroQuery>(
       data: nil,
       extensions: ["FeatureA": true],
       errors: nil,
@@ -286,7 +286,7 @@ final class GraphQLResultTests: XCTestCase {
 
   func test__merging__givenIncrementalDependentKeys_shouldMergeDependentKeys() throws {
     // given
-    let result = GraphQLResult<MockHeroQuery.Data>(
+    let result = GraphQLResponse<MockHeroQuery>(
       data: nil,
       extensions: nil,
       errors: nil,

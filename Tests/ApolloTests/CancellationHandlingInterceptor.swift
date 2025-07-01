@@ -1,11 +1,3 @@
-//
-//  CancellationHandlingInterceptor.swift
-//  ApolloTests
-//
-//  Created by Ellen Shapiro on 9/17/20.
-//  Copyright © 2020 Apollo GraphQL. All rights reserved.
-//
-
 import Apollo
 import ApolloAPI
 import Foundation

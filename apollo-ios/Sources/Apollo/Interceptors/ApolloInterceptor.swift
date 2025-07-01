@@ -6,7 +6,7 @@ import Foundation
 #endif
 
 public typealias InterceptorResultStream<Request: GraphQLRequest> =
-NonCopyableAsyncThrowingStream<GraphQLResponse<Request.Operation>>
+NonCopyableAsyncThrowingStream<ParsedResult<Request.Operation>>
 
 public protocol ResponseParsingInterceptor: Sendable {
   func parse<Request: GraphQLRequest>(
@@ -16,11 +16,11 @@ public protocol ResponseParsingInterceptor: Sendable {
   ) async throws -> InterceptorResultStream<Request>
 }
 
-public struct GraphQLResponse<Operation: GraphQLOperation>: Sendable, Hashable {
-  public let result: GraphQLResult<Operation.Data>
+public struct ParsedResult<Operation: GraphQLOperation>: Sendable, Hashable {
+  public let result: GraphQLResponse<Operation>
   public let cacheRecords: RecordSet?
 
-  public init(result: GraphQLResult<Operation.Data>, cacheRecords: RecordSet?) {
+  public init(result: GraphQLResponse<Operation>, cacheRecords: RecordSet?) {
     self.result = result
     self.cacheRecords = cacheRecords
   }
@@ -53,9 +53,9 @@ public struct HTTPResponse: Sendable, ~Copyable {
 
   public consuming func mapChunks(
     _ transform: @escaping @Sendable (HTTPURLResponse, Data) async throws -> (Data)
-  ) async throws -> HTTPResponse {
+  ) async -> HTTPResponse {
     let response = self.response
-    let stream = try await chunks.map { chunk in
+    let stream = await chunks.map { chunk in
       return try await transform(response, chunk)
     }
     return HTTPResponse(response: response, chunks: stream)
