@@ -228,7 +228,6 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
         expectation.to(equal("{\"episode\":\"\(episode.rawValue)\"}"))
 
       case .none:
-        #warning("TODO: write test to test this case actually happens")
         expectation.to(equal("{}"))
 
       case .null:
