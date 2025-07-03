@@ -6,6 +6,8 @@ public final class MockNetworkTransport: NetworkTransport {
   public let mockServer: MockGraphQLServer
   public let requestChainTransport: RequestChainNetworkTransport
 
+  public var url: URL { requestChainTransport.endpointURL }
+
   public init(
     mockServer: MockGraphQLServer = MockGraphQLServer(),
     store: ApolloStore
@@ -87,7 +89,7 @@ public final class MockNetworkTransport: NetworkTransport {
       }
 
       let httpResponse = HTTPURLResponse(
-        url: TestURL.mockServer.url,
+        url: request.url!,
         statusCode: 200,
         httpVersion: nil,
         headerFields: nil

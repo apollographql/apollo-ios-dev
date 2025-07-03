@@ -30,12 +30,12 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
 
   func test__execute__givenObjectWithNoCacheKey_normalizesRecordToPathFromQueryRoot() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("name", String.self)
         ]}
@@ -59,12 +59,12 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   
   func test__execute__givenObjectWithNoCacheKey_forFieldWithStringArgument_normalizesRecordToPathFromQueryRootIncludingArgument() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self, arguments: ["episode": .variable("episode")])
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("name", String.self)
         ]}
@@ -96,12 +96,12 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       case JEDI
     }
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self, arguments: ["episode": .variable("episode")])
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("name", String.self)
         ]}
@@ -127,18 +127,18 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
 
   func test__execute__givenObjectWithNoCacheKey_andNestedArrayOfObjectsWithNoCacheKey_normalizesRecordsToPathsFromQueryRoot() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("name", String.self),
           .field("friends", [Friend].self)
         ]}
 
-        class Friend: MockSelectionSet {
+        class Friend: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("name", String.self)
           ]}
@@ -179,19 +179,19 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   @MainActor
   func test__execute__givenObjectWithCacheKey_andNestedArrayOfObjectsWithCacheKey_normalizesRecordsToIndividualReferences() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("id", String.self),
           .field("name", String.self),
           .field("friends", [Friend].self)
         ]}
 
-        class Friend: MockSelectionSet {
+        class Friend: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("id", String.self),
             .field("name", String.self)
@@ -241,20 +241,20 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   
   func test__execute__givenFieldForObjectWithNoCacheKey_andAliasedFieldForSameFieldName_normalizesRecordsForBothFieldsIntoOneRecord() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self),
         .field("hero", alias: "r2", R2.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
         ]}
       }
 
-      class R2: MockSelectionSet {
+      class R2: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("catchphrase", String.self)
         ]}
@@ -292,26 +292,26 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       }
     })
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self),
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .inlineFragment(AsHuman.self),
           .inlineFragment(AsDroid.self),
         ]}
 
-        class AsHuman: MockTypeCase {
+        class AsHuman: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("name", alias: "property", String.self)
           ]}
         }
 
-        class AsDroid: MockTypeCase {
+        class AsDroid: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Droid }
           override class var __selections: [Selection] {[
             .field("primaryFunction", alias: "property", String.self)
@@ -350,18 +350,18 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       }
     })
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self),
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .inlineFragment(AsHuman.self),
           .inlineFragment(AsDroid.self),
         ]}
 
-        class AsHuman: MockTypeCase {
+        class AsHuman: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
@@ -369,7 +369,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
           ]}
         }
 
-        class AsDroid: MockTypeCase {
+        class AsDroid: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Droid }
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
@@ -409,38 +409,38 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       }
     })
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self),
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .inlineFragment(AsHuman.self),
           .inlineFragment(AsDroid.self),
         ]}
 
-        class AsHuman: MockTypeCase {
+        class AsHuman: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("friend", Friend.self),
           ]}
 
-          class Friend: MockSelectionSet {
+          class Friend: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("height", Double.self, arguments: ["unit": "FOOT"])
             ]}
           }
         }
 
-        class AsDroid: MockTypeCase {
+        class AsDroid: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Droid }
           override class var __selections: [Selection] {[
             .field("friend", Friend.self),
           ]}
 
-          class Friend: MockSelectionSet {
+          class Friend: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("height", Double.self, arguments: ["unit": "METER"])
             ]}
@@ -483,38 +483,38 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       }
     })
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self),
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .inlineFragment(AsHuman.self),
           .inlineFragment(AsDroid.self),
         ]}
 
-        class AsHuman: MockTypeCase {
+        class AsHuman: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("friend", Friend.self),
           ]}
 
-          class Friend: MockSelectionSet {
+          class Friend: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("height", Double.self, arguments: ["unit": "FOOT"])
             ]}
           }
         }
 
-        class AsDroid: MockTypeCase {
+        class AsDroid: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Droid }
           override class var __selections: [Selection] {[
             .field("friend", Friend.self),
           ]}
 
-          class Friend: MockSelectionSet {
+          class Friend: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("height", Double.self, arguments: ["unit": "METER"])
             ]}
@@ -546,12 +546,12 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   @MainActor
   func test__execute__givenObjectOfTypeWithKeyFields_normalizesRecordsToReference() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [], keyFields: ["name"])
         }
@@ -586,12 +586,12 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   @MainActor
   func test__execute__givenObjectOfUnknownType_forInterfaceFieldWithKeyFields_normalizesRecordsToReference() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Interface(name: "Hero", keyFields: ["name"], implementingObjects: ["Hero"])
         }

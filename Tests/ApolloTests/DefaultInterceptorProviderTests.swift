@@ -1,4 +1,5 @@
 import XCTest
+import Nimble
 import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
@@ -31,7 +32,7 @@ class DefaultInterceptorProviderTests: XCTestCase {
     super.tearDown()
   }
   
-  func testLoading() async {
+  func testLoading() async throws {
     // given
     final class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
@@ -50,20 +51,18 @@ class DefaultInterceptorProviderTests: XCTestCase {
       DefaultInterceptorProviderTests.mockData
     }
 
-    client.fetch(query: MockQuery<GivenSelectionSet>()) { result in
-      switch result {
-      case .success(let graphQLResult):
-        XCTAssertEqual(graphQLResult.source, .server)
-        XCTAssertEqual(graphQLResult.data?.hero?.name, "R2-D2")
-      case .failure(let error):
-        XCTFail("Unexpected error: \(error)")
-      }
-    }
+    let results = try await client.fetch(query: MockQuery<GivenSelectionSet>()).getAllValues()
+
+    expect(results.count).to(equal(1))
+
+    let graphQLResult = results.first
+    XCTAssertEqual(graphQLResult?.source, .server)
+    XCTAssertEqual(graphQLResult?.data?.hero?.name, "R2-D2")
 
     await fulfillment(of: [expectation])
   }
 
-  func testInitialLoadFromNetworkAndSecondaryLoadFromCache() async {
+  func testInitialLoadFromNetworkAndSecondaryLoadFromCache() async throws {
     // given
     final class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
@@ -82,36 +81,21 @@ class DefaultInterceptorProviderTests: XCTestCase {
       DefaultInterceptorProviderTests.mockData
     }
     initialLoadExpectation.assertForOverFulfill = false
-    let fetchCompleteExpectation = self.expectation(description: "fetch complete")
 
-    client.fetch(query: MockQuery<GivenSelectionSet>()) { result in
-      defer { fetchCompleteExpectation.fulfill() }
-      switch result {
-      case .success(let graphQLResult):
-        XCTAssertEqual(graphQLResult.source, .server)
-        XCTAssertEqual(graphQLResult.data?.hero?.name, "R2-D2")
-      case .failure(let error):
-        XCTFail("Unexpected error: \(error)")
-      }
-    }
+    let results = try await client.fetch(query: MockQuery<GivenSelectionSet>()).getAllValues()
 
-    await fulfillment(of: [initialLoadExpectation, fetchCompleteExpectation])
+    expect(results.count).to(equal(1))
+    let graphQLResult = results.first
 
-    let secondLoadExpectation = self.expectation(description: "loaded with default client")
+    XCTAssertEqual(graphQLResult?.source, .server)
+    XCTAssertEqual(graphQLResult?.data?.hero?.name, "R2-D2")
 
-    client.fetch(query: MockQuery<GivenSelectionSet>(), cachePolicy: .returnCacheDataElseFetch) { result in
-      switch result {
-      case .success(let graphQLResult):
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertEqual(graphQLResult.data?.hero?.name, "R2-D2")
-      case .failure(let error):
-        XCTFail("Unexpected error: \(error)")
+    await fulfillment(of: [initialLoadExpectation])
 
-      }
-      secondLoadExpectation.fulfill()
-    }
+    let secondLoadResult = try await client.fetch(query: MockQuery<GivenSelectionSet>(), cachePolicy: .cacheFirst)
 
-    await fulfillment(of: [secondLoadExpectation], timeout: 10)
+    XCTAssertEqual(secondLoadResult.source, .cache)
+    XCTAssertEqual(secondLoadResult.data?.hero?.name, "R2-D2")
   }
 
 
