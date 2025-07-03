@@ -81,8 +81,6 @@ class UploadRequestTests: XCTestCase {
       writeResultsToCache: false
     )
 
-    let urlRequest = try uploadRequest.toURLRequest()
-
     let multipartData = try uploadRequest.requestMultipartFormData()
     let actual = try multipartData.toTestString()
 
@@ -149,8 +147,6 @@ class UploadRequestTests: XCTestCase {
       multipartBoundary: "TEST.BOUNDARY",
       writeResultsToCache: false
     )        
-
-    let urlRequest = try uploadRequest.toURLRequest()
 
     let multipartData = try uploadRequest.requestMultipartFormData()
     let actual = try multipartData.toTestString()

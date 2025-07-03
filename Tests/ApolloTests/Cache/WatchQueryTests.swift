@@ -212,18 +212,10 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    let otherFetchCompletedExpectation = expectation(description: "Other fetch completed")
-
-    client.fetch(
-      query: MockQuery<SimpleMockSelectionSet>(),
-      cachePolicy: .fetchIgnoringCacheData
-    ) { result in
-      defer { otherFetchCompletedExpectation.fulfill() }
-      XCTAssertSuccessResult(result)
-    }
+    _ = try await client.fetch(query: MockQuery<SimpleMockSelectionSet>(), cachePolicy: .networkOnly)
 
     await fulfillment(
-      of: [refetchServerRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation],
+      of: [refetchServerRequestExpectation, updatedWatcherResultExpectation],
       timeout: Self.defaultWaitTimeout
     )
   }
@@ -306,23 +298,17 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     ) { _ in }
     noUpdatedResultExpectation.isInverted = true
 
-    let otherFetchCompletedExpectation = expectation(description: "Other fetch completed")
-
     let newQuery = MockQuery<GivenMockSelectionSet>()
     newQuery.__variables = ["episode": "JEDI"]
 
-    client.fetch(query: newQuery, cachePolicy: .fetchIgnoringCacheData) { result in
-      defer { otherFetchCompletedExpectation.fulfill() }
-      XCTAssertSuccessResult(result)
-    }
+    _ = try await client.fetch(query: newQuery, cachePolicy: .networkOnly)
 
     await fulfillment(
-      of: [secondServerRequestExpectation, otherFetchCompletedExpectation, noUpdatedResultExpectation],
+      of: [secondServerRequestExpectation, noUpdatedResultExpectation],
       timeout: Self.defaultWaitTimeout
     )
   }
 
-  @MainActor
   func testWatchedQueryGetsUpdatedWhenSameObjectHasChangedInAnotherQueryWithDifferentVariables() async throws {
     class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {
@@ -342,7 +328,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
+    await MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
 
     let watchedQuery = MockQuery<GivenSelectionSet>()
     watchedQuery.__variables = ["episode": "EMPIRE"]
@@ -415,18 +401,13 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    let otherFetchCompletedExpectation = expectation(description: "Other fetch completed")
-
     let query = MockQuery<GivenSelectionSet>()
     query.__variables = ["episode": "JEDI"]
 
-    client.fetch(query: query, cachePolicy: .fetchIgnoringCacheData) { result in
-      defer { otherFetchCompletedExpectation.fulfill() }
-      XCTAssertSuccessResult(result)
-    }
+    _ = try await client.fetch(query: query, cachePolicy: .networkOnly)
 
     await fulfillment(
-      of: [secondServerRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation],
+      of: [secondServerRequestExpectation, updatedWatcherResultExpectation],
       timeout: Self.defaultWaitTimeout
     )
   }
@@ -559,18 +540,10 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    let otherFetchCompletedExpectation = expectation(description: "Other fetch completed")
-
-    client.fetch(
-      query: MockQuery<HeroNameSelectionSet>(),
-      cachePolicy: .fetchIgnoringCacheData
-    ) { result in
-      defer { otherFetchCompletedExpectation.fulfill() }
-      XCTAssertSuccessResult(result)
-    }
+    _ = try await client.fetch(query: MockQuery<HeroNameSelectionSet>(), cachePolicy: .networkOnly)
 
     await fulfillment(
-      of: [secondServerRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation],
+      of: [secondServerRequestExpectation, updatedWatcherResultExpectation],
       timeout: Self.defaultWaitTimeout
     )
   }
@@ -727,18 +700,10 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    let otherFetchCompletedExpectation = expectation(description: "Other fetch completed")
-
-    client.fetch(
-      query: MockQuery<HeroAndFriendsIdsSelectionSet>(),
-      cachePolicy: .fetchIgnoringCacheData
-    ) { result in
-      defer { otherFetchCompletedExpectation.fulfill() }
-      XCTAssertSuccessResult(result)
-    }
+    _ = try await client.fetch(query: MockQuery<HeroAndFriendsIdsSelectionSet>(), cachePolicy: .networkOnly)
 
     await fulfillment(
-      of: [secondServerRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation],
+      of: [secondServerRequestExpectation, updatedWatcherResultExpectation],
       timeout: Self.defaultWaitTimeout
     )
   }
@@ -915,19 +880,12 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    let otherFetchCompletedExpectation = expectation(description: "Other fetch completed")
-
-    client.fetch(
-      query: MockQuery<HeroAndFriendsIDsSelectionSet>(),
-      cachePolicy: .fetchIgnoringCacheData
-    ) { result in
-      defer { otherFetchCompletedExpectation.fulfill() }
-      XCTAssertSuccessResult(result)
-    }
+    _ = try await client.fetch(query: MockQuery<HeroAndFriendsIDsSelectionSet>(), cachePolicy: .networkOnly)
 
     await fulfillment(
       of: [
-        secondServerRequestExpectation, otherFetchCompletedExpectation, refetchServerRequestExpectation,
+        secondServerRequestExpectation,
+        refetchServerRequestExpectation,
         updatedWatcherResultExpectation,
       ],
       timeout: Self.defaultWaitTimeout
@@ -1084,18 +1042,10 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     ) { _ in }
     updatedWatcherResultExpectation.isInverted = true
 
-    let otherFetchCompletedExpectation = expectation(description: "Other fetch completed")
-
-    client.fetch(
-      query: MockQuery<HeroAndFriendsIDsSelectionSet>(),
-      cachePolicy: .fetchIgnoringCacheData
-    ) { result in
-      defer { otherFetchCompletedExpectation.fulfill() }
-      XCTAssertSuccessResult(result)
-    }
+    _ = try await client.fetch(query: MockQuery<HeroAndFriendsIDsSelectionSet>(), cachePolicy: .networkOnly)
 
     await fulfillment(
-      of: [secondServerRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation],
+      of: [secondServerRequestExpectation, updatedWatcherResultExpectation],
       timeout: Self.defaultWaitTimeout
     )
   }
@@ -1439,16 +1389,11 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     }
     noRefetchExpectation.isInverted = true
 
-    let otherFetchCompletedExpectation = expectation(description: "Other fetch completed")
-
     let query = MockQuery<HeroAndFriendsIDsOnlySelectionSet>()
-    client.fetch(query: query, cachePolicy: .fetchIgnoringCacheData) { result in
-      defer { otherFetchCompletedExpectation.fulfill() }
-      XCTAssertSuccessResult(result)
-    }
+    _ = try await client.fetch(query: query, cachePolicy: .networkOnly)
 
     await fulfillment(
-      of: [secondServerRequestExpectation, otherFetchCompletedExpectation, noRefetchExpectation],
+      of: [secondServerRequestExpectation, noRefetchExpectation],
       timeout: Self.defaultWaitTimeout
     )
   }
@@ -1541,17 +1486,15 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     let otherFetchesCompletedExpectation = expectation(description: "Other fetches completed")
     otherFetchesCompletedExpectation.expectedFulfillmentCount = numberOfFetches
 
-    DispatchQueue.concurrentPerform(iterations: numberOfFetches) { _ in
-      client.fetch(
-        query: MockQuery<HeroNameSelectionSet>(),
-        cachePolicy: .fetchIgnoringCacheData
-      ) { [weak self] result in
-        otherFetchesCompletedExpectation.fulfill()
-
-        if let self = self, case .failure(let error) = result {
-          self.record(error)
+    try await withThrowingTaskGroup { group in
+      for _ in 0..<numberOfFetches {
+        group.addTask {
+          _ = try await self.client.fetch(query: MockQuery<HeroNameSelectionSet>(), cachePolicy: .networkOnly)
+          otherFetchesCompletedExpectation.fulfill()
         }
       }
+
+      try await group.waitForAll()
     }
 
     await fulfillment(
@@ -1660,17 +1603,15 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     let otherFetchesCompletedExpectation = expectation(description: "Other fetches completed")
     otherFetchesCompletedExpectation.expectedFulfillmentCount = numberOfFetches
 
-    DispatchQueue.concurrentPerform(iterations: numberOfFetches) { _ in
-      client.fetch(
-        query: MockQuery<HeroNameSelectionSet>(),
-        cachePolicy: .fetchIgnoringCacheData
-      ) { [weak self] result in
-        otherFetchesCompletedExpectation.fulfill()
-
-        if let self = self, case .failure(let error) = result {
-          self.record(error)
+    try await withThrowingTaskGroup { group in
+      for _ in 0..<numberOfFetches {
+        group.addTask {
+          _ = try await self.client.fetch(query: MockQuery<HeroNameSelectionSet>(), cachePolicy: .networkOnly)
+          otherFetchesCompletedExpectation.fulfill()
         }
       }
+
+      try await group.waitForAll()
     }
 
     await fulfillment(
@@ -1862,7 +1803,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
   }
 
   @MainActor
-  func testWatchedQueryDependentKeysAreUpdatedAfterOtherFetchReturnsChangedData() async {
+  func testWatchedQueryDependentKeysAreUpdatedAfterOtherFetchReturnsChangedData() async throws {
     class HeroAndFriendsNameWithIDsSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {
         [
@@ -2010,18 +1951,10 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    let otherFetchCompletedExpectation = expectation(description: "Other fetch completed")
-
-    client.fetch(
-      query: MockQuery<HeroAndFriendsNameWithIDsSelectionSet>(),
-      cachePolicy: .fetchIgnoringCacheData
-    ) { result in
-      defer { otherFetchCompletedExpectation.fulfill() }
-      XCTAssertSuccessResult(result)
-    }
+    _ = try await client.fetch(query: MockQuery<HeroAndFriendsNameWithIDsSelectionSet>(), cachePolicy: .networkOnly)
 
     await fulfillment(
-      of: [secondServerRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation],
+      of: [secondServerRequestExpectation, updatedWatcherResultExpectation],
       timeout: Self.defaultWaitTimeout
     )
   }

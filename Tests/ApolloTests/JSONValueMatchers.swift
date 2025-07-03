@@ -44,16 +44,3 @@ public func contain(
     return MatcherStatus(bool: matches)
   }
 }
-
-#warning("TODO: can we kill these two?")
-extension AnyHashable: @retroactive ExpressibleByDictionaryLiteral {
-  public init(dictionaryLiteral elements: (AnyHashable, AnyHashable)...) {
-    self.init(Dictionary(elements))
-  }
-}
-
-extension AnyHashable: @retroactive ExpressibleByArrayLiteral {
-  public init(arrayLiteral elements: AnyHashable...) {
-    self.init(elements)
-  }
-}

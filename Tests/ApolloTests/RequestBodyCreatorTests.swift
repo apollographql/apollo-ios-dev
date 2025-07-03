@@ -26,6 +26,20 @@ class RequestBodyCreatorTests: XCTestCase {
     )
   }
 
+  struct TestCustomRequestBodyCreator: JSONRequestBodyCreator {
+
+    var stubbedRequestBody: JSONEncodableDictionary = ["TestCustomRequestBodyCreator": "TestBodyValue"]
+
+    func requestBody<Operation: GraphQLOperation>(
+      for operation: Operation,
+      sendQueryDocument: Bool,
+      autoPersistQuery: Bool
+    ) -> JSONEncodableDictionary {
+      stubbedRequestBody
+    }
+  }
+
+
   // MARK: - Tests
 
   func testRequestBodyWithApolloRequestBodyCreator() {

@@ -49,7 +49,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_scalar__givenData_getsValue() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("name", String.self)] }
     }
     let object: JSONObject = ["name": "Luke Skywalker"]
@@ -63,13 +63,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
   
   func test__nonnull_scalar__givenDataMissingKeyForField_throwsMissingValueError() async {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("name", String.self)] }
     }
     let object: JSONObject = [:]
 
     // when
-    await expecta(try await self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["name"]))
       expect(error.underlying).to(matchError(JSONDecodingError.missingValue))
@@ -78,13 +79,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
   
   func test__nonnull_scalar__givenDataHasNullValueForField_throwsNullValueError() async {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("name", String.self)] }
     }
     let object: JSONObject = ["name": NSNull()]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["name"]))
       expect(error.underlying).to(matchError(JSONDecodingError.nullValue))
@@ -93,7 +95,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
   
   func test__nonnull_scalar__givenDataWithTypeConvertibleToFieldType_getsConvertedValue() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("name", String.self)] }
     }
     let object: JSONObject = ["name": 10]
@@ -107,13 +109,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_scalar__givenDataWithTypeNotConvertibleToFieldType_throwsCouldNotConvertError() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("name", String.self)] }
     }
     let object: JSONObject = ["name": false]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
         expect(error.path).to(equal(["name"]))
@@ -129,7 +132,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     // given
     typealias GivenCustomScalar = String
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("customScalar", GivenCustomScalar.self)] }
     }
     let object: JSONObject = ["customScalar": Int(12345678)]
@@ -145,7 +148,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     // given
     typealias GivenCustomScalar = String
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("customScalar", GivenCustomScalar.self)] }
     }
     let object: JSONObject = ["customScalar": Int64(989561700)]
@@ -161,7 +164,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     // given
     typealias GivenCustomScalar = String
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("customScalar", GivenCustomScalar.self)] }
     }
     let object: JSONObject = ["customScalar": Double(1234.5678)]
@@ -186,7 +189,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       var _jsonValue: JSONValue { value }
     }
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("customScalar", GivenCustomScalar.self)] }
     }
     let object: JSONObject = ["customScalar": Int64(989561700)]
@@ -202,7 +205,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
   
   func test__optional_scalar__givenData_getsValue() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("name", String?.self)] }
     }
     let object: JSONObject = ["name": "Luke Skywalker"]
@@ -216,13 +219,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__optional_scalar__givenDataMissingKeyForField_throwsMissingValueError() async {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("name", String?.self)] }
     }
     let object: JSONObject = [:]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["name"]))
       expect(error.underlying).to(matchError(JSONDecodingError.missingValue))
@@ -231,7 +235,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__optional_scalar__givenDataHasNullValueForField_returnsNilValueForField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("name", String?.self)] }
     }
     let object: JSONObject = ["name": NSNull()]
@@ -245,7 +249,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__optional_scalar__givenDataWithTypeConvertibleToFieldType_getsConvertedValue() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("name", String?.self)] }
     }
     let object: JSONObject = ["name": 10]
@@ -259,13 +263,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__optional_scalar__givenDataWithTypeNotConvertibleToFieldType_throwsCouldNotConvertError() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("name", String?.self)] }
     }
     let object: JSONObject = ["name": false]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
         expect(error.path).to(equal(["name"]))
@@ -285,7 +290,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_enum__givenData_getsValue() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("size", GraphQLEnum<MockEnum>.self)] }
     }
     let object: JSONObject = ["size": "SMALL"]
@@ -299,7 +304,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_enum__givenDataIsNotAnEnumCase_getsValueAsUnknownCase() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("size", GraphQLEnum<MockEnum>.self)] }
     }
     let object: JSONObject = ["size": "GIGANTIC"]
@@ -313,13 +318,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_enum__givenDataMissingKeyForField_throwsMissingValueError() async {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("size", GraphQLEnum<MockEnum>.self)] }
     }
     let object: JSONObject = [:]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["size"]))
       expect(error.underlying).to(matchError(JSONDecodingError.missingValue))
@@ -328,7 +334,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_enum__givenDataHasNullValueForField_throwsNullValueError() async {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("size", GraphQLEnum<MockEnum>.self)
       ]}
@@ -336,7 +342,8 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["size": NSNull()]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["size"]))
       expect(error.underlying).to(matchError(JSONDecodingError.nullValue))
@@ -345,13 +352,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_enum__givenDataWithType_Int_throwsCouldNotConvertError() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("size", GraphQLEnum<MockEnum>.self)] }
     }
     let object: JSONObject = ["size": 10]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
         expect(error.path).to(equal(["size"]))
@@ -363,13 +371,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_enum__givenDataWithType_Double_throwsCouldNotConvertError() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("size", GraphQLEnum<MockEnum>.self)] }
     }
     let object: JSONObject = ["size": 10.0]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
         expect(error.path).to(equal(["size"]))
@@ -383,7 +392,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_list_nonnull_scalar__givenData_getsValue() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String].self)] }
     }
     let object: JSONObject = ["favorites": ["Purple", "Potatoes", "iPhone"]]
@@ -397,7 +406,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
   
   func test__nonnull_list_nonnull_scalar__givenEmptyDataArray_getsValueAsEmptyArray() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String].self)] }
     }
     let object: JSONObject = ["favorites": [] as JSONValue]
@@ -411,13 +420,13 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_list_nonnull_scalar__givenDataMissingKeyForField_throwsMissingValueError() async {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String].self)] }
     }
     let object: JSONObject = [:]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }.to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["favorites"]))
       expect(error.underlying).to(matchError(JSONDecodingError.missingValue))
@@ -426,13 +435,13 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_list_nonnull_scalar__givenDataIsNullForField_throwsNullValueError() async {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String].self)] }
     }
     let object: JSONObject = ["favorites": NSNull()]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }.to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["favorites"]))
       expect(error.underlying).to(matchError(JSONDecodingError.nullValue))
@@ -441,7 +450,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_list_nonnull_scalar__givenDataWithElementTypeConvertibleToFieldType_getsConvertedValue() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String].self)] }
     }
     let object: JSONObject = ["favorites": [10, 20, 30]]
@@ -455,7 +464,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_list_nonnull_enum__givenDataWithStringsNotEnumValue_getsValueAsUnknownCase() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("favorites", [GraphQLEnum<MockEnum>].self)
       ] }
@@ -475,13 +484,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_list_nonnull_scalar__givenDataWithElementTypeNotConvertibleToFieldType_throwsCouldNotConvertError() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String].self)] }
     }
     let object: JSONObject = ["favorites": [true, false, true]]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
         expect(error.path).to(equal(["favorites", "0"]))
@@ -495,7 +505,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__optional_list_nonnull_scalar__givenData_getsValue() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String]?.self)] }
     }
     let object: JSONObject = ["favorites": ["Purple", "Potatoes", "iPhone"]]
@@ -509,7 +519,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
   
   func test__optional_list_nonnull_scalar__givenEmptyDataArray_getsValueAsEmptyArray() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String]?.self)] }
     }
     let object: JSONObject = ["favorites": [] as JSONValue]
@@ -523,13 +533,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__optional_list_nonnull_scalar__givenDataMissingKeyForField_throwsMissingValueError() async {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String]?.self)] }
     }
     let object: JSONObject = [:]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["favorites"]))
       expect(error.underlying).to(matchError(JSONDecodingError.missingValue))
@@ -538,7 +549,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__optional_list_nonnull_scalar__givenDataIsNullForField_valueIsNil() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String]?.self)] }
     }
     let object: JSONObject = ["favorites": NSNull()]
@@ -552,7 +563,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__optional_list_nonnull_scalar__givenDataWithElementTypeConvertibleToFieldType_getsConvertedValue() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String]?.self)] }
     }
     let object: JSONObject = ["favorites": [10, 20, 30]]
@@ -566,13 +577,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__optional_list_nonnull_scalar__givenDataWithElementTypeNotConvertibleToFieldType_throwsCouldNotConvertError() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String]?.self)] }
     }
     let object: JSONObject = ["favorites": [true, false, false]]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
         expect(error.path).to(equal(["favorites", "0"]))
@@ -586,7 +598,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_list_optional_scalar__givenData_getsValue() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String?].self)] }
     }
     let object: JSONObject = ["favorites": ["Purple", "Potatoes", "iPhone"]]
@@ -600,7 +612,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_list_optional_scalar__givenEmptyDataArray_getsValueAsEmptyArray() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String?].self)] }
     }
     let object: JSONObject = ["favorites": [] as JSONValue]
@@ -614,13 +626,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_list_optional_scalar__givenDataMissingKeyForField_throwsMissingValueError() async {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String?].self)] }
     }
     let object: JSONObject = [:]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["favorites"]))
       expect(error.underlying).to(matchError(JSONDecodingError.missingValue))
@@ -629,13 +642,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_list_nonnull_optional__givenDataIsNullForField_throwsNullValueError() async {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String?].self)] }
     }
     let object: JSONObject = ["favorites": NSNull()]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["favorites"]))
       expect(error.underlying).to(matchError(JSONDecodingError.nullValue))
@@ -644,7 +658,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_list_nonnull_optional__givenDataIsArrayWithNullElement_valueIsArrayWithValuesIncludingNilElement() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String?].self)] }
     }
     let object: JSONObject = ["favorites": ["Red", NSNull(), "Bird"] as JSONValue]
@@ -659,7 +673,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__optional_list_optional_scalar__givenData_getsValue() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [.field("favorites", [String?]?.self)] }
     }
     let object: JSONObject = ["favorites": ["Purple", "Potatoes", "iPhone"]]
@@ -673,7 +687,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__optional_list_optional_enum__givenDataWithUnknownEnumCaseElement_getsValueWithUnknownEnumCaseElement() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("favorites", [GraphQLEnum<MockEnum>?]?.self)
       ] }
@@ -689,7 +703,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__optional_list_optional_enum__givenDataWithNonConvertibleTypeElement_getsValueWithUnknownEnumCaseElement() async {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("favorites", [GraphQLEnum<MockEnum>?]?.self)
       ] }
@@ -697,7 +711,8 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": [10]]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
         expect(error.path).to(equal(["favorites", "0"]))
@@ -711,12 +726,12 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_nestedObject__givenData_getsValue() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("child", Child.self)
       ]}
 
-      class Child: MockSelectionSet {
+      class Child: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("name", String.self)
         ]}
@@ -738,12 +753,12 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_nestedObject__givenDataMissingKeyForField_throwsMissingValueError() async {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("child", Child.self)
       ]}
 
-      class Child: MockSelectionSet {
+      class Child: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("name", String.self)
         ]}
@@ -752,7 +767,8 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["child": ["__typename": "Child"]]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["child", "name"]))
       expect(error.underlying).to(matchError(JSONDecodingError.missingValue))
@@ -761,12 +777,12 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__nonnull_nestedObject__givenDataHasNullValueForField_throwsNullValueError() async {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("child", Child.self)
       ]}
 
-      class Child: MockSelectionSet {
+      class Child: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("name", String.self)
         ]}
@@ -780,7 +796,8 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    await expecta(await try self.readValues(GivenSelectionSet.self, from: object)).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["child", "name"]))
       expect(error.underlying).to(matchError(JSONDecodingError.nullValue))
@@ -796,14 +813,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       static let MockChildObject = Object(typename: "MockChildObject", implementedInterfaces: [])
     }
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
       override class var __parentType: any ParentType { Object.mock }
       override class var __selections: [Selection] {[
         .field("child", Child.self),
       ]}
 
-      class Child: MockSelectionSet {
+      class Child: MockSelectionSet, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __parentType: any ParentType { Types.MockChildObject }
@@ -812,7 +829,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
           .inlineFragment(AsHuman.self)
         ]}
 
-        class AsHuman: MockTypeCase {
+        class AsHuman: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("name", String.self),
@@ -848,7 +865,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__inlineFragment__givenDataForDeferredSelection_doesNotSelectDeferredFields() async throws {
     // given
-    class AnAnimal: MockSelectionSet {
+    class AnAnimal: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __selections: [Selection] {[
@@ -857,7 +874,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
       var animal: Animal { __data["animal"] }
 
-      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata> {
+      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata>, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self),
@@ -874,7 +891,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
           @Deferred var deferredSpecies: DeferredSpecies?
         }
 
-        class DeferredSpecies: MockTypeCase {
+        class DeferredSpecies: MockTypeCase, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("species", String.self),
           ]}
@@ -905,7 +922,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__deferredInlineFragment__givenPartialDataForSelection_withConditionEvaluatingTrue_collectsDeferredFragment() async throws {
     // given
-    class AnAnimal: MockSelectionSet {
+    class AnAnimal: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __selections: [Selection] {[
@@ -914,7 +931,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
       var animal: Animal { __data["animal"] }
 
-      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata> {
+      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata>, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self),
@@ -931,7 +948,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
           @Deferred var deferredSpecies: DeferredSpecies?
         }
 
-        class DeferredSpecies: MockTypeCase {
+        class DeferredSpecies: MockTypeCase, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("species", String.self),
           ]}
@@ -959,7 +976,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__deferredInlineFragment__givenPartialDataForSelection_withConditionEvaluatingFalse_doesCollectFulfilledFragmentAndFields() async throws {
     // given
-    class AnAnimal: MockSelectionSet {
+    class AnAnimal: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __selections: [Selection] {[
@@ -968,7 +985,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
       var animal: Animal { __data["animal"] }
 
-      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata> {
+      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata>, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self),
@@ -985,7 +1002,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
           @Deferred var deferredSpecies: DeferredSpecies?
         }
 
-        class DeferredSpecies: MockTypeCase {
+        class DeferredSpecies: MockTypeCase, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("species", String.self),
           ]}
@@ -1018,7 +1035,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__deferredInlineFragment__givenPartialDataForSelection_withConditionEvaluatingFalse_whenMissingDeferredIncrementalData_shouldThrow() async throws {
     // given
-    class AnAnimal: MockSelectionSet {
+    class AnAnimal: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __selections: [Selection] {[
@@ -1027,7 +1044,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
       var animal: Animal { __data["animal"] }
 
-      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata> {
+      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata>, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self),
@@ -1044,7 +1061,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
           @Deferred var deferredSpecies: DeferredSpecies?
         }
 
-        class DeferredSpecies: MockTypeCase {
+        class DeferredSpecies: MockTypeCase, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("species", String.self),
           ]}
@@ -1060,7 +1077,8 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when + then
-    await expecta(await try self.readValues(AnAnimal.self, from: object, variables: ["varA": false])).to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await self.readValues(AnAnimal.self, from: object, variables: ["varA": false]) }
+      .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["animal.species"]))
       expect(error.underlying).to(matchError(JSONDecodingError.missingValue))
@@ -1069,7 +1087,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__deferredInlineFragment__givenIncrementalDataForDeferredSelection_selectsFieldsAndFulfillsFragment() async throws {
     // given
-    class AnAnimal: MockSelectionSet {
+    class AnAnimal: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __selections: [Selection] {[
@@ -1078,7 +1096,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
       var animal: Animal { __data["animal"] }
 
-      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata> {
+      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata>, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self),
@@ -1095,7 +1113,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
           @Deferred var deferredSpecies: DeferredSpecies?
         }
 
-        class DeferredSpecies: MockTypeCase {
+        class DeferredSpecies: MockTypeCase, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("species", String.self),
           ]}
@@ -1125,20 +1143,20 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       static let MockChildObject = Object(typename: "MockChildObject", implementedInterfaces: [])
     }
 
-    class GivenFragment: MockFragment {
+    class GivenFragment: MockFragment, @unchecked Sendable {
       override class var __parentType: any ParentType { Types.MockChildObject }
       override class var __selections: [Selection] {[
         .field("child", Child.self)
       ]}
 
-      class Child: MockSelectionSet {
+      class Child: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("name", String.self)
         ]}
       }
     }
 
-    class GivenSelectionSet: AbstractMockSelectionSet<GivenSelectionSet.Fragments, MockSchemaMetadata> {
+    class GivenSelectionSet: AbstractMockSelectionSet<GivenSelectionSet.Fragments, MockSchemaMetadata>, @unchecked Sendable {
       override class var __parentType: any ParentType { Types.MockChildObject }
       override class var __selections: [Selection] {[
         .fragment(GivenFragment.self)
@@ -1176,7 +1194,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_include_singleField__givenVariableIsTrue_getsValueForConditionalField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: "variable", .field("name", String.self))
       ]}
@@ -1193,7 +1211,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_include_singleField__givenVariableIsFalse_doesNotGetsValueForConditionalField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: "variable", .field("name", String.self))
       ]}
@@ -1210,7 +1228,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_include_singleField__givenGraphQLNullableVariableIsTrue_getsValueForConditionalField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: "variable", .field("name", String.self))
       ]}
@@ -1227,7 +1245,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_include_singleField__givenGraphQLNullableVariableIsFalse_doesNotGetsValueForConditionalField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: "variable", .field("name", String.self))
       ]}
@@ -1244,7 +1262,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_multipleIncludes_singleField__givenAllVariablesAreTrue_getsValueForConditionalField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: "one" || "two", .field("name", String.self))
       ]}
@@ -1261,7 +1279,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_include_singleField__givenVariableIsFalse_givenOtherSelection_doesNotGetsValueForConditionalField_doesGetOtherSelection() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("id", String.self),
         .include(if: "variable", .field("name", String.self))
@@ -1280,7 +1298,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_include_multipleFields__givenVariableIsTrue_getsValuesForConditionalFields() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: "variable", [
           .field("name", String.self),
@@ -1301,7 +1319,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_include_multipleFields__givenVariableIsFalse_doesNotGetValuesForConditionalFields() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: "variable", [
           .field("name", String.self),
@@ -1322,13 +1340,13 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_include_fragment__givenVariableIsTrue_getsValuesForFragmentFields() async throws {
     // given
-    class GivenFragment: MockFragment {
+    class GivenFragment: MockFragment, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("name", String.self),
       ]}
     }
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("id", String.self),
         .include(if: "variable", .fragment(GivenFragment.self))
@@ -1347,13 +1365,13 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_include_fragment__givenVariableIsFalse_doesNotGetValuesForFragmentFields() async throws {
     // given
-    class GivenFragment: MockFragment {
+    class GivenFragment: MockFragment, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("name", String.self),
       ]}
     }
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("id", String.self),
         .include(if: "variable", .fragment(GivenFragment.self))
@@ -1376,14 +1394,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       static let Person = Object(typename: "Person", implementedInterfaces: [])
     }
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .field("id", String.self),
         .include(if: "variable", .inlineFragment(AsPerson.self))
       ]}
 
-      class AsPerson: MockTypeCase {
+      class AsPerson: MockTypeCase, @unchecked Sendable {
         override class var __parentType: any ParentType { Types.Person }
         override class var __selections: [Selection] {[
           .field("name", String.self),
@@ -1412,14 +1430,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       static let Person = Object(typename: "Person", implementedInterfaces: [])
     }
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .field("id", String.self),
         .include(if: "variable", .inlineFragment(AsPerson.self))
       ]}
 
-      class AsPerson: MockTypeCase {
+      class AsPerson: MockTypeCase, @unchecked Sendable {
         override class var __parentType: any ParentType { Types.Person }
         override class var __selections: [Selection] {[
           .field("name", String.self),
@@ -1448,14 +1466,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       static let Person = Object(typename: "Person", implementedInterfaces: [])
     }
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .field("id", String.self),
         .include(if: "variable", .inlineFragment(AsPerson.self))
       ]}
 
-      class AsPerson: MockTypeCase {
+      class AsPerson: MockTypeCase, @unchecked Sendable {
         override class var __parentType: any ParentType { Types.Person }
         override class var __selections: [Selection] {[
           .field("name", String.self),
@@ -1484,14 +1502,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       static let Person = Object(typename: "Person", implementedInterfaces: [])
     }
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .field("id", String.self),
         .inlineFragment(AsPerson.self)
       ]}
 
-      class AsPerson: MockTypeCase {
+      class AsPerson: MockTypeCase, @unchecked Sendable {
         override class var __parentType: any ParentType { Types.Person }
         override class var __selections: [Selection] {[
           .include(if: "variable", .field("name", String.self)),
@@ -1520,14 +1538,14 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       static let Person = Object(typename: "Person", implementedInterfaces: [])
     }
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .field("id", String.self),
         .inlineFragment(AsPerson.self)
       ]}
 
-      class AsPerson: MockTypeCase {
+      class AsPerson: MockTypeCase, @unchecked Sendable {
         override class var __parentType: any ParentType { Types.Person }
         override class var __selections: [Selection] {[
           .include(if: "variable", .field("name", String.self)),
@@ -1556,19 +1574,19 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       static let Person = Object(typename: "Person", implementedInterfaces: [])
     }
 
-    class GivenFragment: MockFragment {
+    class GivenFragment: MockFragment, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("name", String.self),
       ]}
     }
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("__typename", String.self),
         .field("id", String.self),
         .include(if: "variable", .inlineFragment(AsPerson.self))
       ]}
 
-      class AsPerson: MockTypeCase {
+      class AsPerson: MockTypeCase, @unchecked Sendable {
         override class var __parentType: any ParentType { Types.Person }
         override class var __selections: [Selection] {[
           .fragment(GivenFragment.self),
@@ -1595,7 +1613,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_skip_singleField__givenVariableIsFalse_getsValueForConditionalField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"variable", .field("name", String.self))
       ]}
@@ -1612,7 +1630,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_skip_singleField__givenVariableIsTrue_doesNotGetsValueForConditionalField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"variable", .field("name", String.self))
       ]}
@@ -1629,7 +1647,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_skip_singleField__givenGraphQLNullableVariableIsFalse_getsValueForConditionalField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"variable", .field("name", String.self))
       ]}
@@ -1646,7 +1664,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_skip_singleField__givenGraphQLNullableVariableIsTrue_doesNotGetsValueForConditionalField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"variable", .field("name", String.self))
       ]}
@@ -1663,7 +1681,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_skip_multipleFields__givenVariableIsFalse_getsValuesForConditionalFields() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"variable", [
           .field("name", String.self),
@@ -1684,7 +1702,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_skip_multipleFields__givenVariableIsTrue_doesNotGetValuesForConditionalFields() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"variable", [
           .field("name", String.self),
@@ -1705,13 +1723,13 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_skip_singleField__givenVariableIsTrue_givenFieldIdSelectedByAnotherSelection_getsValueForField() async throws {
     // given
-    class GivenFragment: MockFragment {
+    class GivenFragment: MockFragment, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("name", String.self),
       ]}
     }
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"variable", .field("name", String.self)),
         .fragment(GivenFragment.self)
@@ -1732,7 +1750,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_bothSkipAndInclude_multipleFields__givenSkipIsTrue_includeIsTrue_doesNotGetValuesForConditionalFields() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"skip" && "include", [
           .field("name", String.self),
@@ -1754,7 +1772,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_bothSkipAndInclude_multipleFields__givenSkipIsTrue_includeIsFalse_doesNotGetValuesForConditionalFields() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"skip" && "include", [
           .field("name", String.self),
@@ -1778,7 +1796,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_bothSkipAndInclude_multipleFields__givenSkipIsFalse_includeIsFalse_doesNotGetValuesForConditionalFields() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"skip" && "include", [
           .field("name", String.self),
@@ -1802,7 +1820,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_bothSkipAndInclude_multipleFields__givenSkipIsFalse_includeIsTrue_getValuesForConditionalFields() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"skip" && "include", [
           .field("name", String.self),
@@ -1826,7 +1844,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_bothSkipAndInclude_onSeperateFieldsForSameSelection__givenSkipIsTrue_includeIsTrue_getsValuesForField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"skip", .field("name", String.self)),
         .include(if: "include", .field("name", String.self))
@@ -1847,7 +1865,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_bothSkipAndInclude_onSeperateFieldsForSameSelectionMergedAsOrCondition__givenSkipIsTrue_includeIsTrue_getsValuesForField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: "include" || !"skip", .field("name", String.self))
       ]}
@@ -1867,7 +1885,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_bothSkipAndInclude_onSeperateFieldsForSameSelection__givenSkipIsFalse_includeIsFalse_getsValuesForField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"skip", .field("name", String.self)),
         .include(if: "include", .field("name", String.self))
@@ -1888,7 +1906,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_bothSkipAndInclude_onSeperateFieldsForSameSelectionMergedAsOrCondition__givenSkipIsFalse_includeIsFalse_getsValuesForField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: "include" || !"skip", .field("name", String.self))
       ]}
@@ -1908,7 +1926,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_bothSkipAndInclude_onSeperateFieldsForSameSelection__givenSkipIsFalse_includeIsTrue_getsValuesForField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"skip", .field("name", String.self)),
         .include(if: "include", .field("name", String.self))
@@ -1929,7 +1947,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_bothSkipAndInclude_onSeperateFieldsForSameSelectionMergedAsOrCondition__givenSkipIsFalse_includeIsTrue_getsValuesForField() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: "include" || !"skip", .field("name", String.self))
       ]}
@@ -1949,7 +1967,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_bothSkipAndInclude_onSeperateFieldsForSameSelection__givenSkipIsTrue_includeIsFalse_doesNotGetValuesForConditionalFields() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: !"skip", .field("name", String.self)),
         .include(if: "include", .field("name", String.self))
@@ -1970,7 +1988,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_bothSkipAndInclude_onSeperateFieldsForSameSelectionMergedAsOrCondition__givenSkipIsTrue_includeIsFalse_doesNotGetValuesForConditionalFields() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: "include" || !"skip", .field("name", String.self))
       ]}
@@ -1990,7 +2008,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   func test__booleanCondition_bothSkipAndInclude_mergedAsComplexLogicalCondition_correctlyEvaluatesConditionalSelections() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .include(if: ("a" && !"b" && "c") || "d" || !"e", .field("name", String?.self))
       ]}
@@ -2040,7 +2058,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
       }
     })
 
-    class Character: MockSelectionSet {
+    class Character: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Character }
@@ -2052,7 +2070,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
       var friend: Friend { __data["friend"] }
 
-      class Friend: MockSelectionSet {
+      class Friend: MockSelectionSet, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __parentType: any ParentType { Types.Character }
@@ -2061,7 +2079,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
         ]}
       }
 
-      class AsHero: ConcreteMockTypeCase<Character> {
+      class AsHero: ConcreteMockTypeCase<Character>, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __parentType: any ParentType { Types.Hero }
@@ -2071,7 +2089,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
         var friend: Friend { __data["friend"] }
 
-        class Friend: MockSelectionSet {
+        class Friend: MockSelectionSet, @unchecked Sendable {
           typealias Schema = MockSchemaMetadata
 
           override class var __parentType: any ParentType { Types.Character }

@@ -1,11 +1,3 @@
-//
-//  MultipartFormDataTests.swift
-//  Apollo
-//
-//  Created by Ellen Shapiro on 9/21/20.
-//  Copyright © 2020 Apollo GraphQL. All rights reserved.
-//
-
 import XCTest
 import Apollo
 import ApolloInternalTestHelpers

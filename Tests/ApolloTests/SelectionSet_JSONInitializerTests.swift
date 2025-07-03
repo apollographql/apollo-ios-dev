@@ -20,7 +20,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       }
     })
 
-    class GivenFragment: MockFragment {
+    class GivenFragment: MockFragment, @unchecked Sendable {
       override class var __parentType: any ParentType { Types.Human }
       override class var __selections: [Selection] {[
         .field("height", Float.self)
@@ -28,7 +28,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       var height: Float { __data["height"] }
     }
 
-    class Hero: AbstractMockSelectionSet<Hero.Fragments, MockSchemaMetadata> {
+    class Hero: AbstractMockSelectionSet<Hero.Fragments, MockSchemaMetadata>, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Human }
@@ -70,7 +70,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       }
     })
 
-    class Hero: MockSelectionSet {
+    class Hero: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Human }
@@ -105,7 +105,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       }
     })
 
-    class Hero: MockSelectionSet {
+    class Hero: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Human }
@@ -142,7 +142,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       }
     })
 
-    class Character: MockSelectionSet {
+    class Character: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Character }
@@ -157,7 +157,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       var asHero: AsHero? { _asInlineFragment() }
       var asHuman: AsHuman? { _asInlineFragment() }
 
-      class Friend: MockSelectionSet {
+      class Friend: MockSelectionSet, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __parentType: any ParentType { Types.Character }
@@ -168,7 +168,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
 
         var asHuman: AsHuman? { _asInlineFragment() }
 
-        class AsHuman: ConcreteMockTypeCase<Character.Friend> {
+        class AsHuman: ConcreteMockTypeCase<Character.Friend>, @unchecked Sendable {
           typealias Schema = MockSchemaMetadata
 
           override class var __parentType: any ParentType { Types.Human }
@@ -180,7 +180,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
         }
       }
 
-      class AsHero: ConcreteMockTypeCase<Character> {
+      class AsHero: ConcreteMockTypeCase<Character>, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __parentType: any ParentType { Types.Hero }
@@ -190,7 +190,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
 
         var friend: Friend { __data["friend"] }
 
-        class Friend: MockSelectionSet {
+        class Friend: MockSelectionSet, @unchecked Sendable {
           typealias Schema = MockSchemaMetadata
 
           override class var __parentType: any ParentType { Types.Character }
@@ -202,7 +202,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
         }
       }
 
-      class AsHuman: MockTypeCase {
+      class AsHuman: MockTypeCase, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __parentType: any ParentType { Types.Human }
@@ -213,7 +213,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
         var name: String? { __data["name"] }
         var friend: Friend { __data["friend"] }
 
-        class Friend: MockSelectionSet {
+        class Friend: MockSelectionSet, @unchecked Sendable {
           typealias Schema = MockSchemaMetadata
 
           override class var __parentType: any ParentType { Types.Character }
@@ -221,7 +221,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
           var heroName: String? { __data["heroName"] }
           var asHuman: AsHuman? { _asInlineFragment() }
 
-          class AsHuman: ConcreteMockTypeCase<Character.AsHuman.Friend>, CompositeInlineFragment {
+          class AsHuman: ConcreteMockTypeCase<Character.AsHuman.Friend>, CompositeInlineFragment, @unchecked Sendable {
             typealias Schema = MockSchemaMetadata
 
             override class var __parentType: any ParentType { Types.Human }
