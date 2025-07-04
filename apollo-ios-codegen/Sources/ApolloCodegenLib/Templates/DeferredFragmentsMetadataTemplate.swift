@@ -44,7 +44,7 @@ struct DeferredFragmentsMetadataTemplate {
   ) -> TemplateString {
     """
     enum DeferredFragmentIdentifiers {
-    \(deferredFragmentPathTypeInfo.map {
+    \(deferredFragmentPathTypeInfo.unique(by: { $0.pathDeferConditionHash }).map {
       return """
         static let \($0.deferCondition.label) = DeferredFragmentIdentifier(label: \"\($0.deferCondition.label)\", fieldPath: [\
       \($0.path.map { "\"\($0)\"" }, separator: ", ")\
@@ -75,6 +75,22 @@ struct DeferredFragmentsMetadataTemplate {
     let path: [String]
     let deferCondition: CompilationResult.DeferCondition
     let typeName: String
+
+    /// Provides a hash value that is a combination of `path` and `deferCondition` values only, `typeName` is not
+    /// included.
+    ///
+    /// This is intended to be used when the selection set type does not matter, such as when generating a deferred
+    /// fragment identifier which is shared amongst all child selection set types within a deferred fragment.
+    ///
+    /// - Returns: Hash value of `path` and `deferCondition`.
+    var pathDeferConditionHash: Int {
+      var hasher = Hasher()
+
+      hasher.combine(path)
+      hasher.combine(deferCondition)
+
+      return hasher.finalize()
+    }
   }
 
   fileprivate func DeferredFragmentsPathTypeInfo(
@@ -132,5 +148,12 @@ struct DeferredFragmentsMetadataTemplate {
     }
 
     return deferredPathTypeInfo
+  }
+}
+
+fileprivate extension Sequence where Element == DeferredFragmentsMetadataTemplate.DeferredPathTypeInfo {
+  func unique<T: Hashable>(by keyForValue: (Iterator.Element) throws -> T) rethrows -> [Iterator.Element] {
+    var seen: Set<T> = []
+    return try filter { try seen.insert(keyForValue($0)).inserted }
   }
 }

@@ -608,5 +608,59 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
       ignoringExtraLines: false)
     )
   }
-  
+
+  func test__render__givenDeferredFragmentsWithDifferentSelectionSets_doesNotRenderDuplicateIdentifiers() async throws {
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String
+        species: String
+      }
+
+      type Dog implements Animal {
+        id: String
+        species: String
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          ... on Dog @defer(label: "deferredDog") {
+            id
+            ...DogFragment
+          }
+        }
+      }
+
+      fragment DogFragment on Dog {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let rendered = renderSubject()
+
+    expect(rendered).to(equalLineByLine("""
+      enum DeferredFragmentIdentifiers {
+        static let deferredDog = DeferredFragmentIdentifier(label: "deferredDog", fieldPath: ["allAnimals"])
+      }
+      
+      public static var deferredFragments: [DeferredFragmentIdentifier: any ApolloAPI.SelectionSet.Type]? {[
+        DeferredFragmentIdentifiers.deferredDog: Data.AllAnimal.AsDog.DeferredDog.self,
+        DeferredFragmentIdentifiers.deferredDog: DogFragment.self,
+      ]}
+      """,
+      atLine: 4,
+      ignoringExtraLines: false)
+    )
+  }
+
 }
