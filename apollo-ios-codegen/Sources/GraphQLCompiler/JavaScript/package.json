@@ -24,7 +24,7 @@
     "@types/jest": "30.0.0",
     "common-tags": "1.8.2",
     "jest": "30.0.4",
-    "rollup": "4.44.1",
+    "rollup": "4.44.2",
     "@rollup/plugin-terser": "0.4.4",
     "ts-jest": "29.4.0",
     "typescript": "5.8.3"
