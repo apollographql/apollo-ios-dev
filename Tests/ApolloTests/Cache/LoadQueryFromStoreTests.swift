@@ -16,18 +16,15 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
 
   static let defaultWaitTimeout: TimeInterval = 5.0
 
-  var cache: (any NormalizedCache)!
   var store: ApolloStore!
 
   override func setUp() async throws {
     try await super.setUp()
 
-    cache = try await makeNormalizedCache()
-    store = ApolloStore(cache: cache)
+    store = try await makeTestStore()
   }
 
   override func tearDown() async throws {
-    cache = nil
     store = nil
 
     await Self.cleanUpRequestHandlers()
@@ -53,7 +50,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid", "name": "R2-D2"],
     ])
@@ -87,7 +84,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero(episode:JEDI)": CacheReference("hero(episode:JEDI)")],
       "hero(episode:JEDI)": ["__typename": "Droid", "name": "R2-D2"],
     ])
@@ -122,7 +119,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid"],
     ])
@@ -155,7 +152,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid", "name": NSNull()],
     ])
@@ -207,7 +204,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -266,7 +263,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -326,7 +323,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -378,7 +375,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -439,7 +436,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid", "name": "R2-D2"],
     ])
@@ -483,7 +480,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -542,7 +539,7 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["starshipCoordinates": CacheReference("starshipCoordinates")],
       "starshipCoordinates": [
         "__typename": "Starship",

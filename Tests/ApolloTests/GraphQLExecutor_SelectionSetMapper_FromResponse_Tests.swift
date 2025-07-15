@@ -9,12 +9,12 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
   // MARK: - Helpers
 
-  private static let executor: GraphQLExecutor = {
-    let executor = GraphQLExecutor(executionSource: NetworkResponseExecutionSource())    
+  private static let executor: GraphQLExecutor<NetworkResponseExecutionSource> = {
+    let executor = GraphQLExecutor(executionSource: NetworkResponseExecutionSource())
     return executor
   }()
 
-  private func readValues<T: RootSelectionSet>(
+  private static func readValues<T: RootSelectionSet>(
     _ selectionSet: T.Type,
     from object: JSONObject,
     variables: GraphQLOperation.Variables? = nil
@@ -28,7 +28,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     return T(_dataDict: dataDict)
   }
 
-  private func readValues<T: SelectionSet, Operation: GraphQLOperation>(
+  private static func readValues<T: SelectionSet, Operation: GraphQLOperation>(
     _ selectionSet: T.Type,
     in operation: Operation.Type,
     from object: JSONObject,
@@ -55,7 +55,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["name": "Luke Skywalker"]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -69,7 +69,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = [:]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["name"]))
@@ -85,7 +85,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["name": NSNull()]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["name"]))
@@ -101,7 +101,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["name": 10]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.name).to(equal("10"))
@@ -115,7 +115,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["name": false]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
@@ -138,7 +138,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["customScalar": Int(12345678)]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.customScalar).to(equal("12345678"))
@@ -154,7 +154,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["customScalar": Int64(989561700)]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.customScalar).to(equal("989561700"))
@@ -170,7 +170,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["customScalar": Double(1234.5678)]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.customScalar).to(equal("1234.5678"))
@@ -195,7 +195,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["customScalar": Int64(989561700)]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.customScalar).to(equal(GivenCustomScalar(value: 989561700)))
@@ -211,7 +211,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["name": "Luke Skywalker"]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -225,7 +225,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = [:]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["name"]))
@@ -241,7 +241,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["name": NSNull()]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.name).to(beNil())
@@ -255,7 +255,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["name": 10]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.name).to(equal("10"))
@@ -269,7 +269,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["name": false]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
@@ -296,7 +296,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["size": "SMALL"]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.size).to(equal(GraphQLEnum(MockEnum.SMALL)))
@@ -310,7 +310,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["size": "GIGANTIC"]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.size).to(equal(GraphQLEnum<MockEnum>.unknown("GIGANTIC")))
@@ -324,7 +324,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = [:]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["size"]))
@@ -342,7 +342,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["size": NSNull()]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["size"]))
@@ -358,7 +358,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["size": 10]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
@@ -377,7 +377,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["size": 10.0]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
@@ -398,7 +398,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": ["Purple", "Potatoes", "iPhone"]]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.favorites).to(equal(["Purple", "Potatoes", "iPhone"]))
@@ -412,7 +412,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": [] as JSONValue]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.favorites).to(equal(Array<String>()))
@@ -426,7 +426,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = [:]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }.to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }.to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["favorites"]))
       expect(error.underlying).to(matchError(JSONDecodingError.missingValue))
@@ -441,7 +441,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": NSNull()]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }.to(throwError { (error: GraphQLExecutionError) in
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }.to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["favorites"]))
       expect(error.underlying).to(matchError(JSONDecodingError.nullValue))
@@ -456,7 +456,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": [10, 20, 30]]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.favorites).to(equal(["10", "20", "30"]))
@@ -472,7 +472,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": ["10", "20", "30"]]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.favorites).to(equal([
@@ -490,7 +490,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": [true, false, true]]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
@@ -511,7 +511,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": ["Purple", "Potatoes", "iPhone"]]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.favorites).to(equal(["Purple", "Potatoes", "iPhone"]))
@@ -525,7 +525,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": [] as JSONValue]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.favorites).to(equal(Array<String>()))
@@ -539,7 +539,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = [:]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["favorites"]))
@@ -555,7 +555,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": NSNull()]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.favorites).to(beNil())
@@ -569,7 +569,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": [10, 20, 30]]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.favorites).to(equal(["10", "20", "30"]))
@@ -583,7 +583,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": [true, false, false]]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
@@ -604,7 +604,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": ["Purple", "Potatoes", "iPhone"]]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.favorites).to(equal(["Purple", "Potatoes", "iPhone"]))
@@ -618,7 +618,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": [] as JSONValue]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.favorites).to(equal(Array<String>()))
@@ -632,7 +632,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = [:]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["favorites"]))
@@ -648,7 +648,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": NSNull()]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["favorites"]))
@@ -663,7 +663,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     }
     let object: JSONObject = ["favorites": ["Red", NSNull(), "Bird"] as JSONValue]
 
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.favorites! as [String?]).to(equal(["Red", nil, "Bird"]))
@@ -679,7 +679,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": ["Purple", "Potatoes", "iPhone"]]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.favorites).to(equal(["Purple", "Potatoes", "iPhone"]))
@@ -695,7 +695,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": ["Purple"]]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.favorites).to(equal([GraphQLEnum<MockEnum>.unknown("Purple")]))
@@ -711,7 +711,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["favorites": [10]]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       if case JSONDecodingError.couldNotConvert(let value, let expectedType) = error.underlying {
@@ -745,7 +745,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.child?.name).to(equal("Luke Skywalker"))
@@ -767,7 +767,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let object: JSONObject = ["child": ["__typename": "Child"]]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["child", "name"]))
@@ -796,7 +796,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    await expect { try await self.readValues(GivenSelectionSet.self, from: object) }
+    await expect { try await Self.readValues(GivenSelectionSet.self, from: object) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["child", "name"]))
@@ -856,7 +856,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.child?.__typename).to(equal("Human"))
@@ -908,7 +908,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(AnAnimal.self, from: object)
+    let data = try await Self.readValues(AnAnimal.self, from: object)
 
     // then
     expect(data.animal.__typename).to(equal("Animal"))
@@ -964,7 +964,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(AnAnimal.self, from: object, variables: ["varA": true])
+    let data = try await Self.readValues(AnAnimal.self, from: object, variables: ["varA": true])
 
     // then
     expect(data.animal.__typename).to(equal("Animal"))
@@ -1019,7 +1019,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(AnAnimal.self, from: object, variables: ["varA": false])
+    let data = try await Self.readValues(AnAnimal.self, from: object, variables: ["varA": false])
 
     // then
     expect(data.animal.__typename).to(equal("Animal"))
@@ -1077,7 +1077,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when + then
-    await expect { try await self.readValues(AnAnimal.self, from: object, variables: ["varA": false]) }
+    await expect { try await Self.readValues(AnAnimal.self, from: object, variables: ["varA": false]) }
       .to(throwError { (error: GraphQLExecutionError) in
       // then
       expect(error.path).to(equal(["animal.species"]))
@@ -1126,7 +1126,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(AnAnimal.Animal.DeferredSpecies.self, in: MockQuery<AnAnimal>.self, from: object)
+    let data = try await Self.readValues(AnAnimal.Animal.DeferredSpecies.self, in: MockQuery<AnAnimal>.self, from: object)
 
     // then
     expect(data.species).to(equal("Canis familiaris"))
@@ -1181,7 +1181,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object)
 
     // then
     expect(data.child?.name).to(equal("Han Solo"))
@@ -1203,7 +1203,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": true]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1220,7 +1220,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": false]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(beNil())
@@ -1237,7 +1237,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": GraphQLNullable<Bool>(true)]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1254,7 +1254,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": GraphQLNullable<Bool>(false)]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(beNil())
@@ -1271,7 +1271,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["one": true, "two": true]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1289,7 +1289,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": false]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(beNil())
@@ -1310,7 +1310,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": true]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1331,7 +1331,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": false]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(beNil())
@@ -1356,7 +1356,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": true]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.id).to(equal("1234"))
@@ -1381,7 +1381,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": false]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.id).to(equal("1234"))
@@ -1417,7 +1417,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": true]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.id).to(equal("1234"))
@@ -1453,7 +1453,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": false]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.id).to(equal("1234"))
@@ -1489,7 +1489,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": true]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.id).to(equal("1234"))
@@ -1525,7 +1525,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": true]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.id).to(equal("1234"))
@@ -1561,7 +1561,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": false]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.id).to(equal("1234"))
@@ -1602,7 +1602,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": true]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.id).to(equal("1234"))
@@ -1622,7 +1622,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": false]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1639,7 +1639,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": true]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(beNil())
@@ -1656,7 +1656,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": GraphQLNullable<Bool>(false)]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1673,7 +1673,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": GraphQLNullable<Bool>(true)]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(beNil())
@@ -1693,7 +1693,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": false]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1714,7 +1714,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": true]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(beNil())
@@ -1739,7 +1739,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     let variables = ["variable": true]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1763,7 +1763,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
                      "include": true]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(beNil())
@@ -1787,7 +1787,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(beNil())
@@ -1811,7 +1811,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(beNil())
@@ -1835,7 +1835,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1857,7 +1857,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1877,7 +1877,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1898,7 +1898,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1918,7 +1918,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1939,7 +1939,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1959,7 +1959,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(equal("Luke Skywalker"))
@@ -1980,7 +1980,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(beNil())
@@ -2000,7 +2000,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let data = try await readValues(GivenSelectionSet.self, from: object, variables: variables)
+    let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: variables)
 
     // then
     expect(data.name).to(beNil())
@@ -2031,7 +2031,7 @@ class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {
 
     for test in tests {
       // when
-      let data = try await readValues(GivenSelectionSet.self, from: object, variables: test.variables)
+      let data = try await Self.readValues(GivenSelectionSet.self, from: object, variables: test.variables)
 
       // then
       if test.expectedResult {

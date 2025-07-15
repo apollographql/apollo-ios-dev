@@ -1,3 +1,5 @@
+import Apollo
+import ApolloAPI
 import XCTest
 
 extension XCTestExpectation {
@@ -7,9 +9,10 @@ extension XCTestExpectation {
   }
 }
 
-public extension XCTestCase {
+extension XCTestCase {
   /// Record  the specified`error` as an `XCTIssue`.
-  func record(_ error: any Error, compactDescription: String? = nil, file: StaticString = #filePath, line: UInt = #line) {
+  public func record(_ error: any Error, compactDescription: String? = nil, file: StaticString = #filePath, line: UInt = #line)
+  {
     var issue = XCTIssue(type: .thrownError, compactDescription: compactDescription ?? String(describing: error))
 
     issue.associatedError = error
@@ -19,10 +22,10 @@ public extension XCTestCase {
 
     record(issue)
   }
-  
+
   /// Invoke a throwing closure, and record any thrown errors without rethrowing. This is useful if you need to run code that may throw
   /// in a place where throwing isn't allowed, like `measure` blocks.
-  func whileRecordingErrors(file: StaticString = #file, line: UInt = #line, _ perform: () throws -> Void) {
+  public func whileRecordingErrors(file: StaticString = #filePath, line: UInt = #line, _ perform: () throws -> Void) {
     do {
       try perform()
     } catch {
@@ -33,16 +36,17 @@ public extension XCTestCase {
       }
     }
   }
-    
+
 }
 
-import Apollo
-import ApolloAPI
-
 public extension XCTestCase {
-  #warning("TODO: See if we can delete this when we refactor all of the tests.")
   /// Make  an `AsyncResultObserver` for receiving results of the specified GraphQL operation.
-  func makeResultObserver<Operation: GraphQLOperation>(for operation: Operation, file: StaticString = #filePath, line: UInt = #line) -> AsyncResultObserver<GraphQLResponse<Operation>, any Error> {
+  func makeResultObserver<Operation: GraphQLOperation>(
+    for operation: Operation,
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) -> AsyncResultObserver<GraphQLResponse<Operation>, any Error> {
+    nonisolated(unsafe) let `self` = self
     return AsyncResultObserver(testCase: self, file: file, line: line)
   }
 }

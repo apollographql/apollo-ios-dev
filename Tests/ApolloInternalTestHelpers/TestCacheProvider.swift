@@ -17,12 +17,13 @@ public class InMemoryTestCacheProvider: TestCacheProvider {
 
 public protocol CacheDependentTesting {
   var cacheType: any TestCacheProvider.Type { get }
-  var cache: (any NormalizedCache)! { get }  
+  var store: ApolloStore! { get }
 }
 
 extension CacheDependentTesting where Self: XCTestCase {
-  public func makeNormalizedCache() async throws -> any NormalizedCache {
+  public func makeTestStore() async throws -> ApolloStore {
     let (cache, tearDownHandler) = await cacheType.makeNormalizedCache()
+    nonisolated(unsafe) let `self` = self
 
     if let tearDownHandler = tearDownHandler {
       self.addTeardownBlock {
@@ -34,10 +35,7 @@ extension CacheDependentTesting where Self: XCTestCase {
       }
     }
 
-    return cache
+    return ApolloStore(cache: cache)
   }
-  
-  public func mergeRecordsIntoCache(_ records: RecordSet) async {
-    _ = try! await cache.merge(records: records)
-  }
+
 }
