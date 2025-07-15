@@ -6,7 +6,7 @@ import XCTest
 ///
 /// To create a directory and write files to it during a unit test, use `TestIsolatedFileManager`,
 /// which uses this object internally for computing it's temporary directory.
-public struct TestFilePathBuilder {
+public struct TestFilePathBuilder: Sendable {
 
   let testName: String
   public let testIsolatedOutputFolder: URL

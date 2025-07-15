@@ -1,7 +1,7 @@
 import Foundation
 import ApolloAPI
 
-open class MockLocalCacheMutation<SelectionSet: MutableRootSelectionSet>: LocalCacheMutation {
+open class MockLocalCacheMutation<SelectionSet: MutableRootSelectionSet>: LocalCacheMutation, @unchecked Sendable {
   open class var operationType: GraphQLOperationType { .query }
 
   public typealias Data = SelectionSet
@@ -13,12 +13,12 @@ open class MockLocalCacheMutation<SelectionSet: MutableRootSelectionSet>: LocalC
 }
 
 open class MockLocalCacheMutationFromMutation<SelectionSet: MutableRootSelectionSet>:
-  MockLocalCacheMutation<SelectionSet> {
+  MockLocalCacheMutation<SelectionSet>, @unchecked Sendable {
   override open class var operationType: GraphQLOperationType { .mutation }
 }
 
 open class MockLocalCacheMutationFromSubscription<SelectionSet: MutableRootSelectionSet>:
-  MockLocalCacheMutation<SelectionSet> {
+  MockLocalCacheMutation<SelectionSet>, @unchecked Sendable {
   override open class var operationType: GraphQLOperationType { .subscription }
 }
 

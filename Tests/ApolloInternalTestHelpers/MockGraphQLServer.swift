@@ -98,7 +98,7 @@ public actor MockGraphQLServer {
     _ operationType: Operation.Type,
     file: StaticString = #filePath,
     line: UInt = #line,
-    requestHandler: @escaping RequestHandler<Operation>
+    requestHandler: @escaping @Sendable RequestHandler<Operation>
   ) -> XCTestExpectation {
     let expectation = RequestExpectation<Operation>(
       description: "Served request for \(String(describing: operationType))",

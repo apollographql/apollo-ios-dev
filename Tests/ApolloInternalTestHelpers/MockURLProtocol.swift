@@ -4,7 +4,7 @@ public enum MockURLError: Swift.Error {
   case requestNotHandled
 }
 
-public final class MockURLProtocol<RequestProvider: MockResponseProvider>: URLProtocol {
+public final class MockURLProtocol<RequestProvider: MockResponseProvider>: URLProtocol, @unchecked Sendable {
 
   override class public func canInit(with request: URLRequest) -> Bool {
     return true
