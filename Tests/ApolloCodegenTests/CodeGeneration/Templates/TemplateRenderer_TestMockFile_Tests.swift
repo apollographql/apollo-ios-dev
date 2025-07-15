@@ -119,7 +119,7 @@ class TemplateRenderer_TestMockFile_Tests: XCTestCase {
     for test in tests {
       let expected = """
       import ApolloTestSupport
-      import \(test.importModuleName)
+      @testable import \(test.importModuleName)
 
       """
       let config = buildConfig(moduleType: test.schemaTypes, operations: test.operations)
@@ -137,7 +137,7 @@ class TemplateRenderer_TestMockFile_Tests: XCTestCase {
     // given
     let expected = """
     import ApolloTestSupport
-    import TestSchema
+    @testable import TestSchema
 
     """
     let config = buildConfig(

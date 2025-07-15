@@ -353,7 +353,7 @@ struct ImportStatementTemplate {
     static func template(for config: ApolloCodegen.ConfigurationContext) -> TemplateString {
       return """
       import ApolloTestSupport
-      import \(config.schemaModuleName)
+      @testable import \(config.schemaModuleName)
       """
     }
   }
