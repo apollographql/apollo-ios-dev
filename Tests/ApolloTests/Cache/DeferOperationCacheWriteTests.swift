@@ -86,20 +86,17 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
     InMemoryTestCacheProvider.self
   }
 
-  var cache: (any NormalizedCache)!
   var store: ApolloStore!
 
   override func setUp() async throws {
     try await super.setUp()
 
-    cache = try await makeNormalizedCache()
-    store = ApolloStore(cache: cache)
+    store = try await makeTestStore()
   }
 
   override func tearDownWithError() throws {
     try super.tearDownWithError()
-
-    cache = nil
+    
     store = nil
   }
 
@@ -307,7 +304,7 @@ class DeferOperationCacheWriteTests: XCTestCase, CacheDependentTesting, StoreLoa
 
     let friendSelectionSet = DeferredFriendName(_dataDict: friendData)
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal"),
       ],

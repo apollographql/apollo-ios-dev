@@ -9,22 +9,19 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
     InMemoryTestCacheProvider.self
   }
 
-  var cache: (any NormalizedCache)!
   var store: ApolloStore!
   var session: MockURLSession!
 
   override func setUp() async throws {
     try await super.setUp()
 
-    cache = try await makeNormalizedCache()
-    store = ApolloStore(cache: cache)
+    store = try await makeTestStore()
     session = MockURLSession(responseProvider: Self.self)
   }
 
   override func tearDown() async throws {
     await Self.cleanUpRequestHandlers()
     session = nil
-    cache = nil
     store = nil
 
     try await super.tearDown()
@@ -185,7 +182,7 @@ class GraphQLInterceptor_ErrorHandling_Tests: XCTestCase, CacheDependentTesting,
     }
 
     // Set up initial cache state
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid", "name": "R2-D2"],
     ])

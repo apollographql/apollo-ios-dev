@@ -59,7 +59,7 @@ final class ApolloClientOperationTests: XCTestCase {
     }
   }
 
-  let jsonObject: JSONObject = [
+  static let jsonObject: JSONObject = [
     "data": [
       "createReview": [
         "__typename": "Review",
@@ -72,8 +72,8 @@ final class ApolloClientOperationTests: XCTestCase {
   func test__performMutation_givenPublishResultToStore_true_publishResultsToStore() async throws {
     let mutation = MockMutation<GivenSelectionSet>()
 
-    let serverRequestExpectation = await server.expect(MockMutation<GivenSelectionSet>.self) { _ in
-      self.jsonObject
+    let serverRequestExpectation = await server.expect(MockMutation<GivenSelectionSet>.self) { @Sendable _ in
+      Self.jsonObject
     }
 
     // when
@@ -115,8 +115,8 @@ final class ApolloClientOperationTests: XCTestCase {
   func test__performMutation_givenPublishResultToStore_false_doesNotPublishResultsToStore() async throws {
     let mutation = MockMutation<GivenSelectionSet>()
 
-    let serverRequestExpectation = await server.expect(MockMutation<GivenSelectionSet>.self) { _ in
-      self.jsonObject
+    let serverRequestExpectation = await server.expect(MockMutation<GivenSelectionSet>.self) { @Sendable _ in
+      Self.jsonObject
     }
 
     // when

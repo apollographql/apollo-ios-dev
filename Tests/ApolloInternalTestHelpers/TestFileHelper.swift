@@ -3,7 +3,7 @@ import Apollo
 
 public struct TestFileHelper {
   
-  public static func testParentFolder(for file: StaticString = #file) -> URL {
+  public static func testParentFolder(for file: StaticString = #filePath) -> URL {
     let fileAsString = file.withUTF8Buffer {
         String(decoding: $0, as: UTF8.self)
     }
@@ -11,14 +11,14 @@ public struct TestFileHelper {
     return url.deletingLastPathComponent()
   }
   
-  public static func uploadServerFolder(from file: StaticString = #file) -> URL {
+  public static func uploadServerFolder(from file: StaticString = #filePath) -> URL {
     self.testParentFolder(for: file)
       .deletingLastPathComponent() // test root
       .deletingLastPathComponent() // source root
       .appendingPathComponent("SimpleUploadServer")
   }
   
-  public static func uploadsFolder(from file: StaticString = #file) -> URL {
+  public static func uploadsFolder(from file: StaticString = #filePath) -> URL {
     self.uploadServerFolder(from: file)
       .appendingPathComponent("uploads")
   }
