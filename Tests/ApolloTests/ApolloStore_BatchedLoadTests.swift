@@ -114,6 +114,7 @@ class ApolloStore_BatchedLoadTests: XCTestCase {
     XCTAssertEqual(data.hero?.name, "R2-D2")
     XCTAssertEqual(data.hero?.friends?.count, 100)
 
+    // 3 loads: ROOT_QUERY.hero, hero.friends, list of friends
     XCTAssertEqual(cache.numberOfBatchLoads, 3)
   }
 
