@@ -3,8 +3,7 @@ description: Installs and run Tuist to generate Xcode projects
 runs:
   using: "composite"
   steps:
+    - uses: jdx/mise-action@v2
     - name: Run Tuist
       shell: bash
-      run: |
-        ./scripts/install-tuist.sh
-        tuist generate
+      run: tuist generate
