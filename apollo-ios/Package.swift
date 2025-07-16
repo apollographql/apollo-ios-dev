@@ -59,7 +59,10 @@ let package = Package(
       resources: [
         .copy("Resources/PrivacyInfo.xcprivacy")
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableExperimentalFeature("StrictConcurrency")
+      ]
     ),
     .target(
       name: "ApolloWebSocket",
@@ -69,7 +72,10 @@ let package = Package(
       resources: [
         .copy("Resources/PrivacyInfo.xcprivacy")
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableExperimentalFeature("StrictConcurrency")
+      ]
     ),
     .target(
       name: "ApolloTestSupport",
@@ -77,7 +83,10 @@ let package = Package(
         "Apollo",
         "ApolloAPI"
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableExperimentalFeature("StrictConcurrency")
+      ]
     ),
     .plugin(
       name: "Install CLI",
@@ -93,5 +102,5 @@ let package = Package(
       path: "Plugins/InstallCLI"
     )
   ],
-  swiftLanguageModes: [.v6]  
+  swiftLanguageModes: [.v6, .v5]
 )

@@ -84,5 +84,6 @@ let package = Package(
       ],
       swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
     ),
-  ]
+  ],
+  swiftLanguageModes: [.v6, .v5]
 )

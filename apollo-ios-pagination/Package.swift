@@ -32,7 +32,11 @@ let package = Package(
         .product(name: "ApolloAPI", package: "apollo-ios"),
         .product(name: "OrderedCollections", package: "swift-collections"),
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableExperimentalFeature("StrictConcurrency")
+      ]
     ),
-  ]
+  ],
+  swiftLanguageModes: [.v6, .v5]
 )
