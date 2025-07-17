@@ -38,9 +38,10 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     self.schemaDocumentation = schemaDocumentation
   }
 
+  @MainActor
   static func fromJSValue(
     _ jsValue: JSValue,
-    bridge: isolated JavaScriptBridge
+    bridge: JavaScriptBridge
   ) -> Self {
     self.init(
       schemaRootTypes: .fromJSValue(jsValue["rootTypes"], bridge: bridge),
@@ -51,7 +52,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     )
   }
 
-  public final class RootTypeDefinition: JavaScriptObjectDecodable {
+  public final class RootTypeDefinition: Sendable, JavaScriptObjectDecodable {
     public let queryType: GraphQLNamedType
 
     public let mutationType: GraphQLNamedType?
@@ -76,9 +77,10 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       ].compactMap { $0 }
     }
 
+    @MainActor
     static func fromJSValue(
       _ jsValue: JSValue,
-      bridge: isolated JavaScriptBridge
+      bridge: JavaScriptBridge
     ) -> RootTypeDefinition {
       self.init(
         queryType: .fromJSValue(jsValue["queryType"], bridge: bridge),
@@ -112,8 +114,8 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     public let isLocalCacheMutation: Bool
       
     public let moduleImports: OrderedSet<String>
-
-    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+    
+    static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
       self.init(
         name: jsValue["name"],
         operationType: jsValue["operationType"],
@@ -202,7 +204,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
     static func fromJSValue(
       _ jsValue: JSValue,
-      bridge: isolated JavaScriptBridge
+      bridge: JavaScriptBridge
     ) -> CompilationResult.VariableDefinition {
       return self.init(
         name: jsValue["name"],
@@ -239,7 +241,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
     public let overrideAsLocalCacheMutation: Bool
 
-    init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+    init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
       self.name = jsValue["name"]
       self.directives = .fromJSValue(jsValue["directives"], bridge: bridge)
       self.type = .fromJSValue(jsValue["typeCondition"], bridge: bridge)
@@ -319,7 +321,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.selections = selections
     }
 
-    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+    static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
       self.init(
         parentType: .fromJSValue(jsValue["parentType"], bridge: bridge),
         selections: .fromJSValue(jsValue["selections"], bridge: bridge)
@@ -356,7 +358,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
     public let deferCondition: DeferCondition?
 
-    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+    static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
       self.init(
         selectionSet: .fromJSValue(jsValue["selectionSet"], bridge: bridge),
         inclusionConditions: jsValue["inclusionConditions"],
@@ -403,7 +405,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
     @inlinable public var parentType: GraphQLCompositeType { fragment.type }
 
-    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+    static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
       self.init(
         fragment: .fromJSValue(jsValue["fragment"], bridge: bridge),
         inclusionConditions: jsValue["inclusionConditions"],
@@ -445,7 +447,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     case inlineFragment(InlineFragment)
     case fragmentSpread(FragmentSpread)
     
-    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+    static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
       precondition(jsValue.isObject, "Expected JavaScript object but found: \(jsValue)")
 
       let kind: String = jsValue["kind"].toString()
@@ -533,7 +535,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.documentation = documentation
     }
 
-    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+    static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
       self.init(
         name: jsValue["name"],
         alias: jsValue["alias"],
@@ -584,7 +586,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
     public let deprecationReason: String?
 
-    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+    static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
       self.init(
         name: jsValue["name"],
         type: .fromJSValue(jsValue["type"], bridge: bridge),
@@ -612,7 +614,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
     public let arguments: [Argument]?
 
-    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+    static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
       self.init(
         name: jsValue["name"],
         arguments: .fromJSValue(jsValue["arguments"], bridge: bridge)

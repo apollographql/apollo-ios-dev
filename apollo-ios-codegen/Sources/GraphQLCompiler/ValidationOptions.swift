@@ -42,7 +42,8 @@ public struct ValidationOptions {
   }
 
   final class Bridged: JavaScriptObject {
-    convenience init(from options: ValidationOptions, bridge: isolated JavaScriptBridge) {
+    @MainActor
+    convenience init(_ options: ValidationOptions, bridge: JavaScriptBridge) {
       let jsValue = JSValue(newObjectIn: bridge.context)
 
       jsValue?.setValue(
