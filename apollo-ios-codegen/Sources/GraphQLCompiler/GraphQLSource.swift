@@ -32,7 +32,7 @@ public struct GraphQLSourceLocation: Sendable {
 // `GraphQLDocument`.
 
 /// An AST node.
-public class ASTNode: JavaScriptObject {
+public class ASTNode: JavaScriptObject, @unchecked Sendable {
   public let kind: String
 
   public let source: GraphQLSource?
@@ -53,7 +53,7 @@ public class ASTNode: JavaScriptObject {
 }
 
 /// A parsed GraphQL document.
-public final class GraphQLDocument: ASTNode {
+public final class GraphQLDocument: ASTNode, @unchecked Sendable {
   public let definitions: [ASTNode]
 
   required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {

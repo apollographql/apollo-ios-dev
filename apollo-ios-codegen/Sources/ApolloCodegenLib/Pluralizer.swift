@@ -24,8 +24,8 @@ public enum InflectionRule: Codable, Equatable, Sendable {
   case uncountable(word: String)
 }
 
-struct Pluralizer {
-  
+struct Pluralizer: Sendable {
+
   private let inflector: StringInflector
   
   init(rules: [InflectionRule] = []) {
@@ -129,3 +129,5 @@ struct Pluralizer {
     .uncountable(word: "police"),
   ]
 }
+
+extension StringInflector: @retroactive @unchecked Sendable {}

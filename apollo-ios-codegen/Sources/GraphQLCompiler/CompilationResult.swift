@@ -3,7 +3,7 @@ import TemplateString
 import OrderedCollections
 
 /// The output of the frontend compiler.
-public final class CompilationResult: JavaScriptObjectDecodable {
+public final class CompilationResult: Sendable, JavaScriptObjectDecodable {
 
   /// String constants used to match JavaScriptObject instances.
   fileprivate enum Constants {

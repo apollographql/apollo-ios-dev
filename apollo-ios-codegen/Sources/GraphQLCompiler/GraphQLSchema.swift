@@ -6,7 +6,7 @@ import OrderedCollections
 // and are partially described in https://graphql.org/graphql-js/type/
 
 /// A GraphQL schema.
-public final class GraphQLSchema: JavaScriptObject {
+public final class GraphQLSchema: JavaScriptObject, @unchecked Sendable {
 
   // MARK: Methods
   @MainActor

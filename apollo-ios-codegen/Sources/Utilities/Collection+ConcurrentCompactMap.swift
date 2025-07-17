@@ -1,6 +1,6 @@
 import Foundation
 
-extension Collection {
+extension Collection where Element: Sendable {
 
   /// Returns an array containing the non-nil results of calling the given transformation
   /// asynchronously with each element of this collection.

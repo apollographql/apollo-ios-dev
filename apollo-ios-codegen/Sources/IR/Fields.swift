@@ -3,14 +3,9 @@ import OrderedCollections
 import GraphQLCompiler
 import TemplateString
 
-public enum Field: Equatable, Sendable {
-  case scalar(ScalarField)
-  case entity(EntityField)
-}
-
-public struct FieldInfo: Equatable, Sendable, CustomDebugStringConvertible {
+public class Field: Equatable, CustomDebugStringConvertible {
   public let underlyingField: CompilationResult.Field
-  public let inclusionConditions: AnyOf<InclusionConditions>?
+  public internal(set) var inclusionConditions: AnyOf<InclusionConditions>?
 
   public var name: String { underlyingField.name }
   public var alias: String? { underlyingField.alias }
@@ -26,7 +21,7 @@ public struct FieldInfo: Equatable, Sendable, CustomDebugStringConvertible {
     self.inclusionConditions = inclusionConditions
   }
 
-  public static func ==(lhs: FieldInfo, rhs: FieldInfo) -> Bool {
+  public static func ==(lhs: Field, rhs: Field) -> Bool {
     lhs.underlyingField == rhs.underlyingField &&
     lhs.inclusionConditions == rhs.inclusionConditions
   }
@@ -40,29 +35,18 @@ public struct FieldInfo: Equatable, Sendable, CustomDebugStringConvertible {
   }
 }
 
-@dynamicMemberLookup
-public struct ScalarField: Sendable, Equatable {
-
-  let fieldInfo: FieldInfo
-
-  init(
+public final class ScalarField: Field {
+  override init(
     _ field: CompilationResult.Field,
     inclusionConditions: AnyOf<InclusionConditions>? = nil
   ) {
-    fieldInfo = .init(field, inclusionConditions: inclusionConditions)
-  }
-
-  public subscript<T>(dynamicMember keyPath: KeyPath<FieldInfo, T>) -> T {
-    fieldInfo[keyPath: keyPath]
+    super.init(field, inclusionConditions: inclusionConditions)
   }
 }
 
-@dynamicMemberLookup
-public struct EntityField: Sendable {
-
+public final class EntityField: Field {
   public let selectionSet: SelectionSet
   public var entity: Entity { selectionSet.typeInfo.entity }
-  let fieldInfo: FieldInfo
 
   init(
     _ field: CompilationResult.Field,
@@ -70,15 +54,12 @@ public struct EntityField: Sendable {
     selectionSet: SelectionSet
   ) {
     self.selectionSet = selectionSet
-    fieldInfo = .init(field, inclusionConditions: inclusionConditions)
-  }
-
-  public subscript<T>(dynamicMember keyPath: KeyPath<FieldInfo, T>) -> T {
-    fieldInfo[keyPath: keyPath]
+    super.init(field, inclusionConditions: inclusionConditions)
   }
 
   public static func ==(lhs: EntityField, rhs: EntityField) -> Bool {
-    lhs.fieldInfo == rhs.fieldInfo &&
+    lhs.underlyingField == rhs.underlyingField &&
+    lhs.inclusionConditions == rhs.inclusionConditions &&
     lhs.selectionSet == rhs.selectionSet
   }
 }

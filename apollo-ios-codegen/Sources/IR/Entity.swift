@@ -71,7 +71,7 @@ public final class Entity: Sendable {
 
   /// The selections that are selected for the entity across all type scopes in the operation.
   /// Represented as a tree.
-  let selectionTree: EntitySelectionTree
+  nonisolated(unsafe) let selectionTree: EntitySelectionTree
 
   /// The location within a GraphQL definition (operation or fragment) where the `Entity` is
   /// located.

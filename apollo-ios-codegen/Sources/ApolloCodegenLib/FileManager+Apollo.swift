@@ -2,9 +2,9 @@ import Foundation
 
 public typealias FileAttributes = [FileAttributeKey : Any]
 
-public class ApolloFileManager {
+public final class ApolloFileManager: Sendable {
 
-  public static var `default` = ApolloFileManager(base: FileManager.default)
+  public static let `default` = ApolloFileManager(base: FileManager.default)
 
   public let base: FileManager
 
@@ -152,3 +152,5 @@ public enum FileManagerPathError: Swift.Error, LocalizedError, Equatable {
     }
   }
 }
+
+extension FileManager: @retroactive @unchecked Sendable {}

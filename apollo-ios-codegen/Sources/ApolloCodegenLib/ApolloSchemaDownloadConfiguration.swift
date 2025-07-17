@@ -1,12 +1,12 @@
 import Foundation
 
 /// A configuration object that defines behavior for schema download.
-public struct ApolloSchemaDownloadConfiguration: Equatable, Codable {
+public struct ApolloSchemaDownloadConfiguration: Equatable, Codable, Sendable {
 
   // MARK: Types
   
   /// How to attempt to download your schema
-  public enum DownloadMethod: Equatable, Codable {
+  public enum DownloadMethod: Equatable, Codable, Sendable {
 
     /// The Apollo Schema Registry, which serves as a central hub for managing your graph.
     case apolloRegistry(_ settings: ApolloRegistrySettings)
@@ -18,7 +18,7 @@ public struct ApolloSchemaDownloadConfiguration: Equatable, Codable {
       includeDeprecatedInputValues: Bool = false
     )
 
-    public struct ApolloRegistrySettings: Equatable, Codable {
+    public struct ApolloRegistrySettings: Equatable, Codable, Sendable {
       /// The API key to use when retrieving your schema from the Apollo Registry.
       public let apiKey: String
       /// The identifier of the graph to fetch. Can be found in Apollo Studio.
@@ -68,7 +68,7 @@ public struct ApolloSchemaDownloadConfiguration: Equatable, Codable {
 
     /// The HTTP request method. This is an option on Introspection schema downloads only.
     /// Apollo Registry downloads are always POST requests.
-    public enum HTTPMethod: Equatable, CustomStringConvertible, Codable {
+    public enum HTTPMethod: Equatable, CustomStringConvertible, Codable, Sendable {
       /// Use POST for HTTP requests. This is the default for GraphQL.
       case POST
       /// Use GET for HTTP requests with the GraphQL query being sent in the query string
@@ -88,7 +88,7 @@ public struct ApolloSchemaDownloadConfiguration: Equatable, Codable {
     /// The output format for the downloaded schema. This is an option on Introspection schema
     /// downloads only. For Apollo Registry schema downloads, the schema will always be output as
     /// an SDL document
-    public enum OutputFormat: String, Equatable, CustomStringConvertible, Codable {
+    public enum OutputFormat: String, Equatable, CustomStringConvertible, Codable, Sendable {
       /// A Schema Definition Language (SDL) document defining the schema as described in
       /// the [GraphQL Specification](https://spec.graphql.org/draft/#sec-Schema)
       case SDL
@@ -117,7 +117,7 @@ public struct ApolloSchemaDownloadConfiguration: Equatable, Codable {
   }
 
   /// An HTTP header that will be sent in the schema download request.
-  public struct HTTPHeader: Equatable, CustomDebugStringConvertible, Codable {
+  public struct HTTPHeader: Equatable, Sendable, CustomDebugStringConvertible, Codable {
     /// The name of the header field. HTTP header field names are case insensitive.
     let key: String
     /// The value for the header field.

@@ -1,9 +1,9 @@
 import Foundation
 import JavaScriptCore
 
-public struct ValidationOptions {
+public struct ValidationOptions: Sendable {
 
-  public struct DisallowedFieldNames {
+  public struct DisallowedFieldNames: Sendable {
     public let allFields: Set<String>
     public let entity: Set<String>
     public let entityList: Set<String>
