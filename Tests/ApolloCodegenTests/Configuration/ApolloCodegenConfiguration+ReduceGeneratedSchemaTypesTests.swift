@@ -169,7 +169,7 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
     
     let subject = createSubject()
     
-    let fileManager = MockApolloFileManager(strict: false)
+    let fileManager = await MockApolloFileManager(strict: false)
 
     await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
@@ -220,7 +220,7 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
     
     let subject = createSubject(reduceGeneratedSchemaTypes: false)
     
-    let fileManager = MockApolloFileManager(strict: false)
+    let fileManager = await MockApolloFileManager(strict: false)
 
     await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
@@ -271,7 +271,7 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
     
     let subject = createSubject()
     
-    let fileManager = MockApolloFileManager(strict: false)
+    let fileManager = await MockApolloFileManager(strict: false)
 
     await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
@@ -321,7 +321,7 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
     
     let subject = createSubject(reduceGeneratedSchemaTypes: false)
     
-    let fileManager = MockApolloFileManager(strict: false)
+    let fileManager = await MockApolloFileManager(strict: false)
 
     await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
@@ -372,7 +372,7 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
     
     let subject = createSubject()
     
-    let fileManager = MockApolloFileManager(strict: false)
+    let fileManager = await MockApolloFileManager(strict: false)
 
     await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
@@ -421,7 +421,7 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
     
     let subject = createSubject(reduceGeneratedSchemaTypes: false)
     
-    let fileManager = MockApolloFileManager(strict: false)
+    let fileManager = await MockApolloFileManager(strict: false)
 
     await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
