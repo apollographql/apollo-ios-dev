@@ -41,7 +41,7 @@ public struct ValidationOptions {
     self.disallowedInputParameterNames = disallowedInputParameterNames
   }
 
-  class Bridged: JavaScriptObject {
+  final class Bridged: JavaScriptObject {
     convenience init(from options: ValidationOptions, bridge: isolated JavaScriptBridge) {
       let jsValue = JSValue(newObjectIn: bridge.context)
 

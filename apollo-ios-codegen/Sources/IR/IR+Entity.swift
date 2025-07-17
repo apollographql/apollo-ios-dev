@@ -5,11 +5,11 @@ import Utilities
 ///
 /// Multiple `SelectionSet`s may select fields on the same `Entity`. All `SelectionSet`s that will
 /// be selected on the same object share the same `Entity`.
-public class Entity {
+public final class Entity: Sendable {
 
   /// Represents the location within a GraphQL definition (operation or fragment) of an `Entity`.
-  public struct Location: Hashable {
-    public enum SourceDefinition: Hashable {
+  public struct Location: Hashable, Sendable {
+    public enum SourceDefinition: Hashable, Sendable {
       case operation(CompilationResult.OperationDefinition)
       case namedFragment(CompilationResult.FragmentDefinition)
 
@@ -21,7 +21,7 @@ public class Entity {
       }
     }
 
-    public struct FieldComponent: Hashable {
+    public struct FieldComponent: Hashable, Sendable {
       public let name: String
       public let type: GraphQLType
 

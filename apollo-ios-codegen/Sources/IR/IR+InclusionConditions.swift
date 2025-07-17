@@ -4,7 +4,7 @@ import TemplateString
 
 /// A condition representing an `@include` or `@skip` directive to determine if a field
 /// or fragment should be included.
-public struct InclusionCondition: Hashable, CustomDebugStringConvertible {
+public struct InclusionCondition: Hashable, Sendable, CustomDebugStringConvertible {
 
   /// The name of variable used to determine if the inclusion condition is met.
   public let variable: String
@@ -40,7 +40,7 @@ public struct InclusionCondition: Hashable, CustomDebugStringConvertible {
 
 }
 
-public struct InclusionConditions: Collection, Hashable, CustomDebugStringConvertible {
+public struct InclusionConditions: Collection, Hashable, Sendable, CustomDebugStringConvertible {
 
   public typealias Element = InclusionCondition
 
@@ -174,7 +174,7 @@ public struct InclusionConditions: Collection, Hashable, CustomDebugStringConver
 
 // MARK: - AnyOf
 
-public struct AnyOf<T: Hashable>: Hashable {
+public struct AnyOf<T: Hashable & Sendable>: Hashable, Sendable {
   public private(set) var elements: OrderedSet<T>
 
   init(_ element: T) {

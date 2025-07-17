@@ -1,7 +1,7 @@
 import GraphQLCompiler
 import OrderedCollections
 
-public class NamedFragment: Definition, Hashable, CustomDebugStringConvertible {
+public final class NamedFragment: Definition, Hashable, CustomDebugStringConvertible {
   public let definition: CompilationResult.FragmentDefinition
   public let rootField: EntityField
 

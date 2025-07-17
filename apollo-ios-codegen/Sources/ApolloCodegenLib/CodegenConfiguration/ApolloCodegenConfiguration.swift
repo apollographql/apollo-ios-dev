@@ -2,7 +2,7 @@ import Foundation
 import IR
 
 /// A configuration object that defines behavior for code generation.
-public struct ApolloCodegenConfiguration: Codable, Equatable {
+public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
 
   // MARK: Input Types
 
@@ -242,7 +242,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   /// Swift access control configuration.
-  public enum AccessModifier: String, Codable, Equatable {
+  public enum AccessModifier: String, Codable, Equatable, Sendable {
     /// Enable entities to be used within any source file from their defining module, and also in
     /// a source file from another module that imports the defining module.
     case `public`
@@ -343,7 +343,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       }
       
       /// Configuation for apollo-ios dependency in SPM modules
-      public struct ApolloSDKDependency: Codable, Equatable {
+      public struct ApolloSDKDependency: Codable, Equatable, Sendable {
         /// URL for the SPM package dependency, not used for local dependencies.
         ///  Defaults to 'https://github.com/apollographql/apollo-ios'.
         let url: String
@@ -399,7 +399,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         }
         
         /// Type of SPM dependency
-        public enum SDKVersion: Codable, Equatable {
+        public enum SDKVersion: Codable, Equatable, Sendable {
           /// Configures SPM dependency to use the exact version of apollo-ios
           /// that matches the code generation library version currently in use.
           /// Results in a dependency that looks like:
@@ -513,7 +513,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   /// The local path structure for the generated operation object files.
-  public enum OperationsFileOutput: Codable, Equatable {
+  public enum OperationsFileOutput: Codable, Equatable, Sendable {
     /// All operation object files will be located in the module with the schema types.
     case inSchemaModule
     /// Operation object files will be co-located relative to the defining operation `.graphql`
@@ -573,7 +573,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   /// The local path structure for the generated test mock object files.
-  public enum TestMockFileOutput: Codable, Equatable {
+  public enum TestMockFileOutput: Codable, Equatable, Sendable {
     /// Test mocks will not be generated. This is the default value.
     case none
     /// Generated test mock files will be located in the specified `path`. Use `accessModifier` to
@@ -872,7 +872,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   /// Composition is used as a substitute for a boolean where context is better placed in the value
   /// instead of the parameter name, e.g.: `includeDeprecatedEnumCases = true` vs.
   /// `deprecatedEnumCases = .include`.
-  public enum Composition: String, Codable, Equatable {
+  public enum Composition: String, Codable, Equatable, Sendable {
     case include
     case exclude
   }
@@ -1060,7 +1060,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   /// ``SelectionSetInitializers`` functions like an `OptionSet`, allowing you to combine multiple
   /// different instances together to indicate all the types you would like to generate
   /// initializers for.
-  public struct SelectionSetInitializers: Codable, Equatable, ExpressibleByArrayLiteral {
+  public struct SelectionSetInitializers: Codable, Equatable, Sendable, ExpressibleByArrayLiteral {
     /// Option to generate initializers for all named fragments.
     public static let namedFragments: SelectionSetInitializers = .init(.namedFragments)
 
@@ -1122,7 +1122,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   ///  - Note: Disabling field merging and `selectionSetInitializers` functionality are
   /// incompatible. If using `selectionSetInitializers`, `fieldMerging` must be set to `.all`,
   /// otherwise a validation error will be thrown when runnning code generation.
-  public struct FieldMerging: Codable, Equatable, ExpressibleByArrayLiteral {
+  public struct FieldMerging: Codable, Equatable, Sendable, ExpressibleByArrayLiteral {
     /// Merges fields and fragment accessors from the selection set's direct ancestors.
     public static let ancestors          = FieldMerging(.ancestors)
 

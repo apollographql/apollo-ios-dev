@@ -9,8 +9,8 @@ extension Collection {
   ///
   /// Though the transformations will be called concurrently, the returned array is guaranteed to
   /// retain the order of the initial sequence.
-  public func concurrentCompactMap<ElementOfResult>(
-    _ transform: @escaping (Element) async throws -> ElementOfResult?
+  public func concurrentCompactMap<ElementOfResult: Sendable>(
+    _ transform: @Sendable @escaping (Element) async throws -> ElementOfResult?
   ) async throws -> [ElementOfResult] {
     try await withThrowingTaskGroup(
       of: (Int, ElementOfResult?).self,

@@ -113,6 +113,7 @@ class EntitySelectionTree {
 
   // MARK: - Calculate Merged Selections From Tree
 
+  @EntitySelectionTreeActor
   func addMergedSelections(into selections: ComputedSelectionSet.Builder) {
     let rootTypePath = selections.typeInfo.scopePath.head
     rootNode.mergeSelections(
@@ -206,7 +207,7 @@ class EntitySelectionTree {
       self.child = .selections(entitySelections)
     }
 
-
+    @EntitySelectionTreeActor
     func mergeSelections(
       matchingScopePath entityPathNode: LinkedList<ScopeDescriptor>.Node,
       entityTypeScopePath: LinkedList<ScopeCondition>.Node,
@@ -601,4 +602,8 @@ extension EntityTreeScopeSelections: CustomDebugStringConvertible {
     Fragments: \(namedFragments.values.elements.description)
     """
   }
+}
+
+@globalActor actor EntitySelectionTreeActor: GlobalActor {
+    static let shared = EntitySelectionTreeActor()
 }

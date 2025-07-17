@@ -3,7 +3,7 @@ import OrderedCollections
 import GraphQLCompiler
 import Utilities
 
-public struct ScopeCondition: Hashable, CustomDebugStringConvertible {
+public struct ScopeCondition: Hashable, Sendable, CustomDebugStringConvertible {
   public let type: GraphQLCompositeType?
   public let conditions: InclusionConditions?
   public let deferCondition: CompilationResult.DeferCondition?

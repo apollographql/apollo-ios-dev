@@ -2,7 +2,7 @@ import Foundation
 import InflectorKit
 
 /// The types of inflection rules that can be used to customize pluralization. 
-public enum InflectionRule: Codable, Equatable {
+public enum InflectionRule: Codable, Equatable, Sendable {
 
   /// A pluralization rule that allows taking a singular word and pluralizing it.
   /// - singularRegex: A regular expression representing the single version of the word

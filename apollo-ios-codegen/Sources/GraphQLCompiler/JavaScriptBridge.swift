@@ -1,4 +1,4 @@
-import JavaScriptCore
+@preconcurrency import JavaScriptCore
 import OrderedCollections
 
 // MARK: - JavaScriptError
@@ -185,7 +185,8 @@ extension JavaScriptObject: CustomDebugStringConvertible {
 
 // MARK: - JavaScriptBridge
 
-/// The JavaScript bridge is responsible for converting values to and from type-safe wrapper objects. It also ensures exceptions thrown from JavaScript wrapped and rethrown.
+/// The JavaScript bridge is responsible for converting values to and from type-safe wrapper objects. It also ensures
+/// exceptions thrown from JavaScript wrapped and rethrown.
 actor JavaScriptBridge {
 
   nonisolated var unownedExecutor: UnownedSerialExecutor {
@@ -333,8 +334,8 @@ actor JavaScriptBridge {
     on jsValue: JSValue,
     with arguments: [any JavaScriptValueConvertible]
   ) throws -> JSValue {
-    return try throwingJavaScriptErrorIfNeeded {
-      jsValue.invokeMethod(methodName, withArguments: unwrap(arguments))
+    return try throwingJavaScriptErrorIfNeeded { `self` in
+      jsValue.invokeMethod(methodName, withArguments: self.unwrap(arguments))
     }
   }
 
@@ -372,12 +373,12 @@ actor JavaScriptBridge {
     on jsValue: JSValue,
     with arguments: [any JavaScriptValueConvertible]
   ) throws -> JSValue {
-    return try throwingJavaScriptErrorIfNeeded {
+    return try throwingJavaScriptErrorIfNeeded { `self` in
       let function = jsValue[functionName]
 
       precondition(!function.isUndefined, "Function \(functionName) is undefined")
 
-      return function.call(withArguments: unwrap(arguments))!
+      return function.call(withArguments: self.unwrap(arguments))!
     }
   }
 
@@ -416,9 +417,9 @@ actor JavaScriptBridge {
     from jsValue: JSValue,
     with arguments: [any JavaScriptValueConvertible]
   ) throws -> Wrapper {
-    return try throwingJavaScriptErrorIfNeeded {
+    return try throwingJavaScriptErrorIfNeeded { `self` in
       return Wrapper.fromJSValue(
-        jsValue.construct(withArguments: unwrap(arguments)),
+        jsValue.construct(withArguments: self.unwrap(arguments)),
         bridge: self)
     }
   }
@@ -426,7 +427,7 @@ actor JavaScriptBridge {
   // MARK: Error Handling
 
   @discardableResult func throwingJavaScriptErrorIfNeeded<ReturnValue>(
-    body: () -> ReturnValue
+    body: (isolated JavaScriptBridge) -> ReturnValue
   ) throws -> ReturnValue {
     let previousExceptionHandler = context.exceptionHandler
 
@@ -435,7 +436,7 @@ actor JavaScriptBridge {
       exception = thrownException
     }
 
-    let result = body()
+    let result = body(self)
 
     // Errors thrown from JavaScript are stored on the context and ignored by default.
     // To surface these to callers, we wrap them in a `JavaScriptError` and throw.

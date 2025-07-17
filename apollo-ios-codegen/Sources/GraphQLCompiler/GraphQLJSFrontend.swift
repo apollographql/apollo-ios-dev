@@ -1,5 +1,5 @@
 import Foundation
-import JavaScriptCore
+@preconcurrency import JavaScriptCore
 
 public final class GraphQLJSFrontend {
   private let bridge: JavaScriptBridge
@@ -10,7 +10,7 @@ public final class GraphQLJSFrontend {
     let bridge = try await JavaScriptBridge()
     self.bridge = bridge
 
-    try await bridge.throwingJavaScriptErrorIfNeeded {
+    try await bridge.throwingJavaScriptErrorIfNeeded { bridge in
       bridge.context.evaluateScript(ApolloCodegenFrontendBundle)
     }
 
