@@ -78,7 +78,7 @@ public final class GraphQLJSFrontend {
     schema: GraphQLSchema,
     document: GraphQLDocument,
     validationOptions: ValidationOptions
-  ) async throws -> [GraphQLError] {
+  ) throws -> [GraphQLError] {
     return try library.call(
       "validateDocument",
       with: schema,
@@ -94,7 +94,7 @@ public final class GraphQLJSFrontend {
     experimentalLegacySafelistingCompatibleOperations: Bool = false,
     reduceGeneratedSchemaTypes: Bool,
     validationOptions: ValidationOptions
-  ) async throws -> CompilationResult {
+  ) throws -> CompilationResult {
     return try library.call(
       "compileDocument",
       with: schema,

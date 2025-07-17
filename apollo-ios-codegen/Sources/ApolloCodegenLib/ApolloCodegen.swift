@@ -654,7 +654,7 @@ public final class ApolloCodegen: Sendable {
     let filePathsToDelete = await oldGeneratedFilePaths.subtracting(fileManager.writtenFiles)
 
     for path in filePathsToDelete {
-      try fileManager.deleteFile(atPath: path)
+      try await fileManager.deleteFile(atPath: path)
     }
   }
 

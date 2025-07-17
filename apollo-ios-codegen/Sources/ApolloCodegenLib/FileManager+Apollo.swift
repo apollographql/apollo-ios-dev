@@ -2,30 +2,21 @@ import Foundation
 
 public typealias FileAttributes = [FileAttributeKey : Any]
 
-public final class ApolloFileManager: Sendable {
+@globalActor public actor FileManagerActor: GlobalActor {
+  public static let shared = FileManagerActor()
+}
 
-  public static let `default` = ApolloFileManager(base: FileManager.default)
+@FileManagerActor
+public class ApolloFileManager {
+
+  public nonisolated static let `default` = ApolloFileManager(base: FileManager.default)
 
   public let base: FileManager
 
-  actor WrittenFiles {
-    public fileprivate(set) var value: Set<String> = []
-
-    func addWrittenFile(path: String) {
-      value.insert(path)
-    }
-  }
-
-  private let _writtenFiles = WrittenFiles()
-
   /// The paths for the files written to by the ``ApolloFileManager``.
-  public var writtenFiles: Set<String> {
-    get async {
-      await _writtenFiles.value
-    }
-  }
+  public var writtenFiles: Set<String> = []
 
-  init(base: FileManager) {
+  nonisolated init(base: FileManager) {
     self.base = base
   }
 
@@ -96,7 +87,7 @@ public final class ApolloFileManager: Sendable {
   ///       If `false` the function will exit without writing the file if it already exists.
   ///       This will not throw an error.
   ///       Defaults to `false.
-  public func createFile(atPath path: String, data: Data? = nil, overwrite: Bool = true) async throws {
+  public func createFile(atPath path: String, data: Data? = nil, overwrite: Bool = true) throws {
     try createContainingDirectoryIfNeeded(forPath: path)
 
     if !overwrite && doesFileExist(atPath: path) { return }
@@ -104,15 +95,15 @@ public final class ApolloFileManager: Sendable {
     guard base.createFile(atPath: path, contents: data, attributes: nil) else {
       throw FileManagerPathError.cannotCreateFile(at: path)
     }
-    await _writtenFiles.addWrittenFile(path: path)
+    writtenFiles.insert(path)
   }
 
-  public func renameFile(atPath oldPath: String, toPath newPath: String) async throws {
+  public func renameFile(atPath oldPath: String, toPath newPath: String) throws {
     guard doesFileExist(atPath: oldPath) else { return }
 
     try base.moveItem(atPath: oldPath, toPath: newPath)
 
-    await _writtenFiles.addWrittenFile(path: newPath)
+    writtenFiles.insert(newPath)
   }
 
   /// Creates the containing directory (including all intermediate directories) for the given file URL if necessary.
