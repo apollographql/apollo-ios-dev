@@ -5,7 +5,7 @@ extension Target {
     public static func apolloPaginationTests() -> Target {
         let target: ApolloTarget = .apolloPaginationTests
 
-        return Target(
+      return .target(
             name: target.name,
             destinations: target.destinations,
             product: .unitTests,
@@ -33,10 +33,10 @@ extension Scheme {
     public static func apolloPaginationTests() -> Scheme {
         let target: ApolloTarget = .apolloPaginationTests
 
-        return Scheme(
+      return .scheme(
             name: target.name,
             buildAction: .buildAction(targets: [
-                TargetReference(projectPath: nil, target: target.name)
+              TargetReference.target(target.name)
             ]),
             testAction: .testPlans([
                 ApolloTestPlan.paginationTest.path,

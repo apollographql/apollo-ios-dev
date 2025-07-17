@@ -35,6 +35,7 @@ public class TestObserver: NSObject, XCTestObservation {
   }
 
   public nonisolated func testCaseDidFinish(_ testCase: XCTestCase) {
+    nonisolated(unsafe) let testCase = testCase
     MainActor.assumeIsolated {
       onFinish(testCase)
       if stopAfterEachTest { stop() }

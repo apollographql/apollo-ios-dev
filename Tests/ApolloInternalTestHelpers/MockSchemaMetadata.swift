@@ -5,10 +5,9 @@ extension Object {
   public static let mock = Object(typename: "Mock", implementedInterfaces: [])
 }
 
-public class MockSchemaMetadata: SchemaMetadata {
-  public init() { }
+public class MockSchemaMetadata: SchemaMetadata {  
 
-  public static var _configuration: SchemaConfiguration.Type = SchemaConfiguration.self
+  private nonisolated(unsafe) static var _configuration: SchemaConfiguration.Type = SchemaConfiguration.self
   public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
 
   @MainActor
@@ -17,7 +16,7 @@ public class MockSchemaMetadata: SchemaMetadata {
     stub_cacheKeyInfoForType_Object(nil)
   }
 
-  private static var _objectTypeForTypeName: ((String) -> Object?)?
+  private nonisolated(unsafe) static var _objectTypeForTypeName: ((String) -> Object?)?
   public static var objectTypeForTypeName: ((String) -> Object?)? {
       _objectTypeForTypeName
   }
@@ -49,7 +48,8 @@ public class MockSchemaMetadata: SchemaMetadata {
   }
 
   public class SchemaConfiguration: ApolloAPI.SchemaConfiguration {
-    static var stub_cacheKeyInfoForType_Object: ((Object, ObjectData) -> CacheKeyInfo?)?
+
+    fileprivate static nonisolated(unsafe) var stub_cacheKeyInfoForType_Object: ((Object, ObjectData) -> CacheKeyInfo?)?
 
     public static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
       stub_cacheKeyInfoForType_Object?(type, object)
@@ -91,7 +91,7 @@ public struct MockCacheKeyProvider {
 // MARK: - Custom Mock Schemas
 
 public enum MockSchema1: SchemaMetadata {
-  public static var configuration: any SchemaConfiguration.Type = MockSchema1Configuration.self
+  public static let configuration: any SchemaConfiguration.Type = MockSchema1Configuration.self
 
   public static func objectType(forTypename __typename: String) -> Object? {
     Object(typename: __typename, implementedInterfaces: [])
@@ -105,7 +105,7 @@ public enum MockSchema1Configuration: SchemaConfiguration {
 }
 
 public enum MockSchema2: SchemaMetadata {
-  public static var configuration: any SchemaConfiguration.Type = MockSchema2Configuration.self
+  public static let configuration: any SchemaConfiguration.Type = MockSchema2Configuration.self
 
   public static func objectType(forTypename __typename: String) -> Object? {
     Object(typename: __typename, implementedInterfaces: [])

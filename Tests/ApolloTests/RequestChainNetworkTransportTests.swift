@@ -40,7 +40,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     }
   }
 
-  func emptyResponseData() -> Data {
+  static func emptyResponseData() -> Data {
     return """
       {
         "data": {}
@@ -109,7 +109,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     await Self.registerRequestHandler(for: serverUrl) { request in
       (
         .mock(),
-        self.emptyResponseData()
+        Self.emptyResponseData()
       )
     }
 
@@ -178,7 +178,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
 
       return (
         .mock(),
-        self.emptyResponseData()
+        Self.emptyResponseData()
       )
     }
 

@@ -5,7 +5,7 @@ import XCTest
 
 @testable import Apollo
 
-class WatchQueryTests: XCTestCase, CacheDependentTesting {
+class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
   var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
@@ -13,15 +13,14 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
   static let defaultWaitTimeout: TimeInterval = 1
 
-  var cache: (any NormalizedCache)!
+  var store: ApolloStore!
   var server: MockGraphQLServer!
   var client: ApolloClient!
 
   override func setUp() async throws {
     try await super.setUp()
 
-    cache = try await makeNormalizedCache()
-    let store = ApolloStore(cache: cache)
+    store = try await makeTestStore()
 
     server = MockGraphQLServer()
     let networkTransport = MockNetworkTransport(mockServer: server, store: store)
@@ -30,7 +29,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
   }
 
   override func tearDownWithError() throws {
-    cache = nil
+    store = nil
     server = nil
     client = nil
 
@@ -78,7 +77,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
 
     let initialWatcherResultExpectation =
-      resultObserver.expectation(
+    await resultObserver.expectation(
         description: "Watcher received initial result from server"
       ) { result in
         try XCTAssertSuccessResult(result) { graphQLResult in
@@ -110,7 +109,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let refetchedWatcherResultExpectation = resultObserver.expectation(
+    let refetchedWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received refetched result from server"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -168,7 +167,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let initialWatcherResultExpectation = resultObserver.expectation(
+    let initialWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received initial result from server"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -200,7 +199,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let updatedWatcherResultExpectation = resultObserver.expectation(
+    let updatedWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received updated result from cache"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -259,7 +258,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let initialWatcherResultExpectation = resultObserver.expectation(
+    let initialWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received initial result from server"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -293,7 +292,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let noUpdatedResultExpectation = resultObserver.expectation(
+    let noUpdatedResultExpectation = await resultObserver.expectation(
       description: "Other query shouldn't trigger refetch"
     ) { _ in }
     noUpdatedResultExpectation.isInverted = true
@@ -309,6 +308,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     )
   }
 
+  @MainActor
   func testWatchedQueryGetsUpdatedWhenSameObjectHasChangedInAnotherQueryWithDifferentVariables() async throws {
     class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {
@@ -328,7 +328,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
     }
 
-    await MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
+    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
 
     let watchedQuery = MockQuery<GivenSelectionSet>()
     watchedQuery.__variables = ["episode": "EMPIRE"]
@@ -342,8 +342,8 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     )
     addTeardownBlock { watcher.cancel() }
 
-    // Initial fetch from server") { _ in
-    let serverRequestExpectation = await server.expect(MockQuery<GivenSelectionSet>.self) { request in
+    // Initial fetch from server
+    let serverRequestExpectation = await server.expect(MockQuery<GivenSelectionSet>.self) { @Sendable request in
       expect(request.operation.__variables?["episode"] as? String).to(equal("EMPIRE"))
       return [
         "data": [
@@ -356,7 +356,9 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       ]
     }
 
-    let initialWatcherResultExpectation = resultObserver.expectation(description: "Watcher received initial result") {
+    let initialWatcherResultExpectation = await resultObserver.expectation(
+      description: "Watcher received initial result"
+    ) {
       result in
       try XCTAssertSuccessResult(result) { graphQLResult in
         XCTAssertEqual(graphQLResult.source, .server)
@@ -376,7 +378,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     )
 
     // Fetch same query from server with different argument but returning same object with changed data
-    let secondServerRequestExpectation = await server.expect(MockQuery<GivenSelectionSet>.self) { request in
+    let secondServerRequestExpectation = await server.expect(MockQuery<GivenSelectionSet>.self) { @Sendable request in
       expect(request.operation.__variables?["episode"] as? String).to(equal("JEDI"))
       return [
         "data": [
@@ -389,7 +391,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       ]
     }
 
-    let updatedWatcherResultExpectation = resultObserver.expectation(
+    let updatedWatcherResultExpectation = await resultObserver.expectation(
       description: "Updated result after refetching query"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -492,7 +494,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let initialWatcherResultExpectation = resultObserver.expectation(
+    let initialWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received initial result from server"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -526,7 +528,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let updatedWatcherResultExpectation = resultObserver.expectation(
+    let updatedWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received updated result from cache"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -616,6 +618,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         }
       }
     }
+
     MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
 
     let watchedQuery = MockQuery<HeroAndFriendsNameSelectionSet>()
@@ -630,7 +633,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     addTeardownBlock { watcher.cancel() }
 
     // Initial fetch from server
-    let serverRequestExpectation = await server.expect(MockQuery<HeroAndFriendsNameSelectionSet>.self) { request in
+    let serverRequestExpectation = await server.expect(MockQuery<HeroAndFriendsNameSelectionSet>.self) { @Sendable request in
       [
         "data": [
           "hero": [
@@ -647,7 +650,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       ]
     }
 
-    let initialWatcherResultExpectation = resultObserver.expectation(
+    let initialWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received initial result from server"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -670,7 +673,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Fetch other query with list of updated keys from server
     let secondServerRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsIdsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsIdsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -686,7 +689,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let updatedWatcherResultExpectation = resultObserver.expectation(
+    let updatedWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received updated result from cache"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -791,7 +794,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -808,7 +811,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let initialWatcherResultExpectation = resultObserver.expectation(
+    let initialWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received initial result from server"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -831,7 +834,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Fetch other query with list of updated keys from server
     let secondServerRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -849,7 +852,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       }
 
     let refetchServerRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -866,7 +869,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let updatedWatcherResultExpectation = resultObserver.expectation(
+    let updatedWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received updated result from cache"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -980,7 +983,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -997,7 +1000,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let initialWatcherResultExpectation = resultObserver.expectation(
+    let initialWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received initial result from server"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -1020,7 +1023,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Fetch other query with list of updated keys from server
     let secondServerRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -1037,7 +1040,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let updatedWatcherResultExpectation = resultObserver.expectation(
+    let updatedWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received updated result from cache"
     ) { _ in }
     updatedWatcherResultExpectation.isInverted = true
@@ -1136,7 +1139,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let initialWatcherResultExpectation = resultObserver.expectation(
+    let initialWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received initial result from server"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -1160,7 +1163,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     )
 
     // Update object directly in store
-    let updatedWatcherResultExpectation = resultObserver.expectation(
+    let updatedWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received updated result from cache"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -1347,7 +1350,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     })
 
     // Initial fetch from cache
-    let initialWatcherResultExpectation = resultObserver.expectation(
+    let initialWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received initial result from cache"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -1368,7 +1371,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     // Fetch other query with list of updated keys from server
     let secondServerRequestExpectation = await server.expect(
       MockQuery<HeroAndFriendsIDsOnlySelectionSet>.self
-    ) { request in
+    ) { @Sendable request in
       [
         "data": [
           "hero": [
@@ -1385,7 +1388,9 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       ]
     }
 
-    let noRefetchExpectation = resultObserver.expectation(description: "Initial query shouldn't trigger refetch") { _ in
+    let noRefetchExpectation = await resultObserver.expectation(
+      description: "Initial query shouldn't trigger refetch"
+    ) { _ in
     }
     noRefetchExpectation.isInverted = true
 
@@ -1436,7 +1441,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let initialWatcherResultExpectation = resultObserver.expectation(
+    let initialWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received initial result from server"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -1471,7 +1476,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     secondServerRequestExpectation.expectedFulfillmentCount = numberOfFetches
 
-    let updatedWatcherResultExpectation = resultObserver.expectation(
+    let updatedWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received updated result from cache"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -1551,7 +1556,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let initialWatcherResultExpectation = resultObserver.expectation(
+    let initialWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received initial result from server"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -1586,7 +1591,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     secondServerRequestExpectation.expectedFulfillmentCount = numberOfFetches
 
-    let updatedWatcherResultExpectation = resultObserver.expectation(
+    let updatedWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received updated result from cache"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -1704,7 +1709,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     addTeardownBlock { watcher.cancel() }
 
     // Initial fetch from server
-    let serverRequestExpectation = await server.expect(HeroAndFriendsNamesWithIDsQuery.self) { request in
+    let serverRequestExpectation = await server.expect(HeroAndFriendsNamesWithIDsQuery.self) { @Sendable request in
       [
         "data": [
           "hero": [
@@ -1719,7 +1724,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       ]
     }
 
-    let initialWatcherResultExpectation = resultObserver.expectation(
+    let initialWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received initial result from server"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -1756,7 +1761,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
     )
 
     // Update same query directly in store
-    let updatedWatcherResultExpectation = resultObserver.expectation(
+    let updatedWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received updated result from cache"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -1850,7 +1855,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -1865,7 +1870,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let initialWatcherResultExpectation = resultObserver.expectation(
+    let initialWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received initial result from server"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -1903,7 +1908,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Fetch other query from server
     let secondServerRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -1919,7 +1924,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let updatedWatcherResultExpectation = resultObserver.expectation(
+    let updatedWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received updated result from cache"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -2012,7 +2017,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { request in
+    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -2027,7 +2032,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         ]
       }
 
-    let initialWatcherResultExpectation = resultObserver.expectation(
+    let initialWatcherResultExpectation = await resultObserver.expectation(
       description: "Watcher received initial result from server"
     ) { result in
       try XCTAssertSuccessResult(result) { graphQLResult in
@@ -2065,7 +2070,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
     // Make sure it gets released
     watcher = nil
-    cache = nil
+    store = nil
     server = nil
     client = nil
 

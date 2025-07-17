@@ -102,15 +102,14 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     InMemoryTestCacheProvider.self
   }
 
-  var cache: (any NormalizedCache)!
+  var store: ApolloStore!
   var server: MockGraphQLServer!
   var client: ApolloClient!
 
   override func setUp() async throws {
     try await super.setUp()
 
-    cache = try await makeNormalizedCache()
-    let store = ApolloStore(cache: cache)
+    store = try await makeTestStore()
 
     server = MockGraphQLServer()
     let networkTransport = MockNetworkTransport(mockServer: server, store: store)
@@ -121,13 +120,13 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
   override func tearDownWithError() throws {
     try super.tearDownWithError()
 
-    cache = nil
+    store = nil
     server = nil
     client = nil
   }
 
   func test__fetch__givenPartialAndIncrementalDataIsCached_returnsAllDeferredFragmentsAsFulfilled() async throws {
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal")
       ],
@@ -156,7 +155,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
   }
 
   func test__fetch__givenOnlyPartialDataIsCached_returnsAllDeferredFragmentsAsPending() async throws {
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal")
       ],
@@ -183,7 +182,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     test__fetch__givenPartialAndSomeIncrementalDataIsCached_returnsCachedDeferredFragmentAsFulfilledAndUncachedDeferredFragmentsAsPending()
     async throws
   {
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal")
       ],
@@ -210,7 +209,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     test__fetch__givenNestedIncrementalDataIsNotCached_returnsNestedDeferredFragmentsAsPending_otherDeferredFragmentsAsFulfilled()
     async throws
   {
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal")
       ],
@@ -243,7 +242,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     test__fetch__givenMissingValueInDeferredFragment_returnsDeferredFragmentAsPending_otherDeferredFragmentsAsFulfilled()
     async throws
   {
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal")
       ],
@@ -272,7 +271,7 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
   }
 
   func test__fetch__givenMissingValueInPartialData_shouldReturnNil() async throws {
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "animal": CacheReference("QUERY_ROOT.animal")
       ],

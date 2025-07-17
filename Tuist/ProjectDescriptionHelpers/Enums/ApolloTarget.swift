@@ -104,6 +104,6 @@ public enum ApolloTarget {
   }
     
     public var deploymentTargets: DeploymentTargets {
-      return DeploymentTargets(macOS: "12.0")        
+      return DeploymentTargets.macOS("12.0")
     }
 }

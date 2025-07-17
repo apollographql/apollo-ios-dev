@@ -57,7 +57,7 @@ class StoreSubscriptionTests: XCTestCase {
       self.changeSet = changeSet
     }
 
-    func isolatedDo(_ block: @escaping (isolated SimpleSubscriber) -> Void) {
+    func isolatedDo(_ block: @Sendable @escaping (isolated SimpleSubscriber) -> Void) {
       block(self)
     }
 

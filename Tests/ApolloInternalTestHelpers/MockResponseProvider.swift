@@ -74,7 +74,7 @@ extension MockResponseProvider {
   public static func registerRequestHandler(for url: URL, handler: @escaping SingleResponseHandler) async {
     await requestStorage.registerRequestHandler(for: Self.self, url: url, handler: { request in
       let (response, data) = try await handler(request)
-      var didYieldData = false
+      nonisolated(unsafe) var didYieldData = false
 
       let stream = AsyncThrowingStream<Data, any Error> {
         if didYieldData {
