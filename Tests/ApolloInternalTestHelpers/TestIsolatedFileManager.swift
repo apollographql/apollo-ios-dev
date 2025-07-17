@@ -11,7 +11,7 @@ import XCTest
 /// `testIsolatedFileManager()` function on `XCTestCase`.
 public actor TestIsolatedFileManager {
 
-  public var directoryURL: URL { filePathBuilder.testIsolatedOutputFolder }
+  nonisolated public var directoryURL: URL { filePathBuilder.testIsolatedOutputFolder }
   public let fileManager: FileManager
   public let filePathBuilder: TestFilePathBuilder
 

@@ -4,7 +4,7 @@ import ApolloCodegenInternalTestHelpers
 import XCTest
 
 fileprivate class FailingNetworkSession: NetworkSession {
-  func loadData(with urlRequest: URLRequest, completionHandler: @escaping (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionDataTask? {
+  func loadData(with urlRequest: URLRequest, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) async -> Void) -> URLSessionDataTask? {
     XCTFail("You must call setRequestHandler before using downloader!")
 
     return nil
@@ -102,8 +102,10 @@ class URLDownloaderTests: XCTestCase {
 
   func testDownloadError_withIncorrectResponseType_shouldThrow() throws {
     class CustomNetworkSession: NetworkSession {
-      func loadData(with urlRequest: URLRequest, completionHandler: @escaping (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionDataTask? {
-        completionHandler(nil,  URLResponse(), nil)
+      func loadData(with urlRequest: URLRequest, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) async -> Void) -> URLSessionDataTask? {
+        Task {
+          await completionHandler(nil,  URLResponse(), nil)
+        }
 
         return nil
       }
