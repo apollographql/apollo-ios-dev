@@ -3822,7 +3822,93 @@ class SelectionSetTemplateTests: XCTestCase {
       ignoringExtraLines: true
     ))
   }
-  
+
+  func test__render_selections__givenDeferredNamedFragment_insideNamedFragment_rendersInitializerForBothMergedAndDirectFragmentAccessors() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      type Animal {
+        id: String!
+        name: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          ...BasicFragment
+        }
+      }
+
+      fragment BasicFragment on Animal {
+        id
+        ...DetailsFragment @defer(label: "slowDetails")
+      }
+      
+      fragment DetailsFragment on Animal {
+        name
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let allAnimals = try XCTUnwrap(operation[field: "query"]?[field: "allAnimals"]?.selectionSet)
+    let allAnimals_basicFragment = try XCTUnwrap(allAnimals[fragment: "BasicFragment"])
+
+    let rendered_allAnimals = subject.test_render(childEntity: allAnimals.computed)
+
+    let basicFragmentSubject = SelectionSetTemplate(
+      definition: allAnimals_basicFragment.fragment,
+      generateInitializers: false,
+      config: self.subject.config,
+      nonFatalErrorRecorder: .init(),
+      renderAccessControl: self.subject.renderAccessControl()
+    )
+    let rendered_allAnimals_basicFragment = basicFragmentSubject.test_render(
+      childEntity: try XCTUnwrap(allAnimals_basicFragment.rootField.selectionSet?.computed)
+    )
+
+    expect(rendered_allAnimals).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _detailsFragment = Deferred(_dataDict: _dataDict)
+          }
+
+          public var basicFragment: BasicFragment { _toFragment() }
+          @Deferred public var detailsFragment: DetailsFragment?
+        }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+
+    expect(rendered_allAnimals_basicFragment).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _detailsFragment = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var detailsFragment: DetailsFragment?
+        }
+      """,
+      atLine: 15,
+      ignoringExtraLines: true
+    ))
+  }
+
   func test__render_selections__givenDeferredInlineFragmentOnDifferentTypeCase_insideNamedFragment_rendersDeferredFragmentSelection() async throws {
     // given
     schemaSDL = """
