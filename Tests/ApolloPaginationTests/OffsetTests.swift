@@ -19,18 +19,17 @@ final class OffsetTests: XCTestCase {
     super.setUp()
     store = ApolloStore(cache: InMemoryNormalizedCache())
     server = MockGraphQLServer()
-    networkTransport = MockNetworkTransport(server: server, store: store)
+    networkTransport = MockNetworkTransport(mockServer: server, store: store)
     client = ApolloClient(networkTransport: networkTransport, store: store)
   }
 
-  private func createPager() async -> AsyncGraphQLQueryPager<PaginationOutput<Query, Query>> {
+  private func createPager() async -> GraphQLQueryPager<PaginationOutput<Query, Query>> {
     let pageSize = 2
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "offset": 0, "limit": pageSize]
-    let pager = AsyncGraphQLQueryPagerCoordinator<Query, Query>(
+    let pager = GraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
-      initialQuery: initialQuery,
-      watcherDispatchQueue: .main,
+      initialQuery: initialQuery,      
       extractPageInfo: { data in
         switch data {
         case .initial(let data, let output), .paginated(let data, let output):
@@ -57,7 +56,7 @@ final class OffsetTests: XCTestCase {
         return nextQuery
       }
     )
-    return AsyncGraphQLQueryPager(pager: pager)
+    return GraphQLQueryPager(pager: pager)
   }
 
   // This is due to a timing issue in unit tests only wherein we deinit immediately after waiting for expectations
@@ -69,14 +68,14 @@ final class OffsetTests: XCTestCase {
     }
   }
 
-  private func fetchFirstPage<T>(pager: AsyncGraphQLQueryPager<T>) async {
-    let serverExpectation = Mocks.Hero.OffsetFriendsQuery.expectationForFirstPage(server: server)
+  private func fetchFirstPage<T>(pager: GraphQLQueryPager<T>) async {
+    let serverExpectation = await Mocks.Hero.OffsetFriendsQuery.expectationForFirstPage(server: server)
     await pager.fetch()
     await fulfillment(of: [serverExpectation], timeout: 1.0)
   }
 
-  private func fetchSecondPage<T>(pager: AsyncGraphQLQueryPager<T>) async throws {
-    let serverExpectation = Mocks.Hero.OffsetFriendsQuery.expectationForLastPage(server: server)
+  private func fetchSecondPage<T>(pager: GraphQLQueryPager<T>) async throws {
+    let serverExpectation = await Mocks.Hero.OffsetFriendsQuery.expectationForLastPage(server: server)
     try await pager.loadNext()
     await fulfillment(of: [serverExpectation], timeout: 1.0)
   }

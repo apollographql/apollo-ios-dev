@@ -3,10 +3,10 @@ import ApolloInternalTestHelpers
 import XCTest
 
 extension Mocks.Hero.FriendsQuery {
-  static func expectationForFirstPage(server: MockGraphQLServer) -> XCTestExpectation {
+  static func expectationForFirstPage(server: MockGraphQLServer) async -> XCTestExpectation {
     let query = MockQuery<Mocks.Hero.FriendsQuery>()
     query.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return server.expect(query) { _ in
+    return await server.expect(query) { _ in
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "endCursor": "Y3Vyc29yMg==",
@@ -31,27 +31,27 @@ extension Mocks.Hero.FriendsQuery {
         "pageInfo": pageInfo,
       ]
 
-      let hero: [String: AnyHashable] = [
+      let hero = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
         "friendsConnection": friendsConnection,
       ]
 
-      let data: [String: AnyHashable] = [
+      let data = [
         "hero": hero
       ]
 
       return [
-        "data": data
+        "data": data as JSONValue
       ]
     }
   }
 
-  static func expectationForSecondPage(server: MockGraphQLServer) -> XCTestExpectation {
+  static func expectationForSecondPage(server: MockGraphQLServer) async -> XCTestExpectation {
     let query = MockQuery<Mocks.Hero.FriendsQuery>()
     query.__variables = ["id": "2001", "first": 2, "after": "Y3Vyc29yMg=="]
-    return server.expect(query) { _ in
+    return await server.expect(query) { _ in
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "endCursor": "Y3Vyc29yMw==",
@@ -71,27 +71,27 @@ extension Mocks.Hero.FriendsQuery {
         "pageInfo": pageInfo,
       ]
 
-      let hero: [String: AnyHashable] = [
+      let hero = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
         "friendsConnection": friendsConnection,
       ]
 
-      let data: [String: AnyHashable] = [
+      let data = [
         "hero": hero
       ]
 
       return [
-        "data": data
+        "data": data as JSONValue
       ]
     }
   }
 
-  static func expectationForFirstPageWithErrors(server: MockGraphQLServer) -> XCTestExpectation {
+  static func expectationForFirstPageWithErrors(server: MockGraphQLServer) async -> XCTestExpectation {
     let query = MockQuery<Mocks.Hero.FriendsQuery>()
     query.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return server.expect(query) { _ in
+    return await server.expect(query) { _ in
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "endCursor": "Y3Vyc29yMg==",
@@ -116,19 +116,19 @@ extension Mocks.Hero.FriendsQuery {
         "pageInfo": pageInfo,
       ]
 
-      let hero: [String: AnyHashable] = [
+      let hero = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
         "friendsConnection": friendsConnection,
       ]
 
-      let data: [String: AnyHashable] = [
+      let data = [
         "hero": hero
       ]
 
       return [
-        "data": data,
+        "data": data as JSONValue,
         "errors": [
           [
             "message": "uh oh!"
@@ -141,10 +141,10 @@ extension Mocks.Hero.FriendsQuery {
     }
   }
 
-  static func expectationForFirstPageErrorsOnly(server: MockGraphQLServer) -> XCTestExpectation {
+  static func expectationForFirstPageErrorsOnly(server: MockGraphQLServer) async -> XCTestExpectation {
     let query = MockQuery<Mocks.Hero.FriendsQuery>()
     query.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return server.expect(query) { _ in
+    return await server.expect(query) { _ in
       return [
         "errors": [
           [
@@ -158,10 +158,10 @@ extension Mocks.Hero.FriendsQuery {
     }
   }
 
-  static func expectationForSecondPageErrorsOnly(server: MockGraphQLServer) -> XCTestExpectation {
+  static func expectationForSecondPageErrorsOnly(server: MockGraphQLServer) async -> XCTestExpectation {
     let query = MockQuery<Mocks.Hero.FriendsQuery>()
     query.__variables = ["id": "2001", "first": 2, "after": "Y3Vyc29yMg=="]
-    return server.expect(query) { _ in
+    return await server.expect(query) { _ in
       return [
         "errors": [
           [
@@ -177,10 +177,10 @@ extension Mocks.Hero.FriendsQuery {
 }
 
 extension Mocks.Hero.ReverseFriendsQuery {
-  static func expectationForPreviousItem(server: MockGraphQLServer) -> XCTestExpectation {
+  static func expectationForPreviousItem(server: MockGraphQLServer) async -> XCTestExpectation {
     let query = MockQuery<Mocks.Hero.ReverseFriendsQuery>()
     query.__variables = ["id": "2001", "first": 2, "before": "Y3Vyc29yMg=="]
-    return server.expect(query) { _ in
+    return await server.expect(query) { _ in
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "startCursor": "Y3Vyc29yZg==",
@@ -200,26 +200,26 @@ extension Mocks.Hero.ReverseFriendsQuery {
         "pageInfo": pageInfo,
       ]
 
-      let hero: [String: AnyHashable] = [
+      let hero = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
         "friendsConnection": friendsConnection,
       ]
 
-      let data: [String: AnyHashable] = [
+      let data = [
         "hero": hero
       ]
 
       return [
-        "data": data
+        "data": data as JSONValue
       ]
     }
   }
-  static func expectationForLastItem(server: MockGraphQLServer) -> XCTestExpectation {
+  static func expectationForLastItem(server: MockGraphQLServer) async -> XCTestExpectation {
     let query = MockQuery<Mocks.Hero.ReverseFriendsQuery>()
     query.__variables = ["id": "2001", "first": 2, "before": "Y3Vyc29yMw=="]
-    return server.expect(query) { _ in
+    return await server.expect(query) { _ in
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "startCursor": "Y3Vyc29yMg==",
@@ -244,29 +244,29 @@ extension Mocks.Hero.ReverseFriendsQuery {
         "pageInfo": pageInfo,
       ]
 
-      let hero: [String: AnyHashable] = [
+      let hero = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
         "friendsConnection": friendsConnection,
       ]
 
-      let data: [String: AnyHashable] = [
+      let data = [
         "hero": hero
       ]
 
       return [
-        "data": data
+        "data": data as JSONValue
       ]
     }
   }
 }
 
 extension Mocks.Hero.BidirectionalFriendsQuery {
-  static func expectationForFirstFetchInMiddleOfList(server: MockGraphQLServer) -> XCTestExpectation {
+  static func expectationForFirstFetchInMiddleOfList(server: MockGraphQLServer) async -> XCTestExpectation {
     let query = MockQuery<Mocks.Hero.BidirectionalFriendsQuery>()
     query.__variables = ["id": "2001", "first": 1, "before": GraphQLNullable<String>.null, "after": "Y3Vyc29yMw=="]
-    return server.expect(query) { _ in
+    return await server.expect(query) { _ in
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "startCursor": "Y3Vyc29yMw==",
@@ -281,34 +281,34 @@ extension Mocks.Hero.BidirectionalFriendsQuery {
           "id": "1003",
         ],
       ]
-      let friendsConnection: [String: AnyHashable] = [
+      let friendsConnection = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
         "friends": friends,
         "pageInfo": pageInfo,
       ]
 
-      let hero: [String: AnyHashable] = [
+      let hero = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
         "friendsConnection": friendsConnection,
       ]
 
-      let data: [String: AnyHashable] = [
+      let data = [
         "hero": hero
       ]
 
       return [
-        "data": data
+        "data": data as JSONValue
       ]
     }
   }
 
-  static func expectationForLastPage(server: MockGraphQLServer) -> XCTestExpectation {
+  static func expectationForLastPage(server: MockGraphQLServer) async -> XCTestExpectation {
     let query = MockQuery<Mocks.Hero.BidirectionalFriendsQuery>()
     query.__variables = ["id": "2001", "first": 1, "after": "Y3Vyc29yMg==", "before": GraphQLNullable<String>.null]
-    return server.expect(query) { _ in
+    return await server.expect(query) { _ in
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "startCursor": "Y3Vyc29yMg==",
@@ -330,27 +330,27 @@ extension Mocks.Hero.BidirectionalFriendsQuery {
         "pageInfo": pageInfo,
       ]
 
-      let hero: [String: AnyHashable] = [
+      let hero = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
         "friendsConnection": friendsConnection,
       ]
 
-      let data: [String: AnyHashable] = [
+      let data = [
         "hero": hero
       ]
 
       return [
-        "data": data
+        "data": data as JSONValue
       ]
     }
   }
 
-  static func expectationForPreviousPage(server: MockGraphQLServer) -> XCTestExpectation {
+  static func expectationForPreviousPage(server: MockGraphQLServer) async -> XCTestExpectation {
     let query = MockQuery<Mocks.Hero.BidirectionalFriendsQuery>()
     query.__variables = ["id": "2001", "first": 1, "before": "Y3Vyc29yMw==", "after": GraphQLNullable<String>.null]
-    return server.expect(query) { _ in
+    return await server.expect(query) { _ in
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "startCursor": "Y3Vyc29yMq==",
@@ -372,29 +372,29 @@ extension Mocks.Hero.BidirectionalFriendsQuery {
         "pageInfo": pageInfo,
       ]
 
-      let hero: [String: AnyHashable] = [
+      let hero = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
         "friendsConnection": friendsConnection,
       ]
 
-      let data: [String: AnyHashable] = [
+      let data = [
         "hero": hero
       ]
 
       return [
-        "data": data
+        "data": data as JSONValue
       ]
     }
   }
 }
 
 extension Mocks.Hero.OffsetFriendsQuery {
-  static func expectationForFirstPage(server: MockGraphQLServer) -> XCTestExpectation {
+  static func expectationForFirstPage(server: MockGraphQLServer) async -> XCTestExpectation {
     let query = MockQuery<Mocks.Hero.OffsetFriendsQuery>()
     query.__variables = ["id": "2001", "offset": 0, "limit": 2]
-    return server.expect(query) { _ in
+    return await server.expect(query) { _ in
       let friends: [[String: AnyHashable]] = [
         [
           "__typename": "Human",
@@ -408,27 +408,27 @@ extension Mocks.Hero.OffsetFriendsQuery {
         ],
       ]
 
-      let hero: [String: AnyHashable] = [
+      let hero = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
         "friends": friends,
       ]
 
-      let data: [String: AnyHashable] = [
+      let data = [
         "hero": hero
       ]
 
       return [
-        "data": data
+        "data": data as JSONValue
       ]
     }
   }
 
-  static func expectationForLastPage(server: MockGraphQLServer) -> XCTestExpectation {
+  static func expectationForLastPage(server: MockGraphQLServer) async -> XCTestExpectation {
     let query = MockQuery<Mocks.Hero.OffsetFriendsQuery>()
     query.__variables = ["id": "2001", "offset": 2, "limit": 2]
-    return server.expect(query) { _ in
+    return await server.expect(query) { _ in
       let friends: [[String: AnyHashable]] = [
         [
           "__typename": "Human",
@@ -437,19 +437,19 @@ extension Mocks.Hero.OffsetFriendsQuery {
         ],
       ]
 
-      let hero: [String: AnyHashable] = [
+      let hero = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
         "friends": friends,
       ]
 
-      let data: [String: AnyHashable] = [
+      let data = [
         "hero": hero
       ]
 
       return [
-        "data": data
+        "data": data as JSONValue
       ]
     }
   }
