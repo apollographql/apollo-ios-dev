@@ -14,7 +14,7 @@ public class MaxRetryInterceptor: ApolloInterceptor {
     public let baseDelay: TimeInterval
     /// Multiplier for exponential backoff calculation. Defaults to `2.0`.
     public let multiplier: Double
-    /// Maximum delay cap in seconds to prevent excessive wait times. Defaults to `30.0`.
+    /// Maximum delay cap in seconds to prevent excessive wait times. Defaults to `20.0`.
     public let maxDelay: TimeInterval
     /// Whether to enable exponential backoff delays between retries. Defaults to `false`.
     public let enableExponentialBackoff: Bool
@@ -34,7 +34,7 @@ public class MaxRetryInterceptor: ApolloInterceptor {
       maxRetries: Int = 3,
       baseDelay: TimeInterval = 0.3,
       multiplier: Double = 2.0,
-      maxDelay: TimeInterval = 30.0,
+      maxDelay: TimeInterval = 20.0,
       enableExponentialBackoff: Bool = false,
       enableJitter: Bool = true
     ) {
