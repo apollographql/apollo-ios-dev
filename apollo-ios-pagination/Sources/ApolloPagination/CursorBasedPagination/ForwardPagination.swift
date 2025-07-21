@@ -1,6 +1,6 @@
 extension CursorBasedPagination {
   /// A cursor based pagination strategy that supports forward pagination; fetching the next page.
-  public struct Forward: PaginationInfo, Hashable {
+  public struct Forward: PaginationInfo, Hashable, Sendable {
     public let hasNext: Bool
     public let endCursor: String?
 

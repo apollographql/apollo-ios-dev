@@ -1,5 +1,5 @@
 extension OffsetPagination {
-  public struct Forward: PaginationInfo, Hashable {
+  public struct Forward: PaginationInfo, Hashable, Sendable {
     public let offset: Int
     public let canLoadNext: Bool
     public var canLoadPrevious: Bool { false }
