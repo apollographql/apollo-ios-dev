@@ -3,7 +3,7 @@ import Foundation
 import ApolloAPI
 #endif
 
-/// An interceptor to enforce a maximum number of retries of any `HTTPRequest`
+/// An interceptor to enforce a maximum number of retries of any `HTTPRequest` with optional exponential backoff support
 public class MaxRetryInterceptor: ApolloInterceptor {
   
   /// A configuration object that defines behavior for retry logic and exponential backoff.
