@@ -10,7 +10,7 @@ public class MaxRetryInterceptor: ApolloInterceptor {
   public struct Configuration {
     /// Maximum number of retries allowed. Defaults to `3`.
     public let maxRetries: Int
-    /// Initial delay in seconds for exponential backoff. Defaults to `0.5`.
+    /// Initial delay in seconds for exponential backoff. Defaults to `0.3`.
     public let baseDelay: TimeInterval
     /// Multiplier for exponential backoff calculation. Defaults to `2.0`.
     public let multiplier: Double
@@ -32,7 +32,7 @@ public class MaxRetryInterceptor: ApolloInterceptor {
     ///   - enableJitter: Whether to add jitter to delays to prevent thundering herd problems.
     public init(
       maxRetries: Int = 3,
-      baseDelay: TimeInterval = 0.5,
+      baseDelay: TimeInterval = 0.3,
       multiplier: Double = 2.0,
       maxDelay: TimeInterval = 30.0,
       enableExponentialBackoff: Bool = false,
