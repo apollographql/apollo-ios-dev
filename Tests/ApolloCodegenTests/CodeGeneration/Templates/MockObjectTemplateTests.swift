@@ -547,6 +547,7 @@ class MockObjectTemplateTests: XCTestCase {
 
   func test__render__givenSchemaTypeAndDefaultParameterFlagOn_generatesDefaultValueForRequiredFields() {
     // given
+    let aardvark: GraphQLType = .entity(GraphQLObjectType.mock("aardvark"))
     let Cat: GraphQLType = .entity(GraphQLObjectType.mock("Cat"))
     let Animal: GraphQLType = .entity(GraphQLInterfaceType.mock("Animal", implementingObjects: [GraphQLObjectType.mock("Duck")]))
     let Pet: GraphQLType = .entity(GraphQLUnionType.mock("Pet", types: [GraphQLObjectType.mock("Goldfish"), GraphQLObjectType.mock("Hamster")]))
@@ -558,6 +559,7 @@ class MockObjectTemplateTests: XCTestCase {
         "stringNestedList": .mock("stringNestedList", type: .nonNull(.list(.nonNull(.list(.nonNull(.string())))))),
         "customScalar": .mock("customScalar", type: .nonNull(.scalar(.mock(name: "CustomScalar")))),
         "customScalarList": .mock("customScalarList", type: .nonNull(.list(.nonNull(.scalar(.mock(name: "CustomScalar")))))),
+        "lowercaseObject": .mock("object", type: .nonNull(aardvark)),
         "object": .mock("object", type: .nonNull(Cat)),
         "objectList": .mock("objectList", type: .nonNull(.list(.nonNull(Cat)))),
         "objectNestedList": .mock("objectNestedList", type: .nonNull(.list(.nonNull(.list(.nonNull(Cat)))))),
@@ -585,6 +587,7 @@ class MockObjectTemplateTests: XCTestCase {
         interface: (any AnyMock) = Mock<Duck>(),
         interfaceList: [(any AnyMock)] = [],
         interfaceNestedList: [[(any AnyMock)]] = [],
+        lowercaseObject: Mock<Aardvark> = Mock<Aardvark>(),
         object: Mock<Cat> = Mock<Cat>(),
         objectList: [Mock<Cat>] = [],
         objectNestedList: [[Mock<Cat>]] = [],
@@ -603,6 +606,7 @@ class MockObjectTemplateTests: XCTestCase {
         _setEntity(interface, for: \\.interface)
         _setList(interfaceList, for: \\.interfaceList)
         _setList(interfaceNestedList, for: \\.interfaceNestedList)
+        _setEntity(lowercaseObject, for: \\.lowercaseObject)
         _setEntity(object, for: \\.object)
         _setList(objectList, for: \\.objectList)
         _setList(objectNestedList, for: \\.objectNestedList)
