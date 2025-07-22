@@ -2,8 +2,8 @@ import Foundation
 
 extension ApolloCodegenConfiguration {
   
-  public struct SchemaCustomization: Codable, Equatable {
-    
+  public struct SchemaCustomization: Codable, Equatable, Sendable {
+
     // MARK: - Properties
     
     /// Dictionary with Keys representing the types being renamed/customized, and
@@ -54,7 +54,7 @@ extension ApolloCodegenConfiguration {
     
     // MARK: - Enums
     
-    public enum CustomSchemaTypeName: Codable, ExpressibleByStringLiteral, Equatable {
+    public enum CustomSchemaTypeName: Codable, ExpressibleByStringLiteral, Equatable, Sendable {
       case type(name: String)
       case `enum`(name: String?, cases: [String: String]?)
       case inputObject(name: String?, fields: [String: String]?)

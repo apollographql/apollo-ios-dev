@@ -90,10 +90,10 @@ class LegacyAPQOperationManifestTemplateTests: XCTestCase {
         }
         """
       )
-    ].asyncMap {
+    ].asyncMap { [operationIdentiferFactory] in
       OperationManifestTemplate.OperationManifestItem(
         operation: OperationDescriptor($0),
-        identifier: try await self.operationIdentiferFactory.identifier(for: $0)
+        identifier: try await operationIdentiferFactory!.identifier(for: $0)
       )
     }
 
@@ -145,10 +145,10 @@ class LegacyAPQOperationManifestTemplateTests: XCTestCase {
           )
         ]
       )
-    ].asyncMap {
+    ].asyncMap { [operationIdentiferFactory] in
       OperationManifestTemplate.OperationManifestItem(
         operation: OperationDescriptor($0),
-        identifier: try await self.operationIdentiferFactory.identifier(for: $0)
+        identifier: try await operationIdentiferFactory!.identifier(for: $0)
       )
     }
 

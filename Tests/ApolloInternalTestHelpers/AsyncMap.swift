@@ -2,7 +2,7 @@ import Foundation
 
 extension Sequence {
   public func asyncMap<T>(
-    _ transform: (Element) async throws -> T
+    _ transform: @Sendable (Element) async throws -> T
   ) async rethrows -> [T] {
     var values = [T]()
     
@@ -14,7 +14,7 @@ extension Sequence {
   }
 
   public func asyncForEach(
-    _ body: (Element) async throws -> Void
+    _ body: @Sendable (Element) async throws -> Void
   ) async rethrows {
     for element in self {
       try await body(element)

@@ -102,9 +102,9 @@ extension String {
 public func equalLineByLine(
   toFileAt expectedFileURL: URL,
   trimmingImports trimImports: Bool = false
-) -> Nimble.Matcher<String> {
-  return Matcher.define() { actual in
-    guard ApolloFileManager.default.doesFileExist(atPath: expectedFileURL.path) else {
+) -> Nimble.AsyncMatcher<String> {
+  return AsyncMatcher.define() { actual in
+    guard await ApolloFileManager.default.doesFileExist(atPath: expectedFileURL.path) else {
       return MatcherResult(
         status: .fail,
         message: .fail("File not found at \(expectedFileURL)")
@@ -121,6 +121,6 @@ public func equalLineByLine(
 
     let expected = fileContents.trimmingCharacters(in: .whitespacesAndNewlines)
 
-    return try equalLineByLine(expected).satisfies(actual)
+    return try await equalLineByLine(expected).satisfies(actual)
   }
 }

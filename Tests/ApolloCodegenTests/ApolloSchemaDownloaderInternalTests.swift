@@ -1,4 +1,5 @@
 import XCTest
+import Nimble
 import ApolloInternalTestHelpers
 import ApolloCodegenInternalTestHelpers
 @testable import ApolloCodegenLib
@@ -41,7 +42,7 @@ class ApolloSchemaDownloaderInternalTests: XCTestCase {
       withRootURL: nil
     )
 
-    XCTAssertTrue(ApolloFileManager.default.doesFileExist(atPath: configuration.outputPath))
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: configuration.outputPath) }.to(beTrue())
 
     let frontend = try await GraphQLJSFrontend()
     let source = try await frontend.makeSource(from: URL(fileURLWithPath: configuration.outputPath))
@@ -76,7 +77,7 @@ class ApolloSchemaDownloaderInternalTests: XCTestCase {
       withRootURL: nil
     )
 
-    XCTAssertTrue(ApolloFileManager.default.doesFileExist(atPath: configuration.outputPath))
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: configuration.outputPath) }.to(beTrue())
 
     let frontend = try await GraphQLJSFrontend()
     let source = try await frontend.makeSource(from: URL(fileURLWithPath: configuration.outputPath))
@@ -225,17 +226,17 @@ class ApolloSchemaDownloaderInternalTests: XCTestCase {
     // given
     let path = "./subfolder/output.test"
 
-    mockFileManager.base.changeCurrentDirectoryPath(TestFileHelper.sourceRootURL().path)
+    await mockFileManager.base.changeCurrentDirectoryPath(TestFileHelper.sourceRootURL().path)
 
-    mockFileManager.mock(closure: .fileExists({ path, isDirectory in
+    await mockFileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
     }))
 
-    mockFileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
+    await mockFileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
       // no-op
     }))
 
-    mockFileManager.mock(closure: .createFile({ path, data, attributes in
+    await mockFileManager.mock(closure: .createFile({ path, data, attributes in
       let expected = TestFileHelper.sourceRootURL()
         .appendingPathComponent("subfolder/output.test").path
 
@@ -257,17 +258,17 @@ class ApolloSchemaDownloaderInternalTests: XCTestCase {
     // given
     let path = "/absolute/path/subfolder/output.test"
 
-    mockFileManager.base.changeCurrentDirectoryPath(TestFileHelper.sourceRootURL().path)
+    await mockFileManager.base.changeCurrentDirectoryPath(TestFileHelper.sourceRootURL().path)
 
-    mockFileManager.mock(closure: .fileExists({ path, isDirectory in
+    await mockFileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
     }))
 
-    mockFileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
+    await mockFileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
       // no-op
     }))
 
-    mockFileManager.mock(closure: .createFile({ path, data, attributes in
+    await mockFileManager.mock(closure: .createFile({ path, data, attributes in
       let expected = "/absolute/path/subfolder/output.test"
 
       // then
@@ -288,17 +289,17 @@ class ApolloSchemaDownloaderInternalTests: XCTestCase {
     // given
     let path = "output.test"
 
-    mockFileManager.base.changeCurrentDirectoryPath(TestFileHelper.sourceRootURL().path)
+    await mockFileManager.base.changeCurrentDirectoryPath(TestFileHelper.sourceRootURL().path)
 
-    mockFileManager.mock(closure: .fileExists({ path, isDirectory in
+    await mockFileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
     }))
 
-    mockFileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
+    await mockFileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
       // no-op
     }))
 
-    mockFileManager.mock(closure: .createFile({ path, data, attributes in
+    await mockFileManager.mock(closure: .createFile({ path, data, attributes in
       let expected = "/rootURL/path/output.test"
 
       // then

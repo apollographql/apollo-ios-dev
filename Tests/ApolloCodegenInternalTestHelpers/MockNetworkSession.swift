@@ -14,11 +14,13 @@ public final class MockNetworkSession: NetworkSession {
     self.abandon = abandon
   }
 
-  public func loadData(with urlRequest: URLRequest, completionHandler: @escaping (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionDataTask? {
+  public func loadData(with urlRequest: URLRequest, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) async -> Void) -> URLSessionDataTask? {
     guard !abandon else { return nil }
 
     let response = HTTPURLResponse(url: urlRequest.url!, statusCode: statusCode, httpVersion: nil, headerFields: nil)
-    completionHandler(data, response, error)
+    Task { [data, error] in
+      await completionHandler(data, response, error)
+    }
 
     return nil
   }
