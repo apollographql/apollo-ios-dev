@@ -136,8 +136,9 @@ public class MaxRetryInterceptor: ApolloInterceptor {
     
     // Apply jitter if enabled to prevent thundering herd problems
     if configuration.enableJitter {
-      // Full jitter: random value between 0 and calculated delay
-      return TimeInterval.random(in: 0...cappedDelay)
+      // Equal jitter: random value between 50% and 100% of calculated delay
+      let minDelay = cappedDelay / 2
+      return TimeInterval.random(in: minDelay...cappedDelay)
     } else {
       return cappedDelay
     }
