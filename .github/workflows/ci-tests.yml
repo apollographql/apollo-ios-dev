@@ -1,11 +1,11 @@
-name: "CI Tests (Xcode 15.4)"
+name: "CI Tests (Xcode 16.4)"
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
 env:
-  XCODE_VERSION: "15.4"
+  XCODE_VERSION: "16.4"
 
 jobs:
   changes:
@@ -40,7 +40,7 @@ jobs:
               - '.tuist-version'
 
   tuist-generation:
-    runs-on: macos-latest
+    runs-on: macos-15
     needs: [changes]
     if: ${{ needs.changes.outputs.ios == 'true' || needs.changes.outputs.codegen  == 'true' || needs.changes.outputs.pagination  == 'true' || needs.changes.outputs.tuist == 'true' }}
     timeout-minutes: 8
@@ -63,7 +63,7 @@ jobs:
         key: ${{ github.run_id }}-dependencies
 
   run-swift-builds:
-    runs-on: macos-latest
+    runs-on: macos-15
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -85,7 +85,7 @@ jobs:
         cd ${{ matrix.package }} && swift build
 
   build-and-unit-test:
-    runs-on: macos-latest
+    runs-on: macos-15
     needs: [tuist-generation, changes]
     timeout-minutes: 20
     strategy:
@@ -136,16 +136,6 @@ jobs:
           ./Derived/*
         key: ${{ github.run_id }}-dependencies
         fail-on-cache-miss: true
-    # Caching for apollo-ios and apollo-ios-codegen SPM dependencies
-    # - uses: actions/cache@v3
-    #   with:
-    #     path: ./DerivedData/SourcePackages
-    #     key: ${{ runner.os }}-spm-${{ hashFiles('./apollo-ios/Package.resolved') }}-${{ hashFiles('./apollo-ios-codegen/Package.resolved') }}
-    # - name: Run Tuist Generation
-    #   uses: tuist/tuist-action@0.13.0
-    #   with:
-    #       command: 'generate'
-    #       arguments: ''
     - name: Build and Test
       if: ${{ matrix.should-run == true || matrix.should-run == 'true' }}
       id: build-and-test
@@ -189,7 +179,7 @@ jobs:
           TestResults/ResultBundle.zip
 
   run-codegen-test-configurations:
-    runs-on: macos-latest
+    runs-on: macos-15
     timeout-minutes: 20
     name: Codegen Test Configurations - macOS
     steps:
@@ -202,9 +192,9 @@ jobs:
       shell: bash
       run: |
         ./scripts/run-test-codegen-configurations.sh -t
-  
+
   verify-frontend-bundle-latest:
-    runs-on: macos-latest
+    runs-on: macos-15
     needs: [changes]
     if: ${{ needs.changes.outputs.codegen  == 'true' }}
     timeout-minutes: 5
@@ -222,7 +212,7 @@ jobs:
         git diff --exit-code
 
   verify-cli-binary-archive:
-    runs-on: macos-latest
+    runs-on: macos-15
     needs: [changes]
     if: ${{ needs.changes.outputs.codegen  == 'true' }}
     timeout-minutes: 5
@@ -240,7 +230,7 @@ jobs:
       run: ./cli-version-check.sh
 
   run-cocoapods-integration-tests:
-    runs-on: macos-latest
+    runs-on: macos-15
     timeout-minutes: 20
     name: Cocoapods Integration Tests - macOS
     steps:
@@ -258,3 +248,4 @@ jobs:
     - name: Run CocoaPods Integration Tests
       id: run-cocoapods-integration-tests
       uses: ./.github/actions/run-cocoapods-integration-tests
+
