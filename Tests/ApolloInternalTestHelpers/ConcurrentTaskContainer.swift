@@ -32,6 +32,7 @@ public actor ConcurrentTaskContainer {
         continuation.resume()
       }
     }
+    tasks[taskID] = task
   }
   
   public func waitForAllTasks() async {
