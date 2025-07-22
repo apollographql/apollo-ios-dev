@@ -1,9 +1,9 @@
 import Foundation
 import JavaScriptCore
 
-public struct ValidationOptions {
+public struct ValidationOptions: Sendable {
 
-  public struct DisallowedFieldNames {
+  public struct DisallowedFieldNames: Sendable {
     public let allFields: Set<String>
     public let entity: Set<String>
     public let entityList: Set<String>
@@ -41,8 +41,9 @@ public struct ValidationOptions {
     self.disallowedInputParameterNames = disallowedInputParameterNames
   }
 
-  class Bridged: JavaScriptObject {
-    convenience init(from options: ValidationOptions, bridge: isolated JavaScriptBridge) {
+  final class Bridged: JavaScriptObject {
+    @MainActor
+    convenience init(_ options: ValidationOptions, bridge: JavaScriptBridge) {
       let jsValue = JSValue(newObjectIn: bridge.context)
 
       jsValue?.setValue(

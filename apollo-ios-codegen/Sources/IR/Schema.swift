@@ -3,7 +3,7 @@ import OrderedCollections
 import GraphQLCompiler
 import TemplateString
 
-public final class Schema {
+public final class Schema: Sendable {
   public let referencedTypes: ReferencedTypes
   public let documentation: String?
 
@@ -15,7 +15,7 @@ public final class Schema {
     self.documentation = documentation
   }
 
-  public final class ReferencedTypes: CustomDebugStringConvertible {
+  public final class ReferencedTypes: Sendable, CustomDebugStringConvertible {
     public let allTypes: OrderedSet<GraphQLNamedType>
     public let schemaRootTypes: CompilationResult.RootTypeDefinition
 
