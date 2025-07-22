@@ -112,12 +112,4 @@ class RequestBodyCreatorTests: XCTestCase {
     expect(actual["variables"]).to(equalJSONValue(["TestVar": "123"]))
     expect(actual["query"]).to(equalJSONValue("Test Query Document"))
   }
-
-  #warning(
-    """
-    TODO: Test generated input objects converted to variables correctly.
-    - nil variable value
-    - null variable value
-    """
-  )
 }
