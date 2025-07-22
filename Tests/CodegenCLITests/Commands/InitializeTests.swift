@@ -152,15 +152,15 @@ class InitializeTests: XCTestCase {
     let subject = try parse(options)
 
     // when
-    mockFileManager.mock(closure: .fileExists({ path, isDirectory in
+    await mockFileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
     }))
 
-    mockFileManager.mock(closure: .createDirectory({ path, intermediateDirectories, fileAttributes in
+    await mockFileManager.mock(closure: .createDirectory({ path, intermediateDirectories, fileAttributes in
       // no-op
     }))
 
-    mockFileManager.mock(closure: .createFile({ path, data, fileAttributes in
+    await mockFileManager.mock(closure: .createFile({ path, data, fileAttributes in
       let actualPath = URL(fileURLWithPath: path).standardizedFileURL.path
       let expectedPath = URL(fileURLWithPath: outputPath).standardizedFileURL.path
 
@@ -179,7 +179,7 @@ class InitializeTests: XCTestCase {
     try await subject._run(fileManager: mockFileManager)
 
     // then
-    expect(self.mockFileManager.allClosuresCalled).to(beTrue())
+    await expect { await self.mockFileManager.allClosuresCalled }.to(beTrue())
   }
 
   func test__output__givenParameters_pathCustom_overwriteDefault_whenFileExists_shouldThrow() async throws {
@@ -193,11 +193,11 @@ class InitializeTests: XCTestCase {
     let subject = try parse(options)
 
     // when
-    mockFileManager.mock(closure: .fileExists({ path, isDirectory in
+    await mockFileManager.mock(closure: .fileExists({ path, isDirectory in
       return true
     }))
 
-    mockFileManager.mock(closure: .createDirectory({ path, intermediateDirectories, fileAttributes in
+    await mockFileManager.mock(closure: .createDirectory({ path, intermediateDirectories, fileAttributes in
       // no-op
     }))
 
@@ -222,15 +222,15 @@ class InitializeTests: XCTestCase {
     let subject = try parse(options)
 
     // when
-    mockFileManager.mock(closure: .fileExists({ path, isDirectory in
+    await mockFileManager.mock(closure: .fileExists({ path, isDirectory in
       return true
     }))
 
-    mockFileManager.mock(closure: .createDirectory({ path, intermediateDirectories, fileAttributes in
+    await mockFileManager.mock(closure: .createDirectory({ path, intermediateDirectories, fileAttributes in
       // no-op
     }))
 
-    mockFileManager.mock(closure: .createFile({ path, data, fileAttributes in
+    await mockFileManager.mock(closure: .createFile({ path, data, fileAttributes in
       let actualPath = URL(fileURLWithPath: path).standardizedFileURL.path
       let expectedPath = URL(fileURLWithPath: outputPath).standardizedFileURL.path
 
@@ -249,7 +249,7 @@ class InitializeTests: XCTestCase {
     try await subject._run(fileManager: mockFileManager)
 
     // then
-    expect(self.mockFileManager.allClosuresCalled).to(beTrue())
+    await expect { await self.mockFileManager.allClosuresCalled }.to(beTrue())
   }
 
   func test__output__givenParameters_printTrue_shouldPrintToStandardOutput() async throws {

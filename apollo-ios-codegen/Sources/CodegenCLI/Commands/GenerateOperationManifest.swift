@@ -6,7 +6,7 @@ public struct GenerateOperationManifest: AsyncParsableCommand {
 
   // MARK: - Configuration
   
-  public static var configuration = CommandConfiguration(
+  public static let configuration = CommandConfiguration(
     abstract: "Generate Persisted Queries operation manifest based on a code generation configuration."
   )
 
@@ -30,7 +30,7 @@ public struct GenerateOperationManifest: AsyncParsableCommand {
 
     let configuration = try inputs.getCodegenConfiguration(fileManager: fileManager)
 
-    try validate(configuration: configuration, projectRootURL: projectRootURL)
+    try await validate(configuration: configuration, projectRootURL: projectRootURL)
 
     try await generateManifest(
       configuration: configuration,
@@ -55,8 +55,8 @@ public struct GenerateOperationManifest: AsyncParsableCommand {
   func validate(
     configuration: ApolloCodegenConfiguration,
     projectRootURL: URL?
-  ) throws {
-    try checkForCLIVersionMismatch(with: inputs, projectRootURL: projectRootURL)
+  ) async throws {
+    try await checkForCLIVersionMismatch(with: inputs, projectRootURL: projectRootURL)
 
     guard configuration.operationManifest != nil else {
       throw ValidationError("""
