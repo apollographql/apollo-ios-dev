@@ -9,6 +9,7 @@ enum VersionChecker {
     case versionMismatch(cliVersion: String, apolloVersion: String)
   }
 
+  @FileManagerActor
   static func matchCLIVersionToApolloVersion(projectRootURL: URL?) throws -> VersionCheckResult {
     guard var packageModel = try findPackageResolvedFile(projectRootURL: projectRootURL),
           let apolloVersion = packageModel.apolloVersion else {
@@ -23,6 +24,7 @@ enum VersionChecker {
     }
   }
 
+  @FileManagerActor
   private static func findPackageResolvedFile(projectRootURL: URL?) throws -> PackageResolvedModel? {
     let Package_resolved = "Package.resolved"
     let fileManager = ApolloFileManager.default

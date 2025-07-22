@@ -38,7 +38,7 @@ class GenerateTests: XCTestCase {
     let mockConfiguration = ApolloCodegenConfiguration.mock()
     let mockFileManager = MockApolloFileManager(strict: true)
 
-    mockFileManager.mock(closure: .contents({ path in
+    await mockFileManager.mock(closure: .contents({ path in
       let actualPath = URL(fileURLWithPath: path).standardizedFileURL.path
       let expectedPath = URL(fileURLWithPath: inputPath).standardizedFileURL.path
 
@@ -347,7 +347,7 @@ class GenerateTests: XCTestCase {
     MockApolloCodegen.buildHandler = { configuration in }
     MockApolloSchemaDownloader.fetchHandler = { configuration in }
 
-    try fileManager.createFile(
+    try await fileManager.createFile(
       body: """
         {
           "pins": [
@@ -399,7 +399,7 @@ class GenerateTests: XCTestCase {
     MockApolloCodegen.buildHandler = { configuration in }
     MockApolloSchemaDownloader.fetchHandler = { configuration in }
 
-    try fileManager.createFile(
+    try await fileManager.createFile(
       body: """
         {
           "pins": [

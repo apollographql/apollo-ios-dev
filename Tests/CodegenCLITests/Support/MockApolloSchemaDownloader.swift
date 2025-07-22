@@ -3,7 +3,7 @@ import CodegenCLI
 import ApolloCodegenLib
 
 class MockApolloSchemaDownloader: SchemaDownloadProvider {
-  static var fetchHandler: ((ApolloSchemaDownloadConfiguration) throws -> Void)? = nil
+  nonisolated(unsafe) static var fetchHandler: ((ApolloSchemaDownloadConfiguration) throws -> Void)? = nil
 
   static func fetch(
     configuration: ApolloSchemaDownloadConfiguration,
