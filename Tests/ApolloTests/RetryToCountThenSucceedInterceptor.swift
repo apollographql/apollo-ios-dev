@@ -1,11 +1,3 @@
-//
-//  RetryToCountThenSucceedInterceptor.swift
-//  ApolloTests
-//
-//  Created by Ellen Shapiro on 8/19/20.
-//  Copyright © 2020 Apollo GraphQL. All rights reserved.
-//
-
 import Apollo
 import ApolloAPI
 import Foundation

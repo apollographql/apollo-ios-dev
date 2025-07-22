@@ -177,7 +177,6 @@ jobs:
         name: ${{ matrix.name }}-results
         path: |
           TestResults/ResultBundle.zip
-
   run-codegen-test-configurations:
     runs-on: macos-15
     timeout-minutes: 20
@@ -248,4 +247,3 @@ jobs:
     - name: Run CocoaPods Integration Tests
       id: run-cocoapods-integration-tests
       uses: ./.github/actions/run-cocoapods-integration-tests
-
