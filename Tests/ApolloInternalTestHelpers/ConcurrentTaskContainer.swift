@@ -32,9 +32,10 @@ public actor ConcurrentTaskContainer {
         continuation.resume()
       }
     }
+    tasks[taskID] = task
   }
   
-  func waitForAllTasks() async {
+  public func waitForAllTasks() async {
     guard !tasks.isEmpty else { return }
     await withCheckedContinuation { continuation in
       waitForAllTaskContinuations.append(continuation)

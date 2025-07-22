@@ -64,11 +64,11 @@ struct DeferredFragmentsMetadataTemplate {
       deferredFragments: [
         \(deferredFragmentPathTypeInfo.map {
           return """
-            DeferredFragmentIdentifiers.\($0.deferCondition.label): \($0.typeName).self,
+          DeferredFragmentIdentifiers.\($0.deferCondition.label): \($0.typeName).self,
           """
         }, separator: "\n")
       ]
-    )    
+    )
     """
   }
 

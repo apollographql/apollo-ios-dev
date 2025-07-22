@@ -13,17 +13,19 @@ public protocol NetworkSession {
   /// to `resume`.
   @discardableResult func loadData(
     with urlRequest: URLRequest,
-    completionHandler: @escaping (Data?, URLResponse?, (any Error)?) -> Void
+    completionHandler: @Sendable @escaping (Data?, URLResponse?, (any Error)?) async -> Void
   ) -> URLSessionDataTask?
 }
 
 extension URLSession: NetworkSession {
   public func loadData(
     with urlRequest: URLRequest,
-    completionHandler: @escaping (Data?, URLResponse?, (any Error)?) -> Void
+    completionHandler: @Sendable @escaping (Data?, URLResponse?, (any Error)?) async -> Void
   ) -> URLSessionDataTask? {
     let task = dataTask(with: urlRequest) { (data, response, error) in
-      completionHandler(data, response, error)
+      Task {
+        await completionHandler(data, response, error)
+      }
     }
     task.resume()
 
@@ -80,7 +82,7 @@ class URLDownloader {
     timeout: Double
   ) throws {
     let semaphore = DispatchSemaphore(value: 0)
-    var errorToThrow: (any Error)? = DownloadError.downloadTimedOut(after: timeout)
+    nonisolated(unsafe) var errorToThrow: (any Error)? = DownloadError.downloadTimedOut(after: timeout)
 
     session.loadData(with: request) { data, response, error in
       func finished(_ error: (any Error)? = nil) {
@@ -118,7 +120,7 @@ class URLDownloader {
       }
       
       do {
-        try ApolloFileManager.default.createContainingDirectoryIfNeeded(forPath: outputURL.path)
+        try await ApolloFileManager.default.createContainingDirectoryIfNeeded(forPath: outputURL.path)
         try data.write(to: outputURL)
 
       } catch (let writeError) {

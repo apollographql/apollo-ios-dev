@@ -2,7 +2,7 @@
 @testable import IR
 import OrderedCollections
 
-extension IR.InclusionConditions {
+extension InclusionConditions {
 
   public static func mock(
     _ conditions: OrderedSet<IR.InclusionCondition>
@@ -13,7 +13,9 @@ extension IR.InclusionConditions {
 
 }
 
-extension IR.InclusionCondition: ExpressibleByStringLiteral {
+extension InclusionCondition: @retroactive ExpressibleByExtendedGraphemeClusterLiteral {}
+extension InclusionCondition: @retroactive ExpressibleByUnicodeScalarLiteral {}
+extension InclusionCondition: @retroactive ExpressibleByStringLiteral {
 
   public init(stringLiteral: String) {
     self.init(stringLiteral, isInverted: false)

@@ -1,7 +1,7 @@
 import OrderedCollections
 import GraphQLCompiler
 
-public class IRBuilder {
+public final class IRBuilder: Sendable {
 
   public let compilationResult: CompilationResult
 
@@ -60,7 +60,7 @@ public class IRBuilder {
 
     var fragmentCache: [String: CacheEntry] = [:]
 
-    func getFragment(named name: String, builder: @escaping () async -> NamedFragment) async -> NamedFragment {
+    func getFragment(named name: String, builder: @Sendable @escaping () async -> NamedFragment) async -> NamedFragment {
       if let cachedFragment = fragmentCache[name] {
         switch cachedFragment {
         case let .ready(fragment): return fragment
