@@ -43,7 +43,7 @@ public class MockApolloFileManager: ApolloFileManager {
   ///  - strict: If `true` then all called closures must be mocked otherwise the call will fail.
   ///  When `false` any called closure that is not mocked will fall through to `super`. As a
   ///  byproduct of `false`, all mocked closures must be called otherwise the test will fail.
-  public init(strict: Bool = true) {
+  public nonisolated init(strict: Bool = true) {
     super.init(base: MockFileManager(strict: strict))
   }
 
@@ -63,7 +63,7 @@ public class MockApolloFileManager: ApolloFileManager {
     return _base.closuresToBeCalled.isEmpty
   }
 
-  class MockFileManager: FileManager {
+  class MockFileManager: FileManager, @unchecked Sendable {
 
     fileprivate var closures: [String: Closure] = [:]
     fileprivate var closuresToBeCalled: Set<String> = []
