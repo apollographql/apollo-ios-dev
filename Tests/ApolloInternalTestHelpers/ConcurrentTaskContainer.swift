@@ -13,7 +13,7 @@ public actor ConcurrentTaskContainer {
     }
   }
   
-  public func dispatch(_ operation: @escaping @Sendable () async throws -> Void) {
+  func dispatch(_ operation: @escaping @Sendable () async throws -> Void) {
     let taskID = UUID()
     let task = Task {
       try await operation()
@@ -23,7 +23,7 @@ public actor ConcurrentTaskContainer {
     tasks[taskID] = task
   }
   
-  private func didFinishTask() {
+  func didFinishTask() {
     if tasks.isEmpty {
       let continuations = waitForAllTaskContinuations
       waitForAllTaskContinuations = []
@@ -32,6 +32,7 @@ public actor ConcurrentTaskContainer {
         continuation.resume()
       }
     }
+    tasks[taskID] = task
   }
   
   public func waitForAllTasks() async {
