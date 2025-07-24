@@ -11,13 +11,13 @@ class GlobTests: XCTestCase {
 
   // MARK: Setup
 
-  override func setUpWithError() throws {
-    try super.setUpWithError()
+  override func setUp() async throws {
+    try await super.setUp()
     testFilePathBuilder = TestFilePathBuilder(test: self)
     baseURL = testFilePathBuilder.testIsolatedOutputFolder
       .appendingPathComponent("Glob/\(UUID().uuidString)")
 
-    try fileManager.createDirectoryIfNeeded(atPath: baseURL.path)
+    try await fileManager.createDirectoryIfNeeded(atPath: baseURL.path)
   }
 
   override func tearDownWithError() throws {
@@ -35,9 +35,9 @@ class GlobTests: XCTestCase {
     }
   }
 
-  private func changeCurrentDirectory(to directory: String) throws {
-    try fileManager.createDirectoryIfNeeded(atPath: directory)
-    expect(self.fileManager.base.changeCurrentDirectoryPath(directory)).to(beTrue())
+  private func changeCurrentDirectory(to directory: String) async throws {
+    try await fileManager.createDirectoryIfNeeded(atPath: directory)
+    await expect { await self.fileManager.base.changeCurrentDirectoryPath(directory) }.to(beTrue())
   }
 
   // MARK: Tests
@@ -384,7 +384,7 @@ class GlobTests: XCTestCase {
     let pattern = ["**/*.one"]
 
     // when
-    try changeCurrentDirectory(to: baseURL.path)
+    try await changeCurrentDirectory(to: baseURL.path)
 
     try await create(files: [
       baseURL.appendingPathComponent("file.one").path,
@@ -414,7 +414,7 @@ class GlobTests: XCTestCase {
     let pattern = ["**/*.one"]
 
     // when
-    try changeCurrentDirectory(to: baseURL.appendingPathComponent("a/").path)
+    try await changeCurrentDirectory(to: baseURL.appendingPathComponent("a/").path)
 
     try await create(files: [
       baseURL.appendingPathComponent("file.one").path,
@@ -442,7 +442,7 @@ class GlobTests: XCTestCase {
     let pattern = ["./**/*.one"]
 
     // when
-    try changeCurrentDirectory(to: baseURL.path)
+    try await changeCurrentDirectory(to: baseURL.path)
 
     try await create(files: [
       baseURL.appendingPathComponent("file.one").path,

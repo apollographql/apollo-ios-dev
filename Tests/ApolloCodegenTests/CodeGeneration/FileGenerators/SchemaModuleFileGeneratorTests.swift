@@ -34,7 +34,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
       to: rootURL.path
     ))
 
-    mockFileManager.mock(closure: .createFile({ path, data, attributes in
+    await mockFileManager.mock(closure: .createFile({ path, data, attributes in
       // then
       expect(path).to(equal(fileURL.path))
 
@@ -45,7 +45,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     _ = try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
-    expect(self.mockFileManager.allClosuresCalled).to(beTrue())
+    await expect{ await self.mockFileManager.allClosuresCalled }.to(beTrue())
   }
 
   func test__generate__givenModuleTypeEmbeddedInTarget_lowercaseSchemaName_shouldGenerateNamespaceFileWithCapitalizedName() async throws {
@@ -58,7 +58,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
       to: rootURL.path
     ))
 
-    mockFileManager.mock(closure: .createFile({ path, data, attributes in
+    await mockFileManager.mock(closure: .createFile({ path, data, attributes in
       // then
       expect(path).to(equal(fileURL.path))
 
@@ -69,7 +69,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     _ = try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
-    expect(self.mockFileManager.allClosuresCalled).to(beTrue())
+    await expect{ await self.mockFileManager.allClosuresCalled }.to(beTrue())
   }
 
   func test__generate__givenModuleTypeEmbeddedInTarget_uppercaseSchemaName_shouldGenerateNamespaceFileWithUppercaseName() async throws {
@@ -82,7 +82,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
       to: rootURL.path
     ))
 
-    mockFileManager.mock(closure: .createFile({ path, data, attributes in
+    await mockFileManager.mock(closure: .createFile({ path, data, attributes in
       // then
       expect(path).to(equal(fileURL.path))
 
@@ -93,7 +93,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     _ = try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
-    expect(self.mockFileManager.allClosuresCalled).to(beTrue())
+    await expect{ await self.mockFileManager.allClosuresCalled }.to(beTrue())
   }
 
   func test__generate__givenModuleTypeEmbeddedInTarget_capitalizedSchemaName_shouldGenerateNamespaceFileWithCapitalizedName() async throws {
@@ -106,7 +106,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
       to: rootURL.path
     ))
 
-    mockFileManager.mock(closure: .createFile({ path, data, attributes in
+    await mockFileManager.mock(closure: .createFile({ path, data, attributes in
       // then
       expect(path).to(equal(fileURL.path))
 
@@ -117,7 +117,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     _ = try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
-    expect(self.mockFileManager.allClosuresCalled).to(beTrue())
+    await expect{ await self.mockFileManager.allClosuresCalled }.to(beTrue())
   }
 
   func test__generate__givenModuleType_other_shouldNotGenerateFile() async throws {
@@ -132,7 +132,7 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
       to: rootURL.path
     ))
 
-    mockFileManager.mock(closure: .createFile({ path, data, attributes in
+    await mockFileManager.mock(closure: .createFile({ path, data, attributes in
       // then
       fail("Unexpected module file created at \(path)")
 
@@ -143,6 +143,6 @@ class SchemaModuleFileGeneratorTests: XCTestCase {
     _ = try await SchemaModuleFileGenerator.generate(configuration, fileManager: mockFileManager)
 
     // then
-    expect(self.mockFileManager.allClosuresCalled).to(beFalse())
+    await expect{ await self.mockFileManager.allClosuresCalled }.to(beFalse())
   }
 }

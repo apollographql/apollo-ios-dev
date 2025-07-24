@@ -5,7 +5,7 @@
 ///
 /// It is not optimized for prepending or insertion of items.
 public struct LinkedList<T>: ExpressibleByArrayLiteral {
-  public class Node {
+  public class Node: @unchecked Sendable {
     public let value: T
     fileprivate let index: Int
 
@@ -27,7 +27,7 @@ public struct LinkedList<T>: ExpressibleByArrayLiteral {
     }
   }
 
-  final class HeadNode: Node {
+  final class HeadNode: Node, @unchecked Sendable {
     fileprivate var lastPointer: Node?
 
     var last: Node! {
@@ -300,3 +300,5 @@ extension LinkedList.Node: CustomDebugStringConvertible {
     return string
   }
 }
+
+extension LinkedList: Sendable where T: Sendable {}

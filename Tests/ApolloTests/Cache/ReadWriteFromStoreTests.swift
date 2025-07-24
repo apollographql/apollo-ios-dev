@@ -12,18 +12,15 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
   static let defaultWaitTimeout: TimeInterval = 5.0
 
-  var cache: (any NormalizedCache)!
   var store: ApolloStore!
 
   override func setUp() async throws {
     try await super.setUp()
 
-    cache = try await makeNormalizedCache()
-    store = ApolloStore(cache: cache)
+    store = try await makeTestStore()
   }
 
   override func tearDownWithError() throws {
-    cache = nil
     store = nil
 
     try super.tearDownWithError()
@@ -47,7 +44,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let query = MockQuery<HeroNameSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -70,7 +67,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let query = MockQuery<GivenSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["test": "data"],
     ])
 
@@ -106,7 +103,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     let query = MockQuery<HeroNameSelectionSet>()
     query.__variables = ["episode": Episode.JEDI]
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero(episode:JEDI)": CacheReference("hero(episode:JEDI)")],
       "hero(episode:JEDI)": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -145,7 +142,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     let query = MockQuery<HeroNameSelectionSet>()
     query.__variables = ["episode": Episode.PHANTOM_MENACE]
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero(episode:JEDI)": CacheReference("hero(episode:JEDI)")],
       "hero(episode:JEDI)": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -190,7 +187,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
 
     let query = MockQuery<HeroFriendsSelectionSet>()
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -252,7 +249,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "2001": ["name": "R2-D2", "__typename": "Droid", "primaryFunction": "Protocol"]
     ])
 
@@ -303,13 +300,13 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "2001": ["name": "R2-D2", "__typename": "Droid"]
     ])
 
     // when
-    _ = try await store.withinReadTransaction { transaction in
-      await expect {
+    try await store.withinReadTransaction { transaction in
+      _ = await expect {
         _ = try await transaction.readObject(
           ofType: GivenSelectionSet.self,
           withKey: "2001"
@@ -354,7 +351,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let cacheMutation = MockLocalCacheMutation<GivenSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
       "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -418,7 +415,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let cacheMutation = MockLocalCacheMutation<GivenSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
       "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2", "nickname": NSNull()]
     ])
@@ -430,8 +427,9 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    let record = try! await self.cache.loadRecords(forKeys: ["QUERY_ROOT.hero"]).first?.value
-    expect(record?["nickname"]).to(equal(NSNull()))
+    let record = try await self.store.loadRecord(forKey: "QUERY_ROOT.hero")
+
+    expect(record["nickname"]).to(equal(NSNull()))
 
     let query = MockQuery<GivenSelectionSet>()
 
@@ -482,7 +480,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let cacheMutation = MockLocalCacheMutation<GivenSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
       "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2", "nickname": NSNull()]
     ])
@@ -540,7 +538,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let cacheMutation = MockLocalCacheMutation<GivenSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
       "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -597,7 +595,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let cacheMutation = MockLocalCacheMutation<GivenSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
       "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -646,7 +644,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let cacheMutation = MockLocalCacheMutationFromMutation<GivenSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "MUTATION_ROOT": ["hero": CacheReference("MUTATION_ROOT.hero")],
       "MUTATION_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -704,7 +702,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "hero(episode:JEDI)": CacheReference("hero(episode:JEDI)"),
         "hero(episode:PHANTOM_MENACE)": CacheReference("hero(episode:PHANTOM_MENACE)")
@@ -811,7 +809,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
       "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2", "primaryFunction": "Protocol"]
     ])
@@ -930,7 +928,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
       "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2", "primaryFunction": "Protocol"]
     ])
@@ -1072,7 +1070,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
       "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2", "primaryFunction": "Protocol"]
     ])
@@ -1157,7 +1155,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -1238,7 +1236,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let cacheMutation = MockLocalCacheMutation<GivenSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
       "QUERY_ROOT.hero": ["__typename": "Droid", "type": "droid"]
     ])
@@ -1749,10 +1747,9 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     // then
     let heroKey = "QUERY_ROOT.hero"
-    let records = try await self.cache.loadRecords(forKeys: [heroKey])
-    let heroRecord = records[heroKey]
+    let heroRecord = try await self.store.loadRecord(forKey: heroKey)
 
-    expect(heroRecord?.fields["name"] as? String).to(equal("Han Solo"))
+    expect(heroRecord.fields["name"] as? String).to(equal("Han Solo"))
   }
 
   @MainActor func test_writeDataForOperation_givenSelectionSetManuallyInitializedWithNamedFragmentInInclusionConditionIsFulfilled_writesFieldsForNamedFragment() async throws {
@@ -2023,7 +2020,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
       "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -2086,7 +2083,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -2209,7 +2206,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
       }
     }
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
         "name": "R2-D2",
@@ -2267,7 +2264,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     // 1. Merge all required records into the cache with lowercase key
     //
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["\(heroKey.lowercased())": CacheReference("QUERY_ROOT.\(heroKey.lowercased())")],
       "QUERY_ROOT.\(heroKey.lowercased())": ["__typename": "Droid", "name": "R2-D2"]
     ])
@@ -2332,7 +2329,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     //
     // 1. Merge all required records into the cache
     //
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "hero(episode:NEWHOPE)": CacheReference("1002"),
         "hero(episode:JEDI)": CacheReference("1101"),
@@ -2427,7 +2424,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
     let query = MockQuery<HeroNameSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": ["__typename": "Droid", "name": "R2-D2"]
     ])

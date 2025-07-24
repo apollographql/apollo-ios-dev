@@ -9,15 +9,15 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
   private var directoryURL: URL { testFileManager.directoryURL }
   private var testFileManager: TestIsolatedFileManager!
   
-  override func setUpWithError() throws {
-    try super.setUpWithError()
+  override func setUp() async throws {
+    try await super.setUp()
     testFileManager = try testIsolatedFileManager()
-    try createMockSchema()
+    try await createMockSchema()
   }
 
-  override func tearDownWithError() throws {
+  override func tearDown() async throws {
     testFileManager = nil
-    try super.tearDownWithError()
+    try await super.tearDown()
   }
   
   private func createSubject(
@@ -49,8 +49,8 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
   
   // MARK: Mock File Setup
   
-  private func createMockSchema() throws {
-    try createFile(
+  private func createMockSchema() async throws {
+    try await createFile(
       body: """
       type Query {
         allAnimals: [Animal]!
@@ -137,11 +137,11 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
       
   @discardableResult
   private func createFile(
-    body: @autoclosure () -> String = "Test File",
+    body: @Sendable @autoclosure () -> String = "Test File",
     filename: String,
     inDirectory directory: String? = nil
-  ) throws -> String {
-    return try self.testFileManager.createFile(
+  ) async throws -> String {
+    return try await self.testFileManager.createFile(
       body: body(),
       named: filename,
       inDirectory: directory
@@ -151,7 +151,7 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
   // MARK: - Tests
   
   func test_givenSchemaAndOperationDocuments_andInterfaceWithTypePolicy_reducingGeneratedSchemaTypes_generatesOnlyReferencedObjects() async throws {
-    try createFile(
+    try await createFile(
       body: """
       query AllAnimalsQuery {
         allAnimals {
@@ -169,15 +169,9 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
     
     let subject = createSubject()
     
-    let fileManager = MockApolloFileManager(strict: false)
+    let fileManager = await MockApolloFileManager(strict: false)
 
-    let filePathStore = ApolloFileManager.WrittenFiles()
-    let concurrentTasks = ConcurrentTaskContainer()
-
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      concurrentTasks.dispatch {
-        await filePathStore.addWrittenFile(path: path)
-      }
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
     }))
     
@@ -200,15 +194,15 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
       ir: ir,
       fileManager: fileManager
     )
-    await concurrentTasks.waitForAllTasks()
-    let filePaths = await filePathStore.value
-    
+
+    let filePaths = await fileManager.writtenFiles
+
     expect(filePaths).to(equal(expectedPaths))
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    await expect { await fileManager.allClosuresCalled }.to(beTrue())
   }
   
   func test_givenSchemaAndOperationDocuments_andInterfaceWithTypePolicy_generatesAllInterfaceObjects() async throws {
-    try createFile(
+    try await createFile(
       body: """
       query AllAnimalsQuery {
         allAnimals {
@@ -226,15 +220,9 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
     
     let subject = createSubject(reduceGeneratedSchemaTypes: false)
     
-    let fileManager = MockApolloFileManager(strict: false)
+    let fileManager = await MockApolloFileManager(strict: false)
 
-    let filePathStore = ApolloFileManager.WrittenFiles()
-    let concurrentTasks = ConcurrentTaskContainer()
-
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      concurrentTasks.dispatch {
-        await filePathStore.addWrittenFile(path: path)
-      }
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
     }))
     
@@ -258,16 +246,15 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
       compilationResult: compilationResult,
       ir: ir,
       fileManager: fileManager
-    )
-    await concurrentTasks.waitForAllTasks()
-    let filePaths = await filePathStore.value
-    
+    )    
+    let filePaths = await fileManager.writtenFiles
+
     expect(filePaths).to(equal(expectedPaths))
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    await expect { await fileManager.allClosuresCalled }.to(beTrue())
   }
   
   func test_givenSchemaAndOperationDocuments_andTypesWithTypePolicy_reducingGeneratedSchemaTypes_generatesOnlyReferencedAndTypePolicyObjects() async throws {
-    try createFile(
+    try await createFile(
       body: """
       query AllPetFoodQuery {
         allPetFood {
@@ -284,15 +271,9 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
     
     let subject = createSubject()
     
-    let fileManager = MockApolloFileManager(strict: false)
+    let fileManager = await MockApolloFileManager(strict: false)
 
-    let filePathStore = ApolloFileManager.WrittenFiles()
-    let concurrentTasks = ConcurrentTaskContainer()
-
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      concurrentTasks.dispatch {
-        await filePathStore.addWrittenFile(path: path)
-      }
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
     }))
     
@@ -316,15 +297,14 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
       ir: ir,
       fileManager: fileManager
     )
-    await concurrentTasks.waitForAllTasks()
-    let filePaths = await filePathStore.value
-    
+    let filePaths = await fileManager.writtenFiles
+
     expect(filePaths).to(equal(expectedPaths))
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    await expect { await fileManager.allClosuresCalled }.to(beTrue())
   }
   
   func test_givenSchemaAndOperationDocuments_andTypesWithTypePolicy_generatesInterfaceAndTypePolicyObjects() async throws {
-    try createFile(
+    try await createFile(
       body: """
       query AllPetFoodQuery {
         allPetFood {
@@ -341,15 +321,9 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
     
     let subject = createSubject(reduceGeneratedSchemaTypes: false)
     
-    let fileManager = MockApolloFileManager(strict: false)
+    let fileManager = await MockApolloFileManager(strict: false)
 
-    let filePathStore = ApolloFileManager.WrittenFiles()
-    let concurrentTasks = ConcurrentTaskContainer()
-
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      concurrentTasks.dispatch {
-        await filePathStore.addWrittenFile(path: path)
-      }
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
     }))
     
@@ -374,15 +348,14 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
       ir: ir,
       fileManager: fileManager
     )
-    await concurrentTasks.waitForAllTasks()
-    let filePaths = await filePathStore.value
-    
+    let filePaths = await fileManager.writtenFiles
+
     expect(filePaths).to(equal(expectedPaths))
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    await expect { await fileManager.allClosuresCalled }.to(beTrue())
   }
   
   func test_givenSchemaAndOperationDocuments_andInterface_reducingGeneratedSchemaTypes_generatesOnlyReferencedObjects() async throws {
-    try createFile(
+    try await createFile(
       body: """
       query AllPetBedsQuery {
         allPetBeds {
@@ -399,15 +372,9 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
     
     let subject = createSubject()
     
-    let fileManager = MockApolloFileManager(strict: false)
+    let fileManager = await MockApolloFileManager(strict: false)
 
-    let filePathStore = ApolloFileManager.WrittenFiles()
-    let concurrentTasks = ConcurrentTaskContainer()
-
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      concurrentTasks.dispatch {
-        await filePathStore.addWrittenFile(path: path)
-      }
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
     }))
     
@@ -430,15 +397,14 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
       ir: ir,
       fileManager: fileManager
     )
-    await concurrentTasks.waitForAllTasks()
-    let filePaths = await filePathStore.value
-    
+    let filePaths = await fileManager.writtenFiles
+
     expect(filePaths).to(equal(expectedPaths))
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    await expect { await fileManager.allClosuresCalled }.to(beTrue())
   }
 
   func test_givenSchemaAndOperationDocuments_andInterface_generatesAllInterfaceObjects() async throws {
-    try createFile(
+    try await createFile(
       body: """
       query AllPetBedsQuery {
         allPetBeds {
@@ -455,15 +421,9 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
     
     let subject = createSubject(reduceGeneratedSchemaTypes: false)
     
-    let fileManager = MockApolloFileManager(strict: false)
+    let fileManager = await MockApolloFileManager(strict: false)
 
-    let filePathStore = ApolloFileManager.WrittenFiles()
-    let concurrentTasks = ConcurrentTaskContainer()
-
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      concurrentTasks.dispatch {
-        await filePathStore.addWrittenFile(path: path)
-      }
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
     }))
     
@@ -488,11 +448,10 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
       ir: ir,
       fileManager: fileManager
     )
-    await concurrentTasks.waitForAllTasks()
-    let filePaths = await filePathStore.value
-    
+    let filePaths = await fileManager.writtenFiles
+
     expect(filePaths).to(equal(expectedPaths))
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    await expect { await fileManager.allClosuresCalled }.to(beTrue())
   }
   
 }

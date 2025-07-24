@@ -44,7 +44,7 @@ enum TemplateTarget: Equatable {
 ///
 /// All templates that output to a file should conform to this protocol, this does not include
 /// templates that are used by others such as `HeaderCommentTemplate` or `ImportStatementTemplate`.
-protocol TemplateRenderer {
+protocol TemplateRenderer: Sendable {
   /// Shared codegen configuration.
   var config: ApolloCodegen.ConfigurationContext { get }
 

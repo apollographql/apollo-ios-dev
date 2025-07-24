@@ -116,7 +116,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "camelCase",
             "inputObjects" : "none"
           },
-          "deprecatedEnumCases" : "exclude",          
+          "deprecatedEnumCases" : "exclude",
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1291,7 +1291,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "idiomatic",
             "inputObjects" : "camelCase"
           },
-          "deprecatedEnumCases" : "include",          
+          "deprecatedEnumCases" : "include",
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1776,7 +1776,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "idiomatic",
             "inputObjects" : "camelCase"
           },
-          "deprecatedEnumCases" : "include",          
+          "deprecatedEnumCases" : "include",
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1883,7 +1883,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "idiomatic",
             "inputObjects" : "camelCase"
           },
-          "deprecatedEnumCases" : "include",          
+          "deprecatedEnumCases" : "include",
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -2097,7 +2097,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "idiomatic",
             "inputObjects" : "camelCase"
           },
-          "deprecatedEnumCases" : "include",          
+          "deprecatedEnumCases" : "include",
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -2204,7 +2204,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "fieldAccessors" : "idiomatic",
             "inputObjects" : "camelCase"
           },
-          "deprecatedEnumCases" : "include",          
+          "deprecatedEnumCases" : "include",
           "operationDocumentFormat" : [
             "definition"
           ],

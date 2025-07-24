@@ -14,11 +14,11 @@ extension ParsableCommand {
     with inputs: InputOptions,
     projectRootURL: URL?,
     ignoreVersionMismatch: Bool = false
-  ) throws {
+  ) async throws {
     let rootURL = projectRootURL ?? rootOutputURL(for: inputs)
 
     if case let .versionMismatch(cliVersion, apolloVersion) =
-        try VersionChecker.matchCLIVersionToApolloVersion(projectRootURL: rootURL) {
+        try await VersionChecker.matchCLIVersionToApolloVersion(projectRootURL: rootURL) {
       let errorMessage = """
         Apollo Version Mismatch
         We've detected that the version of the Apollo Codegen CLI does not match the version of the

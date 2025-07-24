@@ -6,7 +6,7 @@ public struct FetchSchema: AsyncParsableCommand {
 
   // MARK: - Configuration
 
-  public static var configuration = CommandConfiguration(
+  public static let configuration = CommandConfiguration(
     commandName: "fetch-schema",
     abstract: "Download a GraphQL schema from the Apollo Registry or GraphQL introspection."
   )

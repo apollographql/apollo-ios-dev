@@ -6,7 +6,7 @@ public struct Generate: AsyncParsableCommand {
 
   // MARK: - Configuration
   
-  public static var configuration = CommandConfiguration(
+  public static let configuration = CommandConfiguration(
     abstract: "Generate Swift source code based on a code generation configuration."
   )
 
@@ -35,7 +35,7 @@ public struct Generate: AsyncParsableCommand {
   ) async throws {
     logger.SetLoggingLevel(verbose: inputs.verbose)
 
-    try checkForCLIVersionMismatch(
+    try await checkForCLIVersionMismatch(
       with: inputs,
       projectRootURL: projectRootURL
     )

@@ -105,7 +105,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     // given
     let expected =
     """
-    public class TestOperationLocalCacheMutation: LocalCacheMutation {
+    public struct TestOperationLocalCacheMutation: LocalCacheMutation {
       public static let operationType: GraphQLOperationType = .query
 
     """
@@ -128,7 +128,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     // given
     let expected =
     """
-    class TestOperationLocalCacheMutation: LocalCacheMutation {
+    struct TestOperationLocalCacheMutation: LocalCacheMutation {
       public static let operationType: GraphQLOperationType = .query
 
     """
@@ -151,7 +151,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     // given
     let expected =
     """
-    class TestOperationLocalCacheMutation: LocalCacheMutation {
+    struct TestOperationLocalCacheMutation: LocalCacheMutation {
       static let operationType: GraphQLOperationType = .query
 
     """
@@ -174,7 +174,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     // given
     let expected =
     """
-    public class TestOperationLocalCacheMutation: LocalCacheMutation {
+    public struct TestOperationLocalCacheMutation: LocalCacheMutation {
       public static let operationType: GraphQLOperationType = .query
 
     """
@@ -197,7 +197,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     // given
     let expected =
     """
-    class TestOperationLocalCacheMutation: LocalCacheMutation {
+    struct TestOperationLocalCacheMutation: LocalCacheMutation {
       static let operationType: GraphQLOperationType = .query
 
     """
@@ -220,7 +220,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     // given
     let expected =
     """
-    public class TestOperationLocalCacheMutation: LocalCacheMutation {
+    public struct TestOperationLocalCacheMutation: LocalCacheMutation {
       public static let operationType: GraphQLOperationType = .query
 
     """
@@ -243,7 +243,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     // given
     let expected =
     """
-    class TestOperationLocalCacheMutation: LocalCacheMutation {
+    struct TestOperationLocalCacheMutation: LocalCacheMutation {
       static let operationType: GraphQLOperationType = .query
 
     """
@@ -268,7 +268,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     // given
     let expected =
     """
-    class TestOperationLocalCacheMutation: LocalCacheMutation {
+    struct TestOperationLocalCacheMutation: LocalCacheMutation {
       static let operationType: GraphQLOperationType = .query
 
     """
@@ -393,7 +393,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
     let expected =
     """
-    class LowercaseOperationLocalCacheMutation: LocalCacheMutation {
+    struct LowercaseOperationLocalCacheMutation: LocalCacheMutation {
       static let operationType: GraphQLOperationType = .query
 
     """
@@ -419,7 +419,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
     let expected =
     """
-    class TestOperationLocalCacheMutation: LocalCacheMutation {
+    struct TestOperationLocalCacheMutation: LocalCacheMutation {
       static let operationType: GraphQLOperationType = .query
 
     """
@@ -459,7 +459,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
     let expected =
     """
-    class TestOperationLocalCacheMutation: LocalCacheMutation {
+    struct TestOperationLocalCacheMutation: LocalCacheMutation {
       static let operationType: GraphQLOperationType = .mutation
 
     """
@@ -499,7 +499,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
     let expected =
     """
-    class TestOperationLocalCacheMutation: LocalCacheMutation {
+    struct TestOperationLocalCacheMutation: LocalCacheMutation {
       static let operationType: GraphQLOperationType = .subscription
 
     """
@@ -572,7 +572,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     let expected = """
-    public class TestOperationLocalCacheMutation: LocalCacheMutation {
+    public struct TestOperationLocalCacheMutation: LocalCacheMutation {
     """
 
     // when
@@ -588,7 +588,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     let expected = """
-    public class TestOperationLocalCacheMutation: LocalCacheMutation {
+    public struct TestOperationLocalCacheMutation: LocalCacheMutation {
     """
 
     // when
@@ -604,7 +604,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     let expected = """
-    class TestOperationLocalCacheMutation: LocalCacheMutation {
+    struct TestOperationLocalCacheMutation: LocalCacheMutation {
     """
 
     // when

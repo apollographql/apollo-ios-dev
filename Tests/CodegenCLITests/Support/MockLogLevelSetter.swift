@@ -9,7 +9,7 @@ extension LogLevelSetter {
 }
 
 struct MockLogLevelSetter: LogLevelSetter {
-  static var levelHandler: ((CodegenLogger.LogLevel) -> Void)? = nil
+  nonisolated(unsafe) static var levelHandler: ((CodegenLogger.LogLevel) -> Void)? = nil
 
   static func SetLoggingLevel(_ level: CodegenLogger.LogLevel) {
     guard let levelHandler = levelHandler else {

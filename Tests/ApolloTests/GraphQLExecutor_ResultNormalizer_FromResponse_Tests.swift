@@ -7,17 +7,17 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
 
   // MARK: - Helpers
 
-  private static let executor: GraphQLExecutor = {
-    let executor = GraphQLExecutor(executionSource: NetworkResponseExecutionSource())    
+  private static let executor: GraphQLExecutor<NetworkResponseExecutionSource> = {
+    let executor = GraphQLExecutor(executionSource: NetworkResponseExecutionSource())
     return executor
   }()
 
-  private func normalizeRecords<S: RootSelectionSet>(
+  private static func normalizeRecords<S: RootSelectionSet>(
     _ selectionSet: S.Type,
     with variables: GraphQLOperation.Variables? = nil,
     from object: JSONObject
   ) async throws -> RecordSet {
-    return try await GraphQLExecutor_ResultNormalizer_FromResponse_Tests.executor.execute(
+    return try await executor.execute(
       selectionSet: selectionSet,
       on: object,
       withRootCacheReference: CacheReference.RootQuery,
@@ -47,7 +47,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
@@ -78,7 +78,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try await normalizeRecords(GivenSelectionSet.self, with: variables, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, with: variables, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero(episode:JEDI)"] as? CacheReference,
@@ -115,7 +115,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try await normalizeRecords(GivenSelectionSet.self, with: variables, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, with: variables, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero(episode:EMPIRE)"] as? CacheReference,
@@ -159,7 +159,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
@@ -216,7 +216,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
@@ -267,7 +267,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let hero = try XCTUnwrap(records["QUERY_ROOT.hero"])
@@ -325,7 +325,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let hero = try XCTUnwrap(records["QUERY_ROOT.hero"])
@@ -384,7 +384,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let hero = try XCTUnwrap(records["QUERY_ROOT.hero"])
@@ -458,7 +458,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let han = try XCTUnwrap(records["QUERY_ROOT.hero.friend"])
@@ -532,7 +532,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let luke = try XCTUnwrap(records["QUERY_ROOT.hero.friend"])
@@ -576,7 +576,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
@@ -614,7 +614,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try await normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,

@@ -3,12 +3,12 @@ import JavaScriptCore
 
 /// A representation of source input to GraphQL parsing.
 /// Corresponds to https://github.com/graphql/graphql-js/blob/master/src/language/source.js
-public final class GraphQLSource: JavaScriptObject {
+public final class GraphQLSource: JavaScriptObject, @unchecked Sendable {
   public let filePath: String
 
   public let body: String
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.filePath = jsValue["name"]
     self.body = jsValue["body"]
     super.init(jsValue, bridge: bridge)
@@ -17,7 +17,7 @@ public final class GraphQLSource: JavaScriptObject {
 }
 
 /// Represents a location in a GraphQL source file.
-public struct GraphQLSourceLocation {
+public struct GraphQLSourceLocation: Sendable {
   let filePath: String?
 
   let lineNumber: Int
@@ -32,30 +32,31 @@ public struct GraphQLSourceLocation {
 // `GraphQLDocument`.
 
 /// An AST node.
-public class ASTNode: JavaScriptObject {
+public class ASTNode: JavaScriptObject, @unchecked Sendable {
   public let kind: String
 
   public let source: GraphQLSource?
 
   public var filePath: String? { source?.filePath }
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.kind = jsValue["kind"]
     self.source = .fromJSValue(jsValue["loc"]["source"], bridge: bridge)
     super.init(jsValue, bridge: bridge)
   }
 
-  static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
+  @MainActor
+  static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
     self.init(jsValue, bridge: bridge)
   }
 
 }
 
 /// A parsed GraphQL document.
-public final class GraphQLDocument: ASTNode {
+public final class GraphQLDocument: ASTNode, @unchecked Sendable {
   public let definitions: [ASTNode]
 
-  required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
+  required init(_ jsValue: JSValue, bridge: JavaScriptBridge) {
     self.definitions = .fromJSValue(jsValue["definitions"], bridge: bridge)
     super.init(jsValue, bridge: bridge)
 

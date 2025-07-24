@@ -3,7 +3,7 @@ import CodegenCLI
 import ApolloCodegenLib
 
 class MockApolloCodegen: CodegenProvider {
-  static var buildHandler: ((ApolloCodegenConfiguration) throws -> Void)? = nil
+  nonisolated(unsafe) static var buildHandler: ((ApolloCodegenConfiguration) throws -> Void)? = nil
 
   static func build(
     with configuration: ApolloCodegenConfiguration,

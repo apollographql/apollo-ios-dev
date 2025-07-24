@@ -3,7 +3,7 @@ import TemplateString
 import Utilities
 
 @dynamicMemberLookup
-public class SelectionSet: Hashable, CustomDebugStringConvertible {
+public final class SelectionSet: Hashable, CustomDebugStringConvertible {
   public class TypeInfo: Hashable, CustomDebugStringConvertible {
     /// The entity that the `selections` are being selected on.
     ///

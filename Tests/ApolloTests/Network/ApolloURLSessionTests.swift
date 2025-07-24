@@ -169,16 +169,15 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
       statusCode: -1
     )
 
-    let task = Task {
-      await expect {
-        try await self.session.chunks(for: request)
-      }.to(throwError(CancellationError()))
+    let task = Task { [session] in
+      return try await session!.chunks(for: request)
     }
 
     task.cancel()
 
-    let expectation = await task.value
-    expect(expectation.status).to(equal(.passed))
+    await expect {
+      try await task.value
+    }.to(throwError(CancellationError()))
   }
 
   func test__request__multipleSimultaneousRequests() async throws {
@@ -205,8 +204,8 @@ class ApolloURLSessionTests: XCTestCase, MockResponseProvider {
 
     await withThrowingTaskGroup(of: Void.self) { group in
       for (index, request) in requests {
-        group.addTask {
-          let (chunks, response) = try await self.session.chunks(for: request)
+        group.addTask { [session, responseStrings] in
+          let (chunks, response) = try await session!.chunks(for: request)
           guard let httpResponse = response as? HTTPURLResponse else {
             fail()
             return

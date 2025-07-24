@@ -56,7 +56,7 @@ public struct ApolloSchemaDownloader {
     withRootURL rootURL: URL? = nil,
     session: (any NetworkSession)? = nil
   ) async throws {
-    try ApolloFileManager.default.createContainingDirectoryIfNeeded(
+    try await ApolloFileManager.default.createContainingDirectoryIfNeeded(
       forPath: configuration.outputPath
     )
 

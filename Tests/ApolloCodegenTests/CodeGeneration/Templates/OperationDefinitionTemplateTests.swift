@@ -94,7 +94,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     // given
     let expected =
     """
-    class TestOperationQuery: GraphQLQuery {
+    struct TestOperationQuery: GraphQLQuery {
       static let operationName: String = "TestOperation"
     """
 
@@ -119,7 +119,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     let expected =
     """
-    class TestOperationQuery: GraphQLQuery {
+    struct TestOperationQuery: GraphQLQuery {
       static let operationName: String = "TestOperationQuery"
     """
 
@@ -158,7 +158,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     let expected =
     """
-    class TestOperationQueryMutation: GraphQLMutation {
+    struct TestOperationQueryMutation: GraphQLMutation {
       static let operationName: String = "TestOperationQuery"
     """
 
@@ -197,7 +197,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     let expected =
     """
-    class TestOperationMutation: GraphQLMutation {
+    struct TestOperationMutation: GraphQLMutation {
       static let operationName: String = "TestOperation"
     """
 
@@ -236,7 +236,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     let expected =
     """
-    class TestOperationSubscription: GraphQLSubscription {
+    struct TestOperationSubscription: GraphQLSubscription {
       static let operationName: String = "TestOperation"
     """
 
@@ -271,7 +271,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     let expected =
     """
-    class LowercaseOperationQuery: GraphQLQuery {
+    struct LowercaseOperationQuery: GraphQLQuery {
       static let operationName: String = "lowercaseOperation"
       static let operationDocument: ApolloAPI.OperationDocument = .init(
         definition: .init(
@@ -1098,6 +1098,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
         
         // MARK: - Deferred Fragment Metadata
       
+        public typealias ResponseFormat = IncrementalDeferredResponseFormat
         enum DeferredFragmentIdentifiers {
       """,
       atLine: 64,
@@ -1106,11 +1107,12 @@ class OperationDefinitionTemplateTests: XCTestCase {
     
     expect(actual).to(equalLineByLine(
       """
-        ]}
+          ]
+        )
       }
 
       """,
-      atLine: 74,
+      atLine: 76,
       ignoringExtraLines: false
     ))
   }
@@ -1160,6 +1162,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
         
         // MARK: - Deferred Fragment Metadata
       
+        public typealias ResponseFormat = IncrementalDeferredResponseFormat
         enum DeferredFragmentIdentifiers {
       """,
       atLine: 64,
@@ -1168,11 +1171,12 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     expect(actual).to(equalLineByLine(
       """
-        ]}
+          ]
+        )
       }
 
       """,
-      atLine: 74,
+      atLine: 76,
       ignoringExtraLines: false
     ))
   }
@@ -1222,6 +1226,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
         
         // MARK: - Deferred Fragment Metadata
       
+        public typealias ResponseFormat = IncrementalDeferredResponseFormat
         enum DeferredFragmentIdentifiers {
       """,
       atLine: 64,
@@ -1230,11 +1235,12 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     expect(actual).to(equalLineByLine(
       """
-        ]}
+          ]
+        )
       }
 
       """,
-      atLine: 74,
+      atLine: 76,
       ignoringExtraLines: false
     ))
   }

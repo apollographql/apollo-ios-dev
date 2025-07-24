@@ -21,8 +21,8 @@ public struct CodegenLogger {
   
   /// The `LogLevel` at which to print logs. Higher raw values than this will
   /// be ignored. Defaults to `debug`.
-  public static var level = LogLevel.debug
-  
+  nonisolated(unsafe) public static var level = LogLevel.debug
+
   /// Logs the given string if its `logLevel` is at or above `CodegenLogger.level`, otherwise ignores it.
   ///
   /// - Parameter logString: The string to log out, as an autoclosure
@@ -44,7 +44,7 @@ public struct CodegenLogger {
 }
 
 // Extension which allows `print` to output to a FileHandle
-extension FileHandle: TextOutputStream {
+extension FileHandle: @retroactive TextOutputStream {
   public func write(_ string: String) {
     guard let data = string.data(using: .utf8) else { return }
     self.write(data)

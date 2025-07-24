@@ -6,7 +6,7 @@ public struct Initialize: AsyncParsableCommand {
 
   // MARK: - Configuration
 
-  public static var configuration = CommandConfiguration(
+  public static let configuration = CommandConfiguration(
     commandName: "init",
     abstract: "Initialize a new configuration with defaults."
   )
@@ -132,13 +132,15 @@ public struct Initialize: AsyncParsableCommand {
     fileManager: ApolloFileManager,
     output: OutputClosure? = nil
   ) async throws {
-    if !overwrite && fileManager.doesFileExist(atPath: path) {
-      throw Error(
-        errorDescription: """
+    if !overwrite {
+      if await fileManager.doesFileExist(atPath: path) {
+        throw Error(
+          errorDescription: """
           File already exists at \(path). Hint: use --overwrite to overwrite any existing \
           file at the path.
           """
-      )
+        )
+      }
     }
 
     try await fileManager.createFile(

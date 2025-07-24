@@ -55,8 +55,9 @@ class FileGeneratorTests: XCTestCase {
     buildConfig()
     buildSubject()
 
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      let expected = self.fileTarget.resolvePath(forConfig: self.config)
+    let expected = self.fileTarget.resolvePath(forConfig: self.config)
+    
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
 
       // then
       let actual = URL(fileURLWithPath: path).deletingLastPathComponent().path
@@ -69,7 +70,7 @@ class FileGeneratorTests: XCTestCase {
     _ = try await subject.generate(forConfig: config, fileManager: fileManager)
 
     // then
-    expect(self.fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await self.fileManager.allClosuresCalled }.to(beTrue())
   }
 
   func test__generate__shouldFirstUppercaseFilename() async throws {
@@ -77,7 +78,7 @@ class FileGeneratorTests: XCTestCase {
     buildConfig()
     buildSubject()
 
-    fileManager.mock(closure: .createFile({ path, data, attributes in
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       let expected = "LowercasedType.graphql.swift"
 
       // then
@@ -91,7 +92,7 @@ class FileGeneratorTests: XCTestCase {
     _ = try await subject.generate(forConfig: config, fileManager: fileManager)
 
     // then
-    expect(self.fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await self.fileManager.allClosuresCalled }.to(beTrue())
   }
 
   func test__generate__shouldAddExtensionToFilePath() async throws {
@@ -99,7 +100,7 @@ class FileGeneratorTests: XCTestCase {
     buildConfig()
     buildSubject(extension: "test")
 
-    fileManager.mock(closure: .createFile({ path, data, attributes in
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       let expected = "LowercasedType.test"
 
       // then
@@ -113,7 +114,7 @@ class FileGeneratorTests: XCTestCase {
     _ = try await subject.generate(forConfig: config, fileManager: fileManager)
 
     // then
-    expect(self.fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await self.fileManager.allClosuresCalled }.to(beTrue())
   }
 
   func test__generate__shouldWriteRenderedTemplate() async throws {
@@ -124,7 +125,7 @@ class FileGeneratorTests: XCTestCase {
     let (actual, _) = template.render()
     let expectedData = actual.data(using: .utf8)
 
-    fileManager.mock(closure: .createFile({ path, data, attributes in
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       // then
       expect(data).to(equal(expectedData))
 
@@ -135,6 +136,6 @@ class FileGeneratorTests: XCTestCase {
     _ = try await subject.generate(forConfig: config, fileManager: fileManager)
 
     // then
-    expect(self.fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await self.fileManager.allClosuresCalled }.to(beTrue())
   }
 }

@@ -2,12 +2,12 @@ import Foundation
 import IR
 
 /// A configuration object that defines behavior for code generation.
-public struct ApolloCodegenConfiguration: Codable, Equatable {
+public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
 
   // MARK: Input Types
 
   /// The input paths and files required for code generation.
-  public struct FileInput: Codable, Equatable {
+  public struct FileInput: Codable, Equatable, Sendable {
     /// An array of path matching pattern strings used to find GraphQL schema
     /// files to be included for code generation.
     ///
@@ -158,7 +158,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   // MARK: Output Types
 
   /// The paths and files output by code generation.
-  public struct FileOutput: Codable, Equatable {
+  public struct FileOutput: Codable, Equatable, Sendable {
     /// The local path structure for the generated schema types files.
     public let schemaTypes: SchemaTypesFileOutput
     /// The local path structure for the generated operation object files.
@@ -242,7 +242,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   /// Swift access control configuration.
-  public enum AccessModifier: String, Codable, Equatable {
+  public enum AccessModifier: String, Codable, Equatable, Sendable {
     /// Enable entities to be used within any source file from their defining module, and also in
     /// a source file from another module that imports the defining module.
     case `public`
@@ -252,7 +252,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   /// The local path structure for the generated schema types files.
-  public struct SchemaTypesFileOutput: Codable, Equatable {
+  public struct SchemaTypesFileOutput: Codable, Equatable, Sendable {
     /// Local path where the generated schema types files should be stored.
     public let path: String
     /// How to package the schema types for dependency management.
@@ -272,7 +272,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     }
 
     /// Compatible dependency manager automation.
-    public enum ModuleType: Codable, Equatable {
+    public enum ModuleType: Codable, Equatable, Sendable {
       /// Generated schema types will be manually embedded in a target with the specified `name`.
       /// No module will be created for the generated schema types. Use `accessModifier` to control
       /// the visibility of generated code, defaults to `.internal`.
@@ -343,7 +343,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       }
       
       /// Configuation for apollo-ios dependency in SPM modules
-      public struct ApolloSDKDependency: Codable, Equatable {
+      public struct ApolloSDKDependency: Codable, Equatable, Sendable {
         /// URL for the SPM package dependency, not used for local dependencies.
         ///  Defaults to 'https://github.com/apollographql/apollo-ios'.
         let url: String
@@ -399,7 +399,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         }
         
         /// Type of SPM dependency
-        public enum SDKVersion: Codable, Equatable {
+        public enum SDKVersion: Codable, Equatable, Sendable {
           /// Configures SPM dependency to use the exact version of apollo-ios
           /// that matches the code generation library version currently in use.
           /// Results in a dependency that looks like:
@@ -513,7 +513,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   /// The local path structure for the generated operation object files.
-  public enum OperationsFileOutput: Codable, Equatable {
+  public enum OperationsFileOutput: Codable, Equatable, Sendable {
     /// All operation object files will be located in the module with the schema types.
     case inSchemaModule
     /// Operation object files will be co-located relative to the defining operation `.graphql`
@@ -573,7 +573,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   /// The local path structure for the generated test mock object files.
-  public enum TestMockFileOutput: Codable, Equatable {
+  public enum TestMockFileOutput: Codable, Equatable, Sendable {
     /// Test mocks will not be generated. This is the default value.
     case none
     /// Generated test mock files will be located in the specified `path`. Use `accessModifier` to
@@ -639,7 +639,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   // MARK: - Other Types
-  public struct OutputOptions: Codable, Equatable {
+  public struct OutputOptions: Codable, Equatable, Sendable {
     /// Any non-default rules for pluralization or singularization you wish to include.
     public let additionalInflectionRules: [InflectionRule]
     /// How deprecated enum cases from the schema should be handled.
@@ -872,18 +872,18 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   /// Composition is used as a substitute for a boolean where context is better placed in the value
   /// instead of the parameter name, e.g.: `includeDeprecatedEnumCases = true` vs.
   /// `deprecatedEnumCases = .include`.
-  public enum Composition: String, Codable, Equatable {
+  public enum Composition: String, Codable, Equatable, Sendable {
     case include
     case exclude
   }
 
   /// ``ConversionStrategies`` configures rules for how to convert the names of values from the
   /// schema in generated code.
-  public struct ConversionStrategies: Codable, Equatable {
+  public struct ConversionStrategies: Codable, Equatable, Sendable {
 
     /// ``ApolloCodegenConfiguration/ConversionStrategies/EnumCases`` is used to specify the strategy
     /// used to convert the casing of enum cases in a GraphQL schema into generated Swift code.
-    public enum EnumCases: String, Codable, Equatable {
+    public enum EnumCases: String, Codable, Equatable, Sendable {
       /// Generates swift code using the exact name provided in the GraphQL schema
       /// performing no conversion.
       case none
@@ -894,7 +894,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     /// ``ApolloCodegenConfiguration/ConversionStrategies/FieldAccessors`` is used to specify the
     /// strategy used to convert the casing of fields on GraphQL selection sets into field accessors
     /// on the response models in generated Swift code.
-    public enum FieldAccessors: String, Codable, Equatable {
+    public enum FieldAccessors: String, Codable, Equatable, Sendable {
       /// This conversion strategy will:
       /// - Lowercase the first letter of all fields.
       /// - Convert field names that are all `UPPERCASE` to all `lowercase`.
@@ -907,7 +907,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     
     /// ``ApolloCodegenConfiguration/ConversionStrategies/InputObjects`` is used to specify
     ///  the strategy used to convert the casing of input objects in a GraphQL schema into generated Swift code.
-    public enum InputObjects: String, Codable, Equatable {
+    public enum InputObjects: String, Codable, Equatable, Sendable {
       /// Generates swift code using the exact name provided in the GraphQL schema
       ///  performing no conversion
       case none
@@ -997,7 +997,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   
   // MARK: - OperationDocumentFormat
   
-  public struct OperationDocumentFormat: OptionSet, Codable, Equatable {
+  public struct OperationDocumentFormat: OptionSet, Codable, Equatable, Sendable {
     /// Include the GraphQL source document for the operation in the generated operation models.
     public static let definition = Self(rawValue: 1)
     /// Include the computed operation identifier hash for use with persisted queries
@@ -1060,7 +1060,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   /// ``SelectionSetInitializers`` functions like an `OptionSet`, allowing you to combine multiple
   /// different instances together to indicate all the types you would like to generate
   /// initializers for.
-  public struct SelectionSetInitializers: Codable, Equatable, ExpressibleByArrayLiteral {
+  public struct SelectionSetInitializers: Codable, Equatable, Sendable, ExpressibleByArrayLiteral {
     /// Option to generate initializers for all named fragments.
     public static let namedFragments: SelectionSetInitializers = .init(.namedFragments)
 
@@ -1122,7 +1122,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   ///  - Note: Disabling field merging and `selectionSetInitializers` functionality are
   /// incompatible. If using `selectionSetInitializers`, `fieldMerging` must be set to `.all`,
   /// otherwise a validation error will be thrown when runnning code generation.
-  public struct FieldMerging: Codable, Equatable, ExpressibleByArrayLiteral {
+  public struct FieldMerging: Codable, Equatable, Sendable, ExpressibleByArrayLiteral {
     /// Merges fields and fragment accessors from the selection set's direct ancestors.
     public static let ancestors          = FieldMerging(.ancestors)
 
@@ -1160,7 +1160,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     }
   }
 
-  public struct ExperimentalFeatures: Codable, Equatable {
+  public struct ExperimentalFeatures: Codable, Equatable, Sendable {
 
     /// **EXPERIMENTAL**: If enabled, the generated operations will be transformed using a method
     /// that attempts to maintain compatibility with the legacy behavior from

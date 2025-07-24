@@ -5,7 +5,7 @@ extension Target {
     public static func gitHubFramework() -> Target {
         let target: ApolloTarget = .gitHubAPI
         
-        return Target(
+      return .target(
             name: target.name,
             destinations: target.destinations,
             product: .framework,

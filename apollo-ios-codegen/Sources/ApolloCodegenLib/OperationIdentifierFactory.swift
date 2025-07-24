@@ -5,7 +5,7 @@ import CryptoKit
 
 /// An async closure used to compute the operation identifiers for operations
 /// in the persisted queries manifest
-public typealias OperationIdentifierProvider = (_ operation: OperationDescriptor) async throws -> String
+public typealias OperationIdentifierProvider = @Sendable (_ operation: OperationDescriptor) async throws -> String
 
 actor OperationIdentifierFactory {
 
@@ -49,7 +49,7 @@ actor OperationIdentifierFactory {
 }
 
 let DefaultOperationIdentifierProvider =
-{ (operation: OperationDescriptor) -> String in
+{ @Sendable (operation: OperationDescriptor) -> String in
   var hasher = SHA256()
   func updateHash(with source: inout String) {
     source.withUTF8({ buffer in

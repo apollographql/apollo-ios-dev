@@ -1,9 +1,9 @@
 import GraphQLCompiler
 import OrderedCollections
 
-public class NamedFragment: Definition, Hashable, CustomDebugStringConvertible {
+public final class NamedFragment: Definition, Sendable, Hashable, CustomDebugStringConvertible {
   public let definition: CompilationResult.FragmentDefinition
-  public let rootField: EntityField
+  nonisolated(unsafe) public let rootField: EntityField
 
   /// All of the fragments that are referenced by this fragment's selection set.
   public let referencedFragments: OrderedSet<NamedFragment>
@@ -13,7 +13,7 @@ public class NamedFragment: Definition, Hashable, CustomDebugStringConvertible {
   ///
   /// - Note: The FieldPath for an entity within a fragment will begin with a path component
   /// with the fragment's name and type.
-  public let entityStorage: DefinitionEntityStorage
+  nonisolated(unsafe) public let entityStorage: DefinitionEntityStorage
 
   /// `True` if any selection set, or nested selection set, within the fragment contains any
   /// fragment marked with the `@defer` directive.

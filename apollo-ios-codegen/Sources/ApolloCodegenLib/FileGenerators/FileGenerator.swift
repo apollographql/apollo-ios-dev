@@ -4,7 +4,7 @@ import GraphQLCompiler
 // MARK: FileGenerator (protocol and extension)
 
 /// The methods to conform to when building a code generation Swift file generator.
-protocol FileGenerator {
+protocol FileGenerator: Sendable {
   var fileName: String { get }
   var fileExtension: String { get }
   var fileSuffix: String? { get }

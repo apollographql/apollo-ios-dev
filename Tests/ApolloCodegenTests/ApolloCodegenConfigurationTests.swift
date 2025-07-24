@@ -16,15 +16,15 @@ class ApolloCodegenConfigurationTests: XCTestCase {
 
   // MARK: Lifecycle
 
-  override func setUpWithError() throws {
-    try super.setUpWithError()
+  override func setUp() async throws {
+    try await super.setUp()
     testFilePathBuilder = TestFilePathBuilder(test: self)
 
     directoryURL = testFilePathBuilder.testIsolatedOutputFolder
       .appendingPathComponent("Configuration")
       .appendingPathComponent(self.testRun!.test.name)
 
-    try ApolloFileManager.default.createDirectoryIfNeeded(atPath: directoryURL.path)
+    try await ApolloFileManager.default.createDirectoryIfNeeded(atPath: directoryURL.path)
 
     filename = UUID().uuidString
     fileURL = directoryURL.appendingPathComponent(filename)
@@ -36,8 +36,8 @@ class ApolloCodegenConfigurationTests: XCTestCase {
     ))
   }
 
-  override func tearDownWithError() throws {
-    try ApolloFileManager.default.deleteDirectory(atPath: directoryURL.path)
+  override func tearDown() async throws {
+    try await ApolloFileManager.default.deleteDirectory(atPath: directoryURL.path)
 
     testFilePathBuilder = nil
     config = nil
@@ -47,7 +47,7 @@ class ApolloCodegenConfigurationTests: XCTestCase {
     fileURL = nil
     filename = nil
 
-    try super.tearDownWithError()
+    try await super.tearDown()
   }
 
   // MARK: Test Helpers

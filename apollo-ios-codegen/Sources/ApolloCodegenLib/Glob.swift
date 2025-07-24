@@ -221,7 +221,7 @@ public struct Glob {
     }
 
     return (0..<Int(globT.gl_matchc)).compactMap({ index in
-      if let path = String(validatingUTF8: globT.gl_pathv[index]!) {
+      if let path = String(validatingCString: globT.gl_pathv[index]!) {
         CodegenLogger.log("Matched \(path)", logLevel: .debug)
         return path
       }

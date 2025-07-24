@@ -6,10 +6,10 @@ import XCTest
 public class MockApolloFileManager: ApolloFileManager {
   /// Translates to the `FileManager` functions that can be mocked.
   public enum Closure: CustomStringConvertible {
-    case fileExists(_ handler: (String, UnsafeMutablePointer<ObjCBool>?) -> Bool)
-    case removeItem(_ handler: (String) throws -> Void)
-    case createFile(_ handler: (String, Data?, FileAttributes?) -> Bool)
-    case createDirectory(_ handler: (String, Bool, FileAttributes?) throws -> Void)
+    case fileExists(_ handler: @Sendable (String, UnsafeMutablePointer<ObjCBool>?) -> Bool)
+    case removeItem(_ handler: @Sendable (String) throws -> Void)
+    case createFile(_ handler: @Sendable (String, Data?, FileAttributes?) -> Bool)
+    case createDirectory(_ handler: @Sendable (String, Bool, FileAttributes?) throws -> Void)
 
     // These are based on the return string from the #function macro. They are used in overriden
     // functions to lookup the provided closure. Be aware that if the function signature changes
@@ -43,7 +43,7 @@ public class MockApolloFileManager: ApolloFileManager {
   ///  through to `super`. Defaults to `true`.
   ///  - requireAllClosuresCalled: If `true` all mocked closures must be called otherwise the test
   ///  will fail. Defaults to `true`.
-  public init(
+  public nonisolated init(
     strict: Bool = true,
     requireAllClosuresCalled: Bool = true
   ) {
@@ -69,7 +69,7 @@ public class MockApolloFileManager: ApolloFileManager {
     return _base.closuresToBeCalled.isEmpty
   }
 
-  class MockFileManager: FileManager {
+  class MockFileManager: FileManager, @unchecked Sendable {
 
     private let lock = NSLock()
 

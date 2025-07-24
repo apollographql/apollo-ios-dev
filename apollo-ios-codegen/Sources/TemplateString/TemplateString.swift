@@ -1,6 +1,6 @@
 import Foundation
 
-public struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible {
+public struct TemplateString: ExpressibleByStringInterpolation, CustomStringConvertible, Sendable {
 
   private let value: String
   private let lastLineWasRemoved: Bool

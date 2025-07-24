@@ -67,7 +67,7 @@ extension ApolloCodegen {
   /// Errors that may occur during code generation that are not fatal. If these errors are present,
   /// the generated files will likely not compile correctly. Code generation execution can continue,
   /// but these errors should be surfaced to the user.
-  public enum NonFatalError: Equatable {
+  public enum NonFatalError: Equatable, Sendable {
     case typeNameConflict(name: String, conflictingName: String, containingObject: String)
 
     var errorTypeName: String {

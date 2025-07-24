@@ -2,8 +2,8 @@ import Foundation
 
 extension ApolloCodegenConfiguration {
   
-  public struct OperationManifestConfiguration: Codable, Equatable {
-    
+  public struct OperationManifestConfiguration: Codable, Equatable, Sendable {
+
     // MARK: - Properties
     
     /// Local path where the generated operation manifest file should be written.
@@ -11,7 +11,7 @@ extension ApolloCodegenConfiguration {
     /// The version format to use when generating the operation manifest. Defaults to `.persistedQueries`.
     public let version: Version
 
-    public enum Version: String, Codable, Equatable {
+    public enum Version: String, Codable, Equatable, Sendable {
       /// Generates an operation manifest for use with persisted queries.
       case persistedQueries
       /// Generates an operation manifest in the legacy safelisting format used prior to the

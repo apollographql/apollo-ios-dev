@@ -206,7 +206,6 @@ class EntitySelectionTree {
       self.child = .selections(entitySelections)
     }
 
-
     func mergeSelections(
       matchingScopePath entityPathNode: LinkedList<ScopeDescriptor>.Node,
       entityTypeScopePath: LinkedList<ScopeCondition>.Node,

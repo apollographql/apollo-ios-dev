@@ -6,7 +6,7 @@ import XCTest
 ///
 /// By default, expectations returned from `AsyncResultObserver` only expect to be called once, which is similar to how other built-in expectations work. Unexpected fulfillments will result in test failures. Usually this is what you want, and you add additional expectations with their own assertions if you expect further results.
 /// If multiple fulfillments of a single expectation are expected however, you can use the standard `expectedFulfillmentCount` property to change that.
-public final class AsyncResultObserver<Success: Sendable, Failure: Swift.Error> {
+public final actor AsyncResultObserver<Success: Sendable, Failure: Swift.Error> {
   public typealias ResultHandler = @Sendable (Result<Success, Failure>) throws -> Void
 
   private final class AsyncResultExpectation: XCTestExpectation, @unchecked Sendable {
@@ -24,7 +24,7 @@ public final class AsyncResultObserver<Success: Sendable, Failure: Swift.Error> 
   }
 
   private let testCase: XCTestCase
-  
+
   // We keep track of the file and line number associated with the constructor as a fallback, in addition te keeping
   // these for each expectation. That way, we can still show a failure within the context of the test in case unexpected
   // results are received (which by definition do not have an associated expectation).
@@ -48,23 +48,33 @@ public final class AsyncResultObserver<Success: Sendable, Failure: Swift.Error> 
     return expectation
   }
 
-  @Sendable public func handler(_ result: Result<Success, Failure>) {
-    guard let expectation = expectations.first else {
-      XCTFail("Unexpected result received by handler", file: file, line: line)
-      return
-    }
-        
-    do {
-      try expectation.handler(result)
-    } catch {
-      testCase.record(error, file: expectation.file, line: expectation.line)
-    }
-    
-    expectation.fulfill()
-    
-    if expectation.numberOfFulfillments >= expectation.expectedFulfillmentCount {
-      expectations.removeFirst()
+  private func isolatedDo(_ block: @Sendable (isolated AsyncResultObserver) -> Void) {
+    block(self)
+  }
+
+  public nonisolated func handler(_ result: Result<Success, Failure>) {
+    Task {
+      await isolatedDo { isolatedSelf in
+
+        guard let expectation = isolatedSelf.expectations.first else {
+          XCTFail("Unexpected result received by handler", file: file, line: line)
+          return
+        }
+
+        do {
+          try expectation.handler(result)
+        } catch {
+          isolatedSelf.testCase.record(error, file: expectation.file, line: expectation.line)
+        }
+
+        expectation.fulfill()
+
+        if expectation.numberOfFulfillments >= expectation.expectedFulfillmentCount {
+          isolatedSelf.expectations.removeFirst()
+        }
+      }
     }
   }
+
 }
 
