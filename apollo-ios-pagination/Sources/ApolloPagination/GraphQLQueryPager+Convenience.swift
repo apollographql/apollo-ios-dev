@@ -5,68 +5,18 @@ import Foundation
 // MARK: - GraphQLQueryPager Convenience Functions
 
 public extension GraphQLQueryPager {
-
-  /// Convenience initializer for creating a pager that has a single query and does not 
+  /// Convenience initializer for creating a pager that has a single query and does not
   /// transform output responses.
   convenience init<InitialQuery: GraphQLQuery, P: PaginationInfo>(
-    client: any ApolloClientProtocol,
-    watcherDispatchQueue: DispatchQueue = .main,
+    client: ApolloClient,
     initialQuery: InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> P,
-    pageResolver: @escaping (P, PaginationDirection) -> InitialQuery?
+    extractPageInfo: @escaping @Sendable (InitialQuery.Data) -> P,
+    pageResolver: @escaping @Sendable (P, PaginationDirection) -> InitialQuery?
   ) where Model == PaginationOutput<InitialQuery, InitialQuery> {
     self.init(
       pager: GraphQLQueryPagerCoordinator(
         client: client,
         initialQuery: initialQuery,
-        watcherDispatchQueue: watcherDispatchQueue,
-        extractPageInfo: pageExtraction(transform: extractPageInfo),
-        pageResolver: pageResolver
-      ))
-  }
-
-  /// Convenience initializer for creating a multi-query pager that does not
-  /// transform output responses.
-  convenience init<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery, P: PaginationInfo>(
-    client: any ApolloClientProtocol,
-    initialQuery: InitialQuery,
-    watcherDispatchQueue: DispatchQueue = .main,
-    extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
-    extractNextPageInfo: @escaping (PaginatedQuery.Data) -> P,
-    pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery?
-  ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
-    self.init(
-      pager: .init(
-        client: client,
-        initialQuery: initialQuery,
-        watcherDispatchQueue: watcherDispatchQueue,
-        extractPageInfo: pageExtraction(
-          initialTransfom: extractInitialPageInfo,
-          paginatedTransform: extractNextPageInfo
-        ),
-        pageResolver: pageResolver
-      )
-    )
-  }
-}
-
-// MARK: - AsyncGraphQLQueryPager Convenience Functions
-
-public extension AsyncGraphQLQueryPager {
-  /// Convenience initializer for creating a pager that has a single query and does not
-  /// transform output responses.
-  convenience init<InitialQuery: GraphQLQuery, P: PaginationInfo>(
-    client: any ApolloClientProtocol,
-    watcherDispatchQueue: DispatchQueue = .main,
-    initialQuery: InitialQuery,
-    extractPageInfo: @escaping (InitialQuery.Data) -> P,
-    pageResolver: @escaping (P, PaginationDirection) -> InitialQuery?
-  ) where Model == PaginationOutput<InitialQuery, InitialQuery> {
-    self.init(
-      pager: AsyncGraphQLQueryPagerCoordinator(
-        client: client,
-        initialQuery: initialQuery,
-        watcherDispatchQueue: watcherDispatchQueue,
         extractPageInfo: pageExtraction(transform: extractPageInfo),
         pageResolver: pageResolver
       ))
@@ -75,18 +25,16 @@ public extension AsyncGraphQLQueryPager {
   /// Convenience initializer for creating a multi-query pager that does not 
   /// transform output responses.
   convenience init<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery, P: PaginationInfo>(
-    client: any ApolloClientProtocol,
+    client: ApolloClient,
     initialQuery: InitialQuery,
-    watcherDispatchQueue: DispatchQueue = .main,
-    extractInitialPageInfo: @escaping (InitialQuery.Data) -> P,
-    extractNextPageInfo: @escaping (PaginatedQuery.Data) -> P,
-    pageResolver: @escaping (P, PaginationDirection) -> PaginatedQuery?
+    extractInitialPageInfo: @escaping @Sendable (InitialQuery.Data) -> P,
+    extractNextPageInfo: @escaping @Sendable (PaginatedQuery.Data) -> P,
+    pageResolver: @escaping @Sendable (P, PaginationDirection) -> PaginatedQuery?
   ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
     self.init(
       pager: .init(
         client: client,
         initialQuery: initialQuery,
-        watcherDispatchQueue: watcherDispatchQueue,
         extractPageInfo: pageExtraction(
           initialTransfom: extractInitialPageInfo,
           paginatedTransform: extractNextPageInfo
@@ -98,9 +46,9 @@ public extension AsyncGraphQLQueryPager {
 }
 
 private func pageExtraction<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery, P: PaginationInfo, T>(
-  initialTransfom: @escaping (InitialQuery.Data) -> P,
-  paginatedTransform: @escaping (PaginatedQuery.Data) -> P
-) -> (PageExtractionData<InitialQuery, PaginatedQuery, T>) -> P {
+  initialTransfom: @escaping @Sendable (InitialQuery.Data) -> P,
+  paginatedTransform: @escaping @Sendable (PaginatedQuery.Data) -> P
+) -> @Sendable (PageExtractionData<InitialQuery, PaginatedQuery, T>) -> P {
   { extractionData in
     switch extractionData {
     case .initial(let value, _):
@@ -112,8 +60,8 @@ private func pageExtraction<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQ
 }
 
 private func pageExtraction<InitialQuery: GraphQLQuery, P: PaginationInfo, T>(
-  transform: @escaping (InitialQuery.Data) -> P
-) -> (PageExtractionData<InitialQuery, InitialQuery, T>) -> P {
+  transform: @escaping @Sendable (InitialQuery.Data) -> P
+) -> @Sendable (PageExtractionData<InitialQuery, InitialQuery, T>) -> P {
   { extractionData in
     switch extractionData {
     case .initial(let value, _), .paginated(let value, _):

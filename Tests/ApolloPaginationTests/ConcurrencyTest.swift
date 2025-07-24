@@ -1,7 +1,7 @@
 import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
-import Combine
+@preconcurrency import Combine
 import XCTest
 
 @testable import ApolloPagination
@@ -19,92 +19,63 @@ final class ConcurrencyTests: XCTestCase {
     super.setUp()
     store = ApolloStore(cache: InMemoryNormalizedCache())
     server = MockGraphQLServer()
-    networkTransport = MockNetworkTransport(server: server, store: store)
+    networkTransport = MockNetworkTransport(mockServer: server, store: store)
     client = ApolloClient(networkTransport: networkTransport, store: store)
   }
 
   // MARK: - Test helpers
 
   private func loadDataFromManyThreads(
-    pager: AsyncGraphQLQueryPagerCoordinator<Query, Query>,
+    pager: GraphQLQueryPagerCoordinator<Query, Query>,
     expectation: XCTestExpectation
   ) async {
+    let serverExpectation = await Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
     await withTaskGroup(of: Void.self) { group in
-      let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
       group.addTask { try? await pager.loadNext() }
       group.addTask { try? await pager.loadNext() }
       group.addTask { try? await pager.loadNext() }
       group.addTask { try? await pager.loadNext() }
       group.addTask { try? await pager.loadNext() }
 
-      group.addTask { await self.fulfillment(of: [serverExpectation, expectation], timeout: 100) }
       await group.waitForAll()
     }
+
+    await self.fulfillment(of: [serverExpectation, expectation], timeout: 100)
   }
 
   private func loadDataFromManyThreadsThrowing(
-    pager: AsyncGraphQLQueryPagerCoordinator<Query, Query>
+    pager: GraphQLQueryPagerCoordinator<Query, Query>
   ) async throws {
+    let serverExpectation = await Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
     try await withThrowingTaskGroup(of: Void.self) { group in
-      let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
       group.addTask { try await pager.loadNext() }
       group.addTask { try await pager.loadNext() }
       group.addTask { try await pager.loadNext() }
       group.addTask { try await pager.loadNext() }
       group.addTask { try await pager.loadNext() }
 
-      group.addTask { await self.fulfillment(of: [serverExpectation], timeout: 100) }
       try await group.waitForAll()
     }
+    await self.fulfillment(of: [serverExpectation], timeout: 100)
   }
 
   private func loadDataFromManyThreads(
     pager: GraphQLQueryPagerCoordinator<Query, Query>
-  ) {
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
+  ) async throws {
+    let serverExpectation = await Mocks.Hero.FriendsQuery.expectationForSecondPage(server: self.server)
 
-    (0..<5).forEach { _ in
-      pager.loadNext()
+    for _ in (0..<5) {
+      try await pager.loadNext()
     }
-    wait(for: [serverExpectation], timeout: 1.0)
+    await fulfillment(of: [serverExpectation], timeout: 1.0)
   }
 
-  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
-    let initialQuery = Query()
-    initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
-      client: client,
-      initialQuery: initialQuery,
-      watcherDispatchQueue: .main,
-      extractPageInfo: { data in
-        switch data {
-        case .initial(let data, _), .paginated(let data, _):
-          return CursorBasedPagination.Forward(
-            hasNext: data.hero.friendsConnection.pageInfo.hasNextPage,
-            endCursor: data.hero.friendsConnection.pageInfo.endCursor
-          )
-        }
-      },
-      pageResolver: { pageInfo, direction in
-        guard direction == .next else { return nil }
-        let nextQuery = Query()
-        nextQuery.__variables = [
-          "id": "2001",
-          "first": 2,
-          "after": pageInfo.endCursor,
-        ]
-        return nextQuery
-      }
-    )
-  }
-
-  private func createNonisolatedPager() -> GraphQLQueryPagerCoordinator<Query, Query> {
+  private func createPager() -> GraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
     return GraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
-      watcherDispatchQueue: .main,
       extractPageInfo: { data in
         switch data {
         case .initial(let data, _), .paginated(let data, _):
@@ -127,8 +98,8 @@ final class ConcurrencyTests: XCTestCase {
     )
   }
 
-  private func fetchFirstPage(pager: AsyncGraphQLQueryPagerCoordinator<Query, Query>) async {
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+  private func fetchFirstPage(pager: GraphQLQueryPagerCoordinator<Query, Query>) async {
+    let serverExpectation = await Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     await pager.fetch()
     await fulfillment(of: [serverExpectation], timeout: 1.0)
   }
@@ -137,7 +108,7 @@ final class ConcurrencyTests: XCTestCase {
 
   func test_concurrentFetches() async throws {
     let pager = createPager()
-    var results: [Result<PaginationOutput<Query, Query>, any Error>] = []
+    nonisolated(unsafe) var results: [Result<PaginationOutput<Query, Query>, any Error>] = []
     let resultsExpectation = expectation(description: "Results arrival")
     resultsExpectation.expectedFulfillmentCount = 2
     await pager.subscribe { result in
@@ -158,26 +129,4 @@ final class ConcurrencyTests: XCTestCase {
     }
   }
 
-  func test_concurrentFetches_nonisolated() throws {
-    let pager = createNonisolatedPager()
-    var results: [Result<PaginationOutput<Query, Query>, any Error>] = []
-    let initialExpectation = expectation(description: "Initial")
-    initialExpectation.assertForOverFulfill = false
-    let nextExpectation = expectation(description: "Next")
-    nextExpectation.expectedFulfillmentCount = 2
-    pager.subscribe(onUpdate: {
-      results.append($0)
-      initialExpectation.fulfill()
-      nextExpectation.fulfill()
-    })
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-    pager.fetch()
-    wait(for: [serverExpectation, initialExpectation], timeout: 1.0)
-
-    XCTAssertEqual(results.count, 1)
-    loadDataFromManyThreads(pager: pager)
-    wait(for: [nextExpectation], timeout: 1)
-
-    XCTAssertEqual(results.count, 2)
-  }
 }

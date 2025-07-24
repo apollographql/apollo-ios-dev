@@ -1,23 +1,24 @@
 import Apollo
 import ApolloAPI
-import Combine
+@preconcurrency import Combine
 import Foundation
 
-/// Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.
-public class AsyncGraphQLQueryPager<Model>: Publisher {
+/// Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array
+/// of view models.
+public final class GraphQLQueryPager<Model>: Publisher, @unchecked Sendable {
   public typealias Failure = Never
   public typealias Output = Result<Model, any Error>
   let _subject: CurrentValueSubject<Output?, Never> = .init(nil)
   var publisher: AnyPublisher<Output, Never> { _subject.compactMap({ $0 }).eraseToAnyPublisher() }
   @Atomic public var cancellables: Set<AnyCancellable> = []
-  public let pager: any AsyncPagerType
+  public let pager: any PagerType
 
   public var canLoadNext: Bool { get async { await pager.canLoadNext } }
   public var canLoadPrevious: Bool { get async { await pager.canLoadPrevious } }
 
-  init<Pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
+  init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager,
-    transform: @escaping (PaginationOutput<InitialQuery, PaginatedQuery>) throws -> Model
+    transform: @escaping @Sendable (PaginationOutput<InitialQuery, PaginatedQuery>) throws -> Model
   ) {
     self.pager = pager
     Task {
@@ -43,7 +44,7 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     }
   }
 
-  init<Pager: AsyncGraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
+  init<Pager: GraphQLQueryPagerCoordinator<InitialQuery, PaginatedQuery>, InitialQuery, PaginatedQuery>(
     pager: Pager
   ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
     self.pager = pager
@@ -68,16 +69,14 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     InitialQuery: GraphQLQuery,
     PaginatedQuery: GraphQLQuery
   >(
-    client: any ApolloClientProtocol,
+    client: ApolloClient,
     initialQuery: InitialQuery,
-    watcherDispatchQueue: DispatchQueue = .main,
-    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
-    pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?
+    extractPageInfo: @escaping @Sendable (PageExtractionData<InitialQuery, PaginatedQuery, Model?>) -> P,
+    pageResolver: (@Sendable (P, PaginationDirection) -> PaginatedQuery?)?
   ) where Model == PaginationOutput<InitialQuery, PaginatedQuery> {
-    let pager = AsyncGraphQLQueryPagerCoordinator(
+    let pager = GraphQLQueryPagerCoordinator(
       client: client,
       initialQuery: initialQuery,
-      watcherDispatchQueue: watcherDispatchQueue,
       extractPageInfo: extractPageInfo,
       pageResolver: pageResolver
     )
@@ -97,50 +96,98 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     InitialQuery: GraphQLQuery,
     PaginatedQuery: GraphQLQuery
   >(
-    client: any ApolloClientProtocol,
+    client: ApolloClient,
     initialQuery: InitialQuery,
-    watcherDispatchQueue: DispatchQueue = .main,
-    extractPageInfo: @escaping (PageExtractionData<InitialQuery, PaginatedQuery, PaginationOutput<InitialQuery, PaginatedQuery>?>) -> P,
-    pageResolver: ((P, PaginationDirection) -> PaginatedQuery?)?,
-    transform: @escaping (PaginationOutput<InitialQuery, PaginatedQuery>) throws -> Model
+    extractPageInfo: @escaping @Sendable (PageExtractionData<InitialQuery, PaginatedQuery, PaginationOutput<InitialQuery, PaginatedQuery>?>) -> P,
+    pageResolver: (@Sendable (P, PaginationDirection) -> PaginatedQuery?)?,
+    transform: @escaping @Sendable (PaginationOutput<InitialQuery, PaginatedQuery>) throws -> Model
   ) {
-    let pager = AsyncGraphQLQueryPagerCoordinator(
+    let pager = GraphQLQueryPagerCoordinator(
       client: client,
       initialQuery: initialQuery,
-      watcherDispatchQueue: watcherDispatchQueue,
       extractPageInfo: extractPageInfo,
       pageResolver: pageResolver
     )
     self.init(pager: pager, transform: transform)
   }
 
-  /// Subscribe to the results of the pager, with the management of the subscriber being stored internally to the `AnyGraphQLQueryPager`.
-  /// - Parameter completion: The closure to trigger when new values come in.
-  @available(*, deprecated, message: "Will be removed in a future version of ApolloPagination. Use the `Combine` publishers instead. If you need to dispatch to the main thread, make sure to use a `.receive(on: RunLoop.main)` as part of your `Combine` operation.")
-  public func subscribe(completion: @MainActor @escaping (Output) -> Void) {
-    let cancellable = publisher.sink { result in
-      Task { await completion(result) }
-    }
-    _ = $cancellables.mutate { $0.insert(cancellable) }
+  // MARK: Load Next
+
+  /// Load the next page, if available.
+  /// - Parameters:
+  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `cacheAndNetwork`.
+  public func loadNext(
+    cachePolicy: CachePolicy.Query.CacheAndNetwork = .cacheAndNetwork
+  ) async throws {
+    try await self.loadNext(fetchBehavior: cachePolicy.toFetchBehavior())
   }
 
   /// Load the next page, if available.
   /// - Parameters:
-  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
+  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `cacheAndNetwork`.
   public func loadNext(
-    cachePolicy: CachePolicy = .returnCacheDataAndFetch
+    cachePolicy: CachePolicy.Query.CacheOnly
   ) async throws {
-    try await pager.loadNext(cachePolicy: cachePolicy)
+    try await self.loadNext(fetchBehavior: cachePolicy.toFetchBehavior())
+  }
+
+  /// Load the next page, if available.
+  /// - Parameters:
+  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `cacheAndNetwork`.
+  public func loadNext(
+    cachePolicy: CachePolicy.Query.SingleResponse
+  ) async throws {
+    try await self.loadNext(fetchBehavior: cachePolicy.toFetchBehavior())
+  }
+
+  /// Load the next page, if available.
+  /// - Parameters:
+  ///   - fetchBehavior: The Apollo `FetchBehavior` to use.
+  public func loadNext(
+    fetchBehavior: FetchBehavior
+  ) async throws {
+    try await pager.loadNext(fetchBehavior: fetchBehavior)
+  }
+
+  // MARK: Load Previous
+
+  /// Load the previous page, if available.
+  /// - Parameters:
+  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `cacheAndNetwork`.
+  public func loadPrevious(
+    cachePolicy: CachePolicy.Query.CacheAndNetwork = .cacheAndNetwork
+  ) async throws {
+    try await self.loadPrevious(fetchBehavior: cachePolicy.toFetchBehavior())
   }
 
   /// Load the previous page, if available.
   /// - Parameters:
-  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `returnCacheDataAndFetch`.
+  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `cacheAndNetwork`.
   public func loadPrevious(
-    cachePolicy: CachePolicy = .returnCacheDataAndFetch
+    cachePolicy: CachePolicy.Query.CacheOnly
   ) async throws {
-    try await pager.loadPrevious(cachePolicy: cachePolicy)
+    try await self.loadPrevious(fetchBehavior: cachePolicy.toFetchBehavior())
   }
+
+  /// Load the previous page, if available.
+  /// - Parameters:
+  ///   - cachePolicy: The Apollo `CachePolicy` to use. Defaults to `cacheAndNetwork`.
+  public func loadPrevious(
+    cachePolicy: CachePolicy.Query.SingleResponse
+  ) async throws {
+    try await self.loadPrevious(fetchBehavior: cachePolicy.toFetchBehavior())
+  }
+
+  /// Load the previous page, if available.
+  /// - Parameters:
+  ///   - fetchBehavior: The Apollo `FetchBehavior` to use.
+  public func loadPrevious(
+    fetchBehavior: FetchBehavior
+  ) async throws {
+    try await pager.loadPrevious(fetchBehavior: fetchBehavior)
+  }
+
+  // MARK: Load All
 
   /// Loads all pages. Does not output a value until all pages have loaded.
   /// - Parameters:
@@ -151,10 +198,30 @@ public class AsyncGraphQLQueryPager<Model>: Publisher {
     try await pager.loadAll(fetchFromInitialPage: fetchFromInitialPage)
   }
 
+  // MARK: Refetch
+
   /// Discards pagination state and fetches the first page from scratch.
-  /// - Parameter cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `fetchIgnoringCacheData`.
-  public func refetch(cachePolicy: CachePolicy = .fetchIgnoringCacheData) async {
-    await pager.refetch(cachePolicy: cachePolicy)
+  /// - Parameter cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `networkOnly`.
+  public func refetch(cachePolicy: CachePolicy.Query.SingleResponse = .networkOnly) async {
+    await self.refetch(fetchBehavior: cachePolicy.toFetchBehavior())
+  }
+
+  /// Discards pagination state and fetches the first page from scratch.
+  /// - Parameter cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `networkOnly`.
+  public func refetch(cachePolicy: CachePolicy.Query.CacheOnly) async {
+    await self.refetch(fetchBehavior: cachePolicy.toFetchBehavior())
+  }
+
+  /// Discards pagination state and fetches the first page from scratch.
+  /// - Parameter cachePolicy: The apollo cache policy to trigger the first fetch with. Defaults to `networkOnly`.
+  public func refetch(cachePolicy: CachePolicy.Query.CacheAndNetwork) async {
+    await self.refetch(fetchBehavior: cachePolicy.toFetchBehavior())
+  }
+
+  /// Discards pagination state and fetches the first page from scratch.
+  /// - Parameter fetchBehavior: The Apollo `FetchBehavior` to use.
+  public func refetch(fetchBehavior: FetchBehavior) async {
+    await pager.refetch(fetchBehavior: fetchBehavior)
   }
 
   /// Fetches the first page.
