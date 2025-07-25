@@ -556,10 +556,11 @@ extension WebSocketTransport: WebSocketClientDelegate {
       return previousState
     }
     // report any error to all subscribers
-    self.$error.mutate { $0 = WebSocketError(payload: nil,
-                                            error: error,
-                                            kind: .networkError) }
-    self.notifyErrorAllHandlers(error)
+    let webSocketError = WebSocketError(payload: nil,
+                                        error: error,
+                                        kind: .networkError)
+    self.$error.mutate { $0 = webSocketError }
+    self.notifyErrorAllHandlers(webSocketError)
 
     switch previousState {
     case .connected, .disconnected:
