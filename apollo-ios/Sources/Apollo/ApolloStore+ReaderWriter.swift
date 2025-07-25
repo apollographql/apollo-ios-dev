@@ -1,12 +1,13 @@
 import Foundation
 import Atomics
 
+
 extension ApolloStore {
-  final class ReaderWriter: Sendable {
+  final class ReaderWriter: @unchecked Sendable {
 
     /// Atomic counter for number of current readers.
     /// While writing, this will have a value of `WRITING`
-    private let readerCount = ManagedAtomic(0)
+    @Atomic private var readerCount = 0
 
     /// Value for `readerCount` while in writing state
     private static let WRITING = -1
@@ -21,30 +22,21 @@ extension ApolloStore {
     }
 
     private func beginReading() async {
-      var didIncrementReadCount = false
-
       while true {
-        let currentReaderCount = readerCount.load(ordering: .relaxed)
+        let currentReaderCount = readerCount
 
         guard currentReaderCount != Self.WRITING else {
           await Task.yield()
           continue
         }
 
-        (didIncrementReadCount, _) = readerCount.weakCompareExchange(
-          // Ensure no other thread has changed count before increment
-          expected: currentReaderCount,
-          // Increment count to add reader
-          desired: currentReaderCount + 1,
-          ordering: .acquiringAndReleasing
-        )
-
-        if didIncrementReadCount { return }
+        $readerCount.increment()
+        return
       }
     }
 
     private func finishReading() {
-      readerCount.wrappingDecrement(ordering: .acquiringAndReleasing)
+      $readerCount.decrement()
     }
 
     // MARK: - Write
@@ -56,21 +48,23 @@ extension ApolloStore {
 
     private func beginWriting() async {
       while true {
-        let (didSetWritingFlag, _) = readerCount.weakCompareExchange(
-          expected: 0,
-          desired: Self.WRITING,
-          ordering: .acquiringAndReleasing
-        )
-
-        if didSetWritingFlag { return } else {
+        let currentReaderCount = readerCount
+        guard currentReaderCount == 0 else {
           await Task.yield()
+          continue
         }
+
+        $readerCount.mutate { value in
+          value = Self.WRITING
+        }
+        return
       }
     }
 
     func finishWriting() {
-      readerCount.store(0, ordering: .releasing)
+      $readerCount.mutate { value in
+        value = 0
+      }
     }
   }
 }
-
