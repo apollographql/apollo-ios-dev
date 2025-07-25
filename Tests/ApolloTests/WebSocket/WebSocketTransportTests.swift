@@ -108,4 +108,34 @@ class WebSocketTransportTests: XCTestCase {
 
     XCTAssertEqual(self.webSocketTransport.enableSOCKSProxy, true)
   }
+  
+  func testWebSocketDidDisconnect() {
+    let request = URLRequest(url: TestURL.mockServer.url)
+    self.webSocketTransport = WebSocketTransport(
+      websocket: ProxyableMockWebSocket(request: request, protocol: .graphql_ws),
+      store: ApolloStore()
+    )
+    
+    let errorExpectation = XCTestExpectation(description: "Received WebSocket error")
+    
+    class GivenMockOperation: MockOperation<MockSelectionSet> {
+      override class var operationName: String { "Test Operation Name" }
+      override class var operationDocument: OperationDocument {
+        .init(definition: .init("Test Query Document"))
+      }
+    }
+    
+    _ = webSocketTransport.sendHelper(operation: GivenMockOperation()) { result in
+      switch result {
+      case .failure(let error) where error is WebSocketError:
+        errorExpectation.fulfill()
+      default:
+        XCTFail()
+      }
+    }
+    
+    webSocketTransport.websocketDidDisconnect(socket: MockWebSocket(request: request, protocol: .graphql_ws), error: TestError())
+    
+    wait(for: [errorExpectation], timeout: 1.0)
+  }
 }
