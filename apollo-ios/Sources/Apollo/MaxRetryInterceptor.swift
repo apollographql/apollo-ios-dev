@@ -4,7 +4,7 @@ import ApolloAPI
 #endif
 
 /// An interceptor to enforce a maximum number of retries of any `HTTPRequest` with optional exponential backoff support
-public class MaxRetryInterceptor: ApolloInterceptor {
+public class MaxRetryInterceptor: NSObject, ApolloInterceptor {
   
   /// A configuration object that defines behavior for retry logic and exponential backoff.
   public struct Configuration {
@@ -49,6 +49,7 @@ public class MaxRetryInterceptor: ApolloInterceptor {
   
   private let configuration: Configuration
   private var hitCount = 0
+  private var pendingRetryClosure: (() -> Void)?
 
   public var id: String = UUID().uuidString
   
@@ -68,6 +69,7 @@ public class MaxRetryInterceptor: ApolloInterceptor {
   /// - Parameter maxRetriesAllowed: How many times a query can be retried, in addition to the initial attempt before
   public init(maxRetriesAllowed: Int = 3) {
     self.configuration = Configuration(maxRetries: maxRetriesAllowed)
+    super.init()
   }
   
   /// Designated initializer with full configuration support.
@@ -75,6 +77,11 @@ public class MaxRetryInterceptor: ApolloInterceptor {
   /// - Parameter configuration: Configuration object defining retry behavior and exponential backoff settings.
   public init(configuration: Configuration) {
     self.configuration = configuration
+    super.init()
+  }
+  
+  deinit {
+    NSObject.cancelPreviousPerformRequests(withTarget: self)
   }
   
   public func interceptAsync<Operation: GraphQLOperation>(
@@ -103,7 +110,8 @@ public class MaxRetryInterceptor: ApolloInterceptor {
     // Apply exponential backoff delay if enabled and this is a retry (hitCount > 1)
     if self.configuration.enableExponentialBackoff && self.hitCount > 1 {
       let delay = calculateExponentialBackoffDelay()
-      DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+      // Store retry closure for use in performRetry
+      self.pendingRetryClosure = { [weak self] in
         guard let self = self else { return }
         chain.proceedAsync(
           request: request,
@@ -112,6 +120,8 @@ public class MaxRetryInterceptor: ApolloInterceptor {
           completion: completion
         )
       }
+      // Use perform to execute on current run loop after delay
+      self.perform(#selector(performRetry), with: nil, afterDelay: delay)
     } else {
       chain.proceedAsync(
         request: request,
@@ -142,5 +152,11 @@ public class MaxRetryInterceptor: ApolloInterceptor {
     } else {
       return cappedDelay
     }
+  }
+  
+  @objc private func performRetry() {
+    guard let retryClosure = self.pendingRetryClosure else { return }
+    self.pendingRetryClosure = nil
+    retryClosure()
   }
 }
