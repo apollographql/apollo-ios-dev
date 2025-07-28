@@ -129,7 +129,7 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "before": pageInfo.startCursor,
+          "before": pageInfo.startCursor ?? .null,
         ]
         return nextQuery
       }

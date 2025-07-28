@@ -83,10 +83,11 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
 
     let expected = """
       platforms: [
-        .iOS(.v12),
-        .macOS(.v10_14),
-        .tvOS(.v12),
-        .watchOS(.v5),
+        .iOS(.v15),
+        .macOS(.v12),
+        .tvOS(.v15),
+        .watchOS(.v8),
+        .visionOS(.v1),
       ],
     """
 
@@ -111,7 +112,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
   func test__packageDescription__givenUppercasedSchemaName_generatesProductWithUppercasedName() {
@@ -128,7 +129,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
   func test__packageDescription__givenCapitalizedSchemaName_generatesProductWithCapitalizedName() {
@@ -145,7 +146,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
   func test__packageDescription__generatesDefaultVersionDependency() {
@@ -168,7 +169,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
   
   func test__packageDescription__generatesBranchVersionDependency() {
@@ -194,7 +195,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
   
   func test__packageDescription__generatesCommitVersionDependency() {
@@ -220,7 +221,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
   
   func test__packageDescription__generatesExactVersionDependency() {
@@ -246,7 +247,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
   
   func test__packageDescription__generatesFromVersionDependency() {
@@ -272,7 +273,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
   
   func test__packageDescription__generatesLocalVersionDependency() {
@@ -298,7 +299,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
   func test__packageDescription__givenTestMockConfigNone_withLowercaseSchemaName_generatesTargetWithCapitalizedName() {
@@ -314,14 +315,14 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
           ],
           path: "./Sources"
         ),
-      ]
+      ],
     """
 
     // when
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 19, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 20, ignoringExtraLines: true))
   }
 
   func test__packageDescription__givenTestMockConfigNone_withUppercaseSchemaName_generatesTargetWithUppercasedName() {
@@ -337,14 +338,14 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
           ],
           path: "./Sources"
         ),
-      ]
+      ],
     """
 
     // when
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 19, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 20, ignoringExtraLines: true))
   }
 
   func test__packageDescription__givenTestMockConfigNone_withCapitalizedSchemaName_generatesTargetWithCapitalizedName() {
@@ -360,14 +361,14 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
           ],
           path: "./Sources"
         ),
-      ]
+      ],
     """
 
     // when
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 19, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 20, ignoringExtraLines: true))
   }
 
   func test__packageDescription__givenTestMockConfig_absolute_generatesTargets() {
@@ -383,14 +384,14 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
           ],
           path: "./Sources"
         ),
-      ]
+      ],
     """
 
     // when
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 19, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 20, ignoringExtraLines: true))
   }
   
   func test__packageDescription__givenTestMockConfig_swiftPackage_noTargetName_generatesProduct() {
@@ -408,7 +409,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
   
@@ -433,14 +434,14 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
           ],
           path: "./TestMocks"
         ),
-      ]
+      ],
     """
 
     // when
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 20, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 21, ignoringExtraLines: true))
   }
   
   func test__packageDescription__givenTestMockConfig_swiftPackage_withTargetName_generatesProduct() {
@@ -458,7 +459,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
   }
 
   func test__packageDescription__givenTestMockConfig_swiftPackage_withTargetName_generatesTargets() {
@@ -482,14 +483,14 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
           ],
           path: "./CustomMocks"
         ),
-      ]
+      ],
     """
 
     // when
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 20, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 21, ignoringExtraLines: true))
   }
 
   func test__packageDescription__givenTestMockConfig_withLowercaseSchemaName_generatesTestMockTargetWithCapitalizedTargetDependency() {
@@ -506,7 +507,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 32, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 33, ignoringExtraLines: true))
   }
 
   func test__packageDescription__givenTestMockConfig_withUppercaseSchemaName_generatesTestMockTargetWithUppercaseTargetDependency() {
@@ -523,7 +524,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 32, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 33, ignoringExtraLines: true))
   }
 
   func test__packageDescription__givenTestMockConfig_withCapitalizedSchemaName_generatesTestMockTargetWithCapitalizedTargetDependency() {
@@ -540,7 +541,7 @@ class SwiftPackageManagerModuleTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 32, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 33, ignoringExtraLines: true))
   }
 
 }

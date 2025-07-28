@@ -264,7 +264,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "after": pageInfo.endCursor,
+          "after": pageInfo.endCursor ?? .null,
         ]
         return nextQuery
       }
@@ -300,7 +300,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "after": pageInfo.endCursor,
+          "after": pageInfo.endCursor ?? .null,
         ]
         return nextQuery
       }

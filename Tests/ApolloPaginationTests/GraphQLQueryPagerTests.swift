@@ -44,7 +44,7 @@ final class GraphQLQueryPagerTests: XCTestCase {
           nextQuery.__variables = [
             "id": "2001",
             "first": 2,
-            "after": page.endCursor,
+            "after": page.endCursor ?? .null,
           ]
           return nextQuery
         case .previous:
@@ -100,7 +100,7 @@ final class GraphQLQueryPagerTests: XCTestCase {
           nextQuery.__variables = [
             "id": "2001",
             "first": 2,
-            "after": page.endCursor,
+            "after": page.endCursor ?? .null,
           ]
           return nextQuery
         case .previous:
@@ -161,7 +161,7 @@ final class GraphQLQueryPagerTests: XCTestCase {
           nextQuery.__variables = [
             "id": "2001",
             "first": 2,
-            "after": page.endCursor,
+            "after": page.endCursor ?? .null,
           ]
           return nextQuery
         case .previous:
@@ -217,7 +217,7 @@ final class GraphQLQueryPagerTests: XCTestCase {
           nextQuery.__variables = [
             "id": "2001",
             "first": 2,
-            "after": page.endCursor,
+            "after": page.endCursor ?? .null,
           ]
           return nextQuery
         case .previous:
@@ -459,7 +459,7 @@ final class GraphQLQueryPagerTests: XCTestCase {
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "after": pageInfo.endCursor,
+          "after": pageInfo.endCursor ?? .null,
         ]
         return nextQuery
       }

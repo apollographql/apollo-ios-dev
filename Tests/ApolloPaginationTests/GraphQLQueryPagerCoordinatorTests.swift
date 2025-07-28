@@ -184,7 +184,7 @@ final class GraphQLQueryPagerCoordinatorTests:
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "before": pageInfo.startCursor,
+          "before": pageInfo.startCursor ?? .null,
         ]
         return nextQuery
       }
@@ -212,7 +212,7 @@ final class GraphQLQueryPagerCoordinatorTests:
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "after": pageInfo.endCursor,
+          "after": pageInfo.endCursor ?? .null,
         ]
         return nextQuery
       }
