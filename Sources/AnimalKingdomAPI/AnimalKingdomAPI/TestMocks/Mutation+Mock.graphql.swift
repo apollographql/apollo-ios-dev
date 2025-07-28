@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import AnimalKingdomAPI
+@testable import AnimalKingdomAPI
 
 public class Mutation: MockObject {
   public static let objectType: ApolloAPI.Object = AnimalKingdomAPI.Objects.Mutation
@@ -16,7 +16,7 @@ public class Mutation: MockObject {
 
 public extension Mock where O == Mutation {
   convenience init(
-    adoptPet: (any AnyMock)? = nil
+    adoptPet: (any AnyMock) = Mock<Cat>()
   ) {
     self.init()
     _setEntity(adoptPet, for: \.adoptPet)

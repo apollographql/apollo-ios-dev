@@ -1339,9 +1339,9 @@ public struct AllAnimalsDeferQuery: GraphQLQuery {
 
   public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
     deferredFragments: [
-        DeferredFragmentIdentifiers.deferredPetAnimal: Data.AllAnimal.AsPet.DeferredPetAnimal.self,
-        DeferredFragmentIdentifiers.deferredCat: Data.AllAnimal.AsCat.DeferredCat.self,
-        DeferredFragmentIdentifiers.deferredDog: Data.AllAnimal.AsDog.DeferredDog.self,
+      DeferredFragmentIdentifiers.deferredPetAnimal: Data.AllAnimal.AsPet.DeferredPetAnimal.self,
+      DeferredFragmentIdentifiers.deferredCat: Data.AllAnimal.AsCat.DeferredCat.self,
+      DeferredFragmentIdentifiers.deferredDog: Data.AllAnimal.AsDog.DeferredDog.self,
     ]
-  )    
+  )
 }
