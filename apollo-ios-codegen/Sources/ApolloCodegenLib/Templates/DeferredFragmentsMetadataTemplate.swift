@@ -60,7 +60,7 @@ struct DeferredFragmentsMetadataTemplate {
     _ deferredFragmentPathTypeInfo: [DeferredPathTypeInfo]
   ) -> TemplateString {
     """
-    public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+    public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
       deferredFragments: [
         \(deferredFragmentPathTypeInfo.map {
           return """

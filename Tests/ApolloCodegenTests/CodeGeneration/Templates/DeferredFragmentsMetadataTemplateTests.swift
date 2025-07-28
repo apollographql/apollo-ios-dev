@@ -94,7 +94,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
         deferredFragments: [
           DeferredFragmentIdentifiers.root: Data.AllAnimal.Root.self,
         ]
@@ -144,7 +144,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
         deferredFragments: [
           DeferredFragmentIdentifiers.root: Data.AllAnimal.Root.self,
         ]
@@ -199,7 +199,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
         deferredFragments: [
           DeferredFragmentIdentifiers.root: Data.AllAnimal.AsDog.Root.self,
         ]
@@ -260,7 +260,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         static let two = DeferredFragmentIdentifier(label: "two", fieldPath: ["allAnimals"])
       }
 
-      public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
         deferredFragments: [
           DeferredFragmentIdentifiers.one: Data.AllAnimal.AsDog.One.self,
           DeferredFragmentIdentifiers.two: Data.AllAnimal.AsDog.Two.self,
@@ -328,7 +328,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         static let two = DeferredFragmentIdentifier(label: "two", fieldPath: ["allAnimals"])
       }
 
-      public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
         deferredFragments: [
           DeferredFragmentIdentifiers.one: Data.AllAnimal.AsDog.One.self,
           DeferredFragmentIdentifiers.two: Data.AllAnimal.AsCat.Two.self,
@@ -399,7 +399,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         static let inner = DeferredFragmentIdentifier(label: "inner", fieldPath: ["allAnimals", "friend"])
       }
 
-      public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
         deferredFragments: [
           DeferredFragmentIdentifiers.outer: Data.AllAnimal.AsDog.Outer.self,
           DeferredFragmentIdentifiers.inner: Data.AllAnimal.AsDog.Outer.Friend.AsCat.Inner.self,
@@ -454,7 +454,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
         deferredFragments: [
           DeferredFragmentIdentifiers.root: AnimalFragment.self,
         ]
@@ -510,7 +510,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
         deferredFragments: [
           DeferredFragmentIdentifiers.root: DogFragment.self,
         ]
@@ -569,7 +569,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
         deferredFragments: [
           DeferredFragmentIdentifiers.root: Data.Root.self,
         ]
@@ -628,7 +628,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
         deferredFragments: [
           DeferredFragmentIdentifiers.root: Data.AsDog.Root.self,
         ]
@@ -684,7 +684,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         static let deferredDog = DeferredFragmentIdentifier(label: "deferredDog", fieldPath: ["allAnimals"])
       }
       
-      public static var responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
         deferredFragments: [
           DeferredFragmentIdentifiers.deferredDog: Data.AllAnimal.AsDog.DeferredDog.self,
           DeferredFragmentIdentifiers.deferredDog: DogFragment.self,

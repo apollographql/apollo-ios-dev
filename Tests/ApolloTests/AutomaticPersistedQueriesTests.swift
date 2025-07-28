@@ -5,6 +5,7 @@ import XCTest
 @testable import Apollo
 @testable import Nimble
 
+#warning("TODO: Test if cache returns result, then server returns failed result, APQ retry still occurs")
 class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   private static let endpoint = TestURL.mockServer.url
