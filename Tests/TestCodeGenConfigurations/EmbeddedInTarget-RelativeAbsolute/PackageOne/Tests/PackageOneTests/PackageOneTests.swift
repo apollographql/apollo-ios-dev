@@ -4,10 +4,10 @@ import TestMocks
 import ApolloTestSupport
 
 final class PackageOneTests: XCTestCase {
-  func testOperation() {
+  func testOperation() async {
     let mockDog = Mock<Dog>(species: "Canis familiaris")
     let mockQuery = Mock<Query>(dog: mockDog)
-    let dogQuery = DogQuery.Data.from(mockQuery)
+    let dogQuery = await DogQuery.Data.from(mockQuery)
 
     XCTAssertEqual(dogQuery.dog.species, "Canis familiaris")
   }
