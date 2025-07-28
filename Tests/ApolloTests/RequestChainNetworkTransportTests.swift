@@ -11,6 +11,8 @@ import XCTest
   To test:
   - Retrying
   - Cache reads and writes based on cache policy (and if source is cache)
+  - cache only request gets sent through interceptors still
+  - cache read after failed network fetch
   """
 )
 class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
