@@ -21,8 +21,7 @@ extension Target {
       ]),
       dependencies: [
         .target(name: ApolloTarget.apolloCodegenLibWrapper.name),
-        .package(product: "OrderedCollections"),
-        .package(product: "Atomics"),
+        .package(product: "OrderedCollections")        
       ],
       settings: .forTarget(target)
     )
