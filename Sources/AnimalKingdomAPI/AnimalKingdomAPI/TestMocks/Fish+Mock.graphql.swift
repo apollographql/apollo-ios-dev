@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import AnimalKingdomAPI
+@testable import AnimalKingdomAPI
 
 public class Fish: MockObject {
   public static let objectType: ApolloAPI.Object = AnimalKingdomAPI.Objects.Fish
@@ -23,14 +23,14 @@ public class Fish: MockObject {
 
 public extension Mock where O == Fish {
   convenience init(
-    favoriteToy: String? = nil,
-    height: Mock<Height>? = nil,
+    favoriteToy: String = "",
+    height: Mock<Height> = Mock<Height>(),
     humanName: String? = nil,
-    id: AnimalKingdomAPI.ID? = nil,
+    id: AnimalKingdomAPI.ID = "",
     owner: Mock<Human>? = nil,
-    predators: [(any AnyMock)]? = nil,
+    predators: [(any AnyMock)] = [],
     skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
-    species: String? = nil
+    species: String = ""
   ) {
     self.init()
     _setScalar(favoriteToy, for: \.favoriteToy)

@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import AnimalKingdomAPI
+@testable import AnimalKingdomAPI
 
 public class Cat: MockObject {
   public static let objectType: ApolloAPI.Object = AnimalKingdomAPI.Objects.Cat
@@ -26,17 +26,17 @@ public class Cat: MockObject {
 
 public extension Mock where O == Cat {
   convenience init(
-    bodyTemperature: Int? = nil,
-    favoriteToy: String? = nil,
-    height: Mock<Height>? = nil,
+    bodyTemperature: Int = 0,
+    favoriteToy: String = "",
+    height: Mock<Height> = Mock<Height>(),
     humanName: String? = nil,
-    id: AnimalKingdomAPI.ID? = nil,
-    isJellicle: Bool? = nil,
-    laysEggs: Bool? = nil,
+    id: AnimalKingdomAPI.ID = "",
+    isJellicle: Bool = false,
+    laysEggs: Bool = false,
     owner: Mock<Human>? = nil,
-    predators: [(any AnyMock)]? = nil,
+    predators: [(any AnyMock)] = [],
     skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
-    species: String? = nil
+    species: String = ""
   ) {
     self.init()
     _setScalar(bodyTemperature, for: \.bodyTemperature)
