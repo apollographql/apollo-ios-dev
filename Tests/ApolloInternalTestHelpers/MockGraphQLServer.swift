@@ -63,13 +63,19 @@ public actor MockGraphQLServer {
     }
   }
 
+
   public init() {}
 
+  private var customDelay: UInt64?
   // Since RequestExpectation is generic over a specific GraphQLOperation, we can't store these in the dictionary
   // directly. Moreover, there is no way to specify the type relationship that holds between the key and value.
   // To work around this, we store values as Any and use a generic subscript as a type-safe way to access them.
   private var requestExpectations: [AnyHashable: Any] = [:]
 
+  public func setDelay(milliseconds: UInt64) {
+    customDelay = milliseconds * 1_000_000
+  }
+  
   private subscript<Operation: GraphQLOperation>(_ operationType: Operation.Type)
     -> RequestExpectation<Operation>?
   {
@@ -137,7 +143,7 @@ public actor MockGraphQLServer {
   ) async throws -> JSONObject {
     if let expectation = self[request.operation] ?? self[type(of: request.operation)] {
       // Dispatch after a small random delay to spread out concurrent requests and simulate somewhat real-world conditions.
-      try await Task.sleep(nanoseconds: UInt64.random(in: 10...50) * 1_000_000)
+      try await Task.sleep(nanoseconds: customDelay ?? UInt64.random(in: 10...50) * 1_000_000)
       expectation.fulfill()
       return expectation.handler(request)
 

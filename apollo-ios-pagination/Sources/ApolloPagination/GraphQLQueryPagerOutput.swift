@@ -3,23 +3,23 @@ import ApolloAPI
 import Foundation
 
 /// A struct which contains the outputs of pagination
-public struct PaginationOutput<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: Hashable {
+public struct PaginationOutput<InitialQuery: GraphQLQuery, PaginatedQuery: GraphQLQuery>: Hashable, Sendable {
   /// An array of previous pages, in pagination order
   /// Earlier pages come first in the array.
-  public let previousPages: [GraphQLResult<PaginatedQuery.Data>]
+  public let previousPages: [GraphQLResponse<PaginatedQuery>]
 
   /// The initial page that we fetched.
-  public let initialPage: GraphQLResult<InitialQuery.Data>?
+  public let initialPage: GraphQLResponse<InitialQuery>?
 
   /// An array of pages after the initial page.
-  public let nextPages: [GraphQLResult<PaginatedQuery.Data>]
+  public let nextPages: [GraphQLResponse<PaginatedQuery>]
 
   public let lastUpdatedPage: QueryWrapper
 
   public init(
-    previousPages: [GraphQLResult<PaginatedQuery.Data>],
-    initialPage: GraphQLResult<InitialQuery.Data>?,
-    nextPages: [GraphQLResult<PaginatedQuery.Data>],
+    previousPages: [GraphQLResponse<PaginatedQuery>],
+    initialPage: GraphQLResponse<InitialQuery>?,
+    nextPages: [GraphQLResponse<PaginatedQuery>],
     lastUpdatedPage: QueryWrapper
   ) {
     self.previousPages = previousPages
@@ -34,9 +34,9 @@ public struct PaginationOutput<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
 }
 
 extension PaginationOutput {
-  public enum QueryWrapper: Hashable {
-    case initial(GraphQLResult<InitialQuery.Data>)
-    case paginated(GraphQLResult<PaginatedQuery.Data>)
+  public enum QueryWrapper: Hashable, Sendable {
+    case initial(GraphQLResponse<InitialQuery>)
+    case paginated(GraphQLResponse<PaginatedQuery>)
   }
 }
 
@@ -76,7 +76,7 @@ extension PaginationOutput where InitialQuery == PaginatedQuery {
     previousPages.compactMap(\.data) + [initialPage?.data].compactMap { $0 } + nextPages.compactMap(\.data)
   }
 
-  public var allPages: [GraphQLResult<InitialQuery.Data>] {
+  public var allPages: [GraphQLResponse<InitialQuery>] {
     previousPages + [initialPage].compactMap { $0 } + nextPages
   }
 }
