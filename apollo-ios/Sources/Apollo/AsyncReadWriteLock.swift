@@ -1,4 +1,3 @@
-import Atomics
 import Foundation
 
 actor AsyncReadWriteLock {
