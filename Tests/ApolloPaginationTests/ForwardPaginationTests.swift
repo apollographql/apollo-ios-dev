@@ -213,7 +213,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     let mutationExpectation = expectation(description: "Mutation")
     mutationExpectation.expectedFulfillmentCount = 3 // once for subscribe, 2 for pages refreshing
     await pager.subscribe(onUpdate: { _ in mutationExpectation.fulfill() }).store(in: &cancellables)
-    await client.store.withinReadWriteTransaction { transaction in
+    try await client.store.withinReadWriteTransaction { transaction in
       let cacheMutation = MockLocalCacheMutation<Mocks.Hero.NameCacheMutation>()
       cacheMutation.__variables = ["id": "2001"]
       try! await transaction.update(cacheMutation) { data in
