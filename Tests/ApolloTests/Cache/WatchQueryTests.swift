@@ -308,7 +308,6 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
     )
   }
 
-  @MainActor
   func testWatchedQueryGetsUpdatedWhenSameObjectHasChangedInAnotherQueryWithDifferentVariables() async throws {
     class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {
@@ -328,7 +327,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
       }
     }
 
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
+    await MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
 
     let watchedQuery = MockQuery<GivenSelectionSet>()
     watchedQuery.__variables = ["episode": "EMPIRE"]
