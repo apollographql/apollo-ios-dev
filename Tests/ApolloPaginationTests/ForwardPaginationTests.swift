@@ -1,7 +1,7 @@
 import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
-import Combine
+@preconcurrency import Combine
 import XCTest
 
 @testable import ApolloPagination
@@ -19,7 +19,6 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
   var client: ApolloClient!
   var cancellables: [AnyCancellable] = []
 
-  @MainActor
   override func setUp() async throws {
     try await super.setUp()
 
@@ -29,7 +28,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     let networkTransport = MockNetworkTransport(mockServer: server, store: store)
 
     client = ApolloClient(networkTransport: networkTransport, store: store)
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
+    await MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
   }
 
   override func tearDownWithError() throws {
@@ -45,7 +44,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
   func test_fetchMultiplePages() async throws {
     let pager = createPager()
 
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    let serverExpectation = await Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
     var results: [Result<PaginationOutput<Query, Query>, any Error>] = []
     let firstPageExpectation = expectation(description: "First page")
@@ -64,7 +63,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertEqual(output.initialPage?.source, .server)
     }
 
-    let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
+    let secondPageExpectation = await Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
     subscription = await pager.subscribe(onUpdate: { _ in
@@ -99,18 +98,18 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
   func test_variableMapping() async throws {
     let pager = createPager()
 
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    let serverExpectation = await Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
     await pager.fetch()
     await fulfillment(of: [serverExpectation])
 
-    let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
+    let secondPageExpectation = await Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
     let subscription = await pager.subscribe(onUpdate: { _ in
       secondPageFetch.fulfill()
     })
-    try await pager.loadNext(cachePolicy: .fetchIgnoringCacheData)
+    try await pager.loadNext(fetchBehavior: .NetworkOnly)
     await fulfillment(of: [secondPageExpectation, secondPageFetch])
     subscription.cancel()
 
@@ -123,11 +122,8 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       "after": "Y3Vyc29yMg==",
     ]
 
-    let expectedVariables = Set(nextQuery.__variables?.underlyingJsonValues ?? [])
+    let expectedVariables = PageVariables(nextQuery.__variables!)
     let actualVariables = try await XCTUnwrapping(await pager.nextPageVarMap.keys.first)
-
-    XCTAssertEqual(expectedVariables.count, actualVariables.count)
-    XCTAssertEqual(expectedVariables.count, 3)
 
     XCTAssertEqual(expectedVariables, actualVariables)
   }
@@ -138,7 +134,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     var nextPageInfo = await pager.nextPageInfo
     XCTAssertNil(nextPageInfo)
 
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    let serverExpectation = await Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
     await pager.fetch()
     await fulfillment(of: [serverExpectation])
@@ -151,13 +147,13 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     )
     XCTAssertEqual(page, expectedFirstPage)
 
-    let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
+    let secondPageExpectation = await Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
     let subscription = await pager.subscribe(onUpdate: { _ in
       secondPageFetch.fulfill()
     })
-    try await pager.loadNext(cachePolicy: .fetchIgnoringCacheData)
+    try await pager.loadNext(fetchBehavior: .NetworkOnly)
     await fulfillment(of: [secondPageExpectation, secondPageFetch])
     subscription.cancel()
 
@@ -174,7 +170,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
   func test_fetchMultiplePages_mutateHero() async throws {
     let pager = createPager()
 
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    let serverExpectation = await Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
     let firstPageExpectation = expectation(description: "First page")
     var subscription = await pager.subscribe(onUpdate: { _ in
       firstPageExpectation.fulfill()
@@ -190,7 +186,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertEqual(output.initialPage?.source, .server)
     }
 
-    let secondPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
+    let secondPageExpectation = await Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
     subscription = await pager.subscribe(onUpdate: { _ in
@@ -217,10 +213,10 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     let mutationExpectation = expectation(description: "Mutation")
     mutationExpectation.expectedFulfillmentCount = 3 // once for subscribe, 2 for pages refreshing
     await pager.subscribe(onUpdate: { _ in mutationExpectation.fulfill() }).store(in: &cancellables)
-    client.store.withinReadWriteTransaction { transaction in
+    try await client.store.withinReadWriteTransaction { transaction in
       let cacheMutation = MockLocalCacheMutation<Mocks.Hero.NameCacheMutation>()
       cacheMutation.__variables = ["id": "2001"]
-      try! transaction.update(cacheMutation) { data in
+      try! await transaction.update(cacheMutation) { data in
         data.hero?.name = "C3PO"
         transactionExpectation.fulfill()
       }
@@ -237,8 +233,8 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
   func test_loadAll() async throws {
     let pager = createPager()
 
-    let firstPageExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
-    let lastPageExpectation = Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
+    let firstPageExpectation = await Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    let lastPageExpectation = await Mocks.Hero.FriendsQuery.expectationForSecondPage(server: server)
     let loadAllExpectation = expectation(description: "Load all pages")
     await pager.subscribe(onUpdate: { _ in
       loadAllExpectation.fulfill()
@@ -250,7 +246,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
   func test_failingFetch_finishes() async throws {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "flirst": 2, "after": GraphQLNullable<String>.none]
-    let pager = AsyncGraphQLQueryPagerCoordinator<Query, Query>(
+    let pager = GraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,
       extractPageInfo: { data in
@@ -273,7 +269,7 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
         return nextQuery
       }
     )
-    let lastPageExpectation = Mocks.Hero.FriendsQuery.failingExpectation(server: server)
+    let lastPageExpectation = await Mocks.Hero.FriendsQuery.failingExpectation(server: server)
 
     let cancellable = await pager.subscribe { result in
       try? XCTAssertThrowsError(result.get())
@@ -283,13 +279,12 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     cancellable.cancel()
   }
 
-  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
+  private func createPager() -> GraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
+    return GraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
-      initialQuery: initialQuery,
-      watcherDispatchQueue: .main,
+      initialQuery: initialQuery,      
       extractPageInfo: { data in
         switch data {
         case .initial(let data, _), .paginated(let data, _):
@@ -314,10 +309,10 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
 }
 
 private extension Mocks.Hero.FriendsQuery {
-  static func failingExpectation(server: MockGraphQLServer) -> XCTestExpectation {
+  static func failingExpectation(server: MockGraphQLServer) async -> XCTestExpectation {
     let query = MockQuery<Mocks.Hero.FriendsQuery>()
     query.__variables = ["id": "2001", "flirst": 2, "after": GraphQLNullable<String>.none]
-    return server.expect(query) { _ in
+    return await server.expect(query) { _ in
       let pageInfo: [AnyHashable: AnyHashable] = [
         "__typename": "PageInfo",
         "endCursor": "Y3Vyc29yMg==",
@@ -335,26 +330,26 @@ private extension Mocks.Hero.FriendsQuery {
           "id": "1002",
         ],
       ]
-      let friendsConnection: [String: AnyHashable] = [
+      let friendsConnection = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
         "friends": friends,
         "pageInfo": pageInfo,
       ]
 
-      let hero: [String: AnyHashable] = [
+      let hero = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
         "friendsConnection": friendsConnection,
       ]
 
-      let data: [String: AnyHashable] = [
+      let data = [
         "hero": hero
       ]
 
       return [
-        "data": data
+        "data": data as JSONValue
       ]
     }
   }

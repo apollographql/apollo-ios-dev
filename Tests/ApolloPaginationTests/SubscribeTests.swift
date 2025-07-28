@@ -1,7 +1,7 @@
 import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
-import Combine
+@preconcurrency import Combine
 import XCTest
 
 @testable import ApolloPagination
@@ -16,7 +16,6 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
   var client: ApolloClient!
   var cancellables: [AnyCancellable] = []
 
-  @MainActor
   override func setUp() async throws {
     try await super.setUp()
 
@@ -26,7 +25,7 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     let networkTransport = MockNetworkTransport(mockServer: server, store: store)
 
     client = ApolloClient(networkTransport: networkTransport, store: store)
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
+    await MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
   }
 
   override func tearDownWithError() throws {
@@ -56,7 +55,7 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
       otherResults.append(result)
     }.store(in: &cancellables)
 
-    let serverExpectation = Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
+    let serverExpectation = await Mocks.Hero.FriendsQuery.expectationForFirstPage(server: server)
 
     await pager.fetch()
     await fulfillment(of: [serverExpectation, initialFetchExpectation], timeout: 1.0)
@@ -71,13 +70,12 @@ final class SubscribeTest: XCTestCase, CacheDependentTesting {
     }
   }
 
-  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
+  private func createPager() -> GraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
+    return GraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
-      initialQuery: initialQuery,
-      watcherDispatchQueue: .main,
+      initialQuery: initialQuery,      
       extractPageInfo: { data in
         switch data {
         case .initial(let data, _), .paginated(let data, _):
