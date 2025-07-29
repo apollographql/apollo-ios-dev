@@ -19,9 +19,14 @@ public protocol ApolloStoreSubscriber: AnyObject, Sendable {
 }
 
 /// The `ApolloStore` class acts as a local cache for normalized GraphQL results.
-#warning("TODO: Docs. ReaderWriter usage; why you should not share a cache with 2 stores, etc.")
+///
+/// - Warning: Using the same `NormalizedCache` with multiple `ApolloStore` instances at the same time is unsupported
+/// and can result in undefined behavior, data races, and crashes.
+/// The store uses an internal read/write lock to protect against concurrent write access to the `NormalizedCache`.
+/// This means that the `NormalizedCache` implementation does not need to manage thread safety. If a cache is used
+/// with multiple `ApolloStore` instances, no guaruntees about thread safety can be made.
 public final class ApolloStore: Sendable {
-  private let readerWriterLock = ReaderWriter()
+  private let readerWriterLock = AsyncReadWriteLock()
 
   /// The `NormalizedCache` itself is not thread-safe. Access to the cache by a single store is made
   /// thread-safe by using a `ReaderWriter`. All access to the cache must be done within the
@@ -72,7 +77,7 @@ public final class ApolloStore: Sendable {
   ///                  ensure you call `unsubscribe` on this subscriber before it goes out of scope.
   public func subscribe(_ subscriber: any ApolloStoreSubscriber) async -> SubscriptionToken {
     let token = SubscriptionToken(id: ObjectIdentifier(subscriber))
-    await readerWriterLock.write {
+    try? await readerWriterLock.write {
       self.subscribers[token] = subscriber
     }
     return token
@@ -85,7 +90,7 @@ public final class ApolloStore: Sendable {
   ///    To avoid retain cycles, call `unsubscribe` on all active subscribers before they go out of scope.
   public func unsubscribe(_ subscriptionToken: SubscriptionToken) {
     Task(priority: Task.currentPriority > .medium ? .medium : Task.currentPriority) {
-      await readerWriterLock.write {
+      try? await readerWriterLock.write {
         self.subscribers.removeValue(forKey: subscriptionToken)
       }
     }
@@ -95,10 +100,10 @@ public final class ApolloStore: Sendable {
   ///
   /// - Parameters:
   ///   - body: The body of the operation to perform.
-  public func withinReadTransaction<T>(
-    _ body: @Sendable (ReadTransaction) async throws -> T
+  public func withinReadTransaction<T: Sendable>(
+    _ body: @Sendable @escaping (ReadTransaction) async throws -> T
   ) async throws -> T {
-    var value: T!
+    nonisolated(unsafe) var value: T!
     try await readerWriterLock.read {
       value = try await body(ReadTransaction(store: self))
     }
@@ -109,10 +114,10 @@ public final class ApolloStore: Sendable {
   ///
   /// - Parameters:
   ///   - body: The body of the operation to perform
-  public func withinReadWriteTransaction<T>(
-    _ body: (ReadWriteTransaction) async throws -> T
-  ) async rethrows -> T {
-    var value: T!
+  public func withinReadWriteTransaction<T: Sendable>(
+    _ body: @Sendable @escaping (ReadWriteTransaction) async throws -> T
+  ) async throws -> T {
+    nonisolated(unsafe) var value: T!
     try await readerWriterLock.write {
       value = try await body(ReadWriteTransaction(store: self))
     }
@@ -170,12 +175,7 @@ public final class ApolloStore: Sendable {
   }
 
   // MARK: -
-  #warning(
-    """
-    TODO: figure out how to prevent transaction from escaping closure scope.
-    Maybe explicitly mark non-sendable: https://forums.swift.org/t/what-does-available-unavailable-sendable-actually-do/65218
-    """
-  )
+
   public class ReadTransaction {
     fileprivate let _cache: any NormalizedCache
 
@@ -501,3 +501,6 @@ public final class ApolloStore: Sendable {
     }
   }
 }
+
+@available(*, unavailable)
+extension ApolloStore.ReadTransaction: Sendable { }

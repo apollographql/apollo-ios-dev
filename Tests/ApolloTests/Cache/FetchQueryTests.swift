@@ -13,15 +13,14 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
   static let defaultWaitTimeout: TimeInterval = 1
 
-  var cache: (any NormalizedCache)!
+  var store: ApolloStore!
   var server: MockGraphQLServer!
   var client: ApolloClient!
 
   override func setUp() async throws {
     try await super.setUp()
 
-    cache = try await makeNormalizedCache()
-    let store = ApolloStore(cache: cache)
+    store = try await makeTestStore()    
 
     server = MockGraphQLServer()
     let networkTransport = MockNetworkTransport(mockServer: server, store: store)
@@ -30,7 +29,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
   }
 
   override func tearDownWithError() throws {
-    cache = nil
+    store = nil
     server = nil
     client = nil
 
@@ -57,7 +56,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -108,7 +107,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -172,7 +171,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
       "QUERY_ROOT.hero": [
         "name": "R2-D2",
@@ -210,7 +209,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameAndAppearsInSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -266,7 +265,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -304,7 +303,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameAndAppearsInSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",
@@ -338,7 +337,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
 
     let query = MockQuery<HeroNameSelectionSet>()
 
-    await mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("hero")],
       "hero": [
         "name": "R2-D2",

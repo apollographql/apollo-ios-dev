@@ -41,7 +41,7 @@ final class CodegenTests: XCTestCase {
       #endif
     }
 
-    static var allTests = [
+    static nonisolated(unsafe) var allTests = [
         ("testExample", testExample),
     ]
 }

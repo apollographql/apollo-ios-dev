@@ -1,4 +1,4 @@
-// swift-tools-version:5.9
+// swift-tools-version:6.1
 
 import PackageDescription
 
@@ -20,17 +20,12 @@ let package = Package(
     .library(name: "ApolloTestSupport", targets: ["ApolloTestSupport"]),
     .plugin(name: "InstallCLI", targets: ["Install CLI"])
   ],
-  dependencies: [
-    .package(
-      url: "https://github.com/apple/swift-atomics",
-      .upToNextMajor(from: "1.2.0"))
-  ],
+  dependencies: [],
   targets: [
     .target(
       name: "Apollo",
       dependencies: [
-        "ApolloAPI",
-        .product(name: "Atomics", package: "swift-atomics"),
+        "ApolloAPI"
       ],
       resources: [
         .copy("Resources/PrivacyInfo.xcprivacy")
@@ -59,7 +54,10 @@ let package = Package(
       resources: [
         .copy("Resources/PrivacyInfo.xcprivacy")
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableExperimentalFeature("StrictConcurrency")
+      ]
     ),
     .target(
       name: "ApolloWebSocket",
@@ -69,7 +67,10 @@ let package = Package(
       resources: [
         .copy("Resources/PrivacyInfo.xcprivacy")
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableExperimentalFeature("StrictConcurrency")
+      ]
     ),
     .target(
       name: "ApolloTestSupport",
@@ -77,7 +78,10 @@ let package = Package(
         "Apollo",
         "ApolloAPI"
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableExperimentalFeature("StrictConcurrency")
+      ]
     ),
     .plugin(
       name: "Install CLI",
@@ -93,5 +97,5 @@ let package = Package(
       path: "Plugins/InstallCLI"
     )
   ],
-  swiftLanguageVersions: [.version("6"), .v5]
+  swiftLanguageModes: [.v6, .v5]
 )

@@ -4,7 +4,7 @@ import CodegenCLI
 
 @main
 struct Apollo_iOS_CLI: AsyncParsableCommand {
-  static var configuration = CommandConfiguration(
+  static let configuration = CommandConfiguration(
     commandName: "apollo-ios-cli",
     abstract: "A command line utility for Apollo iOS code generation.",
     version: CodegenCLI.Constants.CLIVersion,

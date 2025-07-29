@@ -5,6 +5,7 @@ import XCTest
 @testable import Apollo
 @testable import Nimble
 
+#warning("TODO: Test if cache returns result, then server returns failed result, APQ retry still occurs")
 class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
   private static let endpoint = TestURL.mockServer.url
@@ -83,7 +84,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
     }
   }
 
-  private func mockResponseData() -> Data {
+  private static func mockResponseData() -> Data {
     """
     {
       "data": {
@@ -299,7 +300,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), self.mockResponseData())
+      return (HTTPURLResponse.mock(), Self.mockResponseData())
     }
 
     _ = try await network.send(
@@ -333,7 +334,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), self.mockResponseData())
+      return (HTTPURLResponse.mock(), Self.mockResponseData())
     }
 
     _ = try await network.send(
@@ -367,7 +368,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), self.mockResponseData())
+      return (HTTPURLResponse.mock(), Self.mockResponseData())
     }
 
     _ = try await network.send(
@@ -402,7 +403,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), self.mockResponseData())
+      return (HTTPURLResponse.mock(), Self.mockResponseData())
     }
 
     _ = try await network.send(
@@ -436,7 +437,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), self.mockResponseData())
+      return (HTTPURLResponse.mock(), Self.mockResponseData())
     }
 
     _ = try await network.send(
@@ -469,7 +470,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), self.mockResponseData())
+      return (HTTPURLResponse.mock(), Self.mockResponseData())
     }
 
     _ = try await network.send(
@@ -505,7 +506,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), self.mockResponseData())
+      return (HTTPURLResponse.mock(), Self.mockResponseData())
     }
 
     _ = try await network.send(
@@ -541,7 +542,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), self.mockResponseData())
+      return (HTTPURLResponse.mock(), Self.mockResponseData())
     }
 
     _ = try await network.send(
@@ -577,7 +578,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), self.mockResponseData())
+      return (HTTPURLResponse.mock(), Self.mockResponseData())
     }
 
     _ = try await network.send(
@@ -613,7 +614,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), self.mockResponseData())
+      return (HTTPURLResponse.mock(), Self.mockResponseData())
     }
 
     _ = try await network.send(
@@ -649,7 +650,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
 
     await Self.registerRequestHandler(for: Self.endpoint) {
       lastRequest = $0
-      return (HTTPURLResponse.mock(), self.mockResponseData())
+      return (HTTPURLResponse.mock(), Self.mockResponseData())
     }
 
     _ = try await network.send(
@@ -704,7 +705,7 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
         )
         return (response, data)
       } else {
-        return (response, self.mockResponseData())
+        return (response, Self.mockResponseData())
       }
     }
 

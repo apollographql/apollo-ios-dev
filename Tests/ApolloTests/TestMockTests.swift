@@ -589,7 +589,7 @@ extension MockObject {
   typealias ClassroomPet = Union
 }
 
-class Dog: MockObject {
+final class Dog: MockObject {
   static let objectType: Object = TestMockSchema.Types.Dog
   static let _mockFields = MockFields()
 
@@ -629,7 +629,7 @@ extension Mock where O == Dog {
 }
 
 
-class Cat: MockObject {
+final class Cat: MockObject {
   static let objectType: Object = TestMockSchema.Types.Cat
   static let _mockFields = MockFields()
 
@@ -643,7 +643,7 @@ class Cat: MockObject {
   }
 }
 
-class Height: MockObject {
+final class Height: MockObject {
   static let objectType: Object = TestMockSchema.Types.Height
   static let _mockFields = MockFields()
 

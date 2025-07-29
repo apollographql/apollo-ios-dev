@@ -1,7 +1,4 @@
-// swift-tools-version:5.9
-//
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-// Swift 5.9 is available from Xcode 15.0.
+// swift-tools-version:6.1
 
 import PackageDescription
 
@@ -20,7 +17,7 @@ let package = Package(
   dependencies: [
     .package(
       url: "https://github.com/apollographql/apollo-ios.git",
-      .upToNextMajor(from: "1.2.0")
+      .exactItem("2.0.0-alpha-1")
     ),
     .package(
       url: "https://github.com/apple/swift-collections",
@@ -35,7 +32,11 @@ let package = Package(
         .product(name: "ApolloAPI", package: "apollo-ios"),
         .product(name: "OrderedCollections", package: "swift-collections"),
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableExperimentalFeature("StrictConcurrency")
+      ]
     ),
-  ]
+  ],
+  swiftLanguageModes: [.v6, .v5]
 )

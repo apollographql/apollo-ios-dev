@@ -34,12 +34,12 @@ class FileManagerExtensionTests: XCTestCase {
 
   // MARK: Presence
 
-  func test_doesFileExist_givenFileExistsAndIsDirectory_shouldReturnFalse() {
+  func test_doesFileExist_givenFileExistsAndIsDirectory_shouldReturnFalse() async {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = true
@@ -47,16 +47,16 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(mocked.doesFileExist(atPath: self.uniquePath)).to(beFalse())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.doesFileExist(atPath: self.uniquePath) }.to(beFalse())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_doesFileExist_givenFileExistsAndIsNotDirectory_shouldReturnTrue() {
+  func test_doesFileExist_givenFileExistsAndIsNotDirectory_shouldReturnTrue() async {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = false
@@ -64,16 +64,16 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(mocked.doesFileExist(atPath: self.uniquePath)).to(beTrue())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.doesFileExist(atPath: self.uniquePath) }.to(beTrue())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_doesFileExist_givenFileDoesNotExistAndIsDirectory_shouldReturnFalse() {
+  func test_doesFileExist_givenFileDoesNotExistAndIsDirectory_shouldReturnFalse() async {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = true
@@ -81,16 +81,16 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(mocked.doesFileExist(atPath: self.uniquePath)).to(beFalse())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.doesFileExist(atPath: self.uniquePath) }.to(beFalse())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_doesFileExist_givenFileDoesNotExistAndIsNotDirectory_shouldReturnFalse() {
+  func test_doesFileExist_givenFileDoesNotExistAndIsNotDirectory_shouldReturnFalse() async {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = false
@@ -98,16 +98,16 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(mocked.doesFileExist(atPath: self.uniquePath)).to(beFalse())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.doesFileExist(atPath: self.uniquePath) }.to(beFalse())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_doesDirectoryExist_givenFilesExistsAndIsDirectory_shouldReturnTrue() {
+  func test_doesDirectoryExist_givenFilesExistsAndIsDirectory_shouldReturnTrue() async {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = true
@@ -115,16 +115,16 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(mocked.doesDirectoryExist(atPath: self.uniquePath)).to(beTrue())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.doesDirectoryExist(atPath: self.uniquePath) }.to(beTrue())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_doesDirectoryExist_givenFileExistsAndIsNotDirectory_shouldReturnFalse() {
+  func test_doesDirectoryExist_givenFileExistsAndIsNotDirectory_shouldReturnFalse() async {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = false
@@ -132,16 +132,16 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(mocked.doesDirectoryExist(atPath: self.uniquePath)).to(beFalse())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.doesDirectoryExist(atPath: self.uniquePath) }.to(beFalse())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_doesDirectoryExist_givenFileDoesNotExistAndIsDirectory_shouldReturnFalse() {
+  func test_doesDirectoryExist_givenFileDoesNotExistAndIsDirectory_shouldReturnFalse() async {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = true
@@ -149,16 +149,16 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(mocked.doesDirectoryExist(atPath: self.uniquePath)).to(beFalse())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.doesDirectoryExist(atPath: self.uniquePath) }.to(beFalse())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_doesDirectoryExist_givenFileDoesNotExistAndIsNotDirectory_shouldFalse() {
+  func test_doesDirectoryExist_givenFileDoesNotExistAndIsNotDirectory_shouldFalse() async {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = false
@@ -166,18 +166,18 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(mocked.doesDirectoryExist(atPath: self.uniquePath)).to(beFalse())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.doesDirectoryExist(atPath: self.uniquePath) }.to(beFalse())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
   // MARK: Deletion
 
-  func test_deleteFile_givenFileExistsAndIsDirectory_shouldThrow() throws {
+  func test_deleteFile_givenFileExistsAndIsDirectory_shouldThrow() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = true
@@ -185,61 +185,61 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(try mocked.deleteFile(atPath: self.uniquePath))
+    await expect { try await mocked.deleteFile(atPath: self.uniquePath) }
       .to(throwError(FileManagerPathError.notAFile(path: self.uniquePath)))
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_deleteFile_givenFileExistsAndIsNotDirectory_shouldSucceed() throws {
+  func test_deleteFile_givenFileExistsAndIsNotDirectory_shouldSucceed() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = false
       return true
 
     }))
-    mocked.mock(closure: .removeItem({ path in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .removeItem({ [uniquePath] path in
+      expect(path).to(equal(uniquePath))
     }))
 
     // then
-    expect(try mocked.deleteFile(atPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.deleteFile(atPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_deleteFile_givenFileExistsAndIsNotDirectoryAndError_shouldThrow() throws {
+  func test_deleteFile_givenFileExistsAndIsNotDirectoryAndError_shouldThrow() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = false
       return true
 
     }))
-    mocked.mock(closure: .removeItem({ path in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .removeItem({ [uniquePath, uniqueError] path in
+      expect(path).to(equal(uniquePath))
 
-      throw self.uniqueError
+      throw uniqueError!
     }))
 
     // then
-    expect(try mocked.deleteFile(atPath: self.uniquePath)).to(throwError(self.uniqueError))
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.deleteFile(atPath: self.uniquePath) }.to(throwError(self.uniqueError))
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_deleteFile_givenFileDoesNotExistAndIsDirectory_shouldSucceed() throws {
+  func test_deleteFile_givenFileDoesNotExistAndIsDirectory_shouldSucceed() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = true
@@ -247,16 +247,16 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(try mocked.deleteFile(atPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.deleteFile(atPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_deleteFile_givenFileDoesNotExistAndIsNotDirectory_shouldSucceed() throws {
+  func test_deleteFile_givenFileDoesNotExistAndIsNotDirectory_shouldSucceed() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = false
@@ -264,60 +264,60 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(try mocked.deleteFile(atPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.deleteFile(atPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_deleteDirectory_givenFileExistsAndIsDirectory_shouldSucceed() throws {
+  func test_deleteDirectory_givenFileExistsAndIsDirectory_shouldSucceed() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = true
       return true
 
     }))
-    mocked.mock(closure: .removeItem({ path in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .removeItem({ [uniquePath] path in
+      expect(path).to(equal(uniquePath))
     }))
 
     // then
-    expect(try mocked.deleteDirectory(atPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.deleteDirectory(atPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_deleteDirectory_givenFileExistsAndIsDirectoryAndError_shouldThrow() throws {
+  func test_deleteDirectory_givenFileExistsAndIsDirectoryAndError_shouldThrow() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = true
       return true
 
     }))
-    mocked.mock(closure: .removeItem({ path in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .removeItem({ [uniquePath, uniqueError] path in
+      expect(path).to(equal(uniquePath))
 
-      throw self.uniqueError
+      throw uniqueError!
     }))
 
     // then
-    expect(try mocked.deleteDirectory(atPath: self.uniquePath)).to(throwError(self.uniqueError))
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.deleteDirectory(atPath: self.uniquePath) }.to(throwError(self.uniqueError))
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_deleteDirectory_givenFileExistsAndIsNotDirectory_shouldThrow() throws {
+  func test_deleteDirectory_givenFileExistsAndIsNotDirectory_shouldThrow() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = false
@@ -326,17 +326,17 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(try mocked.deleteDirectory(atPath: self.uniquePath))
+    await expect { try await mocked.deleteDirectory(atPath: self.uniquePath) }
       .to(throwError(FileManagerPathError.notADirectory(path: self.uniquePath)))
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_deleteDirectory_givenFileDoesNotExistAndIsDirectory_shouldSucceed() throws {
+  func test_deleteDirectory_givenFileDoesNotExistAndIsDirectory_shouldSucceed() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = true
@@ -344,16 +344,16 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(try mocked.deleteDirectory(atPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.deleteDirectory(atPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_deleteDirectory_givenFileDoesNotExistAndIsNotDirectory_shouldSucceed() throws {
+  func test_deleteDirectory_givenFileDoesNotExistAndIsNotDirectory_shouldSucceed() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = false
@@ -361,8 +361,8 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(try mocked.deleteDirectory(atPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.deleteDirectory(atPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
   // MARK: Creation
@@ -372,7 +372,7 @@ class FileManagerExtensionTests: XCTestCase {
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
       expect(path).to(equal(parentPath))
       expect(isDirectory).notTo(beNil())
 
@@ -380,9 +380,11 @@ class FileManagerExtensionTests: XCTestCase {
       return true
 
     }))
-    mocked.mock(closure: .createFile({ path, data, attr in
-      expect(path).to(equal(self.uniquePath))
-      expect(data).to(equal(self.uniqueData))
+    let expectedPath = self.uniquePath
+    let expectedData = self.uniqueData
+    await mocked.mock(closure: .createFile({ path, data, attr in
+      expect(path).to(equal(expectedPath))
+      expect(data).to(equal(expectedData))
       expect(attr).to(beNil())
 
       return true
@@ -393,7 +395,7 @@ class FileManagerExtensionTests: XCTestCase {
     await expect {
       try await mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
     }.notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
   func test_createFile_givenContainingDirectoryDoesExistAndFileNotCreated_shouldThrow() async throws {
@@ -401,7 +403,7 @@ class FileManagerExtensionTests: XCTestCase {
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
       expect(path).to(equal(parentPath))
       expect(isDirectory).notTo(beNil())
 
@@ -409,9 +411,11 @@ class FileManagerExtensionTests: XCTestCase {
       return true
 
     }))
-    mocked.mock(closure: .createFile({ path, data, attr in
-      expect(path).to(equal(self.uniquePath))
-      expect(data).to(equal(self.uniqueData))
+    let expectedPath = self.uniquePath
+    let expectedData = self.uniqueData
+    await mocked.mock(closure: .createFile({ path, data, attr in
+      expect(path).to(equal(expectedPath))
+      expect(data).to(equal(expectedData))
       expect(attr).to(beNil())
 
       return false
@@ -422,7 +426,7 @@ class FileManagerExtensionTests: XCTestCase {
     await expect {
       try await mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
     }.to(throwError(FileManagerPathError.cannotCreateFile(at: self.uniquePath)))
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
   func test_createFile_givenContainingDirectoryDoesNotExistAndFileCreated_shouldNotThrow() async throws {
@@ -430,7 +434,7 @@ class FileManagerExtensionTests: XCTestCase {
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
       expect(path).to(equal(parentPath))
       expect(isDirectory).notTo(beNil())
 
@@ -438,15 +442,17 @@ class FileManagerExtensionTests: XCTestCase {
       return false
 
     }))
-    mocked.mock(closure: .createFile({ path, data, attr in
-      expect(path).to(equal(self.uniquePath))
-      expect(data).to(equal(self.uniqueData))
+    let expectedPath = self.uniquePath
+    let expectedData = self.uniqueData
+    await mocked.mock(closure: .createFile({ path, data, attr in
+      expect(path).to(equal(expectedPath))
+      expect(data).to(equal(expectedData))
       expect(attr).to(beNil())
 
       return true
 
     }))
-    mocked.mock(closure: .createDirectory({ path, createIntermediates, attr in
+    await mocked.mock(closure: .createDirectory({ path, createIntermediates, attr in
       expect(path).to(equal(parentPath))
       expect(createIntermediates).to(beTrue())
       expect(attr).to(beNil())
@@ -456,7 +462,7 @@ class FileManagerExtensionTests: XCTestCase {
     await expect {
       try await mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
     }.notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
   func test_createFile_givenContainingDirectoryDoesNotExistAndFileNotCreated_shouldThrow() async throws {
@@ -464,7 +470,7 @@ class FileManagerExtensionTests: XCTestCase {
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
       expect(path).to(equal(parentPath))
       expect(isDirectory).notTo(beNil())
 
@@ -472,15 +478,17 @@ class FileManagerExtensionTests: XCTestCase {
       return false
 
     }))
-    mocked.mock(closure: .createFile({ path, data, attr in
-      expect(path).to(equal(self.uniquePath))
-      expect(data).to(equal(self.uniqueData))
+    let expectedPath = self.uniquePath
+    let expectedData = self.uniqueData
+    await mocked.mock(closure: .createFile({ path, data, attr in
+      expect(path).to(equal(expectedPath))
+      expect(data).to(equal(expectedData))
       expect(attr).to(beNil())
 
       return false
 
     }))
-    mocked.mock(closure: .createDirectory({ path, createIntermediates, attr in
+    await mocked.mock(closure: .createDirectory({ path, createIntermediates, attr in
       expect(path).to(equal(parentPath))
       expect(createIntermediates).to(beTrue())
       expect(attr).to(beNil())
@@ -490,7 +498,7 @@ class FileManagerExtensionTests: XCTestCase {
     await expect {
       try await mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
     }.to(throwError(FileManagerPathError.cannotCreateFile(at: self.uniquePath)))
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
   func test_createFile_givenContainingDirectoryDoesNotExistAndError_shouldThrow() async throws {
@@ -498,7 +506,7 @@ class FileManagerExtensionTests: XCTestCase {
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
       expect(path).to(equal(parentPath))
       expect(isDirectory).notTo(beNil())
 
@@ -506,19 +514,19 @@ class FileManagerExtensionTests: XCTestCase {
       return false
 
     }))
-    mocked.mock(closure: .createDirectory({ path, createIntermediates, attr in
+    await mocked.mock(closure: .createDirectory({ [uniqueError] path, createIntermediates, attr in
       expect(path).to(equal(parentPath))
       expect(createIntermediates).to(beTrue())
       expect(attr).to(beNil())
 
-      throw self.uniqueError
+      throw uniqueError!
     }))
 
     // then
     await expect{
       try await mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
     }.to(throwError(self.uniqueError))
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
   func test_createFile_givenOverwriteFalse_whenFileExists_shouldNotThrow_shouldNotOverwrite() async throws {
@@ -527,7 +535,7 @@ class FileManagerExtensionTests: XCTestCase {
     let directoryPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager(strict: true, requireAllClosuresCalled: false)
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
       switch path {
       case directoryPath: isDirectory?.pointee = true
       case filePath: isDirectory?.pointee = false
@@ -537,7 +545,7 @@ class FileManagerExtensionTests: XCTestCase {
       return true
 
     }))
-    mocked.mock(closure: .createFile({ path, data, attr in
+    await mocked.mock(closure: .createFile({ path, data, attr in
       fail("Tried to create file when overwrite was false")
 
       return false
@@ -553,12 +561,12 @@ class FileManagerExtensionTests: XCTestCase {
     }.notTo(throwError())
   }
 
-  func test_createContainingDirectory_givenFileExistsAndIsDirectory_shouldReturnEarly() throws {
+  func test_createContainingDirectory_givenFileExistsAndIsDirectory_shouldReturnEarly() async throws {
     // given
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
       expect(path).to(equal(parentPath))
       expect(isDirectory).notTo(beNil())
 
@@ -568,16 +576,16 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(try mocked.createContainingDirectoryIfNeeded(forPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.createContainingDirectoryIfNeeded(forPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_createContainingDirectory_givenFileExistsAndIsNotDirectory_shouldSucceed() throws {
+  func test_createContainingDirectory_givenFileExistsAndIsNotDirectory_shouldSucceed() async throws {
     // given
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
       expect(path).to(equal(parentPath))
       expect(isDirectory).notTo(beNil())
 
@@ -585,23 +593,23 @@ class FileManagerExtensionTests: XCTestCase {
       return true
 
     }))
-    mocked.mock(closure: .createDirectory({ path, createIntermediates, attributes in
+    await mocked.mock(closure: .createDirectory({ path, createIntermediates, attributes in
       expect(path).to(equal(parentPath))
       expect(createIntermediates).to(beTrue())
       expect(attributes).to(beNil())
     }))
 
     // then
-    expect(try mocked.createContainingDirectoryIfNeeded(forPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.createContainingDirectoryIfNeeded(forPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_createContainingDirectory_givenFileDoesNotExistAndIsDirectory_shouldSucceed() throws {
+  func test_createContainingDirectory_givenFileDoesNotExistAndIsDirectory_shouldSucceed() async throws {
     // given
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
       expect(path).to(equal(parentPath))
       expect(isDirectory).notTo(beNil())
 
@@ -609,23 +617,23 @@ class FileManagerExtensionTests: XCTestCase {
       return false
 
     }))
-    mocked.mock(closure: .createDirectory({ path, createIntermediates, attributes in
+    await mocked.mock(closure: .createDirectory({ path, createIntermediates, attributes in
       expect(path).to(equal(parentPath))
       expect(createIntermediates).to(beTrue())
       expect(attributes).to(beNil())
     }))
 
     // then
-    expect(try mocked.createContainingDirectoryIfNeeded(forPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.createContainingDirectoryIfNeeded(forPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_createContainingDirectory_givenFileDoesNotExistAndIsNotDirectory_shouldSucceed() throws {
+  func test_createContainingDirectory_givenFileDoesNotExistAndIsNotDirectory_shouldSucceed() async throws {
     // given
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
       expect(path).to(equal(parentPath))
       expect(isDirectory).notTo(beNil())
 
@@ -633,23 +641,23 @@ class FileManagerExtensionTests: XCTestCase {
       return false
 
     }))
-    mocked.mock(closure: .createDirectory({ path, createIntermediates, attributes in
+    await mocked.mock(closure: .createDirectory({ path, createIntermediates, attributes in
       expect(path).to(equal(parentPath))
       expect(createIntermediates).to(beTrue())
       expect(attributes).to(beNil())
     }))
 
     // then
-    expect(try mocked.createContainingDirectoryIfNeeded(forPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.createContainingDirectoryIfNeeded(forPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_createContainingDirectory_givenError_shouldThrow() throws {
+  func test_createContainingDirectory_givenError_shouldThrow() async throws {
     // given
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
       expect(path).to(equal(parentPath))
       expect(isDirectory).notTo(beNil())
 
@@ -657,26 +665,26 @@ class FileManagerExtensionTests: XCTestCase {
       return false
 
     }))
-    mocked.mock(closure: .createDirectory({ path, createIntermediates, attributes in
+    await mocked.mock(closure: .createDirectory({ [uniqueError] path, createIntermediates, attributes in
       expect(path).to(equal(parentPath))
       expect(createIntermediates).to(beTrue())
       expect(attributes).to(beNil())
 
-      throw self.uniqueError
+      throw uniqueError!
     }))
 
     // then
-    expect(try mocked.createContainingDirectoryIfNeeded(forPath: self.uniquePath))
+    await expect { try await mocked.createContainingDirectoryIfNeeded(forPath: self.uniquePath) }
       .to(throwError(self.uniqueError))
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_createDirectory_givenFileExistsAndIsDirectory_shouldReturnEarly() throws {
+  func test_createDirectory_givenFileExistsAndIsDirectory_shouldReturnEarly() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = true
@@ -685,102 +693,102 @@ class FileManagerExtensionTests: XCTestCase {
     }))
 
     // then
-    expect(try mocked.createDirectoryIfNeeded(atPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.createDirectoryIfNeeded(atPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_createDirectory_givenFileExistsAndIsNotDirectory_shouldSucceed() throws {
+  func test_createDirectory_givenFileExistsAndIsNotDirectory_shouldSucceed() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = false
       return true
 
     }))
-    mocked.mock(closure: .createDirectory({ path, createIntermediates, attributes in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .createDirectory({ [uniquePath] path, createIntermediates, attributes in
+      expect(path).to(equal(uniquePath))
       expect(createIntermediates).to(beTrue())
       expect(attributes).to(beNil())
     }))
 
     // then
-    expect(try mocked.createDirectoryIfNeeded(atPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.createDirectoryIfNeeded(atPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_createDirectory_givenFileDoesNotExistAndIsDirectory_shouldSucceed() throws {
+  func test_createDirectory_givenFileDoesNotExistAndIsDirectory_shouldSucceed() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = true
       return false
 
     }))
-    mocked.mock(closure: .createDirectory({ path, createIntermediates, attributes in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .createDirectory({ [uniquePath] path, createIntermediates, attributes in
+      expect(path).to(equal(uniquePath))
       expect(createIntermediates).to(beTrue())
       expect(attributes).to(beNil())
     }))
 
     // then
-    expect(try mocked.createDirectoryIfNeeded(atPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.createDirectoryIfNeeded(atPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_createDirectory_givenFileDoesNotExistAndIsNotDirectory_shouldSucceed() throws {
+  func test_createDirectory_givenFileDoesNotExistAndIsNotDirectory_shouldSucceed() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = false
       return false
 
     }))
-    mocked.mock(closure: .createDirectory({ path, createIntermediates, attributes in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .createDirectory({ [uniquePath] path, createIntermediates, attributes in
+      expect(path).to(equal(uniquePath))
       expect(createIntermediates).to(beTrue())
       expect(attributes).to(beNil())
     }))
 
     // then
-    expect(try mocked.createDirectoryIfNeeded(atPath: self.uniquePath)).notTo(throwError())
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { try await mocked.createDirectoryIfNeeded(atPath: self.uniquePath) }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 
-  func test_createDirectory_givenError_shouldThrow() throws {
+  func test_createDirectory_givenError_shouldThrow() async throws {
     // given
     let mocked = MockApolloFileManager()
 
-    mocked.mock(closure: .fileExists({ path, isDirectory in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .fileExists({ [uniquePath] path, isDirectory in
+      expect(path).to(equal(uniquePath))
       expect(isDirectory).notTo(beNil())
 
       isDirectory?.pointee = false
       return false
 
     }))
-    mocked.mock(closure: .createDirectory({ path, createIntermediates, attributes in
-      expect(path).to(equal(self.uniquePath))
+    await mocked.mock(closure: .createDirectory({ [uniquePath, uniqueError] path, createIntermediates, attributes in
+      expect(path).to(equal(uniquePath))
       expect(createIntermediates).to(beTrue())
       expect(attributes).to(beNil())
 
-      throw self.uniqueError
+      throw uniqueError!
     }))
 
     // then
-    expect(try mocked.createDirectoryIfNeeded(atPath: self.uniquePath))
+    await expect { try await mocked.createDirectoryIfNeeded(atPath: self.uniquePath) }
       .to(throwError(self.uniqueError))
-    expect(mocked.allClosuresCalled).to(beTrue())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
 }

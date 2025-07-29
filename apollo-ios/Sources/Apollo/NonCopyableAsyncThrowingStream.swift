@@ -20,12 +20,11 @@ public struct NonCopyableAsyncThrowingStream<Element: Sendable>: Sendable, ~Copy
 
   private let stream: AsyncThrowingStream<Element, any Error>
 
-#warning("Maybe these shouldn't be public inits. Easy to create bugs when creating your own stream")
-  public init(stream: AsyncThrowingStream<Element, any Error>) {
+  public init(stream: consuming AsyncThrowingStream<Element, any Error>) {
     self.stream = stream
   }
 
-  public init<S: AsyncSequence & Sendable>(stream wrapped: sending S) where S.Element == Element {
+  public init<S: AsyncSequence & Sendable>(stream wrapped: consuming sending S) where S.Element == Element {
     self.stream = AsyncThrowingStream.executingInAsyncTask { [wrapped] continuation in
       for try await element in wrapped {
         continuation.yield(element)
@@ -71,7 +70,10 @@ public struct NonCopyableAsyncThrowingStream<Element: Sendable>: Sendable, ~Copy
 
   // MARK: - Error Handling
 
-  #warning("TODO: Write unit tests for this. Docs: if return nil, error is supressed and stream finishes.")
+  /// Calls the given `transform` if an error is thrown by the stream.
+  ///
+  /// If the `transform` returns `nil`, the error is supressed and the resulting stream will terminate without
+  /// emitting an error.
   public consuming func mapErrors(
     _ transform: @escaping @Sendable (any Error) async throws -> Element?
   ) async -> NonCopyableAsyncThrowingStream<Element> {
@@ -114,7 +116,6 @@ public struct NonCopyableAsyncThrowingStream<Element: Sendable>: Sendable, ~Copy
   }
 }
 
-#warning("Do we keep this public? Helps make TaskLocalValues work, but extension on Swift standard lib type could conflict with other extensions")
 extension TaskLocal {
 
   @_disfavoredOverload
