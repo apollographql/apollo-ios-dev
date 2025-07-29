@@ -89,7 +89,13 @@ struct InputObjectTemplate: TemplateRenderer {
     _ fields: GraphQLInputFieldDictionary
   ) -> TemplateString {
     TemplateString("""
-    \(fields.map({ "\"\($1.name.schemaName)\": \($1.render(config: config))" }), separator: ",\n")
+    \(fields.map({
+      TemplateString("""
+      "\($1.name.schemaName)": \($1.render(config: config))\(
+          if: !$1.type.isNullable && $1.hasDefaultValue, " ?? GraphQLNullable.none"
+        )
+      """)
+    }), separator: ",\n")
     """)
   }
 
