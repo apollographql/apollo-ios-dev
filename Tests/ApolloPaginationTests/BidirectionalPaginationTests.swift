@@ -66,7 +66,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
           nextQuery.__variables = [
             "id": "2001",
             "first": 1,
-            "after": pageInfo.endCursor,
+            "after": pageInfo.endCursor ?? .null,
             "before": GraphQLNullable<String>.null,
           ]
           return nextQuery
@@ -75,7 +75,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
           previousQuery.__variables = [
             "id": "2001",
             "first": 1,
-            "before": pageInfo.startCursor,
+            "before": pageInfo.startCursor ?? .null,
             "after": GraphQLNullable<String>.null,
           ]
           return previousQuery
