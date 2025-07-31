@@ -23,7 +23,7 @@ public struct PetAdoptionInput: InputObject {
       "petID": petID,
       "humanName": humanName,
       "favoriteToy": favoriteToy,
-      "isSpayedOrNeutered": isSpayedOrNeutered,
+      "isSpayedOrNeutered": isSpayedOrNeutered ?? GraphQLNullable.none,
       "measurements": measurements
     ])
   }

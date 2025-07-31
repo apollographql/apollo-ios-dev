@@ -113,18 +113,18 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("feet", Int.self),
-          .field("inches", Int?.self),
+          .field("feet", Int32.self),
+          .field("inches", Int32?.self),
         ] }
 
-        public var feet: Int { __data["feet"] }
-        public var inches: Int? { __data["inches"] }
-        public var meters: Int { __data["meters"] }
+        public var feet: Int32 { __data["feet"] }
+        public var inches: Int32? { __data["inches"] }
+        public var meters: Int32 { __data["meters"] }
 
         public init(
-          feet: Int,
-          inches: Int? = nil,
-          meters: Int
+          feet: Int32,
+          inches: Int32? = nil,
+          meters: Int32
         ) {
           self.init(_dataDict: DataDict(
             data: [
@@ -192,7 +192,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
           public var predators: [Predator] { __data["predators"] }
           public var laysEggs: Bool { __data["laysEggs"] }
           public var species: String { __data["species"] }
-          public var bodyTemperature: Int { __data["bodyTemperature"] }
+          public var bodyTemperature: Int32 { __data["bodyTemperature"] }
           public var height: Height { __data["height"] }
 
           public struct Fragments: FragmentContainer {
@@ -208,7 +208,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
             predators: [Predator],
             laysEggs: Bool,
             species: String,
-            bodyTemperature: Int,
+            bodyTemperature: Int32,
             height: Height
           ) {
             self.init(_dataDict: DataDict(
@@ -282,7 +282,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public var species: String { __data["species"] }
         public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
         public var predators: [Predator] { __data["predators"] }
-        public var bodyTemperature: Int { __data["bodyTemperature"] }
+        public var bodyTemperature: Int32 { __data["bodyTemperature"] }
 
         public struct Fragments: FragmentContainer {
           public let __data: DataDict
@@ -299,7 +299,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
           species: String,
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
           predators: [Predator],
-          bodyTemperature: Int
+          bodyTemperature: Int32
         ) {
           self.init(_dataDict: DataDict(
             data: [
@@ -329,14 +329,14 @@ public struct AllAnimalsQuery: GraphQLQuery {
 
           public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
 
-          public var feet: Int { __data["feet"] }
-          public var inches: Int? { __data["inches"] }
-          public var meters: Int { __data["meters"] }
+          public var feet: Int32 { __data["feet"] }
+          public var inches: Int32? { __data["inches"] }
+          public var meters: Int32 { __data["meters"] }
 
           public init(
-            feet: Int,
-            inches: Int? = nil,
-            meters: Int
+            feet: Int32,
+            inches: Int32? = nil,
+            meters: Int32
           ) {
             self.init(_dataDict: DataDict(
               data: [
@@ -436,16 +436,16 @@ public struct AllAnimalsQuery: GraphQLQuery {
 
           public var relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize> { __data["relativeSize"] }
           public var centimeters: Double { __data["centimeters"] }
-          public var feet: Int { __data["feet"] }
-          public var inches: Int? { __data["inches"] }
-          public var meters: Int { __data["meters"] }
+          public var feet: Int32 { __data["feet"] }
+          public var inches: Int32? { __data["inches"] }
+          public var meters: Int32 { __data["meters"] }
 
           public init(
             relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize>,
             centimeters: Double,
-            feet: Int,
-            inches: Int? = nil,
-            meters: Int
+            feet: Int32,
+            inches: Int32? = nil,
+            meters: Int32
           ) {
             self.init(_dataDict: DataDict(
               data: [
@@ -485,7 +485,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
           public var predators: [Predator] { __data["predators"] }
-          public var bodyTemperature: Int { __data["bodyTemperature"] }
+          public var bodyTemperature: Int32 { __data["bodyTemperature"] }
           public var humanName: String? { __data["humanName"] }
           public var favoriteToy: String { __data["favoriteToy"] }
           public var owner: Owner? { __data["owner"] }
@@ -506,7 +506,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
             species: String,
             skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
             predators: [Predator],
-            bodyTemperature: Int,
+            bodyTemperature: Int32,
             humanName: String? = nil,
             favoriteToy: String,
             owner: Owner? = nil
@@ -544,16 +544,16 @@ public struct AllAnimalsQuery: GraphQLQuery {
 
             public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
 
-            public var feet: Int { __data["feet"] }
-            public var inches: Int? { __data["inches"] }
-            public var meters: Int { __data["meters"] }
+            public var feet: Int32 { __data["feet"] }
+            public var inches: Int32? { __data["inches"] }
+            public var meters: Int32 { __data["meters"] }
             public var relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize> { __data["relativeSize"] }
             public var centimeters: Double { __data["centimeters"] }
 
             public init(
-              feet: Int,
-              inches: Int? = nil,
-              meters: Int,
+              feet: Int32,
+              inches: Int32? = nil,
+              meters: Int32,
               relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize>,
               centimeters: Double
             ) {
@@ -599,7 +599,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public var species: String { __data["species"] }
         public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
         public var predators: [Predator] { __data["predators"] }
-        public var bodyTemperature: Int { __data["bodyTemperature"] }
+        public var bodyTemperature: Int32 { __data["bodyTemperature"] }
         public var humanName: String? { __data["humanName"] }
         public var favoriteToy: String { __data["favoriteToy"] }
         public var owner: Owner? { __data["owner"] }
@@ -620,7 +620,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
           species: String,
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
           predators: [Predator],
-          bodyTemperature: Int,
+          bodyTemperature: Int32,
           humanName: String? = nil,
           favoriteToy: String,
           owner: Owner? = nil
@@ -661,16 +661,16 @@ public struct AllAnimalsQuery: GraphQLQuery {
 
           public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
 
-          public var feet: Int { __data["feet"] }
-          public var inches: Int? { __data["inches"] }
-          public var meters: Int { __data["meters"] }
+          public var feet: Int32 { __data["feet"] }
+          public var inches: Int32? { __data["inches"] }
+          public var meters: Int32 { __data["meters"] }
           public var relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize> { __data["relativeSize"] }
           public var centimeters: Double { __data["centimeters"] }
 
           public init(
-            feet: Int,
-            inches: Int? = nil,
-            meters: Int,
+            feet: Int32,
+            inches: Int32? = nil,
+            meters: Int32,
             relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize>,
             centimeters: Double
           ) {
@@ -758,14 +758,14 @@ public struct AllAnimalsQuery: GraphQLQuery {
 
           public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
 
-          public var feet: Int { __data["feet"] }
-          public var inches: Int? { __data["inches"] }
-          public var meters: Int { __data["meters"] }
+          public var feet: Int32 { __data["feet"] }
+          public var inches: Int32? { __data["inches"] }
+          public var meters: Int32 { __data["meters"] }
 
           public init(
-            feet: Int,
-            inches: Int? = nil,
-            meters: Int
+            feet: Int32,
+            inches: Int32? = nil,
+            meters: Int32
           ) {
             self.init(_dataDict: DataDict(
               data: [
@@ -802,7 +802,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
           public var species: String { __data["species"] }
           public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
           public var predators: [Predator] { __data["predators"] }
-          public var bodyTemperature: Int { __data["bodyTemperature"] }
+          public var bodyTemperature: Int32 { __data["bodyTemperature"] }
           public var humanName: String? { __data["humanName"] }
           public var favoriteToy: String { __data["favoriteToy"] }
           public var owner: Owner? { __data["owner"] }
@@ -823,7 +823,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
             species: String,
             skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
             predators: [Predator],
-            bodyTemperature: Int,
+            bodyTemperature: Int32,
             humanName: String? = nil,
             favoriteToy: String,
             owner: Owner? = nil
@@ -865,16 +865,16 @@ public struct AllAnimalsQuery: GraphQLQuery {
 
             public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
 
-            public var feet: Int { __data["feet"] }
-            public var inches: Int? { __data["inches"] }
-            public var meters: Int { __data["meters"] }
+            public var feet: Int32 { __data["feet"] }
+            public var inches: Int32? { __data["inches"] }
+            public var meters: Int32 { __data["meters"] }
             public var relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize> { __data["relativeSize"] }
             public var centimeters: Double { __data["centimeters"] }
 
             public init(
-              feet: Int,
-              inches: Int? = nil,
-              meters: Int,
+              feet: Int32,
+              inches: Int32? = nil,
+              meters: Int32,
               relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize>,
               centimeters: Double
             ) {
@@ -922,7 +922,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public var species: String { __data["species"] }
         public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
         public var predators: [Predator] { __data["predators"] }
-        public var bodyTemperature: Int { __data["bodyTemperature"] }
+        public var bodyTemperature: Int32 { __data["bodyTemperature"] }
         public var humanName: String? { __data["humanName"] }
         public var owner: Owner? { __data["owner"] }
 
@@ -943,7 +943,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
           species: String,
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
           predators: [Predator],
-          bodyTemperature: Int,
+          bodyTemperature: Int32,
           humanName: String? = nil,
           owner: Owner? = nil
         ) {
@@ -983,16 +983,16 @@ public struct AllAnimalsQuery: GraphQLQuery {
 
           public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
 
-          public var feet: Int { __data["feet"] }
-          public var inches: Int? { __data["inches"] }
-          public var meters: Int { __data["meters"] }
+          public var feet: Int32 { __data["feet"] }
+          public var inches: Int32? { __data["inches"] }
+          public var meters: Int32 { __data["meters"] }
           public var relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize> { __data["relativeSize"] }
           public var centimeters: Double { __data["centimeters"] }
 
           public init(
-            feet: Int,
-            inches: Int? = nil,
-            meters: Int,
+            feet: Int32,
+            inches: Int32? = nil,
+            meters: Int32,
             relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize>,
             centimeters: Double
           ) {

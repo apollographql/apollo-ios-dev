@@ -4,14 +4,14 @@
 import ApolloTestSupport
 @testable import AnimalKingdomAPI
 
-public class Dog: MockObject {
+public final class Dog: MockObject {
   public static let objectType: ApolloAPI.Object = AnimalKingdomAPI.Objects.Dog
   public static let _mockFields = MockFields()
   public typealias MockValueCollectionType = Array<Mock<Dog>>
 
-  public struct MockFields {
+  public struct MockFields: Sendable {
     @Field<AnimalKingdomAPI.CustomDate>("birthdate") public var birthdate
-    @Field<Int>("bodyTemperature") public var bodyTemperature
+    @Field<Int32>("bodyTemperature") public var bodyTemperature
     @Field<String>("favoriteToy") public var favoriteToy
     @Field<Height>("height") public var height
     @Field<AnimalKingdomAPI.Object>("houseDetails") public var houseDetails
@@ -28,7 +28,7 @@ public class Dog: MockObject {
 public extension Mock where O == Dog {
   convenience init(
     birthdate: AnimalKingdomAPI.CustomDate? = nil,
-    bodyTemperature: Int = 0,
+    bodyTemperature: Int32 = 0,
     favoriteToy: String = "",
     height: Mock<Height> = Mock<Height>(),
     houseDetails: AnimalKingdomAPI.Object? = nil,

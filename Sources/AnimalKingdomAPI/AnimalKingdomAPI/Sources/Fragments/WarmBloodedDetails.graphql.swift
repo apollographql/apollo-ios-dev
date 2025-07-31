@@ -14,11 +14,11 @@ public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
   public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
-    .field("bodyTemperature", Int.self),
+    .field("bodyTemperature", Int32.self),
     .fragment(HeightInMeters.self),
   ] }
 
-  public var bodyTemperature: Int { __data["bodyTemperature"] }
+  public var bodyTemperature: Int32 { __data["bodyTemperature"] }
   public var height: Height { __data["height"] }
 
   public struct Fragments: FragmentContainer {
@@ -30,7 +30,7 @@ public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
 
   public init(
     __typename: String,
-    bodyTemperature: Int,
+    bodyTemperature: Int32,
     height: Height
   ) {
     self.init(_dataDict: DataDict(

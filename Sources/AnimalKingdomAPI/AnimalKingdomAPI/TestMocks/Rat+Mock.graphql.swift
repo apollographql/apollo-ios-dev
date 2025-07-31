@@ -4,12 +4,12 @@
 import ApolloTestSupport
 @testable import AnimalKingdomAPI
 
-public class Rat: MockObject {
+public final class Rat: MockObject {
   public static let objectType: ApolloAPI.Object = AnimalKingdomAPI.Objects.Rat
   public static let _mockFields = MockFields()
   public typealias MockValueCollectionType = Array<Mock<Rat>>
 
-  public struct MockFields {
+  public struct MockFields: Sendable {
     @Field<String>("favoriteToy") public var favoriteToy
     @Field<Height>("height") public var height
     @Field<String>("humanName") public var humanName

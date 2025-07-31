@@ -12,9 +12,9 @@ public struct ColorInput: InputObject {
   }
 
   public init(
-    red: Int,
-    green: Int,
-    blue: Int
+    red: Int32,
+    green: Int32,
+    blue: Int32
   ) {
     __data = InputDict([
       "red": red,
@@ -23,17 +23,17 @@ public struct ColorInput: InputObject {
     ])
   }
 
-  public var red: Int {
+  public var red: Int32 {
     get { __data["red"] }
     set { __data["red"] = newValue }
   }
 
-  public var green: Int {
+  public var green: Int32 {
     get { __data["green"] }
     set { __data["green"] = newValue }
   }
 
-  public var blue: Int {
+  public var blue: Int32 {
     get { __data["blue"] }
     set { __data["blue"] = newValue }
   }
