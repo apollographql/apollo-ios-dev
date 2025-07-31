@@ -48,7 +48,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     
     let expected = """
     public enum MockOneOfInput: OneOfInputObject {
-      case field(Int)
+      case field(Int32)
     
       public var __data: InputDict {
         switch self {
@@ -753,7 +753,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     let expected = """
     public enum MockOneOfInput: OneOfInputObject {
       case stringField(String)
-      case intField(Int)
+      case intField(Int32)
       case boolField(Bool)
       case floatField(Double)
       case customScalarField(CustomScalar)

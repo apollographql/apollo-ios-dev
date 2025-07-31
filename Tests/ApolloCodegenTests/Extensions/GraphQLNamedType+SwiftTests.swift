@@ -14,7 +14,7 @@ class GraphQLNamedType_SwiftTests: XCTestCase {
   func test_swiftName_givenGraphQLScalar_int_providesCompatibleSwiftName() {
     let graphqlNamedType = GraphQLType.scalar(.integer())
 
-    expect(graphqlNamedType.namedType.name.swiftName).to(equal("Int"))
+    expect(graphqlNamedType.namedType.name.swiftName).to(equal("Int32"))
   }
 
   func test_swiftName_givenGraphQLScalar_float_providesCompatibleSwiftName() {

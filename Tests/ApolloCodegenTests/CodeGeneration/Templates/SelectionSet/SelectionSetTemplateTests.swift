@@ -517,7 +517,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let expected = """
       public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Nested }
 
-      public var a: Int { __data["a"] }
+      public var a: Int32 { __data["a"] }
     """
 
     // when
@@ -654,8 +654,8 @@ class SelectionSetTemplateTests: XCTestCase {
         .field("__typename", String.self),
         .field("string", String.self),
         .field("string_optional", String?.self),
-        .field("int", Int.self),
-        .field("int_optional", Int?.self),
+        .field("int", Int32.self),
+        .field("int_optional", Int32?.self),
         .field("float", Double.self),
         .field("float_optional", Double?.self),
         .field("boolean", Bool.self),
@@ -1302,6 +1302,7 @@ class SelectionSetTemplateTests: XCTestCase {
       string: Animal!
       bool: Animal!
       int: Animal!
+      int32: Animal!
       float: Animal!
       double: Animal!
       iD: Animal!
@@ -1346,6 +1347,9 @@ class SelectionSetTemplateTests: XCTestCase {
         int {
           species
         }
+        int32 {
+          species
+        }
         float {
           species
         }
@@ -1384,6 +1388,7 @@ class SelectionSetTemplateTests: XCTestCase {
         .field("string", String_SelectionSet.self),
         .field("bool", Bool_SelectionSet.self),
         .field("int", Int_SelectionSet.self),
+        .field("int32", Int32_SelectionSet.self),
         .field("float", Float_SelectionSet.self),
         .field("double", Double_SelectionSet.self),
         .field("iD", ID_SelectionSet.self),
@@ -4766,8 +4771,8 @@ class SelectionSetTemplateTests: XCTestCase {
     let expected = """
       public var string: String { __data["string"] }
       public var string_optional: String? { __data["string_optional"] }
-      public var int: Int { __data["int"] }
-      public var int_optional: Int? { __data["int_optional"] }
+      public var int: Int32 { __data["int"] }
+      public var int_optional: Int32? { __data["int_optional"] }
       public var float: Double { __data["float"] }
       public var float_optional: Double? { __data["float_optional"] }
       public var boolean: Bool { __data["boolean"] }
@@ -10754,7 +10759,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expectedTypeAlias = """
       public var comments: [Comment]? { __data["comments"] }
-      public var total: Int { __data["total"] }
+      public var total: Int32 { __data["total"] }
 
       public typealias Comment = PostsInfoById.Awarding.Comment
     """
@@ -10866,7 +10871,7 @@ class SelectionSetTemplateTests: XCTestCase {
 
     public var name: String { __data["name"] }
     public var comments: [Comment]? { __data["comments"] }
-    public var total: Int { __data["total"] }
+    public var total: Int32 { __data["total"] }
 
     public typealias Comment = PostsInfoById.Awarding.Comment
   """

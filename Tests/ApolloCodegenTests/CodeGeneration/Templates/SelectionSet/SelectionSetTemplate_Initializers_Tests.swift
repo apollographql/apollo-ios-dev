@@ -630,8 +630,8 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
         public init(
           string: String,
           string_optional: String? = nil,
-          int: Int,
-          int_optional: Int? = nil,
+          int: Int32,
+          int_optional: Int32? = nil,
           float: Double,
           float_optional: Double? = nil,
           boolean: Bool,
@@ -1211,7 +1211,7 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
       public init(
         __typename: String,
         species: String,
-        age: Int
+        age: Int32
       ) {
         self.init(_dataDict: DataDict(
           data: [
@@ -1288,8 +1288,8 @@ class SelectionSetTemplate_Initializers_Tests: XCTestCase {
     let expected =
     """
       public init(
-        inches: Int? = nil,
-        feet: Int? = nil
+        inches: Int32? = nil,
+        feet: Int32? = nil
       ) {
         self.init(_dataDict: DataDict(
           data: [

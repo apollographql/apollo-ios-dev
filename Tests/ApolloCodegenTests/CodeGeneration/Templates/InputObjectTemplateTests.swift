@@ -544,7 +544,7 @@ class InputObjectTemplateTests: XCTestCase {
     let expected = """
       public init(
         stringField: GraphQLNullable<String> = nil,
-        intField: GraphQLNullable<Int> = nil,
+        intField: GraphQLNullable<Int32> = nil,
         boolField: GraphQLNullable<Bool> = nil,
         floatField: GraphQLNullable<Double> = nil,
         customScalarField: GraphQLNullable<CustomScalar> = nil,
@@ -575,7 +575,7 @@ class InputObjectTemplateTests: XCTestCase {
         set { __data["stringField"] = newValue }
       }
 
-      public var intField: GraphQLNullable<Int> {
+      public var intField: GraphQLNullable<Int32> {
         get { __data["intField"] }
         set { __data["intField"] = newValue }
       }
@@ -731,14 +731,14 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nullable: GraphQLNullable<Int> = nil
+        nullable: GraphQLNullable<Int32> = nil
       ) {
         __data = InputDict([
           "nullable": nullable
         ])
       }
 
-      public var nullable: GraphQLNullable<Int> {
+      public var nullable: GraphQLNullable<Int32> {
     """
 
     // when
@@ -756,14 +756,14 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nullableWithDefault: GraphQLNullable<Int> = nil
+        nullableWithDefault: GraphQLNullable<Int32> = nil
       ) {
         __data = InputDict([
           "nullableWithDefault": nullableWithDefault
         ])
       }
 
-      public var nullableWithDefault: GraphQLNullable<Int> {
+      public var nullableWithDefault: GraphQLNullable<Int32> {
     """
 
     // when
@@ -781,14 +781,14 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nonNullable: Int
+        nonNullable: Int32
       ) {
         __data = InputDict([
           "nonNullable": nonNullable
         ])
       }
 
-      public var nonNullable: Int {
+      public var nonNullable: Int32 {
     """
 
     // when
@@ -806,14 +806,14 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nonNullableWithDefault: Int? = nil
+        nonNullableWithDefault: Int32? = nil
       ) {
         __data = InputDict([
           "nonNullableWithDefault": nonNullableWithDefault ?? GraphQLNullable.none
         ])
       }
 
-      public var nonNullableWithDefault: Int? {
+      public var nonNullableWithDefault: Int32? {
     """
 
     // when

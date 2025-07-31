@@ -141,7 +141,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
           type: .scalar(.integer()),
           defaultValue: nil
         ),
-        "intField: GraphQLNullable<Int>"
+        "intField: GraphQLNullable<Int32>"
       ),
       (
         .mock(
@@ -225,7 +225,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
           type: .scalar(.integer()),
           defaultValue: .int(300)
         ),
-        "intField: GraphQLNullable<Int> = 300"
+        "intField: GraphQLNullable<Int32> = 300"
       ),
       (
         .mock(
@@ -522,7 +522,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     // given
     subject = .mock("nullable", type: .scalar(.integer()), defaultValue: nil)
 
-    let expected = "nullable: GraphQLNullable<Int>"
+    let expected = "nullable: GraphQLNullable<Int32>"
 
     // when
     buildTemplate()
@@ -536,7 +536,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     // given
     subject = .mock("nullableWithDefault", type: .scalar(.integer()), defaultValue: .int(3))
 
-    let expected = "nullableWithDefault: GraphQLNullable<Int> = 3"
+    let expected = "nullableWithDefault: GraphQLNullable<Int32> = 3"
 
     // when
     buildTemplate()
@@ -550,7 +550,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     // given
     subject = .mock("nonNullable", type: .nonNull(.scalar(.integer())), defaultValue: nil)
 
-    let expected = "nonNullable: Int"
+    let expected = "nonNullable: Int32"
 
     // when
     buildTemplate()
@@ -564,7 +564,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     // given
     subject = .mock("nonNullableWithDefault", type: .nonNull(.scalar(.integer())), defaultValue: .int(3))
 
-    let expected = "nonNullableWithDefault: Int = 3"
+    let expected = "nonNullableWithDefault: Int32 = 3"
     
     // when
     buildTemplate()

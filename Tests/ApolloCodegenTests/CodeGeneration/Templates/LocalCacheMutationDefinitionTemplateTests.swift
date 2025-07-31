@@ -681,12 +681,12 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     """
       public var variable1: String
       public var variable2: Bool
-      public var variable3: Int
+      public var variable3: Int32
 
       public init(
         variable1: String,
         variable2: Bool,
-        variable3: Int
+        variable3: Int32
       ) {
         self.variable1 = variable1
         self.variable2 = variable2

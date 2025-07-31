@@ -80,6 +80,7 @@ public final class ApolloCodegen: Sendable {
 
   // MARK: - Internal
 
+#warning("TODO: make this a struct and test performance?")
   @dynamicMemberLookup
   final class ConfigurationContext: Sendable {
     let config: ApolloCodegenConfiguration

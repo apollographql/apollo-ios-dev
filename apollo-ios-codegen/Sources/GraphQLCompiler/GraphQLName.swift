@@ -10,28 +10,6 @@ public class GraphQLName: Hashable, CustomDebugStringConvertible {
   
   public var customName: String?
   
-  public var swiftName: String {
-    switch schemaName {
-    case "Boolean": return "Bool"
-    case "Float": return "Double"
-    default: return schemaName
-    }
-  }
-  
-  private var shouldRenderDocumentation: Bool {
-    if let customName, !customName.isEmpty {
-      return true
-    }
-    return false
-  }
-  
-  public var typeNameDocumentation: TemplateString? {
-    guard shouldRenderDocumentation else { return nil }
-    return """
-    // Renamed from GraphQL schema value: '\(schemaName)'
-    """
-  }
-  
   public init(
     schemaName: String
   ) {
@@ -42,10 +20,12 @@ public class GraphQLName: Hashable, CustomDebugStringConvertible {
   
   public func hash(into hasher: inout Hasher) {
     hasher.combine(schemaName)
+    hasher.combine(customName)
   }
   
   public static func == (lhs: GraphQLName, rhs: GraphQLName) -> Bool {
-    return lhs.schemaName == rhs.schemaName
+    return lhs.schemaName == rhs.schemaName &&
+    lhs.customName == rhs.customName
   }
 
   public var debugDescription: String {

@@ -1,5 +1,6 @@
 import Foundation
 import GraphQLCompiler
+import TemplateString
 
 extension GraphQLNamedType {
 
@@ -7,7 +8,7 @@ extension GraphQLNamedType {
     case filename
     case typename
   }
-  
+
   func render(
     as context: RenderContext
   ) -> String {
@@ -15,7 +16,7 @@ extension GraphQLNamedType {
     if let customName = name.customName {
       return customName
     }
-    
+
     switch context {
     case .filename:
       return self.name.schemaName
@@ -23,7 +24,7 @@ extension GraphQLNamedType {
       return renderTypeName()
     }
   }
-  
+
   private func renderTypeName() -> String {
     switch self {
     case let type as GraphQLScalarType:
@@ -44,10 +45,10 @@ extension GraphQLNamedType {
     default:
       break
     }
-    
+
     return self.name.swiftName
   }
-  
+
   private var typenameSuffix: String {
     switch self {
     case is GraphQLEnumType:
@@ -66,7 +67,32 @@ extension GraphQLNamedType {
       return "_GraphQL"
     }
   }
-  
+}
+
+extension GraphQLName {
+
+  var swiftName: String {
+    switch schemaName {
+    case "Boolean": return "Bool"
+    case "Float": return "Double"
+    case "Int": return "Int32"
+    default: return schemaName
+    }
+  }
+
+  var typeNameDocumentation: TemplateString? {
+    guard shouldRenderTypeNameDocumentation else { return nil }
+    return """
+    // Renamed from GraphQL schema value: '\(schemaName)'
+    """
+  }
+
+  private var shouldRenderTypeNameDocumentation: Bool {
+    if let customName, !customName.isEmpty {
+      return true
+    }
+    return false
+  }
 }
 
 extension GraphQLEnumValue {
