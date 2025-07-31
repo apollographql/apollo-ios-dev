@@ -300,6 +300,6 @@ class OperationManifestFileGeneratorTests: XCTestCase {
 
     // then
     expect(actual).toNot(beNil())
-    expect(actual?.config).to(beIdenticalTo(self.subject.config))
+    expect(actual?.config).to(equal(self.subject.config))
   }
 }

@@ -80,9 +80,8 @@ public final class ApolloCodegen: Sendable {
 
   // MARK: - Internal
 
-#warning("TODO: make this a struct and test performance?")
   @dynamicMemberLookup
-  final class ConfigurationContext: Sendable {
+  struct ConfigurationContext: Sendable, Equatable {
     let config: ApolloCodegenConfiguration
     let pluralizer: Pluralizer
     let rootURL: URL?
