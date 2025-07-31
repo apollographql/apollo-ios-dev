@@ -20,12 +20,10 @@ public class GraphQLName: Hashable, CustomDebugStringConvertible {
   
   public func hash(into hasher: inout Hasher) {
     hasher.combine(schemaName)
-    hasher.combine(customName)
   }
   
   public static func == (lhs: GraphQLName, rhs: GraphQLName) -> Bool {
-    return lhs.schemaName == rhs.schemaName &&
-    lhs.customName == rhs.customName
+    return lhs.schemaName == rhs.schemaName
   }
 
   public var debugDescription: String {
