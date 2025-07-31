@@ -12,7 +12,7 @@ public struct ReviewInput: InputObject {
   }
 
   public init(
-    stars: Int,
+    stars: Int32,
     commentary: GraphQLNullable<String> = nil,
     favoriteColor: GraphQLNullable<ColorInput> = nil
   ) {
@@ -24,7 +24,7 @@ public struct ReviewInput: InputObject {
   }
 
   /// 0-5 stars
-  public var stars: Int {
+  public var stars: Int32 {
     get { __data["stars"] }
     set { __data["stars"] = newValue }
   }

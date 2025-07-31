@@ -81,7 +81,7 @@ public final class ApolloCodegen: Sendable {
   // MARK: - Internal
 
   @dynamicMemberLookup
-  final class ConfigurationContext: Sendable {
+  struct ConfigurationContext: Sendable, Equatable {
     let config: ApolloCodegenConfiguration
     let pluralizer: Pluralizer
     let rootURL: URL?

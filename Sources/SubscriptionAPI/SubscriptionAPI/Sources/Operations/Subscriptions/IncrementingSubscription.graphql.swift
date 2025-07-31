@@ -18,9 +18,9 @@ public struct IncrementingSubscription: GraphQLSubscription {
 
     public static var __parentType: any ApolloAPI.ParentType { SubscriptionAPI.Objects.Subscription }
     public static var __selections: [ApolloAPI.Selection] { [
-      .field("numberIncremented", Int?.self),
+      .field("numberIncremented", Int32?.self),
     ] }
 
-    public var numberIncremented: Int? { __data["numberIncremented"] }
+    public var numberIncremented: Int32? { __data["numberIncremented"] }
   }
 }

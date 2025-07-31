@@ -292,11 +292,11 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
     override class var __selections: [Selection] {
       [
         .field("__typename", String.self),
-        .field("ticker", Int.self),
+        .field("ticker", Int32.self),
       ]
     }
 
-    var ticker: Int { __data["ticker"] }
+    var ticker: Int32 { __data["ticker"] }
   }
 
   func test__parsing__givenHeartbeat_shouldIgnore() async throws {

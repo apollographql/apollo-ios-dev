@@ -15,17 +15,17 @@ public struct CrocodileFragment: AnimalKingdomAPI.SelectionSet, Fragment {
   public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("species", String.self),
-    .field("age", Int.self),
+    .field("age", Int32.self),
     .field("tag", String?.self, arguments: ["id": "albino"]),
   ] }
 
   public var species: String { __data["species"] }
-  public var age: Int { __data["age"] }
+  public var age: Int32 { __data["age"] }
   public var tag: String? { __data["tag"] }
 
   public init(
     species: String,
-    age: Int,
+    age: Int32,
     tag: String? = nil
   ) {
     self.init(_dataDict: DataDict(

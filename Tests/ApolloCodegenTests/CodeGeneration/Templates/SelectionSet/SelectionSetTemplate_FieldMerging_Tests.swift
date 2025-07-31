@@ -166,7 +166,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let expected = """
 
       public var petName: String { __data["petName"] }
-      public var bodyTemperature: Int { __data["bodyTemperature"] }
+      public var bodyTemperature: Int32 { __data["bodyTemperature"] }
     }
     """
 
