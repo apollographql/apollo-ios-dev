@@ -17,11 +17,10 @@ import { emptyValidationOptions } from "../__testUtils__/validationHelpers";
 describe("given schema", () => {
   const schemaSDL: string =
 `type Query {
-  allAnimals(id: String!): [Animal!]
+  allAnimals: [Animal!]
 }
 
-interface Animal @typePolicy(keyFields: "id") {
-  id: String! 
+interface Animal {
   species: String!
   friend: Animal!
 }
@@ -29,8 +28,6 @@ interface Animal @typePolicy(keyFields: "id") {
 interface Pet {
   name: String!
 }
-  
-extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "id")
 `;
 
   const schema: GraphQLSchema = loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);

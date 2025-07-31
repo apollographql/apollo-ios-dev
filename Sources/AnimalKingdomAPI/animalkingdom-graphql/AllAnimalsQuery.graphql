@@ -1,5 +1,5 @@
-query AllAnimalsQuery {
-  allAnimals {
+query AllAnimalsQuery(species: String) {
+  allAnimals(species: $species) {
     __typename
     id
     height {

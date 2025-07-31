@@ -1,5 +1,5 @@
 type Query {
-  allAnimals: [Animal!]!
+  allAnimals(species: String): [Animal!]!
   classroomPets: [ClassroomPet]
   pets(filters: PetSearchFilters!): [Pet!]!
   findPet(input: PetSearchInput!): [Pet!]!

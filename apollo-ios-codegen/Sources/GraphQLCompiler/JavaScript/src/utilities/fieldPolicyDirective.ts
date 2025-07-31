@@ -30,20 +30,20 @@ export function addFieldPolicyDirectivesToSchema(
     const type = types[t];
 
     if (type instanceof GraphQLObjectType || type instanceof GraphQLInterfaceType) {
-      (type as any)._apolloFieldPolicies = fieldPoliciesFor(type);
+      // (type as any)._apolloFieldPolicies = applyFieldPoliciesFor(type);
+      applyFieldPoliciesFor(type);
     }
   }
 }
 
-export function fieldPoliciesFor(
+export function applyFieldPoliciesFor(
   type: GraphQLCompositeType
-): Record<string, string[]> {
+) {
   const directives = fieldPolicyDirectivesFor(type)
   if (!directives || isUnionType(type)) {
-    return {};
+    return;
   }
 
-  const fieldPolicies: Record<string, string[]> = {};
   const typeFields = type.getFields()
 
   for (const directive of directives) {
@@ -101,28 +101,41 @@ export function fieldPoliciesFor(
       }
     }
 
-    // validate that if we have a list input parameter we have a list return type
+    // List input and return type validation
     if (inputs) {
+      var numListInputs = 0;
+      const hasListReturnType = isListType(actualField.type);
+
       for (const inputArg of inputs) {
-        if (isListType(inputArg.type)) {
-          if (!isListType(actualField.type)) {
-            throw new GraphQLError(
-              `@fieldPolicy requires fields with List input type to have a List return type.`,
-              { nodes: actualField.astNode }
-            );
-          } else {
-            break;
-          }
+        if (inputArg.type.kind == "ListType") {
+          numListInputs += 1;
         }
+      }
+
+      // validate we have at most 1 list input parameter
+      if (numListInputs > 1) {
+        throw new GraphQLError(
+          `@fieldPolicy can only have at most 1 List type input parameter.`,
+          { nodes: actualField.astNode }
+        );
+      }
+
+      // validate that a list input parameter and return type exist either together
+      // or not at all
+      if ((hasListReturnType && numListInputs != 1) || (numListInputs == 1 && !hasListReturnType)) {
+        throw new GraphQLError(
+          `@fieldPolicy requires either both a List return type and 1 List input parameter, or neither.`,
+          { nodes: actualField.astNode }
+        );
       }
     }
 
-    if (!fieldPolicies[forField]) {
-      fieldPolicies[forField] = keyArgs
+    if (!(actualField as any)._apolloFieldPolicies) {
+      (actualField as any)._apolloFieldPolicies = keyArgs
+    } else {
+      (actualField as any)._apolloFieldPolicies = []
     }
   }
-
-  return fieldPolicies;
 }
 
 function fieldPolicyDirectivesFor(
