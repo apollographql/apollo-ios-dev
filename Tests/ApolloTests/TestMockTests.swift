@@ -648,10 +648,10 @@ final class Height: MockObject {
   static let _mockFields = MockFields()
 
   struct MockFields {
-    @Field<Int>("meters") public var meters
-    @Field<Int>("feet") public var feet
-    @Field<Int>("yards") public var yards
-    @Field<Int>("inches") public var inches
+    @Field<Int32>("meters") public var meters
+    @Field<Int32>("feet") public var feet
+    @Field<Int32>("yards") public var yards
+    @Field<Int32>("inches") public var inches
   }
 }
 

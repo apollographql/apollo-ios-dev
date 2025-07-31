@@ -175,7 +175,7 @@ class MutatingSelectionSetTests: XCTestCase {
         set { __data["name"] = newValue }
       }
 
-      var age: Int? {
+      var age: Int32? {
         get { __data["age"] }
         set { __data["age"] = newValue }
       }
@@ -183,7 +183,7 @@ class MutatingSelectionSetTests: XCTestCase {
       init(
         __typename: String,
         name: String,
-        age: Int
+        age: Int32
       ) {
         self.init(_dataDict: DataDict(
           data: [
@@ -216,7 +216,7 @@ class MutatingSelectionSetTests: XCTestCase {
         init(
           __typename: String,
           name: String,
-          age: Int,
+          age: Int32,
           birthMonth: String?
         ) {
           self.init(_dataDict: DataDict(

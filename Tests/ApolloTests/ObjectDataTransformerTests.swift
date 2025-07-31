@@ -21,7 +21,7 @@ class ObjectDataTransformerTests: XCTestCase {
 
   // MARK: ObjectData Tests
 
-  func test__ObjectData_subscript_ScalarType__givenData_asInt_equalToBoolFalse_shouldReturnIntType() {
+  func test__ObjectData_subscript_ScalarType__givenData_asInt_equalToBoolFalse_shouldReturnInt32Type() {
     // given
     let dataTransformer = ObjectData(
       _transformer: DataTransformer(),
@@ -32,10 +32,10 @@ class ObjectDataTransformerTests: XCTestCase {
     let actual = dataTransformer["intKey"]
 
     // then
-    expect(actual).to(beAnInstanceOf(Int.self))
+    expect(actual).to(beAnInstanceOf(Int32.self))
   }
 
-  func test__ObjectData_subscript_ScalarType__givenData_asInt_equalToBoolTrue_shouldReturnIntType() {
+  func test__ObjectData_subscript_ScalarType__givenData_asInt_equalToBoolTrue_shouldReturnInt32Type() {
     // given
     let dataTransformer = ObjectData(
       _transformer: DataTransformer(),
@@ -46,10 +46,10 @@ class ObjectDataTransformerTests: XCTestCase {
     let actual = dataTransformer["intKey"]
 
     // then
-    expect(actual).to(beAnInstanceOf(Int.self))
+    expect(actual).to(beAnInstanceOf(Int32.self))
   }
 
-  func test__ObjectData_subscript_ScalarType__givenData_asInt_outsideBoolRange_shouldReturnIntType() {
+  func test__ObjectData_subscript_ScalarType__givenData_asInt_outsideBoolRange_shouldReturnInt32Type() {
     // given
     let dataTransformer = ObjectData(
       _transformer: DataTransformer(),
@@ -60,7 +60,7 @@ class ObjectDataTransformerTests: XCTestCase {
     let actual = dataTransformer["intKey"]
 
     // then
-    expect(actual).to(beAnInstanceOf(Int.self))
+    expect(actual).to(beAnInstanceOf(Int32.self))
   }
 
   func test__ObjectData_subscript_ScalarType__givenData_asBool_true_shouldReturnBoolType() {
@@ -93,7 +93,7 @@ class ObjectDataTransformerTests: XCTestCase {
 
   // MARK: ListData Tests
 
-  func test__ListData_subscript_ScalarType__givenData_asInt_equalToBoolFalse_shouldReturnIntType() {
+  func test__ListData_subscript_ScalarType__givenData_asInt_equalToBoolFalse_shouldReturnInt32Type() {
     // given
     let dataTransformer = ListData(_transformer: DataTransformer(), _rawData: [0])
 
@@ -101,10 +101,10 @@ class ObjectDataTransformerTests: XCTestCase {
     let actual = dataTransformer[0]
 
     // then
-    expect(actual).to(beAnInstanceOf(Int.self))
+    expect(actual).to(beAnInstanceOf(Int32.self))
   }
 
-  func test__ListData_subscript_ScalarType__givenData_asInt_equalToBoolTrue_shouldReturnIntType() {
+  func test__ListData_subscript_ScalarType__givenData_asInt_equalToBoolTrue_shouldReturnInt32Type() {
     // given
     let dataTransformer = ListData(_transformer: DataTransformer(), _rawData: [1])
 
@@ -112,10 +112,10 @@ class ObjectDataTransformerTests: XCTestCase {
     let actual = dataTransformer[0]
 
     // then
-    expect(actual).to(beAnInstanceOf(Int.self))
+    expect(actual).to(beAnInstanceOf(Int32.self))
   }
 
-  func test__ListData_subscript_ScalarType__givenData_asInt_outsideBoolRange_shouldReturnIntType() {
+  func test__ListData_subscript_ScalarType__givenData_asInt_outsideBoolRange_shouldReturnInt32Type() {
     // given
     let dataTransformer = ListData(_transformer: DataTransformer(), _rawData: [2])
 
@@ -123,7 +123,7 @@ class ObjectDataTransformerTests: XCTestCase {
     let actual = dataTransformer[0]
 
     // then
-    expect(actual).to(beAnInstanceOf(Int.self))
+    expect(actual).to(beAnInstanceOf(Int32.self))
   }
 
   func test__ListData_subscript_ScalarType__givenData_asBool_true_shouldReturnBoolType() {
