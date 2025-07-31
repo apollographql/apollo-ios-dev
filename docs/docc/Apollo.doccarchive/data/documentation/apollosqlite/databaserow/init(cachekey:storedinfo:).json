@@ -2,29 +2,60 @@
   "hierarchy" : {
     "paths" : [
       [
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow"
       ]
     ]
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow"
+    "url" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow\/init(cacheKey:storedInfo:)"
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:12ApolloSQLite11DatabaseRowV",
+    "externalID" : "s:12ApolloSQLite11DatabaseRowV8cacheKey10storedInfoACSS_SStcfc",
     "fragments" : [
       {
-        "kind" : "keyword",
-        "text" : "struct"
+        "kind" : "identifier",
+        "text" : "init"
       },
       {
         "kind" : "text",
-        "text" : " "
+        "text" : "("
       },
       {
-        "kind" : "identifier",
-        "text" : "DatabaseRow"
+        "kind" : "externalParam",
+        "text" : "cacheKey"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:6Apollo8CacheKeya",
+        "text" : "CacheKey"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "storedInfo"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
+      },
+      {
+        "kind" : "text",
+        "text" : ")"
       }
     ],
     "modules" : [
@@ -32,16 +63,10 @@
         "name" : "ApolloSQLite"
       }
     ],
-    "navigatorTitle" : [
-      {
-        "kind" : "identifier",
-        "text" : "DatabaseRow"
-      }
-    ],
     "role" : "symbol",
-    "roleHeading" : "Structure",
-    "symbolKind" : "struct",
-    "title" : "DatabaseRow"
+    "roleHeading" : "Initializer",
+    "symbolKind" : "init",
+    "title" : "init(cacheKey:storedInfo:)"
   },
   "primaryContentSections" : [
     {
@@ -56,15 +81,45 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "struct"
+              "text" : "init"
             },
             {
               "kind" : "text",
-              "text" : " "
+              "text" : "("
             },
             {
-              "kind" : "identifier",
-              "text" : "DatabaseRow"
+              "kind" : "externalParam",
+              "text" : "cacheKey"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo8CacheKeya",
+              "text" : "CacheKey"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "storedInfo"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
+            },
+            {
+              "kind" : "text",
+              "text" : ")"
             }
           ]
         }
@@ -80,18 +135,10 @@
   "sections" : [
 
   ],
-  "topicSections" : [
-    {
-      "identifiers" : [
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow\/init(cacheKey:storedInfo:)"
-      ],
-      "title" : "Initializers"
-    }
-  ],
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apollosqlite\/databaserow"
+        "\/documentation\/apollosqlite\/databaserow\/init(cachekey:storedinfo:)"
       ],
       "traits" : [
         {

@@ -65,7 +65,6 @@ public class GraphQLNamedType:
 }
 
 public final class GraphQLScalarType: GraphQLNamedType {
-
   public let specifiedByURL: String?
 
   public var isCustomScalar: Bool {
