@@ -26,7 +26,7 @@ final class OffsetTests: XCTestCase {
   private func createPager() async -> GraphQLQueryPager<PaginationOutput<Query, Query>> {
     let pageSize = 2
     let initialQuery = Query()
-    initialQuery.__variables = ["id": "2001", "offset": 0, "limit": pageSize]
+    initialQuery.__variables = ["id": "2001", "offset": 0, "limit": Int32(pageSize)]
     let pager = GraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
       initialQuery: initialQuery,      
@@ -50,8 +50,8 @@ final class OffsetTests: XCTestCase {
         let nextQuery = Query()
         nextQuery.__variables = [
           "id": "2001",
-          "offset": pageInfo.offset,
-          "limit": pageSize,
+          "offset": Int32(pageInfo.offset),
+          "limit": Int32(pageSize),
         ]
         return nextQuery
       }

@@ -31,12 +31,12 @@ enum Mocks {
         class FriendsConnection: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
-            .field("totalCount", Int.self),
+            .field("totalCount", Int32.self),
             .field("friends", [Character].self),
             .field("pageInfo", PageInfo.self),
           ]}
 
-          var totalCount: Int { __data["totalCount"] }
+          var totalCount: Int32 { __data["totalCount"] }
           var friends: [Character] { __data["friends"] }
           var pageInfo: PageInfo { __data["pageInfo"] }
 
@@ -93,12 +93,12 @@ enum Mocks {
         class FriendsConnection: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
-            .field("totalCount", Int.self),
+            .field("totalCount", Int32.self),
             .field("friends", [Character].self),
             .field("pageInfo", PageInfo.self),
           ]}
 
-          var totalCount: Int { __data["totalCount"] }
+          var totalCount: Int32 { __data["totalCount"] }
           var friends: [Character] { __data["friends"] }
           var pageInfo: PageInfo { __data["pageInfo"] }
 
@@ -151,12 +151,12 @@ enum Mocks {
         class FriendsConnection: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
-            .field("totalCount", Int.self),
+            .field("totalCount", Int32.self),
             .field("friends", [Character].self),
             .field("pageInfo", PageInfo.self),
           ]}
 
-          var totalCount: Int { __data["totalCount"] }
+          var totalCount: Int32 { __data["totalCount"] }
           var friends: [Character] { __data["friends"] }
           var pageInfo: PageInfo { __data["pageInfo"] }
 
