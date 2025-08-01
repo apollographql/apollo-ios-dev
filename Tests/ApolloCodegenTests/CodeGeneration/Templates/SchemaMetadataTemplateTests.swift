@@ -195,41 +195,6 @@ class SchemaMetadataTemplateTests: XCTestCase {
       .to(beNil())
   }
 
-  func test__render__given_cocoapodsCompatibleImportStatements_true_shouldGenerateEmbeddedProtocols_withApolloTargetName() {
-    // given
-    buildSubject(
-      config: .mock(
-        .other,
-        options: .init(cocoapodsCompatibleImportStatements: true),
-        schemaNamespace: "aName"
-      )
-    )
-
-    let expectedTemplate = """
-    public protocol SelectionSet: Apollo.SelectionSet & Apollo.RootSelectionSet
-    where Schema == AName.SchemaMetadata {}
-
-    public protocol InlineFragment: Apollo.SelectionSet & Apollo.InlineFragment
-    where Schema == AName.SchemaMetadata {}
-
-    public protocol MutableSelectionSet: Apollo.MutableRootSelectionSet
-    where Schema == AName.SchemaMetadata {}
-
-    public protocol MutableInlineFragment: Apollo.MutableSelectionSet & Apollo.InlineFragment
-    where Schema == AName.SchemaMetadata {}
-    """
-
-    // when
-    let actualTemplate = renderTemplate()
-    let actualDetached = renderDetachedTemplate()
-
-    // then
-    expect(actualTemplate)
-      .to(equalLineByLine(expectedTemplate, ignoringExtraLines: true))
-    expect(actualDetached)
-      .to(beNil())
-  }
-
   // MARK: Schema Tests
 
   func test__render__givenModuleEmbeddedInTarget_withInternalAccessModifier_shouldGenerateEnumDefinition_withInternalAccess() {
@@ -294,22 +259,6 @@ class SchemaMetadataTemplateTests: XCTestCase {
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
-  }
-
-  func test__render__givenCocoapodsCompatibleImportStatements_true_shouldGenerateEnumDefinition_withApolloTargetName() {
-    // given
-    buildSubject(config: .mock(options: .init(cocoapodsCompatibleImportStatements: true)))
-
-    let expected = """
-    enum SchemaMetadata: Apollo.SchemaMetadata {
-      static let configuration: any Apollo.SchemaConfiguration.Type = SchemaConfiguration.self
-    """
-
-    // when
-    let actual = renderTemplate()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }
 
   func test__render__givenWithReferencedObjects_generatesObjectTypeFunctionCorrectlyCased() {

@@ -1,4 +1,4 @@
-.PHONY: clean wipe build build-for-cocoapods test
+.PHONY: clean wipe build
 
 default: clean build
 
@@ -18,9 +18,6 @@ build-cli:
 build-cli-universal:
 	swift build --product apollo-ios-cli -c release --arch arm64 --arch x86_64; \
 	cp -f .build/apple/Products/Release/apollo-ios-cli apollo-ios-cli
-
-build-cli-for-cocoapods:
-	swift build --product apollo-ios-cli -c release -Xswiftc -DCOCOAPODS
 
 archive-cli-for-release:
 	make build-cli-universal; \

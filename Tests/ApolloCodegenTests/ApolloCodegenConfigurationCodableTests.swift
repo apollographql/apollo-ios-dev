@@ -56,7 +56,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             ]
           ),
           reduceGeneratedSchemaTypes: false,
-          cocoapodsCompatibleImportStatements: true,
           warningsOnDeprecatedUsage: .exclude,
           conversionStrategies:.init(
             enumCases: .none,
@@ -110,7 +109,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             }
           ],
           "appendSchemaTypeFilenameSuffix" : true,
-          "cocoapodsCompatibleImportStatements" : true,
           "conversionStrategies" : {
             "enumCases" : "none",
             "fieldAccessors" : "camelCase",
@@ -1285,7 +1283,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1382,7 +1379,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "additionalInflectionRules" : [
 
           ],
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1476,7 +1472,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1573,7 +1568,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "additionalInflectionRules" : [
 
           ],
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1667,7 +1661,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1770,7 +1763,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1877,7 +1869,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1984,7 +1975,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -2091,7 +2081,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -2198,7 +2187,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -2305,7 +2293,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",

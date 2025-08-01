@@ -10,14 +10,12 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
   private func buildConfig(
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType,
     schemaNamespace: String = "testSchema",
-    operations: ApolloCodegenConfiguration.OperationsFileOutput,
-    cocoapodsCompatibleImportStatements: Bool = false
+    operations: ApolloCodegenConfiguration.OperationsFileOutput
   ) -> ApolloCodegenConfiguration {
     ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       input: .init(schemaPath: "MockInputPath", operationSearchPaths: []),
-      output: .mock(moduleType: moduleType, operations: operations),
-      options: .init(cocoapodsCompatibleImportStatements: cocoapodsCompatibleImportStatements)
+      output: .mock(moduleType: moduleType, operations: operations)
     )
   }
 
@@ -119,71 +117,6 @@ class TemplateRenderer_SchemaFile_Tests: XCTestCase {
 
     for test in tests {
       let config = buildConfig(moduleType: test.schemaTypes, operations: test.operations)
-      let subject = buildSubject(config: config)
-
-      // when
-      let (actual, _) = subject.render()
-
-      // then
-      expect(actual).to(equalLineByLine(expected, atLine: 4, ignoringExtraLines: true))
-    }
-  }
-
-  func test__renderTargetSchemaFile__given_cocoapodsCompatibleImportStatements_true_allSchemaTypesOperationsCombinations_shouldIncludeImportStatement() {
-    // given
-    let expected = """
-    import Apollo
-
-    """
-
-    let tests: [(
-      schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType,
-      operations: ApolloCodegenConfiguration.OperationsFileOutput
-    )] = [
-      (
-        schemaTypes: .swiftPackage(),
-        operations: .relative(subpath: nil)
-      ),
-      (
-        schemaTypes: .swiftPackage(),
-        operations: .absolute(path: "path")
-      ),
-      (
-        schemaTypes: .swiftPackage(),
-        operations: .inSchemaModule
-      ),
-      (
-        schemaTypes: .other,
-        operations: .relative(subpath: nil)
-      ),
-      (
-        schemaTypes: .other,
-        operations: .absolute(path: "path")
-      ),
-      (
-        schemaTypes: .other,
-        operations: .inSchemaModule
-      ),
-      (
-        schemaTypes: .embeddedInTarget(name: "MockApplication"),
-        operations: .relative(subpath: nil)
-      ),
-      (
-        schemaTypes: .embeddedInTarget(name: "MockApplication"),
-        operations: .absolute(path: "path")
-      ),
-      (
-        .embeddedInTarget(name: "MockApplication"),
-        operations: .inSchemaModule
-      )
-    ]
-
-    for test in tests {
-      let config = buildConfig(
-        moduleType: test.schemaTypes,
-        operations: test.operations,
-        cocoapodsCompatibleImportStatements: true
-      )
       let subject = buildSubject(config: config)
 
       // when

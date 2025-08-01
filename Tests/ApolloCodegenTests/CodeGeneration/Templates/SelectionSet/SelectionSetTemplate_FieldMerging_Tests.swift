@@ -36,8 +36,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     fieldMerging: ApolloCodegenConfiguration.FieldMerging = .all,
     selectionSetInitializers: Bool = false,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude,
-    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = .init(),
-    cocoapodsImportStatements: Bool = false
+    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = .init()
   ) async throws {
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
@@ -52,8 +51,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       output: configOutput,
       options: .init(
         additionalInflectionRules: inflectionRules,
-        schemaDocumentation: schemaDocumentation,
-        cocoapodsCompatibleImportStatements: cocoapodsImportStatements,
+        schemaDocumentation: schemaDocumentation,        
         warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
         conversionStrategies: conversionStrategies
       ),

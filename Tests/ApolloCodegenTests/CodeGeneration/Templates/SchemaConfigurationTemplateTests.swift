@@ -121,25 +121,4 @@ class SchemaConfigurationTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 10, ignoringExtraLines: false))
   }
 
-  func test__render_givenCocoapodsCompatibleImportStatements_true__rendersTemplateWithApolloTargetName() throws {
-    // given
-    let expected = """
-    enum SchemaConfiguration: Apollo.SchemaConfiguration {
-      static func cacheKeyInfo(for type: Apollo.Object, object: Apollo.ObjectData) -> CacheKeyInfo? {
-        // Implement this function to configure cache key resolution for your schema types.
-        return nil
-      }
-    }
-
-    """
-
-    buildSubject(config: .mock(options: .init(cocoapodsCompatibleImportStatements: true)))
-    // when
-
-    let (actual, _) = subject.render()
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 10, ignoringExtraLines: false))
-  }
-
 }

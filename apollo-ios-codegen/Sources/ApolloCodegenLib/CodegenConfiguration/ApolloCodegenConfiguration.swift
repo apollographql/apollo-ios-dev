@@ -293,10 +293,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       /// module to support your preferred dependency manager. You must specify the name of the
       /// module you will create in the `schemaNamespace` property as this will be used in `import`
       /// statements of generated operation files.
-      ///
-      /// Use this option for dependency managers, such as CocoaPods. Example usage would be to 
-      /// create the podspec file that is expecting the generated files in the configured output 
-      /// location.
       case other
 
       public init(from decoder: any Decoder) throws {
@@ -654,16 +650,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     public let schemaCustomization: SchemaCustomization
     /// Whether to reduce the number of schema types that are generated to only those that are referenced in an operation.
     public let reduceGeneratedSchemaTypes: Bool
-    /// Generate import statements that are compatible with including `Apollo` via Cocoapods.
-    ///
-    /// Cocoapods bundles all files from subspecs into the main target for a pod. This means that
-    /// when including `Apollo` via Cocoapods, the files in `ApolloAPI` will be added to the
-    /// `Apollo` target. In order for the generated code to compile, all `import ApolloAPI`
-    /// statements must be generated as `import Apollo` instead. Setting this option to `true`
-    /// configures the import statements to be compatible with Cocoapods.
-    ///
-    /// Defaults to `false`.
-    public let cocoapodsCompatibleImportStatements: Bool
     /// Annotate generated Swift code with the Swift `available` attribute and `deprecated`
     /// argument for parts of the GraphQL schema annotated with the built-in `@deprecated`
     /// directive.
@@ -704,7 +690,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       public static let operationDocumentFormat: OperationDocumentFormat = .definition
       public static let schemaCustomization: SchemaCustomization = .init()
       public static let reduceGeneratedSchemaTypes: Bool = false
-      public static let cocoapodsCompatibleImportStatements: Bool = false
       public static let warningsOnDeprecatedUsage: Composition = .include
       public static let conversionStrategies: ConversionStrategies = .init()
       public static let pruneGeneratedFiles: Bool = true
@@ -723,8 +708,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     ///   - operationDocumentFormat: How to generate the operation documents for your generated operations.
     ///   - schemaCustomization: Customization options to be applied to the schema during code generation.
     ///   - reduceGeneratedSchemaTypes: Whether to reduce the number of schema types that are generated to only those that are referenced in an operation.
-    ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
-    ///     including `Apollo` via Cocoapods.
     ///   - warningsOnDeprecatedUsage: Annotate generated Swift code with the Swift `available`
     ///     attribute and `deprecated` argument for parts of the GraphQL schema annotated with the
     ///     built-in `@deprecated` directive.
@@ -742,7 +725,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       operationDocumentFormat: OperationDocumentFormat = Default.operationDocumentFormat,
       schemaCustomization: SchemaCustomization = Default.schemaCustomization,
       reduceGeneratedSchemaTypes: Bool = Default.reduceGeneratedSchemaTypes,
-      cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
       warningsOnDeprecatedUsage: Composition = Default.warningsOnDeprecatedUsage,
       conversionStrategies: ConversionStrategies = Default.conversionStrategies,
       pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
@@ -755,7 +737,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       self.operationDocumentFormat = operationDocumentFormat
       self.schemaCustomization = schemaCustomization
       self.reduceGeneratedSchemaTypes = reduceGeneratedSchemaTypes
-      self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
       self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
       self.conversionStrategies = conversionStrategies
       self.pruneGeneratedFiles = pruneGeneratedFiles
@@ -774,7 +755,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       case operationDocumentFormat
       case schemaCustomization
       case reduceGeneratedSchemaTypes
-      case cocoapodsCompatibleImportStatements
       case warningsOnDeprecatedUsage
       case conversionStrategies
       case pruneGeneratedFiles
@@ -825,11 +805,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
         forKey: .reduceGeneratedSchemaTypes
       ) ?? Default.reduceGeneratedSchemaTypes
 
-      cocoapodsCompatibleImportStatements = try values.decodeIfPresent(
-        Bool.self,
-        forKey: .cocoapodsCompatibleImportStatements
-      ) ?? Default.cocoapodsCompatibleImportStatements
-
       warningsOnDeprecatedUsage = try values.decodeIfPresent(
         Composition.self,
         forKey: .warningsOnDeprecatedUsage
@@ -861,7 +836,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       try container.encode(self.operationDocumentFormat, forKey: .operationDocumentFormat)
       try container.encode(self.schemaCustomization, forKey: .schemaCustomization)
       try container.encode(self.reduceGeneratedSchemaTypes, forKey: .reduceGeneratedSchemaTypes)
-      try container.encode(self.cocoapodsCompatibleImportStatements, forKey: .cocoapodsCompatibleImportStatements)
       try container.encode(self.warningsOnDeprecatedUsage, forKey: .warningsOnDeprecatedUsage)
       try container.encode(self.conversionStrategies, forKey: .conversionStrategies)
       try container.encode(self.pruneGeneratedFiles, forKey: .pruneGeneratedFiles)
@@ -1255,10 +1229,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     public static let operationManifest: OperationManifestConfiguration? = nil
   }
 
-  // MARK: - Helper Properties
-  
-  let ApolloAPITargetName: String
-
   // MARK: Initializers
 
   /// Designated initializer.
@@ -1285,7 +1255,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     self.experimentalFeatures = experimentalFeatures
     self.schemaDownload = schemaDownload
     self.operationManifest = operationManifest
-    self.ApolloAPITargetName = options.cocoapodsCompatibleImportStatements ? "Apollo" : "ApolloAPI"
   }
 
   // MARK: Codable
@@ -1714,8 +1683,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///   - selectionSetInitializers: Which generated selection sets should include
   ///     generated initializers.
   ///   - operationDocumentFormat: How to generate the operation documents for your generated operations.
-  ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
-  ///     including `Apollo` via Cocoapods.
+  ///   - cocoapodsCompatibleImportStatements: **[Deprecated] This option is ignored**
   ///   - warningsOnDeprecatedUsage: Annotate generated Swift code with the Swift `available`
   ///     attribute and `deprecated` argument for parts of the GraphQL schema annotated with the
   ///     built-in `@deprecated` directive.
@@ -1730,7 +1698,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///
   @_disfavoredOverload
   @available(*, deprecated,
-              renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:reduceGeneratedSchemaTypes:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
+              renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:reduceGeneratedSchemaTypes:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
   )
   public init(
     additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
@@ -1739,7 +1707,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     selectionSetInitializers: ApolloCodegenConfiguration.SelectionSetInitializers = Default.selectionSetInitializers,
     operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat = Default.operationDocumentFormat,
     schemaCustomization: ApolloCodegenConfiguration.SchemaCustomization = Default.schemaCustomization,
-    cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
+    cocoapodsCompatibleImportStatements: Bool = false,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
@@ -1753,7 +1721,6 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.operationDocumentFormat = operationDocumentFormat
     self.schemaCustomization = schemaCustomization
     self.reduceGeneratedSchemaTypes = Default.reduceGeneratedSchemaTypes
-    self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
     self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
     self.conversionStrategies = conversionStrategies
     self.pruneGeneratedFiles = pruneGeneratedFiles
@@ -1772,8 +1739,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///   - selectionSetInitializers: Which generated selection sets should include
   ///     generated initializers.
   ///   - apqs: Whether the generated operations should use Automatic Persisted Queries.
-  ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
-  ///     including `Apollo` via Cocoapods.
+  ///   - cocoapodsCompatibleImportStatements: **[Deprecated] This option is ignored**
   ///   - warningsOnDeprecatedUsage: Annotate generated Swift code with the Swift `available`
   ///     attribute and `deprecated` argument for parts of the GraphQL schema annotated with the
   ///     built-in `@deprecated` directive.
@@ -1782,7 +1748,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///   - pruneGeneratedFiles: Whether unused generated files will be automatically deleted.
   ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation class types will be marked as `final`.
   @available(*, deprecated,
-              renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
+              renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
   )
   @_disfavoredOverload
   public init(
@@ -1792,7 +1758,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     schemaDocumentation: ApolloCodegenConfiguration.Composition = Default.schemaDocumentation,
     selectionSetInitializers: ApolloCodegenConfiguration.SelectionSetInitializers = Default.selectionSetInitializers,
     apqs: ApolloCodegenConfiguration.APQConfig,
-    cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
+    cocoapodsCompatibleImportStatements: Bool = false,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
@@ -1803,7 +1769,6 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.schemaDocumentation = schemaDocumentation
     self.selectionSetInitializers = selectionSetInitializers
     self.operationDocumentFormat = apqs.operationDocumentFormat
-    self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
     self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
     self.conversionStrategies = conversionStrategies
     self.pruneGeneratedFiles = pruneGeneratedFiles
@@ -1824,8 +1789,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///   - selectionSetInitializers: Which generated selection sets should include
   ///     generated initializers.
   ///   - operationDocumentFormat: How to generate the operation documents for your generated operations.
-  ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
-  ///     including `Apollo` via Cocoapods.
+  ///   - cocoapodsCompatibleImportStatements: **[Deprecated] This option is ignored**
   ///   - warningsOnDeprecatedUsage: Annotate generated Swift code with the Swift `available`
   ///     attribute and `deprecated` argument for parts of the GraphQL schema annotated with the
   ///     built-in `@deprecated` directive.
@@ -1834,7 +1798,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
   ///   - pruneGeneratedFiles: Whether unused generated files will be automatically deleted.
   ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation class types will be marked as `final`.
   @available(*, deprecated,
-              renamed: "init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:)"
+              renamed: "init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:)"
   )
   @_disfavoredOverload
   public init(
@@ -1844,7 +1808,7 @@ extension ApolloCodegenConfiguration.OutputOptions {
     schemaDocumentation: ApolloCodegenConfiguration.Composition = Default.schemaDocumentation,
     selectionSetInitializers: ApolloCodegenConfiguration.SelectionSetInitializers = Default.selectionSetInitializers,
     operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat = Default.operationDocumentFormat,
-    cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
+    cocoapodsCompatibleImportStatements: Bool = false,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
     conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
     pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
@@ -1855,7 +1819,6 @@ extension ApolloCodegenConfiguration.OutputOptions {
     self.schemaDocumentation = schemaDocumentation
     self.selectionSetInitializers = selectionSetInitializers
     self.operationDocumentFormat = operationDocumentFormat
-    self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
     self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
     self.conversionStrategies = conversionStrategies
     self.pruneGeneratedFiles = pruneGeneratedFiles

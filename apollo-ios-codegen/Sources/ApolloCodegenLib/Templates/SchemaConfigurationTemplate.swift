@@ -23,9 +23,9 @@ struct SchemaConfigurationTemplate: TemplateRenderer {
   ) -> TemplateString {
     return """
     \(accessControlModifier(for: .parent))enum SchemaConfiguration: \
-    \(config.ApolloAPITargetName).SchemaConfiguration {
+    \(TemplateConstants.ApolloAPITargetName).SchemaConfiguration {
       \(accessControlModifier(for: .member))\
-    static func cacheKeyInfo(for type: \(config.ApolloAPITargetName).Object, object: \(config.ApolloAPITargetName).ObjectData) -> CacheKeyInfo? {
+    static func cacheKeyInfo(for type: \(TemplateConstants.ApolloAPITargetName).Object, object: \(TemplateConstants.ApolloAPITargetName).ObjectData) -> CacheKeyInfo? {
         // Implement this function to configure cache key resolution for your schema types.
         return nil
       }

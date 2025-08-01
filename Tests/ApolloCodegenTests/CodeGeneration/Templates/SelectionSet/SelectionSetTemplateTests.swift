@@ -33,8 +33,7 @@ class SelectionSetTemplateTests: XCTestCase {
     inflectionRules: [ApolloCodegenLib.InflectionRule] = [],
     schemaDocumentation: ApolloCodegenConfiguration.Composition = .exclude,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude,
-    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = .init(),
-    cocoapodsImportStatements: Bool = false
+    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = .init()
   ) async throws {
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
@@ -45,7 +44,6 @@ class SelectionSetTemplateTests: XCTestCase {
       options: .init(
         additionalInflectionRules: inflectionRules,
         schemaDocumentation: schemaDocumentation,
-        cocoapodsCompatibleImportStatements: cocoapodsImportStatements,
         warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
         conversionStrategies: conversionStrategies
       )
@@ -71,8 +69,7 @@ class SelectionSetTemplateTests: XCTestCase {
     inflectionRules: [ApolloCodegenLib.InflectionRule] = [],
     schemaDocumentation: ApolloCodegenConfiguration.Composition = .exclude,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude,
-    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = .init(),
-    cocoapodsImportStatements: Bool = false
+    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = .init(),    
   ) async throws -> FragmentTemplate {
     let fragmentDefinition = try XCTUnwrap(ir.compilationResult[fragment: fragmentName])
     let fragment = await ir.build(fragment: fragmentDefinition)
@@ -82,7 +79,6 @@ class SelectionSetTemplateTests: XCTestCase {
       options: .init(
         additionalInflectionRules: inflectionRules,
         schemaDocumentation: schemaDocumentation,
-        cocoapodsCompatibleImportStatements: cocoapodsImportStatements,
         warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
         conversionStrategies: conversionStrategies
       )
@@ -389,87 +385,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
 
-  func test__render_parentType__givenCocoapodsImportStatements_true_rendersParentTypeWithApolloNamespace() async throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    type Dog {
-      species: String!
-    }
-
-    union Animal = Dog
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        ... on Dog {
-          species
-        }
-      }
-    }
-    """
-
-    let expected = """
-      public static var __parentType: any Apollo.ParentType { TestSchema.Unions.Animal }
-    """
-
-    // when
-    try await buildSubjectAndOperation(cocoapodsImportStatements: true)
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
-    )
-
-    let actual = subject.test_render(childEntity: allAnimals.computed)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
-  }
-
   // MARK: - Selections
-
-  func test__render_selections__givenCocoapodsImportStatements_true_rendersSelectionsWithApolloNamespace() async throws {
-    // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    type Animal {
-      FieldName: String!
-    }
-    """
-
-    document = """
-    query TestOperation {
-      allAnimals {
-        FieldName
-      }
-    }
-    """
-
-    let expected = """
-      public static var __selections: [Apollo.Selection] { [
-        .field("__typename", String.self),
-        .field("FieldName", String.self),
-      ] }
-    """
-
-    // when
-    try await buildSubjectAndOperation(cocoapodsImportStatements: true)
-    let allAnimals = try XCTUnwrap(
-      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
-    )
-
-    let actual = subject.test_render(childEntity: allAnimals.computed)
-
-    // then
-    expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
-  }
-
+  
   func test__render_selections__givenNilDirectSelections_mergedFromMultipleSources_doesNotRenderSelections() async throws {
     // given
     schemaSDL = """

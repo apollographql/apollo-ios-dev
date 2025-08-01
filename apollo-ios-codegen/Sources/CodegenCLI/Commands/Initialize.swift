@@ -178,36 +178,6 @@ extension ApolloCodegenConfiguration {
     moduleType: ModuleTypeExpressibleByArgument,
     targetName: String?
   ) -> String {
-    #if COCOAPODS
-      minimalJSON(
-        schemaNamespace: schemaNamespace,
-        supportCocoaPods: true,
-        moduleType: moduleType,
-        targetName: targetName
-      )
-    #else
-      minimalJSON(
-        schemaNamespace: schemaNamespace,
-        supportCocoaPods: false,
-        moduleType: moduleType,
-        targetName: targetName
-      )
-    #endif
-  }
-
-  static func minimalJSON(
-    schemaNamespace: String,
-    supportCocoaPods: Bool,
-    moduleType: ModuleTypeExpressibleByArgument,
-    targetName: String?
-  ) -> String {
-    let cocoaPodsOption = supportCocoaPods ? """
-
-        "options" : {
-          "cocoapodsCompatibleImportStatements" : true
-        },
-      """ : ""
-
     let moduleTarget: String = {
       guard let targetName = targetName else { return "}" }
 
@@ -219,7 +189,7 @@ extension ApolloCodegenConfiguration {
 
     return """
     {
-      "schemaNamespace" : "\(schemaNamespace)",\(cocoaPodsOption)
+      "schemaNamespace" : "\(schemaNamespace)",
       "input" : {
         "operationSearchPaths" : [
           "**/*.graphql"

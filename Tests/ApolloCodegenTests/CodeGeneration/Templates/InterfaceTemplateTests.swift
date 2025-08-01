@@ -113,30 +113,6 @@ class InterfaceTemplateTests: XCTestCase {
     // then
     expect(rendered).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
-  
-  // MARK: Namespacing Tests
-
-  func test_render_givenCocoapodsCompatibleImportStatements_generatesWithApolloNamespace() throws {
-    // given
-    buildSubject(
-      name: "Dog",
-      config: .mock(.other, options: .init(cocoapodsCompatibleImportStatements: true))
-    )
-
-    let expected = """
-    static let Dog = Apollo.Interface(
-      name: "Dog",
-      keyFields: nil,
-      implementingObjects: []
-    )
-    """
-
-    // when
-    let actual = renderSubject()
-
-    // then
-    expect(actual).to(equalLineByLine(expected))
-  }
 
   // MARK: - Reserved Keyword Tests
   
