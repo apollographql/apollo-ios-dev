@@ -333,17 +333,16 @@ struct ImportStatementTemplate {
     static func template(
       for config: ApolloCodegen.ConfigurationContext
     ) -> String {
-      "import \(config.ApolloAPITargetName)"
+      "import \(TemplateConstants.ApolloAPITargetName)"
     }
   }
 
   enum Operation {
     static func template(
       for config: ApolloCodegen.ConfigurationContext
-    ) -> TemplateString {
-      let apolloAPITargetName = config.ApolloAPITargetName
+    ) -> TemplateString {      
       return """
-      @_exported import \(apolloAPITargetName)
+      @_exported import \(TemplateConstants.ApolloAPITargetName)
       \(if: config.output.operations != .inSchemaModule, "import \(config.schemaModuleName)")
       """
     }

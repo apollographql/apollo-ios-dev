@@ -119,7 +119,7 @@ struct SelectionSetTemplate {
       \(SelectionSetNameDocumentation(inlineFragment))
       \(renderAccessControl())\
       struct \(inlineFragment.renderedTypeName): \(SelectionSetType(asInlineFragment: true))\
-      \(if: inlineFragment.isCompositeInlineFragment, ", \(config.ApolloAPITargetName).CompositeInlineFragment")\
+      \(if: inlineFragment.isCompositeInlineFragment, ", \(TemplateConstants.ApolloAPITargetName).CompositeInlineFragment")\
       \(if: inlineFragment.isIdentifiable, ", Identifiable")\
        {
         \(BodyTemplate(context))
@@ -234,7 +234,7 @@ struct SelectionSetTemplate {
   private func ParentTypeTemplate(_ type: GraphQLCompositeType) -> String {
     """
     \(renderAccessControl())\
-    static var __parentType: any \(config.ApolloAPITargetName).ParentType { \
+    static var __parentType: any \(TemplateConstants.ApolloAPITargetName).ParentType { \
     \(GeneratedSchemaTypeReference(type)) }
     """
   }
@@ -243,7 +243,7 @@ struct SelectionSetTemplate {
     _ mergedSources: OrderedSet<IR.MergedSelections.MergedSource>
   ) -> TemplateString {
     return """
-      public static var __mergedSources: [any \(config.ApolloAPITargetName).SelectionSet.Type] { [
+      public static var __mergedSources: [any \(TemplateConstants.ApolloAPITargetName).SelectionSet.Type] { [
         \(mergedSources.map {
         let selectionSetName = SelectionSetNameGenerator.generatedSelectionSetName(
           for: $0,
@@ -278,7 +278,7 @@ struct SelectionSetTemplate {
     if !groupedSelections.isEmpty || shouldIncludeTypenameSelection {
       selectionsTemplate = TemplateString("""
         \(renderAccessControl())\
-        static var __selections: [\(config.ApolloAPITargetName).Selection] { [
+        static var __selections: [\(TemplateConstants.ApolloAPITargetName).Selection] { [
           \(if: shouldIncludeTypenameSelection, ".field(\"__typename\", String.self),")
           \(renderedSelections(groupedSelections.unconditionalSelections, &deprecatedArguments), terminator: ",")
           \(groupedSelections.inclusionConditionGroups.map {
