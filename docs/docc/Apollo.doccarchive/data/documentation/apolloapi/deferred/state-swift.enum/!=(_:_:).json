@@ -18,8 +18,7 @@
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred\/State-swift.enum",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred\/State-swift.enum\/Equatable-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred\/State-swift.enum"
       ]
     ]
   },
@@ -385,17 +384,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/deferred\/state-swift.enum\/!=(_:_:)"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Deferred/State-swift.enum/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred\/State-swift.enum\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/deferred\/state-swift.enum\/equatable-implementations"
 }
 }
 }

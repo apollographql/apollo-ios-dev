@@ -133,7 +133,7 @@
         },
         {
           "code" : [
-            "dictionary.compactMapValues { $0.jsonValue }"
+            "dictionary.mapValues { $0.jsonValue }"
           ],
           "syntax" : "swift",
           "type" : "codeListing"
@@ -152,6 +152,7 @@
   ],
   "seeAlsoSections" : [
     {
+      "anchor" : "JSON-Conversion",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONValue",

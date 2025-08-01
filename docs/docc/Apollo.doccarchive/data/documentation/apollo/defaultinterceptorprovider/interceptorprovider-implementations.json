@@ -32,9 +32,14 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/additionalErrorInterceptor(for:)-5ff01"
+        "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/cacheInterceptor(for:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/graphQLInterceptors(for:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/httpInterceptors(for:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/interceptors(for:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/responseParser(for:)"
       ],
       "title" : "Instance Methods"
     }
@@ -58,7 +63,7 @@
 "doc://Apollo/documentation/Apollo/DefaultInterceptorProvider": {
   "abstract" : [
     {
-      "text" : "The default interceptor provider for typescript-generated code",
+      "text" : "The default interceptor provider.",
       "type" : "text"
     }
   ],
@@ -89,7 +94,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/defaultinterceptorprovider"
 },
-"doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/additionalErrorInterceptor(for:)-5ff01": {
+"doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/cacheInterceptor(for:)": {
   "abstract" : [
 
   ],
@@ -104,7 +109,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "additionalErrorInterceptor"
+      "text" : "cacheInterceptor"
     },
     {
       "kind" : "text",
@@ -132,24 +137,260 @@
     },
     {
       "kind" : "text",
-      "text" : ") -> (any "
+      "text" : ") -> any "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo0A16ErrorInterceptorP",
-      "text" : "ApolloErrorInterceptor"
+      "preciseIdentifier" : "s:6Apollo16CacheInterceptorP",
+      "text" : "CacheInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/cacheInterceptor(for:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "cacheInterceptor(for:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/defaultinterceptorprovider\/cacheinterceptor(for:)"
+},
+"doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/graphQLInterceptors(for:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
     },
     {
       "kind" : "text",
-      "text" : ")?"
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "graphQLInterceptors"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "for"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> [any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo18GraphQLInterceptorP",
+      "text" : "GraphQLInterceptor"
+    },
+    {
+      "kind" : "text",
+      "text" : "]"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/additionalErrorInterceptor(for:)-5ff01",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/graphQLInterceptors(for:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "additionalErrorInterceptor(for:)",
+  "title" : "graphQLInterceptors(for:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/defaultinterceptorprovider\/additionalerrorinterceptor(for:)-5ff01"
+  "url" : "\/documentation\/apollo\/defaultinterceptorprovider\/graphqlinterceptors(for:)"
+},
+"doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/httpInterceptors(for:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "httpInterceptors"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "for"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> [any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15HTTPInterceptorP",
+      "text" : "HTTPInterceptor"
+    },
+    {
+      "kind" : "text",
+      "text" : "]"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/httpInterceptors(for:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "httpInterceptors(for:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/defaultinterceptorprovider\/httpinterceptors(for:)"
+},
+"doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/interceptors(for:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "interceptors"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "for"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12InterceptorsV",
+      "text" : "Interceptors"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/interceptors(for:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "interceptors(for:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/defaultinterceptorprovider\/interceptors(for:)"
+},
+"doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/responseParser(for:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "responseParser"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "for"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo26ResponseParsingInterceptorP",
+      "text" : "ResponseParsingInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/responseParser(for:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "responseParser(for:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/defaultinterceptorprovider\/responseparser(for:)"
 }
 }
 }

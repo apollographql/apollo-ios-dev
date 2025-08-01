@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ResponsePath",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ResponsePath\/CustomStringConvertible-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ResponsePath"
       ]
     ]
   },
@@ -182,17 +181,6 @@
   "title" : "ResponsePath",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/responsepath"
-},
-"doc://Apollo/documentation/Apollo/ResponsePath/CustomStringConvertible-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponsePath\/CustomStringConvertible-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "CustomStringConvertible Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/responsepath\/customstringconvertible-implementations"
 },
 "doc://Apollo/documentation/Apollo/ResponsePath/description": {
   "abstract" : [

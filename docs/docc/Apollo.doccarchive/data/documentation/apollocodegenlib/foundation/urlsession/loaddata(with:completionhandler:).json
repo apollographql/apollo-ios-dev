@@ -18,8 +18,7 @@
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URLSession",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URLSession\/NetworkSession-Implementations"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URLSession"
       ]
     ]
   },
@@ -30,7 +29,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "Foundation",
-    "externalID" : "s:So12NSURLSessionC16ApolloCodegenLibE8loadData4with17completionHandlerSo0aF4TaskCSg10Foundation10URLRequestV_yAJ0F0VSg_So13NSURLResponseCSgs5Error_pSgtctF",
+    "externalID" : "s:So12NSURLSessionC16ApolloCodegenLibE8loadData4with17completionHandlerSo0aF4TaskCSg10Foundation10URLRequestV_yAJ0F0VSg_So13NSURLResponseCSgs5Error_pSgtYaYbctF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -98,7 +97,15 @@
       },
       {
         "kind" : "text",
-        "text" : ")?) -> "
+        "text" : ")?) "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " -> "
       },
       {
         "kind" : "typeIdentifier",
@@ -225,7 +232,15 @@
             },
             {
               "kind" : "text",
-              "text" : ")?) -> "
+              "text" : ")?) "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " -> "
             },
             {
               "kind" : "typeIdentifier",
@@ -330,17 +345,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/foundation\/urlsession"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Foundation/URLSession/NetworkSession-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URLSession\/NetworkSession-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "NetworkSession Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/foundation\/urlsession\/networksession-implementations"
-},
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Foundation/URLSession/loadData(with:completionHandler:)": {
   "abstract" : [
 
@@ -412,7 +416,15 @@
     },
     {
       "kind" : "text",
-      "text" : ")?) -> "
+      "text" : ")?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
     },
     {
       "kind" : "typeIdentifier",

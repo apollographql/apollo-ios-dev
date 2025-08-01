@@ -44,6 +44,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Extended-Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/Selection\/Field"
       ],

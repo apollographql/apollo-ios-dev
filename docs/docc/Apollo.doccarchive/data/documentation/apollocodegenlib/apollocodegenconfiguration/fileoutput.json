@@ -84,7 +84,8 @@
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/Se",
         "doc:\/\/ApolloCodegenLib\/SE",
-        "doc:\/\/ApolloCodegenLib\/SQ"
+        "doc:\/\/ApolloCodegenLib\/SQ",
+        "doc:\/\/ApolloCodegenLib\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -101,12 +102,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/FileOutput\/Default"
       ],
       "title" : "Structures"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/FileOutput\/init(from:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/FileOutput\/init(schemaTypes:operations:testMocks:)",
@@ -115,6 +120,8 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/FileOutput\/operationIdentifiersPath",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/FileOutput\/operations",
@@ -124,12 +131,15 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/FileOutput\/encode(to:)"
       ],
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/FileOutput\/Equatable-Implementations"
@@ -801,6 +811,11 @@
   "title" : "testMocks",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/fileoutput\/testmocks"
+},
+"doc://ApolloCodegenLib/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

@@ -1,10 +1,4 @@
 {
-  "abstract" : [
-    {
-      "text" : "Creates a new array of interceptors when called",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -19,7 +13,8 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo19InterceptorProviderP12interceptors3forSayAA0aB0_pGqd___t0A3API16GraphQLOperationRd__lF",
+    "extendedModule" : "Apollo",
+    "externalID" : "s:6Apollo19InterceptorProviderPAAE12interceptors3forAA12InterceptorsVqd___t0A3API16GraphQLOperationRd__lF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -59,16 +54,12 @@
       },
       {
         "kind" : "text",
-        "text" : ") -> [any "
+        "text" : ") -> "
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo0A11InterceptorP",
-        "text" : "ApolloInterceptor"
-      },
-      {
-        "kind" : "text",
-        "text" : "]"
+        "preciseIdentifier" : "s:6Apollo12InterceptorsV",
+        "text" : "Interceptors"
       }
     ],
     "modules" : [
@@ -76,7 +67,6 @@
         "name" : "Apollo"
       }
     ],
-    "required" : true,
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
@@ -139,17 +129,17 @@
             },
             {
               "kind" : "text",
-              "text" : ") -> [any "
+              "text" : ") -> "
             },
             {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor",
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Interceptors",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo0A11InterceptorP",
-              "text" : "ApolloInterceptor"
+              "preciseIdentifier" : "s:6Apollo12InterceptorsV",
+              "text" : "Interceptors"
             },
             {
               "kind" : "text",
-              "text" : "] "
+              "text" : " "
             },
             {
               "kind" : "keyword",
@@ -176,25 +166,6 @@
         }
       ],
       "kind" : "declarations"
-    },
-    {
-      "kind" : "parameters",
-      "parameters" : [
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The operation to provide interceptors for",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "operation"
-        }
-      ]
     }
   ],
   "schemaVersion" : {
@@ -233,40 +204,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/ApolloInterceptor": {
-  "abstract" : [
-    {
-      "text" : "A protocol to set up a chainable unit of networking work.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "protocol"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "ApolloInterceptor"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "ApolloInterceptor"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "ApolloInterceptor",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollointerceptor"
-},
 "doc://Apollo/documentation/Apollo/InterceptorProvider": {
   "abstract" : [
     {
@@ -303,10 +240,7 @@
 },
 "doc://Apollo/documentation/Apollo/InterceptorProvider/interceptors(for:)": {
   "abstract" : [
-    {
-      "text" : "Creates a new array of interceptors when called",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
@@ -347,25 +281,51 @@
     },
     {
       "kind" : "text",
-      "text" : ") -> [any "
+      "text" : ") -> "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo0A11InterceptorP",
-      "text" : "ApolloInterceptor"
-    },
-    {
-      "kind" : "text",
-      "text" : "]"
+      "preciseIdentifier" : "s:6Apollo12InterceptorsV",
+      "text" : "Interceptors"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider\/interceptors(for:)",
   "kind" : "symbol",
-  "required" : true,
   "role" : "symbol",
   "title" : "interceptors(for:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/interceptorprovider\/interceptors(for:)"
+},
+"doc://Apollo/documentation/Apollo/Interceptors": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Interceptors"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Interceptors",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Interceptors"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "Interceptors",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/interceptors"
 }
 }
 }

@@ -78,7 +78,8 @@
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/Se",
         "doc:\/\/ApolloCodegenLib\/SE",
-        "doc:\/\/ApolloCodegenLib\/SQ"
+        "doc:\/\/ApolloCodegenLib\/SQ",
+        "doc:\/\/ApolloCodegenLib\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -95,12 +96,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/Default"
       ],
       "title" : "Structures"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/init(fieldMerging:legacySafelistingCompatibleOperations:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/init(from:)"
@@ -108,6 +113,8 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/fieldMerging",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/legacySafelistingCompatibleOperations"
@@ -115,18 +122,23 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/encode(to:)"
       ],
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/CodingKeys"
       ],
       "title" : "Enumerations"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ExperimentalFeatures-swift.struct\/Equatable-Implementations"
@@ -618,6 +630,11 @@
   "title" : "legacySafelistingCompatibleOperations",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/experimentalfeatures-swift.struct\/legacysafelistingcompatibleoperations"
+},
+"doc://ApolloCodegenLib/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 },
 "https://github.com/apollographql/apollo-tooling": {
   "identifier" : "https:\/\/github.com\/apollographql\/apollo-tooling",

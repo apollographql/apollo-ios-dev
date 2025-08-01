@@ -12,11 +12,11 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo12RequestChainP",
+    "externalID" : "s:6Apollo12RequestChainV",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "protocol"
+        "text" : "struct"
       },
       {
         "kind" : "text",
@@ -39,8 +39,8 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Protocol",
-    "symbolKind" : "protocol",
+    "roleHeading" : "Structure",
+    "symbolKind" : "struct",
     "title" : "RequestChain"
   },
   "primaryContentSections" : [
@@ -56,7 +56,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "protocol"
+              "text" : "struct"
             },
             {
               "kind" : "text",
@@ -68,13 +68,37 @@
             },
             {
               "kind" : "text",
+              "text" : "<"
+            },
+            {
+              "kind" : "genericParameter",
+              "text" : "Request"
+            },
+            {
+              "kind" : "text",
+              "text" : "> "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "where"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Request"
+            },
+            {
+              "kind" : "text",
               "text" : " : "
             },
             {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable",
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo11CancellableP",
-              "text" : "Cancellable"
+              "preciseIdentifier" : "s:6Apollo14GraphQLRequestP",
+              "text" : "GraphQLRequest"
             }
           ]
         }
@@ -85,19 +109,11 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable"
+        "doc:\/\/Apollo\/s8SendableP"
       ],
       "kind" : "relationships",
-      "title" : "Inherits From",
-      "type" : "inheritsFrom"
-    },
-    {
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain"
-      ],
-      "kind" : "relationships",
-      "title" : "Conforming Types",
-      "type" : "conformingTypes"
+      "title" : "Conforms To",
+      "type" : "conformsTo"
     }
   ],
   "schemaVersion" : {
@@ -110,22 +126,37 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/isCancelled"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/Retry"
       ],
-      "title" : "Instance Properties"
+      "title" : "Structures"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/cancel()",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/handleErrorAsync(_:request:response:completion:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/kickoff(request:completion:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/proceedAsync(request:response:completion:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/proceedAsync(request:response:interceptor:completion:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/retry(request:completion:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/returnValueAsync(for:value:completion:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/init(urlSession:interceptors:store:)"
+      ],
+      "title" : "Initializers"
+    },
+    {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/kickoff(request:)"
       ],
       "title" : "Instance Methods"
+    },
+    {
+      "anchor" : "Type-Aliases",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/Operation",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/ResultStream"
+      ],
+      "title" : "Type Aliases"
     }
   ],
   "variants" : [
@@ -156,12 +187,9 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/Cancellable": {
+"doc://Apollo/documentation/Apollo/GraphQLRequest": {
   "abstract" : [
-    {
-      "text" : "An object that can be used to cancel an in progress action.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
@@ -174,55 +202,21 @@
     },
     {
       "kind" : "identifier",
-      "text" : "Cancellable"
+      "text" : "GraphQLRequest"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "Cancellable"
+      "text" : "GraphQLRequest"
     }
   ],
   "role" : "symbol",
-  "title" : "Cancellable",
+  "title" : "GraphQLRequest",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/cancellable"
-},
-"doc://Apollo/documentation/Apollo/InterceptorRequestChain": {
-  "abstract" : [
-    {
-      "text" : "A chain that allows a single network request to be created and executed.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "class"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "InterceptorRequestChain"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "InterceptorRequestChain"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "InterceptorRequestChain",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/interceptorrequestchain"
+  "url" : "\/documentation\/apollo\/graphqlrequest"
 },
 "doc://Apollo/documentation/Apollo/RequestChain": {
   "abstract" : [
@@ -231,7 +225,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "protocol"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -255,14 +249,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchain"
 },
-"doc://Apollo/documentation/Apollo/RequestChain/cancel()": {
+"doc://Apollo/documentation/Apollo/RequestChain/Operation": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "func"
+      "text" : "typealias"
     },
     {
       "kind" : "text",
@@ -270,29 +264,30 @@
     },
     {
       "kind" : "identifier",
-      "text" : "cancel"
-    },
-    {
-      "kind" : "text",
-      "text" : "()"
+      "text" : "Operation"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/cancel()",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/Operation",
   "kind" : "symbol",
-  "required" : true,
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Operation"
+    }
+  ],
   "role" : "symbol",
-  "title" : "cancel()",
+  "title" : "RequestChain.Operation",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchain\/cancel()"
+  "url" : "\/documentation\/apollo\/requestchain\/operation"
 },
-"doc://Apollo/documentation/Apollo/RequestChain/handleErrorAsync(_:request:response:completion:)": {
+"doc://Apollo/documentation/Apollo/RequestChain/ResultStream": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "func"
+      "text" : "typealias"
     },
     {
       "kind" : "text",
@@ -300,24 +295,81 @@
     },
     {
       "kind" : "identifier",
-      "text" : "handleErrorAsync"
+      "text" : "ResultStream"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/ResultStream",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ResultStream"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "RequestChain.ResultStream",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchain\/resultstream"
+},
+"doc://Apollo/documentation/Apollo/RequestChain/Retry": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
     },
     {
       "kind" : "text",
-      "text" : "<"
+      "text" : " "
     },
     {
-      "kind" : "genericParameter",
-      "text" : "Operation"
+      "kind" : "identifier",
+      "text" : "Retry"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/Retry",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Retry"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "RequestChain.Retry",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchain\/retry"
+},
+"doc://Apollo/documentation/Apollo/RequestChain/init(urlSession:interceptors:store:)": {
+  "abstract" : [
+    {
+      "text" : "Creates a chain with the given interceptor array.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
     },
     {
       "kind" : "text",
-      "text" : ">(any "
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "urlSession"
+    },
+    {
+      "kind" : "text",
+      "text" : ": any "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s5ErrorP",
-      "text" : "Error"
+      "preciseIdentifier" : "s:6Apollo0A10URLSessionP",
+      "text" : "ApolloURLSession"
     },
     {
       "kind" : "text",
@@ -325,7 +377,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "request"
+      "text" : "interceptors"
     },
     {
       "kind" : "text",
@@ -333,24 +385,16 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11HTTPRequestC",
-      "text" : "HTTPRequest"
+      "preciseIdentifier" : "s:6Apollo12InterceptorsV",
+      "text" : "Interceptors"
     },
     {
       "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, "
+      "text" : ", "
     },
     {
       "kind" : "externalParam",
-      "text" : "response"
+      "text" : "store"
     },
     {
       "kind" : "text",
@@ -358,129 +402,27 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12HTTPResponseC",
-      "text" : "HTTPResponse"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "completion"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6ResultO",
-      "text" : "Result"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s5ErrorP",
-      "text" : "Error"
-    },
-    {
-      "kind" : "text",
-      "text" : ">) -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s4Voida",
-      "text" : "Void"
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
     },
     {
       "kind" : "text",
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/handleErrorAsync(_:request:response:completion:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/init(urlSession:interceptors:store:)",
   "kind" : "symbol",
-  "required" : true,
   "role" : "symbol",
-  "title" : "handleErrorAsync(_:request:response:completion:)",
+  "title" : "init(urlSession:interceptors:store:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchain\/handleerrorasync(_:request:response:completion:)"
+  "url" : "\/documentation\/apollo\/requestchain\/init(urlsession:interceptors:store:)"
 },
-"doc://Apollo/documentation/Apollo/RequestChain/isCancelled": {
+"doc://Apollo/documentation/Apollo/RequestChain/kickoff(request:)": {
   "abstract" : [
-
-  ],
-  "fragments" : [
     {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "isCancelled"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
+      "text" : "Kicks off the request from the beginning of the interceptor array.",
+      "type" : "text"
     }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/isCancelled",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "isCancelled",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchain\/iscancelled"
-},
-"doc://Apollo/documentation/Apollo/RequestChain/kickoff(request:completion:)": {
-  "abstract" : [
-
   ],
   "fragments" : [
     {
@@ -497,15 +439,7 @@
     },
     {
       "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "genericParameter",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">("
+      "text" : "("
     },
     {
       "kind" : "externalParam",
@@ -517,8 +451,16 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11HTTPRequestC",
-      "text" : "HTTPRequest"
+      "text" : "Request"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12RequestChainV",
+      "text" : "RequestChain"
     },
     {
       "kind" : "text",
@@ -526,679 +468,29 @@
     },
     {
       "kind" : "typeIdentifier",
-      "text" : "Operation"
+      "text" : "Request"
     },
     {
       "kind" : "text",
-      "text" : ">, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "completion"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ("
+      "text" : ">."
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6ResultO",
-      "text" : "Result"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s5ErrorP",
-      "text" : "Error"
-    },
-    {
-      "kind" : "text",
-      "text" : ">) -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s4Voida",
-      "text" : "Void"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
+      "preciseIdentifier" : "s:6Apollo12RequestChainV12ResultStreama",
+      "text" : "ResultStream"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/kickoff(request:completion:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/kickoff(request:)",
   "kind" : "symbol",
-  "required" : true,
   "role" : "symbol",
-  "title" : "kickoff(request:completion:)",
+  "title" : "kickoff(request:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchain\/kickoff(request:completion:)"
+  "url" : "\/documentation\/apollo\/requestchain\/kickoff(request:)"
 },
-"doc://Apollo/documentation/Apollo/RequestChain/proceedAsync(request:response:completion:)": {
-  "abstract" : [
-
-  ],
-  "deprecated" : true,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "proceedAsync"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "genericParameter",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "request"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11HTTPRequestC",
-      "text" : "HTTPRequest"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "response"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12HTTPResponseC",
-      "text" : "HTTPResponse"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "completion"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6ResultO",
-      "text" : "Result"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s5ErrorP",
-      "text" : "Error"
-    },
-    {
-      "kind" : "text",
-      "text" : ">) -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s4Voida",
-      "text" : "Void"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/proceedAsync(request:response:completion:)",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "proceedAsync(request:response:completion:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchain\/proceedasync(request:response:completion:)"
-},
-"doc://Apollo/documentation/Apollo/RequestChain/proceedAsync(request:response:interceptor:completion:)": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "proceedAsync"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "genericParameter",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "request"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11HTTPRequestC",
-      "text" : "HTTPRequest"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "response"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12HTTPResponseC",
-      "text" : "HTTPResponse"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "interceptor"
-    },
-    {
-      "kind" : "text",
-      "text" : ": any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo0A11InterceptorP",
-      "text" : "ApolloInterceptor"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "completion"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6ResultO",
-      "text" : "Result"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s5ErrorP",
-      "text" : "Error"
-    },
-    {
-      "kind" : "text",
-      "text" : ">) -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s4Voida",
-      "text" : "Void"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/proceedAsync(request:response:interceptor:completion:)",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "proceedAsync(request:response:interceptor:completion:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchain\/proceedasync(request:response:interceptor:completion:)"
-},
-"doc://Apollo/documentation/Apollo/RequestChain/retry(request:completion:)": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "retry"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "genericParameter",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "request"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11HTTPRequestC",
-      "text" : "HTTPRequest"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "completion"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6ResultO",
-      "text" : "Result"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s5ErrorP",
-      "text" : "Error"
-    },
-    {
-      "kind" : "text",
-      "text" : ">) -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s4Voida",
-      "text" : "Void"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/retry(request:completion:)",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "retry(request:completion:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchain\/retry(request:completion:)"
-},
-"doc://Apollo/documentation/Apollo/RequestChain/returnValueAsync(for:value:completion:)": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "returnValueAsync"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "genericParameter",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "for"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11HTTPRequestC",
-      "text" : "HTTPRequest"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "value"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "completion"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6ResultO",
-      "text" : "Result"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s5ErrorP",
-      "text" : "Error"
-    },
-    {
-      "kind" : "text",
-      "text" : ">) -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s4Voida",
-      "text" : "Void"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/returnValueAsync(for:value:completion:)",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "returnValueAsync(for:value:completion:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchain\/returnvalueasync(for:value:completion:)"
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

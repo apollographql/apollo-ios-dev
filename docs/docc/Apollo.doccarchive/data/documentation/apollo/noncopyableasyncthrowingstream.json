@@ -1,0 +1,876 @@
+{
+  "abstract" : [
+    {
+      "text" : "A move-only wrapper around an ",
+      "type" : "text"
+    },
+    {
+      "code" : "AsyncThrowingStream",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " that conforms to ",
+      "type" : "text"
+    },
+    {
+      "code" : "~Copyable",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " used to",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "protect against multiple concurrent consumers receiving partial data.",
+      "type" : "text"
+    }
+  ],
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/Apollo\/documentation\/Apollo"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:6Apollo30NonCopyableAsyncThrowingStreamV",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "struct"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "NonCopyableAsyncThrowingStream"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "Apollo"
+      }
+    ],
+    "navigatorTitle" : [
+      {
+        "kind" : "identifier",
+        "text" : "NonCopyableAsyncThrowingStream"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Structure",
+    "symbolKind" : "struct",
+    "title" : "NonCopyableAsyncThrowingStream"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "struct"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "NonCopyableAsyncThrowingStream"
+            },
+            {
+              "kind" : "text",
+              "text" : "<"
+            },
+            {
+              "kind" : "genericParameter",
+              "text" : "Element"
+            },
+            {
+              "kind" : "text",
+              "text" : "> "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "where"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Element"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "overview",
+          "level" : 2,
+          "text" : "Overview",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "code" : "AsyncThrowingStream",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " does not support multiple consumers awaiting on it’s elements. Any",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "elements consumed by one consumer will not be emitted to any others.",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "code" : "NonCopyableAsyncThrowingStream",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " helps to protect a stream’s elements from being consumed",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "until the final consumer.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Intermediary consumers may used the mapping functions of the stream to read or transform the",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "stream’s emitted values. These functions wrap the consumed stream in a new stream, which is",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "returned. Because these functions ",
+              "type" : "text"
+            },
+            {
+              "code" : "consume",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " the reciever, only the newly returned stream is",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "available to be used after the function returns.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "When a stream reaches it’s final consumer, ",
+              "type" : "text"
+            },
+            {
+              "code" : "getStream()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " may be called to return the",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "underlying ",
+              "type" : "text"
+            },
+            {
+              "code" : "AsyncThrowingStream",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ". The caller is then responsible for ensuring the stream",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "is only awaited by a single consumer.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    }
+  ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/Apollo\/s8SendableP"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "topicSections" : [
+    {
+      "anchor" : "Initializers",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream\/init(stream:)-55ow4",
+        "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream\/init(stream:)-9p6wp"
+      ],
+      "title" : "Initializers"
+    },
+    {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream\/compactMap(_:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream\/getStream()",
+        "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream\/map(_:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream\/mapErrors(_:)"
+      ],
+      "title" : "Instance Methods"
+    }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/noncopyableasyncthrowingstream"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://Apollo/documentation/Apollo": {
+  "abstract" : [
+    {
+      "text" : "A Strongly typed, Swift-first, GraphQL client.",
+      "type" : "text"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "Apollo",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo"
+},
+"doc://Apollo/documentation/Apollo/NonCopyableAsyncThrowingStream": {
+  "abstract" : [
+    {
+      "text" : "A move-only wrapper around an ",
+      "type" : "text"
+    },
+    {
+      "code" : "AsyncThrowingStream",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " that conforms to ",
+      "type" : "text"
+    },
+    {
+      "code" : "~Copyable",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " used to",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "protect against multiple concurrent consumers receiving partial data.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "NonCopyableAsyncThrowingStream"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "NonCopyableAsyncThrowingStream"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "NonCopyableAsyncThrowingStream",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/noncopyableasyncthrowingstream"
+},
+"doc://Apollo/documentation/Apollo/NonCopyableAsyncThrowingStream/compactMap(_:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "compactMap"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "ElementOfResult"
+    },
+    {
+      "kind" : "text",
+      "text" : ">(("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Element"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "ElementOfResult"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo30NonCopyableAsyncThrowingStreamV",
+      "text" : "NonCopyableAsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "ElementOfResult"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream\/compactMap(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "compactMap(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/noncopyableasyncthrowingstream\/compactmap(_:)"
+},
+"doc://Apollo/documentation/Apollo/NonCopyableAsyncThrowingStream/getStream()": {
+  "abstract" : [
+    {
+      "text" : "Exposes the underlying ",
+      "type" : "text"
+    },
+    {
+      "code" : "AsyncThrowingStream",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " for final consumption.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "getStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "() -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Element"
+    },
+    {
+      "kind" : "text",
+      "text" : ", any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream\/getStream()",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "getStream()",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/noncopyableasyncthrowingstream\/getstream()"
+},
+"doc://Apollo/documentation/Apollo/NonCopyableAsyncThrowingStream/init(stream:)-55ow4": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "stream"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "consuming"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Element"
+    },
+    {
+      "kind" : "text",
+      "text" : ", any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ">)"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream\/init(stream:)-55ow4",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(stream:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/noncopyableasyncthrowingstream\/init(stream:)-55ow4"
+},
+"doc://Apollo/documentation/Apollo/NonCopyableAsyncThrowingStream/init(stream:)-9p6wp": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "S"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "stream"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "consuming"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "attribute",
+      "text" : "sending "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "S"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream\/init(stream:)-9p6wp",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(stream:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/noncopyableasyncthrowingstream\/init(stream:)-9p6wp"
+},
+"doc://Apollo/documentation/Apollo/NonCopyableAsyncThrowingStream/map(_:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "map"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "ElementOfResult"
+    },
+    {
+      "kind" : "text",
+      "text" : ">(("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Element"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "ElementOfResult"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo30NonCopyableAsyncThrowingStreamV",
+      "text" : "NonCopyableAsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "ElementOfResult"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream\/map(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "map(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/noncopyableasyncthrowingstream\/map(_:)"
+},
+"doc://Apollo/documentation/Apollo/NonCopyableAsyncThrowingStream/mapErrors(_:)": {
+  "abstract" : [
+    {
+      "text" : "Calls the given ",
+      "type" : "text"
+    },
+    {
+      "code" : "transform",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " if an error is thrown by the stream.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "mapErrors"
+    },
+    {
+      "kind" : "text",
+      "text" : "((any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Element"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo30NonCopyableAsyncThrowingStreamV",
+      "text" : "NonCopyableAsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Element"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream\/mapErrors(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "mapErrors(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/noncopyableasyncthrowingstream\/maperrors(_:)"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
+}
+}
+}

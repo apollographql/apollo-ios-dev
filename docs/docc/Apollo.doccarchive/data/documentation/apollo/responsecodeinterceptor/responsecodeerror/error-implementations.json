@@ -33,6 +33,7 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/localizedDescription"
@@ -97,7 +98,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "enum"
+      "text" : "struct"
     },
     {
       "kind" : "text",

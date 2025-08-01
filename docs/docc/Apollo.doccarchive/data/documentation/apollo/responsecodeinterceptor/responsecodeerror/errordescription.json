@@ -28,7 +28,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo23ResponseCodeInterceptorV0bC5ErrorO16errorDescriptionSSSgvp",
+    "externalID" : "s:6Apollo23ResponseCodeInterceptorV0bC5ErrorV16errorDescriptionSSSgvp",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -193,7 +193,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "enum"
+      "text" : "struct"
     },
     {
       "kind" : "text",

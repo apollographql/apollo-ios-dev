@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Represents a complete GraphQL response received from a server.",
+      "text" : "Represents the result of a GraphQL operation.",
       "type" : "text"
     }
   ],
@@ -18,11 +18,11 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo15GraphQLResponseC",
+    "externalID" : "s:6Apollo15GraphQLResponseV",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "class"
+        "text" : "struct"
       },
       {
         "kind" : "text",
@@ -45,8 +45,8 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Class",
-    "symbolKind" : "class",
+    "roleHeading" : "Structure",
+    "symbolKind" : "struct",
     "title" : "GraphQLResponse"
   },
   "primaryContentSections" : [
@@ -62,15 +62,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "final"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "class"
+              "text" : "struct"
             },
             {
               "kind" : "text",
@@ -86,7 +78,7 @@
             },
             {
               "kind" : "genericParameter",
-              "text" : "Data"
+              "text" : "Operation"
             },
             {
               "kind" : "text",
@@ -102,7 +94,7 @@
             },
             {
               "kind" : "typeIdentifier",
-              "text" : "Data"
+              "text" : "Operation"
             },
             {
               "kind" : "text",
@@ -110,8 +102,8 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI16RootSelectionSetP",
-              "text" : "RootSelectionSet"
+              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP",
+              "text" : "GraphQLOperation"
             }
           ]
         }
@@ -122,8 +114,10 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/Apollo\/s8CopyableP",
         "doc:\/\/Apollo\/SQ",
-        "doc:\/\/Apollo\/SH"
+        "doc:\/\/Apollo\/SH",
+        "doc:\/\/Apollo\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -140,20 +134,42 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/init(operation:body:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/init(data:extensions:errors:source:dependentKeys:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/parseResult()",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/parseResult(withCachePolicy:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/parseResultFast()"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/data",
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/errors",
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/extensions",
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/source-swift.property"
+      ],
+      "title" : "Instance Properties"
+    },
+    {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/asJSONDictionary()"
       ],
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/Source-swift.enum"
+      ],
+      "title" : "Enumerations"
+    },
+    {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/Equatable-Implementations",
@@ -203,14 +219,14 @@
 "doc://Apollo/documentation/Apollo/GraphQLResponse": {
   "abstract" : [
     {
-      "text" : "Represents a complete GraphQL response received from a server.",
+      "text" : "Represents the result of a GraphQL operation.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -256,30 +272,157 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlresponse\/hashable-implementations"
 },
-"doc://Apollo/documentation/Apollo/GraphQLResponse/init(operation:body:)": {
+"doc://Apollo/documentation/Apollo/GraphQLResponse/Source-swift.enum": {
   "abstract" : [
-
+    {
+      "text" : "Represents source of data",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
       "kind" : "identifier",
-      "text" : "init"
+      "text" : "Source"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/Source-swift.enum",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Source"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "GraphQLResponse.Source",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlresponse\/source-swift.enum"
+},
+"doc://Apollo/documentation/Apollo/GraphQLResponse/asJSONDictionary()": {
+  "abstract" : [
+    {
+      "text" : "Converts a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " into a basic JSON dictionary for use.",
+      "type" : "text"
+    }
+  ],
+  "conformance" : {
+    "availabilityPrefix" : [
+      {
+        "text" : "Available when",
+        "type" : "text"
+      }
+    ],
+    "conformancePrefix" : [
+      {
+        "text" : "Conforms when",
+        "type" : "text"
+      }
+    ],
+    "constraints" : [
+      {
+        "code" : "Operation",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "GraphQLOperation",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ".",
+        "type" : "text"
+      }
+    ]
+  },
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
     },
     {
       "kind" : "text",
-      "text" : "<"
+      "text" : " "
     },
     {
-      "kind" : "genericParameter",
-      "text" : "Operation"
+      "kind" : "identifier",
+      "text" : "asJSONDictionary"
     },
     {
       "kind" : "text",
-      "text" : ">("
+      "text" : "() -> ["
     },
     {
-      "kind" : "externalParam",
-      "text" : "operation"
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "Any"
+    },
+    {
+      "kind" : "text",
+      "text" : "]"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/asJSONDictionary()",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "asJSONDictionary()",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlresponse\/asjsondictionary()"
+},
+"doc://Apollo/documentation/Apollo/GraphQLResponse/data": {
+  "abstract" : [
+    {
+      "text" : "The typed result data, or ",
+      "type" : "text"
+    },
+    {
+      "code" : "nil",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " if an error was encountered that prevented a valid response.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "data"
     },
     {
       "kind" : "text",
@@ -291,11 +434,93 @@
     },
     {
       "kind" : "text",
-      "text" : ", "
+      "text" : "."
     },
     {
-      "kind" : "externalParam",
-      "text" : "body"
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
+      "text" : "Data"
+    },
+    {
+      "kind" : "text",
+      "text" : "?"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/data",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "data",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlresponse\/data"
+},
+"doc://Apollo/documentation/Apollo/GraphQLResponse/errors": {
+  "abstract" : [
+    {
+      "text" : "A list of errors, or ",
+      "type" : "text"
+    },
+    {
+      "code" : "nil",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " if the operation completed without encountering any errors.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "errors"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV",
+      "text" : "GraphQLError"
+    },
+    {
+      "kind" : "text",
+      "text" : "]?"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/errors",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "errors",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlresponse\/errors"
+},
+"doc://Apollo/documentation/Apollo/GraphQLResponse/extensions": {
+  "abstract" : [
+    {
+      "text" : "A dictionary which services can use however they see fit to provide additional information to clients.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "extensions"
     },
     {
       "kind" : "text",
@@ -308,165 +533,24 @@
     },
     {
       "kind" : "text",
-      "text" : ")"
+      "text" : "?"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/init(operation:body:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/extensions",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(operation:body:)",
+  "title" : "extensions",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlresponse\/init(operation:body:)"
+  "url" : "\/documentation\/apollo\/graphqlresponse\/extensions"
 },
-"doc://Apollo/documentation/Apollo/GraphQLResponse/parseResult()": {
+"doc://Apollo/documentation/Apollo/GraphQLResponse/init(data:extensions:errors:source:dependentKeys:)": {
   "abstract" : [
-    {
-      "text" : "Parses a response into a ",
-      "type" : "text"
-    },
-    {
-      "code" : "GraphQLResult",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " and a ",
-      "type" : "text"
-    },
-    {
-      "code" : "RecordSet",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ". The result can be sent to a completion block for a",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "request and the ",
-      "type" : "text"
-    },
-    {
-      "code" : "RecordSet",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " can be merged into a local cache.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
       "kind" : "identifier",
-      "text" : "parseResult"
-    },
-    {
-      "kind" : "text",
-      "text" : "() "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "throws"
-    },
-    {
-      "kind" : "text",
-      "text" : " -> ("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo9RecordSetV",
-      "text" : "RecordSet"
-    },
-    {
-      "kind" : "text",
-      "text" : "?)"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/parseResult()",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "parseResult()",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlresponse\/parseresult()"
-},
-"doc://Apollo/documentation/Apollo/GraphQLResponse/parseResult(withCachePolicy:)": {
-  "abstract" : [
-    {
-      "text" : "Parses the response into a ",
-      "type" : "text"
-    },
-    {
-      "code" : "GraphQLResult",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " and a ",
-      "type" : "text"
-    },
-    {
-      "code" : "RecordSet",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " depending on the cache policy. The result can be",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "sent to a completion block for a request and the ",
-      "type" : "text"
-    },
-    {
-      "code" : "RecordSet",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " can be merged into a local cache.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "parseResult"
+      "text" : "init"
     },
     {
       "kind" : "text",
@@ -474,7 +558,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "withCachePolicy"
+      "text" : "data"
     },
     {
       "kind" : "text",
@@ -482,25 +566,67 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-      "text" : "CachePolicy"
+      "text" : "Operation"
     },
     {
       "kind" : "text",
-      "text" : ") "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "throws"
-    },
-    {
-      "kind" : "text",
-      "text" : " -> ("
+      "text" : "."
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
+      "text" : "Data"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "extensions"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI10JSONObjecta",
+      "text" : "JSONObject"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "errors"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV",
+      "text" : "GraphQLError"
+    },
+    {
+      "kind" : "text",
+      "text" : "]?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "source"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -508,64 +634,66 @@
     },
     {
       "kind" : "typeIdentifier",
-      "text" : "Data"
+      "text" : "Operation"
     },
     {
       "kind" : "text",
-      "text" : ">, "
+      "text" : ">."
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo9RecordSetV",
-      "text" : "RecordSet"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV6SourceO",
+      "text" : "Source"
     },
     {
       "kind" : "text",
-      "text" : "?)"
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "dependentKeys"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sh",
+      "text" : "Set"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo8CacheKeya",
+      "text" : "CacheKey"
+    },
+    {
+      "kind" : "text",
+      "text" : ">?)"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/parseResult(withCachePolicy:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/init(data:extensions:errors:source:dependentKeys:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "parseResult(withCachePolicy:)",
+  "title" : "init(data:extensions:errors:source:dependentKeys:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlresponse\/parseresult(withcachepolicy:)"
+  "url" : "\/documentation\/apollo\/graphqlresponse\/init(data:extensions:errors:source:dependentkeys:)"
 },
-"doc://Apollo/documentation/Apollo/GraphQLResponse/parseResultFast()": {
+"doc://Apollo/documentation/Apollo/GraphQLResponse/source-swift.property": {
   "abstract" : [
     {
-      "text" : "Parses a response into a ",
-      "type" : "text"
-    },
-    {
-      "code" : "GraphQLResult",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " for use without the cache. This parsing does not",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "create dependent keys or a ",
-      "type" : "text"
-    },
-    {
-      "code" : "RecordSet",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " for the cache.",
+      "text" : "Source of data",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "func"
+      "text" : "let"
     },
     {
       "kind" : "text",
@@ -573,24 +701,16 @@
     },
     {
       "kind" : "identifier",
-      "text" : "parseResultFast"
+      "text" : "source"
     },
     {
       "kind" : "text",
-      "text" : "() "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "throws"
-    },
-    {
-      "kind" : "text",
-      "text" : " -> "
+      "text" : ": "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -598,19 +718,34 @@
     },
     {
       "kind" : "typeIdentifier",
-      "text" : "Data"
+      "text" : "Operation"
     },
     {
       "kind" : "text",
-      "text" : ">"
+      "text" : ">."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV6SourceO",
+      "text" : "Source"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/parseResultFast()",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/source-swift.property",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "parseResultFast()",
+  "title" : "source",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlresponse\/parseresultfast()"
+  "url" : "\/documentation\/apollo\/graphqlresponse\/source-swift.property"
+},
+"doc://Apollo/s8CopyableP": {
+  "identifier" : "doc:\/\/Apollo\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

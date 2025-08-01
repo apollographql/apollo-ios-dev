@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference\/Equatable-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference"
       ]
     ]
   },
@@ -345,17 +344,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/cachereference\/!=(_:_:)"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/CacheReference/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/cachereference\/equatable-implementations"
 }
 }
 }

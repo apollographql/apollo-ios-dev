@@ -23,7 +23,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI15GraphQLNullableO4someyACyxGxcAEmlF",
+    "externalID" : "s:9ApolloAPI15GraphQLNullableO4someyACyxGxcAEms8SendableRzlF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -111,6 +111,7 @@
   ],
   "seeAlsoSections" : [
     {
+      "anchor" : "Enumeration-Cases",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/none",

@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Clears the instance of the cache. Note that a cache can be shared across multiple ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloClient",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " objects, so clearing that underlying cache will clear it for all clients.",
+      "text" : "Clears the instance of the cache.",
       "type" : "text"
     }
   ],
@@ -27,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A5StoreC10clearCache13callbackQueue10completionySo17OS_dispatch_queueC_ys6ResultOyyts5Error_pGcSgtF",
+    "externalID" : "s:6Apollo0A5StoreC10clearCache13callbackQueue10completionySo17OS_dispatch_queueC_ys6ResultOyyts5Error_pGYbcSgtF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -112,6 +104,14 @@
         "name" : "Apollo"
       }
     ],
+    "platforms" : [
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "renamed" : "clearCache()",
+        "unavailable" : false
+      }
+    ],
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
@@ -128,6 +128,14 @@
             "macOS"
           ],
           "tokens" : [
+            {
+              "kind" : "attribute",
+              "text" : "nonisolated"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
             {
               "kind" : "keyword",
               "text" : "func"
@@ -240,7 +248,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] A completion block to be called after records are merged into the cache.",
+                  "text" : "[Optional] A completion block to be called after records are merged into the cache.",
                   "type" : "text"
                 }
               ],
@@ -333,18 +341,11 @@
 "doc://Apollo/documentation/Apollo/ApolloStore/clearCache(callbackQueue:completion:)": {
   "abstract" : [
     {
-      "text" : "Clears the instance of the cache. Note that a cache can be shared across multiple ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloClient",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " objects, so clearing that underlying cache will clear it for all clients.",
+      "text" : "Clears the instance of the cache.",
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",

@@ -81,12 +81,14 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/Apollo\/s8CopyableP",
         "doc:\/\/Apollo\/s28CustomDebugStringConvertibleP",
         "doc:\/\/Apollo\/s34CustomPlaygroundDisplayConvertibleP",
         "doc:\/\/Apollo\/s23CustomStringConvertibleP",
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/s30ExpressibleByDictionaryLiteralP",
-        "doc:\/\/Apollo\/SH"
+        "doc:\/\/Apollo\/SH",
+        "doc:\/\/Apollo\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -103,12 +105,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/init(records:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/isEmpty",
         "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/keys",
@@ -117,6 +123,8 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/clear()",
         "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/insert(_:)",
@@ -129,12 +137,15 @@
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Subscripts",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/subscript(_:)"
       ],
       "title" : "Subscripts"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/CustomDebugStringConvertible-Implementations",
@@ -843,6 +854,16 @@
 "doc://Apollo/s34CustomPlaygroundDisplayConvertibleP": {
   "identifier" : "doc:\/\/Apollo\/s34CustomPlaygroundDisplayConvertibleP",
   "title" : "Swift.CustomPlaygroundDisplayConvertible",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8CopyableP": {
+  "identifier" : "doc:\/\/Apollo\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

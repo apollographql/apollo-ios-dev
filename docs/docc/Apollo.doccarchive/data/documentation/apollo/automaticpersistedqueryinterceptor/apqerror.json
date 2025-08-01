@@ -96,20 +96,24 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/AutomaticPersistedQueryInterceptor\/APQError\/noParsedResponse",
         "doc:\/\/Apollo\/documentation\/Apollo\/AutomaticPersistedQueryInterceptor\/APQError\/persistedQueryNotFoundForPersistedOnlyQuery(operationName:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/AutomaticPersistedQueryInterceptor\/APQError\/persistedQueryRetryFailed(operationName:)"
       ],
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/AutomaticPersistedQueryInterceptor\/APQError\/errorDescription"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/AutomaticPersistedQueryInterceptor\/APQError\/Equatable-Implementations",
@@ -289,31 +293,6 @@
   "title" : "errorDescription",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/automaticpersistedqueryinterceptor\/apqerror\/errordescription"
-},
-"doc://Apollo/documentation/Apollo/AutomaticPersistedQueryInterceptor/APQError/noParsedResponse": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "case"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "noParsedResponse"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/AutomaticPersistedQueryInterceptor\/APQError\/noParsedResponse",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "AutomaticPersistedQueryInterceptor.APQError.noParsedResponse",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/automaticpersistedqueryinterceptor\/apqerror\/noparsedresponse"
 },
 "doc://Apollo/documentation/Apollo/AutomaticPersistedQueryInterceptor/APQError/persistedQueryNotFoundForPersistedOnlyQuery(operationName:)": {
   "abstract" : [

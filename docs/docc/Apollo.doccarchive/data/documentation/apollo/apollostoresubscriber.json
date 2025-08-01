@@ -98,7 +98,12 @@
             },
             {
               "kind" : "text",
-              "text" : " : AnyObject"
+              "text" : " : AnyObject, "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -107,6 +112,14 @@
     }
   ],
   "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/Apollo\/s8SendableP"
+      ],
+      "kind" : "relationships",
+      "title" : "Inherits From",
+      "type" : "inheritsFrom"
+    },
     {
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher"
@@ -126,8 +139,10 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber\/store(_:didChangeKeys:contextIdentifier:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber\/store(_:didChangeKeys:)"
       ],
       "title" : "Instance Methods"
     }
@@ -218,7 +233,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostoresubscriber"
 },
-"doc://Apollo/documentation/Apollo/ApolloStoreSubscriber/store(_:didChangeKeys:contextIdentifier:)": {
+"doc://Apollo/documentation/Apollo/ApolloStoreSubscriber/store(_:didChangeKeys:)": {
   "abstract" : [
     {
       "text" : "A callback that can be received by subscribers when keys are changed within the database",
@@ -275,33 +290,16 @@
     },
     {
       "kind" : "text",
-      "text" : ">, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "contextIdentifier"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:10Foundation4UUIDV",
-      "text" : "UUID"
-    },
-    {
-      "kind" : "text",
-      "text" : "?)"
+      "text" : ">)"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber\/store(_:didChangeKeys:contextIdentifier:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber\/store(_:didChangeKeys:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
-  "title" : "store(_:didChangeKeys:contextIdentifier:)",
+  "title" : "store(_:didChangeKeys:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollostoresubscriber\/store(_:didchangekeys:contextidentifier:)"
+  "url" : "\/documentation\/apollo\/apollostoresubscriber\/store(_:didchangekeys:)"
 },
 "doc://Apollo/documentation/Apollo/GraphQLQueryWatcher": {
   "abstract" : [
@@ -322,30 +320,14 @@
       "type" : "text"
     },
     {
-      "text" : "whenever any of the data the previous result depends on changes. If your query shares response objects with other",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "operations you should read about normalizing objects by cache key in our documentation. Normalized objects will",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "update all query watchers that had received that object before.",
+      "text" : "whenever any of query’s data changes.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "actor"
     },
     {
       "kind" : "text",
@@ -368,6 +350,11 @@
   "title" : "GraphQLQueryWatcher",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlquerywatcher"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

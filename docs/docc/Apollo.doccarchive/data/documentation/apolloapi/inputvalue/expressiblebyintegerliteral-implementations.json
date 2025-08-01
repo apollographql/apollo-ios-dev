@@ -32,6 +32,7 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/init(integerLiteral:)"
@@ -180,8 +181,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s18IntegerLiteralTypea",
-      "text" : "IntegerLiteralType"
+      "preciseIdentifier" : "s:s5Int32V",
+      "text" : "Int32"
     },
     {
       "kind" : "text",

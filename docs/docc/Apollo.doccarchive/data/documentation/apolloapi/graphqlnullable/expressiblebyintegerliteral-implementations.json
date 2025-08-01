@@ -32,6 +32,7 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/init(integerLiteral:)"
@@ -183,6 +184,14 @@
       },
       {
         "code" : "ExpressibleByIntegerLiteral",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " and ",
+        "type" : "text"
+      },
+      {
+        "code" : "Sendable",
         "type" : "codeVoice"
       },
       {

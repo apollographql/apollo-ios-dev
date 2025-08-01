@@ -70,6 +70,14 @@
           "tokens" : [
             {
               "kind" : "keyword",
+              "text" : "final"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
               "text" : "class"
             },
             {
@@ -84,6 +92,115 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "overview",
+          "level" : 2,
+          "text" : "Overview",
+          "type" : "heading"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Using the same ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "NormalizedCache",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " with multiple ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "ApolloStore",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " instances at the same time is unsupported",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "and can result in undefined behavior, data races, and crashes.",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "The store uses an internal read\/write lock to protect against concurrent write access to the ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "NormalizedCache",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "This means that the ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "NormalizedCache",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " implementation does not need to manage thread safety. If a cache is used",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "with multiple ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "ApolloStore",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " instances, no guaruntees about thread safety can be made.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "Warning",
+          "style" : "warning",
+          "type" : "aside"
+        }
+      ],
+      "kind" : "content"
+    }
+  ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/Apollo\/s8SendableP"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
     }
   ],
   "schemaVersion" : {
@@ -96,6 +213,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Classes",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadTransaction",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction"
@@ -103,24 +222,43 @@
       "title" : "Classes"
     },
     {
+      "anchor" : "Structures",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/SubscriptionToken"
+      ],
+      "title" : "Structures"
+    },
+    {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/init(cache:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/clearCache()",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/clearCache(callbackQueue:completion:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/load(_:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/load(_:callbackQueue:resultHandler:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/publish(records:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/publish(records:identifier:callbackQueue:completion:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/subscribe(_:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/unsubscribe(_:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/withinReadTransaction(_:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/withinReadTransaction(_:callbackQueue:completion:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/withinReadWriteTransaction(_:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/withinReadWriteTransaction(_:callbackQueue:completion:)"
       ],
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/Error"
       ],
@@ -290,21 +428,89 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction"
 },
-"doc://Apollo/documentation/Apollo/ApolloStore/clearCache(callbackQueue:completion:)": {
+"doc://Apollo/documentation/Apollo/ApolloStore/SubscriptionToken": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "SubscriptionToken"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/SubscriptionToken",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "SubscriptionToken"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloStore.SubscriptionToken",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore\/subscriptiontoken"
+},
+"doc://Apollo/documentation/Apollo/ApolloStore/clearCache()": {
   "abstract" : [
     {
-      "text" : "Clears the instance of the cache. Note that a cache can be shared across multiple ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloClient",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " objects, so clearing that underlying cache will clear it for all clients.",
+      "text" : "Clears the instance of the cache.",
       "type" : "text"
     }
   ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "clearCache"
+    },
+    {
+      "kind" : "text",
+      "text" : "() "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/clearCache()",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "clearCache()",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore\/clearcache()"
+},
+"doc://Apollo/documentation/Apollo/ApolloStore/clearCache(callbackQueue:completion:)": {
+  "abstract" : [
+    {
+      "text" : "Clears the instance of the cache.",
+      "type" : "text"
+    }
+  ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -432,6 +638,87 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/init(cache:)"
 },
+"doc://Apollo/documentation/Apollo/ApolloStore/load(_:)": {
+  "abstract" : [
+    {
+      "text" : "Loads the results for the given operation from the cache.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "load"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">?"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/load(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "load(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore\/load(_:)"
+},
 "doc://Apollo/documentation/Apollo/ApolloStore/load(_:callbackQueue:resultHandler:)": {
   "abstract" : [
     {
@@ -439,6 +726,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -512,15 +800,6 @@
     },
     {
       "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
       "text" : ">)"
     }
   ],
@@ -530,6 +809,75 @@
   "title" : "load(_:callbackQueue:resultHandler:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/load(_:callbackqueue:resulthandler:)"
+},
+"doc://Apollo/documentation/Apollo/ApolloStore/publish(records:)": {
+  "abstract" : [
+    {
+      "text" : "Merges a ",
+      "type" : "text"
+    },
+    {
+      "code" : "RecordSet",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " into the normalized cache.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "publish"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "records"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo9RecordSetV",
+      "text" : "RecordSet"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/publish(records:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "publish(records:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore\/publish(records:)"
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/publish(records:identifier:callbackQueue:completion:)": {
   "abstract" : [
@@ -546,6 +894,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -697,7 +1046,29 @@
     },
     {
       "kind" : "text",
-      "text" : ")"
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC17SubscriptionTokenV",
+      "text" : "SubscriptionToken"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/subscribe(_:)",
@@ -729,12 +1100,21 @@
     },
     {
       "kind" : "text",
-      "text" : "(any "
+      "text" : "("
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo0A15StoreSubscriberP",
-      "text" : "ApolloStoreSubscriber"
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC17SubscriptionTokenV",
+      "text" : "SubscriptionToken"
     },
     {
       "kind" : "text",
@@ -748,7 +1128,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/unsubscribe(_:)"
 },
-"doc://Apollo/documentation/Apollo/ApolloStore/withinReadTransaction(_:callbackQueue:completion:)": {
+"doc://Apollo/documentation/Apollo/ApolloStore/withinReadTransaction(_:)": {
   "abstract" : [
     {
       "text" : "Performs an operation within a read transaction",
@@ -797,6 +1177,117 @@
     {
       "kind" : "text",
       "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "T"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/withinReadTransaction(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "withinReadTransaction(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore\/withinreadtransaction(_:)"
+},
+"doc://Apollo/documentation/Apollo/ApolloStore/withinReadTransaction(_:callbackQueue:completion:)": {
+  "abstract" : [
+    {
+      "text" : "Performs an operation within a read transaction",
+      "type" : "text"
+    }
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "withinReadTransaction"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ">(("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC15ReadTransactionC",
+      "text" : "ReadTransaction"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",
@@ -882,6 +1373,108 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/withinreadtransaction(_:callbackqueue:completion:)"
 },
+"doc://Apollo/documentation/Apollo/ApolloStore/withinReadWriteTransaction(_:)": {
+  "abstract" : [
+    {
+      "text" : "Performs an operation within a read-write transaction",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "withinReadWriteTransaction"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ">(("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC20ReadWriteTransactionC",
+      "text" : "ReadWriteTransaction"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "T"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/withinReadWriteTransaction(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "withinReadWriteTransaction(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore\/withinreadwritetransaction(_:)"
+},
 "doc://Apollo/documentation/Apollo/ApolloStore/withinReadWriteTransaction(_:callbackQueue:completion:)": {
   "abstract" : [
     {
@@ -889,6 +1482,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -1015,6 +1609,11 @@
   "title" : "withinReadWriteTransaction(_:callbackQueue:completion:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/withinreadwritetransaction(_:callbackqueue:completion:)"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

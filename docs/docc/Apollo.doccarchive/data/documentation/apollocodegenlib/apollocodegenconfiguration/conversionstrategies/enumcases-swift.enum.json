@@ -100,7 +100,8 @@
         "doc:\/\/ApolloCodegenLib\/SE",
         "doc:\/\/ApolloCodegenLib\/SQ",
         "doc:\/\/ApolloCodegenLib\/SH",
-        "doc:\/\/ApolloCodegenLib\/SY"
+        "doc:\/\/ApolloCodegenLib\/SY",
+        "doc:\/\/ApolloCodegenLib\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -117,6 +118,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/EnumCases-swift.enum\/camelCase",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/EnumCases-swift.enum\/none"
@@ -124,12 +127,15 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/EnumCases-swift.enum\/init(rawValue:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/ConversionStrategies\/EnumCases-swift.enum\/Equatable-Implementations",
@@ -466,6 +472,11 @@
   "title" : "ApolloCodegenConfiguration.ConversionStrategies.EnumCases.none",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/conversionstrategies\/enumcases-swift.enum\/none"
+},
+"doc://ApolloCodegenLib/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

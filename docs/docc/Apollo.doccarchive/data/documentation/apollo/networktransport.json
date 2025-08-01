@@ -74,7 +74,12 @@
             },
             {
               "kind" : "text",
-              "text" : " : AnyObject"
+              "text" : " : AnyObject, "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -85,15 +90,16 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/UploadingNetworkTransport"
+        "doc:\/\/Apollo\/s8SendableP"
       ],
       "kind" : "relationships",
-      "title" : "Inherited By",
-      "type" : "inheritedBy"
+      "title" : "Inherits From",
+      "type" : "inheritsFrom"
     },
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport",
+        "doc:\/\/Apollo\/documentation\/Apollo\/SplitNetworkTransport"
       ],
       "kind" : "relationships",
       "title" : "Conforming Types",
@@ -110,27 +116,13 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/clientName-689z0",
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/clientVersion-9p2ue"
-      ],
-      "title" : "Instance Properties"
-    },
-    {
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/addApolloClientHeaders(to:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/send(operation:cachePolicy:contextIdentifier:context:callbackQueue:completionHandler:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/send(mutation:requestConfiguration:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/send(query:fetchBehavior:requestConfiguration:)"
       ],
       "title" : "Instance Methods"
-    },
-    {
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/defaultClientName",
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/defaultClientVersion",
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/headerFieldNameApolloClientName",
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/headerFieldNameApolloClientVersion"
-      ],
-      "title" : "Type Properties"
     }
   ],
   "variants" : [
@@ -195,20 +187,9 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/networktransport"
 },
-"doc://Apollo/documentation/Apollo/NetworkTransport/addApolloClientHeaders(to:)": {
+"doc://Apollo/documentation/Apollo/NetworkTransport/send(mutation:requestConfiguration:)": {
   "abstract" : [
-    {
-      "text" : "Adds the Apollo client headers for this instance of ",
-      "type" : "text"
-    },
-    {
-      "code" : "NetworkTransport",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " to the given request",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
@@ -221,65 +202,23 @@
     },
     {
       "kind" : "identifier",
-      "text" : "addApolloClientHeaders"
+      "text" : "send"
     },
     {
       "kind" : "text",
-      "text" : "("
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
     },
     {
       "kind" : "externalParam",
-      "text" : "to"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "inout"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:10Foundation10URLRequestV",
-      "text" : "URLRequest"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/addApolloClientHeaders(to:)",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "addApolloClientHeaders(to:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/networktransport\/addapolloclientheaders(to:)"
-},
-"doc://Apollo/documentation/Apollo/NetworkTransport/clientName-689z0": {
-  "abstract" : [
-    {
-      "text" : "The name of the client to send as a header value.",
-      "type" : "text"
-    }
-  ],
-  "defaultImplementations" : 1,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "clientName"
+      "text" : "mutation"
     },
     {
       "kind" : "text",
@@ -287,38 +226,15 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/clientName-689z0",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "clientName",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/networktransport\/clientname-689z0"
-},
-"doc://Apollo/documentation/Apollo/NetworkTransport/clientVersion-9p2ue": {
-  "abstract" : [
-    {
-      "text" : "The version of the client to send as a header value.",
-      "type" : "text"
-    }
-  ],
-  "defaultImplementations" : 1,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "var"
+      "text" : "Mutation"
     },
     {
       "kind" : "text",
-      "text" : " "
+      "text" : ", "
     },
     {
-      "kind" : "identifier",
-      "text" : "clientVersion"
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
     },
     {
       "kind" : "text",
@@ -326,215 +242,66 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">, any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/clientVersion-9p2ue",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/send(mutation:requestConfiguration:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
-  "title" : "clientVersion",
+  "title" : "send(mutation:requestConfiguration:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/networktransport\/clientversion-9p2ue"
+  "url" : "\/documentation\/apollo\/networktransport\/send(mutation:requestconfiguration:)"
 },
-"doc://Apollo/documentation/Apollo/NetworkTransport/defaultClientName": {
-  "abstract" : [
-    {
-      "text" : "The default client name to use when setting up the ",
-      "type" : "text"
-    },
-    {
-      "code" : "clientName",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " property",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "defaultClientName"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/defaultClientName",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "defaultClientName",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/networktransport\/defaultclientname"
-},
-"doc://Apollo/documentation/Apollo/NetworkTransport/defaultClientVersion": {
-  "abstract" : [
-    {
-      "text" : "The default client version to use when setting up the ",
-      "type" : "text"
-    },
-    {
-      "code" : "clientVersion",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " property.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "defaultClientVersion"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/defaultClientVersion",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "defaultClientVersion",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/networktransport\/defaultclientversion"
-},
-"doc://Apollo/documentation/Apollo/NetworkTransport/headerFieldNameApolloClientName": {
-  "abstract" : [
-    {
-      "text" : "The field name for the Apollo Client Name header",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "headerFieldNameApolloClientName"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/headerFieldNameApolloClientName",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "headerFieldNameApolloClientName",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/networktransport\/headerfieldnameapolloclientname"
-},
-"doc://Apollo/documentation/Apollo/NetworkTransport/headerFieldNameApolloClientVersion": {
-  "abstract" : [
-    {
-      "text" : "The field name for the Apollo Client Version header",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "headerFieldNameApolloClientVersion"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/headerFieldNameApolloClientVersion",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "headerFieldNameApolloClientVersion",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/networktransport\/headerfieldnameapolloclientversion"
-},
-"doc://Apollo/documentation/Apollo/NetworkTransport/send(operation:cachePolicy:contextIdentifier:context:callbackQueue:completionHandler:)": {
+"doc://Apollo/documentation/Apollo/NetworkTransport/send(query:fetchBehavior:requestConfiguration:)": {
   "abstract" : [
     {
       "text" : "Send a GraphQL operation to a server and return a response.",
@@ -560,7 +327,7 @@
     },
     {
       "kind" : "genericParameter",
-      "text" : "Operation"
+      "text" : "Query"
     },
     {
       "kind" : "text",
@@ -568,7 +335,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "operation"
+      "text" : "query"
     },
     {
       "kind" : "text",
@@ -576,7 +343,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "text" : "Operation"
+      "text" : "Query"
     },
     {
       "kind" : "text",
@@ -584,7 +351,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "cachePolicy"
+      "text" : "fetchBehavior"
     },
     {
       "kind" : "text",
@@ -592,8 +359,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-      "text" : "CachePolicy"
+      "preciseIdentifier" : "s:6Apollo13FetchBehaviorV",
+      "text" : "FetchBehavior"
     },
     {
       "kind" : "text",
@@ -601,7 +368,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "contextIdentifier"
+      "text" : "requestConfiguration"
     },
     {
       "kind" : "text",
@@ -609,59 +376,25 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:10Foundation4UUIDV",
-      "text" : "UUID"
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
     },
     {
       "kind" : "text",
-      "text" : "?, "
+      "text" : ") "
     },
     {
-      "kind" : "externalParam",
-      "text" : "context"
+      "kind" : "keyword",
+      "text" : "throws"
     },
     {
       "kind" : "text",
-      "text" : ": (any "
+      "text" : " -> "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo14RequestContextP",
-      "text" : "RequestContext"
-    },
-    {
-      "kind" : "text",
-      "text" : ")?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "callbackQueue"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
-      "text" : "DispatchQueue"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "completionHandler"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6ResultO",
-      "text" : "Result"
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
     },
     {
       "kind" : "text",
@@ -669,8 +402,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -678,16 +411,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
+      "text" : "Query"
     },
     {
       "kind" : "text",
@@ -700,30 +424,16 @@
     },
     {
       "kind" : "text",
-      "text" : ">) -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s4Voida",
-      "text" : "Void"
-    },
-    {
-      "kind" : "text",
-      "text" : ") -> any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11CancellableP",
-      "text" : "Cancellable"
+      "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/send(operation:cachePolicy:contextIdentifier:context:callbackQueue:completionHandler:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/send(query:fetchBehavior:requestConfiguration:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
-  "title" : "send(operation:cachePolicy:contextIdentifier:context:callbackQueue:completionHandler:)",
+  "title" : "send(query:fetchBehavior:requestConfiguration:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/networktransport\/send(operation:cachepolicy:contextidentifier:context:callbackqueue:completionhandler:)"
+  "url" : "\/documentation\/apollo\/networktransport\/send(query:fetchbehavior:requestconfiguration:)"
 },
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport": {
   "abstract" : [
@@ -783,17 +493,25 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport"
 },
-"doc://Apollo/documentation/Apollo/UploadingNetworkTransport": {
+"doc://Apollo/documentation/Apollo/SplitNetworkTransport": {
   "abstract" : [
     {
-      "text" : "A network transport which can also handle uploads of files.",
+      "text" : "A network transport that sends allows you to use different ",
+      "type" : "text"
+    },
+    {
+      "code" : "NetworkTransport",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " types for each operation type.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "protocol"
+      "text" : "class"
     },
     {
       "kind" : "text",
@@ -801,21 +519,26 @@
     },
     {
       "kind" : "identifier",
-      "text" : "UploadingNetworkTransport"
+      "text" : "SplitNetworkTransport"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadingNetworkTransport",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/SplitNetworkTransport",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "UploadingNetworkTransport"
+      "text" : "SplitNetworkTransport"
     }
   ],
   "role" : "symbol",
-  "title" : "UploadingNetworkTransport",
+  "title" : "SplitNetworkTransport",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/uploadingnetworktransport"
+  "url" : "\/documentation\/apollo\/splitnetworktransport"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

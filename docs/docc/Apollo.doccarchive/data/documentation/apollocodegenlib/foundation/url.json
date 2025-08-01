@@ -89,6 +89,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URL\/childFileURL(fileName:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URL\/childFolderURL(folderName:)",

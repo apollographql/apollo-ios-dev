@@ -33,6 +33,7 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Operators",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloadConfiguration\/DownloadMethod-swift.enum\/!=(_:_:)"

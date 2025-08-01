@@ -64,7 +64,12 @@
       }
     ],
     "platforms" : [
-
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "message" : "This property will be removed in version 2.0. To check if an Object implements an interface please use the 'implements(_)' function.",
+        "unavailable" : false
+      }
     ],
     "role" : "symbol",
     "roleHeading" : "Instance Property",

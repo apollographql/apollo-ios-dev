@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/ExpressibleByFloatLiteral-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable"
       ]
     ]
   },
@@ -55,13 +54,21 @@
           "type" : "codeVoice"
         },
         {
+          "text" : " and ",
+          "type" : "text"
+        },
+        {
+          "code" : "Sendable",
+          "type" : "codeVoice"
+        },
+        {
           "text" : ".",
           "type" : "text"
         }
       ]
     },
     "extendedModule" : "ApolloAPI",
-    "externalID" : "s:9ApolloAPI15GraphQLNullableOAAs25ExpressibleByFloatLiteralRzlE05floatH0ACyxG0gH4TypeQz_tcfc",
+    "externalID" : "s:9ApolloAPI15GraphQLNullableOAAs25ExpressibleByFloatLiteralRzrlE05floatH0ACyxG0gH4TypeQz_tcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -289,17 +296,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqlnullable"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/ExpressibleByFloatLiteral-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/ExpressibleByFloatLiteral-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ExpressibleByFloatLiteral Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqlnullable\/expressiblebyfloatliteral-implementations"
-},
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/init(floatLiteral:)": {
   "abstract" : [
 
@@ -328,6 +324,14 @@
       },
       {
         "code" : "ExpressibleByFloatLiteral",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " and ",
+        "type" : "text"
+      },
+      {
+        "code" : "Sendable",
         "type" : "codeVoice"
       },
       {

@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo15NormalizedCacheP5clearyyKF",
+    "externalID" : "s:6Apollo15NormalizedCacheP5clearyyYaKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -36,6 +36,14 @@
       {
         "kind" : "text",
         "text" : "() "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
       },
       {
         "kind" : "keyword",
@@ -79,6 +87,14 @@
             {
               "kind" : "text",
               "text" : "() "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
             },
             {
               "kind" : "keyword",
@@ -180,6 +196,14 @@
     {
       "kind" : "text",
       "text" : "() "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

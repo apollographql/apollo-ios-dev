@@ -14,7 +14,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A5StoreC20ReadWriteTransactionC12updateObject6ofType7withKey9variables_yxm_SSSDySS0A3API29GraphQLOperationVariableValue_pGSgyxzKXEtKAJ23MutableRootSelectionSetRzlF",
+    "externalID" : "s:6Apollo0A5StoreC20ReadWriteTransactionC12updateObject6ofType7withKey9variables_yxm_SSSDySS0A3API29GraphQLOperationVariableValue_pGSgyxzKXEtYaKAJ23MutableRootSelectionSetRzlF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -131,6 +131,14 @@
       {
         "kind" : "text",
         "text" : ") "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
       },
       {
         "kind" : "keyword",
@@ -306,6 +314,14 @@
             {
               "kind" : "text",
               "text" : ") "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
             },
             {
               "kind" : "keyword",
@@ -571,6 +587,14 @@
     {
       "kind" : "text",
       "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

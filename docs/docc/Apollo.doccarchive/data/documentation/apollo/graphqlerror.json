@@ -114,6 +114,7 @@
     {
       "identifiers" : [
         "doc:\/\/Apollo\/10Foundation14LocalizedErrorP",
+        "doc:\/\/Apollo\/s8CopyableP",
         "doc:\/\/Apollo\/s23CustomStringConvertibleP",
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/s5ErrorP",
@@ -135,18 +136,32 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/Location"
       ],
       "title" : "Structures"
     },
     {
+      "anchor" : "Operators",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/==(_:_:)"
+      ],
+      "title" : "Operators"
+    },
+    {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/init(_:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/extensions",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/locations",
@@ -156,18 +171,31 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/hash(into:)"
+      ],
+      "title" : "Instance Methods"
+    },
+    {
+      "anchor" : "Subscripts",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/subscript(_:)"
       ],
       "title" : "Subscripts"
     },
     {
+      "anchor" : "Type-Aliases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry"
       ],
       "title" : "Type Aliases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/CustomStringConvertible-Implementations",
@@ -254,6 +282,70 @@
   "title" : "GraphQLError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlerror"
+},
+"doc://Apollo/documentation/Apollo/GraphQLError/==(_:_:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "=="
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV",
+      "text" : "GraphQLError"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV",
+      "text" : "GraphQLError"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/==(_:_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "==(_:_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlerror\/==(_:_:)"
 },
 "doc://Apollo/documentation/Apollo/GraphQLError/CustomStringConvertible-Implementations": {
   "abstract" : [
@@ -412,6 +504,60 @@
   "title" : "extensions",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlerror\/extensions"
+},
+"doc://Apollo/documentation/Apollo/GraphQLError/hash(into:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "hash"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "into"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "inout"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s6HasherV",
+      "text" : "Hasher"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/hash(into:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "hash(into:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlerror\/hash(into:)"
 },
 "doc://Apollo/documentation/Apollo/GraphQLError/init(_:)": {
   "abstract" : [
@@ -633,6 +779,11 @@
 "doc://Apollo/s5ErrorP": {
   "identifier" : "doc:\/\/Apollo\/s5ErrorP",
   "title" : "Swift.Error",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8CopyableP": {
+  "identifier" : "doc:\/\/Apollo\/s8CopyableP",
+  "title" : "Swift.Copyable",
   "type" : "unresolvable"
 },
 "doc://Apollo/s8SendableP": {

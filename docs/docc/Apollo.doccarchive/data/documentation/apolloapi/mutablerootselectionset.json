@@ -102,7 +102,8 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSetEntityValue",
         "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
         "doc:\/\/ApolloAPI\/SQ",
-        "doc:\/\/ApolloAPI\/SH"
+        "doc:\/\/ApolloAPI\/SH",
+        "doc:\/\/ApolloAPI\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Inherits From",
@@ -119,6 +120,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableRootSelectionSet\/mutateIfFulfilled(_:_:)"
       ],
@@ -512,6 +515,11 @@
 "doc://ApolloAPI/s28CustomDebugStringConvertibleP": {
   "identifier" : "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
   "title" : "Swift.CustomDebugStringConvertible",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

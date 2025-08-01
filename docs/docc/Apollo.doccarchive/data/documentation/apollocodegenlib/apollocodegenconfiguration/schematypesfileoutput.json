@@ -84,7 +84,8 @@
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/Se",
         "doc:\/\/ApolloCodegenLib\/SE",
-        "doc:\/\/ApolloCodegenLib\/SQ"
+        "doc:\/\/ApolloCodegenLib\/SQ",
+        "doc:\/\/ApolloCodegenLib\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -101,6 +102,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/init(from:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/init(path:moduleType:)"
@@ -108,6 +111,8 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/moduleType-swift.property",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/path"
@@ -115,12 +120,15 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum"
       ],
       "title" : "Enumerations"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/Equatable-Implementations"
@@ -493,6 +501,11 @@
   "title" : "path",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schematypesfileoutput\/path"
+},
+"doc://ApolloCodegenLib/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

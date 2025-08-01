@@ -13,7 +13,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo13UploadRequestC19serializationFormatAA017JSONSerializationE0Cmvp",
+    "externalID" : "s:6Apollo13UploadRequestV19serializationFormatAA017JSONSerializationE0Cmvp",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -171,7 +171,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",

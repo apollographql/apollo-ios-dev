@@ -18,8 +18,7 @@
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
         "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/LocalizedError-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError"
       ]
     ]
   },
@@ -30,7 +29,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "Foundation",
-    "externalID" : "s:10Foundation14LocalizedErrorPAAE13failureReasonSSSgvp::SYNTHESIZED::s:6Apollo23ResponseCodeInterceptorV0bC5ErrorO",
+    "externalID" : "s:10Foundation14LocalizedErrorPAAE13failureReasonSSSgvp::SYNTHESIZED::s:6Apollo23ResponseCodeInterceptorV0bC5ErrorV",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -228,7 +227,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "enum"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -251,17 +250,6 @@
   "title" : "ResponseCodeInterceptor.ResponseCodeError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/responsecodeinterceptor\/responsecodeerror"
-},
-"doc://Apollo/documentation/Apollo/ResponseCodeInterceptor/ResponseCodeError/LocalizedError-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/LocalizedError-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "LocalizedError Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/responsecodeinterceptor\/responsecodeerror\/localizederror-implementations"
 },
 "doc://Apollo/documentation/Apollo/ResponseCodeInterceptor/ResponseCodeError/failureReason": {
   "abstract" : [

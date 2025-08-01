@@ -18,8 +18,7 @@
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error\/LocalizedError-Implementations"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error"
       ]
     ]
   },
@@ -262,17 +261,6 @@
   "title" : "ApolloCodegen.Error",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/error"
-},
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/Error/LocalizedError-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/Error\/LocalizedError-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "LocalizedError Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/error\/localizederror-implementations"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/Error/recoverySuggestion": {
   "abstract" : [

@@ -81,7 +81,8 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/SQ"
+        "doc:\/\/Apollo\/SQ",
+        "doc:\/\/Apollo\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -98,6 +99,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent\/field(_:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent\/index(_:)"
@@ -105,6 +108,7 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent\/Equatable-Implementations"
@@ -271,6 +275,11 @@
   "title" : "PathComponent.index(_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/pathcomponent\/index(_:)"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

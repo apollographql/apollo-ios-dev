@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/ExpressibleByArrayLiteral-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable"
       ]
     ]
   },
@@ -55,13 +54,21 @@
           "type" : "codeVoice"
         },
         {
+          "text" : " and ",
+          "type" : "text"
+        },
+        {
+          "code" : "Sendable",
+          "type" : "codeVoice"
+        },
+        {
           "text" : ".",
           "type" : "text"
         }
       ]
     },
     "extendedModule" : "ApolloAPI",
-    "externalID" : "s:9ApolloAPI15GraphQLNullableOA2A36_InitializableByArrayLiteralElementsRzlE05arrayH0ACyxG0gH7ElementQzd_tcfc",
+    "externalID" : "s:9ApolloAPI15GraphQLNullableOA2A36_InitializableByArrayLiteralElementsRzrlE05arrayH0ACyxG0gH7ElementQzd_tcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -289,17 +296,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqlnullable"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/ExpressibleByArrayLiteral-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/ExpressibleByArrayLiteral-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ExpressibleByArrayLiteral Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqlnullable\/expressiblebyarrayliteral-implementations"
-},
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/init(arrayLiteral:)": {
   "abstract" : [
 
@@ -328,6 +324,14 @@
       },
       {
         "code" : "_InitializableByArrayLiteralElements",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " and ",
+        "type" : "text"
+      },
+      {
+        "code" : "Sendable",
         "type" : "codeVoice"
       },
       {

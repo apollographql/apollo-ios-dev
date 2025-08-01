@@ -12,11 +12,11 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo18RequestBodyCreatorP",
+    "externalID" : "s:6Apollo18RequestBodyCreatora",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "protocol"
+        "text" : "typealias"
       },
       {
         "kind" : "text",
@@ -38,9 +38,17 @@
         "text" : "RequestBodyCreator"
       }
     ],
+    "platforms" : [
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "renamed" : "JSONRequestBodyCreator",
+        "unavailable" : false
+      }
+    ],
     "role" : "symbol",
-    "roleHeading" : "Protocol",
-    "symbolKind" : "protocol",
+    "roleHeading" : "Type Alias",
+    "symbolKind" : "typealias",
     "title" : "RequestBodyCreator"
   },
   "primaryContentSections" : [
@@ -56,7 +64,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "protocol"
+              "text" : "typealias"
             },
             {
               "kind" : "text",
@@ -65,21 +73,21 @@
             {
               "kind" : "identifier",
               "text" : "RequestBodyCreator"
+            },
+            {
+              "kind" : "text",
+              "text" : " = "
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequestBodyCreator",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo22JSONRequestBodyCreatorP",
+              "text" : "JSONRequestBodyCreator"
             }
           ]
         }
       ],
       "kind" : "declarations"
-    }
-  ],
-  "relationshipsSections" : [
-    {
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloRequestBodyCreator"
-      ],
-      "kind" : "relationships",
-      "title" : "Conforming Types",
-      "type" : "conformingTypes"
     }
   ],
   "schemaVersion" : {
@@ -89,14 +97,6 @@
   },
   "sections" : [
 
-  ],
-  "topicSections" : [
-    {
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestBodyCreator\/requestBody(for:sendQueryDocument:autoPersistQuery:)-1ddq1"
-      ],
-      "title" : "Instance Methods"
-    }
   ],
   "variants" : [
     {
@@ -126,38 +126,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/ApolloRequestBodyCreator": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "struct"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "ApolloRequestBodyCreator"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloRequestBodyCreator",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "ApolloRequestBodyCreator"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "ApolloRequestBodyCreator",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollorequestbodycreator"
-},
-"doc://Apollo/documentation/Apollo/RequestBodyCreator": {
+"doc://Apollo/documentation/Apollo/JSONRequestBodyCreator": {
   "abstract" : [
 
   ],
@@ -165,6 +134,38 @@
     {
       "kind" : "keyword",
       "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "JSONRequestBodyCreator"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequestBodyCreator",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "JSONRequestBodyCreator"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "JSONRequestBodyCreator",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/jsonrequestbodycreator"
+},
+"doc://Apollo/documentation/Apollo/RequestBodyCreator": {
+  "abstract" : [
+
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
     },
     {
       "kind" : "text",
@@ -187,111 +188,6 @@
   "title" : "RequestBodyCreator",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestbodycreator"
-},
-"doc://Apollo/documentation/Apollo/RequestBodyCreator/requestBody(for:sendQueryDocument:autoPersistQuery:)-1ddq1": {
-  "abstract" : [
-    {
-      "text" : "Creates a ",
-      "type" : "text"
-    },
-    {
-      "code" : "JSONEncodableDictionary",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " out of the passed-in operation",
-      "type" : "text"
-    }
-  ],
-  "defaultImplementations" : 1,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "requestBody"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "genericParameter",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "for"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "sendQueryDocument"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "autoPersistQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
-    },
-    {
-      "kind" : "text",
-      "text" : ") -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI23JSONEncodableDictionarya",
-      "text" : "JSONEncodableDictionary"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestBodyCreator\/requestBody(for:sendQueryDocument:autoPersistQuery:)-1ddq1",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "requestBody(for:sendQueryDocument:autoPersistQuery:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestbodycreator\/requestbody(for:sendquerydocument:autopersistquery:)-1ddq1"
 }
 }
 }

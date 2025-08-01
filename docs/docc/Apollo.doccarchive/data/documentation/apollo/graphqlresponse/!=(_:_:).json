@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/Equatable-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse"
       ]
     ]
   },
@@ -29,7 +28,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "Swift",
-    "externalID" : "s:SQsE2neoiySbx_xtFZ::SYNTHESIZED::s:6Apollo15GraphQLResponseC",
+    "externalID" : "s:SQsE2neoiySbx_xtFZ::SYNTHESIZED::s:6Apollo15GraphQLResponseV",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -215,14 +214,14 @@
 "doc://Apollo/documentation/Apollo/GraphQLResponse": {
   "abstract" : [
     {
-      "text" : "Represents a complete GraphQL response received from a server.",
+      "text" : "Represents the result of a GraphQL operation.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -307,17 +306,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlresponse\/!=(_:_:)"
-},
-"doc://Apollo/documentation/Apollo/GraphQLResponse/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlresponse\/equatable-implementations"
 }
 }
 }

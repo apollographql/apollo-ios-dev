@@ -111,6 +111,7 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Schema-Types",
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface",
@@ -121,6 +122,7 @@
       "title" : "Schema Types"
     },
     {
+      "anchor" : "Scalar-Types",
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/AnyScalarType",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ScalarType",
@@ -129,6 +131,7 @@
       "title" : "Scalar Types"
     },
     {
+      "anchor" : "JSON-Conversion",
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONValue",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONObject",
@@ -140,6 +143,8 @@
       "title" : "JSON Conversion"
     },
     {
+      "anchor" : "Protocols",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/AnyHashableConvertible",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CompositeInlineFragment",
@@ -157,6 +162,7 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableRootSelectionSet",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableSelectionSet",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OneOfInputObject",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OperationResponseFormat",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OutputTypeConvertible",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ParentType",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/RootSelectionSet",
@@ -168,21 +174,28 @@
       "title" : "Protocols"
     },
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheKeyInfo",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DeferredFragmentIdentifier",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/IncrementalDeferredResponseFormat",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputDict",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ListData",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ObjectData",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OperationDefinition",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OperationDocument"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OperationDocument",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SingleResponseFormat",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SubscriptionResponseFormat"
       ],
       "title" : "Structures"
     },
     {
+      "anchor" : "Operators",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/!=(_:_:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/__(_:_:)"
@@ -190,6 +203,8 @@
       "title" : "Operators"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DocumentType",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum",
@@ -202,6 +217,8 @@
       "title" : "Enumerations"
     },
     {
+      "anchor" : "Extended-Modules",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift"
       ],
@@ -1241,6 +1258,48 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqlsubscription"
 },
+"doc://ApolloAPI/documentation/ApolloAPI/IncrementalDeferredResponseFormat": {
+  "abstract" : [
+    {
+      "text" : "An incremental response format for an operation which uses the ",
+      "type" : "text"
+    },
+    {
+      "code" : "@defer",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " directive.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "IncrementalDeferredResponseFormat"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/IncrementalDeferredResponseFormat",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "IncrementalDeferredResponseFormat"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "IncrementalDeferredResponseFormat",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/incrementaldeferredresponseformat"
+},
 "doc://ApolloAPI/documentation/ApolloAPI/InlineFragment": {
   "abstract" : [
     {
@@ -2141,6 +2200,40 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/operationdocument"
 },
+"doc://ApolloAPI/documentation/ApolloAPI/OperationResponseFormat": {
+  "abstract" : [
+    {
+      "text" : "The format expected for the network response of an operation.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "OperationResponseFormat"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OperationResponseFormat",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "OperationResponseFormat"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "OperationResponseFormat",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/operationresponseformat"
+},
 "doc://ApolloAPI/documentation/ApolloAPI/OutputTypeConvertible": {
   "abstract" : [
 
@@ -2561,6 +2654,71 @@
   "title" : "SelectionSetEntityValue",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionsetentityvalue"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/SingleResponseFormat": {
+  "abstract" : [
+    {
+      "text" : "A response format for an operation that expects a single network response.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "SingleResponseFormat"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SingleResponseFormat",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "SingleResponseFormat"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "SingleResponseFormat",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/singleresponseformat"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/SubscriptionResponseFormat": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "SubscriptionResponseFormat"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SubscriptionResponseFormat",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "SubscriptionResponseFormat"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "SubscriptionResponseFormat",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/subscriptionresponseformat"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Swift": {
   "abstract" : [

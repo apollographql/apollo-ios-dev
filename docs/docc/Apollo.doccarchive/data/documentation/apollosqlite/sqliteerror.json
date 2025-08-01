@@ -94,6 +94,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError\/execution(message:)",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError\/open(path:)",
@@ -103,12 +105,15 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError\/description"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError\/Error-Implementations"

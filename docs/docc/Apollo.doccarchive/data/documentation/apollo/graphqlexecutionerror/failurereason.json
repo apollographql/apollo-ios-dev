@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLExecutionError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLExecutionError\/LocalizedError-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLExecutionError"
       ]
     ]
   },
@@ -219,17 +218,6 @@
   "title" : "GraphQLExecutionError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlexecutionerror"
-},
-"doc://Apollo/documentation/Apollo/GraphQLExecutionError/LocalizedError-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLExecutionError\/LocalizedError-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "LocalizedError Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlexecutionerror\/localizederror-implementations"
 },
 "doc://Apollo/documentation/Apollo/GraphQLExecutionError/failureReason": {
   "abstract" : [

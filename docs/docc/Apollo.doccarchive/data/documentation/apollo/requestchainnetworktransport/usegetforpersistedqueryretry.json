@@ -29,6 +29,17 @@
       "type" : "text"
     }
   ],
+  "deprecationSummary" : [
+    {
+      "inlineContent" : [
+        {
+          "text" : "Use apqConfig.useGETForPersistedQueryRetry instead.",
+          "type" : "text"
+        }
+      ],
+      "type" : "paragraph"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -43,11 +54,12 @@
   },
   "kind" : "symbol",
   "metadata" : {
+    "extendedModule" : "Apollo",
     "externalID" : "s:6Apollo28RequestChainNetworkTransportC28useGETForPersistedQueryRetrySbvp",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "let"
+        "text" : "var"
       },
       {
         "kind" : "text",
@@ -72,6 +84,14 @@
         "name" : "Apollo"
       }
     ],
+    "platforms" : [
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "message" : "Use apqConfig.useGETForPersistedQueryRetry instead.",
+        "unavailable" : false
+      }
+    ],
     "role" : "symbol",
     "roleHeading" : "Instance Property",
     "symbolKind" : "property",
@@ -90,7 +110,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "let"
+              "text" : "var"
             },
             {
               "kind" : "text",
@@ -108,6 +128,18 @@
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:Sb",
               "text" : "Bool"
+            },
+            {
+              "kind" : "text",
+              "text" : " { "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "get"
+            },
+            {
+              "kind" : "text",
+              "text" : " }"
             }
           ]
         }
@@ -240,10 +272,11 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "let"
+      "text" : "var"
     },
     {
       "kind" : "text",

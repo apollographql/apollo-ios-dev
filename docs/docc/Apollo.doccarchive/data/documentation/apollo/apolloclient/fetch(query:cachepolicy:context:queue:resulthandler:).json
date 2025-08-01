@@ -1,16 +1,9 @@
 {
-  "abstract" : [
-    {
-      "text" : "Fetches a query from the server or from the local cache, depending on the current contents of the cache and the specified cache policy.",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientProtocol-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient"
       ]
     ]
   },
@@ -21,7 +14,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "Apollo",
-    "externalID" : "s:6Apollo0A14ClientProtocolPAAE5fetch5query11cachePolicy7context5queue13resultHandlerAA11Cancellable_pqd___AA05CacheG0OAA14RequestContext_pSgSo012OS_dispatch_I0Cys6ResultOyAA13GraphQLResultVy4DataQyd__Gs5Error_pGcSgt0A3API0S7QLQueryRd__lF::SYNTHESIZED::s:6Apollo0A6ClientC",
+    "externalID" : "s:6Apollo0A6ClientC5fetch5query11cachePolicy7context5queue13resultHandlerAA11Cancellable_px_AA05CacheF3_v1OSgAA14RequestContext_pSgSo012OS_dispatch_H0Cys6ResultOyAA15GraphQLResponseVyxGs5Error_pGYbcSgt0A3API0S7QLQueryRzlF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -73,12 +66,12 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-        "text" : "CachePolicy"
+        "preciseIdentifier" : "s:6Apollo14CachePolicy_v1O",
+        "text" : "CachePolicy_v1"
       },
       {
         "kind" : "text",
-        "text" : ", "
+        "text" : "?, "
       },
       {
         "kind" : "externalParam",
@@ -137,30 +130,24 @@
       },
       {
         "kind" : "text",
-        "text" : "."
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-        "text" : "Data"
-      },
-      {
-        "kind" : "text",
-        "text" : ">?) -> (any "
+        "text" : ">?) -> any "
       },
       {
         "kind" : "typeIdentifier",
         "preciseIdentifier" : "s:6Apollo11CancellableP",
         "text" : "Cancellable"
-      },
-      {
-        "kind" : "text",
-        "text" : ")"
       }
     ],
     "modules" : [
       {
         "name" : "Apollo"
+      }
+    ],
+    "platforms" : [
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "unavailable" : false
       }
     ],
     "role" : "symbol",
@@ -179,6 +166,14 @@
             "macOS"
           ],
           "tokens" : [
+            {
+              "kind" : "attribute",
+              "text" : "@discardableResult"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
             {
               "kind" : "keyword",
               "text" : "func"
@@ -228,14 +223,14 @@
               "text" : ": "
             },
             {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-              "text" : "CachePolicy"
+              "preciseIdentifier" : "s:6Apollo14CachePolicy_v1O",
+              "text" : "CachePolicy_v1"
             },
             {
               "kind" : "text",
-              "text" : ", "
+              "text" : "? = nil, "
             },
             {
               "kind" : "externalParam",
@@ -253,7 +248,7 @@
             },
             {
               "kind" : "text",
-              "text" : ")?, "
+              "text" : ")? = nil, "
             },
             {
               "kind" : "externalParam",
@@ -270,7 +265,7 @@
             },
             {
               "kind" : "text",
-              "text" : ", "
+              "text" : " = .main, "
             },
             {
               "kind" : "externalParam",
@@ -296,16 +291,7 @@
             },
             {
               "kind" : "text",
-              "text" : "."
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-              "text" : "Data"
-            },
-            {
-              "kind" : "text",
-              "text" : ">?) -> (any "
+              "text" : ">? = nil) -> any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable",
@@ -315,7 +301,7 @@
             },
             {
               "kind" : "text",
-              "text" : ") "
+              "text" : " "
             },
             {
               "kind" : "keyword",
@@ -342,109 +328,6 @@
         }
       ],
       "kind" : "declarations"
-    },
-    {
-      "kind" : "parameters",
-      "parameters" : [
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The query to fetch.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "query"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "A cache policy that specifies when results should be fetched from the server and when data should be loaded from the local cache.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "cachePolicy"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "A dispatch queue on which the result handler will be called. Should default to the main queue.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "queue"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "[optional] A context that is being passed through the request chain. Should default to ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "nil",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : ".",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "context"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "[optional] A closure that is called when query results are available or when an error occurs.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "resultHandler"
-        }
-      ]
-    },
-    {
-      "content" : [
-        {
-          "anchor" : "return-value",
-          "level" : 2,
-          "text" : "Return Value",
-          "type" : "heading"
-        },
-        {
-          "inlineContent" : [
-            {
-              "text" : "An object that can be used to cancel an in progress fetch.",
-              "type" : "text"
-            }
-          ],
-          "type" : "paragraph"
-        }
-      ],
-      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -486,23 +369,19 @@
 "doc://Apollo/documentation/Apollo/ApolloClient": {
   "abstract" : [
     {
-      "text" : "The ",
-      "type" : "text"
-    },
-    {
       "code" : "ApolloClient",
       "type" : "codeVoice"
     },
     {
-      "text" : " class implements the core API for Apollo by conforming to ",
+      "text" : " is the primary public entry point for interacting with a GraphQL server and a local GraphQL",
       "type" : "text"
     },
     {
-      "code" : "ApolloClientProtocol",
-      "type" : "codeVoice"
+      "text" : " ",
+      "type" : "text"
     },
     {
-      "text" : ".",
+      "text" : "normalized cache. This class provides the",
       "type" : "text"
     }
   ],
@@ -533,24 +412,11 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclient"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient/ApolloClientProtocol-Implementations": {
+"doc://Apollo/documentation/Apollo/ApolloClient/fetch(query:cachePolicy:context:queue:resultHandler:)": {
   "abstract" : [
 
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientProtocol-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ApolloClientProtocol Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/apolloclientprotocol-implementations"
-},
-"doc://Apollo/documentation/Apollo/ApolloClient/fetch(query:cachePolicy:context:queue:resultHandler:)": {
-  "abstract" : [
-    {
-      "text" : "Fetches a query from the server or from the local cache, depending on the current contents of the cache and the specified cache policy.",
-      "type" : "text"
-    }
-  ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -602,12 +468,12 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-      "text" : "CachePolicy"
+      "preciseIdentifier" : "s:6Apollo14CachePolicy_v1O",
+      "text" : "CachePolicy_v1"
     },
     {
       "kind" : "text",
-      "text" : ", "
+      "text" : "?, "
     },
     {
       "kind" : "externalParam",
@@ -666,25 +532,12 @@
     },
     {
       "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">?) -> (any "
+      "text" : ">?) -> any "
     },
     {
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "s:6Apollo11CancellableP",
       "text" : "Cancellable"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:context:queue:resultHandler:)",
@@ -694,13 +547,11 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:context:queue:resulthandler:)"
 },
-"doc://Apollo/documentation/Apollo/CachePolicy": {
+"doc://Apollo/documentation/Apollo/CachePolicy_v1": {
   "abstract" : [
-    {
-      "text" : "A cache policy that specifies whether results should be fetched from the server or loaded from the local cache.",
-      "type" : "text"
-    }
+
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -712,21 +563,21 @@
     },
     {
       "kind" : "identifier",
-      "text" : "CachePolicy"
+      "text" : "CachePolicy_v1"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "CachePolicy"
+      "text" : "CachePolicy_v1"
     }
   ],
   "role" : "symbol",
-  "title" : "CachePolicy",
+  "title" : "CachePolicy_v1",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/cachepolicy"
+  "url" : "\/documentation\/apollo\/cachepolicy_v1"
 },
 "doc://Apollo/documentation/Apollo/Cancellable": {
   "abstract" : [
@@ -735,6 +586,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -769,6 +621,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -803,6 +656,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",

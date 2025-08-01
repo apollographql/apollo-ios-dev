@@ -27,7 +27,8 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo26DefaultInterceptorProviderC12interceptors3forSayAA0aC0_pGx_t0A3API16GraphQLOperationRzlF",
+    "extendedModule" : "Apollo",
+    "externalID" : "s:6Apollo19InterceptorProviderPAAE12interceptors3forAA12InterceptorsVqd___t0A3API16GraphQLOperationRd__lF::SYNTHESIZED::s:6Apollo26DefaultInterceptorProviderC",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -67,16 +68,12 @@
       },
       {
         "kind" : "text",
-        "text" : ") -> [any "
+        "text" : ") -> "
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo0A11InterceptorP",
-        "text" : "ApolloInterceptor"
-      },
-      {
-        "kind" : "text",
-        "text" : "]"
+        "preciseIdentifier" : "s:6Apollo12InterceptorsV",
+        "text" : "Interceptors"
       }
     ],
     "modules" : [
@@ -146,17 +143,17 @@
             },
             {
               "kind" : "text",
-              "text" : ") -> [any "
+              "text" : ") -> "
             },
             {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor",
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Interceptors",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo0A11InterceptorP",
-              "text" : "ApolloInterceptor"
+              "preciseIdentifier" : "s:6Apollo12InterceptorsV",
+              "text" : "Interceptors"
             },
             {
               "kind" : "text",
-              "text" : "] "
+              "text" : " "
             },
             {
               "kind" : "keyword",
@@ -221,44 +218,10 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/ApolloInterceptor": {
-  "abstract" : [
-    {
-      "text" : "A protocol to set up a chainable unit of networking work.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "protocol"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "ApolloInterceptor"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "ApolloInterceptor"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "ApolloInterceptor",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollointerceptor"
-},
 "doc://Apollo/documentation/Apollo/DefaultInterceptorProvider": {
   "abstract" : [
     {
-      "text" : "The default interceptor provider for typescript-generated code",
+      "text" : "The default interceptor provider.",
       "type" : "text"
     }
   ],
@@ -332,16 +295,12 @@
     },
     {
       "kind" : "text",
-      "text" : ") -> [any "
+      "text" : ") -> "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo0A11InterceptorP",
-      "text" : "ApolloInterceptor"
-    },
-    {
-      "kind" : "text",
-      "text" : "]"
+      "preciseIdentifier" : "s:6Apollo12InterceptorsV",
+      "text" : "Interceptors"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/interceptors(for:)",
@@ -350,6 +309,37 @@
   "title" : "interceptors(for:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/defaultinterceptorprovider\/interceptors(for:)"
+},
+"doc://Apollo/documentation/Apollo/Interceptors": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Interceptors"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Interceptors",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Interceptors"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "Interceptors",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/interceptors"
 }
 }
 }

@@ -13,7 +13,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI8DataDictV4data18fulfilledFragments08deferredG0ACSDySSs11AnyHashableVG_ShySOGAJtcfc",
+    "externalID" : "s:9ApolloAPI8DataDictV4data18fulfilledFragments08deferredG0ACSDySSSH_s8SendablepG_ShySOGAItcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -42,8 +42,17 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:s11AnyHashableV",
-        "text" : "AnyHashable"
+        "preciseIdentifier" : "s:9ApolloAPI8DataDictV",
+        "text" : "DataDict"
+      },
+      {
+        "kind" : "text",
+        "text" : "."
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:9ApolloAPI8DataDictV10FieldValuea",
+        "text" : "FieldValue"
       },
       {
         "kind" : "text",
@@ -149,9 +158,20 @@
               "text" : " : "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:s11AnyHashableV",
-              "text" : "AnyHashable"
+              "preciseIdentifier" : "s:9ApolloAPI8DataDictV",
+              "text" : "DataDict"
+            },
+            {
+              "kind" : "text",
+              "text" : "."
+            },
+            {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/FieldValue",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI8DataDictV10FieldValuea",
+              "text" : "FieldValue"
             },
             {
               "kind" : "text",
@@ -332,6 +352,37 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/datadict"
 },
+"doc://ApolloAPI/documentation/ApolloAPI/DataDict/FieldValue": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "FieldValue"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/FieldValue",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "FieldValue"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "DataDict.FieldValue",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/datadict\/fieldvalue"
+},
 "doc://ApolloAPI/documentation/ApolloAPI/DataDict/init(data:fulfilledFragments:deferredFragments:)": {
   "abstract" : [
 
@@ -364,8 +415,17 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s11AnyHashableV",
-      "text" : "AnyHashable"
+      "preciseIdentifier" : "s:9ApolloAPI8DataDictV",
+      "text" : "DataDict"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI8DataDictV10FieldValuea",
+      "text" : "FieldValue"
     },
     {
       "kind" : "text",

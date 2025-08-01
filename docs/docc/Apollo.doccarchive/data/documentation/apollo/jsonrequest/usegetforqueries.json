@@ -1,4 +1,34 @@
 {
+  "abstract" : [
+    {
+      "text" : "Set to  ",
+      "type" : "text"
+    },
+    {
+      "code" : "true",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " if you want to use ",
+      "type" : "text"
+    },
+    {
+      "code" : "GET",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " instead of ",
+      "type" : "text"
+    },
+    {
+      "code" : "POST",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " for queries.",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -13,7 +43,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo11JSONRequestC16useGETForQueriesSbvp",
+    "externalID" : "s:6Apollo11JSONRequestV16useGETForQueriesSbvp",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -83,6 +113,47 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "This can improve performance if your GraphQL server uses a CDN (Content Delivery Network)",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "to cache the results of queries that rarely change.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Mutation operations always use POST, even when this is ",
+              "type" : "text"
+            },
+            {
+              "code" : "false",
+              "type" : "codeVoice"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -131,7 +202,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -157,7 +228,34 @@
 },
 "doc://Apollo/documentation/Apollo/JSONRequest/useGETForQueries": {
   "abstract" : [
-
+    {
+      "text" : "Set to  ",
+      "type" : "text"
+    },
+    {
+      "code" : "true",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " if you want to use ",
+      "type" : "text"
+    },
+    {
+      "code" : "GET",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " instead of ",
+      "type" : "text"
+    },
+    {
+      "code" : "POST",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " for queries.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

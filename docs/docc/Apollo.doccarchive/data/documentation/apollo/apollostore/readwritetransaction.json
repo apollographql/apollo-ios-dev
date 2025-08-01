@@ -101,19 +101,23 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/cache"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/removeObject(for:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/removeObjects(matching:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/update(_:_:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/updateObject(ofType:withKey:variables:_:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-9mzaz",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-y0jm",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-4w5fv",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-5stiz",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(selectionSet:withKey:variables:)"
       ],
       "title" : "Instance Methods"
@@ -344,6 +348,14 @@
     },
     {
       "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
       "text" : "throws"
     }
   ],
@@ -418,6 +430,14 @@
     {
       "kind" : "text",
       "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",
@@ -509,6 +529,14 @@
     {
       "kind" : "text",
       "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",
@@ -645,6 +673,14 @@
     },
     {
       "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
       "text" : "throws"
     }
   ],
@@ -655,7 +691,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/updateobject(oftype:withkey:variables:_:)"
 },
-"doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/write(data:for:)-9mzaz": {
+"doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/write(data:for:)-4w5fv": {
   "abstract" : [
 
   ],
@@ -727,17 +763,25 @@
     },
     {
       "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-9mzaz",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-4w5fv",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "write(data:for:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/write(data:for:)-9mzaz"
+  "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/write(data:for:)-4w5fv"
 },
-"doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/write(data:for:)-y0jm": {
+"doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/write(data:for:)-5stiz": {
   "abstract" : [
 
   ],
@@ -809,15 +853,23 @@
     },
     {
       "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-y0jm",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-5stiz",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "write(data:for:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/write(data:for:)-y0jm"
+  "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/write(data:for:)-5stiz"
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/write(selectionSet:withKey:variables:)": {
   "abstract" : [
@@ -906,6 +958,14 @@
     {
       "kind" : "text",
       "text" : "]?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

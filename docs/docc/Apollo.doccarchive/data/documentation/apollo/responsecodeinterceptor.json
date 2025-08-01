@@ -81,7 +81,8 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor"
+        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPInterceptor",
+        "doc:\/\/Apollo\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -98,28 +99,36 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Structures",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError"
+      ],
+      "title" : "Structures"
+    },
+    {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/init()"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/id"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/interceptAsync(chain:request:response:completion:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/intercept(request:next:)"
       ],
       "title" : "Instance Methods"
-    },
-    {
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError"
-      ],
-      "title" : "Enumerations"
     }
   ],
   "variants" : [
@@ -150,12 +159,9 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/ApolloInterceptor": {
+"doc://Apollo/documentation/Apollo/HTTPInterceptor": {
   "abstract" : [
-    {
-      "text" : "A protocol to set up a chainable unit of networking work.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
@@ -168,21 +174,21 @@
     },
     {
       "kind" : "identifier",
-      "text" : "ApolloInterceptor"
+      "text" : "HTTPInterceptor"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPInterceptor",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "ApolloInterceptor"
+      "text" : "HTTPInterceptor"
     }
   ],
   "role" : "symbol",
-  "title" : "ApolloInterceptor",
+  "title" : "HTTPInterceptor",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollointerceptor"
+  "url" : "\/documentation\/apollo\/httpinterceptor"
 },
 "doc://Apollo/documentation/Apollo/ResponseCodeInterceptor": {
   "abstract" : [
@@ -225,7 +231,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "enum"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -307,7 +313,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/responsecodeinterceptor\/init()"
 },
-"doc://Apollo/documentation/Apollo/ResponseCodeInterceptor/interceptAsync(chain:request:response:completion:)": {
+"doc://Apollo/documentation/Apollo/ResponseCodeInterceptor/intercept(request:next:)": {
   "abstract" : [
 
   ],
@@ -322,36 +328,11 @@
     },
     {
       "kind" : "identifier",
-      "text" : "interceptAsync"
+      "text" : "intercept"
     },
     {
       "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "genericParameter",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "chain"
-    },
-    {
-      "kind" : "text",
-      "text" : ": any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12RequestChainP",
-      "text" : "RequestChain"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
+      "text" : "("
     },
     {
       "kind" : "externalParam",
@@ -363,49 +344,16 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11HTTPRequestC",
-      "text" : "HTTPRequest"
+      "preciseIdentifier" : "s:10Foundation10URLRequestV",
+      "text" : "URLRequest"
     },
     {
       "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, "
+      "text" : ", "
     },
     {
       "kind" : "externalParam",
-      "text" : "response"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12HTTPResponseC",
-      "text" : "HTTPResponse"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "completion"
+      "text" : "next"
     },
     {
       "kind" : "text",
@@ -413,64 +361,71 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6ResultO",
-      "text" : "Result"
+      "preciseIdentifier" : "s:10Foundation10URLRequestV",
+      "text" : "URLRequest"
     },
     {
       "kind" : "text",
-      "text" : "<"
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo12HTTPResponseV",
+      "text" : "HTTPResponse"
     },
     {
       "kind" : "text",
-      "text" : "<"
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
     },
     {
       "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s5ErrorP",
-      "text" : "Error"
-    },
-    {
-      "kind" : "text",
-      "text" : ">) -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s4Voida",
-      "text" : "Void"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
+      "preciseIdentifier" : "s:6Apollo12HTTPResponseV",
+      "text" : "HTTPResponse"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/interceptAsync(chain:request:response:completion:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/intercept(request:next:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "interceptAsync(chain:request:response:completion:)",
+  "title" : "intercept(request:next:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/responsecodeinterceptor\/interceptasync(chain:request:response:completion:)"
+  "url" : "\/documentation\/apollo\/responsecodeinterceptor\/intercept(request:next:)"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

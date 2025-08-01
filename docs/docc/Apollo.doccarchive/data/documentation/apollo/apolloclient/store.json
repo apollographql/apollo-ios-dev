@@ -1,18 +1,4 @@
 {
-  "abstract" : [
-    {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloClientProtocol.store",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -139,23 +125,19 @@
 "doc://Apollo/documentation/Apollo/ApolloClient": {
   "abstract" : [
     {
-      "text" : "The ",
-      "type" : "text"
-    },
-    {
       "code" : "ApolloClient",
       "type" : "codeVoice"
     },
     {
-      "text" : " class implements the core API for Apollo by conforming to ",
+      "text" : " is the primary public entry point for interacting with a GraphQL server and a local GraphQL",
       "type" : "text"
     },
     {
-      "code" : "ApolloClientProtocol",
-      "type" : "codeVoice"
+      "text" : " ",
+      "type" : "text"
     },
     {
-      "text" : ".",
+      "text" : "normalized cache. This class provides the",
       "type" : "text"
     }
   ],

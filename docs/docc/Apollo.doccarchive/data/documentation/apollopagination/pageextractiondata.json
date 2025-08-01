@@ -152,6 +152,16 @@
       "kind" : "declarations"
     }
   ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloPagination\/s8SendableP"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
+    }
+  ],
   "schemaVersion" : {
     "major" : 0,
     "minor" : 3,
@@ -162,6 +172,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PageExtractionData\/initial(_:_:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PageExtractionData\/paginated(_:_:)"
@@ -343,6 +355,11 @@
   "title" : "PageExtractionData.paginated(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/pageextractiondata\/paginated(_:_:)"
+},
+"doc://ApolloPagination/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloPagination\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

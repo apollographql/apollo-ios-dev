@@ -5,7 +5,7 @@
       "type" : "text"
     },
     {
-      "code" : "ExpressibleByUnicodeScalarLiteral.init(unicodeScalarLiteral:)",
+      "code" : "ExpressibleByExtendedGraphemeClusterLiteral.init(unicodeScalarLiteral:)",
       "type" : "codeVoice"
     },
     {
@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByUnicodeScalarLiteral-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue"
       ]
     ]
   },
@@ -293,17 +292,6 @@
   "title" : "InputValue",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/inputvalue"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/InputValue/ExpressibleByUnicodeScalarLiteral-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByUnicodeScalarLiteral-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ExpressibleByUnicodeScalarLiteral Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/inputvalue\/expressiblebyunicodescalarliteral-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/InputValue/init(unicodeScalarLiteral:)": {
   "abstract" : [

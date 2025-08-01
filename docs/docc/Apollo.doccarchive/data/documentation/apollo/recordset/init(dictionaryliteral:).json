@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/ExpressibleByDictionaryLiteral-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet"
       ]
     ]
   },
@@ -29,7 +28,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "Apollo",
-    "externalID" : "s:6Apollo9RecordSetV17dictionaryLiteralACSS_SDySSs11AnyHashableVGtd_tcfc",
+    "externalID" : "s:6Apollo9RecordSetV17dictionaryLiteralACSS_SDySSSH_s8SendablepGtd_tcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -324,17 +323,6 @@
   "title" : "RecordSet",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/recordset"
-},
-"doc://Apollo/documentation/Apollo/RecordSet/ExpressibleByDictionaryLiteral-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/ExpressibleByDictionaryLiteral-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ExpressibleByDictionaryLiteral Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/recordset\/expressiblebydictionaryliteral-implementations"
 },
 "doc://Apollo/documentation/Apollo/RecordSet/init(dictionaryLiteral:)": {
   "abstract" : [

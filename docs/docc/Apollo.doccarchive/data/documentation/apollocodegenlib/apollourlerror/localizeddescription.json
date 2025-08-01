@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloURLError",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloURLError\/Error-Implementations"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloURLError"
       ]
     ]
   },
@@ -212,17 +211,6 @@
   "title" : "ApolloURLError",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollourlerror"
-},
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloURLError/Error-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloURLError\/Error-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Error Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollourlerror\/error-implementations"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloURLError/localizedDescription": {
   "abstract" : [

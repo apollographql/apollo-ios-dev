@@ -235,7 +235,8 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONEncodable",
         "doc:\/\/ApolloAPI\/s12CaseIterableP",
-        "doc:\/\/ApolloAPI\/SY"
+        "doc:\/\/ApolloAPI\/SY",
+        "doc:\/\/ApolloAPI\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Inherits From",
@@ -252,6 +253,7 @@
   ],
   "seeAlsoSections" : [
     {
+      "anchor" : "Schema-Types",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object",
@@ -717,6 +719,11 @@
 "doc://ApolloAPI/s12CaseIterableP": {
   "identifier" : "doc:\/\/ApolloAPI\/s12CaseIterableP",
   "title" : "Swift.CaseIterable",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 },
 "https://spec.graphql.org/draft/#sec-Enums": {

@@ -1,0 +1,721 @@
+{
+  "abstract" : [
+    {
+      "text" : "A data structure containing telemetry metadata about the client. This is used by GraphOS Studio’s",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "https:\/\/www.apollographql.com\/docs\/graphos\/platform\/insights\/client-segmentation",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "feature.",
+      "type" : "text"
+    }
+  ],
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/Apollo\/documentation\/Apollo"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:6Apollo23ClientAwarenessMetadataV",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "struct"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "ClientAwarenessMetadata"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "Apollo"
+      }
+    ],
+    "navigatorTitle" : [
+      {
+        "kind" : "identifier",
+        "text" : "ClientAwarenessMetadata"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Structure",
+    "symbolKind" : "struct",
+    "title" : "ClientAwarenessMetadata"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "struct"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "ClientAwarenessMetadata"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    }
+  ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/Apollo\/s8SendableP"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "topicSections" : [
+    {
+      "anchor" : "Initializers",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/init(clientApplicationName:clientApplicationVersion:includeApolloLibraryAwareness:)"
+      ],
+      "title" : "Initializers"
+    },
+    {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/clientApplicationName",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/clientApplicationVersion",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/includeApolloLibraryAwareness"
+      ],
+      "title" : "Instance Properties"
+    },
+    {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/applyHeaders(to:)"
+      ],
+      "title" : "Instance Methods"
+    },
+    {
+      "anchor" : "Type-Properties",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/defaultClientName",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/defaultClientVersion",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/enabledWithDefaults",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/none"
+      ],
+      "title" : "Type Properties"
+    }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/clientawarenessmetadata"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://Apollo/documentation/Apollo": {
+  "abstract" : [
+    {
+      "text" : "A Strongly typed, Swift-first, GraphQL client.",
+      "type" : "text"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "Apollo",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo"
+},
+"doc://Apollo/documentation/Apollo/ClientAwarenessMetadata": {
+  "abstract" : [
+    {
+      "text" : "A data structure containing telemetry metadata about the client. This is used by GraphOS Studio’s",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "https:\/\/www.apollographql.com\/docs\/graphos\/platform\/insights\/client-segmentation",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "feature.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ClientAwarenessMetadata"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ClientAwarenessMetadata"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ClientAwarenessMetadata",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/clientawarenessmetadata"
+},
+"doc://Apollo/documentation/Apollo/ClientAwarenessMetadata/applyHeaders(to:)": {
+  "abstract" : [
+    {
+      "text" : "A helper method that adds the client awareness headers to the given request",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "This is used by GraphOS Studio’s",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "https:\/\/www.apollographql.com\/docs\/graphos\/platform\/insights\/client-segmentation",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "feature.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "applyHeaders"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "to"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "inout"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation10URLRequestV",
+      "text" : "URLRequest"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/applyHeaders(to:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "applyHeaders(to:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/clientawarenessmetadata\/applyheaders(to:)"
+},
+"doc://Apollo/documentation/Apollo/ClientAwarenessMetadata/clientApplicationName": {
+  "abstract" : [
+    {
+      "text" : "The name of the application. This value is sent for the header “apollographql-client-name”.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "clientApplicationName"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : "?"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/clientApplicationName",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "clientApplicationName",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/clientawarenessmetadata\/clientapplicationname"
+},
+"doc://Apollo/documentation/Apollo/ClientAwarenessMetadata/clientApplicationVersion": {
+  "abstract" : [
+    {
+      "text" : "The version of the application. This value is sent for the header “apollographql-client-version”.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "clientApplicationVersion"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : "?"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/clientApplicationVersion",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "clientApplicationVersion",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/clientawarenessmetadata\/clientapplicationversion"
+},
+"doc://Apollo/documentation/Apollo/ClientAwarenessMetadata/defaultClientName": {
+  "abstract" : [
+    {
+      "text" : "The default client name to use when setting up the ",
+      "type" : "text"
+    },
+    {
+      "code" : "clientName",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " property",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "defaultClientName"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/defaultClientName",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "defaultClientName",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/clientawarenessmetadata\/defaultclientname"
+},
+"doc://Apollo/documentation/Apollo/ClientAwarenessMetadata/defaultClientVersion": {
+  "abstract" : [
+    {
+      "text" : "The default client version to use when setting up the ",
+      "type" : "text"
+    },
+    {
+      "code" : "clientVersion",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " property.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "defaultClientVersion"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/defaultClientVersion",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "defaultClientVersion",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/clientawarenessmetadata\/defaultclientversion"
+},
+"doc://Apollo/documentation/Apollo/ClientAwarenessMetadata/enabledWithDefaults": {
+  "abstract" : [
+    {
+      "text" : "Enables all client awareness metadata with the following default values:",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "enabledWithDefaults"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo23ClientAwarenessMetadataV",
+      "text" : "ClientAwarenessMetadata"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/enabledWithDefaults",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "enabledWithDefaults",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/clientawarenessmetadata\/enabledwithdefaults"
+},
+"doc://Apollo/documentation/Apollo/ClientAwarenessMetadata/includeApolloLibraryAwareness": {
+  "abstract" : [
+    {
+      "text" : "Determines if the Apollo iOS library name and version should be sent with the telemetry data.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "includeApolloLibraryAwareness"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/includeApolloLibraryAwareness",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "includeApolloLibraryAwareness",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/clientawarenessmetadata\/includeapollolibraryawareness"
+},
+"doc://Apollo/documentation/Apollo/ClientAwarenessMetadata/init(clientApplicationName:clientApplicationVersion:includeApolloLibraryAwareness:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "clientApplicationName"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "clientApplicationVersion"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "includeApolloLibraryAwareness"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/init(clientApplicationName:clientApplicationVersion:includeApolloLibraryAwareness:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(clientApplicationName:clientApplicationVersion:includeApolloLibraryAwareness:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/clientawarenessmetadata\/init(clientapplicationname:clientapplicationversion:includeapollolibraryawareness:)"
+},
+"doc://Apollo/documentation/Apollo/ClientAwarenessMetadata/none": {
+  "abstract" : [
+    {
+      "text" : "Disables all client awareness metadata.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "none"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo23ClientAwarenessMetadataV",
+      "text" : "ClientAwarenessMetadata"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata\/none",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "none",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/clientawarenessmetadata\/none"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
+},
+"https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation": {
+  "identifier" : "https:\/\/www.apollographql.com\/docs\/graphos\/platform\/insights\/client-segmentation",
+  "title" : "client awareness",
+  "titleInlineContent" : [
+    {
+      "text" : "client awareness",
+      "type" : "text"
+    }
+  ],
+  "type" : "link",
+  "url" : "https:\/\/www.apollographql.com\/docs\/graphos\/platform\/insights\/client-segmentation"
+}
+}
+}

@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Union",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Union\/Equatable-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Union"
       ]
     ]
   },
@@ -353,17 +352,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/union\/!=(_:_:)"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Union/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Union\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/union\/equatable-implementations"
 }
 }
 }

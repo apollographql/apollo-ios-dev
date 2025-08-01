@@ -88,7 +88,8 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet",
         "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
         "doc:\/\/ApolloAPI\/SQ",
-        "doc:\/\/ApolloAPI\/SH"
+        "doc:\/\/ApolloAPI\/SH",
+        "doc:\/\/ApolloAPI\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Inherits From",
@@ -389,6 +390,11 @@
 "doc://ApolloAPI/s28CustomDebugStringConvertibleP": {
   "identifier" : "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
   "title" : "Swift.CustomDebugStringConvertible",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

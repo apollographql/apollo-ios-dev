@@ -32,9 +32,10 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/upload(operation:files:context:callbackQueue:completionHandler:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/upload(operation:files:requestConfiguration:)"
       ],
       "title" : "Instance Methods"
     }
@@ -113,7 +114,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport"
 },
-"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/upload(operation:files:context:callbackQueue:completionHandler:)": {
+"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/upload(operation:files:requestConfiguration:)": {
   "abstract" : [
 
   ],
@@ -177,24 +178,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "context"
-    },
-    {
-      "kind" : "text",
-      "text" : ": (any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo14RequestContextP",
-      "text" : "RequestContext"
-    },
-    {
-      "kind" : "text",
-      "text" : ")?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "callbackQueue"
+      "text" : "requestConfiguration"
     },
     {
       "kind" : "text",
@@ -202,25 +186,25 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
-      "text" : "DispatchQueue"
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
     },
     {
       "kind" : "text",
-      "text" : ", "
+      "text" : ") "
     },
     {
-      "kind" : "externalParam",
-      "text" : "completionHandler"
+      "kind" : "keyword",
+      "text" : "throws"
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : " -> "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6ResultO",
-      "text" : "Result"
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
     },
     {
       "kind" : "text",
@@ -228,8 +212,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -238,15 +222,6 @@
     {
       "kind" : "typeIdentifier",
       "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
     },
     {
       "kind" : "text",
@@ -259,29 +234,15 @@
     },
     {
       "kind" : "text",
-      "text" : ">) -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s4Voida",
-      "text" : "Void"
-    },
-    {
-      "kind" : "text",
-      "text" : ") -> any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11CancellableP",
-      "text" : "Cancellable"
+      "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/upload(operation:files:context:callbackQueue:completionHandler:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/upload(operation:files:requestConfiguration:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "upload(operation:files:context:callbackQueue:completionHandler:)",
+  "title" : "upload(operation:files:requestConfiguration:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/upload(operation:files:context:callbackqueue:completionhandler:)"
+  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/upload(operation:files:requestconfiguration:)"
 }
 }
 }

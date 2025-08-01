@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerPathError",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerPathError\/LocalizedError-Implementations"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerPathError"
       ]
     ]
   },
@@ -216,17 +215,6 @@
   "title" : "FileManagerPathError",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/filemanagerpatherror"
-},
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileManagerPathError/LocalizedError-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerPathError\/LocalizedError-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "LocalizedError Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/filemanagerpatherror\/localizederror-implementations"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileManagerPathError/helpAnchor": {
   "abstract" : [

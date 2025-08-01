@@ -85,7 +85,8 @@
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/Se",
         "doc:\/\/ApolloCodegenLib\/SE",
-        "doc:\/\/ApolloCodegenLib\/SQ"
+        "doc:\/\/ApolloCodegenLib\/SQ",
+        "doc:\/\/ApolloCodegenLib\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -102,12 +103,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/ApolloSDKDependency"
       ],
       "title" : "Structures"
     },
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/embeddedInTarget(name:accessModifier:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/other",
@@ -117,12 +122,15 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/init(from:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/Equatable-Implementations"
@@ -704,6 +712,11 @@
   "title" : "ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.swiftPackageManager",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schematypesfileoutput\/moduletype-swift.enum\/swiftpackagemanager"
+},
+"doc://ApolloCodegenLib/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

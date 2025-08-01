@@ -86,10 +86,9 @@
               "text" : " : "
             },
             {
-              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/AnyHashableConvertible",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI22AnyHashableConvertibleP",
-              "text" : "AnyHashableConvertible"
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -144,7 +143,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/AnyHashableConvertible"
+        "doc:\/\/ApolloAPI\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Inherits From",
@@ -166,7 +165,7 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Double",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Float",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Int",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Int32",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/String"
       ],
       "kind" : "relationships",
@@ -184,6 +183,7 @@
   ],
   "seeAlsoSections" : [
     {
+      "anchor" : "JSON-Conversion",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONValue",
@@ -260,60 +260,6 @@
   "title" : "ApolloAPI",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/AnyHashableConvertible": {
-  "abstract" : [
-    {
-      "text" : "A helper protocol to enable ",
-      "type" : "text"
-    },
-    {
-      "code" : "AnyHashable",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " conversion for types that do not have automatic",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "code" : "AnyHashable",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " conversion implemented.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "protocol"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "AnyHashableConvertible"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/AnyHashableConvertible",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "AnyHashableConvertible"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "AnyHashableConvertible",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/anyhashableconvertible"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/CustomScalarType": {
   "abstract" : [
@@ -796,7 +742,7 @@
         "type" : "text"
       },
       {
-        "code" : "AnyHashable",
+        "code" : "any Hashable & Sendable",
         "type" : "codeVoice"
       },
       {
@@ -843,14 +789,19 @@
   "title" : "Float",
   "type" : "unresolvable"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Swift/Int": {
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Int",
-  "title" : "Int",
+"doc://ApolloAPI/documentation/ApolloAPI/Swift/Int32": {
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Int32",
+  "title" : "Int32",
   "type" : "unresolvable"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Swift/String": {
   "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/String",
   "title" : "String",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

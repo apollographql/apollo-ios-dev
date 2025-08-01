@@ -1,23 +1,19 @@
 {
   "abstract" : [
     {
-      "text" : "The ",
-      "type" : "text"
-    },
-    {
       "code" : "ApolloClient",
       "type" : "codeVoice"
     },
     {
-      "text" : " class implements the core API for Apollo by conforming to ",
+      "text" : " is the primary public entry point for interacting with a GraphQL server and a local GraphQL",
       "type" : "text"
     },
     {
-      "code" : "ApolloClientProtocol",
-      "type" : "codeVoice"
+      "text" : " ",
+      "type" : "text"
     },
     {
-      "text" : ".",
+      "text" : "normalized cache. This class provides the",
       "type" : "text"
     }
   ],
@@ -78,6 +74,14 @@
           "tokens" : [
             {
               "kind" : "keyword",
+              "text" : "final"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
               "text" : "class"
             },
             {
@@ -97,7 +101,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol"
+        "doc:\/\/Apollo\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -114,36 +118,60 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(networkTransport:store:sendEnhancedClientAwareness:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:sendEnhancedClientAwareness:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(networkTransport:store:defaultRequestConfiguration:clientAwarenessMetadata:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:defaultRequestConfiguration:clientAwarenessMetadata:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/defaultRequestConfiguration",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/store"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/clearCache()",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/clearCache(callbackQueue:completion:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:context:queue:resultHandler:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:requestConfiguration:)-5hdrc",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:requestConfiguration:)-76j0",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:requestConfiguration:)-8cs8p",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:requestConfiguration:)-9fy48",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:requestConfiguration:)-9mfto",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:fetchBehavior:requestConfiguration:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:publishResultToStore:queue:resultHandler:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:requestConfiguration:)-1jp4n",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:requestConfiguration:)-qz4x",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/sendMutation(mutation:requestConfiguration:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/subscribe(subscription:cachePolicy:requestConfiguration:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/subscribe(subscription:queue:resultHandler:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/upload(operation:files:queue:resultHandler:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/upload(operation:files:requestConfiguration:)-5a8sc",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/upload(operation:files:requestConfiguration:)-7uf6u",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:context:callbackQueue:resultHandler:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:requestConfiguration:refetchOnFailedUpdates:resultHandler:)-17ej6",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:requestConfiguration:refetchOnFailedUpdates:resultHandler:)-5l1i8",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:requestConfiguration:refetchOnFailedUpdates:resultHandler:)-7zhsq",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:fetchBehavior:requestConfiguration:refetchOnFailedUpdates:resultHandler:)"
       ],
       "title" : "Instance Methods"
     },
     {
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientError"
-      ],
-      "title" : "Enumerations"
-    },
-    {
+      "anchor" : "Enumerations",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientProtocol-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/Error"
       ],
-      "title" : "Default Implementations"
+      "title" : "Enumerations"
     }
   ],
   "variants" : [
@@ -177,23 +205,19 @@
 "doc://Apollo/documentation/Apollo/ApolloClient": {
   "abstract" : [
     {
-      "text" : "The ",
-      "type" : "text"
-    },
-    {
       "code" : "ApolloClient",
       "type" : "codeVoice"
     },
     {
-      "text" : " class implements the core API for Apollo by conforming to ",
+      "text" : " is the primary public entry point for interacting with a GraphQL server and a local GraphQL",
       "type" : "text"
     },
     {
-      "code" : "ApolloClientProtocol",
-      "type" : "codeVoice"
+      "text" : " ",
+      "type" : "text"
     },
     {
-      "text" : ".",
+      "text" : "normalized cache. This class provides the",
       "type" : "text"
     }
   ],
@@ -224,7 +248,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclient"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient/ApolloClientError": {
+"doc://Apollo/documentation/Apollo/ApolloClient/Error": {
   "abstract" : [
 
   ],
@@ -239,34 +263,1196 @@
     },
     {
       "kind" : "identifier",
-      "text" : "ApolloClientError"
+      "text" : "Error"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientError",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/Error",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "ApolloClientError"
+      "text" : "Error"
     }
   ],
   "role" : "symbol",
-  "title" : "ApolloClient.ApolloClientError",
+  "title" : "ApolloClient.Error",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/apolloclienterror"
+  "url" : "\/documentation\/apollo\/apolloclient\/error"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient/ApolloClientProtocol-Implementations": {
+"doc://Apollo/documentation/Apollo/ApolloClient/clearCache()": {
+  "abstract" : [
+    {
+      "text" : "Clears the ",
+      "type" : "text"
+    },
+    {
+      "code" : "NormalizedCache",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " of the client’s ",
+      "type" : "text"
+    },
+    {
+      "code" : "ApolloStore",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "clearCache"
+    },
+    {
+      "kind" : "text",
+      "text" : "() "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/clearCache()",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "clearCache()",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/clearcache()"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/clearCache(callbackQueue:completion:)": {
   "abstract" : [
 
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientProtocol-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ApolloClientProtocol Implementations",
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "clearCache"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "callbackQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
+      "text" : "DispatchQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "completion"
+    },
+    {
+      "kind" : "text",
+      "text" : ": (("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s6ResultO",
+      "text" : "Result"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s4Voida",
+      "text" : "Void"
+    },
+    {
+      "kind" : "text",
+      "text" : ", any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ">) -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s4Voida",
+      "text" : "Void"
+    },
+    {
+      "kind" : "text",
+      "text" : ")?)"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/clearCache(callbackQueue:completion:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "clearCache(callbackQueue:completion:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/apolloclientprotocol-implementations"
+  "url" : "\/documentation\/apollo\/apolloclient\/clearcache(callbackqueue:completion:)"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient/init(networkTransport:store:sendEnhancedClientAwareness:)": {
+"doc://Apollo/documentation/Apollo/ApolloClient/defaultRequestConfiguration": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "defaultRequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/defaultRequestConfiguration",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "defaultRequestConfiguration",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/defaultrequestconfiguration"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/fetch(query:cachePolicy:context:queue:resultHandler:)": {
+  "abstract" : [
+
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fetch"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "query"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "cachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo14CachePolicy_v1O",
+      "text" : "CachePolicy_v1"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "context"
+    },
+    {
+      "kind" : "text",
+      "text" : ": (any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo14RequestContextP",
+      "text" : "RequestContext"
+    },
+    {
+      "kind" : "text",
+      "text" : ")?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "queue"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
+      "text" : "DispatchQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "resultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20GraphQLResultHandlera",
+      "text" : "GraphQLResultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">?) -> any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CancellableP",
+      "text" : "Cancellable"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:context:queue:resultHandler:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "fetch(query:cachePolicy:context:queue:resultHandler:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:context:queue:resulthandler:)"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/fetch(query:cachePolicy:requestConfiguration:)-5hdrc": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fetch"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "query"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "cachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+      "text" : "CachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO0B10AndNetworkO",
+      "text" : "CacheAndNetwork"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">, any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:requestConfiguration:)-5hdrc",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "fetch(query:cachePolicy:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:requestconfiguration:)-5hdrc"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/fetch(query:cachePolicy:requestConfiguration:)-76j0": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fetch"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "query"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "cachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+      "text" : "CachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO14SingleResponseO",
+      "text" : "SingleResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">, any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:requestConfiguration:)-76j0",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "fetch(query:cachePolicy:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:requestconfiguration:)-76j0"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/fetch(query:cachePolicy:requestConfiguration:)-8cs8p": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fetch"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "query"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "cachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+      "text" : "CachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO14SingleResponseO",
+      "text" : "SingleResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:requestConfiguration:)-8cs8p",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "fetch(query:cachePolicy:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:requestconfiguration:)-8cs8p"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/fetch(query:cachePolicy:requestConfiguration:)-9fy48": {
+  "abstract" : [
+    {
+      "text" : "Fetches a query from the local cache. Does not attempt to fetch results from the server.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fetch"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "query"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "cachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+      "text" : "CachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO0B4OnlyO",
+      "text" : "CacheOnly"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">?"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:requestConfiguration:)-9fy48",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "fetch(query:cachePolicy:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:requestconfiguration:)-9fy48"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/fetch(query:cachePolicy:requestConfiguration:)-9mfto": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fetch"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "query"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "cachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+      "text" : "CachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO0B10AndNetworkO",
+      "text" : "CacheAndNetwork"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">, any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:requestConfiguration:)-9mfto",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "fetch(query:cachePolicy:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:requestconfiguration:)-9mfto"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/fetch(query:fetchBehavior:requestConfiguration:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fetch"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "query"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "fetchBehavior"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo13FetchBehaviorV",
+      "text" : "FetchBehavior"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">, any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:fetchBehavior:requestConfiguration:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "fetch(query:fetchBehavior:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/fetch(query:fetchbehavior:requestconfiguration:)"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/init(networkTransport:store:defaultRequestConfiguration:clientAwarenessMetadata:)": {
   "abstract" : [
     {
       "text" : "Creates a client with the specified network transport and store.",
@@ -318,7 +1504,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "sendEnhancedClientAwareness"
+      "text" : "defaultRequestConfiguration"
     },
     {
       "kind" : "text",
@@ -326,33 +1512,42 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "clientAwarenessMetadata"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo23ClientAwarenessMetadataV",
+      "text" : "ClientAwarenessMetadata"
     },
     {
       "kind" : "text",
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(networkTransport:store:sendEnhancedClientAwareness:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(networkTransport:store:defaultRequestConfiguration:clientAwarenessMetadata:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(networkTransport:store:sendEnhancedClientAwareness:)",
+  "title" : "init(networkTransport:store:defaultRequestConfiguration:clientAwarenessMetadata:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/init(networktransport:store:sendenhancedclientawareness:)"
+  "url" : "\/documentation\/apollo\/apolloclient\/init(networktransport:store:defaultrequestconfiguration:clientawarenessmetadata:)"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient/init(url:sendEnhancedClientAwareness:)": {
+"doc://Apollo/documentation/Apollo/ApolloClient/init(url:defaultRequestConfiguration:clientAwarenessMetadata:)": {
   "abstract" : [
     {
-      "text" : "Creates a client with a ",
-      "type" : "text"
-    },
-    {
-      "code" : "RequestChainNetworkTransport",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " connecting to the specified URL.",
+      "text" : "Convenience initializer that creates a client with a default network transport and cache setup.",
       "type" : "text"
     }
   ],
@@ -392,7 +1587,95 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "sendEnhancedClientAwareness"
+      "text" : "defaultRequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "clientAwarenessMetadata"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo23ClientAwarenessMetadataV",
+      "text" : "ClientAwarenessMetadata"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:defaultRequestConfiguration:clientAwarenessMetadata:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(url:defaultRequestConfiguration:clientAwarenessMetadata:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/init(url:defaultrequestconfiguration:clientawarenessmetadata:)"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/perform(mutation:publishResultToStore:queue:resultHandler:)": {
+  "abstract" : [
+
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "perform"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "publishResultToStore"
     },
     {
       "kind" : "text",
@@ -405,15 +1688,397 @@
     },
     {
       "kind" : "text",
-      "text" : ")"
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "queue"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
+      "text" : "DispatchQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "resultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20GraphQLResultHandlera",
+      "text" : "GraphQLResultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">?) -> any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CancellableP",
+      "text" : "Cancellable"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:sendEnhancedClientAwareness:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:publishResultToStore:queue:resultHandler:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(url:sendEnhancedClientAwareness:)",
+  "title" : "perform(mutation:publishResultToStore:queue:resultHandler:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/init(url:sendenhancedclientawareness:)"
+  "url" : "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:queue:resulthandler:)"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/perform(mutation:requestConfiguration:)-1jp4n": {
+  "abstract" : [
+    {
+      "text" : "Performs a mutation by sending it to the server.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "perform"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">, any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:requestConfiguration:)-1jp4n",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "perform(mutation:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/perform(mutation:requestconfiguration:)-1jp4n"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/perform(mutation:requestConfiguration:)-qz4x": {
+  "abstract" : [
+    {
+      "text" : "Performs a mutation by sending it to the server.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "perform"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/perform(mutation:requestConfiguration:)-qz4x",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "perform(mutation:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/perform(mutation:requestconfiguration:)-qz4x"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/sendMutation(mutation:requestConfiguration:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "sendMutation"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Mutation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">, any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/sendMutation(mutation:requestConfiguration:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "sendMutation(mutation:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/sendmutation(mutation:requestconfiguration:)"
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/store": {
   "abstract" : [
@@ -449,10 +2114,814 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclient\/store"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient/watch(query:cachePolicy:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)": {
+"doc://Apollo/documentation/Apollo/ApolloClient/subscribe(subscription:cachePolicy:requestConfiguration:)": {
   "abstract" : [
     {
-      "text" : "Watches a query by first fetching an initial result from the server or from the local cache, depending on the current contents of the cache and the specified cache policy. After the initial fetch, the returned query watcher object will get notified whenever any of the data the query result depends on changes in the local cache, and calls the result handler again with the new result.",
+      "text" : "Subscribe to a subscription",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "subscribe"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Subscription"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "subscription"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Subscription"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "cachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+      "text" : "CachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO12SubscriptionO",
+      "text" : "Subscription"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Subscription"
+    },
+    {
+      "kind" : "text",
+      "text" : ">, any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/subscribe(subscription:cachePolicy:requestConfiguration:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "subscribe(subscription:cachePolicy:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/subscribe(subscription:cachepolicy:requestconfiguration:)"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/subscribe(subscription:queue:resultHandler:)": {
+  "abstract" : [
+
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "subscribe"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Subscription"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "subscription"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Subscription"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "queue"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
+      "text" : "DispatchQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "resultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20GraphQLResultHandlera",
+      "text" : "GraphQLResultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Subscription"
+    },
+    {
+      "kind" : "text",
+      "text" : ">) -> any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CancellableP",
+      "text" : "Cancellable"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/subscribe(subscription:queue:resultHandler:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "subscribe(subscription:queue:resultHandler:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/subscribe(subscription:queue:resulthandler:)"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/upload(operation:files:queue:resultHandler:)": {
+  "abstract" : [
+
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "upload"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "files"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11GraphQLFileV",
+      "text" : "GraphQLFile"
+    },
+    {
+      "kind" : "text",
+      "text" : "], "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "queue"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
+      "text" : "DispatchQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "resultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20GraphQLResultHandlera",
+      "text" : "GraphQLResultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">?) -> any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CancellableP",
+      "text" : "Cancellable"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/upload(operation:files:queue:resultHandler:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "upload(operation:files:queue:resultHandler:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/upload(operation:files:queue:resulthandler:)"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/upload(operation:files:requestConfiguration:)-5a8sc": {
+  "abstract" : [
+    {
+      "text" : "Uploads the given files with the given operation.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "upload"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "files"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11GraphQLFileV",
+      "text" : "GraphQLFile"
+    },
+    {
+      "kind" : "text",
+      "text" : "], "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">, any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/upload(operation:files:requestConfiguration:)-5a8sc",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "upload(operation:files:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/upload(operation:files:requestconfiguration:)-5a8sc"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/upload(operation:files:requestConfiguration:)-7uf6u": {
+  "abstract" : [
+    {
+      "text" : "Uploads the given files with the given operation.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "upload"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "files"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11GraphQLFileV",
+      "text" : "GraphQLFile"
+    },
+    {
+      "kind" : "text",
+      "text" : "], "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/upload(operation:files:requestConfiguration:)-7uf6u",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "upload(operation:files:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/upload(operation:files:requestconfiguration:)-7uf6u"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/watch(query:cachePolicy:context:callbackQueue:resultHandler:)": {
+  "abstract" : [
+
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "watch"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "query"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "cachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo14CachePolicy_v1O",
+      "text" : "CachePolicy_v1"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "context"
+    },
+    {
+      "kind" : "text",
+      "text" : ": (any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo14RequestContextP",
+      "text" : "RequestContext"
+    },
+    {
+      "kind" : "text",
+      "text" : ")?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "callbackQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
+      "text" : "DispatchQueue"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "resultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20GraphQLResultHandlera",
+      "text" : "GraphQLResultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC",
+      "text" : "GraphQLQueryWatcher"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:context:callbackQueue:resultHandler:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "watch(query:cachePolicy:context:callbackQueue:resultHandler:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/watch(query:cachepolicy:context:callbackqueue:resulthandler:)"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/watch(query:cachePolicy:requestConfiguration:refetchOnFailedUpdates:resultHandler:)-17ej6": {
+  "abstract" : [
+    {
+      "text" : "Watches a query by first fetching an initial result from the server or from the local cache, depending on the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "current contents of the cache and the specified cache policy. After the initial fetch, the returned query",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "watcher object will get notified whenever any of the data the query result depends on changes in the local cache,",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "and calls the result handler again with the new result.",
       "type" : "text"
     }
   ],
@@ -512,7 +2981,42 @@
     },
     {
       "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO0B10AndNetworkO",
+      "text" : "CacheAndNetwork"
+    },
+    {
+      "kind" : "text",
       "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
     },
     {
       "kind" : "externalParam",
@@ -533,40 +3037,6 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "context"
-    },
-    {
-      "kind" : "text",
-      "text" : ": (any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo14RequestContextP",
-      "text" : "RequestContext"
-    },
-    {
-      "kind" : "text",
-      "text" : ")?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "callbackQueue"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
-      "text" : "DispatchQueue"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
       "text" : "resultHandler"
     },
     {
@@ -575,8 +3045,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo20GraphQLResultHandlera",
-      "text" : "GraphQLResultHandler"
+      "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC",
+      "text" : "GraphQLQueryWatcher"
     },
     {
       "kind" : "text",
@@ -588,16 +3058,24 @@
     },
     {
       "kind" : "text",
-      "text" : "."
+      "text" : ">."
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
+      "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC13ResultHandlera",
+      "text" : "ResultHandler"
     },
     {
       "kind" : "text",
-      "text" : ">) -> "
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
     },
     {
       "kind" : "typeIdentifier",
@@ -617,32 +3095,48 @@
       "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:requestConfiguration:refetchOnFailedUpdates:resultHandler:)-17ej6",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "watch(query:cachePolicy:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)",
+  "title" : "watch(query:cachePolicy:requestConfiguration:refetchOnFailedUpdates:resultHandler:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/watch(query:cachepolicy:refetchonfailedupdates:context:callbackqueue:resulthandler:)"
+  "url" : "\/documentation\/apollo\/apolloclient\/watch(query:cachepolicy:requestconfiguration:refetchonfailedupdates:resulthandler:)-17ej6"
 },
-"doc://Apollo/documentation/Apollo/ApolloClientProtocol": {
+"doc://Apollo/documentation/Apollo/ApolloClient/watch(query:cachePolicy:requestConfiguration:refetchOnFailedUpdates:resultHandler:)-5l1i8": {
   "abstract" : [
     {
-      "text" : "The ",
+      "text" : "Watches a query by first fetching an initial result from the server or from the local cache, depending on the",
       "type" : "text"
     },
     {
-      "code" : "ApolloClientProtocol",
-      "type" : "codeVoice"
+      "text" : " ",
+      "type" : "text"
     },
     {
-      "text" : " provides the core API for Apollo. This API provides methods to fetch and watch queries, and to perform mutations.",
+      "text" : "current contents of the cache and the specified cache policy. After the initial fetch, the returned query",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "watcher object will get notified whenever any of the data the query result depends on changes in the local cache,",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "and calls the result handler again with the new result.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "protocol"
+      "text" : "func"
     },
     {
       "kind" : "text",
@@ -650,21 +3144,574 @@
     },
     {
       "kind" : "identifier",
-      "text" : "ApolloClientProtocol"
+      "text" : "watch"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "query"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "cachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+      "text" : "CachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO0B4OnlyO",
+      "text" : "CacheOnly"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "refetchOnFailedUpdates"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "resultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC",
+      "text" : "GraphQLQueryWatcher"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC13ResultHandlera",
+      "text" : "ResultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC",
+      "text" : "GraphQLQueryWatcher"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:requestConfiguration:refetchOnFailedUpdates:resultHandler:)-5l1i8",
   "kind" : "symbol",
-  "navigatorTitle" : [
+  "role" : "symbol",
+  "title" : "watch(query:cachePolicy:requestConfiguration:refetchOnFailedUpdates:resultHandler:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/watch(query:cachepolicy:requestconfiguration:refetchonfailedupdates:resulthandler:)-5l1i8"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/watch(query:cachePolicy:requestConfiguration:refetchOnFailedUpdates:resultHandler:)-7zhsq": {
+  "abstract" : [
+    {
+      "text" : "Watches a query by first fetching an initial result from the server or from the local cache, depending on the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "current contents of the cache and the specified cache policy. After the initial fetch, the returned query",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "watcher object will get notified whenever any of the data the query result depends on changes in the local cache,",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "and calls the result handler again with the new result.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
     {
       "kind" : "identifier",
-      "text" : "ApolloClientProtocol"
+      "text" : "watch"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "query"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "cachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
+      "text" : "CachePolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO14SingleResponseO",
+      "text" : "SingleResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "refetchOnFailedUpdates"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "resultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC",
+      "text" : "GraphQLQueryWatcher"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC13ResultHandlera",
+      "text" : "ResultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC",
+      "text" : "GraphQLQueryWatcher"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
     }
   ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:requestConfiguration:refetchOnFailedUpdates:resultHandler:)-7zhsq",
+  "kind" : "symbol",
   "role" : "symbol",
-  "title" : "ApolloClientProtocol",
+  "title" : "watch(query:cachePolicy:requestConfiguration:refetchOnFailedUpdates:resultHandler:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclientprotocol"
+  "url" : "\/documentation\/apollo\/apolloclient\/watch(query:cachepolicy:requestconfiguration:refetchonfailedupdates:resulthandler:)-7zhsq"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/watch(query:fetchBehavior:requestConfiguration:refetchOnFailedUpdates:resultHandler:)": {
+  "abstract" : [
+    {
+      "text" : "Watches a query by first fetching an initial result from the server or from the local cache, depending on the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "current contents of the cache and the specified cache policy. After the initial fetch, the returned query",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "watcher object will get notified whenever any of the data the query result depends on changes in the local cache,",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "and calls the result handler again with the new result.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "watch"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "query"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "fetchBehavior"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo13FetchBehaviorV",
+      "text" : "FetchBehavior"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "refetchOnFailedUpdates"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "resultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC",
+      "text" : "GraphQLQueryWatcher"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC13ResultHandlera",
+      "text" : "ResultHandler"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19GraphQLQueryWatcherC",
+      "text" : "GraphQLQueryWatcher"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:fetchBehavior:requestConfiguration:refetchOnFailedUpdates:resultHandler:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "watch(query:fetchBehavior:requestConfiguration:refetchOnFailedUpdates:resultHandler:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/watch(query:fetchbehavior:requestconfiguration:refetchonfailedupdates:resulthandler:)"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

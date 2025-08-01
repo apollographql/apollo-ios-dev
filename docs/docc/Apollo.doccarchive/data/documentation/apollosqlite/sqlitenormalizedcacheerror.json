@@ -93,13 +93,15 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/invalidRecordEncoding(record:)",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/invalidRecordShape(object:)"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/invalidRecordEncoding(record:)"
       ],
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/Error-Implementations"
@@ -251,51 +253,6 @@
   "title" : "SQLiteNormalizedCacheError.invalidRecordEncoding(record:)",
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/sqlitenormalizedcacheerror\/invalidrecordencoding(record:)"
-},
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteNormalizedCacheError/invalidRecordShape(object:)": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "case"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "invalidRecordShape"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "object"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "Any"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/invalidRecordShape(object:)",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "SQLiteNormalizedCacheError.invalidRecordShape(object:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitenormalizedcacheerror\/invalidrecordshape(object:)"
 },
 "doc://ApolloSQLite/s5ErrorP": {
   "identifier" : "doc:\/\/ApolloSQLite\/s5ErrorP",

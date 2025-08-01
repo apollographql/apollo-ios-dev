@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo23ReadOnlyNormalizedCacheP11loadRecords7forKeysSDySSAA6RecordVGShySSG_tKF",
+    "externalID" : "s:6Apollo23ReadOnlyNormalizedCacheP11loadRecords7forKeysSDySSAA6RecordVGShySSG_tYaKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -62,6 +62,14 @@
       {
         "kind" : "text",
         "text" : ">) "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
       },
       {
         "kind" : "keyword",
@@ -165,6 +173,14 @@
             },
             {
               "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
               "text" : "throws"
             },
             {
@@ -195,25 +211,6 @@
         }
       ],
       "kind" : "declarations"
-    },
-    {
-      "kind" : "parameters",
-      "parameters" : [
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The cache keys to load data for",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "key"
-        }
-      ]
     },
     {
       "content" : [
@@ -405,6 +402,14 @@
     {
       "kind" : "text",
       "text" : ">) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

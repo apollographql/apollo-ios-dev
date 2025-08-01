@@ -1,0 +1,619 @@
+{
+  "abstract" : [
+    {
+      "text" : "Convenience initializer that creates a client with a default network transport and cache setup.",
+      "type" : "text"
+    }
+  ],
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/Apollo\/documentation\/Apollo",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:defaultRequestConfiguration:clientAwarenessMetadata:)"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:6Apollo0A6ClientC3url27defaultRequestConfiguration23clientAwarenessMetadataAC10Foundation3URLV_AA0eF0VAA0bhI0Vtcfc",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "convenience"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "init"
+      },
+      {
+        "kind" : "text",
+        "text" : "("
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "url"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:10Foundation3URLV",
+        "text" : "URL"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "defaultRequestConfiguration"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+        "text" : "RequestConfiguration"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "clientAwarenessMetadata"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:6Apollo23ClientAwarenessMetadataV",
+        "text" : "ClientAwarenessMetadata"
+      },
+      {
+        "kind" : "text",
+        "text" : ")"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "Apollo"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Initializer",
+    "symbolKind" : "init",
+    "title" : "init(url:defaultRequestConfiguration:clientAwarenessMetadata:)"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "convenience"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "init"
+            },
+            {
+              "kind" : "text",
+              "text" : "("
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "url"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:10Foundation3URLV",
+              "text" : "URL"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "defaultRequestConfiguration"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestConfiguration",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+              "text" : "RequestConfiguration"
+            },
+            {
+              "kind" : "text",
+              "text" : " = RequestConfiguration(), "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "clientAwarenessMetadata"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo23ClientAwarenessMetadataV",
+              "text" : "ClientAwarenessMetadata"
+            },
+            {
+              "kind" : "text",
+              "text" : " = ClientAwarenessMetadata())"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The URL of a GraphQL server to connect to.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "url"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A default",
+                  "type" : "text"
+                },
+                {
+                  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestConfiguration",
+                  "isActive" : true,
+                  "type" : "reference"
+                },
+                {
+                  "text" : " for the client’s requests. When starting a",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "request with the client, if no ",
+                  "type" : "text"
+                },
+                {
+                  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestConfiguration",
+                  "isActive" : true,
+                  "type" : "reference"
+                },
+                {
+                  "text" : " is provided the default will be used.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "defaultRequestConfiguration"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Metadata used by the",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "identifier" : "https:\/\/www.apollographql.com\/docs\/graphos\/platform\/insights\/client-segmentation",
+                  "isActive" : true,
+                  "type" : "reference"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "feature of GraphOS Studio.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "clientAwarenessMetadata"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "This initializer creates a client that uses an in-memory only cache and a ",
+              "type" : "text"
+            },
+            {
+              "code" : "RequestChainNetworkTransport",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "connecting to the specified URL with a default interceptor setup.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InMemoryNormalizedCache",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " used by this client does not persist data between application runs.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/apolloclient\/init(url:defaultrequestconfiguration:clientawarenessmetadata:)"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://Apollo/documentation/Apollo": {
+  "abstract" : [
+    {
+      "text" : "A Strongly typed, Swift-first, GraphQL client.",
+      "type" : "text"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "Apollo",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient": {
+  "abstract" : [
+    {
+      "code" : "ApolloClient",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " is the primary public entry point for interacting with a GraphQL server and a local GraphQL",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "normalized cache. This class provides the",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ApolloClient"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ApolloClient"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloClient",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient"
+},
+"doc://Apollo/documentation/Apollo/ApolloClient/init(url:defaultRequestConfiguration:clientAwarenessMetadata:)": {
+  "abstract" : [
+    {
+      "text" : "Convenience initializer that creates a client with a default network transport and cache setup.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "convenience"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "url"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation3URLV",
+      "text" : "URL"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "defaultRequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "clientAwarenessMetadata"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo23ClientAwarenessMetadataV",
+      "text" : "ClientAwarenessMetadata"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:defaultRequestConfiguration:clientAwarenessMetadata:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(url:defaultRequestConfiguration:clientAwarenessMetadata:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient\/init(url:defaultrequestconfiguration:clientawarenessmetadata:)"
+},
+"doc://Apollo/documentation/Apollo/ClientAwarenessMetadata": {
+  "abstract" : [
+    {
+      "text" : "A data structure containing telemetry metadata about the client. This is used by GraphOS Studio’s",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "https:\/\/www.apollographql.com\/docs\/graphos\/platform\/insights\/client-segmentation",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "feature.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ClientAwarenessMetadata"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ClientAwarenessMetadata",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ClientAwarenessMetadata"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ClientAwarenessMetadata",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/clientawarenessmetadata"
+},
+"doc://Apollo/documentation/Apollo/InMemoryNormalizedCache": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "InMemoryNormalizedCache"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InMemoryNormalizedCache",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "InMemoryNormalizedCache"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "InMemoryNormalizedCache",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/inmemorynormalizedcache"
+},
+"doc://Apollo/documentation/Apollo/RequestConfiguration": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "RequestConfiguration"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestConfiguration",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "RequestConfiguration"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "RequestConfiguration",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestconfiguration"
+},
+"https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation": {
+  "identifier" : "https:\/\/www.apollographql.com\/docs\/graphos\/platform\/insights\/client-segmentation",
+  "title" : "client awareness",
+  "titleInlineContent" : [
+    {
+      "text" : "client awareness",
+      "type" : "text"
+    }
+  ],
+  "type" : "link",
+  "url" : "https:\/\/www.apollographql.com\/docs\/graphos\/platform\/insights\/client-segmentation"
+}
+}
+}

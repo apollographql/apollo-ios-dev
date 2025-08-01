@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/JournalMode",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/JournalMode\/RawRepresentable-Implementations"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/JournalMode"
       ]
     ]
   },
@@ -295,17 +294,6 @@
   "title" : "JournalMode",
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/journalmode"
-},
-"doc://ApolloSQLite/documentation/ApolloSQLite/JournalMode/RawRepresentable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/JournalMode\/RawRepresentable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "RawRepresentable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/journalmode\/rawrepresentable-implementations"
 },
 "doc://ApolloSQLite/documentation/ApolloSQLite/JournalMode/hash(into:)": {
   "abstract" : [

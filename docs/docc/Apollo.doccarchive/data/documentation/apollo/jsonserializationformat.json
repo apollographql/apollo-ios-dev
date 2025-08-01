@@ -90,10 +90,13 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Type-Methods",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/JSONSerializationFormat\/deserialize(data:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/JSONSerializationFormat\/deserialize(data:)-2a6vk",
+        "doc:\/\/Apollo\/documentation\/Apollo\/JSONSerializationFormat\/deserialize(data:)-6ujmg",
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONSerializationFormat\/serialize(value:)-5ftc9",
-        "doc:\/\/Apollo\/documentation\/Apollo\/JSONSerializationFormat\/serialize(value:)-6eeoc"
+        "doc:\/\/Apollo\/documentation\/Apollo\/JSONSerializationFormat\/serialize(value:)-9eu0f"
       ],
       "title" : "Type Methods"
     }
@@ -157,7 +160,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/jsonserializationformat"
 },
-"doc://Apollo/documentation/Apollo/JSONSerializationFormat/deserialize(data:)": {
+"doc://Apollo/documentation/Apollo/JSONSerializationFormat/deserialize(data:)-2a6vk": {
   "abstract" : [
 
   ],
@@ -213,16 +216,87 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI9JSONValuea",
-      "text" : "JSONValue"
+      "preciseIdentifier" : "s:9ApolloAPI10JSONObjecta",
+      "text" : "JSONObject"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONSerializationFormat\/deserialize(data:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONSerializationFormat\/deserialize(data:)-2a6vk",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "deserialize(data:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/jsonserializationformat\/deserialize(data:)"
+  "url" : "\/documentation\/apollo\/jsonserializationformat\/deserialize(data:)-2a6vk"
+},
+"doc://Apollo/documentation/Apollo/JSONSerializationFormat/deserialize(data:)-6ujmg": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "deserialize"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "data"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation4DataV",
+      "text" : "Data"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9JSONValuea",
+      "text" : "JSONValue"
+    },
+    {
+      "kind" : "text",
+      "text" : "]"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONSerializationFormat\/deserialize(data:)-6ujmg",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "deserialize(data:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/jsonserializationformat\/deserialize(data:)-6ujmg"
 },
 "doc://Apollo/documentation/Apollo/JSONSerializationFormat/serialize(value:)-5ftc9": {
   "abstract" : [
@@ -291,7 +365,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/jsonserializationformat\/serialize(value:)-5ftc9"
 },
-"doc://Apollo/documentation/Apollo/JSONSerializationFormat/serialize(value:)-6eeoc": {
+"doc://Apollo/documentation/Apollo/JSONSerializationFormat/serialize(value:)-9eu0f": {
   "abstract" : [
 
   ],
@@ -351,12 +425,12 @@
       "text" : "Data"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONSerializationFormat\/serialize(value:)-6eeoc",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONSerializationFormat\/serialize(value:)-9eu0f",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "serialize(value:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/jsonserializationformat\/serialize(value:)-6eeoc"
+  "url" : "\/documentation\/apollo\/jsonserializationformat\/serialize(value:)-9eu0f"
 }
 }
 }

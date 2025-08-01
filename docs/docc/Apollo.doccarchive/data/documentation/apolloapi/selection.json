@@ -75,6 +75,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/s8CopyableP",
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/SH"
       ],
@@ -93,6 +94,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field"
@@ -100,6 +103,8 @@
       "title" : "Structures"
     },
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/conditional(_:_:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/deferred(if:_:label:)",
@@ -110,6 +115,8 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Type-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/field(_:alias:_:arguments:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/include(if:_:)-1mgoh",
@@ -124,12 +131,15 @@
       "title" : "Type Methods"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition"
       ],
       "title" : "Enumerations"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Equatable-Implementations",
@@ -1362,6 +1372,11 @@
   "title" : "Selection.inlineFragment(_:)",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/inlinefragment(_:)"
+},
+"doc://ApolloAPI/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

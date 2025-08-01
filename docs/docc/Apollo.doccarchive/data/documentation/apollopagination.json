@@ -33,27 +33,33 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Classes",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager"
       ],
       "title" : "Classes"
     },
     {
+      "anchor" : "Protocols",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationInfo"
       ],
       "title" : "Protocols"
     },
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput"
       ],
       "title" : "Structures"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination",
@@ -89,71 +95,6 @@
   "title" : "ApolloPagination",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager": {
-  "abstract" : [
-    {
-      "text" : "Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "class"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "AsyncGraphQLQueryPager"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "AsyncGraphQLQueryPager"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "AsyncGraphQLQueryPager",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/AsyncPagerType": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "protocol"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "AsyncPagerType"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "AsyncPagerType"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "AsyncPagerType",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/asyncpagertype"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/CursorBasedPagination": {
   "abstract" : [
@@ -200,7 +141,15 @@
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager": {
   "abstract" : [
     {
-      "text" : "Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.",
+      "text" : "Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "of view models.",
       "type" : "text"
     }
   ],

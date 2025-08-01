@@ -87,7 +87,8 @@
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation",
         "doc:\/\/ApolloAPI\/SQ",
-        "doc:\/\/ApolloAPI\/SH"
+        "doc:\/\/ApolloAPI\/SH",
+        "doc:\/\/ApolloAPI\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Inherits From",
@@ -239,6 +240,11 @@
   "title" : "GraphQLOperation",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqloperation"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

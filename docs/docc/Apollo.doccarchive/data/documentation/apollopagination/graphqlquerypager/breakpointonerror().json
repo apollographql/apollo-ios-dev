@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/Publisher-Implementations"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager"
       ]
     ]
   },
@@ -212,7 +211,15 @@
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager": {
   "abstract" : [
     {
-      "text" : "Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array of view models.",
+      "text" : "Type-erases a query pager, transforming data from a generic type to a specific type, often a view model or array",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "of view models.",
       "type" : "text"
     }
   ],
@@ -242,17 +249,6 @@
   "title" : "GraphQLQueryPager",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/graphqlquerypager"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/Publisher-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/Publisher-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Publisher Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/publisher-implementations"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/breakpointOnError()": {
   "abstract" : [

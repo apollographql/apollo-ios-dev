@@ -13,11 +13,11 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo23ResponseCodeInterceptorV0bC5ErrorO",
+    "externalID" : "s:6Apollo23ResponseCodeInterceptorV0bC5ErrorV",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "enum"
+        "text" : "struct"
       },
       {
         "kind" : "text",
@@ -40,8 +40,8 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Enumeration",
-    "symbolKind" : "enum",
+    "roleHeading" : "Structure",
+    "symbolKind" : "struct",
     "title" : "ResponseCodeInterceptor.ResponseCodeError"
   },
   "primaryContentSections" : [
@@ -57,7 +57,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "enum"
+              "text" : "struct"
             },
             {
               "kind" : "text",
@@ -95,19 +95,18 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/invalidResponseCode(response:rawData:)"
-      ],
-      "title" : "Enumeration Cases"
-    },
-    {
-      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/chunk",
         "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/errorDescription",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/graphQLError"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/graphQLError",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/response"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/Error-Implementations",
@@ -190,7 +189,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "enum"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -235,6 +234,40 @@
   "title" : "LocalizedError Implementations",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/responsecodeinterceptor\/responsecodeerror\/localizederror-implementations"
+},
+"doc://Apollo/documentation/Apollo/ResponseCodeInterceptor/ResponseCodeError/chunk": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "chunk"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation4DataV",
+      "text" : "Data"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/chunk",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "chunk",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/responsecodeinterceptor\/responsecodeerror\/chunk"
 },
 "doc://Apollo/documentation/Apollo/ResponseCodeInterceptor/ResponseCodeError/errorDescription": {
   "abstract" : [
@@ -312,14 +345,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/responsecodeinterceptor\/responsecodeerror\/graphqlerror"
 },
-"doc://Apollo/documentation/Apollo/ResponseCodeInterceptor/ResponseCodeError/invalidResponseCode(response:rawData:)": {
+"doc://Apollo/documentation/Apollo/ResponseCodeInterceptor/ResponseCodeError/response": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "case"
+      "text" : "let"
     },
     {
       "kind" : "text",
@@ -327,14 +360,6 @@
     },
     {
       "kind" : "identifier",
-      "text" : "invalidResponseCode"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "externalParam",
       "text" : "response"
     },
     {
@@ -345,35 +370,14 @@
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "c:objc(cs)NSHTTPURLResponse",
       "text" : "HTTPURLResponse"
-    },
-    {
-      "kind" : "text",
-      "text" : "?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "rawData"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:10Foundation4DataV",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : "?)"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/invalidResponseCode(response:rawData:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/response",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "ResponseCodeInterceptor.ResponseCodeError.invalidResponseCode(response:rawData:)",
+  "title" : "response",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/responsecodeinterceptor\/responsecodeerror\/invalidresponsecode(response:rawdata:)"
+  "url" : "\/documentation\/apollo\/responsecodeinterceptor\/responsecodeerror\/response"
 },
 "doc://Apollo/s5ErrorP": {
   "identifier" : "doc:\/\/Apollo\/s5ErrorP",

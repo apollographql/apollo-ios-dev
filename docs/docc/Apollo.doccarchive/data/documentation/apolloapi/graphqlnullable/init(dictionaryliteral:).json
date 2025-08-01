@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/ExpressibleByDictionaryLiteral-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable"
       ]
     ]
   },
@@ -55,13 +54,21 @@
           "type" : "codeVoice"
         },
         {
+          "text" : " and ",
+          "type" : "text"
+        },
+        {
+          "code" : "Sendable",
+          "type" : "codeVoice"
+        },
+        {
           "text" : ".",
           "type" : "text"
         }
       ]
     },
     "extendedModule" : "ApolloAPI",
-    "externalID" : "s:9ApolloAPI15GraphQLNullableOA2A41_InitializableByDictionaryLiteralElementsRzlE010dictionaryH0ACyxG3KeyQz_5ValueQztd_tcfc",
+    "externalID" : "s:9ApolloAPI15GraphQLNullableOA2A41_InitializableByDictionaryLiteralElementsRzrlE010dictionaryH0ACyxG3KeyQz_5ValueQztd_tcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -323,17 +330,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqlnullable"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/ExpressibleByDictionaryLiteral-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/ExpressibleByDictionaryLiteral-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ExpressibleByDictionaryLiteral Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqlnullable\/expressiblebydictionaryliteral-implementations"
-},
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/init(dictionaryLiteral:)": {
   "abstract" : [
 
@@ -362,6 +358,14 @@
       },
       {
         "code" : "_InitializableByDictionaryLiteralElements",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " and ",
+        "type" : "text"
+      },
+      {
+        "code" : "Sendable",
         "type" : "codeVoice"
       },
       {

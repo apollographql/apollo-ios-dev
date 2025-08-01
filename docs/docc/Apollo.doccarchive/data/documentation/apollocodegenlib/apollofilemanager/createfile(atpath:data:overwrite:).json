@@ -43,7 +43,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloCodegenLib0A11FileManagerC06createD06atPath4data9overwriteySS_10Foundation4DataVSgSbtYaKF",
+    "externalID" : "s:16ApolloCodegenLib0A11FileManagerC06createD06atPath4data9overwriteySS_10Foundation4DataVSgSbtKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -114,14 +114,6 @@
       },
       {
         "kind" : "keyword",
-        "text" : "async"
-      },
-      {
-        "kind" : "text",
-        "text" : " "
-      },
-      {
-        "kind" : "keyword",
         "text" : "throws"
       }
     ],
@@ -146,6 +138,20 @@
             "macOS"
           ],
           "tokens" : [
+            {
+              "kind" : "attribute",
+              "text" : "@"
+            },
+            {
+              "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerActor",
+              "kind" : "attribute",
+              "preciseIdentifier" : "s:16ApolloCodegenLib16FileManagerActorC",
+              "text" : "FileManagerActor"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
             {
               "kind" : "keyword",
               "text" : "func"
@@ -223,14 +229,6 @@
             },
             {
               "kind" : "keyword",
-              "text" : "async"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "keyword",
               "text" : "throws"
             }
           ]
@@ -260,7 +258,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] Data to write to the file path.",
+                  "text" : "[Optional] Data to write to the file path.",
                   "type" : "text"
                 }
               ],
@@ -486,14 +484,6 @@
     },
     {
       "kind" : "keyword",
-      "text" : "async"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
       "text" : "throws"
     }
   ],
@@ -503,6 +493,37 @@
   "title" : "createFile(atPath:data:overwrite:)",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollofilemanager\/createfile(atpath:data:overwrite:)"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileManagerActor": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "actor"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "FileManagerActor"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerActor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "FileManagerActor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "FileManagerActor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/filemanageractor"
 }
 }
 }

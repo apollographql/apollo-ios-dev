@@ -12,7 +12,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:m:s:e:s:9ApolloAPI16RootSelectionSetP0A0E4data9variablesxSDySSs11AnyHashableVG_SDySSAA29GraphQLOperationVariableValue_pGSgtKcfc",
+    "externalID" : "s:m:s:e:s:9ApolloAPI16RootSelectionSetP0A0E4data9variablesxSDySSSH_s8SendablepG_SDySSAA29GraphQLOperationVariableValue_pGSgtYaKcfc",
     "modules" : [
       {
         "name" : "Apollo"
@@ -33,12 +33,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Extended-Protocols",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/RootSelectionSet"
       ],
       "title" : "Extended Protocols"
     },
     {
+      "anchor" : "Extended-Types",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/Selection"
       ],

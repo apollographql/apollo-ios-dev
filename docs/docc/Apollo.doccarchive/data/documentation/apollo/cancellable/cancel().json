@@ -43,6 +43,13 @@
         "name" : "Apollo"
       }
     ],
+    "platforms" : [
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "unavailable" : false
+      }
+    ],
     "required" : true,
     "role" : "symbol",
     "roleHeading" : "Instance Method",
@@ -125,6 +132,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -159,6 +167,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",

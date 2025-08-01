@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A5StoreC4load_13callbackQueue13resultHandleryx_So17OS_dispatch_queueCSgys6ResultOyAA13GraphQLResultVy4DataQzGs5Error_pGct0A3API0L11QLOperationRzlF",
+    "externalID" : "s:6Apollo0A5StoreC4load_13callbackQueue13resultHandleryx_So17OS_dispatch_queueCSgys6ResultOyAA15GraphQLResponseVyxGs5Error_pGYbct0A3API0L11QLOperationRzlF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -93,21 +93,20 @@
       },
       {
         "kind" : "text",
-        "text" : "."
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-        "text" : "Data"
-      },
-      {
-        "kind" : "text",
         "text" : ">)"
       }
     ],
     "modules" : [
       {
         "name" : "Apollo"
+      }
+    ],
+    "platforms" : [
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "renamed" : "load(_:)",
+        "unavailable" : false
       }
     ],
     "role" : "symbol",
@@ -223,15 +222,6 @@
             },
             {
               "kind" : "text",
-              "text" : "."
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-              "text" : "Data"
-            },
-            {
-              "kind" : "text",
               "text" : ">) "
             },
             {
@@ -263,20 +253,6 @@
     {
       "kind" : "parameters",
       "parameters" : [
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The query to load results for",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "query"
-        },
         {
           "content" : [
             {
@@ -379,6 +355,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -452,15 +429,6 @@
     },
     {
       "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
       "text" : ">)"
     }
   ],
@@ -478,6 +446,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",

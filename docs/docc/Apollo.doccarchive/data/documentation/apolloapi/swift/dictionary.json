@@ -86,7 +86,9 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONDecodable",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONEncodable",
-        "doc:\/\/ApolloAPI\/s30ExpressibleByDictionaryLiteralP"
+        "doc:\/\/ApolloAPI\/s8CopyableP",
+        "doc:\/\/ApolloAPI\/s30ExpressibleByDictionaryLiteralP",
+        "doc:\/\/ApolloAPI\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -103,11 +105,12 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary\/_InitializableByDictionaryLiteralElements-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary\/init(_:)"
       ],
-      "title" : "Default Implementations"
+      "title" : "Initializers"
     }
   ],
   "variants" : [
@@ -222,11 +225,11 @@
         "type" : "codeVoice"
       },
       {
-        "text" : " is ",
+        "text" : " conforms to ",
         "type" : "text"
       },
       {
-        "code" : "String",
+        "code" : "Hashable",
         "type" : "codeVoice"
       },
       {
@@ -238,11 +241,11 @@
         "type" : "codeVoice"
       },
       {
-        "text" : " is ",
+        "text" : " conforms to ",
         "type" : "text"
       },
       {
-        "code" : "AnyHashable",
+        "code" : "Hashable",
         "type" : "codeVoice"
       },
       {
@@ -412,7 +415,7 @@
         "type" : "text"
       },
       {
-        "code" : "AnyHashable",
+        "code" : "any Hashable & Sendable",
         "type" : "codeVoice"
       },
       {
@@ -621,20 +624,88 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/swift\/dictionary"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Swift/Dictionary/_InitializableByDictionaryLiteralElements-Implementations": {
+"doc://ApolloAPI/documentation/ApolloAPI/Swift/Dictionary/init(_:)": {
   "abstract" : [
 
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary\/_InitializableByDictionaryLiteralElements-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "_InitializableByDictionaryLiteralElements Implementations",
+  "conformance" : {
+    "availabilityPrefix" : [
+      {
+        "text" : "Available when",
+        "type" : "text"
+      }
+    ],
+    "conformancePrefix" : [
+      {
+        "text" : "Conforms when",
+        "type" : "text"
+      }
+    ],
+    "constraints" : [
+      {
+        "code" : "Key",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "Hashable",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ".",
+        "type" : "text"
+      }
+    ]
+  },
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "([("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Key"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Value"
+    },
+    {
+      "kind" : "text",
+      "text" : ")])"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary\/init(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/swift\/dictionary\/_initializablebydictionaryliteralelements-implementations"
+  "url" : "\/documentation\/apolloapi\/swift\/dictionary\/init(_:)"
 },
 "doc://ApolloAPI/s30ExpressibleByDictionaryLiteralP": {
   "identifier" : "doc:\/\/ApolloAPI\/s30ExpressibleByDictionaryLiteralP",
   "title" : "Swift.ExpressibleByDictionaryLiteral",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

@@ -92,15 +92,19 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/init(fileURL:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/addOrUpdate(records:)",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/addOrUpdateRecordString(_:for:)-4jvew",
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/addOrUpdateRecordString(_:for:)",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/clearDatabase(shouldVacuumOnClear:)",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/createRecordsTableIfNeeded()",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/deleteRecord(for:)",
@@ -110,6 +114,8 @@
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Type-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/idColumnName",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/keyColumnName",
@@ -306,7 +312,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/sqlitedatabase\/addorupdate(records:)"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDatabase/addOrUpdateRecordString(_:for:)-4jvew": {
+"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDatabase/addOrUpdateRecordString(_:for:)": {
   "abstract" : [
 
   ],
@@ -360,13 +366,13 @@
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/addOrUpdateRecordString(_:for:)-4jvew",
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteDatabase\/addOrUpdateRecordString(_:for:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
   "title" : "addOrUpdateRecordString(_:for:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitedatabase\/addorupdaterecordstring(_:for:)-4jvew"
+  "url" : "\/documentation\/apollosqlite\/sqlitedatabase\/addorupdaterecordstring(_:for:)"
 },
 "doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteDatabase/clearDatabase(shouldVacuumOnClear:)": {
   "abstract" : [

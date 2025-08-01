@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A5StoreC11unsubscribeyyAA0aB10Subscriber_pF",
+    "externalID" : "s:6Apollo0A5StoreC11unsubscribeyyAC17SubscriptionTokenVF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -35,12 +35,21 @@
       },
       {
         "kind" : "text",
-        "text" : "(any "
+        "text" : "("
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo0A15StoreSubscriberP",
-        "text" : "ApolloStoreSubscriber"
+        "preciseIdentifier" : "s:6Apollo0A5StoreC",
+        "text" : "ApolloStore"
+      },
+      {
+        "kind" : "text",
+        "text" : "."
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:6Apollo0A5StoreC17SubscriptionTokenV",
+        "text" : "SubscriptionToken"
       },
       {
         "kind" : "text",
@@ -94,17 +103,27 @@
             },
             {
               "kind" : "internalParam",
-              "text" : "subscriber"
+              "text" : "subscriptionToken"
             },
             {
               "kind" : "text",
-              "text" : ": any "
+              "text" : ": "
             },
             {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber",
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo0A15StoreSubscriberP",
-              "text" : "ApolloStoreSubscriber"
+              "preciseIdentifier" : "s:6Apollo0A5StoreC",
+              "text" : "ApolloStore"
+            },
+            {
+              "kind" : "text",
+              "text" : "."
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/SubscriptionToken",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo0A5StoreC17SubscriptionTokenV",
+              "text" : "SubscriptionToken"
             },
             {
               "kind" : "text",
@@ -123,15 +142,15 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "A subscribe that has previously been added via ",
+                  "text" : "An opaque token for the subscriber that was provided via ",
                   "type" : "text"
                 },
                 {
-                  "code" : "subscribe",
+                  "code" : "subscribe(_:)",
                   "type" : "codeVoice"
                 },
                 {
-                  "text" : ". To avoid retain cycles,",
+                  "text" : ".",
                   "type" : "text"
                 },
                 {
@@ -139,7 +158,7 @@
                   "type" : "text"
                 },
                 {
-                  "text" : "call ",
+                  "text" : "To avoid retain cycles, call ",
                   "type" : "text"
                 },
                 {
@@ -154,7 +173,7 @@
               "type" : "paragraph"
             }
           ],
-          "name" : "subscriber"
+          "name" : "subscriptionToken"
         }
       ]
     }
@@ -237,6 +256,37 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore"
 },
+"doc://Apollo/documentation/Apollo/ApolloStore/SubscriptionToken": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "SubscriptionToken"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/SubscriptionToken",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "SubscriptionToken"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloStore.SubscriptionToken",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore\/subscriptiontoken"
+},
 "doc://Apollo/documentation/Apollo/ApolloStore/unsubscribe(_:)": {
   "abstract" : [
     {
@@ -259,12 +309,21 @@
     },
     {
       "kind" : "text",
-      "text" : "(any "
+      "text" : "("
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo0A15StoreSubscriberP",
-      "text" : "ApolloStoreSubscriber"
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC17SubscriptionTokenV",
+      "text" : "SubscriptionToken"
     },
     {
       "kind" : "text",
@@ -277,64 +336,6 @@
   "title" : "unsubscribe(_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/unsubscribe(_:)"
-},
-"doc://Apollo/documentation/Apollo/ApolloStoreSubscriber": {
-  "abstract" : [
-    {
-      "text" : "The ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloStoreSubscriber",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " provides a means to observe changes to items in the ApolloStore.",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "This protocol is available for advanced use cases only. Most users will prefer using ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloClient.watch(query:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "protocol"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "ApolloStoreSubscriber"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "ApolloStoreSubscriber"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "ApolloStoreSubscriber",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollostoresubscriber"
 }
 }
 }

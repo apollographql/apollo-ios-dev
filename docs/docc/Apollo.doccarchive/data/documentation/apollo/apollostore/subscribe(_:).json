@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A5StoreC9subscribeyyAA0aB10Subscriber_pF",
+    "externalID" : "s:6Apollo0A5StoreC9subscribeyAC17SubscriptionTokenVAA0aB10Subscriber_pYaF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -44,7 +44,29 @@
       },
       {
         "kind" : "text",
-        "text" : ")"
+        "text" : ") "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " -> "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:6Apollo0A5StoreC",
+        "text" : "ApolloStore"
+      },
+      {
+        "kind" : "text",
+        "text" : "."
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:6Apollo0A5StoreC17SubscriptionTokenV",
+        "text" : "SubscriptionToken"
       }
     ],
     "modules" : [
@@ -108,7 +130,31 @@
             },
             {
               "kind" : "text",
-              "text" : ")"
+              "text" : ") "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " -> "
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo0A5StoreC",
+              "text" : "ApolloStore"
+            },
+            {
+              "kind" : "text",
+              "text" : "."
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/SubscriptionToken",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo0A5StoreC17SubscriptionTokenV",
+              "text" : "SubscriptionToken"
             }
           ]
         }
@@ -229,6 +275,37 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore"
 },
+"doc://Apollo/documentation/Apollo/ApolloStore/SubscriptionToken": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "SubscriptionToken"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/SubscriptionToken",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "SubscriptionToken"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloStore.SubscriptionToken",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore\/subscriptiontoken"
+},
 "doc://Apollo/documentation/Apollo/ApolloStore/subscribe(_:)": {
   "abstract" : [
     {
@@ -260,7 +337,29 @@
     },
     {
       "kind" : "text",
-      "text" : ")"
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC17SubscriptionTokenV",
+      "text" : "SubscriptionToken"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/subscribe(_:)",

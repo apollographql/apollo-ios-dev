@@ -88,6 +88,15 @@
             {
               "kind" : "identifier",
               "text" : "ParentType"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -170,6 +179,14 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/s8SendableP"
+      ],
+      "kind" : "relationships",
+      "title" : "Inherits From",
+      "type" : "inheritsFrom"
+    },
+    {
+      "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Union"
@@ -189,6 +206,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ParentType\/canBeConverted(from:)"
       ],
@@ -540,6 +559,11 @@
   "title" : "Union",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/union"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

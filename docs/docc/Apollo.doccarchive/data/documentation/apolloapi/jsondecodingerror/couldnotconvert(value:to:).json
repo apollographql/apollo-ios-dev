@@ -27,7 +27,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI17JSONDecodingErrorO15couldNotConvertyACs11AnyHashableV_ypXptcACmF",
+    "externalID" : "s:9ApolloAPI17JSONDecodingErrorO15couldNotConvertyACSH_s8Sendablep_ypXptcACmF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -55,8 +55,8 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:s11AnyHashableV",
-        "text" : "AnyHashable"
+        "preciseIdentifier" : "s:9ApolloAPI9JSONValuea",
+        "text" : "JSONValue"
       },
       {
         "kind" : "text",
@@ -125,9 +125,10 @@
               "text" : ": "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONValue",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:s11AnyHashableV",
-              "text" : "AnyHashable"
+              "preciseIdentifier" : "s:9ApolloAPI9JSONValuea",
+              "text" : "JSONValue"
             },
             {
               "kind" : "text",
@@ -385,8 +386,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s11AnyHashableV",
-      "text" : "AnyHashable"
+      "preciseIdentifier" : "s:9ApolloAPI9JSONValuea",
+      "text" : "JSONValue"
     },
     {
       "kind" : "text",
@@ -415,6 +416,40 @@
   "title" : "JSONDecodingError.couldNotConvert(value:to:)",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/jsondecodingerror\/couldnotconvert(value:to:)"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/JSONObject": {
+  "abstract" : [
+    {
+      "text" : "Represents a JSON Dictionary",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "JSONObject"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONObject",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "JSONObject"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "JSONObject",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/jsonobject"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/JSONValue": {
   "abstract" : [

@@ -81,7 +81,8 @@
         "doc:\/\/ApolloCodegenLib\/SE",
         "doc:\/\/ApolloCodegenLib\/SQ",
         "doc:\/\/ApolloCodegenLib\/SH",
-        "doc:\/\/ApolloCodegenLib\/SY"
+        "doc:\/\/ApolloCodegenLib\/SY",
+        "doc:\/\/ApolloCodegenLib\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -98,6 +99,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/OperationManifestConfiguration\/Version-swift.enum\/legacy",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/OperationManifestConfiguration\/Version-swift.enum\/persistedQueries"
@@ -105,12 +108,15 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/OperationManifestConfiguration\/Version-swift.enum\/init(rawValue:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/OperationManifestConfiguration\/Version-swift.enum\/Equatable-Implementations",
@@ -396,6 +402,11 @@
   "title" : "ApolloCodegenConfiguration.OperationManifestConfiguration.Version.persistedQueries",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/operationmanifestconfiguration\/version-swift.enum\/persistedqueries"
+},
+"doc://ApolloCodegenLib/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 },
 "https://www.apollographql.com/docs/ios/fetching/persisted-queries": {
   "identifier" : "https:\/\/www.apollographql.com\/docs\/ios\/fetching\/persisted-queries",

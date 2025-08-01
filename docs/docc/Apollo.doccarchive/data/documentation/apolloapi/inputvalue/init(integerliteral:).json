@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByIntegerLiteral-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue"
       ]
     ]
   },
@@ -29,7 +28,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "ApolloAPI",
-    "externalID" : "s:9ApolloAPI10InputValueO14integerLiteralACSi_tcfc",
+    "externalID" : "s:9ApolloAPI10InputValueO14integerLiteralACs5Int32V_tcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -49,8 +48,8 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:s18IntegerLiteralTypea",
-        "text" : "IntegerLiteralType"
+        "preciseIdentifier" : "s:s5Int32V",
+        "text" : "Int32"
       },
       {
         "kind" : "text",
@@ -104,8 +103,8 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:s18IntegerLiteralTypea",
-              "text" : "IntegerLiteralType"
+              "preciseIdentifier" : "s:s5Int32V",
+              "text" : "Int32"
             },
             {
               "kind" : "text",
@@ -243,17 +242,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/inputvalue"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/InputValue/ExpressibleByIntegerLiteral-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByIntegerLiteral-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ExpressibleByIntegerLiteral Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/inputvalue\/expressiblebyintegerliteral-implementations"
-},
 "doc://ApolloAPI/documentation/ApolloAPI/InputValue/init(integerLiteral:)": {
   "abstract" : [
 
@@ -277,8 +265,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s18IntegerLiteralTypea",
-      "text" : "IntegerLiteralType"
+      "preciseIdentifier" : "s:s5Int32V",
+      "text" : "Int32"
     },
     {
       "kind" : "text",

@@ -12,7 +12,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:m:s:e:s:10Foundation3URLV16ApolloCodegenLibE011isDirectoryB0Sbvp",
+    "externalID" : "s:m:s:e:c:objc(cs)NSFileManagers:s8SendableP",
     "modules" : [
       {
         "name" : "ApolloCodegenLib"
@@ -33,6 +33,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Extended-Classes",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/FileHandle",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URLSession"
@@ -40,6 +42,8 @@
       "title" : "Extended Classes"
     },
     {
+      "anchor" : "Extended-Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URL"
       ],

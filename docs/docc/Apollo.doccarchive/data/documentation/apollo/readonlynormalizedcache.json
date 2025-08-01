@@ -126,6 +126,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ReadOnlyNormalizedCache\/loadRecords(forKeys:)"
       ],
@@ -321,6 +323,14 @@
     {
       "kind" : "text",
       "text" : ">) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

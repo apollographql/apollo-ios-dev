@@ -1,10 +1,4 @@
 {
-  "abstract" : [
-    {
-      "text" : "Data about a response received by an HTTP request.",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -18,11 +12,11 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo12HTTPResponseC",
+    "externalID" : "s:6Apollo12HTTPResponseV",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "class"
+        "text" : "struct"
       },
       {
         "kind" : "text",
@@ -45,8 +39,8 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Class",
-    "symbolKind" : "class",
+    "roleHeading" : "Structure",
+    "symbolKind" : "struct",
     "title" : "HTTPResponse"
   },
   "primaryContentSections" : [
@@ -62,7 +56,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "class"
+              "text" : "struct"
             },
             {
               "kind" : "text",
@@ -71,39 +65,6 @@
             {
               "kind" : "identifier",
               "text" : "HTTPResponse"
-            },
-            {
-              "kind" : "text",
-              "text" : "<"
-            },
-            {
-              "kind" : "genericParameter",
-              "text" : "Operation"
-            },
-            {
-              "kind" : "text",
-              "text" : "> "
-            },
-            {
-              "kind" : "keyword",
-              "text" : "where"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "text" : "Operation"
-            },
-            {
-              "kind" : "text",
-              "text" : " : "
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP",
-              "text" : "GraphQLOperation"
             }
           ]
         }
@@ -114,8 +75,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/SQ",
-        "doc:\/\/Apollo\/SH"
+        "doc:\/\/Apollo\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -132,28 +92,21 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/init(response:rawData:parsedResponse:)"
-      ],
-      "title" : "Initializers"
-    },
-    {
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/cacheRecords",
-        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/httpResponse",
-        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/legacyResponse",
-        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/parsedResponse",
-        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/rawData"
+        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/chunks",
+        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/response"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/Equatable-Implementations",
-        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/Hashable-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/mapChunks(_:)"
       ],
-      "title" : "Default Implementations"
+      "title" : "Instance Methods"
     }
   ],
   "variants" : [
@@ -170,16 +123,6 @@
   ]
 , 
 "references": {
-"doc://Apollo/SH": {
-  "identifier" : "doc:\/\/Apollo\/SH",
-  "title" : "Swift.Hashable",
-  "type" : "unresolvable"
-},
-"doc://Apollo/SQ": {
-  "identifier" : "doc:\/\/Apollo\/SQ",
-  "title" : "Swift.Equatable",
-  "type" : "unresolvable"
-},
 "doc://Apollo/documentation/Apollo": {
   "abstract" : [
     {
@@ -196,15 +139,12 @@
 },
 "doc://Apollo/documentation/Apollo/HTTPResponse": {
   "abstract" : [
-    {
-      "text" : "Data about a response received by an HTTP request.",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -228,39 +168,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/httpresponse"
 },
-"doc://Apollo/documentation/Apollo/HTTPResponse/Equatable-Implementations": {
+"doc://Apollo/documentation/Apollo/HTTPResponse/chunks": {
   "abstract" : [
 
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/httpresponse\/equatable-implementations"
-},
-"doc://Apollo/documentation/Apollo/HTTPResponse/Hashable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/Hashable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Hashable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/httpresponse\/hashable-implementations"
-},
-"doc://Apollo/documentation/Apollo/HTTPResponse/cacheRecords": {
-  "abstract" : [
-    {
-      "text" : "A set of cache records from the response",
-      "type" : "text"
-    }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "var"
+      "text" : "let"
     },
     {
       "kind" : "text",
@@ -268,7 +183,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "cacheRecords"
+      "text" : "chunks"
     },
     {
       "kind" : "text",
@@ -276,40 +191,38 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo9RecordSetV",
-      "text" : "RecordSet"
+      "preciseIdentifier" : "s:6Apollo30NonCopyableAsyncThrowingStreamV",
+      "text" : "NonCopyableAsyncThrowingStream"
     },
     {
       "kind" : "text",
-      "text" : "?"
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation4DataV",
+      "text" : "Data"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/cacheRecords",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/chunks",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "cacheRecords",
+  "title" : "chunks",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/httpresponse\/cacherecords"
+  "url" : "\/documentation\/apollo\/httpresponse\/chunks"
 },
-"doc://Apollo/documentation/Apollo/HTTPResponse/httpResponse": {
+"doc://Apollo/documentation/Apollo/HTTPResponse/mapChunks(_:)": {
   "abstract" : [
-    {
-      "text" : "The ",
-      "type" : "text"
-    },
-    {
-      "code" : "HTTPURLResponse",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " received from the URL loading system",
-      "type" : "text"
-    }
+
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "var"
+      "text" : "func"
     },
     {
       "kind" : "text",
@@ -317,43 +230,91 @@
     },
     {
       "kind" : "identifier",
-      "text" : "httpResponse"
+      "text" : "mapChunks"
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : "(("
     },
     {
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "c:objc(cs)NSHTTPURLResponse",
       "text" : "HTTPURLResponse"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/httpResponse",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "httpResponse",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/httpresponse\/httpresponse"
-},
-"doc://Apollo/documentation/Apollo/HTTPResponse/init(response:rawData:parsedResponse:)": {
-  "abstract" : [
-    {
-      "text" : "Designated initializer",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "identifier",
-      "text" : "init"
     },
     {
       "kind" : "text",
-      "text" : "("
+      "text" : ", "
     },
     {
-      "kind" : "externalParam",
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation4DataV",
+      "text" : "Data"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation4DataV",
+      "text" : "Data"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12HTTPResponseV",
+      "text" : "HTTPResponse"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/mapChunks(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "mapChunks(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/httpresponse\/mapchunks(_:)"
+},
+"doc://Apollo/documentation/Apollo/HTTPResponse/response": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
       "text" : "response"
     },
     {
@@ -364,259 +325,19 @@
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "c:objc(cs)NSHTTPURLResponse",
       "text" : "HTTPURLResponse"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "rawData"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:10Foundation4DataV",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "parsedResponse"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">?)"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/init(response:rawData:parsedResponse:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/response",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(response:rawData:parsedResponse:)",
+  "title" : "response",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/httpresponse\/init(response:rawdata:parsedresponse:)"
+  "url" : "\/documentation\/apollo\/httpresponse\/response"
 },
-"doc://Apollo/documentation/Apollo/HTTPResponse/legacyResponse": {
-  "abstract" : [
-    {
-      "text" : "[optional] The data as parsed into a ",
-      "type" : "text"
-    },
-    {
-      "code" : "GraphQLResponse",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " for legacy caching purposes. If you’re not using the",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "code" : "JSONResponseParsingInterceptor",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ", you probably shouldn’t be using this property.",
-      "type" : "text"
-    }
-  ],
-  "deprecated" : true,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "legacyResponse"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo15GraphQLResponseC",
-      "text" : "GraphQLResponse"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">?"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/legacyResponse",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "legacyResponse",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/httpresponse\/legacyresponse"
-},
-"doc://Apollo/documentation/Apollo/HTTPResponse/parsedResponse": {
-  "abstract" : [
-    {
-      "text" : "[optional] The data as parsed into a ",
-      "type" : "text"
-    },
-    {
-      "code" : "GraphQLResult",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ", which can eventually be returned to the UI. Will be nil",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "if not yet parsed.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "parsedResponse"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">?"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/parsedResponse",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "parsedResponse",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/httpresponse\/parsedresponse"
-},
-"doc://Apollo/documentation/Apollo/HTTPResponse/rawData": {
-  "abstract" : [
-    {
-      "text" : "The raw data received from the URL loading system",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "rawData"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:10Foundation4DataV",
-      "text" : "Data"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/rawData",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "rawData",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/httpresponse\/rawdata"
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

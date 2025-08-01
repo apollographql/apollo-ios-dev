@@ -80,6 +80,15 @@
             {
               "kind" : "identifier",
               "text" : "JSONEncodable"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -134,6 +143,14 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/s8SendableP"
+      ],
+      "kind" : "relationships",
+      "title" : "Inherits From",
+      "type" : "inheritsFrom"
+    },
+    {
+      "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/AnyScalarType",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CustomScalarType",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/EnumType",
@@ -153,8 +170,7 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Double",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Float",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Int",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Foundation\/NSDictionary",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Int32",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Foundation\/NSNull",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Optional",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/String"
@@ -174,6 +190,7 @@
   ],
   "seeAlsoSections" : [
     {
+      "anchor" : "JSON-Conversion",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONValue",
@@ -368,11 +385,6 @@
   "title" : "EnumType",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/enumtype"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Foundation/NSDictionary": {
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Foundation\/NSDictionary",
-  "title" : "NSDictionary",
-  "type" : "unresolvable"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Foundation/NSNull": {
   "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Foundation\/NSNull",
@@ -901,9 +913,9 @@
   "title" : "Float",
   "type" : "unresolvable"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Swift/Int": {
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Int",
-  "title" : "Int",
+"doc://ApolloAPI/documentation/ApolloAPI/Swift/Int32": {
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Int32",
+  "title" : "Int32",
   "type" : "unresolvable"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Swift/Optional": {
@@ -933,15 +945,7 @@
         "type" : "text"
       },
       {
-        "code" : "JSONEncodable",
-        "type" : "codeVoice"
-      },
-      {
-        "text" : " and ",
-        "type" : "text"
-      },
-      {
-        "code" : "Hashable",
+        "code" : "AnyScalarType",
         "type" : "codeVoice"
       },
       {
@@ -981,6 +985,11 @@
 "doc://ApolloAPI/documentation/ApolloAPI/Swift/String": {
   "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/String",
   "title" : "String",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

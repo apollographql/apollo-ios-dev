@@ -134,7 +134,8 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONEncodable",
         "doc:\/\/ApolloAPI\/SQ",
-        "doc:\/\/ApolloAPI\/SH"
+        "doc:\/\/ApolloAPI\/SH",
+        "doc:\/\/ApolloAPI\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Inherits From",
@@ -159,6 +160,7 @@
   ],
   "seeAlsoSections" : [
     {
+      "anchor" : "Schema-Types",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object",
@@ -171,12 +173,15 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputObject\/jsonEncodableValue"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputObject\/Equatable-Implementations",
@@ -658,6 +663,11 @@
   "title" : "Union",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/union"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 },
 "https://spec.graphql.org/draft/#sec-Input-Objects": {
   "identifier" : "https:\/\/spec.graphql.org\/draft\/#sec-Input-Objects",

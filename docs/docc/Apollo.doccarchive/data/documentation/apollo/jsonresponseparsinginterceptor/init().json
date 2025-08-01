@@ -13,7 +13,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo30JSONResponseParsingInterceptorVACycfc",
+    "externalID" : "s:6Apollo30JSONResponseParsingInterceptorCACycfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -121,7 +121,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "struct"
+      "text" : "actor"
     },
     {
       "kind" : "text",

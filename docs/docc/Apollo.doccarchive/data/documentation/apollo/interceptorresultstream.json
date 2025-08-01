@@ -1,0 +1,370 @@
+{
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/Apollo\/documentation\/Apollo"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorResultStream"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:6Apollo23InterceptorResultStreama",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "typealias"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "InterceptorResultStream"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "Apollo"
+      }
+    ],
+    "navigatorTitle" : [
+      {
+        "kind" : "identifier",
+        "text" : "InterceptorResultStream"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Type Alias",
+    "symbolKind" : "typealias",
+    "title" : "InterceptorResultStream"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "typealias"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "InterceptorResultStream"
+            },
+            {
+              "kind" : "text",
+              "text" : "<"
+            },
+            {
+              "kind" : "genericParameter",
+              "text" : "Request"
+            },
+            {
+              "kind" : "text",
+              "text" : "> = "
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo30NonCopyableAsyncThrowingStreamV",
+              "text" : "NonCopyableAsyncThrowingStream"
+            },
+            {
+              "kind" : "text",
+              "text" : "<"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo12ParsedResultV",
+              "text" : "ParsedResult"
+            },
+            {
+              "kind" : "text",
+              "text" : "<"
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Request"
+            },
+            {
+              "kind" : "text",
+              "text" : "."
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest\/Operation-swift.associatedtype",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo14GraphQLRequestP9OperationQa",
+              "text" : "Operation"
+            },
+            {
+              "kind" : "text",
+              "text" : ">> "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "where"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Request"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo14GraphQLRequestP",
+              "text" : "GraphQLRequest"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/interceptorresultstream"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://Apollo/documentation/Apollo": {
+  "abstract" : [
+    {
+      "text" : "A Strongly typed, Swift-first, GraphQL client.",
+      "type" : "text"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "Apollo",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo"
+},
+"doc://Apollo/documentation/Apollo/GraphQLRequest": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLRequest"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLRequest"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "GraphQLRequest",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlrequest"
+},
+"doc://Apollo/documentation/Apollo/GraphQLRequest/Operation-swift.associatedtype": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "associatedtype"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP",
+      "text" : "GraphQLOperation"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest\/Operation-swift.associatedtype",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "Operation",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlrequest\/operation-swift.associatedtype"
+},
+"doc://Apollo/documentation/Apollo/InterceptorResultStream": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "InterceptorResultStream"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorResultStream",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "InterceptorResultStream"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "InterceptorResultStream",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/interceptorresultstream"
+},
+"doc://Apollo/documentation/Apollo/NonCopyableAsyncThrowingStream": {
+  "abstract" : [
+    {
+      "text" : "A move-only wrapper around an ",
+      "type" : "text"
+    },
+    {
+      "code" : "AsyncThrowingStream",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " that conforms to ",
+      "type" : "text"
+    },
+    {
+      "code" : "~Copyable",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " used to",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "protect against multiple concurrent consumers receiving partial data.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "NonCopyableAsyncThrowingStream"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "NonCopyableAsyncThrowingStream"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "NonCopyableAsyncThrowingStream",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/noncopyableasyncthrowingstream"
+},
+"doc://Apollo/documentation/Apollo/ParsedResult": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ParsedResult"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ParsedResult"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ParsedResult",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/parsedresult"
+}
+}
+}

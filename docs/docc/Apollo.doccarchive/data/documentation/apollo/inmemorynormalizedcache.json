@@ -56,14 +56,6 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "final"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
-            {
-              "kind" : "keyword",
               "text" : "class"
             },
             {
@@ -101,12 +93,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/InMemoryNormalizedCache\/init(records:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/InMemoryNormalizedCache\/clear()",
         "doc:\/\/Apollo\/documentation\/Apollo\/InMemoryNormalizedCache\/loadRecords(forKeys:)",

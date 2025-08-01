@@ -95,6 +95,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerPathError\/cannotCreateFile(at:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerPathError\/notADirectory(path:)",
@@ -103,12 +105,15 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerPathError\/errorDescription"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerPathError\/Equatable-Implementations",

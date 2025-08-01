@@ -1,24 +1,9 @@
 {
-  "abstract" : [
-    {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloClientProtocol.clearCache(callbackQueue:completion:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientProtocol-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient"
       ]
     ]
   },
@@ -29,7 +14,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "Apollo",
-    "externalID" : "s:6Apollo0A6ClientC10clearCache13callbackQueue10completionySo17OS_dispatch_queueC_ys6ResultOyyts5Error_pGcSgtF",
+    "externalID" : "s:6Apollo0A6ClientC10clearCache13callbackQueue10completionySo17OS_dispatch_queueC_ys6ResultOyyts5Error_pGYbcSgtF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -112,6 +97,13 @@
     "modules" : [
       {
         "name" : "Apollo"
+      }
+    ],
+    "platforms" : [
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "unavailable" : false
       }
     ],
     "role" : "symbol",
@@ -252,23 +244,19 @@
 "doc://Apollo/documentation/Apollo/ApolloClient": {
   "abstract" : [
     {
-      "text" : "The ",
-      "type" : "text"
-    },
-    {
       "code" : "ApolloClient",
       "type" : "codeVoice"
     },
     {
-      "text" : " class implements the core API for Apollo by conforming to ",
+      "text" : " is the primary public entry point for interacting with a GraphQL server and a local GraphQL",
       "type" : "text"
     },
     {
-      "code" : "ApolloClientProtocol",
-      "type" : "codeVoice"
+      "text" : " ",
+      "type" : "text"
     },
     {
-      "text" : ".",
+      "text" : "normalized cache. This class provides the",
       "type" : "text"
     }
   ],
@@ -299,21 +287,11 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclient"
 },
-"doc://Apollo/documentation/Apollo/ApolloClient/ApolloClientProtocol-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientProtocol-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ApolloClientProtocol Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/apolloclientprotocol-implementations"
-},
 "doc://Apollo/documentation/Apollo/ApolloClient/clearCache(callbackQueue:completion:)": {
   "abstract" : [
 
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",

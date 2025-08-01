@@ -1,24 +1,9 @@
 {
-  "abstract" : [
-    {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloClientProtocol.watch(query:cachePolicy:context:callbackQueue:resultHandler:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientProtocol-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient"
       ]
     ]
   },
@@ -29,7 +14,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "Apollo",
-    "externalID" : "s:6Apollo0A6ClientC5watch5query11cachePolicy7context13callbackQueue13resultHandlerAA19GraphQLQueryWatcherCyxGx_AA05CacheF0OAA14RequestContext_pSgSo17OS_dispatch_queueCys6ResultOyAA0L8QLResultVy4DataQzGs5Error_pGct0A3API0lM0RzlF",
+    "externalID" : "s:6Apollo0A6ClientC5watch5query11cachePolicy7context13callbackQueue13resultHandlerAA19GraphQLQueryWatcherCyxGx_AA05CacheF3_v1OSgAA14RequestContext_pSgSo17OS_dispatch_queueCys6ResultOyAA0L10QLResponseVyxGs5Error_pGYbctYa0A3API0lM0RzlF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -81,12 +66,12 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-        "text" : "CachePolicy"
+        "preciseIdentifier" : "s:6Apollo14CachePolicy_v1O",
+        "text" : "CachePolicy_v1"
       },
       {
         "kind" : "text",
-        "text" : ", "
+        "text" : "?, "
       },
       {
         "kind" : "externalParam",
@@ -145,16 +130,15 @@
       },
       {
         "kind" : "text",
-        "text" : "."
+        "text" : ">) "
       },
       {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-        "text" : "Data"
+        "kind" : "keyword",
+        "text" : "async"
       },
       {
         "kind" : "text",
-        "text" : ">) -> "
+        "text" : " -> "
       },
       {
         "kind" : "typeIdentifier",
@@ -180,7 +164,12 @@
       }
     ],
     "platforms" : [
-
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "renamed" : "watch(query:cachePolicy:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)",
+        "unavailable" : false
+      }
     ],
     "role" : "symbol",
     "roleHeading" : "Instance Method",
@@ -247,14 +236,14 @@
               "text" : ": "
             },
             {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-              "text" : "CachePolicy"
+              "preciseIdentifier" : "s:6Apollo14CachePolicy_v1O",
+              "text" : "CachePolicy_v1"
             },
             {
               "kind" : "text",
-              "text" : " = .default, "
+              "text" : "? = nil, "
             },
             {
               "kind" : "externalParam",
@@ -323,16 +312,15 @@
             },
             {
               "kind" : "text",
-              "text" : "."
+              "text" : ">) "
             },
             {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-              "text" : "Data"
+              "kind" : "keyword",
+              "text" : "async"
             },
             {
               "kind" : "text",
-              "text" : ">) -> "
+              "text" : " -> "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher",
@@ -418,23 +406,19 @@
 "doc://Apollo/documentation/Apollo/ApolloClient": {
   "abstract" : [
     {
-      "text" : "The ",
-      "type" : "text"
-    },
-    {
       "code" : "ApolloClient",
       "type" : "codeVoice"
     },
     {
-      "text" : " class implements the core API for Apollo by conforming to ",
+      "text" : " is the primary public entry point for interacting with a GraphQL server and a local GraphQL",
       "type" : "text"
     },
     {
-      "code" : "ApolloClientProtocol",
-      "type" : "codeVoice"
+      "text" : " ",
+      "type" : "text"
     },
     {
-      "text" : ".",
+      "text" : "normalized cache. This class provides the",
       "type" : "text"
     }
   ],
@@ -464,17 +448,6 @@
   "title" : "ApolloClient",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclient"
-},
-"doc://Apollo/documentation/Apollo/ApolloClient/ApolloClientProtocol-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientProtocol-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ApolloClientProtocol Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/apolloclientprotocol-implementations"
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/watch(query:cachePolicy:context:callbackQueue:resultHandler:)": {
   "abstract" : [
@@ -532,12 +505,12 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-      "text" : "CachePolicy"
+      "preciseIdentifier" : "s:6Apollo14CachePolicy_v1O",
+      "text" : "CachePolicy_v1"
     },
     {
       "kind" : "text",
-      "text" : ", "
+      "text" : "?, "
     },
     {
       "kind" : "externalParam",
@@ -596,16 +569,15 @@
     },
     {
       "kind" : "text",
-      "text" : "."
+      "text" : ">) "
     },
     {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
+      "kind" : "keyword",
+      "text" : "async"
     },
     {
       "kind" : "text",
-      "text" : ">) -> "
+      "text" : " -> "
     },
     {
       "kind" : "typeIdentifier",
@@ -632,13 +604,11 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclient\/watch(query:cachepolicy:context:callbackqueue:resulthandler:)"
 },
-"doc://Apollo/documentation/Apollo/CachePolicy": {
+"doc://Apollo/documentation/Apollo/CachePolicy_v1": {
   "abstract" : [
-    {
-      "text" : "A cache policy that specifies whether results should be fetched from the server or loaded from the local cache.",
-      "type" : "text"
-    }
+
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -650,21 +620,21 @@
     },
     {
       "kind" : "identifier",
-      "text" : "CachePolicy"
+      "text" : "CachePolicy_v1"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "CachePolicy"
+      "text" : "CachePolicy_v1"
     }
   ],
   "role" : "symbol",
-  "title" : "CachePolicy",
+  "title" : "CachePolicy_v1",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/cachepolicy"
+  "url" : "\/documentation\/apollo\/cachepolicy_v1"
 },
 "doc://Apollo/documentation/Apollo/GraphQLQueryWatcher": {
   "abstract" : [
@@ -685,30 +655,14 @@
       "type" : "text"
     },
     {
-      "text" : "whenever any of the data the previous result depends on changes. If your query shares response objects with other",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "operations you should read about normalizing objects by cache key in our documentation. Normalized objects will",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "update all query watchers that had received that object before.",
+      "text" : "whenever any of query’s data changes.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "actor"
     },
     {
       "kind" : "text",
@@ -739,6 +693,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -773,6 +728,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",

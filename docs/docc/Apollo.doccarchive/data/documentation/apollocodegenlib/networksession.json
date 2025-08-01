@@ -98,6 +98,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/NetworkSession\/loadData(with:completionHandler:)"
       ],
@@ -272,7 +274,15 @@
     },
     {
       "kind" : "text",
-      "text" : ")?) -> "
+      "text" : ")?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
     },
     {
       "kind" : "typeIdentifier",

@@ -74,6 +74,14 @@
             },
             {
               "kind" : "keyword",
+              "text" : "final"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
               "text" : "class"
             },
             {
@@ -102,6 +110,16 @@
       "kind" : "declarations"
     }
   ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/Apollo\/s8SendableP"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
+    }
+  ],
   "schemaVersion" : {
     "major" : 0,
     "minor" : 3,
@@ -112,12 +130,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/Atomic\/init(wrappedValue:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/Atomic\/projectedValue",
         "doc:\/\/Apollo\/documentation\/Apollo\/Atomic\/wrappedValue"
@@ -125,7 +147,10 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/Atomic\/decrement()",
         "doc:\/\/Apollo\/documentation\/Apollo\/Atomic\/increment()",
         "doc:\/\/Apollo\/documentation\/Apollo\/Atomic\/mutate(block:)"
       ],
@@ -197,6 +222,82 @@
   "title" : "Atomic",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/atomic"
+},
+"doc://Apollo/documentation/Apollo/Atomic/decrement()": {
+  "abstract" : [
+    {
+      "text" : "Decrements the wrapped ",
+      "type" : "text"
+    },
+    {
+      "code" : "Int",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " atomically, subtracting 1 from the value.",
+      "type" : "text"
+    }
+  ],
+  "conformance" : {
+    "availabilityPrefix" : [
+      {
+        "text" : "Available when",
+        "type" : "text"
+      }
+    ],
+    "conformancePrefix" : [
+      {
+        "text" : "Conforms when",
+        "type" : "text"
+      }
+    ],
+    "constraints" : [
+      {
+        "code" : "T",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "Numeric",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ".",
+        "type" : "text"
+      }
+    ]
+  },
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "decrement"
+    },
+    {
+      "kind" : "text",
+      "text" : "() -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "T"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Atomic\/decrement()",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "decrement()",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/atomic\/decrement()"
 },
 "doc://Apollo/documentation/Apollo/Atomic/increment()": {
   "abstract" : [
@@ -480,6 +581,11 @@
   "title" : "wrappedValue",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/atomic\/wrappedvalue"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

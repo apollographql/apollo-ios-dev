@@ -18,8 +18,7 @@
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
         "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/Error-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError"
       ]
     ]
   },
@@ -30,7 +29,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "Swift",
-    "externalID" : "s:s5ErrorP10FoundationE20localizedDescriptionSSvp::SYNTHESIZED::s:6Apollo23ResponseCodeInterceptorV0bC5ErrorO",
+    "externalID" : "s:s5ErrorP10FoundationE20localizedDescriptionSSvp::SYNTHESIZED::s:6Apollo23ResponseCodeInterceptorV0bC5ErrorV",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -224,7 +223,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "enum"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -247,17 +246,6 @@
   "title" : "ResponseCodeInterceptor.ResponseCodeError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/responsecodeinterceptor\/responsecodeerror"
-},
-"doc://Apollo/documentation/Apollo/ResponseCodeInterceptor/ResponseCodeError/Error-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor\/ResponseCodeError\/Error-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Error Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/responsecodeinterceptor\/responsecodeerror\/error-implementations"
 },
 "doc://Apollo/documentation/Apollo/ResponseCodeInterceptor/ResponseCodeError/localizedDescription": {
   "abstract" : [

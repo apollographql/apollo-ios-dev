@@ -1,0 +1,410 @@
+{
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/Apollo\/documentation\/Apollo"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:6Apollo14CachePolicy_v1O",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "enum"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "CachePolicy_v1"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "Apollo"
+      }
+    ],
+    "navigatorTitle" : [
+      {
+        "kind" : "identifier",
+        "text" : "CachePolicy_v1"
+      }
+    ],
+    "platforms" : [
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "unavailable" : false
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Enumeration",
+    "symbolKind" : "enum",
+    "title" : "CachePolicy_v1"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "enum"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "CachePolicy_v1"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    }
+  ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/Apollo\/SQ",
+        "doc:\/\/Apollo\/SH",
+        "doc:\/\/Apollo\/s8SendableP"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "topicSections" : [
+    {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/fetchIgnoringCacheCompletely",
+        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/fetchIgnoringCacheData",
+        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/returnCacheDataAndFetch",
+        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/returnCacheDataDontFetch",
+        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/returnCacheDataElseFetch"
+      ],
+      "title" : "Enumeration Cases"
+    },
+    {
+      "anchor" : "Type-Properties",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/default"
+      ],
+      "title" : "Type Properties"
+    },
+    {
+      "anchor" : "Default-Implementations",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/Equatable-Implementations"
+      ],
+      "title" : "Default Implementations"
+    }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/cachepolicy_v1"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://Apollo/SH": {
+  "identifier" : "doc:\/\/Apollo\/SH",
+  "title" : "Swift.Hashable",
+  "type" : "unresolvable"
+},
+"doc://Apollo/SQ": {
+  "identifier" : "doc:\/\/Apollo\/SQ",
+  "title" : "Swift.Equatable",
+  "type" : "unresolvable"
+},
+"doc://Apollo/documentation/Apollo": {
+  "abstract" : [
+    {
+      "text" : "A Strongly typed, Swift-first, GraphQL client.",
+      "type" : "text"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "Apollo",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo"
+},
+"doc://Apollo/documentation/Apollo/CachePolicy_v1": {
+  "abstract" : [
+
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "CachePolicy_v1"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "CachePolicy_v1"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "CachePolicy_v1",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cachepolicy_v1"
+},
+"doc://Apollo/documentation/Apollo/CachePolicy_v1/Equatable-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/Equatable-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "Equatable Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cachepolicy_v1\/equatable-implementations"
+},
+"doc://Apollo/documentation/Apollo/CachePolicy_v1/default": {
+  "abstract" : [
+    {
+      "text" : "The current default cache policy.",
+      "type" : "text"
+    }
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "`default`"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo14CachePolicy_v1O",
+      "text" : "CachePolicy_v1"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/default",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "default",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cachepolicy_v1\/default"
+},
+"doc://Apollo/documentation/Apollo/CachePolicy_v1/fetchIgnoringCacheCompletely": {
+  "abstract" : [
+    {
+      "text" : "Always fetch results from the server, and don’t store these in the cache.",
+      "type" : "text"
+    }
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fetchIgnoringCacheCompletely"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/fetchIgnoringCacheCompletely",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "CachePolicy_v1.fetchIgnoringCacheCompletely",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cachepolicy_v1\/fetchignoringcachecompletely"
+},
+"doc://Apollo/documentation/Apollo/CachePolicy_v1/fetchIgnoringCacheData": {
+  "abstract" : [
+    {
+      "text" : "Always fetch results from the server.",
+      "type" : "text"
+    }
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fetchIgnoringCacheData"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/fetchIgnoringCacheData",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "CachePolicy_v1.fetchIgnoringCacheData",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cachepolicy_v1\/fetchignoringcachedata"
+},
+"doc://Apollo/documentation/Apollo/CachePolicy_v1/returnCacheDataAndFetch": {
+  "abstract" : [
+    {
+      "text" : "Return data from the cache if available, and always fetch results from the server.",
+      "type" : "text"
+    }
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "returnCacheDataAndFetch"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/returnCacheDataAndFetch",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "CachePolicy_v1.returnCacheDataAndFetch",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cachepolicy_v1\/returncachedataandfetch"
+},
+"doc://Apollo/documentation/Apollo/CachePolicy_v1/returnCacheDataDontFetch": {
+  "abstract" : [
+    {
+      "text" : "Return data from the cache if available, else return an error.",
+      "type" : "text"
+    }
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "returnCacheDataDontFetch"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/returnCacheDataDontFetch",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "CachePolicy_v1.returnCacheDataDontFetch",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cachepolicy_v1\/returncachedatadontfetch"
+},
+"doc://Apollo/documentation/Apollo/CachePolicy_v1/returnCacheDataElseFetch": {
+  "abstract" : [
+    {
+      "text" : "Return data from the cache if available, else fetch results from the server.",
+      "type" : "text"
+    }
+  ],
+  "deprecated" : true,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "returnCacheDataElseFetch"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy_v1\/returnCacheDataElseFetch",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "CachePolicy_v1.returnCacheDataElseFetch",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cachepolicy_v1\/returncachedataelsefetch"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
+}
+}
+}

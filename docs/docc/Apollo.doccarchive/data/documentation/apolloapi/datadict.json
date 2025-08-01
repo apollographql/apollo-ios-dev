@@ -91,7 +91,8 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloAPI\/SQ",
-        "doc:\/\/ApolloAPI\/SH"
+        "doc:\/\/ApolloAPI\/SH",
+        "doc:\/\/ApolloAPI\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -108,31 +109,48 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Operators",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/==(_:_:)"
       ],
       "title" : "Operators"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/init(data:fulfilledFragments:deferredFragments:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/hash(into:)"
       ],
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Subscripts",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/subscript(_:)-5tqti",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/subscript(_:)-7aefb"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/subscript(_:)-7wpt0"
       ],
       "title" : "Subscripts"
     },
     {
+      "anchor" : "Type-Aliases",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/FieldValue"
+      ],
+      "title" : "Type Aliases"
+    },
+    {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/Equatable-Implementations"
@@ -334,6 +352,37 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/datadict\/equatable-implementations"
 },
+"doc://ApolloAPI/documentation/ApolloAPI/DataDict/FieldValue": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "FieldValue"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/FieldValue",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "FieldValue"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "DataDict.FieldValue",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/datadict\/fieldvalue"
+},
 "doc://ApolloAPI/documentation/ApolloAPI/DataDict/hash(into:)": {
   "abstract" : [
 
@@ -420,8 +469,17 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s11AnyHashableV",
-      "text" : "AnyHashable"
+      "preciseIdentifier" : "s:9ApolloAPI8DataDictV",
+      "text" : "DataDict"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI8DataDictV10FieldValuea",
+      "text" : "FieldValue"
     },
     {
       "kind" : "text",
@@ -529,7 +587,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/datadict\/subscript(_:)-5tqti"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/DataDict/subscript(_:)-7aefb": {
+"doc://ApolloAPI/documentation/ApolloAPI/DataDict/subscript(_:)-7wpt0": {
   "abstract" : [
 
   ],
@@ -564,12 +622,12 @@
       "text" : "T"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/subscript(_:)-7aefb",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DataDict\/subscript(_:)-7wpt0",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "subscript(_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/datadict\/subscript(_:)-7aefb"
+  "url" : "\/documentation\/apolloapi\/datadict\/subscript(_:)-7wpt0"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/SelectionSet": {
   "abstract" : [
@@ -601,6 +659,11 @@
   "title" : "SelectionSet",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

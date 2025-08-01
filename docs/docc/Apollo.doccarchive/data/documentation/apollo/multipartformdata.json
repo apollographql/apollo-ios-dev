@@ -89,6 +89,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/Apollo\/s8CopyableP",
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/SH"
       ],
@@ -107,19 +108,24 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/init()",
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/init(boundary:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/boundary"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/appendPart(data:name:contentType:filename:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/appendPart(inputStream:contentLength:name:contentType:filename:)",
@@ -129,6 +135,7 @@
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/Equatable-Implementations",
@@ -597,38 +604,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/multipartformdata\/encode()"
 },
-"doc://Apollo/documentation/Apollo/MultipartFormData/init()": {
-  "abstract" : [
-    {
-      "text" : "Convenience initializer which uses a pre-defined boundary",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "convenience"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "init"
-    },
-    {
-      "kind" : "text",
-      "text" : "()"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/init()",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "init()",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/multipartformdata\/init()"
-},
 "doc://Apollo/documentation/Apollo/MultipartFormData/init(boundary:)": {
   "abstract" : [
     {
@@ -669,6 +644,11 @@
   "title" : "init(boundary:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/multipartformdata\/init(boundary:)"
+},
+"doc://Apollo/s8CopyableP": {
+  "identifier" : "doc:\/\/Apollo\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

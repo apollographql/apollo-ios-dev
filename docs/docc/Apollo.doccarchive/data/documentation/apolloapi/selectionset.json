@@ -83,6 +83,15 @@
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:SH",
               "text" : "Hashable"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -95,7 +104,8 @@
       "identifiers" : [
         "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
         "doc:\/\/ApolloAPI\/SQ",
-        "doc:\/\/ApolloAPI\/SH"
+        "doc:\/\/ApolloAPI\/SH",
+        "doc:\/\/ApolloAPI\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Inherits From",
@@ -127,6 +137,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Associated-Types",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Fragments-swift.associatedtype",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Schema"
@@ -134,12 +146,15 @@
       "title" : "Associated Types"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/fragments-swift.property"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/CustomDebugStringConvertible-Implementations",
@@ -806,6 +821,11 @@
 "doc://ApolloAPI/s28CustomDebugStringConvertibleP": {
   "identifier" : "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
   "title" : "Swift.CustomDebugStringConvertible",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

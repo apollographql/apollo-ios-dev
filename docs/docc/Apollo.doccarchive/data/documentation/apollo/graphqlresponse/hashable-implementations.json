@@ -32,6 +32,7 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/hash(into:)"
@@ -58,14 +59,14 @@
 "doc://Apollo/documentation/Apollo/GraphQLResponse": {
   "abstract" : [
     {
-      "text" : "Represents a complete GraphQL response received from a server.",
+      "text" : "Represents the result of a GraphQL operation.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -108,7 +109,7 @@
     ],
     "constraints" : [
       {
-        "code" : "Data",
+        "code" : "Operation",
         "type" : "codeVoice"
       },
       {
@@ -116,7 +117,7 @@
         "type" : "text"
       },
       {
-        "code" : "RootSelectionSet",
+        "code" : "GraphQLOperation",
         "type" : "codeVoice"
       },
       {

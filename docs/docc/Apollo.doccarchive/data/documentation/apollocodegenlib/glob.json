@@ -88,6 +88,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Glob\/MatchError"
       ],
