@@ -2,9 +2,7 @@
   "schemaNamespace" : "AnimalKingdomAPI",
   "options" : {
     "schemaDocumentation" : "include",
-    "deprecatedEnumCases" : "include",
-    "apqs" : "disabled",
-    "cocoapodsCompatibleImportStatements": false,
+    "deprecatedEnumCases" : "include",    
     "additionalInflectionRules" : [
 
     ],

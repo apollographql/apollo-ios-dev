@@ -67,7 +67,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
 
     return TemplateString("""
       \(accessControlModifier(for: .member))\
-      static let operationDocument: \(config.ApolloAPITargetName).OperationDocument = .init(
+      static let operationDocument: \(TemplateConstants.ApolloAPITargetName).OperationDocument = .init(
       \(if: config.options.operationDocumentFormat.contains(.operationId), {
         precondition(operationIdentifier != nil, "operationIdentifier is missing.")
         return """

@@ -35,21 +35,12 @@ extension ApolloCodegen.ConfigurationContext {
 
     if case .swiftPackage = self.output.testMocks {
       switch self.output.schemaTypes.moduleType {
-      case .swiftPackage(_), .swiftPackageManager:
+      case .swiftPackage(_):
         break
       default:
         throw ApolloCodegen.Error.testMocksInvalidSwiftPackageConfiguration
       }
-    }
-
-    if case .swiftPackage = self.output.schemaTypes.moduleType,
-       self.options.cocoapodsCompatibleImportStatements == true {
-      throw ApolloCodegen.Error.invalidConfiguration(message: """
-        cocoapodsCompatibleImportStatements cannot be set to 'true' when the output schema types \
-        module type is Swift Package Manager. Change the cocoapodsCompatibleImportStatements \
-        value to 'false', or choose a different module type, to resolve the conflict.
-        """)
-    }
+    }    
 
     if case let .embeddedInTarget(targetName, _) = self.output.schemaTypes.moduleType,
        SwiftKeywords.DisallowedEmbeddedTargetNames.contains(targetName.lowercased()) {

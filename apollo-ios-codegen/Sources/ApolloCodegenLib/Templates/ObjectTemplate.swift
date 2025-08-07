@@ -18,7 +18,7 @@ struct ObjectTemplate: TemplateRenderer {
     """
     \(documentation: graphqlObject.documentation, config: config)
     \(graphqlObject.name.typeNameDocumentation)
-    static let \(graphqlObject.render(as: .typename)) = \(config.ApolloAPITargetName).Object(
+    static let \(graphqlObject.render(as: .typename)) = \(TemplateConstants.ApolloAPITargetName).Object(
       typename: "\(graphqlObject.name.schemaName)\",
       implementedInterfaces: \(ImplementedInterfacesTemplate()),
       keyFields: \(KeyFieldsTemplate())

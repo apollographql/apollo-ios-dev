@@ -18,7 +18,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     fields: [GraphQLInputField] = [],
     isOneOf: Bool = true,
     documentation: String? = nil,
-    config: ApolloCodegenConfiguration = .mock(.swiftPackageManager)
+    config: ApolloCodegenConfiguration = .mock(.swiftPackage(apolloSDKDependency: .default))
   ) {
     let inputObject = GraphQLInputObjectType.mock(
       name,
@@ -84,7 +84,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
           defaultValue: nil
         )
       ],
-      config: .mock(.swiftPackageManager)
+      config: .mock(.swiftPackage(apolloSDKDependency: .default))
     )
     
     let expected = """
@@ -319,7 +319,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       fields: fields,
       config: .mock(schemaNamespace: "testschema",
                     output: .mock(
-                      moduleType: .swiftPackageManager,
+                      moduleType: .swiftPackage(apolloSDKDependency: .default),
                       operations: .relative(subpath: nil)
                     ),
                     options: .init(
@@ -374,7 +374,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     buildSubject(
       fields: fields,
       config: .mock(schemaNamespace: "testschema", output: .mock(
-        moduleType: .swiftPackageManager,
+        moduleType: .swiftPackage(apolloSDKDependency: .default),
         operations: .relative(subpath: nil)))
     )
 
@@ -424,7 +424,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     buildSubject(
       fields: fields,
       config: .mock(schemaNamespace: "TESTSCHEMA", output: .mock(
-        moduleType: .swiftPackageManager,
+        moduleType: .swiftPackage(apolloSDKDependency: .default),
         operations: .relative(subpath: nil)))
     )
 
@@ -474,7 +474,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     buildSubject(
       fields: fields,
       config: .mock(schemaNamespace: "TestSchema", output: .mock(
-        moduleType: .swiftPackageManager,
+        moduleType: .swiftPackage(apolloSDKDependency: .default),
         operations: .relative(subpath: nil)))
     )
 
@@ -510,7 +510,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         defaultValue: nil)],
       config: .mock(
         schemaNamespace: "testschema",
-        output: .mock(moduleType: .swiftPackageManager, operations: .relative(subpath: nil))
+        output: .mock(moduleType: .swiftPackage(apolloSDKDependency: .default), operations: .relative(subpath: nil))
       )
     )
 
@@ -543,7 +543,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         defaultValue: nil)],
       config: .mock(
         schemaNamespace: "TESTSCHEMA",
-        output: .mock(moduleType: .swiftPackageManager, operations: .relative(subpath: nil))
+        output: .mock(moduleType: .swiftPackage(apolloSDKDependency: .default), operations: .relative(subpath: nil))
       )
     )
 
@@ -576,7 +576,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         defaultValue: nil)],
       config: .mock(
         schemaNamespace: "TestSchema",
-        output: .mock(moduleType:.swiftPackageManager ,operations: .relative(subpath: nil))
+        output: .mock(moduleType: .swiftPackage(apolloSDKDependency: .default) ,operations: .relative(subpath: nil))
       )
     )
 
@@ -748,7 +748,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         type: .list(.scalar(.string())),
         defaultValue: nil
       )
-    ], config: .mock(.swiftPackageManager, schemaNamespace: "TestSchema"))
+    ], config: .mock(.swiftPackage(apolloSDKDependency: .default), schemaNamespace: "TestSchema"))
 
     let expected = """
     public enum MockOneOfInput: OneOfInputObject {
@@ -831,9 +831,9 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     """
 
     let tests: [(config: ApolloCodegenConfiguration.FileOutput, expected: String)] = [
-      (.mock(moduleType: .swiftPackageManager, operations: .relative(subpath: nil)), expectedWithNamespace),
-      (.mock(moduleType: .swiftPackageManager, operations: .absolute(path: "custom")), expectedWithNamespace),
-      (.mock(moduleType: .swiftPackageManager, operations: .inSchemaModule), expectedNoNamespace),
+      (.mock(moduleType: .swiftPackage(apolloSDKDependency: .default), operations: .relative(subpath: nil)), expectedWithNamespace),
+      (.mock(moduleType: .swiftPackage(apolloSDKDependency: .default), operations: .absolute(path: "custom")), expectedWithNamespace),
+      (.mock(moduleType: .swiftPackage(apolloSDKDependency: .default), operations: .inSchemaModule), expectedNoNamespace),
       (.mock(moduleType: .other, operations: .relative(subpath: nil)), expectedWithNamespace),
       (.mock(moduleType: .other, operations: .absolute(path: "custom")), expectedWithNamespace),
       (.mock(moduleType: .other, operations: .inSchemaModule), expectedNoNamespace),
@@ -867,7 +867,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
                                documentation: "Field Documentation!")
       ],
       documentation: documentation,
-      config: .mock(.swiftPackageManager, options: .init(schemaDocumentation: .include))
+      config: .mock(.swiftPackage(apolloSDKDependency: .default), options: .init(schemaDocumentation: .include))
     )
 
     let expected = """
@@ -895,7 +895,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
                                documentation: "Field Documentation!")
       ],
       documentation: documentation,
-      config: .mock(.swiftPackageManager, options: .init(schemaDocumentation: .exclude))
+      config: .mock(.swiftPackage(apolloSDKDependency: .default), options: .init(schemaDocumentation: .exclude))
     )
 
     let expected = """
@@ -924,7 +924,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         )
       ],
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackage(apolloSDKDependency: .default),
         options: .init(schemaDocumentation: .include, warningsOnDeprecatedUsage: .include)
       )
     )
@@ -954,7 +954,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         )
       ],
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackage(apolloSDKDependency: .default),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude)
       )
     )
@@ -986,7 +986,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       ],
       documentation: documentation,
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackage(apolloSDKDependency: .default),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .include)
       )
     )
@@ -1019,7 +1019,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       ],
       documentation: documentation,
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackage(apolloSDKDependency: .default),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude)
       )
     )
@@ -1066,7 +1066,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         )
       ],
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackage(apolloSDKDependency: .default),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .include)
       )
     )
@@ -1111,7 +1111,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         )
       ],
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackage(apolloSDKDependency: .default),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude)
       )
     )
@@ -1399,7 +1399,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
 
     buildSubject(
       fields: fields,
-      config: .mock(.swiftPackageManager,
+      config: .mock(.swiftPackage(apolloSDKDependency: .default),
                     options: .init(
                       conversionStrategies: .init(inputObjects: .none)
                     ),

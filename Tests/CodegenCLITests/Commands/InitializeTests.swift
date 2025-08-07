@@ -9,7 +9,7 @@ class InitializeTests: XCTestCase {
   var mockFileManager: MockApolloFileManager!
   let requiredOptions = [
     "--schema-namespace=MockSchema",
-    "--module-type=swiftPackageManager",
+    "--module-type=swiftPackage",
   ]
 
   override func setUp() {
@@ -48,7 +48,7 @@ class InitializeTests: XCTestCase {
     // given
     let options = [
       "--schema-namespace= ",
-      "--module-type=swiftPackageManager",
+      "--module-type=swiftPackage",
     ]
 
     let subject = try self.parse(options)
@@ -61,7 +61,7 @@ class InitializeTests: XCTestCase {
     // given
     let options = [
       "--schema-namespace=\"My Schema\"",
-      "--module-type=swiftPackageManager",
+      "--module-type=swiftPackage",
     ]
 
     let subject = try self.parse(options)
@@ -103,7 +103,7 @@ class InitializeTests: XCTestCase {
     // given
     let options = [
       "--schema-namespace=MySchemaName",
-      "--module-type=swiftPackageManager",
+      "--module-type=swiftPackage",
     ]
 
     // then
@@ -168,7 +168,7 @@ class InitializeTests: XCTestCase {
       expect(data?.asString).to(equal(
         ApolloCodegenConfiguration.minimalJSON(
           schemaNamespace: "MockSchema",
-          moduleType: ModuleTypeExpressibleByArgument.swiftPackageManager,
+          moduleType: ModuleTypeExpressibleByArgument.swiftPackage,
           targetName: nil
         )
       ))
@@ -238,7 +238,7 @@ class InitializeTests: XCTestCase {
       expect(data?.asString).to(equal(
         ApolloCodegenConfiguration.minimalJSON(
           schemaNamespace: "MockSchema",
-          moduleType: ModuleTypeExpressibleByArgument.swiftPackageManager,
+          moduleType: ModuleTypeExpressibleByArgument.swiftPackage,
           targetName: nil
         )
       ))
@@ -271,7 +271,7 @@ class InitializeTests: XCTestCase {
     expect(output).to(equal(
       ApolloCodegenConfiguration.minimalJSON(
         schemaNamespace: "MockSchema",
-        moduleType: ModuleTypeExpressibleByArgument.swiftPackageManager,
+        moduleType: ModuleTypeExpressibleByArgument.swiftPackage,
         targetName: nil
       )
     ))
@@ -297,7 +297,7 @@ class InitializeTests: XCTestCase {
     expect(output).to(equal(
       ApolloCodegenConfiguration.minimalJSON(
         schemaNamespace: "MockSchema",
-        moduleType: ModuleTypeExpressibleByArgument.swiftPackageManager,
+        moduleType: ModuleTypeExpressibleByArgument.swiftPackage,
         targetName: nil
       )
     ))
@@ -309,7 +309,6 @@ class InitializeTests: XCTestCase {
     // given
     let encoded = try ApolloCodegenConfiguration.minimalJSON(
       schemaNamespace: "MockSchema",
-      supportCocoaPods: false,
       moduleType: ModuleTypeExpressibleByArgument.embeddedInTarget,
       targetName: "MyTarget"
     ).asData()
@@ -325,8 +324,7 @@ class InitializeTests: XCTestCase {
     // given
     let encoded = try ApolloCodegenConfiguration.minimalJSON(
       schemaNamespace: "MockSchema",
-      supportCocoaPods: false,
-      moduleType: ModuleTypeExpressibleByArgument.swiftPackageManager,
+      moduleType: ModuleTypeExpressibleByArgument.swiftPackage,
       targetName: nil
     ).asData()
 
@@ -340,7 +338,6 @@ class InitializeTests: XCTestCase {
     // given
     let encoded = try ApolloCodegenConfiguration.minimalJSON(
       schemaNamespace: "MockSchema",
-      supportCocoaPods: false,
       moduleType: ModuleTypeExpressibleByArgument.other,
       targetName: nil
     ).asData()
@@ -349,41 +346,7 @@ class InitializeTests: XCTestCase {
     let decoded = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encoded)
 
     expect(decoded.output.schemaTypes.moduleType).to(equal(.other))
-  }
-
-  // MARK: - minimalJSON Tests
-
-  func test__decoding__givenMinimalJSON_cocoapodsIncompatible_shouldNotThrow() throws {
-    // given
-    let encoded = try ApolloCodegenConfiguration.minimalJSON(
-      schemaNamespace: "MockSchema",
-      supportCocoaPods: false,
-      moduleType: ModuleTypeExpressibleByArgument.swiftPackageManager,
-      targetName: nil
-    ).asData()
-
-    // then
-    var decoded: ApolloCodegenConfiguration?
-    expect(decoded = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encoded))
-      .notTo(throwError())
-    expect(decoded.unsafelyUnwrapped.options.cocoapodsCompatibleImportStatements).to(beFalse())
-  }
-
-  func test__decoding__givenMinimalJSON_cocoapodsCompatible_shouldNotThrow() throws {
-    // given
-    let encoded = try ApolloCodegenConfiguration.minimalJSON(
-      schemaNamespace: "MockSchema",
-      supportCocoaPods: true,
-      moduleType: ModuleTypeExpressibleByArgument.swiftPackageManager,
-      targetName: nil
-    ).asData()
-
-    // then
-    var decoded: ApolloCodegenConfiguration?
-    expect(decoded = try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encoded))
-      .notTo(throwError())
-    expect(decoded.unsafelyUnwrapped.options.cocoapodsCompatibleImportStatements).to(beTrue())
-  }
+  }  
 }
 
 extension Data {

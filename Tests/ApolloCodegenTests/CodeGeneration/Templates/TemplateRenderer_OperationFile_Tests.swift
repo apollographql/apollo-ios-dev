@@ -11,14 +11,12 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
   private func buildConfig(
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType,
     schemaNamespace: String = "testSchema",
-    operations: ApolloCodegenConfiguration.OperationsFileOutput,
-    cocoapodsCompatibleImportStatements: Bool = false
+    operations: ApolloCodegenConfiguration.OperationsFileOutput
   ) -> ApolloCodegenConfiguration {
     ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       input: .init(schemaPath: "MockInputPath", operationSearchPaths: []),
-      output: .mock(moduleType: moduleType, operations: operations),
-      options: .init(cocoapodsCompatibleImportStatements: cocoapodsCompatibleImportStatements)
+      output: .mock(moduleType: moduleType, operations: operations)
     )
   }
 
@@ -149,94 +147,7 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
       // then
       expect(actual).to(equalLineByLine(test.expectation, atLine: 4, ignoringExtraLines: true))
     }
-  }
-
-  func test__renderTargetOperationFile__given_cocoapodsCompatibleImportStatements_true_allSchemaTypesOperationsCombinations_conditionallyIncludeImportStatements() {
-    // given
-    let expectedAPI = """
-    @_exported import Apollo
-
-    """
-
-    let expectedAPIAndSchema = """
-    @_exported import Apollo
-    import TestSchema
-
-    """
-
-    let expectedAPIAndTarget = """
-    @_exported import Apollo
-    import MockApplication
-
-    """
-
-    let tests: [(
-      schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType,
-      operations: ApolloCodegenConfiguration.OperationsFileOutput,
-      expectation: String
-    )] = [
-      (
-        schemaTypes: .swiftPackage(),
-        operations: .relative(subpath: nil),
-        expectation: expectedAPIAndSchema
-      ),
-      (
-        schemaTypes: .swiftPackage(),
-        operations: .absolute(path: "path"),
-        expectation: expectedAPIAndSchema
-      ),
-      (
-        schemaTypes: .swiftPackage(),
-        operations: .inSchemaModule,
-        expectation: expectedAPI
-      ),
-      (
-        schemaTypes: .other,
-        operations: .relative(subpath: nil),
-        expectation: expectedAPIAndSchema
-      ),
-      (
-        schemaTypes: .other,
-        operations: .absolute(path: "path"),
-        expectation: expectedAPIAndSchema
-      ),
-      (
-        schemaTypes: .other,
-        operations: .inSchemaModule,
-        expectation: expectedAPI
-      ),
-      (
-        schemaTypes: .embeddedInTarget(name: "MockApplication"),
-        operations: .relative(subpath: nil),
-        expectation: expectedAPIAndTarget
-      ),
-      (
-        schemaTypes: .embeddedInTarget(name: "MockApplication"),
-        operations: .absolute(path: "path"),
-        expectation: expectedAPIAndTarget
-      ),
-      (
-        schemaTypes: .embeddedInTarget(name: "MockApplication"),
-        operations: .inSchemaModule,
-        expectation: expectedAPI
-      )
-    ]
-
-    for test in tests {
-      let config = buildConfig(
-        moduleType: test.schemaTypes,
-        operations: test.operations,
-        cocoapodsCompatibleImportStatements: true
-      )
-      let subject = buildSubject(config: config)
-
-      // when
-      let (actual, _) = subject.render()
-
-      // then
-      expect(actual).to(equalLineByLine(test.expectation, atLine: 4, ignoringExtraLines: true))
-    }
-  }
+  }  
 
   func test__renderTargetOperationFile__givenAllSchemaTypesOperationsCombinations_conditionallyWrapInNamespace() {
     // given

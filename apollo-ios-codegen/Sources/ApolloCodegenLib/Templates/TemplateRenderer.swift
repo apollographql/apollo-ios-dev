@@ -247,7 +247,6 @@ extension TemplateRenderer {
       (.embeddedInTarget(_, .internal), .member):
         return ApolloCodegenConfiguration.AccessModifier.internal.swiftString
     case
-      (.swiftPackageManager, _),
       (.swiftPackage, _),
       (.other, _):
         return ApolloCodegenConfiguration.AccessModifier.public.swiftString
@@ -333,17 +332,16 @@ struct ImportStatementTemplate {
     static func template(
       for config: ApolloCodegen.ConfigurationContext
     ) -> String {
-      "import \(config.ApolloAPITargetName)"
+      "import \(TemplateConstants.ApolloAPITargetName)"
     }
   }
 
   enum Operation {
     static func template(
       for config: ApolloCodegen.ConfigurationContext
-    ) -> TemplateString {
-      let apolloAPITargetName = config.ApolloAPITargetName
+    ) -> TemplateString {      
       return """
-      @_exported import \(apolloAPITargetName)
+      @_exported import \(TemplateConstants.ApolloAPITargetName)
       \(if: config.output.operations != .inSchemaModule, "import \(config.schemaModuleName)")
       """
     }
@@ -377,7 +375,7 @@ fileprivate extension ApolloCodegenConfiguration {
   var schemaModuleName: String {
     switch output.schemaTypes.moduleType {
     case let .embeddedInTarget(targetName, _): return targetName
-    case .swiftPackageManager, .swiftPackage, .other: return schemaNamespace.firstUppercased
+    case .swiftPackage, .other: return schemaNamespace.firstUppercased
     }
   }
 }
