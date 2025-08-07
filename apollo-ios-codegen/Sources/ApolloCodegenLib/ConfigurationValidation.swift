@@ -35,7 +35,7 @@ extension ApolloCodegen.ConfigurationContext {
 
     if case .swiftPackage = self.output.testMocks {
       switch self.output.schemaTypes.moduleType {
-      case .swiftPackage(_), .swiftPackageManager:
+      case .swiftPackage(_):
         break
       default:
         throw ApolloCodegen.Error.testMocksInvalidSwiftPackageConfiguration
