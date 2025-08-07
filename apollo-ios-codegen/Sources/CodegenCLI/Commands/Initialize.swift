@@ -225,6 +225,6 @@ extension ApolloCodegenConfiguration {
 /// parsed from the command line.
 enum ModuleTypeExpressibleByArgument: String, ExpressibleByArgument, CaseIterable {
   case embeddedInTarget
-  case swiftPackageManager
+  case swiftPackage
   case other
 }
