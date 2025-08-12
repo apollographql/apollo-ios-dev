@@ -10,6 +10,7 @@ fragment NodeFragment on Node {
     id
     ...on Person {
         name
+        goodOrBad
     }
     ...PlanetInfo
 }

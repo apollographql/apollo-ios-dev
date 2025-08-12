@@ -8,31 +8,21 @@ public enum ValidationError: Error {
   case dataIsNil
   case dataCorrupted
 }
-  
-extension String: Validatable {
-  public static func validate(value: String?) throws {
+
+extension AnyScalarType {
+  public static func validate(value: Self?) throws {
     guard let value = value else {
       throw ValidationError.dataIsNil
-    }
-    
-    guard let _ = value as? String else {
-      throw ValidationError.dataCorrupted
     }
   }
 }
 
-extension Int: Validatable {
-  public static func validate(value: Int?) throws {
-    guard let value = value else {
-      throw ValidationError.dataIsNil
-    }
-    
-    guard let _ = value as? Int else {
-      throw ValidationError.dataCorrupted
-    }
-  }
-}
-
+extension String: Validatable {}
+extension Int: Validatable {}
+extension Bool: Validatable {}
+extension Float: Validatable {}
+extension Double: Validatable {}
+extension GraphQLEnum: Validatable {}
 
 extension Optional: Validatable where Wrapped: Validatable {
   public static func validate(value: Wrapped??) throws {
@@ -57,7 +47,7 @@ extension Array: Validatable where Element: Validatable {
   }
 }
 
-extension SelectionSet {
+extension ApolloAPI.SelectionSet {
   public func validate<T: Validatable & SelectionSetEntityValue>(_: T.Type, for key: String) throws {
     let value: T? = self.__data[key]
     try T.validate(value: value)

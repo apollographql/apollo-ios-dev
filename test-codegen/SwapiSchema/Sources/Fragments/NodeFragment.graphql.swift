@@ -5,7 +5,7 @@
 
 public struct NodeFragment: SwapiSchema.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
-    #"fragment NodeFragment on Node { __typename id ... on Person { name } ...PlanetInfo }"#
+    #"fragment NodeFragment on Node { __typename id ... on Person { name goodOrBad } ...PlanetInfo }"#
   }
 
   public let __data: DataDict
@@ -13,8 +13,8 @@ public struct NodeFragment: SwapiSchema.SelectionSet, Fragment {
   public static func validate(value: Self?) throws {
     guard let value else { throw ValidationError.dataIsNil }
     try value.validate(SwapiSchema.ID.self, for: "id")
-    try asPerson?.validate()
-    try asPlanet?.validate()
+    try value.asPerson?.validate()
+    try value.asPlanet?.validate()
   }
 
   public static var __parentType: any ApolloAPI.ParentType { SwapiSchema.Interfaces.Node }
@@ -40,6 +40,7 @@ public struct NodeFragment: SwapiSchema.SelectionSet, Fragment {
     public static func validate(value: Self?) throws {
       guard let value else { throw ValidationError.dataIsNil }
       try value.validate(String?.self, for: "name")
+      try value.validate(GraphQLEnum<SwapiSchema.GoodOrBad>?.self, for: "goodOrBad")
       try value.validate(SwapiSchema.ID.self, for: "id")
     }
 
@@ -47,10 +48,13 @@ public struct NodeFragment: SwapiSchema.SelectionSet, Fragment {
     public static var __parentType: any ApolloAPI.ParentType { SwapiSchema.Objects.Person }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("name", String?.self),
+      .field("goodOrBad", GraphQLEnum<SwapiSchema.GoodOrBad>?.self),
     ] }
 
     /// The name of this person.
     public var name: String? { __data["name"] }
+    /// Whether this is a good person or a bad one
+    public var goodOrBad: GraphQLEnum<SwapiSchema.GoodOrBad>? { __data["goodOrBad"] }
     /// The id of the object.
     public var id: SwapiSchema.ID { __data["id"] }
   }
