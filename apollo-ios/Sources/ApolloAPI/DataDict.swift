@@ -203,7 +203,7 @@ struct StringKey: CodingKey {
     
 }
 
-extension DataDict: @retroactive Encodable {
+extension DataDict: Encodable {
   public func encode(to encoder: any Encoder) throws {
     let keys = _data.keys.sorted()
     var container = encoder.container(keyedBy: StringKey.self)
@@ -217,7 +217,7 @@ extension DataDict: @retroactive Encodable {
 
 extension AnyHashable {
   func encode(in container: inout KeyedEncodingContainer<StringKey>, at key: StringKey) throws {
-    if let encodableValue = self.base as? Encodable {
+    if let encodableValue = self.base as? (any Encodable) {
       try encodableValue.encode(to: container.superEncoder(forKey: key))
     } else if let array = self.base as? [AnyHashable] {
       var arrayContainer = container.nestedUnkeyedContainer(forKey: key)
@@ -233,13 +233,19 @@ extension AnyHashable {
           try arrayContainer.encodeNil()
         }
       }
+    } else if let optional = self.base as? Optional<AnyHashable> {
+      if let value = optional {
+        try value.encode(in: &container, at: key)
+      } else {
+        try container.encodeNil(forKey: key)
+      }
     } else {
       throw EncodingError.invalidValue(self.base, .init(codingPath: container.codingPath, debugDescription: "Unexpected type for encoding: \(type(of: self.base))"))
     }
   }
   
-  func encode(in container: inout UnkeyedEncodingContainer) throws {
-    if let encodableValue = self.base as? Encodable {
+  func encode(in container: inout any UnkeyedEncodingContainer) throws {
+    if let encodableValue = self.base as? (any Encodable) {
       try encodableValue.encode(to: container.superEncoder())
     } else if let array = self.base as? [AnyHashable] {
       var arrayContainer = container.nestedUnkeyedContainer()
@@ -254,6 +260,12 @@ extension AnyHashable {
         } else {
           try arrayContainer.encodeNil()
         }
+      }
+    } else if let optional = self.base as? Optional<AnyHashable> {
+      if let value = optional {
+        try value.encode(in: &container)
+      } else {
+        try container.encodeNil()
       }
     } else {
       throw EncodingError.invalidValue(self.base, .init(codingPath: container.codingPath, debugDescription: "Unexpected type for encoding: \(type(of: self.base))"))

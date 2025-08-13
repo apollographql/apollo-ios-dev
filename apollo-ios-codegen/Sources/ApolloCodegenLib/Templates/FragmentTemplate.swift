@@ -25,7 +25,7 @@ struct FragmentTemplate: TemplateRenderer {
     struct \(fragment.generatedDefinitionName.asFragmentName): \
     \(fragment.renderedSelectionSetType(config)), Fragment\
     \(if: fragment.isIdentifiable, ", Identifiable")\
-    \(if: config.config.output.generateTypeValidation, ", Validatable, Codable")\
+    \(if: config.config.output.generateDecodableTypes, ", Encodable")\
      {
     \(if: includeDefinition, """
       \(accessControlModifier(for: .member))\
@@ -37,7 +37,7 @@ struct FragmentTemplate: TemplateRenderer {
       \(SelectionSetTemplate(
         definition: fragment,
         generateInitializers: config.config.shouldGenerateSelectionSetInitializers(for: fragment),
-        generateTypeValidation: config.config.output.generateTypeValidation,
+        generateDecodableTypes: config.config.output.generateDecodableTypes,
         config: config,
         nonFatalErrorRecorder: nonFatalErrorRecorder,
         renderAccessControl: { accessControlModifier(for: .member) }()

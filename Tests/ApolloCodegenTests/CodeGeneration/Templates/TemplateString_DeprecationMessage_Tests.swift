@@ -273,7 +273,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
     let subject = SelectionSetTemplate(
       definition: operation.irObject,
       generateInitializers: true,
-      generateTypeValidation: false,
+      generateDecodableTypes: false,
       config: config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: { "does not matter" }()
@@ -404,7 +404,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
     let subject = SelectionSetTemplate(
       definition: operation.irObject,
       generateInitializers: true,
-      generateTypeValidation: false,
+      generateDecodableTypes: false,
       config: config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: { "does not matter" }()

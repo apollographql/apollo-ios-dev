@@ -9,7 +9,7 @@ struct SelectionSetTemplate {
 
   let definition: any IR.Definition
   let generateInitializers: Bool
-  let generateTypeValidation: Bool
+  let generateDecodableTypes: Bool
   let config: ApolloCodegen.ConfigurationContext
   let nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   let renderAccessControl: () -> String
@@ -21,14 +21,14 @@ struct SelectionSetTemplate {
   init(
     definition: any IR.Definition,
     generateInitializers: Bool,
-    generateTypeValidation: Bool,
+    generateDecodableTypes: Bool,
     config: ApolloCodegen.ConfigurationContext,
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder,
     renderAccessControl: @autoclosure @escaping () -> String
   ) {
     self.definition = definition
     self.generateInitializers = generateInitializers
-    self.generateTypeValidation = generateTypeValidation
+    self.generateDecodableTypes = generateDecodableTypes
     self.config = config
     self.nonFatalErrorRecorder = nonFatalErrorRecorder
     self.renderAccessControl = renderAccessControl
@@ -107,7 +107,7 @@ struct SelectionSetTemplate {
       \(renderAccessControl())\
       struct \(fieldSelectionSetName): \(SelectionSetType())\
       \(if: selectionSet.isIdentifiable, ", Identifiable")\
-      \(if: config.output.generateTypeValidation, ", Decodable")\
+      \(if: config.output.generateDecodableTypes, ", Encodable")\
        {
         \(BodyTemplate(context))
       }
@@ -125,7 +125,7 @@ struct SelectionSetTemplate {
       struct \(inlineFragment.renderedTypeName): \(SelectionSetType(asInlineFragment: true))\
       \(if: inlineFragment.isCompositeInlineFragment, ", \(config.ApolloAPITargetName).CompositeInlineFragment")\
       \(if: inlineFragment.isIdentifiable, ", Identifiable")\
-      \(if: config.output.generateTypeValidation, ", Validatable, Codable")\
+      \(if: config.output.generateDecodableTypes, ", Encodable")\
        {
         \(BodyTemplate(context))
       }
@@ -176,8 +176,6 @@ struct SelectionSetTemplate {
     return """
       \(DataPropertyTemplate())
       \(DesignatedInitializerTemplate())
-      \(section: "\(if: generateTypeValidation, ValidatorTemplate(selectionSet, inlineFragments: computedChildSelectionSets))")
-      \(section: "\(if: generateTypeValidation, CodableTemplate(selectionSet, inlineFragments: computedChildSelectionSets))")
 
       \(RootEntityTypealias(selectionSet))
       \(ParentTypeTemplate(selectionSet.parentType))
@@ -197,7 +195,7 @@ struct SelectionSetTemplate {
       \(section: ChildTypeCaseSelectionSets(computedChildSelectionSets))
       """
   }
-  
+
   private func DesignatedInitializerTemplate(
     _ propertiesTemplate: @autoclosure () -> TemplateString? = { nil }()
   ) -> String {
@@ -218,82 +216,6 @@ struct SelectionSetTemplate {
       )}
       """
     ).description
-  }
-  
-  private func ValidatorTemplate(_ selectionSet: ComputedSelectionSet, inlineFragments: [SelectionSetContext]) -> TemplateString {
-    let scope = selectionSet.typeInfo.scope
-    return """
-      \(renderAccessControl())static func validate(value: Self?) throws {
-        guard let value else { throw ValidationError.dataIsNil }
-        \(selectionSet.allFields.map { field in
-          """
-          try value.validate(\(typeName(for: field, forceOptional: field.isConditionallyIncluded(in: scope))).self, for: "\(field.responseKey)")
-          """
-      }, separator: "\n")
-        \(inlineFragments.map{ InlineFragmentValidatorTemplate($0.selectionSet) }, separator: "\n")
-      }
-      """
-  }
-  
-  private func InlineFragmentValidatorTemplate(
-    _ inlineFragment: IR.ComputedSelectionSet
-  ) -> TemplateString {
-    guard !inlineFragment.typeInfo.scope.isDeferred else { return "" }
-
-    let typeName = inlineFragment.renderedTypeName
-    return """
-      try value.\(typeName.firstLowercased)?.validate()
-      """
-  }
-  
-  private func CodableTemplate(_ selectionSet: ComputedSelectionSet, inlineFragments: [SelectionSetContext]) -> TemplateString {
-    let scope = selectionSet.typeInfo.scope
-    return """
-      \(renderAccessControl())init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: String.self)
-        __data = DataDict(data: [
-          "__typename": try container.decode(String.self, forKey: "__typename"),
-          \(selectionSet.allFields.map { field in
-          """
-          "\(field.responseKey)": try container.decode(\(typeName(for: field, forceOptional: field.isConditionallyIncluded(in: scope))).self, forKey: "\(field.responseKey)")
-          """
-        }, separator: ",\n")
-        ], fulfilledFragments: [
-          \(inlineFragments.map{ InlineFragmentDecodableTemplate($0.selectionSet) }, separator: ",\n")
-        ])
-      }
-      
-      \(renderAccessControl())func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: String.self)
-        try container.encode(__typename, forKey: "__typename")
-        \(selectionSet.allFields.map { field in
-          """
-          try container.encode(\(field.responseKey.renderAsFieldPropertyName(config: config.config)), forKey: "\(field.responseKey)")
-          """
-        }, separator: "\n")
-        \(inlineFragments.map{ InlineFragmentEncodableTemplate($0.selectionSet) }, separator: "\n")
-      }
-      """
-  }
-  
-  private func InlineFragmentDecodableTemplate(
-    _ inlineFragment: IR.ComputedSelectionSet
-  ) -> TemplateString {
-    guard !inlineFragment.typeInfo.scope.isDeferred else { return "" }
-
-    let typeName = inlineFragment.renderedTypeName
-    return "(try? \(typeName)(from: decoder)) != nil ? ObjectIdentifier(\(typeName).self): nil"
-  }
-  
-  private func InlineFragmentEncodableTemplate(
-    _ inlineFragment: IR.ComputedSelectionSet
-  ) -> TemplateString {
-    guard !inlineFragment.typeInfo.scope.isDeferred else { return "" }
-
-    let typeName = inlineFragment.renderedTypeName
-    return """
-      try self.\(typeName.firstLowercased)?.encode(to: encoder)
-      """
   }
 
   private func DataPropertyTemplate() -> TemplateString {
@@ -1343,16 +1265,5 @@ extension OrderedDictionary<ScopeCondition, InlineFragmentSpread> {
 extension OrderedDictionary<String, NamedFragmentSpread> {
   fileprivate var containsDeferredFragment: Bool {
     values.contains(where: { $0.typeInfo.deferCondition != nil })
-  }
-}
-
-extension ComputedSelectionSet {
-  var allFields: [IR.Field] {
-    var fields: [IR.Field] = []
-    if let directFields = direct?.fields.values {
-      fields.append(contentsOf: directFields)
-    }
-    fields.append(contentsOf: merged.fields.values)
-    return fields
   }
 }
