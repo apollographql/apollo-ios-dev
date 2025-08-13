@@ -36,6 +36,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
         \(SelectionSetTemplate(
             definition: operation,
             generateInitializers: config.config.shouldGenerateSelectionSetInitializers(for: operation),
+            generateTypeValidation: config.config.output.generateTypeValidation,
             config: config,
             nonFatalErrorRecorder: nonFatalErrorRecorder,
             renderAccessControl: { accessControlModifier(for: .member) }()

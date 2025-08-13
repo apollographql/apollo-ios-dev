@@ -369,6 +369,9 @@ type Person implements Node {
   vehicleConnection(after: String, before: String, first: Int, last: Int): PersonVehiclesConnection
   """Whether this is a good person or a bad one"""
   goodOrBad: GoodOrBad
+
+  nestedStringArray: [[[String]]]!
+  nestedPlanetArray: [[[Planet]]]!
 }
 
 """A connection to a list of items."""
@@ -1172,3 +1175,5 @@ enum GoodOrBad {
   GOOD
   BAD
 }
+
+union PersonOrPlanet = Person | Planet

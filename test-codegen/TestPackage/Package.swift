@@ -14,7 +14,8 @@ let package = Package(
     .library(name: "TestPackage", targets: ["TestPackage"]),
   ],
   dependencies: [
-    .package(path: "../SwapiSchema")
+    .package(path: "../SwapiSchema"),
+    .package(path: "../../apollo-ios"),
   ],
   targets: [
     .target(
@@ -24,5 +25,13 @@ let package = Package(
       ],
       path: "./Sources"
     ),
+    .testTarget(name: "TestPackageTests",
+      dependencies: [
+        "TestPackage",
+        .product(name: "SwapiSchema", package: "SwapiSchema"),
+        .product(name: "ApolloAPI", package: "apollo-ios"),
+        .product(name: "Apollo", package: "apollo-ios"),
+      ],
+    path: "./Tests")
   ]
 )

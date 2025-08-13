@@ -68,7 +68,7 @@ public struct DataDict: Hashable {
     get {
       if DataDict._AnyHashableCanBeCoerced {
         return _data[key] as! T
-      } else {        
+      } else {
         let value = _data[key]
         if value == DataDict._NullValue {
           return (Optional<T>.none as Any) as! T
@@ -182,6 +182,85 @@ extension DataDict {
   }()
 
 }
+
+// MARK: - Encodable
+struct StringKey: CodingKey {
+  let stringValue: String
+  
+  init?(stringValue: String) {
+    self.stringValue = stringValue
+  }
+  
+  init(_ key: String) {
+    self.stringValue = key
+  }
+  
+  var intValue: Int? { nil }
+  
+  init?(intValue: Int) {
+    nil
+  }
+    
+}
+
+extension DataDict: @retroactive Encodable {
+  public func encode(to encoder: any Encoder) throws {
+    let keys = _data.keys.sorted()
+    var container = encoder.container(keyedBy: StringKey.self)
+    for key in keys {
+      if let value = _data[key] {
+        try value.encode(in: &container, at: StringKey(key))
+      }
+    }
+  }
+}
+
+extension AnyHashable {
+  func encode(in container: inout KeyedEncodingContainer<StringKey>, at key: StringKey) throws {
+    if let encodableValue = self.base as? Encodable {
+      try encodableValue.encode(to: container.superEncoder(forKey: key))
+    } else if let array = self.base as? [AnyHashable] {
+      var arrayContainer = container.nestedUnkeyedContainer(forKey: key)
+      for item in array {
+        try item.encode(in: &arrayContainer)
+      }
+    } else if let array = self.base as? [AnyHashable?] {
+      var arrayContainer = container.nestedUnkeyedContainer(forKey: key)
+      for item in array {
+        if let item = item {
+          try item.encode(in: &arrayContainer)
+        } else {
+          try arrayContainer.encodeNil()
+        }
+      }
+    } else {
+      throw EncodingError.invalidValue(self.base, .init(codingPath: container.codingPath, debugDescription: "Unexpected type for encoding: \(type(of: self.base))"))
+    }
+  }
+  
+  func encode(in container: inout UnkeyedEncodingContainer) throws {
+    if let encodableValue = self.base as? Encodable {
+      try encodableValue.encode(to: container.superEncoder())
+    } else if let array = self.base as? [AnyHashable] {
+      var arrayContainer = container.nestedUnkeyedContainer()
+      for item in array {
+        try item.encode(in: &arrayContainer)
+      }
+    } else if let array = self.base as? [AnyHashable?] {
+      var arrayContainer = container.nestedUnkeyedContainer()
+      for item in array {
+        if let item = item {
+          try item.encode(in: &arrayContainer)
+        } else {
+          try arrayContainer.encodeNil()
+        }
+      }
+    } else {
+      throw EncodingError.invalidValue(self.base, .init(codingPath: container.codingPath, debugDescription: "Unexpected type for encoding: \(type(of: self.base))"))
+    }
+  }
+}
+
 
 // MARK: - Value Conversion Helpers
 

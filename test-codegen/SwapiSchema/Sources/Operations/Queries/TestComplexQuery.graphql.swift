@@ -42,6 +42,20 @@ public class TestComplexQuery: GraphQLQuery {
       guard let value else { throw ValidationError.dataIsNil }
       try value.validate(AllFilms?.self, for: "allFilms")
     }
+    public init(from decoder: Decoder) throws {
+      let container = try decoder.container(keyedBy: String.self)
+      __data = DataDict(data: [
+        "__typename": try container.decode(String.self, forKey: "__typename"),
+        "allFilms": try container.decode(AllFilms?.self, forKey: "allFilms")
+      ], fulfilledFragments: [
+      ])
+    }
+
+    public func encode(to encoder: Encoder) throws {
+      var container = encoder.container(keyedBy: String.self)
+      try container.encode(__typename, forKey: "__typename")
+      try container.encode(allFilms, forKey: "allFilms")
+    }
 
     public static var __parentType: any ApolloAPI.ParentType { SwapiSchema.Objects.Root }
     public static var __selections: [ApolloAPI.Selection] { [
@@ -58,12 +72,26 @@ public class TestComplexQuery: GraphQLQuery {
     /// AllFilms
     ///
     /// Parent Type: `FilmsConnection`
-    public struct AllFilms: SwapiSchema.SelectionSet, Validatable {
+    public struct AllFilms: SwapiSchema.SelectionSet, Validatable, Codable {
       public let __data: DataDict
       public init(_dataDict: DataDict) { __data = _dataDict }
       public static func validate(value: Self?) throws {
         guard let value else { throw ValidationError.dataIsNil }
         try value.validate([Film?]?.self, for: "films")
+      }
+      public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: String.self)
+        __data = DataDict(data: [
+          "__typename": try container.decode(String.self, forKey: "__typename"),
+          "films": try container.decode([Film?]?.self, forKey: "films")
+        ], fulfilledFragments: [
+        ])
+      }
+
+      public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: String.self)
+        try container.encode(__typename, forKey: "__typename")
+        try container.encode(films, forKey: "films")
       }
 
       public static var __parentType: any ApolloAPI.ParentType { SwapiSchema.Objects.FilmsConnection }
@@ -83,13 +111,29 @@ public class TestComplexQuery: GraphQLQuery {
       /// AllFilms.Film
       ///
       /// Parent Type: `Film`
-      public struct Film: SwapiSchema.SelectionSet, Validatable {
+      public struct Film: SwapiSchema.SelectionSet, Validatable, Codable {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
         public static func validate(value: Self?) throws {
           guard let value else { throw ValidationError.dataIsNil }
           try value.validate(String?.self, for: "director")
           try value.validate(Int?.self, for: "episodeID")
+        }
+        public init(from decoder: Decoder) throws {
+          let container = try decoder.container(keyedBy: String.self)
+          __data = DataDict(data: [
+            "__typename": try container.decode(String.self, forKey: "__typename"),
+            "director": try container.decode(String?.self, forKey: "director"),
+            "episodeID": try container.decode(Int?.self, forKey: "episodeID")
+          ], fulfilledFragments: [
+          ])
+        }
+
+        public func encode(to encoder: Encoder) throws {
+          var container = encoder.container(keyedBy: String.self)
+          try container.encode(__typename, forKey: "__typename")
+          try container.encode(director, forKey: "director")
+          try container.encode(episodeID, forKey: "episodeID")
         }
 
         public static var __parentType: any ApolloAPI.ParentType { SwapiSchema.Objects.Film }

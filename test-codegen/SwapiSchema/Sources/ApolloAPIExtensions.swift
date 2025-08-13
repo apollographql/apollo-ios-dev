@@ -11,7 +11,7 @@ public enum ValidationError: Error {
 
 extension AnyScalarType {
   public static func validate(value: Self?) throws {
-    guard let value = value else {
+    guard value != nil else {
       throw ValidationError.dataIsNil
     }
   }
@@ -61,5 +61,42 @@ extension ApolloAPI.SelectionSet {
 extension Validatable {
   public func validate() throws {
     try Self.validate(value: self)
+  }
+}
+
+// MARK - Codable
+
+//extension String: @retroactive CodingKey {
+//  public var stringValue: String {
+//    self
+//  }
+//  public var intValue: Int? {
+//    nil
+//  }
+//  public init?(intValue: Int) {
+//    nil
+//  }
+//  public init?(stringValue: String) {
+//    self = stringValue
+//  }
+//}
+
+extension GraphQLEnum: Codable {
+  
+}
+
+extension DataDict {
+  public init(
+    data: [String: AnyHashable],
+    fulfilledFragments: [ObjectIdentifier?],
+    deferredFragments: [ObjectIdentifier?] = []
+  ) {
+    self.init(data: data, fulfilledFragments: Set(fulfilledFragments.compactMap { $0 }), deferredFragments: Set(deferredFragments.compactMap { $0 }))
+  }
+}
+
+extension ApolloAPI.SelectionSet {
+  public func encode(to encoder: Encoder) throws {
+    try self.__data.encode(to: encoder)
   }
 }

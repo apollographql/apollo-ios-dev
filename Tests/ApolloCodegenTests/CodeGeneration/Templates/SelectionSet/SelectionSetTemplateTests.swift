@@ -58,6 +58,7 @@ class SelectionSetTemplateTests: XCTestCase {
     subject = SelectionSetTemplate(
       definition: self.operation.irObject,
       generateInitializers: false,
+      generateTypeValidation: false,
       config: config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
@@ -3333,6 +3334,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let fragmentSubject = SelectionSetTemplate(
       definition: allAnimals_animalFragment.fragment,
       generateInitializers: false,
+      generateTypeValidation: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()
@@ -3411,6 +3413,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let fragmentSubject = SelectionSetTemplate(
       definition: allAnimals_asDog_animalFragment.fragment,
       generateInitializers: false,
+      generateTypeValidation: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()
@@ -3499,6 +3502,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let fragmentSubject = SelectionSetTemplate(
       definition: allAnimals_asDog_animalFragment.fragment,
       generateInitializers: false,
+      generateTypeValidation: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()
@@ -3587,6 +3591,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let fragmentSubject = SelectionSetTemplate(
       definition: allAnimals_asDog_animalFragment.fragment,
       generateInitializers: false,
+      generateTypeValidation: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()
@@ -3675,6 +3680,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let fragmentSubject = SelectionSetTemplate(
       definition: allAnimals_asDog_animalFragment.fragment,
       generateInitializers: false,
+      generateTypeValidation: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()
@@ -3768,6 +3774,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let fragmentSubject = SelectionSetTemplate(
       definition: allAnimals_asDog_animalFragment.fragment,
       generateInitializers: false,
+      generateTypeValidation: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()
@@ -3867,6 +3874,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let basicFragmentSubject = SelectionSetTemplate(
       definition: allAnimals_basicFragment.fragment,
       generateInitializers: false,
+      generateTypeValidation: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()
@@ -3959,6 +3967,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let fragmentSubject = SelectionSetTemplate(
       definition: allAnimals_animalFragment.fragment,
       generateInitializers: false,
+      generateTypeValidation: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()
@@ -4051,6 +4060,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let fragmentSubject = SelectionSetTemplate(
       definition: allAnimals_animalFragment.fragment,
       generateInitializers: false,
+      generateTypeValidation: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()
@@ -9684,6 +9694,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let fragmentSubject = SelectionSetTemplate(
       definition: allAnimals_asDog_animalFragment.fragment,
       generateInitializers: false,
+      generateTypeValidation: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()
@@ -9769,6 +9780,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let fragmentSubject = SelectionSetTemplate(
       definition: allAnimals_animalFragment.fragment,
       generateInitializers: false,
+      generateTypeValidation: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()
@@ -11940,6 +11952,7 @@ class SelectionSetTemplateTests: XCTestCase {
     let fragmentTemplate = SelectionSetTemplate(
       definition: detailsFragment.fragment,
       generateInitializers: false,
+      generateTypeValidation: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: self.subject.renderAccessControl()

@@ -16,7 +16,7 @@
     "schemaTypes" : {
       "path" : "./SwapiSchema",
       "moduleType" : {
-        "swiftPackageManager" : {
+        "swiftPackage" : {
         }
       }
     },
