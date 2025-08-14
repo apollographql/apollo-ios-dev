@@ -36,7 +36,7 @@ input MeasurementsInput {
 }
 
 input PetSearchFilters {
-  species: [String!]!
+  species: [String]
   size: RelativeSize
   measurements: MeasurementsInput
 }

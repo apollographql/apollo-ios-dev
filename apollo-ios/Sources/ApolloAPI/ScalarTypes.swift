@@ -18,7 +18,9 @@ public protocol AnyScalarType: Sendable, Hashable, JSONEncodable {}
 public protocol ScalarType:
   AnyScalarType,
   JSONDecodable,
-  GraphQLOperationVariableValue {}
+  GraphQLOperationVariableValue,
+  GraphQLOperationVariableListElement
+{}
 
 extension String: ScalarType {}
 extension Int32: ScalarType {}
@@ -39,7 +41,8 @@ public protocol CustomScalarType:
   AnyScalarType,
   JSONDecodable,
   OutputTypeConvertible,
-  GraphQLOperationVariableValue
+  GraphQLOperationVariableValue,
+  GraphQLOperationVariableListElement
 {}
 
 extension CustomScalarType {
