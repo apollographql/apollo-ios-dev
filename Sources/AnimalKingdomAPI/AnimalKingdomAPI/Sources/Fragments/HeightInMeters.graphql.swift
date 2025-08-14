@@ -44,13 +44,13 @@ public struct HeightInMeters: AnimalKingdomAPI.SelectionSet, Fragment {
     public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("__typename", String.self),
-      .field("meters", Int32.self),
+      .field("meters", Int.self),
     ] }
 
-    public var meters: Int32 { __data["meters"] }
+    public var meters: Int { __data["meters"] }
 
     public init(
-      meters: Int32
+      meters: Int
     ) {
       self.init(_dataDict: DataDict(
         data: [

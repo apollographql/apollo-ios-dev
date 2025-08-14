@@ -10,7 +10,7 @@ public final class Bird: MockObject {
   public typealias MockValueCollectionType = Array<Mock<Bird>>
 
   public struct MockFields: Sendable {
-    @Field<Int32>("bodyTemperature") public var bodyTemperature
+    @Field<Int>("bodyTemperature") public var bodyTemperature
     @Field<String>("favoriteToy") public var favoriteToy
     @Field<Height>("height") public var height
     @Field<String>("humanName") public var humanName
@@ -26,7 +26,7 @@ public final class Bird: MockObject {
 
 public extension Mock where O == Bird {
   convenience init(
-    bodyTemperature: Int32 = 0,
+    bodyTemperature: Int = 0,
     favoriteToy: String = "",
     height: Mock<Height> = Mock<Height>(),
     humanName: String? = nil,

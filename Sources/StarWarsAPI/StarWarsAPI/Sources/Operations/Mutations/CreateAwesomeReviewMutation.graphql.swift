@@ -54,17 +54,17 @@ public struct CreateAwesomeReviewMutation: GraphQLMutation {
       public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
-        .field("stars", Int32.self),
+        .field("stars", Int.self),
         .field("commentary", String?.self),
       ] }
 
       /// The number of stars this review gave, 1-5
-      public var stars: Int32 { __data["stars"] }
+      public var stars: Int { __data["stars"] }
       /// Comment about the movie
       public var commentary: String? { __data["commentary"] }
 
       public init(
-        stars: Int32,
+        stars: Int,
         commentary: String? = nil
       ) {
         self.init(_dataDict: DataDict(
