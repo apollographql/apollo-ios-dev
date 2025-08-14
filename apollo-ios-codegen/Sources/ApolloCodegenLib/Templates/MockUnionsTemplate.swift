@@ -17,7 +17,7 @@ struct MockUnionsTemplate: TemplateRenderer {
     TemplateString("""
     \(accessControlModifier(for: .parent))extension MockObject {
       \(graphqlUnions.map {
-      "typealias \($0.render(as: .typename)) = Union"
+      "typealias \($0.render(as: .typename())) = Union"
       }, separator: "\n")
     }
     
