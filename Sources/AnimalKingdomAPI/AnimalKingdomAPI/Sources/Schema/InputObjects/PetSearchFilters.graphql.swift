@@ -11,7 +11,7 @@ public struct PetSearchFilters: InputObject {
   }
 
   public init(
-    species: [String],
+    species: GraphQLNullable<[String?]> = nil,
     size: GraphQLNullable<GraphQLEnum<RelativeSize>> = nil,
     measurements: GraphQLNullable<MeasurementsInput> = nil
   ) {
@@ -22,7 +22,7 @@ public struct PetSearchFilters: InputObject {
     ])
   }
 
-  public var species: [String] {
+  public var species: GraphQLNullable<[String?]> {
     get { __data["species"] }
     set { __data["species"] = newValue }
   }
