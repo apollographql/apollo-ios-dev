@@ -229,7 +229,7 @@ public struct ClassroomPetsQuery: GraphQLQuery {
         public var species: String { __data["species"] }
         public var humanName: String? { __data["humanName"] }
         public var laysEggs: Bool { __data["laysEggs"] }
-        public var bodyTemperature: Int32 { __data["bodyTemperature"] }
+        public var bodyTemperature: Int { __data["bodyTemperature"] }
         public var isJellicle: Bool { __data["isJellicle"] }
 
         public struct Fragments: FragmentContainer {
@@ -243,7 +243,7 @@ public struct ClassroomPetsQuery: GraphQLQuery {
           species: String,
           humanName: String? = nil,
           laysEggs: Bool,
-          bodyTemperature: Int32,
+          bodyTemperature: Int,
           isJellicle: Bool
         ) {
           self.init(_dataDict: DataDict(

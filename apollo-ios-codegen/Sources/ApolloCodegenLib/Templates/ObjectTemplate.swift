@@ -18,7 +18,7 @@ struct ObjectTemplate: TemplateRenderer {
     """
     \(documentation: graphqlObject.documentation, config: config)
     \(graphqlObject.name.typeNameDocumentation)
-    static let \(graphqlObject.render(as: .typename)) = \(TemplateConstants.ApolloAPITargetName).Object(
+    static let \(graphqlObject.render(as: .typename())) = \(TemplateConstants.ApolloAPITargetName).Object(
       typename: "\(graphqlObject.name.schemaName)\",
       implementedInterfaces: \(ImplementedInterfacesTemplate()),
       keyFields: \(KeyFieldsTemplate())
@@ -39,7 +39,7 @@ struct ObjectTemplate: TemplateRenderer {
     [\(list: graphqlObject.interfaces.map({ interface in
           TemplateString("""
           \(if: !config.output.schemaTypes.isInModule, "\(config.schemaNamespace.firstUppercased).")\
-          Interfaces.\(interface.render(as: .typename)).self
+          Interfaces.\(interface.render(as: .typename())).self
           """)
       }))]
     """

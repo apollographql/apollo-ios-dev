@@ -52,7 +52,7 @@ final class ApolloClientOperationTests: XCTestCase {
       override class var __selections: [Selection] {
         [
           .field("__typename", String.self),
-          .field("stars", Int32.self),
+          .field("stars", Int.self),
           .field("commentary", String?.self),
         ]
       }
