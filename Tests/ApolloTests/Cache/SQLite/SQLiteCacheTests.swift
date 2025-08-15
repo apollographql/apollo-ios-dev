@@ -21,7 +21,7 @@ class SQLiteReadWriteFromStoreTests: ReadWriteFromStoreTests {
   }
 }
 
-class SQLiteWatchQueryTests: WatchQueryTests {
+class SQLiteWatchQueryTests: WatchQueryTests, @unchecked Sendable {
   override var cacheType: any TestCacheProvider.Type {
     SQLiteTestCacheProvider.self
   }

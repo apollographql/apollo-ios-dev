@@ -6,9 +6,9 @@ import Nimble
 
 class DataDictMergingTests: XCTestCase {
 
-  class Data: MockSelectionSet {
-    class Animal: MockSelectionSet {
-      class Predator: MockSelectionSet { }
+  class Data: MockSelectionSet, @unchecked Sendable {
+    class Animal: MockSelectionSet, @unchecked Sendable {
+      class Predator: MockSelectionSet, @unchecked Sendable { }
     }
   }
 
