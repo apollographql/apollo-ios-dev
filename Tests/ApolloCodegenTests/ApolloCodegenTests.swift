@@ -2877,7 +2877,7 @@ class ApolloCodegenTests: XCTestCase {
                 init(
                   allAnimals: [AllAnimal]? = nil
                 ) {
-          """, atLine: 26, ignoringExtraLines: true))
+          """, atLine: 1, inSection: .selectionSet.initializer, ignoringExtraLines: true))
 
         expectation.fulfill()
       }
@@ -2961,7 +2961,7 @@ class ApolloCodegenTests: XCTestCase {
                 __typename: String,
                 species: String? = nil
               ) {
-          """, atLine: 26, ignoringExtraLines: true))
+          """, atLine: 29, ignoringExtraLines: true))
 
         expectation.fulfill()
       }

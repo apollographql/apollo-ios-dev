@@ -41,7 +41,8 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
             renderAccessControl: { accessControlModifier(for: .member) }()
         ).renderBody())
       }
-      \(DeferredFragmentsMetadataTemplate(
+    
+      \(section: DeferredFragmentsMetadataTemplate(
         operation: operation,
         config: config,
         renderAccessControl: { accessControlModifier(for: .parent) }()

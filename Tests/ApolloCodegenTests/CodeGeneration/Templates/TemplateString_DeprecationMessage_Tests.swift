@@ -289,7 +289,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
 
     let actual = subject.test_render(childEntity: animal.computed)
 
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
   func test__inputField_givenSDLDeprecationMessageWithDoubleQuotes_shouldEscapeDoubleQuotes() async throws {
