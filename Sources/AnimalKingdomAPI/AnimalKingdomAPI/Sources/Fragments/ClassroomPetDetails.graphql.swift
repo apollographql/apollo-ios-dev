@@ -152,18 +152,18 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
     public typealias RootEntityType = ClassroomPetDetails
     public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Cat }
     public static var __selections: [ApolloAPI.Selection] { [
-      .field("bodyTemperature", Int32.self),
+      .field("bodyTemperature", Int.self),
       .field("isJellicle", Bool.self),
     ] }
 
-    public var bodyTemperature: Int32 { __data["bodyTemperature"] }
+    public var bodyTemperature: Int { __data["bodyTemperature"] }
     public var isJellicle: Bool { __data["isJellicle"] }
     public var species: String { __data["species"] }
     public var humanName: String? { __data["humanName"] }
     public var laysEggs: Bool { __data["laysEggs"] }
 
     public init(
-      bodyTemperature: Int32,
+      bodyTemperature: Int,
       isJellicle: Bool,
       species: String,
       humanName: String? = nil,

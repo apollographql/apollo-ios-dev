@@ -11,7 +11,7 @@ public final class Dog: MockObject {
 
   public struct MockFields: Sendable {
     @Field<AnimalKingdomAPI.CustomDate>("birthdate") public var birthdate
-    @Field<Int32>("bodyTemperature") public var bodyTemperature
+    @Field<Int>("bodyTemperature") public var bodyTemperature
     @Field<String>("favoriteToy") public var favoriteToy
     @Field<Height>("height") public var height
     @Field<AnimalKingdomAPI.Object>("houseDetails") public var houseDetails
@@ -28,7 +28,7 @@ public final class Dog: MockObject {
 public extension Mock where O == Dog {
   convenience init(
     birthdate: AnimalKingdomAPI.CustomDate? = nil,
-    bodyTemperature: Int32 = 0,
+    bodyTemperature: Int = 0,
     favoriteToy: String = "",
     height: Mock<Height> = Mock<Height>(),
     houseDetails: AnimalKingdomAPI.Object? = nil,

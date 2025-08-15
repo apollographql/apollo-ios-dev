@@ -31,7 +31,7 @@ enum Mocks {
         class FriendsConnection: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
-            .field("totalCount", Int32.self),
+            .field("totalCount", Int.self),
             .field("friends", [Character].self),
             .field("pageInfo", PageInfo.self),
           ]}
@@ -93,7 +93,7 @@ enum Mocks {
         class FriendsConnection: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
-            .field("totalCount", Int32.self),
+            .field("totalCount", Int.self),
             .field("friends", [Character].self),
             .field("pageInfo", PageInfo.self),
           ]}
@@ -151,7 +151,7 @@ enum Mocks {
         class FriendsConnection: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
-            .field("totalCount", Int32.self),
+            .field("totalCount", Int.self),
             .field("friends", [Character].self),
             .field("pageInfo", PageInfo.self),
           ]}
