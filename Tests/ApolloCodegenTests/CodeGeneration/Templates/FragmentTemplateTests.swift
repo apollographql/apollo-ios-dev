@@ -315,6 +315,9 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
         init(_dataDict: DataDict) { __data = _dataDict }
 
         static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
+        static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          TestFragment.self
+        ] }
       }
 
       """
@@ -351,6 +354,9 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
         static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
+        ] }
+        static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          TestFragment.self
         ] }
       }
 

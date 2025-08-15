@@ -178,7 +178,7 @@ struct SelectionSetTemplate {
       \(if: selectionSet.isCompositeInlineFragment, MergedSourcesTemplate(selectionSet.merged.mergedSources))
       \(FulfilledFragmentsMetadataTemplate(selectionSet))
       \(DeferredFragmentsMetadataTemplate(selectionSet))
-
+      
       \(section: FieldAccessorsTemplate(selectionSet))
 
       \(section: InlineFragmentAccessorsTemplate(computedChildSelectionSets))
@@ -466,7 +466,7 @@ struct SelectionSetTemplate {
     }
 
     return """
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      \(renderAccessControl())static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         \(fulfilledFragments.map { "\($0).self" })
       ] }
       """
