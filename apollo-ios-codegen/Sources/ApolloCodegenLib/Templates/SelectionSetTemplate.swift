@@ -499,7 +499,7 @@ struct SelectionSetTemplate {
     if deferredFragments.isEmpty { return nil }
 
     return """
-      public static var __deferredFragments: [any ApolloAPI.Deferred.Type] { [
+      public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
         \(deferredFragments.map { "\($0).self" })
       ] }
       """
