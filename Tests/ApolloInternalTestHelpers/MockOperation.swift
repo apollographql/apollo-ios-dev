@@ -1,4 +1,4 @@
-import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 import Foundation
 
 open class MockQuery<SelectionSet: RootSelectionSet>: GraphQLQuery, @unchecked Sendable {
@@ -84,8 +84,10 @@ open class AbstractMockSelectionSet<F, S: SchemaMetadata>: RootSelectionSet, Has
   open class var __parentType: any ParentType { Object.mock }
   open class var __fulfilledFragments: [any SelectionSet.Type] { [] }
 
+  @_spi(Unsafe)
   public var __data: DataDict = .empty()
 
+  @_spi(Unsafe)
   public required init(_dataDict: DataDict) {
     self.__data = _dataDict
   }

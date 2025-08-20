@@ -342,6 +342,7 @@ struct ImportStatementTemplate {
     ) -> TemplateString {      
       return """
       @_exported import \(TemplateConstants.ApolloAPITargetName)
+      @_spi(Unsafe) import \(TemplateConstants.ApolloAPITargetName)
       \(if: config.output.operations != .inSchemaModule, "import \(config.schemaModuleName)")
       """
     }

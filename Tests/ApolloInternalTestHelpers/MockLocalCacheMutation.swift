@@ -1,5 +1,5 @@
 import Foundation
-import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 open class MockLocalCacheMutation<SelectionSet: MutableRootSelectionSet>: LocalCacheMutation, @unchecked Sendable {
   open class var operationType: GraphQLOperationType { .query }

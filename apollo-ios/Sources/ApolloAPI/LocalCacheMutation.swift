@@ -24,18 +24,19 @@ public extension LocalCacheMutation {
 }
 
 public protocol MutableSelectionSet: SelectionSet {
+  @_spi(Unsafe)
   var __data: DataDict { get set }
 }
 
 public extension MutableSelectionSet {
-  @inlinable var __typename: String? {
+  var __typename: String? {
     get { __data["__typename"] }
     set { __data["__typename"] = newValue }
   }
 }
 
 public extension MutableSelectionSet where Fragments: FragmentContainer {
-  @inlinable var fragments: Fragments {
+  var fragments: Fragments {
     get { Self.Fragments(_dataDict: __data) }
     _modify {
       var f = Self.Fragments(_dataDict: __data)
