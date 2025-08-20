@@ -96,8 +96,12 @@ public protocol SelectionSet: Sendable, Hashable, CustomDebugStringConvertible {
 
 extension SelectionSet {  
 
-  @inlinable public static var __selections: [Selection] { [] }
+  public var __typename: String? { __data["__typename"] }
 
+  @_spi(Execution)
+  public static var __selections: [Selection] { [] }
+
+  @_spi(Execution)
   @inlinable public static var __deferredFragments: [any Deferrable.Type] { [] }
 
   @_spi(Execution)
@@ -105,8 +109,6 @@ extension SelectionSet {
     guard let __typename else { return nil }
     return Schema.objectType(forTypename: __typename)
   }
-
-  public var __typename: String? { __data["__typename"] }
 
   /// Verifies if a `SelectionSet` may be converted to an `InlineFragment` and performs
   /// the conversion.

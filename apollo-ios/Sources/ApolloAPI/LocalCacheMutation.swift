@@ -1,12 +1,14 @@
 public protocol LocalCacheMutation: Hashable, Sendable {
   static var operationType: GraphQLOperationType { get }
 
+  @_spi(Unsafe)
   var __variables: GraphQLOperation.Variables? { get }
 
   associatedtype Data: MutableRootSelectionSet
 }
 
 public extension LocalCacheMutation {
+  @_spi(Unsafe)
   var __variables: GraphQLOperation.Variables? {
     return nil
   }

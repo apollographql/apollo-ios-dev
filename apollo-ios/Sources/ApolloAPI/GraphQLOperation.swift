@@ -55,6 +55,7 @@ public struct OperationDefinition: Sendable {
 
 /// A unique identifier used as a key to map a deferred selection set type to an incremental
 /// response label and path.
+@_spi(Execution)
 public struct DeferredFragmentIdentifier: Sendable, Hashable {
   public let label: String
   public let fieldPath: [String]
@@ -161,8 +162,10 @@ public struct SingleResponseFormat: OperationResponseFormat {}
 
 /// An incremental response format for an operation which uses the `@defer` directive.
 public struct IncrementalDeferredResponseFormat: OperationResponseFormat {
+  @_spi(Execution)
   public let deferredFragments: [DeferredFragmentIdentifier: any SelectionSet.Type]
 
+  @_spi(Execution)
   public init(deferredFragments: [DeferredFragmentIdentifier: any SelectionSet.Type]) {
     self.deferredFragments = deferredFragments
   }

@@ -43,12 +43,6 @@ public protocol CustomScalarType:
   GraphQLOperationVariableValue
 {}
 
-extension CustomScalarType {
-  @inlinable public static var _asOutputType: Selection.Field.OutputType {
-    .nonNull(.customScalar(self))
-  }
-}
-
 extension Array: AnyScalarType where Array.Element: AnyScalarType & Hashable {}
 
 extension Optional: AnyScalarType where Wrapped: AnyScalarType & Hashable {}

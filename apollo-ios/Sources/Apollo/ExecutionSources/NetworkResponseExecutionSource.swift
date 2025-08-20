@@ -1,4 +1,4 @@
-@_spi(Internal) import ApolloAPI
+@_spi(Internal) @_spi(Execution) import ApolloAPI
 
 /// A `GraphQLExecutionSource` configured to execute upon the JSON data from the network response
 /// for a GraphQL operation.

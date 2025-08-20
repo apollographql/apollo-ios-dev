@@ -1,4 +1,4 @@
-@_spi(Internal) @_spi(Unsafe) import ApolloAPI
+@_spi(Internal) @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 /// A `GraphQLExecutionSource` designed for use when the data source is a generated model's
 /// `SelectionSet` data.
