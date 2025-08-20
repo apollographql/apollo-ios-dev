@@ -1,7 +1,7 @@
 import XCTest
 @testable @_spi(Execution) import Apollo
-@_spi(Unsafe) import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 import Nimble
 
 fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal>, @unchecked Sendable {

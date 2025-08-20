@@ -1,4 +1,4 @@
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 import Foundation
 
 open class MockQuery<SelectionSet: RootSelectionSet>: GraphQLQuery, @unchecked Sendable {
@@ -13,7 +13,7 @@ open class MockQuery<SelectionSet: RootSelectionSet>: GraphQLQuery, @unchecked S
     .init(definition: .init("Mock Operation Definition"))
   }
 
-  open var __variables: Variables?
+  @_spi(Execution) open var __variables: Variables?
 
   public init() {}
 
@@ -80,9 +80,9 @@ open class AbstractMockSelectionSet<F, S: SchemaMetadata>: RootSelectionSet, Has
   public typealias Schema = S
   public typealias Fragments = F
 
-  open class var __selections: [Selection] { [] }
-  open class var __parentType: any ParentType { Object.mock }
-  open class var __fulfilledFragments: [any SelectionSet.Type] { [] }
+  @_spi(Execution) open class var __selections: [Selection] { [] }
+  @_spi(Execution) open class var __parentType: any ParentType { Object.mock }
+  @_spi(Execution) open class var __fulfilledFragments: [any SelectionSet.Type] { [] }
 
   @_spi(Unsafe)
   public var __data: DataDict = .empty()

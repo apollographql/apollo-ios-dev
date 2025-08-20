@@ -1,5 +1,5 @@
 import Foundation
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 open class MockLocalCacheMutation<SelectionSet: MutableRootSelectionSet>: LocalCacheMutation, @unchecked Sendable {
   open class var operationType: GraphQLOperationType { .query }
@@ -26,8 +26,8 @@ public protocol MockMutableRootSelectionSet: MutableRootSelectionSet
 where Schema == MockSchemaMetadata {}
 
 public extension MockMutableRootSelectionSet {
-  static var __parentType: any ParentType { Object.mock }
-  static var __fulfilledFragments: [any SelectionSet.Type] { [] }
+  @_spi(Execution) static var __parentType: any ParentType { Object.mock }
+  @_spi(Execution) static var __fulfilledFragments: [any SelectionSet.Type] { [] }
 
   init() {
     self.init(_dataDict: DataDict(

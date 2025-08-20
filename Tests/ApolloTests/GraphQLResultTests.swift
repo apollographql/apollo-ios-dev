@@ -1,7 +1,7 @@
 import XCTest
 @testable import Apollo
-@_spi(Unsafe) @_spi(Internal) import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) @_spi(Unsafe) @_spi(Internal) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 
 final class GraphQLResultTests: XCTestCase {
 

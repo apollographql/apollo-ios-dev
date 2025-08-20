@@ -1,5 +1,5 @@
-@_spi(Unsafe) import ApolloAPI
-@_spi(Unsafe) import ApolloInternalTestHelpers
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloInternalTestHelpers
 import Nimble
 import XCTest
 

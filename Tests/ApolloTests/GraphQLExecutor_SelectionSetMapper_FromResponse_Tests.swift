@@ -1,8 +1,8 @@
 import XCTest
 import Nimble
 @_spi(Execution) @testable import Apollo
-@testable @_spi(Unsafe) @_spi(Internal) import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) @testable @_spi(Unsafe) @_spi(Internal) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 
 /// Tests reading fields from a JSON network response using a GraphQLExecutor and a SelectionSetMapper
 class GraphQLExecutor_SelectionSetMapper_FromResponse_Tests: XCTestCase {

@@ -2,8 +2,8 @@ import XCTest
 import Nimble
 @testable import Apollo
 import ApolloTestSupport
-import ApolloInternalTestHelpers
-@_spi(Internal) @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
+@_spi(Execution) @_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 class TestMockTests: XCTestCase {
 
