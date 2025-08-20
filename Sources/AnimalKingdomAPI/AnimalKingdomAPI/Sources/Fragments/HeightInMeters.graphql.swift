@@ -2,14 +2,15 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 public struct HeightInMeters: AnimalKingdomAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment HeightInMeters on Animal { __typename height { __typename meters } }"#
   }
 
-  public let __data: DataDict
-  public init(_dataDict: DataDict) { __data = _dataDict }
+  @_spi(Unsafe) public let __data: DataDict
+  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
   public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
   public static var __selections: [ApolloAPI.Selection] { [
@@ -36,8 +37,8 @@ public struct HeightInMeters: AnimalKingdomAPI.SelectionSet, Fragment {
   ///
   /// Parent Type: `Height`
   public struct Height: AnimalKingdomAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
     public static var __selections: [ApolloAPI.Selection] { [

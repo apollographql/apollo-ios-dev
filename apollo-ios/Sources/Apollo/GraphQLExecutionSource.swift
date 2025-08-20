@@ -1,4 +1,4 @@
-import ApolloAPI
+@_spi(Execution) import ApolloAPI
 
 /// A protocol representing a data source for GraphQL data to be executed upon by a
 /// `GraphQLExecutor`.

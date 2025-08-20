@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 public struct RepoURLQuery: GraphQLQuery {
   public static let operationName: String = "RepoURL"
@@ -13,8 +14,8 @@ public struct RepoURLQuery: GraphQLQuery {
   public init() {}
 
   public struct Data: GitHubAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
@@ -34,8 +35,8 @@ public struct RepoURLQuery: GraphQLQuery {
     ///
     /// Parent Type: `Repository`
     public struct Repository: GitHubAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Repository }
       public static var __selections: [ApolloAPI.Selection] { [

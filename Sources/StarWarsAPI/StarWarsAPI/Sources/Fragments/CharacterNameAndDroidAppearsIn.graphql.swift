@@ -2,14 +2,15 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 public struct CharacterNameAndDroidAppearsIn: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment CharacterNameAndDroidAppearsIn on Character { __typename name ... on Droid { __typename appearsIn } }"#
   }
 
-  public let __data: DataDict
-  public init(_dataDict: DataDict) { __data = _dataDict }
+  @_spi(Unsafe) public let __data: DataDict
+  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
   public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
   public static var __selections: [ApolloAPI.Selection] { [
@@ -40,8 +41,8 @@ public struct CharacterNameAndDroidAppearsIn: StarWarsAPI.SelectionSet, Fragment
   ///
   /// Parent Type: `Droid`
   public struct AsDroid: StarWarsAPI.InlineFragment {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public typealias RootEntityType = CharacterNameAndDroidAppearsIn
     public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }

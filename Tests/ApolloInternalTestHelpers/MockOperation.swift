@@ -125,7 +125,7 @@ open class ConcreteMockTypeCase<T: MockSelectionSet>: MockSelectionSet, InlineFr
   public typealias RootEntityType = T
 }
 
-extension DataDict {
+extension DataDict {  
   public static func empty() -> DataDict {
     DataDict(data: [:], fulfilledFragments: [])
   }

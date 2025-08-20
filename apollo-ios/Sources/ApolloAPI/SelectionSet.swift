@@ -96,6 +96,7 @@ extension SelectionSet {
 
   @inlinable public static var __deferredFragments: [any Deferrable.Type] { [] }
 
+  @_spi(Execution)
   @inlinable public var __objectType: Object? {
     guard let __typename else { return nil }
     return Schema.objectType(forTypename: __typename)

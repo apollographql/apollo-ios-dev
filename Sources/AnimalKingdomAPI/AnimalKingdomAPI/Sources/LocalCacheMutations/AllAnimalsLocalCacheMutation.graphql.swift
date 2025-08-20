@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
   public static let operationType: GraphQLOperationType = .query
@@ -9,8 +10,8 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
   public init() {}
 
   public struct Data: AnimalKingdomAPI.MutableSelectionSet {
-    public var __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public var __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
@@ -38,8 +39,8 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
     ///
     /// Parent Type: `Animal`
     public struct AllAnimal: AnimalKingdomAPI.MutableSelectionSet {
-      public var __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public var __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
       public static var __selections: [ApolloAPI.Selection] { [
@@ -79,8 +80,8 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
       ///
       /// Parent Type: `Bird`
       public struct AsBird: AnimalKingdomAPI.MutableInlineFragment {
-        public var __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public var __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = AllAnimalsLocalCacheMutation.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Bird }

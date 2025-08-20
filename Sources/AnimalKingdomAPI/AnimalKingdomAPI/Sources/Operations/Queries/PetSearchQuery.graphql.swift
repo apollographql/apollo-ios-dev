@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 public struct PetSearchQuery: GraphQLQuery {
   public static let operationName: String = "PetSearch"
@@ -30,8 +31,8 @@ public struct PetSearchQuery: GraphQLQuery {
   public var __variables: Variables? { ["filters": filters] }
 
   public struct Data: AnimalKingdomAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
@@ -56,8 +57,8 @@ public struct PetSearchQuery: GraphQLQuery {
     ///
     /// Parent Type: `Pet`
     public struct Pet: AnimalKingdomAPI.SelectionSet, Identifiable {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
       public static var __selections: [ApolloAPI.Selection] { [

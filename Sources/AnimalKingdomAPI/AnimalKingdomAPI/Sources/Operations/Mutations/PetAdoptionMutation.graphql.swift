@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 public struct PetAdoptionMutation: GraphQLMutation {
   public static let operationName: String = "PetAdoptionMutation"
@@ -19,8 +20,8 @@ public struct PetAdoptionMutation: GraphQLMutation {
   public var __variables: Variables? { ["input": input] }
 
   public struct Data: AnimalKingdomAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Mutation }
     public static var __selections: [ApolloAPI.Selection] { [
@@ -45,8 +46,8 @@ public struct PetAdoptionMutation: GraphQLMutation {
     ///
     /// Parent Type: `Pet`
     public struct AdoptPet: AnimalKingdomAPI.SelectionSet, Identifiable {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
       public static var __selections: [ApolloAPI.Selection] { [

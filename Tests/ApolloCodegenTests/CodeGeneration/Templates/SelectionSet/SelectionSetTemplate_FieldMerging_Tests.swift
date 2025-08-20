@@ -291,8 +291,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
 
     let expected = """
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var speciesFragment: SpeciesFragment { _toFragment() }
       }
@@ -361,8 +361,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
 
     let expected = """
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var tempDetails: TempDetails { _toFragment() }
       }
@@ -935,8 +935,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       public var species: String? { __data["species"] }
 
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var predatorDetails: PredatorDetails { _toFragment() }
       }
@@ -1005,8 +1005,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       public var predator: Predator? { __data["predator"] }
 
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var predatorDetails: PredatorDetails { _toFragment() }
       }
@@ -1283,8 +1283,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let expected = """
     /// AllAnimal.Predator
     public struct Predator: TestSchema.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
       public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -1299,8 +1299,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
 
       /// AllAnimal.Predator.Predator
       public struct Predator: TestSchema.SelectionSet {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
         public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -1386,8 +1386,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let expected = """
     /// AllAnimal.Predator
     public struct Predator: TestSchema.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
       public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -1472,8 +1472,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let expected = """
     /// AllAnimal.Predator
     public struct Predator: TestSchema.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
       public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -1489,8 +1489,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
 
       /// AllAnimal.Predator.AsDog
       public struct AsDog: TestSchema.InlineFragment, ApolloAPI.CompositeInlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal.Predator
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
@@ -1639,8 +1639,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       public var name: String? { __data["name"] }
 
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var animalDetails: AnimalDetails { _toFragment() }
       }
@@ -1768,8 +1768,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       public var name: String? { __data["name"] }
 
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var animalDetails: AnimalDetails { _toFragment() }
       }

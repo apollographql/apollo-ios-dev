@@ -12,7 +12,7 @@ extension TemplateTestRegexMatcher {
 }
 
 enum RegexMatcher {
-  nonisolated(unsafe) private static let endOfSection = /(?:\n\n|\n}\Z)/
+  nonisolated(unsafe) private static let endOfSection = /\n(?:\n|\h*?}(?:\n|\Z))/
   nonisolated(unsafe) private static let startOfLine = /^\h*?/
   nonisolated(unsafe) static let match = Reference(Substring.self)
 
@@ -128,15 +128,9 @@ enum RegexMatcher {
         return .init(Regex {
           Capture(as: match) {
             startOfLine
-            /init\(\n/
-            OneOrMore {
-              startOfLine
-              /[^\n]*?\n/
-            }
+            /init\(\n[^\)]*?\) {\n/
             startOfLine
-            /\) {\n/
-            startOfLine
-            /self.init\(unsafelyWithData: \[\n.*?\]\)\n/
+            /self.init\(unsafelyWithData: \[\n[^\]]*?\]\)\n/
             startOfLine
             "}"
           }

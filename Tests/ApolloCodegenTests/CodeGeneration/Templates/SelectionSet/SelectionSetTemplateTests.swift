@@ -1619,8 +1619,8 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expected = """
     public struct AsAnimalObject: TestSchema.InlineFragment {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
       public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.AnimalObject }
@@ -3809,8 +3809,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _detailsFragment = Deferred(_dataDict: _dataDict)
           }
@@ -3826,8 +3826,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_basicFragment).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _detailsFragment = Deferred(_dataDict: _dataDict)
           }
@@ -8116,8 +8116,8 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expected = """
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var fragmentA: FragmentA { _toFragment() }
         public var lowercaseFragment: LowercaseFragment { _toFragment() }
@@ -8175,8 +8175,8 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expected = """
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var fragmentA: FragmentA { _toFragment() }
       }
@@ -8228,8 +8228,8 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expected = """
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var lowercaseFragment: LowercaseFragment { _toFragment() }
         public var fragmentA: FragmentA? { _toFragment() }
@@ -8275,8 +8275,8 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expected = """
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var fragmentA: FragmentA { _toFragment() }
       }
@@ -8321,8 +8321,8 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expected = """
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var fragmentA: FragmentA? { _toFragment() }
       }
@@ -8367,8 +8367,8 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let expected = """
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var fragmentA: FragmentA { _toFragment() }
       }
@@ -8424,8 +8424,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
@@ -8473,8 +8473,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
@@ -8527,8 +8527,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
@@ -8581,8 +8581,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
@@ -8635,8 +8635,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
@@ -8738,8 +8738,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _one = Deferred(_dataDict: _dataDict)
             _two = Deferred(_dataDict: _dataDict)
@@ -8807,8 +8807,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_asDog).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _one = Deferred(_dataDict: _dataDict)
           }
@@ -8822,8 +8822,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_asCat).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _two = Deferred(_dataDict: _dataDict)
           }
@@ -8881,8 +8881,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
@@ -8946,8 +8946,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
@@ -9021,8 +9021,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_asDog).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _outer = Deferred(_dataDict: _dataDict)
           }
@@ -9036,8 +9036,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_asDog_deferredAsOuter_asCat).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _inner = Deferred(_dataDict: _dataDict)
           }
@@ -9086,8 +9086,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
@@ -9136,8 +9136,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
@@ -9195,8 +9195,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
@@ -9250,8 +9250,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _animalFragment = Deferred(_dataDict: _dataDict)
           }
@@ -9306,8 +9306,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _dogFragment = Deferred(_dataDict: _dataDict)
           }
@@ -9362,8 +9362,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _dogFragment = Deferred(_dataDict: _dataDict)
           }
@@ -9418,8 +9418,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _dogFragment = Deferred(_dataDict: _dataDict)
           }
@@ -9474,8 +9474,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
       
           public var dogFragment: DogFragment { _toFragment() }
         }
@@ -9541,8 +9541,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_asDog).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var animalFragment: AnimalFragment { _toFragment() }
         }
@@ -9553,8 +9553,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_asDog_animalFragment).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
@@ -9624,8 +9624,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var animalFragment: AnimalFragment { _toFragment() }
         }
@@ -9636,8 +9636,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals_animalFragment_asDog).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _root = Deferred(_dataDict: _dataDict)
           }
@@ -9694,8 +9694,8 @@ class SelectionSetTemplateTests: XCTestCase {
     expect(rendered_allAnimals).to(equalLineByLine(
       """
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
             __data = _dataDict
             _animalFragment = Deferred(_dataDict: _dataDict)
           }
@@ -9918,8 +9918,8 @@ class SelectionSetTemplateTests: XCTestCase {
     let expected = """
       /// Badge
       public struct Badge: TestSchema.SelectionSet {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Badge }
         public static var __selections: [ApolloAPI.Selection] { [
@@ -9935,8 +9935,8 @@ class SelectionSetTemplateTests: XCTestCase {
 
       /// Badges
       public struct Badges: TestSchema.SelectionSet {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.ProductBadge }
         public static var __selections: [ApolloAPI.Selection] { [
@@ -10001,8 +10001,8 @@ class SelectionSetTemplateTests: XCTestCase {
     let expected = """
       /// Badge
       public struct Badge: TestSchema.SelectionSet {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Badge }
         public static var __selections: [ApolloAPI.Selection] { [
@@ -10018,8 +10018,8 @@ class SelectionSetTemplateTests: XCTestCase {
 
       /// Badges
       public struct Badges: TestSchema.SelectionSet {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.ProductBadge }
         public static var __selections: [ApolloAPI.Selection] { [
@@ -10372,8 +10372,8 @@ class SelectionSetTemplateTests: XCTestCase {
 
     let predator_asPet_expected = """
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var predatorDetails: PredatorDetails { _toFragment() }
       }
@@ -10783,8 +10783,8 @@ class SelectionSetTemplateTests: XCTestCase {
   let expectedType = """
     /// AllAuthor.PostsInfoById.Awarding.Comment
     public struct Comment: TestSchema.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Comment }
       public static var __selections: [ApolloAPI.Selection] { [
@@ -10933,8 +10933,8 @@ class SelectionSetTemplateTests: XCTestCase {
     let expected = """
       /// AllAnimal.AsPet.Friend
       public struct Friend: TestSchema.SelectionSet {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
         public static var __selections: [ApolloAPI.Selection] { [
@@ -11500,8 +11500,8 @@ class SelectionSetTemplateTests: XCTestCase {
     let expected = """
     /// AllAnimal.AsPet
     public struct AsPet: TestSchema.InlineFragment {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
     """
@@ -11554,8 +11554,8 @@ class SelectionSetTemplateTests: XCTestCase {
     let expected = """
     /// AllAnimal.AsWarmBlooded.AsPet
     public struct AsPet: TestSchema.InlineFragment {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
     """
@@ -11607,8 +11607,8 @@ class SelectionSetTemplateTests: XCTestCase {
     let expected = """
     /// AllAnimal.Predator.AsPet
     public struct AsPet: TestSchema.InlineFragment {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = TestOperationQuery.Data.AllAnimal.Predator
     """
@@ -11668,8 +11668,8 @@ class SelectionSetTemplateTests: XCTestCase {
     let expected = """
     /// Predator.Predator.AsPet
     public struct AsPet: TestSchema.InlineFragment {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = TestOperationQuery.Data.Predator.Predator
     """
@@ -11707,8 +11707,8 @@ class SelectionSetTemplateTests: XCTestCase {
     let expected = """
     /// IfA
     public struct IfA: TestSchema.InlineFragment {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = TestOperationQuery.Data
     """
@@ -11750,8 +11750,8 @@ class SelectionSetTemplateTests: XCTestCase {
     let expected = """
     /// AsAdminQueryIfA
     public struct AsAdminQueryIfA: TestSchema.InlineFragment {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = TestOperationQuery.Data
     """
@@ -11804,8 +11804,8 @@ class SelectionSetTemplateTests: XCTestCase {
     let expected = """
     /// Predator.Predator.AsPet
     public struct AsPet: TestSchema.InlineFragment {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public typealias RootEntityType = Details.Predator.Predator
     """
@@ -11878,8 +11878,8 @@ class SelectionSetTemplateTests: XCTestCase {
       """
       /// AllAnimal.Root
       public struct Root: TestSchema.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
@@ -11930,8 +11930,8 @@ class SelectionSetTemplateTests: XCTestCase {
       """
       /// AllAnimal.Root
       public struct Root: TestSchema.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
@@ -11987,8 +11987,8 @@ class SelectionSetTemplateTests: XCTestCase {
       """
       /// AllAnimal.AsDog.Root
       public struct Root: TestSchema.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
@@ -12052,8 +12052,8 @@ class SelectionSetTemplateTests: XCTestCase {
       """
       /// AllAnimal.AsDog.One
       public struct One: TestSchema.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
@@ -12066,8 +12066,8 @@ class SelectionSetTemplateTests: XCTestCase {
       """
       /// AllAnimal.AsDog.Two
       public struct Two: TestSchema.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
@@ -12138,8 +12138,8 @@ class SelectionSetTemplateTests: XCTestCase {
       """
       /// AllAnimal.AsDog.One
       public struct One: TestSchema.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
@@ -12152,8 +12152,8 @@ class SelectionSetTemplateTests: XCTestCase {
       """
       /// AllAnimal.AsCat.Two
       public struct Two: TestSchema.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Cat }
@@ -12231,8 +12231,8 @@ class SelectionSetTemplateTests: XCTestCase {
       """
       /// AllAnimal.AsDog.Outer
       public struct Outer: TestSchema.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
@@ -12245,8 +12245,8 @@ class SelectionSetTemplateTests: XCTestCase {
       """
       /// AllAnimal.AsDog.Outer.Friend.AsCat.Inner
       public struct Inner: TestSchema.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal.AsDog.Outer.Friend
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Cat }

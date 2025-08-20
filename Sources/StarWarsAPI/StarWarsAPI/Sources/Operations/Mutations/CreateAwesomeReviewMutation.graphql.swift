@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 public struct CreateAwesomeReviewMutation: GraphQLMutation {
   public static let operationName: String = "CreateAwesomeReview"
@@ -14,8 +15,8 @@ public struct CreateAwesomeReviewMutation: GraphQLMutation {
   public init() {}
 
   public struct Data: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Mutation }
     public static var __selections: [ApolloAPI.Selection] { [
@@ -46,8 +47,8 @@ public struct CreateAwesomeReviewMutation: GraphQLMutation {
     ///
     /// Parent Type: `Review`
     public struct CreateReview: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
       public static var __selections: [ApolloAPI.Selection] { [

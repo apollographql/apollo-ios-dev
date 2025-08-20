@@ -312,8 +312,8 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     let expected = """
         struct Data: TestSchema.SelectionSet {
-          let __data: DataDict
-          init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) let __data: DataDict
+          @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
 
           static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
       """
@@ -1303,7 +1303,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     expect(actual).to(
       equalLineByLine(
-        "\n",
+        "",
         after: .operationDefinition.responseModel,
         ignoringExtraLines: false
       )

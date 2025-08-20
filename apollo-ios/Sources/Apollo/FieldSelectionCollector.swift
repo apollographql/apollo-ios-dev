@@ -1,5 +1,5 @@
 import Foundation
-import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 @_spi(Execution)
 public struct FieldSelectionGrouping {

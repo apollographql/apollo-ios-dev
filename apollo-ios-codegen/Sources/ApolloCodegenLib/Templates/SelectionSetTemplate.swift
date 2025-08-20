@@ -200,7 +200,7 @@ struct SelectionSetTemplate {
 
     return TemplateString(
       """
-      \(renderAccessControl())init(_dataDict: DataDict) {\
+      @_spi(Unsafe) \(renderAccessControl())init(_dataDict: DataDict) {\
       \(ifLet: propertiesTemplate(), where: { !$0.isEmpty }, {
         """
 
@@ -216,7 +216,7 @@ struct SelectionSetTemplate {
   }
 
   private func DataPropertyTemplate() -> TemplateString {
-    "\(renderAccessControl())\(isMutable ? "var" : "let") __data: DataDict"
+    "@_spi(Unsafe) \(renderAccessControl())\(isMutable ? "var" : "let") __data: DataDict"
   }
 
   private func RootEntityTypealias(_ selectionSet: IR.ComputedSelectionSet) -> TemplateString {

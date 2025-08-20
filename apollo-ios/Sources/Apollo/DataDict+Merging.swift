@@ -1,5 +1,5 @@
 import Foundation
-@_spi(Internal) import ApolloAPI
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 // MARK: Internal
 

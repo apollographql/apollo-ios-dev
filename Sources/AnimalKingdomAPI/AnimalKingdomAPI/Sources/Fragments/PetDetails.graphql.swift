@@ -2,14 +2,15 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 public struct PetDetails: AnimalKingdomAPI.SelectionSet, Fragment, Identifiable {
   public static var fragmentDefinition: StaticString {
     #"fragment PetDetails on Pet { __typename id humanName favoriteToy owner { __typename firstName } }"#
   }
 
-  public let __data: DataDict
-  public init(_dataDict: DataDict) { __data = _dataDict }
+  @_spi(Unsafe) public let __data: DataDict
+  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
   public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
   public static var __selections: [ApolloAPI.Selection] { [
@@ -48,8 +49,8 @@ public struct PetDetails: AnimalKingdomAPI.SelectionSet, Fragment, Identifiable 
   ///
   /// Parent Type: `Human`
   public struct Owner: AnimalKingdomAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Human }
     public static var __selections: [ApolloAPI.Selection] { [

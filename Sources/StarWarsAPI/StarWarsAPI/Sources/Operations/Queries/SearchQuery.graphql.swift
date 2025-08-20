@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 public struct SearchQuery: GraphQLQuery {
   public static let operationName: String = "Search"
@@ -20,8 +21,8 @@ public struct SearchQuery: GraphQLQuery {
   public var __variables: Variables? { ["term": term] }
 
   public struct Data: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
@@ -46,8 +47,8 @@ public struct SearchQuery: GraphQLQuery {
     ///
     /// Parent Type: `SearchResult`
     public struct Search: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Unions.SearchResult }
       public static var __selections: [ApolloAPI.Selection] { [
@@ -76,8 +77,8 @@ public struct SearchQuery: GraphQLQuery {
       ///
       /// Parent Type: `Human`
       public struct AsHuman: StarWarsAPI.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = SearchQuery.Data.Search
         public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
@@ -111,8 +112,8 @@ public struct SearchQuery: GraphQLQuery {
       ///
       /// Parent Type: `Droid`
       public struct AsDroid: StarWarsAPI.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = SearchQuery.Data.Search
         public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
@@ -146,8 +147,8 @@ public struct SearchQuery: GraphQLQuery {
       ///
       /// Parent Type: `Starship`
       public struct AsStarship: StarWarsAPI.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = SearchQuery.Data.Search
         public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Starship }

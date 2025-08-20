@@ -85,8 +85,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
           #"fragment TestFragment on Query { __typename allAnimals { __typename species } }"#
         }
 
-        let __data: DataDict
-        init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) let __data: DataDict
+        @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
       """
 
     // when
@@ -104,8 +104,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let expected =
       """
       struct TestFragment: TestSchema.SelectionSet, Fragment {
-        let __data: DataDict
-        init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) let __data: DataDict
+        @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
       """
 
     // when
@@ -311,8 +311,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
           #"fragment TestFragment on Query { __typename }"#
         }
 
-        let __data: DataDict
-        init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) let __data: DataDict
+        @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
 
         static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -348,8 +348,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
           #"fragment TestFragment on Animal { __typename }"#
         }
 
-        let __data: DataDict
-        init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) let __data: DataDict
+        @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
 
         static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
         static var __selections: [ApolloAPI.Selection] { [
@@ -575,7 +575,7 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     // then
     expect(actual).to(
       equalLineByLine(
-        "\n",
+        "",
         after: .selectionSet.propertyAccessors(),
         ignoringExtraLines: false
       )
@@ -618,7 +618,7 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     // then
     expect(actual).to(
       equalLineByLine(
-        "\n",
+        "",
         after: .selectionSet.propertyAccessors(),
         ignoringExtraLines: false
       )
@@ -721,7 +721,7 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
       // then
       expect(actual).to(
         equalLineByLine(
-          "\n",
+          "",
           after: .selectionSet.propertyAccessors(),
           ignoringExtraLines: false
         )

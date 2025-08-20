@@ -1,8 +1,8 @@
 import XCTest
 import Nimble
 @testable import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Unsafe) import ApolloAPI
+@_spi(Unsafe) import ApolloInternalTestHelpers
 
 class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
 
@@ -322,7 +322,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
   func test_updateCacheMutation_updateNestedField_updatesObjects() async throws {
     // given
     struct GivenSelectionSet: MockMutableRootSelectionSet {
-      public var __data: DataDict = .empty()
+      @_spi(Unsafe) public var __data: DataDict = .empty()
       init(_dataDict: DataDict) { __data = _dataDict }
 
       static var __selections: [Selection] { [

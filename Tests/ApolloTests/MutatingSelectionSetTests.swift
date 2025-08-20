@@ -1,8 +1,8 @@
 import XCTest
 import Nimble
 @testable import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Unsafe) import ApolloAPI
+@_spi(Unsafe) import ApolloInternalTestHelpers
 
 class MutatingSelectionSetTests: XCTestCase {
 

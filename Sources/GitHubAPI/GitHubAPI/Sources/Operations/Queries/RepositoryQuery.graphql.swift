@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 public struct RepositoryQuery: GraphQLQuery {
   public static let operationName: String = "Repository"
@@ -13,8 +14,8 @@ public struct RepositoryQuery: GraphQLQuery {
   public init() {}
 
   public struct Data: GitHubAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
@@ -34,8 +35,8 @@ public struct RepositoryQuery: GraphQLQuery {
     ///
     /// Parent Type: `Repository`
     public struct Repository: GitHubAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Repository }
       public static var __selections: [ApolloAPI.Selection] { [
@@ -53,8 +54,8 @@ public struct RepositoryQuery: GraphQLQuery {
       ///
       /// Parent Type: `IssueOrPullRequest`
       public struct IssueOrPullRequest: GitHubAPI.SelectionSet {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Unions.IssueOrPullRequest }
         public static var __selections: [ApolloAPI.Selection] { [
@@ -73,8 +74,8 @@ public struct RepositoryQuery: GraphQLQuery {
         ///
         /// Parent Type: `Issue`
         public struct AsIssue: GitHubAPI.InlineFragment {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = RepositoryQuery.Data.Repository.IssueOrPullRequest
           public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Issue }
@@ -102,8 +103,8 @@ public struct RepositoryQuery: GraphQLQuery {
           ///
           /// Parent Type: `Actor`
           public struct Author: GitHubAPI.SelectionSet {
-            public let __data: DataDict
-            public init(_dataDict: DataDict) { __data = _dataDict }
+            @_spi(Unsafe) public let __data: DataDict
+            @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
             public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
             public static var __selections: [ApolloAPI.Selection] { [
@@ -126,8 +127,8 @@ public struct RepositoryQuery: GraphQLQuery {
         ///
         /// Parent Type: `Reactable`
         public struct AsReactable: GitHubAPI.InlineFragment {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = RepositoryQuery.Data.Repository.IssueOrPullRequest
           public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Reactable }
@@ -149,8 +150,8 @@ public struct RepositoryQuery: GraphQLQuery {
           ///
           /// Parent Type: `Comment`
           public struct AsComment: GitHubAPI.InlineFragment {
-            public let __data: DataDict
-            public init(_dataDict: DataDict) { __data = _dataDict }
+            @_spi(Unsafe) public let __data: DataDict
+            @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
             public typealias RootEntityType = RepositoryQuery.Data.Repository.IssueOrPullRequest
             public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Comment }
@@ -172,8 +173,8 @@ public struct RepositoryQuery: GraphQLQuery {
             ///
             /// Parent Type: `Actor`
             public struct Author: GitHubAPI.SelectionSet {
-              public let __data: DataDict
-              public init(_dataDict: DataDict) { __data = _dataDict }
+              @_spi(Unsafe) public let __data: DataDict
+              @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
               public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
               public static var __selections: [ApolloAPI.Selection] { [

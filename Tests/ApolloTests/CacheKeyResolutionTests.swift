@@ -1,7 +1,7 @@
 import XCTest
 import Nimble
 @_spi(Execution) @testable import Apollo
-import ApolloAPI
+@_spi(Unsafe) @_spi(Execution) import ApolloAPI
 import ApolloInternalTestHelpers
 
 @MainActor

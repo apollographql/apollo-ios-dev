@@ -20,6 +20,7 @@ public protocol SchemaMetadata {
   /// - Returns: An ``Object`` type representing the response object if the type is known to the
   /// schema. If the schema does not include a known ``Object`` with the given ``Object/typename``,
   /// returns `nil`.
+  @_spi(Execution)
   static func objectType(forTypename typename: String) -> Object?
 }
 
@@ -34,6 +35,7 @@ extension SchemaMetadata {
   /// - Returns: An ``Object`` type representing the response object if the type is known to the
   /// schema. If the schema does not include a known ``Object`` with the given ``Object/typename``,
   /// returns `nil`.
+  @_spi(Execution)
   @inlinable public static func graphQLType(for object: ObjectData) -> Object? {
     guard let typename = object["__typename"] as? String else {
       return nil
@@ -68,6 +70,7 @@ extension SchemaMetadata {
   ///
   /// - Returns: A `String` representing the cache key for the `object` to be used by
   /// `NormalizedCache` mechanisms.
+  @_spi(Execution)
   @inlinable public static func cacheKey(
     for object: ObjectData,
     inferredToImplementInterface implementedInterface: Interface? = nil

@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 public struct HumanQuery: GraphQLQuery {
   public static let operationName: String = "Human"
@@ -20,8 +21,8 @@ public struct HumanQuery: GraphQLQuery {
   public var __variables: Variables? { ["id": id] }
 
   public struct Data: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
@@ -46,8 +47,8 @@ public struct HumanQuery: GraphQLQuery {
     ///
     /// Parent Type: `Human`
     public struct Human: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
       public static var __selections: [ApolloAPI.Selection] { [

@@ -557,7 +557,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     let expected =
       """
         struct Data: TestSchema.MutableSelectionSet {
-          var __data: DataDict
+          @_spi(Unsafe) var __data: DataDict
       """
 
     // when
@@ -574,7 +574,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     let expected =
       """
         struct Data: Myschema.MutableSelectionSet {
-          var __data: DataDict
+          @_spi(Unsafe) var __data: DataDict
       """
 
     // when
@@ -592,7 +592,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     let expected =
       """
         struct Data: MYSCHEMA.MutableSelectionSet {
-          var __data: DataDict
+          @_spi(Unsafe) var __data: DataDict
       """
 
     // when

@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
   public static let operationName: String = "IssuesAndCommentsForRepository"
@@ -14,8 +15,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
   public init() {}
 
   public struct Data: GitHubAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Query }
     public static var __selections: [ApolloAPI.Selection] { [
@@ -35,8 +36,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
     ///
     /// Parent Type: `Repository`
     public struct Repository: GitHubAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Repository }
       public static var __selections: [ApolloAPI.Selection] { [
@@ -57,8 +58,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
       ///
       /// Parent Type: `IssueConnection`
       public struct Issues: GitHubAPI.SelectionSet {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.IssueConnection }
         public static var __selections: [ApolloAPI.Selection] { [
@@ -76,8 +77,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
         ///
         /// Parent Type: `Issue`
         public struct Node: GitHubAPI.SelectionSet {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Issue }
           public static var __selections: [ApolloAPI.Selection] { [
@@ -104,8 +105,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
           ///
           /// Parent Type: `Actor`
           public struct Author: GitHubAPI.SelectionSet {
-            public let __data: DataDict
-            public init(_dataDict: DataDict) { __data = _dataDict }
+            @_spi(Unsafe) public let __data: DataDict
+            @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
             public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
             public static var __selections: [ApolloAPI.Selection] { [
@@ -123,8 +124,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
             public var asUser: AsUser? { _asInlineFragment() }
 
             public struct Fragments: FragmentContainer {
-              public let __data: DataDict
-              public init(_dataDict: DataDict) { __data = _dataDict }
+              @_spi(Unsafe) public let __data: DataDict
+              @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
               public var authorDetails: AuthorDetails { _toFragment() }
             }
@@ -133,8 +134,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
             ///
             /// Parent Type: `User`
             public struct AsUser: GitHubAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
-              public let __data: DataDict
-              public init(_dataDict: DataDict) { __data = _dataDict }
+              @_spi(Unsafe) public let __data: DataDict
+              @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
               public typealias RootEntityType = IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Author
               public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.User }
@@ -157,8 +158,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
               public var name: String? { __data["name"] }
 
               public struct Fragments: FragmentContainer {
-                public let __data: DataDict
-                public init(_dataDict: DataDict) { __data = _dataDict }
+                @_spi(Unsafe) public let __data: DataDict
+                @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
                 public var authorDetails: AuthorDetails { _toFragment() }
               }
@@ -169,8 +170,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
           ///
           /// Parent Type: `IssueCommentConnection`
           public struct Comments: GitHubAPI.SelectionSet {
-            public let __data: DataDict
-            public init(_dataDict: DataDict) { __data = _dataDict }
+            @_spi(Unsafe) public let __data: DataDict
+            @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
             public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.IssueCommentConnection }
             public static var __selections: [ApolloAPI.Selection] { [
@@ -188,8 +189,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
             ///
             /// Parent Type: `IssueComment`
             public struct Node: GitHubAPI.SelectionSet {
-              public let __data: DataDict
-              public init(_dataDict: DataDict) { __data = _dataDict }
+              @_spi(Unsafe) public let __data: DataDict
+              @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
               public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.IssueComment }
               public static var __selections: [ApolloAPI.Selection] { [
@@ -210,8 +211,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
               ///
               /// Parent Type: `Actor`
               public struct Author: GitHubAPI.SelectionSet {
-                public let __data: DataDict
-                public init(_dataDict: DataDict) { __data = _dataDict }
+                @_spi(Unsafe) public let __data: DataDict
+                @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
                 public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
                 public static var __selections: [ApolloAPI.Selection] { [
@@ -229,8 +230,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
                 public var asUser: AsUser? { _asInlineFragment() }
 
                 public struct Fragments: FragmentContainer {
-                  public let __data: DataDict
-                  public init(_dataDict: DataDict) { __data = _dataDict }
+                  @_spi(Unsafe) public let __data: DataDict
+                  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
                   public var authorDetails: AuthorDetails { _toFragment() }
                 }
@@ -239,8 +240,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
                 ///
                 /// Parent Type: `User`
                 public struct AsUser: GitHubAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
-                  public let __data: DataDict
-                  public init(_dataDict: DataDict) { __data = _dataDict }
+                  @_spi(Unsafe) public let __data: DataDict
+                  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
                   public typealias RootEntityType = IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Comments.Node.Author
                   public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.User }
@@ -263,8 +264,8 @@ public struct IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
                   public var name: String? { __data["name"] }
 
                   public struct Fragments: FragmentContainer {
-                    public let __data: DataDict
-                    public init(_dataDict: DataDict) { __data = _dataDict }
+                    @_spi(Unsafe) public let __data: DataDict
+                    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
                     public var authorDetails: AuthorDetails { _toFragment() }
                   }

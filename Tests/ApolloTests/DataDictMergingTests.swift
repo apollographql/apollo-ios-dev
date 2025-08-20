@@ -1,7 +1,7 @@
 import XCTest
-@testable import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
+@testable @_spi(Unsafe) import Apollo
+@testable @_spi(Unsafe) import ApolloAPI
+@_spi(Unsafe) import ApolloInternalTestHelpers
 import Nimble
 
 class DataDictMergingTests: XCTestCase {

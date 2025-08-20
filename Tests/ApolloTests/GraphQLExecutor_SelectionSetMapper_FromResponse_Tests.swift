@@ -1,7 +1,7 @@
 import XCTest
 import Nimble
 @_spi(Execution) @testable import Apollo
-@testable import ApolloAPI
+@testable @_spi(Unsafe) import ApolloAPI
 import ApolloInternalTestHelpers
 
 /// Tests reading fields from a JSON network response using a GraphQLExecutor and a SelectionSetMapper
