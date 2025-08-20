@@ -336,7 +336,7 @@ struct ImportStatementTemplate {
       let apolloAPIImport = "import \(TemplateConstants.ApolloAPITargetName)"
       switch type {
       case .inputObject:
-        return "@_spi(Unsafe) \(apolloAPIImport)"
+        return "@_spi(Internal) @_spi(Unsafe) \(apolloAPIImport)"
       case .enum:
         return "@_spi(Internal) \(apolloAPIImport)"
       default:
