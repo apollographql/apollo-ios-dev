@@ -1,9 +1,10 @@
-import XCTest
+import ApolloCodegenInternalTestHelpers
+import IR
 import Nimble
 import OrderedCollections
-import IR
+import XCTest
+
 @testable import ApolloCodegenLib
-import ApolloCodegenInternalTestHelpers
 
 class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
@@ -18,22 +19,22 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   override func setUp() {
     super.setUp()
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    query TestOperation @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        species
+      query TestOperation @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     config = .mock()
   }
@@ -80,12 +81,12 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   func test__target__givenModuleImports_targetHasModuleImports() async throws {
     // given
     document = """
-    query TestOperation @apollo_client_ios_localCacheMutation @import(module: "ModuleA") {
-      allAnimals {
-        species
+      query TestOperation @apollo_client_ios_localCacheMutation @import(module: "ModuleA") {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -101,19 +102,24 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
   // MARK: - Access Level Tests
 
-  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsInSchemaModule_generatesWithPublicAccess() async throws {
+  func
+    test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsInSchemaModule_generatesWithPublicAccess()
+    async throws
+  {
     // given
     let expected =
-    """
-    public struct TestOperationLocalCacheMutation: LocalCacheMutation {
-      public static let operationType: GraphQLOperationType = .query
+      """
+      public struct TestOperationLocalCacheMutation: LocalCacheMutation {
+        public static let operationType: GraphQLOperationType = .query
 
-    """
+      """
 
-    config = .mock(output: .mock(
-      moduleType: .swiftPackage(),
-      operations: .inSchemaModule
-    ))
+    config = .mock(
+      output: .mock(
+        moduleType: .swiftPackage(),
+        operations: .inSchemaModule
+      )
+    )
 
     // when
     try await buildSubjectAndOperation()
@@ -124,19 +130,24 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQuery_whenModuleTypeIsEmbeddedInTargetWithPublicAccessModifier_andOperationsInSchemaModule_generatesWithPublicAccess() async throws {
+  func
+    test__generate__givenQuery_whenModuleTypeIsEmbeddedInTargetWithPublicAccessModifier_andOperationsInSchemaModule_generatesWithPublicAccess()
+    async throws
+  {
     // given
     let expected =
-    """
-    struct TestOperationLocalCacheMutation: LocalCacheMutation {
-      public static let operationType: GraphQLOperationType = .query
+      """
+      struct TestOperationLocalCacheMutation: LocalCacheMutation {
+        public static let operationType: GraphQLOperationType = .query
 
-    """
+      """
 
-    config = .mock(output: .mock(
-      moduleType: .embeddedInTarget(name: "TestTarget", accessModifier: .public),
-      operations: .inSchemaModule
-    ))
+    config = .mock(
+      output: .mock(
+        moduleType: .embeddedInTarget(name: "TestTarget", accessModifier: .public),
+        operations: .inSchemaModule
+      )
+    )
 
     // when
     try await buildSubjectAndOperation()
@@ -147,19 +158,24 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQuery_whenModuleTypeIsEmbeddedInTargetWithInternalAccessModifier_andOperationsInSchemaModule_generatesWithInternalAccess() async throws {
+  func
+    test__generate__givenQuery_whenModuleTypeIsEmbeddedInTargetWithInternalAccessModifier_andOperationsInSchemaModule_generatesWithInternalAccess()
+    async throws
+  {
     // given
     let expected =
-    """
-    struct TestOperationLocalCacheMutation: LocalCacheMutation {
-      static let operationType: GraphQLOperationType = .query
+      """
+      struct TestOperationLocalCacheMutation: LocalCacheMutation {
+        static let operationType: GraphQLOperationType = .query
 
-    """
+      """
 
-    config = .mock(output: .mock(
-      moduleType: .embeddedInTarget(name: "TestTarget", accessModifier: .internal),
-      operations: .inSchemaModule
-    ))
+    config = .mock(
+      output: .mock(
+        moduleType: .embeddedInTarget(name: "TestTarget", accessModifier: .internal),
+        operations: .inSchemaModule
+      )
+    )
 
     // when
     try await buildSubjectAndOperation()
@@ -170,19 +186,24 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithPublicAccessModifier_generatesWithPublicAccess() async throws {
+  func
+    test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithPublicAccessModifier_generatesWithPublicAccess()
+    async throws
+  {
     // given
     let expected =
-    """
-    public struct TestOperationLocalCacheMutation: LocalCacheMutation {
-      public static let operationType: GraphQLOperationType = .query
+      """
+      public struct TestOperationLocalCacheMutation: LocalCacheMutation {
+        public static let operationType: GraphQLOperationType = .query
 
-    """
+      """
 
-    config = .mock(output: .mock(
-      moduleType: .swiftPackage(),
-      operations: .relative(subpath: nil, accessModifier: .public)
-    ))
+    config = .mock(
+      output: .mock(
+        moduleType: .swiftPackage(),
+        operations: .relative(subpath: nil, accessModifier: .public)
+      )
+    )
 
     // when
     try await buildSubjectAndOperation()
@@ -193,19 +214,24 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithInternalAccessModifier_generatesWithInternalAccess() async throws {
+  func
+    test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsRelativeWithInternalAccessModifier_generatesWithInternalAccess()
+    async throws
+  {
     // given
     let expected =
-    """
-    struct TestOperationLocalCacheMutation: LocalCacheMutation {
-      static let operationType: GraphQLOperationType = .query
+      """
+      struct TestOperationLocalCacheMutation: LocalCacheMutation {
+        static let operationType: GraphQLOperationType = .query
 
-    """
+      """
 
-    config = .mock(output: .mock(
-      moduleType: .swiftPackage(),
-      operations: .relative(subpath: nil, accessModifier: .internal)
-    ))
+    config = .mock(
+      output: .mock(
+        moduleType: .swiftPackage(),
+        operations: .relative(subpath: nil, accessModifier: .internal)
+      )
+    )
 
     // when
     try await buildSubjectAndOperation()
@@ -216,19 +242,24 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithPublicAccessModifier_generatesWithPublicAccess() async throws {
+  func
+    test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithPublicAccessModifier_generatesWithPublicAccess()
+    async throws
+  {
     // given
     let expected =
-    """
-    public struct TestOperationLocalCacheMutation: LocalCacheMutation {
-      public static let operationType: GraphQLOperationType = .query
+      """
+      public struct TestOperationLocalCacheMutation: LocalCacheMutation {
+        public static let operationType: GraphQLOperationType = .query
 
-    """
+      """
 
-    config = .mock(output: .mock(
-      moduleType: .swiftPackage(),
-      operations: .absolute(path: "", accessModifier: .public)
-    ))
+    config = .mock(
+      output: .mock(
+        moduleType: .swiftPackage(),
+        operations: .absolute(path: "", accessModifier: .public)
+      )
+    )
 
     // when
     try await buildSubjectAndOperation()
@@ -239,19 +270,24 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithInternalAccessModifier_generatesWithInternalAccess() async throws {
+  func
+    test__generate__givenQuery_whenModuleTypeIsSwiftPackageManager_andOperationsAbsoluteWithInternalAccessModifier_generatesWithInternalAccess()
+    async throws
+  {
     // given
     let expected =
-    """
-    struct TestOperationLocalCacheMutation: LocalCacheMutation {
-      static let operationType: GraphQLOperationType = .query
+      """
+      struct TestOperationLocalCacheMutation: LocalCacheMutation {
+        static let operationType: GraphQLOperationType = .query
 
-    """
+      """
 
-    config = .mock(output: .mock(
-      moduleType: .swiftPackage(),
-      operations: .absolute(path: "", accessModifier: .internal)
-    ))
+    config = .mock(
+      output: .mock(
+        moduleType: .swiftPackage(),
+        operations: .absolute(path: "", accessModifier: .internal)
+      )
+    )
 
     // when
     try await buildSubjectAndOperation()
@@ -267,11 +303,11 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenQuery_generatesLocalCacheMutation() async throws {
     // given
     let expected =
-    """
-    struct TestOperationLocalCacheMutation: LocalCacheMutation {
-      static let operationType: GraphQLOperationType = .query
+      """
+      struct TestOperationLocalCacheMutation: LocalCacheMutation {
+        static let operationType: GraphQLOperationType = .query
 
-    """
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -284,20 +320,20 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
   func test__generate__givenQueryWithReferencedFragment_generatesReferencedFragmentAsMutable() async throws {
     document = """
-    query TestOperation @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        ...SpeciesFragment
+      query TestOperation @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          ...SpeciesFragment
+        }
       }
-    }
-    
-    fragment SpeciesFragment on Animal {
-      species
-    }
-    """
+
+      fragment SpeciesFragment on Animal {
+        species
+      }
+      """
 
     let expected = """
-    struct SpeciesFragment: TestSchema.MutableSelectionSet, Fragment {
-    """
+      struct SpeciesFragment: TestSchema.MutableSelectionSet, Fragment {
+      """
 
     try await buildSubjectAndFragment(named: "SpeciesFragment")
 
@@ -309,52 +345,52 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
   func test__generate__givenFragmentWithReferencedFragment_generatesReferencedFragmentAsMutable() async throws {
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      name: String!
-      species: String!
-      friend: Animal!
-    }
-    """
+      type Animal {
+        name: String!
+        species: String!
+        friend: Animal!
+      }
+      """
 
     document = """
-    query TestOperation {
-      allAnimals {
-        ...NameFragment
-        ...SpeciesFragment
+      query TestOperation {
+        allAnimals {
+          ...NameFragment
+          ...SpeciesFragment
+        }
       }
-    }
-    
-    fragment NameFragment on Animal {
-      name
-    }
-    
-    fragment SpeciesFragment on Animal @apollo_client_ios_localCacheMutation {
-      species
-      ...FriendFragment
-    }
-    
-    fragment FriendFragment on Animal {
-      friend {
+
+      fragment NameFragment on Animal {
         name
       }
-    }
-    """
+
+      fragment SpeciesFragment on Animal @apollo_client_ios_localCacheMutation {
+        species
+        ...FriendFragment
+      }
+
+      fragment FriendFragment on Animal {
+        friend {
+          name
+        }
+      }
+      """
 
     let expectedNameFragment = """
-    struct NameFragment: TestSchema.SelectionSet, Fragment {
-    """
+      struct NameFragment: TestSchema.SelectionSet, Fragment {
+      """
 
     let expectedSpeciesFragment = """
-    struct SpeciesFragment: TestSchema.MutableSelectionSet, Fragment {
-    """
+      struct SpeciesFragment: TestSchema.MutableSelectionSet, Fragment {
+      """
 
     let expectedFriendFragment = """
-    struct FriendFragment: TestSchema.MutableSelectionSet, Fragment {
-    """
+      struct FriendFragment: TestSchema.MutableSelectionSet, Fragment {
+      """
 
     try await buildSubjectAndFragment(named: "NameFragment")
     let renderedNameFragment = renderSubject()
@@ -374,29 +410,29 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenQueryWithLowercasing_generatesCorrectlyCasedLocalCacheMutation() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    query lowercaseOperation($variable: String = "TestVar") @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        species
+      query lowercaseOperation($variable: String = "TestVar") @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-    struct LowercaseOperationLocalCacheMutation: LocalCacheMutation {
-      static let operationType: GraphQLOperationType = .query
+      """
+      struct LowercaseOperationLocalCacheMutation: LocalCacheMutation {
+        static let operationType: GraphQLOperationType = .query
 
-    """
+      """
 
     // when
     try await buildSubjectAndOperation(named: "lowercaseOperation")
@@ -407,22 +443,25 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__generate__givenQueryWithNameEndingInLocalCacheMutation_generatesLocalCacheMutationWithoutDoubledTypeSuffix() async throws {
+  func
+    test__generate__givenQueryWithNameEndingInLocalCacheMutation_generatesLocalCacheMutationWithoutDoubledTypeSuffix()
+    async throws
+  {
     // given
     document = """
-    query TestOperationLocalCacheMutation @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        species
+      query TestOperationLocalCacheMutation @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-    struct TestOperationLocalCacheMutation: LocalCacheMutation {
-      static let operationType: GraphQLOperationType = .query
+      """
+      struct TestOperationLocalCacheMutation: LocalCacheMutation {
+        static let operationType: GraphQLOperationType = .query
 
-    """
+      """
 
     // when
     try await buildSubjectAndOperation(named: "TestOperationLocalCacheMutation")
@@ -436,33 +475,33 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenMutation_generatesLocalCacheMutation() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Mutation {
-      addAnimal: Animal!
-    }
+      type Mutation {
+        addAnimal: Animal!
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    mutation TestOperation @apollo_client_ios_localCacheMutation {
-      addAnimal {
-        species
+      mutation TestOperation @apollo_client_ios_localCacheMutation {
+        addAnimal {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-    struct TestOperationLocalCacheMutation: LocalCacheMutation {
-      static let operationType: GraphQLOperationType = .mutation
+      """
+      struct TestOperationLocalCacheMutation: LocalCacheMutation {
+        static let operationType: GraphQLOperationType = .mutation
 
-    """
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -476,33 +515,33 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenSubscription_generatesSubscriptionOperation() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Subscription {
-      streamAnimals: [Animal!]
-    }
+      type Subscription {
+        streamAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    subscription TestOperation @apollo_client_ios_localCacheMutation {
-      streamAnimals {
-        species
+      subscription TestOperation @apollo_client_ios_localCacheMutation {
+        streamAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-    struct TestOperationLocalCacheMutation: LocalCacheMutation {
-      static let operationType: GraphQLOperationType = .subscription
+      """
+      struct TestOperationLocalCacheMutation: LocalCacheMutation {
+        static let operationType: GraphQLOperationType = .subscription
 
-    """
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -516,10 +555,10 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenQuery_generatesSelectionSetsAsMutable() async throws {
     // given
     let expected =
-    """
-      struct Data: TestSchema.MutableSelectionSet {
-        var __data: DataDict
-    """
+      """
+        struct Data: TestSchema.MutableSelectionSet {
+          var __data: DataDict
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -533,10 +572,10 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenLowercasedSchemaName_generatesSelectionSetsWithFirstUppercasedNamespace() async throws {
     // given
     let expected =
-    """
-      struct Data: Myschema.MutableSelectionSet {
-        var __data: DataDict
-    """
+      """
+        struct Data: Myschema.MutableSelectionSet {
+          var __data: DataDict
+      """
 
     // when
     config = .mock(schemaNamespace: "myschema")
@@ -551,10 +590,10 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenUppercasedSchemaName_generatesSelectionSetsWithUppercasedNamespace() async throws {
     // given
     let expected =
-    """
-      struct Data: MYSCHEMA.MutableSelectionSet {
-        var __data: DataDict
-    """
+      """
+        struct Data: MYSCHEMA.MutableSelectionSet {
+          var __data: DataDict
+      """
 
     // when
     config = .mock(schemaNamespace: "MYSCHEMA")
@@ -572,8 +611,8 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     let expected = """
-    public struct TestOperationLocalCacheMutation: LocalCacheMutation {
-    """
+      public struct TestOperationLocalCacheMutation: LocalCacheMutation {
+      """
 
     // when
     let actual = renderSubject()
@@ -584,12 +623,12 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
 
   func test_render_givenModuleType_other_generatesClassDefinition_withPublicModifier() async throws {
     // given
-    config  = .mock(.other)
+    config = .mock(.other)
     try await buildSubjectAndOperation()
 
     let expected = """
-    public struct TestOperationLocalCacheMutation: LocalCacheMutation {
-    """
+      public struct TestOperationLocalCacheMutation: LocalCacheMutation {
+      """
 
     // when
     let actual = renderSubject()
@@ -604,8 +643,8 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     try await buildSubjectAndOperation()
 
     let expected = """
-    struct TestOperationLocalCacheMutation: LocalCacheMutation {
-    """
+      struct TestOperationLocalCacheMutation: LocalCacheMutation {
+      """
 
     // when
     let actual = renderSubject()
@@ -617,88 +656,88 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   // MARK: - Variables
 
   func test__generate__givenQueryWithScalarVariable_generatesQueryOperationWithVariable() async throws {
-     // given
-     schemaSDL = """
-     type Query {
-       allAnimals: [Animal!]
-     }
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-     type Animal {
-       species: String!
-     }
-     """
+      type Animal {
+        species: String!
+      }
+      """
 
-     document = """
-     query TestOperation($variable: String!) @apollo_client_ios_localCacheMutation {
-       allAnimals {
-         species
-       }
-     }
-     """
+    document = """
+      query TestOperation($variable: String!) @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
+      }
+      """
 
-     let expected =
-     """
-       public var variable: String
+    let expected =
+      """
+        public var variable: String
 
-       public init(variable: String) {
-         self.variable = variable
-       }
+        public init(variable: String) {
+          self.variable = variable
+        }
 
-       public var __variables: GraphQLOperation.Variables? { ["variable": variable] }
-     """
+        public var __variables: GraphQLOperation.Variables? { ["variable": variable] }
+      """
 
-     // when
+    // when
     try await buildSubjectAndOperation()
 
-     let actual = renderSubject()
+    let actual = renderSubject()
 
-     // then
-     expect(actual).to(equalLineByLine(expected, atLine: 4, ignoringExtraLines: true))
-   }
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 4, ignoringExtraLines: true))
+  }
 
   func test__generate__givenQueryWithMutlipleScalarVariables_generatesQueryOperationWithVariables() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-      intField: Int!
-    }
-    """
+      type Animal {
+        species: String!
+        intField: Int!
+      }
+      """
 
     document = """
-    query TestOperation($variable1: String!, $variable2: Boolean!, $variable3: Int!) @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        species
+      query TestOperation($variable1: String!, $variable2: Boolean!, $variable3: Int!) @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-      public var variable1: String
-      public var variable2: Bool
-      public var variable3: Int32
+      """
+        public var variable1: String
+        public var variable2: Bool
+        public var variable3: Int32
 
-      public init(
-        variable1: String,
-        variable2: Bool,
-        variable3: Int32
-      ) {
-        self.variable1 = variable1
-        self.variable2 = variable2
-        self.variable3 = variable3
-      }
+        public init(
+          variable1: String,
+          variable2: Bool,
+          variable3: Int32
+        ) {
+          self.variable1 = variable1
+          self.variable2 = variable2
+          self.variable3 = variable3
+        }
 
-      public var __variables: GraphQLOperation.Variables? { [
-        "variable1": variable1,
-        "variable2": variable2,
-        "variable3": variable3
-      ] }
-    """
+        public var __variables: GraphQLOperation.Variables? { [
+          "variable1": variable1,
+          "variable2": variable2,
+          "variable3": variable3
+        ] }
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -712,33 +751,33 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenQueryWithNullableScalarVariable_generatesQueryOperationWithVariable() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    query TestOperation($variable: String = "TestVar") @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        species
+      query TestOperation($variable: String = "TestVar") @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-      public var variable: GraphQLNullable<String>
+      """
+        public var variable: GraphQLNullable<String>
 
-      public init(variable: GraphQLNullable<String> = "TestVar") {
-        self.variable = variable
-      }
+        public init(variable: GraphQLNullable<String> = "TestVar") {
+          self.variable = variable
+        }
 
-      public var __variables: GraphQLOperation.Variables? { ["variable": variable] }
-    """
+        public var __variables: GraphQLOperation.Variables? { ["variable": variable] }
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -754,29 +793,27 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
   func test__render_givenLocalCacheMutation_rendersInitializer() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    query TestOperation @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        species
+      query TestOperation @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-        }
-
-        init(
-    """
+      """
+          init(
+      """
 
     config = ApolloCodegenConfiguration.mock(
       schemaNamespace: "TestSchema",
@@ -791,7 +828,13 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
+    expect(actual).to(
+      equalLineByLine(
+        expected,
+        after: .selectionSet.propertyAccessors(mutable: true),
+        ignoringExtraLines: true
+      )
+    )
   }
 
 }

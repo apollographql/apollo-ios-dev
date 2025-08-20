@@ -27,21 +27,19 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -56,6 +54,9 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
         .field("__typename", String.self),
         .field("friends", [Friend?]?.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.self
+      ] }
 
       /// The friends of the character, or an empty list if they have none
       public var friends: [Friend?]? { __data["friends"] }
@@ -64,15 +65,10 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
         __typename: String,
         friends: [Friend?]? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "friends": friends._fieldData,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "friends": friends._fieldData,
+        ])
       }
 
       /// Hero.Friend
@@ -88,6 +84,9 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
           .field("name", String.self),
           .include(if: "includeFriendsDetails", .inlineFragment(IfIncludeFriendsDetails.self)),
         ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.self
+        ] }
 
         /// The name of the character
         public var name: String { __data["name"] }
@@ -98,15 +97,10 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
           __typename: String,
           name: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": __typename,
-              "name": name,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": __typename,
+            "name": name,
+          ])
         }
 
         /// Hero.Friend.IfIncludeFriendsDetails
@@ -122,6 +116,10 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
             .field("name", String.self),
             .inlineFragment(AsDroid.self),
           ] }
+          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.self,
+            HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.IfIncludeFriendsDetails.self
+          ] }
 
           /// The name of the character
           public var name: String { __data["name"] }
@@ -132,16 +130,10 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
             __typename: String,
             name: String
           ) {
-            self.init(_dataDict: DataDict(
-              data: [
-                "__typename": __typename,
-                "name": name,
-              ],
-              fulfilledFragments: [
-                ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.self),
-                ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.IfIncludeFriendsDetails.self)
-              ]
-            ))
+            self.init(unsafelyWithData: [
+              "__typename": __typename,
+              "name": name,
+            ])
           }
 
           /// Hero.Friend.IfIncludeFriendsDetails.AsDroid
@@ -156,6 +148,11 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
             public static var __selections: [ApolloAPI.Selection] { [
               .field("primaryFunction", String?.self),
             ] }
+            public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+              HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.self,
+              HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.IfIncludeFriendsDetails.self,
+              HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.IfIncludeFriendsDetails.AsDroid.self
+            ] }
 
             /// This droid's primary function
             public var primaryFunction: String? { __data["primaryFunction"] }
@@ -166,18 +163,11 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
               primaryFunction: String? = nil,
               name: String
             ) {
-              self.init(_dataDict: DataDict(
-                data: [
-                  "__typename": StarWarsAPI.Objects.Droid.typename,
-                  "primaryFunction": primaryFunction,
-                  "name": name,
-                ],
-                fulfilledFragments: [
-                  ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.self),
-                  ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.IfIncludeFriendsDetails.self),
-                  ObjectIdentifier(HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.IfIncludeFriendsDetails.AsDroid.self)
-                ]
-              ))
+              self.init(unsafelyWithData: [
+                "__typename": StarWarsAPI.Objects.Droid.typename,
+                "primaryFunction": primaryFunction,
+                "name": name,
+              ])
             }
           }
         }

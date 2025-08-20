@@ -27,21 +27,19 @@ public struct HeroNameWithIDQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroNameWithIDQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroNameWithIDQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -57,6 +55,9 @@ public struct HeroNameWithIDQuery: GraphQLQuery {
         .field("id", StarWarsAPI.ID.self),
         .field("name", String.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroNameWithIDQuery.Data.Hero.self
+      ] }
 
       /// The ID of the character
       public var id: StarWarsAPI.ID { __data["id"] }
@@ -68,16 +69,11 @@ public struct HeroNameWithIDQuery: GraphQLQuery {
         id: StarWarsAPI.ID,
         name: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "id": id,
-            "name": name,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroNameWithIDQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "id": id,
+          "name": name,
+        ])
       }
     }
   }

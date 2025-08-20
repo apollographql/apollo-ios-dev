@@ -37,6 +37,9 @@ public struct UploadMultipleFilesToDifferentParametersMutation: GraphQLMutation 
         "multipleFiles": .variable("multipleFiles")
       ]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      UploadMultipleFilesToDifferentParametersMutation.Data.self
+    ] }
 
     public var multipleParameterUpload: [MultipleParameterUpload] { __data["multipleParameterUpload"] }
 
@@ -54,6 +57,9 @@ public struct UploadMultipleFilesToDifferentParametersMutation: GraphQLMutation 
         .field("path", String.self),
         .field("filename", String.self),
         .field("mimetype", String.self),
+      ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        UploadMultipleFilesToDifferentParametersMutation.Data.MultipleParameterUpload.self
       ] }
 
       public var id: UploadAPI.ID { __data["id"] }

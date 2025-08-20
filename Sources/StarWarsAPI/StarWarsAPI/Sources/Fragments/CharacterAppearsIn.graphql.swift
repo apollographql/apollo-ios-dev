@@ -16,6 +16,9 @@ public struct CharacterAppearsIn: StarWarsAPI.SelectionSet, Fragment {
     .field("__typename", String.self),
     .field("appearsIn", [GraphQLEnum<StarWarsAPI.Episode>?].self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    CharacterAppearsIn.self
+  ] }
 
   /// The movies this character appears in
   public var appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?] { __data["appearsIn"] }
@@ -24,14 +27,9 @@ public struct CharacterAppearsIn: StarWarsAPI.SelectionSet, Fragment {
     __typename: String,
     appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?]
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-        "appearsIn": appearsIn,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(CharacterAppearsIn.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+      "appearsIn": appearsIn,
+    ])
   }
 }

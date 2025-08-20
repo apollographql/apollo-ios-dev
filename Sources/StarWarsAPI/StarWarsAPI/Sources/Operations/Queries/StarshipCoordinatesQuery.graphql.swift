@@ -27,21 +27,19 @@ public struct StarshipCoordinatesQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("starshipCoordinates", StarshipCoordinates?.self, arguments: ["coordinates": .variable("coordinates")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      StarshipCoordinatesQuery.Data.self
+    ] }
 
     public var starshipCoordinates: StarshipCoordinates? { __data["starshipCoordinates"] }
 
     public init(
       starshipCoordinates: StarshipCoordinates? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "starshipCoordinates": starshipCoordinates._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(StarshipCoordinatesQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "starshipCoordinates": starshipCoordinates._fieldData,
+      ])
     }
 
     /// StarshipCoordinates
@@ -58,6 +56,9 @@ public struct StarshipCoordinatesQuery: GraphQLQuery {
         .field("coordinates", [[Double]]?.self),
         .field("length", Double?.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        StarshipCoordinatesQuery.Data.StarshipCoordinates.self
+      ] }
 
       /// The name of the starship
       public var name: String { __data["name"] }
@@ -70,17 +71,12 @@ public struct StarshipCoordinatesQuery: GraphQLQuery {
         coordinates: [[Double]]? = nil,
         length: Double? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": StarWarsAPI.Objects.Starship.typename,
-            "name": name,
-            "coordinates": coordinates,
-            "length": length,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(StarshipCoordinatesQuery.Data.StarshipCoordinates.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": StarWarsAPI.Objects.Starship.typename,
+          "name": name,
+          "coordinates": coordinates,
+          "length": length,
+        ])
       }
     }
   }

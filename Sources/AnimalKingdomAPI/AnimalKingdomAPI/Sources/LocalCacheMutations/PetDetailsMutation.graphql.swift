@@ -16,6 +16,9 @@ public struct PetDetailsMutation: AnimalKingdomAPI.MutableSelectionSet, Fragment
     .field("__typename", String.self),
     .field("owner", Owner?.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    PetDetailsMutation.self
+  ] }
 
   public var owner: Owner? {
     get { __data["owner"] }
@@ -26,15 +29,10 @@ public struct PetDetailsMutation: AnimalKingdomAPI.MutableSelectionSet, Fragment
     __typename: String,
     owner: Owner? = nil
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-        "owner": owner._fieldData,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(PetDetailsMutation.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+      "owner": owner._fieldData,
+    ])
   }
 
   /// Owner
@@ -49,6 +47,9 @@ public struct PetDetailsMutation: AnimalKingdomAPI.MutableSelectionSet, Fragment
       .field("__typename", String.self),
       .field("firstName", String.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      PetDetailsMutation.Owner.self
+    ] }
 
     public var firstName: String {
       get { __data["firstName"] }
@@ -58,15 +59,10 @@ public struct PetDetailsMutation: AnimalKingdomAPI.MutableSelectionSet, Fragment
     public init(
       firstName: String
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.Human.typename,
-          "firstName": firstName,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(PetDetailsMutation.Owner.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.Human.typename,
+        "firstName": firstName,
+      ])
     }
   }
 }

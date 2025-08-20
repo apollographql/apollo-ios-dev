@@ -35,21 +35,19 @@ public struct HeroNameConditionalBothSeparateQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroNameConditionalBothSeparateQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroNameConditionalBothSeparateQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -64,6 +62,9 @@ public struct HeroNameConditionalBothSeparateQuery: GraphQLQuery {
         .field("__typename", String.self),
         .include(if: !"skipName" || "includeName", .field("name", String.self)),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroNameConditionalBothSeparateQuery.Data.Hero.self
+      ] }
 
       /// The name of the character
       public var name: String? { __data["name"] }
@@ -72,15 +73,10 @@ public struct HeroNameConditionalBothSeparateQuery: GraphQLQuery {
         __typename: String,
         name: String? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "name": name,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroNameConditionalBothSeparateQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "name": name,
+        ])
       }
     }
   }

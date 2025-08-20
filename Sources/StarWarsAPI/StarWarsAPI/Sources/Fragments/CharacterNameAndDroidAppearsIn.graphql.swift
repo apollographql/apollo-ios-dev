@@ -17,6 +17,9 @@ public struct CharacterNameAndDroidAppearsIn: StarWarsAPI.SelectionSet, Fragment
     .field("name", String.self),
     .inlineFragment(AsDroid.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    CharacterNameAndDroidAppearsIn.self
+  ] }
 
   /// The name of the character
   public var name: String { __data["name"] }
@@ -27,15 +30,10 @@ public struct CharacterNameAndDroidAppearsIn: StarWarsAPI.SelectionSet, Fragment
     __typename: String,
     name: String
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-        "name": name,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(CharacterNameAndDroidAppearsIn.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+      "name": name,
+    ])
   }
 
   /// AsDroid
@@ -50,6 +48,10 @@ public struct CharacterNameAndDroidAppearsIn: StarWarsAPI.SelectionSet, Fragment
     public static var __selections: [ApolloAPI.Selection] { [
       .field("appearsIn", [GraphQLEnum<StarWarsAPI.Episode>?].self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      CharacterNameAndDroidAppearsIn.self,
+      CharacterNameAndDroidAppearsIn.AsDroid.self
+    ] }
 
     /// The movies this droid appears in
     public var appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?] { __data["appearsIn"] }
@@ -60,17 +62,11 @@ public struct CharacterNameAndDroidAppearsIn: StarWarsAPI.SelectionSet, Fragment
       appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?],
       name: String
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Droid.typename,
-          "appearsIn": appearsIn,
-          "name": name,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(CharacterNameAndDroidAppearsIn.self),
-          ObjectIdentifier(CharacterNameAndDroidAppearsIn.AsDroid.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Droid.typename,
+        "appearsIn": appearsIn,
+        "name": name,
+      ])
     }
   }
 }

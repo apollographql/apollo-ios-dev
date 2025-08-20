@@ -26,6 +26,9 @@ public struct UploadOneFileMutation: GraphQLMutation {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("singleUpload", SingleUpload.self, arguments: ["file": .variable("file")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      UploadOneFileMutation.Data.self
+    ] }
 
     public var singleUpload: SingleUpload { __data["singleUpload"] }
 
@@ -43,6 +46,9 @@ public struct UploadOneFileMutation: GraphQLMutation {
         .field("path", String.self),
         .field("filename", String.self),
         .field("mimetype", String.self),
+      ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        UploadOneFileMutation.Data.SingleUpload.self
       ] }
 
       public var id: UploadAPI.ID { __data["id"] }

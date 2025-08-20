@@ -16,20 +16,18 @@ public struct DogFragment: AnimalKingdomAPI.SelectionSet, Fragment {
     .field("__typename", String.self),
     .field("species", String.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    DogFragment.self
+  ] }
 
   public var species: String { __data["species"] }
 
   public init(
     species: String
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": AnimalKingdomAPI.Objects.Dog.typename,
-        "species": species,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(DogFragment.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": AnimalKingdomAPI.Objects.Dog.typename,
+      "species": species,
+    ])
   }
 }

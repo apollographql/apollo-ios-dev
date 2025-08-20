@@ -23,14 +23,13 @@ struct DeferredFragmentsMetadataTemplate {
   /// Renders metadata definitions for the deferred fragments of an Operation.
   ///
   /// - Returns: The `TemplateString` for the deferred fragments metadata definitions.
-  func render() -> TemplateString? {
+  func render() -> TemplateString {
     let deferredFragmentPathTypeInfo = DeferredFragmentsPathTypeInfo(
       from: operation.rootField.selectionSet.selections
     )
-    guard !deferredFragmentPathTypeInfo.isEmpty else { return nil }
+    guard !deferredFragmentPathTypeInfo.isEmpty else { return "" }
 
     return """
-
     // MARK: - Deferred Fragment Metadata
     
     public typealias ResponseFormat = IncrementalDeferredResponseFormat

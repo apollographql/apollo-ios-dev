@@ -28,21 +28,19 @@ public struct HeroAppearsInWithFragmentQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroAppearsInWithFragmentQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroAppearsInWithFragmentQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -56,6 +54,10 @@ public struct HeroAppearsInWithFragmentQuery: GraphQLQuery {
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .fragment(CharacterAppearsIn.self),
+      ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroAppearsInWithFragmentQuery.Data.Hero.self,
+        CharacterAppearsIn.self
       ] }
 
       /// The movies this character appears in
@@ -72,16 +74,10 @@ public struct HeroAppearsInWithFragmentQuery: GraphQLQuery {
         __typename: String,
         appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?]
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "appearsIn": appearsIn,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroAppearsInWithFragmentQuery.Data.Hero.self),
-            ObjectIdentifier(CharacterAppearsIn.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "appearsIn": appearsIn,
+        ])
       }
     }
   }

@@ -82,6 +82,7 @@ open class AbstractMockSelectionSet<F, S: SchemaMetadata>: RootSelectionSet, Has
 
   open class var __selections: [Selection] { [] }
   open class var __parentType: any ParentType { Object.mock }
+  open class var __fulfilledFragments: [any SelectionSet.Type] { [] }
 
   public var __data: DataDict = .empty()
 

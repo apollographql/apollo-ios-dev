@@ -49,8 +49,8 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     )
   }
   
-  private func renderSubject() -> String? {
-    subject.render()?.description
+  private func renderSubject() -> String {
+    subject.render().description
   }
   
   // MARK: - Deferred Inline Fragments
@@ -100,7 +100,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         ]
       )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -150,7 +149,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         ]
       )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -205,7 +203,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         ]
       )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -267,7 +264,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         ]
       )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -335,7 +331,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         ]
       )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -406,7 +401,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         ]
       )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -460,7 +454,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         ]
       )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -516,7 +509,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         ]
       )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -575,7 +567,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         ]
       )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -634,7 +625,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         ]
       )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -691,7 +681,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         ]
       )
       """,
-      atLine: 4,
+      atLine: 3,
       ignoringExtraLines: false)
     )
   }

@@ -28,21 +28,19 @@ public struct HeroAndFriendsNamesWithFragmentQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroAndFriendsNamesWithFragmentQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroAndFriendsNamesWithFragmentQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -57,6 +55,10 @@ public struct HeroAndFriendsNamesWithFragmentQuery: GraphQLQuery {
         .field("__typename", String.self),
         .field("name", String.self),
         .fragment(FriendsNames.self),
+      ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroAndFriendsNamesWithFragmentQuery.Data.Hero.self,
+        FriendsNames.self
       ] }
 
       /// The name of the character
@@ -76,17 +78,11 @@ public struct HeroAndFriendsNamesWithFragmentQuery: GraphQLQuery {
         name: String,
         friends: [Friend?]? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "name": name,
-            "friends": friends._fieldData,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroAndFriendsNamesWithFragmentQuery.Data.Hero.self),
-            ObjectIdentifier(FriendsNames.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "name": name,
+          "friends": friends._fieldData,
+        ])
       }
 
       public typealias Friend = FriendsNames.Friend

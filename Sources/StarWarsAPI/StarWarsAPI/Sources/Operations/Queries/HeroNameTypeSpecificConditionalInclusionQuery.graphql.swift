@@ -35,21 +35,19 @@ public struct HeroNameTypeSpecificConditionalInclusionQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroNameTypeSpecificConditionalInclusionQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroNameTypeSpecificConditionalInclusionQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -65,6 +63,9 @@ public struct HeroNameTypeSpecificConditionalInclusionQuery: GraphQLQuery {
         .inlineFragment(AsDroid.self),
         .include(if: "includeName", .field("name", String.self)),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroNameTypeSpecificConditionalInclusionQuery.Data.Hero.self
+      ] }
 
       /// The name of the character
       public var name: String? { __data["name"] }
@@ -75,15 +76,10 @@ public struct HeroNameTypeSpecificConditionalInclusionQuery: GraphQLQuery {
         __typename: String,
         name: String? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "name": name,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroNameTypeSpecificConditionalInclusionQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "name": name,
+        ])
       }
 
       /// Hero.AsDroid
@@ -98,6 +94,10 @@ public struct HeroNameTypeSpecificConditionalInclusionQuery: GraphQLQuery {
         public static var __selections: [ApolloAPI.Selection] { [
           .field("name", String.self),
         ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroNameTypeSpecificConditionalInclusionQuery.Data.Hero.self,
+          HeroNameTypeSpecificConditionalInclusionQuery.Data.Hero.AsDroid.self
+        ] }
 
         /// What others call this droid
         public var name: String { __data["name"] }
@@ -105,16 +105,10 @@ public struct HeroNameTypeSpecificConditionalInclusionQuery: GraphQLQuery {
         public init(
           name: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": StarWarsAPI.Objects.Droid.typename,
-              "name": name,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroNameTypeSpecificConditionalInclusionQuery.Data.Hero.self),
-              ObjectIdentifier(HeroNameTypeSpecificConditionalInclusionQuery.Data.Hero.AsDroid.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": StarWarsAPI.Objects.Droid.typename,
+            "name": name,
+          ])
         }
       }
     }

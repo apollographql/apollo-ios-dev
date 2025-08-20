@@ -1,9 +1,10 @@
-import XCTest
+import ApolloCodegenInternalTestHelpers
+import IR
 import Nimble
 import OrderedCollections
-import IR
+import XCTest
+
 @testable import ApolloCodegenLib
-import ApolloCodegenInternalTestHelpers
 
 class OperationDefinitionTemplateTests: XCTestCase {
 
@@ -17,22 +18,22 @@ class OperationDefinitionTemplateTests: XCTestCase {
   override func setUp() {
     super.setUp()
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    query TestOperation {
-      allAnimals {
-        species
+      query TestOperation {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     config = .mock()
   }
@@ -69,12 +70,12 @@ class OperationDefinitionTemplateTests: XCTestCase {
   func test__target__givenModuleImports_targetHasModuleImports() async throws {
     // given
     document = """
-    query TestOperation @import(module: "ModuleA") {
-      allAnimals {
-        species
+      query TestOperation @import(module: "ModuleA") {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -93,10 +94,10 @@ class OperationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenQuery_generatesQueryOperation() async throws {
     // given
     let expected =
-    """
-    struct TestOperationQuery: GraphQLQuery {
-      static let operationName: String = "TestOperation"
-    """
+      """
+      struct TestOperationQuery: GraphQLQuery {
+        static let operationName: String = "TestOperation"
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -105,23 +106,23 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
-  }  
+  }
 
   func test__generate__givenQueryWithNameEndingInQuery_generatesQueryOperationWithoutDoubledTypeSuffix() async throws {
     // given
     document = """
-    query TestOperationQuery {
-      allAnimals {
-        species
+      query TestOperationQuery {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-    struct TestOperationQuery: GraphQLQuery {
-      static let operationName: String = "TestOperationQuery"
-    """
+      """
+      struct TestOperationQuery: GraphQLQuery {
+        static let operationName: String = "TestOperationQuery"
+      """
 
     // when
     try await buildSubjectAndOperation(named: "TestOperationQuery")
@@ -135,32 +136,32 @@ class OperationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenMutationWithNameEndingInQuery_generatesQueryOperationWithBothSuffixes() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Mutation {
-      addAnimal: Animal!
-    }
+      type Mutation {
+        addAnimal: Animal!
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    mutation TestOperationQuery {
-      addAnimal {
-        species
+      mutation TestOperationQuery {
+        addAnimal {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-    struct TestOperationQueryMutation: GraphQLMutation {
-      static let operationName: String = "TestOperationQuery"
-    """
+      """
+      struct TestOperationQueryMutation: GraphQLMutation {
+        static let operationName: String = "TestOperationQuery"
+      """
 
     // when
     try await buildSubjectAndOperation(named: "TestOperationQuery")
@@ -174,32 +175,32 @@ class OperationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenMutation_generatesMutationOperation() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Mutation {
-      addAnimal: Animal!
-    }
+      type Mutation {
+        addAnimal: Animal!
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    mutation TestOperation {
-      addAnimal {
-        species
+      mutation TestOperation {
+        addAnimal {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-    struct TestOperationMutation: GraphQLMutation {
-      static let operationName: String = "TestOperation"
-    """
+      """
+      struct TestOperationMutation: GraphQLMutation {
+        static let operationName: String = "TestOperation"
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -213,32 +214,32 @@ class OperationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenSubscription_generatesSubscriptionOperation() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Subscription {
-      streamAnimals: [Animal!]
-    }
+      type Subscription {
+        streamAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    subscription TestOperation {
-      streamAnimals {
-        species
+      subscription TestOperation {
+        streamAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-    struct TestOperationSubscription: GraphQLSubscription {
-      static let operationName: String = "TestOperation"
-    """
+      """
+      struct TestOperationSubscription: GraphQLSubscription {
+        static let operationName: String = "TestOperation"
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -252,31 +253,31 @@ class OperationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenQueryWithLowercasing_generatesCorrectlyCasedQueryOperation() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    query lowercaseOperation($variable: String = "TestVar") {
-      allAnimals {
-        species
+      query lowercaseOperation($variable: String = "TestVar") {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-    struct LowercaseOperationQuery: GraphQLQuery {
-      static let operationName: String = "lowercaseOperation"
-      static let operationDocument: ApolloAPI.OperationDocument = .init(
-        definition: .init(
-          #\"query lowercaseOperation($variable: String = \"TestVar\") { allAnimals { __typename species } }\"#
-    """
+      """
+      struct LowercaseOperationQuery: GraphQLQuery {
+        static let operationName: String = "lowercaseOperation"
+        static let operationDocument: ApolloAPI.OperationDocument = .init(
+          definition: .init(
+            #\"query lowercaseOperation($variable: String = \"TestVar\") { allAnimals { __typename species } }\"#
+      """
 
     // when
     try await buildSubjectAndOperation(named: "lowercaseOperation")
@@ -292,30 +293,30 @@ class OperationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenOperationSelectionSet_rendersDeclaration() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    interface Animal {
-      species: String!
-    }
-    """
+      interface Animal {
+        species: String!
+      }
+      """
 
     document = """
-    query TestOperation {
-      allAnimals {
-        species
+      query TestOperation {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected = """
-      struct Data: TestSchema.SelectionSet {
-        let __data: DataDict
-        init(_dataDict: DataDict) { __data = _dataDict }
+        struct Data: TestSchema.SelectionSet {
+          let __data: DataDict
+          init(_dataDict: DataDict) { __data = _dataDict }
 
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
-    """
+          static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -349,19 +350,14 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     let expected =
       """
-            init(
-              species: String
-            ) {
-              self.init(_dataDict: DataDict(
-                data: [
-                  "__typename": TestSchema.Objects.Animal.typename,
-                  "species": species,
-                ],
-                fulfilledFragments: [
-                  ObjectIdentifier(TestOperationQuery.Data.AllAnimal.self)
-                ]
-              ))
-            }
+          init(
+            allAnimals: [AllAnimal]? = nil
+          ) {
+            self.init(unsafelyWithData: [
+              "__typename": TestSchema.Objects.Query.typename,
+              "allAnimals": allAnimals._fieldData,
+            ])
+          }
       """
 
     config = .mock(options: .init(selectionSetInitializers: [.operations]))
@@ -372,7 +368,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 50, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, forSection: .selectionSet.initializer))
   }
 
   func test__generate_givenOperationSelectionSet_configIncludesSpecificOperation_rendersInitializer() async throws {
@@ -397,24 +393,21 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     let expected =
       """
-            init(
-              species: String
-            ) {
-              self.init(_dataDict: DataDict(
-                data: [
-                  "__typename": TestSchema.Objects.Animal.typename,
-                  "species": species,
-                ],
-                fulfilledFragments: [
-                  ObjectIdentifier(TestOperationQuery.Data.AllAnimal.self)
-                ]
-              ))
-            }
+          init(
+            allAnimals: [AllAnimal]? = nil
+          ) {
+            self.init(unsafelyWithData: [
+              "__typename": TestSchema.Objects.Query.typename,
+              "allAnimals": allAnimals._fieldData,
+            ])
+          }
       """
 
-    config = .mock(options: .init(selectionSetInitializers: [
-      .operation(named: "TestOperation")
-    ]))
+    config = .mock(
+      options: .init(selectionSetInitializers: [
+        .operation(named: "TestOperation")
+      ])
+    )
 
     // when
     try await buildSubjectAndOperation()
@@ -422,7 +415,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 50, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, forSection: .selectionSet.initializer))
   }
 
   func test__render_givenOperationSelectionSet_configDoesNotIncludeOperations_doesNotRenderInitializer() async throws {
@@ -453,10 +446,18 @@ class OperationDefinitionTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine("    }", atLine: 35, ignoringExtraLines: true))
+    expect(actual).to(
+      equalLineByLine(
+        "    /// AllAnimal",
+        after: .selectionSet.propertyAccessors(),
+        ignoringExtraLines: true
+      )
+    )
   }
 
-  func test__render_givenOperationSelectionSet_configIncludeSpecificOperationWithOtherName_doesNotRenderInitializer() async throws {
+  func test__render_givenOperationSelectionSet_configIncludeSpecificOperationWithOtherName_doesNotRenderInitializer()
+    async throws
+  {
     // given
     schemaSDL = """
       type Query {
@@ -476,9 +477,11 @@ class OperationDefinitionTemplateTests: XCTestCase {
       }
       """
 
-    config = .mock(options: .init(selectionSetInitializers: [
-      .operation(named: "OtherOperation")
-    ]))
+    config = .mock(
+      options: .init(selectionSetInitializers: [
+        .operation(named: "OtherOperation")
+      ])
+    )
 
     // when
     try await buildSubjectAndOperation()
@@ -486,10 +489,19 @@ class OperationDefinitionTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine("    }", atLine: 35, ignoringExtraLines: true))
+    expect(actual).to(
+      equalLineByLine(
+        "    /// AllAnimal",
+        after: .selectionSet.propertyAccessors(),
+        ignoringExtraLines: true
+      )
+    )
   }
 
-  func test__render_givenOperationSelectionSet_initializerConfig_all_fieldMergingConfig_notAll_doesNotRenderInitializer() async throws {
+  func
+    test__render_givenOperationSelectionSet_initializerConfig_all_fieldMergingConfig_notAll_doesNotRenderInitializer()
+    async throws
+  {
     let tests: [ApolloCodegenConfiguration.FieldMerging] = [
       .none,
       .ancestors,
@@ -497,28 +509,28 @@ class OperationDefinitionTemplateTests: XCTestCase {
       .siblings,
       [.ancestors, .namedFragments],
       [.siblings, .ancestors],
-      [.siblings, .namedFragments]
+      [.siblings, .namedFragments],
     ]
-    
+
     for test in tests {
       // given
       schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
+        type Query {
+          allAnimals: [Animal!]
+        }
 
-      type Animal {
-        species: String!
-      }
-      """
+        type Animal {
+          species: String!
+        }
+        """
 
       document = """
-      query TestOperation {
-        allAnimals {
-          species
+        query TestOperation {
+          allAnimals {
+            species
+          }
         }
-      }
-      """
+        """
 
       config = .mock(
         options: .init(
@@ -533,7 +545,13 @@ class OperationDefinitionTemplateTests: XCTestCase {
       let actual = renderSubject()
 
       // then
-      expect(actual).to(equalLineByLine("    }", atLine: 35, ignoringExtraLines: true))
+      expect(actual).to(
+        equalLineByLine(
+          "    /// AllAnimal",
+          after: .selectionSet.propertyAccessors(),
+          ignoringExtraLines: true
+        )
+      )
     }
   }
 
@@ -542,33 +560,33 @@ class OperationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenQueryWithScalarVariable_generatesQueryOperationWithVariable() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    query TestOperation($variable: String!) {
-      allAnimals {
-        species
+      query TestOperation($variable: String!) {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-      public var variable: String
+      """
+        public var variable: String
 
-      public init(variable: String) {
-        self.variable = variable
-      }
+        public init(variable: String) {
+          self.variable = variable
+        }
 
-      public var __variables: Variables? { ["variable": variable] }
-    """
+        public var __variables: Variables? { ["variable": variable] }
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -582,46 +600,46 @@ class OperationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenQueryWithMutlipleScalarVariables_generatesQueryOperationWithVariables() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-      intField: Int!
-    }
-    """
+      type Animal {
+        species: String!
+        intField: Int!
+      }
+      """
 
     document = """
-    query TestOperation($variable1: String!, $variable2: Boolean!, $variable3: Int!) {
-      allAnimals {
-        species
+      query TestOperation($variable1: String!, $variable2: Boolean!, $variable3: Int!) {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-      public var variable1: String
-      public var variable2: Bool
-      public var variable3: Int32
+      """
+        public var variable1: String
+        public var variable2: Bool
+        public var variable3: Int32
 
-      public init(
-        variable1: String,
-        variable2: Bool,
-        variable3: Int32
-      ) {
-        self.variable1 = variable1
-        self.variable2 = variable2
-        self.variable3 = variable3
-      }
+        public init(
+          variable1: String,
+          variable2: Bool,
+          variable3: Int32
+        ) {
+          self.variable1 = variable1
+          self.variable2 = variable2
+          self.variable3 = variable3
+        }
 
-      public var __variables: Variables? { [
-        "variable1": variable1,
-        "variable2": variable2,
-        "variable3": variable3
-      ] }
-    """
+        public var __variables: Variables? { [
+          "variable1": variable1,
+          "variable2": variable2,
+          "variable3": variable3
+        ] }
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -635,33 +653,33 @@ class OperationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenQueryWithNullableScalarVariable_generatesQueryOperationWithVariable() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    query TestOperation($variable: String = "TestVar") {
-      allAnimals {
-        species
+      query TestOperation($variable: String = "TestVar") {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-      public var variable: GraphQLNullable<String>
-    
-      public init(variable: GraphQLNullable<String> = "TestVar") {
-        self.variable = variable
-      }
+      """
+        public var variable: GraphQLNullable<String>
 
-      public var __variables: Variables? { ["variable": variable] }
-    """
+        public init(variable: GraphQLNullable<String> = "TestVar") {
+          self.variable = variable
+        }
+
+        public var __variables: Variables? { ["variable": variable] }
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -675,33 +693,33 @@ class OperationDefinitionTemplateTests: XCTestCase {
   func test__generate__givenQueryWithCapitalizedVariable_generatesQueryOperationWithLowercaseVariable() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
     document = """
-    query TestOperation($Variable: String) {
-      allAnimals {
-        species
+      query TestOperation($Variable: String) {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-      public var variable: GraphQLNullable<String>
+      """
+        public var variable: GraphQLNullable<String>
 
-      public init(variable: GraphQLNullable<String>) {
-        self.variable = variable
-      }
+        public init(variable: GraphQLNullable<String>) {
+          self.variable = variable
+        }
 
-      public var __variables: Variables? { ["Variable": variable] }
-    """
+        public var __variables: Variables? { ["Variable": variable] }
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -714,288 +732,290 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
   // MARK: Variables - Reserved Keywords + Special Names
 
-  func test__generate__givenQueryWithSwiftReservedKeywordNames_generatesQueryOperationWithVariablesBackticked() async throws {
+  func test__generate__givenQueryWithSwiftReservedKeywordNames_generatesQueryOperationWithVariablesBackticked()
+    async throws
+  {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-      intField: Int!
-    }
-    """
+      type Animal {
+        species: String!
+        intField: Int!
+      }
+      """
 
     document = """
-    query TestOperation(
-      $as: String
-      $associatedtype: String
-      $break: String
-      $case: String
-      $catch: String
-      $class: String
-      $continue: String
-      $default: String
-      $defer: String
-      $deinit: String
-      $do: String
-      $else: String
-      $enum: String
-      $extension: String
-      $fallthrough: String
-      $false: String
-      $fileprivate: String
-      $for: String
-      $func: String
-      $guard: String
-      $if: String
-      $import: String
-      $in: String
-      $init: String
-      $inout: String
-      $internal: String
-      $is: String
-      $let: String
-      $nil: String
-      $operator: String
-      $precedencegroup: String
-      $private: String
-      $protocol: String
-      $public: String
-      $repeat: String
-      $rethrows: String
-      $return: String
-      $static: String
-      $struct: String
-      $subscript: String
-      $super: String
-      $switch: String
-      $throw: String
-      $throws: String
-      $true: String
-      $try: String
-      $typealias: String
-      $var: String
-      $where: String
-      $while: String
-    ) {
-      allAnimals {
-        species
+      query TestOperation(
+        $as: String
+        $associatedtype: String
+        $break: String
+        $case: String
+        $catch: String
+        $class: String
+        $continue: String
+        $default: String
+        $defer: String
+        $deinit: String
+        $do: String
+        $else: String
+        $enum: String
+        $extension: String
+        $fallthrough: String
+        $false: String
+        $fileprivate: String
+        $for: String
+        $func: String
+        $guard: String
+        $if: String
+        $import: String
+        $in: String
+        $init: String
+        $inout: String
+        $internal: String
+        $is: String
+        $let: String
+        $nil: String
+        $operator: String
+        $precedencegroup: String
+        $private: String
+        $protocol: String
+        $public: String
+        $repeat: String
+        $rethrows: String
+        $return: String
+        $static: String
+        $struct: String
+        $subscript: String
+        $super: String
+        $switch: String
+        $throw: String
+        $throws: String
+        $true: String
+        $try: String
+        $typealias: String
+        $var: String
+        $where: String
+        $while: String
+      ) {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-      public var `as`: GraphQLNullable<String>
-      public var `associatedtype`: GraphQLNullable<String>
-      public var `break`: GraphQLNullable<String>
-      public var `case`: GraphQLNullable<String>
-      public var `catch`: GraphQLNullable<String>
-      public var `class`: GraphQLNullable<String>
-      public var `continue`: GraphQLNullable<String>
-      public var `default`: GraphQLNullable<String>
-      public var `defer`: GraphQLNullable<String>
-      public var `deinit`: GraphQLNullable<String>
-      public var `do`: GraphQLNullable<String>
-      public var `else`: GraphQLNullable<String>
-      public var `enum`: GraphQLNullable<String>
-      public var `extension`: GraphQLNullable<String>
-      public var `fallthrough`: GraphQLNullable<String>
-      public var `false`: GraphQLNullable<String>
-      public var `fileprivate`: GraphQLNullable<String>
-      public var `for`: GraphQLNullable<String>
-      public var `func`: GraphQLNullable<String>
-      public var `guard`: GraphQLNullable<String>
-      public var `if`: GraphQLNullable<String>
-      public var `import`: GraphQLNullable<String>
-      public var `in`: GraphQLNullable<String>
-      public var `init`: GraphQLNullable<String>
-      public var `inout`: GraphQLNullable<String>
-      public var `internal`: GraphQLNullable<String>
-      public var `is`: GraphQLNullable<String>
-      public var `let`: GraphQLNullable<String>
-      public var `nil`: GraphQLNullable<String>
-      public var `operator`: GraphQLNullable<String>
-      public var `precedencegroup`: GraphQLNullable<String>
-      public var `private`: GraphQLNullable<String>
-      public var `protocol`: GraphQLNullable<String>
-      public var `public`: GraphQLNullable<String>
-      public var `repeat`: GraphQLNullable<String>
-      public var `rethrows`: GraphQLNullable<String>
-      public var `return`: GraphQLNullable<String>
-      public var `static`: GraphQLNullable<String>
-      public var `struct`: GraphQLNullable<String>
-      public var `subscript`: GraphQLNullable<String>
-      public var `super`: GraphQLNullable<String>
-      public var `switch`: GraphQLNullable<String>
-      public var `throw`: GraphQLNullable<String>
-      public var `throws`: GraphQLNullable<String>
-      public var `true`: GraphQLNullable<String>
-      public var `try`: GraphQLNullable<String>
-      public var `typealias`: GraphQLNullable<String>
-      public var `var`: GraphQLNullable<String>
-      public var `where`: GraphQLNullable<String>
-      public var `while`: GraphQLNullable<String>
+      """
+        public var `as`: GraphQLNullable<String>
+        public var `associatedtype`: GraphQLNullable<String>
+        public var `break`: GraphQLNullable<String>
+        public var `case`: GraphQLNullable<String>
+        public var `catch`: GraphQLNullable<String>
+        public var `class`: GraphQLNullable<String>
+        public var `continue`: GraphQLNullable<String>
+        public var `default`: GraphQLNullable<String>
+        public var `defer`: GraphQLNullable<String>
+        public var `deinit`: GraphQLNullable<String>
+        public var `do`: GraphQLNullable<String>
+        public var `else`: GraphQLNullable<String>
+        public var `enum`: GraphQLNullable<String>
+        public var `extension`: GraphQLNullable<String>
+        public var `fallthrough`: GraphQLNullable<String>
+        public var `false`: GraphQLNullable<String>
+        public var `fileprivate`: GraphQLNullable<String>
+        public var `for`: GraphQLNullable<String>
+        public var `func`: GraphQLNullable<String>
+        public var `guard`: GraphQLNullable<String>
+        public var `if`: GraphQLNullable<String>
+        public var `import`: GraphQLNullable<String>
+        public var `in`: GraphQLNullable<String>
+        public var `init`: GraphQLNullable<String>
+        public var `inout`: GraphQLNullable<String>
+        public var `internal`: GraphQLNullable<String>
+        public var `is`: GraphQLNullable<String>
+        public var `let`: GraphQLNullable<String>
+        public var `nil`: GraphQLNullable<String>
+        public var `operator`: GraphQLNullable<String>
+        public var `precedencegroup`: GraphQLNullable<String>
+        public var `private`: GraphQLNullable<String>
+        public var `protocol`: GraphQLNullable<String>
+        public var `public`: GraphQLNullable<String>
+        public var `repeat`: GraphQLNullable<String>
+        public var `rethrows`: GraphQLNullable<String>
+        public var `return`: GraphQLNullable<String>
+        public var `static`: GraphQLNullable<String>
+        public var `struct`: GraphQLNullable<String>
+        public var `subscript`: GraphQLNullable<String>
+        public var `super`: GraphQLNullable<String>
+        public var `switch`: GraphQLNullable<String>
+        public var `throw`: GraphQLNullable<String>
+        public var `throws`: GraphQLNullable<String>
+        public var `true`: GraphQLNullable<String>
+        public var `try`: GraphQLNullable<String>
+        public var `typealias`: GraphQLNullable<String>
+        public var `var`: GraphQLNullable<String>
+        public var `where`: GraphQLNullable<String>
+        public var `while`: GraphQLNullable<String>
 
-      public init(
-        `as`: GraphQLNullable<String>,
-        `associatedtype`: GraphQLNullable<String>,
-        `break`: GraphQLNullable<String>,
-        `case`: GraphQLNullable<String>,
-        `catch`: GraphQLNullable<String>,
-        `class`: GraphQLNullable<String>,
-        `continue`: GraphQLNullable<String>,
-        `default`: GraphQLNullable<String>,
-        `defer`: GraphQLNullable<String>,
-        `deinit`: GraphQLNullable<String>,
-        `do`: GraphQLNullable<String>,
-        `else`: GraphQLNullable<String>,
-        `enum`: GraphQLNullable<String>,
-        `extension`: GraphQLNullable<String>,
-        `fallthrough`: GraphQLNullable<String>,
-        `false`: GraphQLNullable<String>,
-        `fileprivate`: GraphQLNullable<String>,
-        `for`: GraphQLNullable<String>,
-        `func`: GraphQLNullable<String>,
-        `guard`: GraphQLNullable<String>,
-        `if`: GraphQLNullable<String>,
-        `import`: GraphQLNullable<String>,
-        `in`: GraphQLNullable<String>,
-        `init`: GraphQLNullable<String>,
-        `inout`: GraphQLNullable<String>,
-        `internal`: GraphQLNullable<String>,
-        `is`: GraphQLNullable<String>,
-        `let`: GraphQLNullable<String>,
-        `nil`: GraphQLNullable<String>,
-        `operator`: GraphQLNullable<String>,
-        `precedencegroup`: GraphQLNullable<String>,
-        `private`: GraphQLNullable<String>,
-        `protocol`: GraphQLNullable<String>,
-        `public`: GraphQLNullable<String>,
-        `repeat`: GraphQLNullable<String>,
-        `rethrows`: GraphQLNullable<String>,
-        `return`: GraphQLNullable<String>,
-        `static`: GraphQLNullable<String>,
-        `struct`: GraphQLNullable<String>,
-        `subscript`: GraphQLNullable<String>,
-        `super`: GraphQLNullable<String>,
-        `switch`: GraphQLNullable<String>,
-        `throw`: GraphQLNullable<String>,
-        `throws`: GraphQLNullable<String>,
-        `true`: GraphQLNullable<String>,
-        `try`: GraphQLNullable<String>,
-        `typealias`: GraphQLNullable<String>,
-        `var`: GraphQLNullable<String>,
-        `where`: GraphQLNullable<String>,
-        `while`: GraphQLNullable<String>
-      ) {
-        self.`as` = `as`
-        self.`associatedtype` = `associatedtype`
-        self.`break` = `break`
-        self.`case` = `case`
-        self.`catch` = `catch`
-        self.`class` = `class`
-        self.`continue` = `continue`
-        self.`default` = `default`
-        self.`defer` = `defer`
-        self.`deinit` = `deinit`
-        self.`do` = `do`
-        self.`else` = `else`
-        self.`enum` = `enum`
-        self.`extension` = `extension`
-        self.`fallthrough` = `fallthrough`
-        self.`false` = `false`
-        self.`fileprivate` = `fileprivate`
-        self.`for` = `for`
-        self.`func` = `func`
-        self.`guard` = `guard`
-        self.`if` = `if`
-        self.`import` = `import`
-        self.`in` = `in`
-        self.`init` = `init`
-        self.`inout` = `inout`
-        self.`internal` = `internal`
-        self.`is` = `is`
-        self.`let` = `let`
-        self.`nil` = `nil`
-        self.`operator` = `operator`
-        self.`precedencegroup` = `precedencegroup`
-        self.`private` = `private`
-        self.`protocol` = `protocol`
-        self.`public` = `public`
-        self.`repeat` = `repeat`
-        self.`rethrows` = `rethrows`
-        self.`return` = `return`
-        self.`static` = `static`
-        self.`struct` = `struct`
-        self.`subscript` = `subscript`
-        self.`super` = `super`
-        self.`switch` = `switch`
-        self.`throw` = `throw`
-        self.`throws` = `throws`
-        self.`true` = `true`
-        self.`try` = `try`
-        self.`typealias` = `typealias`
-        self.`var` = `var`
-        self.`where` = `where`
-        self.`while` = `while`
-      }
+        public init(
+          `as`: GraphQLNullable<String>,
+          `associatedtype`: GraphQLNullable<String>,
+          `break`: GraphQLNullable<String>,
+          `case`: GraphQLNullable<String>,
+          `catch`: GraphQLNullable<String>,
+          `class`: GraphQLNullable<String>,
+          `continue`: GraphQLNullable<String>,
+          `default`: GraphQLNullable<String>,
+          `defer`: GraphQLNullable<String>,
+          `deinit`: GraphQLNullable<String>,
+          `do`: GraphQLNullable<String>,
+          `else`: GraphQLNullable<String>,
+          `enum`: GraphQLNullable<String>,
+          `extension`: GraphQLNullable<String>,
+          `fallthrough`: GraphQLNullable<String>,
+          `false`: GraphQLNullable<String>,
+          `fileprivate`: GraphQLNullable<String>,
+          `for`: GraphQLNullable<String>,
+          `func`: GraphQLNullable<String>,
+          `guard`: GraphQLNullable<String>,
+          `if`: GraphQLNullable<String>,
+          `import`: GraphQLNullable<String>,
+          `in`: GraphQLNullable<String>,
+          `init`: GraphQLNullable<String>,
+          `inout`: GraphQLNullable<String>,
+          `internal`: GraphQLNullable<String>,
+          `is`: GraphQLNullable<String>,
+          `let`: GraphQLNullable<String>,
+          `nil`: GraphQLNullable<String>,
+          `operator`: GraphQLNullable<String>,
+          `precedencegroup`: GraphQLNullable<String>,
+          `private`: GraphQLNullable<String>,
+          `protocol`: GraphQLNullable<String>,
+          `public`: GraphQLNullable<String>,
+          `repeat`: GraphQLNullable<String>,
+          `rethrows`: GraphQLNullable<String>,
+          `return`: GraphQLNullable<String>,
+          `static`: GraphQLNullable<String>,
+          `struct`: GraphQLNullable<String>,
+          `subscript`: GraphQLNullable<String>,
+          `super`: GraphQLNullable<String>,
+          `switch`: GraphQLNullable<String>,
+          `throw`: GraphQLNullable<String>,
+          `throws`: GraphQLNullable<String>,
+          `true`: GraphQLNullable<String>,
+          `try`: GraphQLNullable<String>,
+          `typealias`: GraphQLNullable<String>,
+          `var`: GraphQLNullable<String>,
+          `where`: GraphQLNullable<String>,
+          `while`: GraphQLNullable<String>
+        ) {
+          self.`as` = `as`
+          self.`associatedtype` = `associatedtype`
+          self.`break` = `break`
+          self.`case` = `case`
+          self.`catch` = `catch`
+          self.`class` = `class`
+          self.`continue` = `continue`
+          self.`default` = `default`
+          self.`defer` = `defer`
+          self.`deinit` = `deinit`
+          self.`do` = `do`
+          self.`else` = `else`
+          self.`enum` = `enum`
+          self.`extension` = `extension`
+          self.`fallthrough` = `fallthrough`
+          self.`false` = `false`
+          self.`fileprivate` = `fileprivate`
+          self.`for` = `for`
+          self.`func` = `func`
+          self.`guard` = `guard`
+          self.`if` = `if`
+          self.`import` = `import`
+          self.`in` = `in`
+          self.`init` = `init`
+          self.`inout` = `inout`
+          self.`internal` = `internal`
+          self.`is` = `is`
+          self.`let` = `let`
+          self.`nil` = `nil`
+          self.`operator` = `operator`
+          self.`precedencegroup` = `precedencegroup`
+          self.`private` = `private`
+          self.`protocol` = `protocol`
+          self.`public` = `public`
+          self.`repeat` = `repeat`
+          self.`rethrows` = `rethrows`
+          self.`return` = `return`
+          self.`static` = `static`
+          self.`struct` = `struct`
+          self.`subscript` = `subscript`
+          self.`super` = `super`
+          self.`switch` = `switch`
+          self.`throw` = `throw`
+          self.`throws` = `throws`
+          self.`true` = `true`
+          self.`try` = `try`
+          self.`typealias` = `typealias`
+          self.`var` = `var`
+          self.`where` = `where`
+          self.`while` = `while`
+        }
 
-      public var __variables: Variables? { [
-        "as": `as`,
-        "associatedtype": `associatedtype`,
-        "break": `break`,
-        "case": `case`,
-        "catch": `catch`,
-        "class": `class`,
-        "continue": `continue`,
-        "default": `default`,
-        "defer": `defer`,
-        "deinit": `deinit`,
-        "do": `do`,
-        "else": `else`,
-        "enum": `enum`,
-        "extension": `extension`,
-        "fallthrough": `fallthrough`,
-        "false": `false`,
-        "fileprivate": `fileprivate`,
-        "for": `for`,
-        "func": `func`,
-        "guard": `guard`,
-        "if": `if`,
-        "import": `import`,
-        "in": `in`,
-        "init": `init`,
-        "inout": `inout`,
-        "internal": `internal`,
-        "is": `is`,
-        "let": `let`,
-        "nil": `nil`,
-        "operator": `operator`,
-        "precedencegroup": `precedencegroup`,
-        "private": `private`,
-        "protocol": `protocol`,
-        "public": `public`,
-        "repeat": `repeat`,
-        "rethrows": `rethrows`,
-        "return": `return`,
-        "static": `static`,
-        "struct": `struct`,
-        "subscript": `subscript`,
-        "super": `super`,
-        "switch": `switch`,
-        "throw": `throw`,
-        "throws": `throws`,
-        "true": `true`,
-        "try": `try`,
-        "typealias": `typealias`,
-        "var": `var`,
-        "where": `where`,
-        "while": `while`
-      ] }
-    """
+        public var __variables: Variables? { [
+          "as": `as`,
+          "associatedtype": `associatedtype`,
+          "break": `break`,
+          "case": `case`,
+          "catch": `catch`,
+          "class": `class`,
+          "continue": `continue`,
+          "default": `default`,
+          "defer": `defer`,
+          "deinit": `deinit`,
+          "do": `do`,
+          "else": `else`,
+          "enum": `enum`,
+          "extension": `extension`,
+          "fallthrough": `fallthrough`,
+          "false": `false`,
+          "fileprivate": `fileprivate`,
+          "for": `for`,
+          "func": `func`,
+          "guard": `guard`,
+          "if": `if`,
+          "import": `import`,
+          "in": `in`,
+          "init": `init`,
+          "inout": `inout`,
+          "internal": `internal`,
+          "is": `is`,
+          "let": `let`,
+          "nil": `nil`,
+          "operator": `operator`,
+          "precedencegroup": `precedencegroup`,
+          "private": `private`,
+          "protocol": `protocol`,
+          "public": `public`,
+          "repeat": `repeat`,
+          "rethrows": `rethrows`,
+          "return": `return`,
+          "static": `static`,
+          "struct": `struct`,
+          "subscript": `subscript`,
+          "super": `super`,
+          "switch": `switch`,
+          "throw": `throw`,
+          "throws": `throws`,
+          "true": `true`,
+          "try": `try`,
+          "typealias": `typealias`,
+          "var": `var`,
+          "where": `where`,
+          "while": `while`
+        ] }
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -1005,42 +1025,42 @@ class OperationDefinitionTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
-  
+
   // MARK: - Reserved Keyword Tests
-  
+
   func test__generate__givenInputObjectUsingReservedKeyword_rendersAsEscapedType() async throws {
     // given
     schemaSDL = """
-    input Type {
-      id: String!
-    }
+      input Type {
+        id: String!
+      }
 
-    type Query {
-      getUser(type: Type!): User
-    }
+      type Query {
+        getUser(type: Type!): User
+      }
 
-    type User {
-      id: String!
-      name: String!
-      role: String!
-    }
-    """
+      type User {
+        id: String!
+        name: String!
+        role: String!
+      }
+      """
 
     document = """
-    query TestOperation($type: Type!) {
-        getUser(type: $type) {
-            name
-        }
-    }
-    """
+      query TestOperation($type: Type!) {
+          getUser(type: $type) {
+              name
+          }
+      }
+      """
 
     let expectedOne = """
-      public var type: Type_InputObject
-    """
-    
+        public var type: Type_InputObject
+      """
+
     let expectedTwo = """
-      public init(type: Type_InputObject) {
-    """
+        public init(type: Type_InputObject) {
+      """
 
     // when
     try await buildSubjectAndOperation()
@@ -1050,102 +1070,105 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expectedOne, atLine: 8, ignoringExtraLines: true))
     expect(actual).to(equalLineByLine(expectedTwo, atLine: 10, ignoringExtraLines: true))
   }
-  
+
   // MARK: - Defer Metadata
-  
-  func test__generateMetadata__givenDeferredFragment_whenModuleTypeIsSwiftPackage_rendersDeferMetadataWithinClassScope() async throws {
+
+  func test__generateMetadata__givenDeferredFragment_whenModuleTypeIsSwiftPackage_rendersDeferMetadataWithinClassScope()
+    async throws
+  {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    interface Animal {
-      id: String!
-      species: String!
-    }
+      interface Animal {
+        id: String!
+        species: String!
+      }
 
-    type Dog implements Animal {
-      id: String!
-      species: String!
-    }
-    """.appendingDeferDirective()
+      type Dog implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
 
     document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... @defer(label: "root") {
-          species
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ... @defer(label: "root") {
+            species
+          }
         }
       }
-    }
-    """
+      """
 
     // when
     config = .mock(.swiftPackage(apolloSDKDependency: .default))
-    
+
     try await buildSubjectAndOperation()
     let actual = renderSubject()
-    
+
     // then
     expect(self.operation.containsDeferredFragment).to(beTrue())
-    
-    expect(actual).to(equalLineByLine(
-      """
-        }
-        
-        // MARK: - Deferred Fragment Metadata
-      
-        public typealias ResponseFormat = IncrementalDeferredResponseFormat
-        enum DeferredFragmentIdentifiers {
-      """,
-      atLine: 64,
-      ignoringExtraLines: true
-    ))
-    
-    expect(actual).to(equalLineByLine(
-      """
-          ]
-        )
-      }
 
-      """,
-      atLine: 76,
-      ignoringExtraLines: false
-    ))
+    expect(actual).to(
+      equalLineByLine(
+        """
+          // MARK: - Deferred Fragment Metadata
+
+          public typealias ResponseFormat = IncrementalDeferredResponseFormat
+          enum DeferredFragmentIdentifiers {
+            static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
+          }
+
+          public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+            deferredFragments: [
+              DeferredFragmentIdentifiers.root: Data.AllAnimal.Root.self,
+            ]
+          )
+        }
+        """,
+        after: .operationDefinition.responseModel,
+        ignoringExtraLines: true
+      )
+    )
   }
 
-  func test__generateMetadata__givenDeferredFragment_whenModuleTypeIsEmbeddedInTarget_rendersDeferMetadataWithinClassScope() async throws {
+  func
+    test__generateMetadata__givenDeferredFragment_whenModuleTypeIsEmbeddedInTarget_rendersDeferMetadataWithinClassScope()
+    async throws
+  {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    interface Animal {
-      id: String!
-      species: String!
-    }
+      interface Animal {
+        id: String!
+        species: String!
+      }
 
-    type Dog implements Animal {
-      id: String!
-      species: String!
-    }
-    """.appendingDeferDirective()
+      type Dog implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
 
     document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... @defer(label: "root") {
-          species
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ... @defer(label: "root") {
+            species
+          }
         }
       }
-    }
-    """
+      """
 
     // when
     config = .mock(.embeddedInTarget(name: "MockApplication"))
@@ -1156,60 +1179,60 @@ class OperationDefinitionTemplateTests: XCTestCase {
     // then
     expect(self.operation.containsDeferredFragment).to(beTrue())
 
-    expect(actual).to(equalLineByLine(
-      """
+    expect(actual).to(
+      equalLineByLine(
+        """
+          // MARK: - Deferred Fragment Metadata
+
+          public typealias ResponseFormat = IncrementalDeferredResponseFormat
+          enum DeferredFragmentIdentifiers {
+            static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
+          }
+
+          public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+            deferredFragments: [
+              DeferredFragmentIdentifiers.root: Data.AllAnimal.Root.self,
+            ]
+          )
         }
-        
-        // MARK: - Deferred Fragment Metadata
-      
-        public typealias ResponseFormat = IncrementalDeferredResponseFormat
-        enum DeferredFragmentIdentifiers {
-      """,
-      atLine: 64,
-      ignoringExtraLines: true
-    ))
-
-    expect(actual).to(equalLineByLine(
-      """
-          ]
-        )
-      }
-
-      """,
-      atLine: 76,
-      ignoringExtraLines: false
-    ))
+        """,
+        after: .operationDefinition.responseModel,
+        ignoringExtraLines: true
+      )
+    )
   }
 
-  func test__generateMetadata__givenDeferredFragment_whenModuleTypeIsOther_rendersDeferMetadataWithinClassScope() async throws {
+  func test__generateMetadata__givenDeferredFragment_whenModuleTypeIsOther_rendersDeferMetadataWithinClassScope()
+    async throws
+  {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    interface Animal {
-      id: String!
-      species: String!
-    }
+      interface Animal {
+        id: String!
+        species: String!
+      }
 
-    type Dog implements Animal {
-      id: String!
-      species: String!
-    }
-    """.appendingDeferDirective()
+      type Dog implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
 
     document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        ... @defer(label: "root") {
-          species
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ... @defer(label: "root") {
+            species
+          }
         }
       }
-    }
-    """
+      """
 
     // when
     config = .mock(.other)
@@ -1220,73 +1243,70 @@ class OperationDefinitionTemplateTests: XCTestCase {
     // then
     expect(self.operation.containsDeferredFragment).to(beTrue())
 
-    expect(actual).to(equalLineByLine(
-      """
+    expect(actual).to(
+      equalLineByLine(
+        """
+          // MARK: - Deferred Fragment Metadata
+
+          public typealias ResponseFormat = IncrementalDeferredResponseFormat
+          enum DeferredFragmentIdentifiers {
+            static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
+          }
+
+          public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+            deferredFragments: [
+              DeferredFragmentIdentifiers.root: Data.AllAnimal.Root.self,
+            ]
+          )
         }
-        
-        // MARK: - Deferred Fragment Metadata
-      
-        public typealias ResponseFormat = IncrementalDeferredResponseFormat
-        enum DeferredFragmentIdentifiers {
-      """,
-      atLine: 64,
-      ignoringExtraLines: true
-    ))
-
-    expect(actual).to(equalLineByLine(
-      """
-          ]
-        )
-      }
-
-      """,
-      atLine: 76,
-      ignoringExtraLines: false
-    ))
+        """,
+        after: .operationDefinition.responseModel,
+        ignoringExtraLines: true
+      )
+    )
   }
 
   func test__generateMetadata__whenDoesNotContainDeferredFragment_doesNotRenderDeferMetadata() async throws {
     // given
     schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    interface Animal {
-      id: String!
-      species: String!
-    }
+      interface Animal {
+        id: String!
+        species: String!
+      }
 
-    type Dog implements Animal {
-      id: String!
-      species: String!
-    }
-    """.appendingDeferDirective()
+      type Dog implements Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
 
     document = """
-    query TestOperation {
-      allAnimals {
-        __typename
-        id
-        species
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          species
+        }
       }
-    }
-    """
+      """
 
     // when
     try await buildSubjectAndOperation()
     let actual = renderSubject()
-    
+
     // then
     expect(self.operation.containsDeferredFragment).to(beFalse())
-    
-    expect(actual).to(equalLineByLine(
-      """
-      }
-      
-      """,
-      atLine: 37,
-      ignoringExtraLines: false
-    ))
+
+    expect(actual).to(
+      equalLineByLine(
+        "\n",
+        after: .operationDefinition.responseModel,
+        ignoringExtraLines: false
+      )
+    )
   }
 }

@@ -17,6 +17,10 @@ public struct CharacterNameAndDroidPrimaryFunction: StarWarsAPI.SelectionSet, Fr
     .inlineFragment(AsDroid.self),
     .fragment(CharacterName.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    CharacterNameAndDroidPrimaryFunction.self,
+    CharacterName.self
+  ] }
 
   /// The name of the character
   public var name: String { __data["name"] }
@@ -34,16 +38,10 @@ public struct CharacterNameAndDroidPrimaryFunction: StarWarsAPI.SelectionSet, Fr
     __typename: String,
     name: String
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-        "name": name,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(CharacterNameAndDroidPrimaryFunction.self),
-        ObjectIdentifier(CharacterName.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+      "name": name,
+    ])
   }
 
   /// AsDroid
@@ -57,6 +55,12 @@ public struct CharacterNameAndDroidPrimaryFunction: StarWarsAPI.SelectionSet, Fr
     public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
     public static var __selections: [ApolloAPI.Selection] { [
       .fragment(DroidPrimaryFunction.self),
+    ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      CharacterNameAndDroidPrimaryFunction.self,
+      CharacterNameAndDroidPrimaryFunction.AsDroid.self,
+      DroidPrimaryFunction.self,
+      CharacterName.self
     ] }
 
     /// This droid's primary function
@@ -76,19 +80,11 @@ public struct CharacterNameAndDroidPrimaryFunction: StarWarsAPI.SelectionSet, Fr
       primaryFunction: String? = nil,
       name: String
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Droid.typename,
-          "primaryFunction": primaryFunction,
-          "name": name,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(CharacterNameAndDroidPrimaryFunction.self),
-          ObjectIdentifier(CharacterNameAndDroidPrimaryFunction.AsDroid.self),
-          ObjectIdentifier(DroidPrimaryFunction.self),
-          ObjectIdentifier(CharacterName.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Droid.typename,
+        "primaryFunction": primaryFunction,
+        "name": name,
+      ])
     }
   }
 }
