@@ -360,7 +360,7 @@ public struct AllAnimalsDeferQuery: GraphQLQuery {
           PetDetails.self,
           HeightInMeters.self
         ] }
-        public static var __deferredFragments: [any ApolloAPI.Deferred.Type] { [
+        public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
           AllAnimalsDeferQuery.Data.AllAnimal.AsPet.DeferredPetAnimal.self
         ] }
 
@@ -676,7 +676,7 @@ public struct AllAnimalsDeferQuery: GraphQLQuery {
           AllAnimalsDeferQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self,
           PetDetails.self
         ] }
-        public static var __deferredFragments: [any ApolloAPI.Deferred.Type] { [
+        public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
           AllAnimalsDeferQuery.Data.AllAnimal.AsCat.DeferredCat.self
         ] }
 
@@ -1081,7 +1081,7 @@ public struct AllAnimalsDeferQuery: GraphQLQuery {
           AllAnimalsDeferQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self,
           PetDetails.self
         ] }
-        public static var __deferredFragments: [any ApolloAPI.Deferred.Type] { [
+        public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
           AllAnimalsDeferQuery.Data.AllAnimal.AsDog.DeferredDog.self
         ] }
 
