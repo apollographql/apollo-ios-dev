@@ -54,17 +54,21 @@ public protocol SelectionSet: Sendable, Hashable, CustomDebugStringConvertible {
   /// A `SelectionSet` with fragments should provide a type that conforms to `FragmentContainer`
   associatedtype Fragments = NoFragments
 
+  @_spi(Execution)
   static var __selections: [Selection] { get }
 
   /// The GraphQL type for the `SelectionSet`.
   ///
   /// This may be a concrete type (`Object`) or an abstract type (`Interface`, or `Union`).
+  @_spi(Execution)
   static var __parentType: any ParentType { get }
 
   /// The fragments whose selections are always fulfilled on a valid instance of the `SelectionSet`.
+  @_spi(Execution)
   static var __fulfilledFragments: [any SelectionSet.Type] { get }
 
   /// The deferred fragments that may be fulfilled on a valid instance of the `SelectionSet`.
+  @_spi(Execution)
   static var __deferredFragments: [any Deferrable.Type] { get }
 
   /// The data of the underlying GraphQL object represented by the generated selection set.
