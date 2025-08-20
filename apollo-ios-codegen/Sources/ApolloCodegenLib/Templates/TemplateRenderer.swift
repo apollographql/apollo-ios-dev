@@ -145,7 +145,7 @@ extension TemplateRenderer {
     return TemplateString(
     """
     \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
-    \(ImportStatementTemplate.SchemaType.template(for: config))
+    \(ImportStatementTemplate.SchemaType.template(for: config, type: type))
 
     \(ifLet: renderDetachedTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
     \(ifLet: namespace, {
@@ -330,9 +330,18 @@ struct ImportStatementTemplate {
 
   enum SchemaType {
     static func template(
-      for config: ApolloCodegen.ConfigurationContext
+      for config: ApolloCodegen.ConfigurationContext,
+      type: TemplateTarget.SchemaFileType
     ) -> String {
-      "import \(TemplateConstants.ApolloAPITargetName)"
+      let apolloAPIImport = "import \(TemplateConstants.ApolloAPITargetName)"
+      switch type {
+      case .inputObject:
+        return "@_spi(Unsafe) \(apolloAPIImport)"
+      case .enum:
+        return "@_spi(Internal) \(apolloAPIImport)"
+      default:
+        return apolloAPIImport
+      }
     }
   }
 
@@ -342,7 +351,7 @@ struct ImportStatementTemplate {
     ) -> TemplateString {      
       return """
       @_exported import \(TemplateConstants.ApolloAPITargetName)
-      @_spi(Unsafe) import \(TemplateConstants.ApolloAPITargetName)
+      @_spi(Execution) @_spi(Unsafe) import \(TemplateConstants.ApolloAPITargetName)
       \(if: config.output.operations != .inSchemaModule, "import \(config.schemaModuleName)")
       """
     }

@@ -235,7 +235,7 @@ struct SelectionSetTemplate {
 
   private func ParentTypeTemplate(_ type: GraphQLCompositeType) -> String {
     """
-    \(renderAccessControl())\
+    @_spi(Execution) \(renderAccessControl())\
     static var __parentType: any \(TemplateConstants.ApolloAPITargetName).ParentType { \
     \(GeneratedSchemaTypeReference(type)) }
     """
@@ -245,7 +245,8 @@ struct SelectionSetTemplate {
     _ mergedSources: OrderedSet<IR.MergedSelections.MergedSource>
   ) -> TemplateString {
     return """
-      public static var __mergedSources: [any \(TemplateConstants.ApolloAPITargetName).SelectionSet.Type] { [
+      @_spi(Execution) \(renderAccessControl())\
+      static var __mergedSources: [any \(TemplateConstants.ApolloAPITargetName).SelectionSet.Type] { [
         \(mergedSources.map {
         let selectionSetName = SelectionSetNameGenerator.generatedSelectionSetName(
           for: $0,
@@ -279,7 +280,7 @@ struct SelectionSetTemplate {
 
     if !groupedSelections.isEmpty || shouldIncludeTypenameSelection {
       selectionsTemplate = TemplateString("""
-        \(renderAccessControl())\
+        @_spi(Execution) \(renderAccessControl())\
         static var __selections: [\(TemplateConstants.ApolloAPITargetName).Selection] { [
           \(if: shouldIncludeTypenameSelection, ".field(\"__typename\", String.self),")
           \(renderedSelections(groupedSelections.unconditionalSelections, &deprecatedArguments), terminator: ",")
@@ -466,7 +467,7 @@ struct SelectionSetTemplate {
     }
 
     return """
-      \(renderAccessControl())static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) \(renderAccessControl())static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         \(fulfilledFragments.map { "\($0).self" })
       ] }
       """
@@ -499,7 +500,7 @@ struct SelectionSetTemplate {
     if deferredFragments.isEmpty { return nil }
 
     return """
-      public static var __deferredFragments: [any ApolloAPI.Deferred.Type] { [
+      @_spi(Execution) \(renderAccessControl())static var __deferredFragments: [any ApolloAPI.Deferred.Type] { [
         \(deferredFragments.map { "\($0).self" })
       ] }
       """

@@ -52,7 +52,7 @@ struct SchemaMetadataTemplate: TemplateRenderer {
 
   var objectTypeFunction: TemplateString {
     return """
-    \(accessControlModifier(for: .member))\
+    @_spi(Execution) \(accessControlModifier(for: .member))\
     static func objectType(forTypename typename: String) -> \(TemplateConstants.ApolloAPITargetName).Object? {
       switch typename {
       \(schema.referencedTypes.objects.map {

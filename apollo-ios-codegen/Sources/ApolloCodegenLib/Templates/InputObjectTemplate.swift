@@ -24,9 +24,9 @@ struct InputObjectTemplate: TemplateRenderer {
     \(graphqlInputObject.name.typeNameDocumentation)
     \(accessControlModifier(for: .parent))\
     struct \(graphqlInputObject.render(as: .typename())): InputObject {
-      \(memberAccessControl)private(set) var __data: InputDict
+      @_spi(Unsafe) \(memberAccessControl)private(set) var __data: InputDict
     
-      \(memberAccessControl)init(_ data: InputDict) {
+      @_spi(Unsafe) \(memberAccessControl)init(_ data: InputDict) {
         __data = data
       }
 

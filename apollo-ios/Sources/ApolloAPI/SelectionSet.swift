@@ -41,6 +41,7 @@ public protocol CompositeSelectionSet: SelectionSet {}
 public protocol CompositeInlineFragment: CompositeSelectionSet, InlineFragment {
 
   /// A list of the selection sets that the selection set is composed of.
+  @_spi(Execution)
   static var __mergedSources: [any SelectionSet.Type] { get }
 
 }
@@ -123,7 +124,7 @@ extension SelectionSet {
   }
 
   @_spi(Unsafe)
-  @inlinable public func _asInlineFragment<T: CompositeInlineFragment>() -> T? {
+  public func _asInlineFragment<T: CompositeInlineFragment>() -> T? {
     guard __data.fragmentsAreFulfilled(T.__mergedSources) else { return nil }
     return T.init(_dataDict: __data)
   }
