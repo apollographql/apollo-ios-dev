@@ -27,21 +27,19 @@ public struct HeroAndFriendsNamesQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroAndFriendsNamesQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroAndFriendsNamesQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -57,6 +55,9 @@ public struct HeroAndFriendsNamesQuery: GraphQLQuery {
         .field("name", String.self),
         .field("friends", [Friend?]?.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroAndFriendsNamesQuery.Data.Hero.self
+      ] }
 
       /// The name of the character
       public var name: String { __data["name"] }
@@ -68,16 +69,11 @@ public struct HeroAndFriendsNamesQuery: GraphQLQuery {
         name: String,
         friends: [Friend?]? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "name": name,
-            "friends": friends._fieldData,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroAndFriendsNamesQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "name": name,
+          "friends": friends._fieldData,
+        ])
       }
 
       /// Hero.Friend
@@ -92,6 +88,9 @@ public struct HeroAndFriendsNamesQuery: GraphQLQuery {
           .field("__typename", String.self),
           .field("name", String.self),
         ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroAndFriendsNamesQuery.Data.Hero.Friend.self
+        ] }
 
         /// The name of the character
         public var name: String { __data["name"] }
@@ -100,15 +99,10 @@ public struct HeroAndFriendsNamesQuery: GraphQLQuery {
           __typename: String,
           name: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": __typename,
-              "name": name,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroAndFriendsNamesQuery.Data.Hero.Friend.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": __typename,
+            "name": name,
+          ])
         }
       }
     }

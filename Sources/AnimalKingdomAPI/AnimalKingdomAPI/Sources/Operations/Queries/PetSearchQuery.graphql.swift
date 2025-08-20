@@ -37,21 +37,19 @@ public struct PetSearchQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("pets", [Pet].self, arguments: ["filters": .variable("filters")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      PetSearchQuery.Data.self
+    ] }
 
     public var pets: [Pet] { __data["pets"] }
 
     public init(
       pets: [Pet]
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.Query.typename,
-          "pets": pets._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(PetSearchQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.Query.typename,
+        "pets": pets._fieldData,
+      ])
     }
 
     /// Pet
@@ -67,6 +65,9 @@ public struct PetSearchQuery: GraphQLQuery {
         .field("id", AnimalKingdomAPI.ID.self),
         .field("humanName", String?.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        PetSearchQuery.Data.Pet.self
+      ] }
 
       public var id: AnimalKingdomAPI.ID { __data["id"] }
       public var humanName: String? { __data["humanName"] }
@@ -76,16 +77,11 @@ public struct PetSearchQuery: GraphQLQuery {
         id: AnimalKingdomAPI.ID,
         humanName: String? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "id": id,
-            "humanName": humanName,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(PetSearchQuery.Data.Pet.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "id": id,
+          "humanName": humanName,
+        ])
       }
     }
   }

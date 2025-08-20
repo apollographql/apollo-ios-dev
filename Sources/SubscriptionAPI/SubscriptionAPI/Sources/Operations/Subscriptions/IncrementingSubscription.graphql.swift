@@ -20,6 +20,9 @@ public struct IncrementingSubscription: GraphQLSubscription {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("numberIncremented", Int?.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      IncrementingSubscription.Data.self
+    ] }
 
     public var numberIncremented: Int? { __data["numberIncremented"] }
   }

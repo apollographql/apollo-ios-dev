@@ -16,6 +16,9 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("allAnimals", [AllAnimal].self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      AllAnimalsLocalCacheMutation.Data.self
+    ] }
 
     public var allAnimals: [AllAnimal] {
       get { __data["allAnimals"] }
@@ -25,15 +28,10 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
     public init(
       allAnimals: [AllAnimal]
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.Query.typename,
-          "allAnimals": allAnimals._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(AllAnimalsLocalCacheMutation.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.Query.typename,
+        "allAnimals": allAnimals._fieldData,
+      ])
     }
 
     /// AllAnimal
@@ -49,6 +47,9 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
         .field("species", String.self),
         .field("skinCovering", GraphQLEnum<AnimalKingdomAPI.SkinCovering>?.self),
         .inlineFragment(AsBird.self),
+      ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        AllAnimalsLocalCacheMutation.Data.AllAnimal.self
       ] }
 
       public var species: String {
@@ -67,16 +68,11 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
         species: String,
         skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "species": species,
-            "skinCovering": skinCovering,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(AllAnimalsLocalCacheMutation.Data.AllAnimal.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "species": species,
+          "skinCovering": skinCovering,
+        ])
       }
 
       /// AllAnimal.AsBird
@@ -90,6 +86,10 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
         public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Bird }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("wingspan", Double.self),
+        ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          AllAnimalsLocalCacheMutation.Data.AllAnimal.self,
+          AllAnimalsLocalCacheMutation.Data.AllAnimal.AsBird.self
         ] }
 
         public var wingspan: Double {
@@ -110,18 +110,12 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
           species: String,
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": AnimalKingdomAPI.Objects.Bird.typename,
-              "wingspan": wingspan,
-              "species": species,
-              "skinCovering": skinCovering,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(AllAnimalsLocalCacheMutation.Data.AllAnimal.self),
-              ObjectIdentifier(AllAnimalsLocalCacheMutation.Data.AllAnimal.AsBird.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": AnimalKingdomAPI.Objects.Bird.typename,
+            "wingspan": wingspan,
+            "species": species,
+            "skinCovering": skinCovering,
+          ])
         }
       }
     }

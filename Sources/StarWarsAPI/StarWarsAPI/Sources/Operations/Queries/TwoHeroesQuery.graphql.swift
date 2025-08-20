@@ -22,6 +22,9 @@ public struct TwoHeroesQuery: GraphQLQuery {
       .field("hero", alias: "r2", R2?.self),
       .field("hero", alias: "luke", Luke?.self, arguments: ["episode": "EMPIRE"]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      TwoHeroesQuery.Data.self
+    ] }
 
     public var r2: R2? { __data["r2"] }
     public var luke: Luke? { __data["luke"] }
@@ -30,16 +33,11 @@ public struct TwoHeroesQuery: GraphQLQuery {
       r2: R2? = nil,
       luke: Luke? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "r2": r2._fieldData,
-          "luke": luke._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(TwoHeroesQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "r2": r2._fieldData,
+        "luke": luke._fieldData,
+      ])
     }
 
     /// R2
@@ -54,6 +52,9 @@ public struct TwoHeroesQuery: GraphQLQuery {
         .field("__typename", String.self),
         .field("name", String.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        TwoHeroesQuery.Data.R2.self
+      ] }
 
       /// The name of the character
       public var name: String { __data["name"] }
@@ -62,15 +63,10 @@ public struct TwoHeroesQuery: GraphQLQuery {
         __typename: String,
         name: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "name": name,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(TwoHeroesQuery.Data.R2.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "name": name,
+        ])
       }
     }
 
@@ -86,6 +82,9 @@ public struct TwoHeroesQuery: GraphQLQuery {
         .field("__typename", String.self),
         .field("name", String.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        TwoHeroesQuery.Data.Luke.self
+      ] }
 
       /// The name of the character
       public var name: String { __data["name"] }
@@ -94,15 +93,10 @@ public struct TwoHeroesQuery: GraphQLQuery {
         __typename: String,
         name: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "name": name,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(TwoHeroesQuery.Data.Luke.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "name": name,
+        ])
       }
     }
   }

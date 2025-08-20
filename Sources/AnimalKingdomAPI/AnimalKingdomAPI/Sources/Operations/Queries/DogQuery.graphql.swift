@@ -21,21 +21,19 @@ public struct DogQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("allAnimals", [AllAnimal].self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      DogQuery.Data.self
+    ] }
 
     public var allAnimals: [AllAnimal] { __data["allAnimals"] }
 
     public init(
       allAnimals: [AllAnimal]
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.Query.typename,
-          "allAnimals": allAnimals._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(DogQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.Query.typename,
+        "allAnimals": allAnimals._fieldData,
+      ])
     }
 
     /// AllAnimal
@@ -52,6 +50,9 @@ public struct DogQuery: GraphQLQuery {
         .field("skinCovering", GraphQLEnum<AnimalKingdomAPI.SkinCovering>?.self),
         .inlineFragment(AsDog.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        DogQuery.Data.AllAnimal.self
+      ] }
 
       public var id: AnimalKingdomAPI.ID { __data["id"] }
       public var skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? { __data["skinCovering"] }
@@ -63,16 +64,11 @@ public struct DogQuery: GraphQLQuery {
         id: AnimalKingdomAPI.ID,
         skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "id": id,
-            "skinCovering": skinCovering,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(DogQuery.Data.AllAnimal.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "id": id,
+          "skinCovering": skinCovering,
+        ])
       }
 
       /// AllAnimal.AsDog
@@ -87,6 +83,11 @@ public struct DogQuery: GraphQLQuery {
         public static var __selections: [ApolloAPI.Selection] { [
           .field("houseDetails", AnimalKingdomAPI.Object?.self),
           .fragment(DogFragment.self),
+        ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          DogQuery.Data.AllAnimal.self,
+          DogQuery.Data.AllAnimal.AsDog.self,
+          DogFragment.self
         ] }
 
         public var houseDetails: AnimalKingdomAPI.Object? { __data["houseDetails"] }
@@ -107,20 +108,13 @@ public struct DogQuery: GraphQLQuery {
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil,
           species: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": AnimalKingdomAPI.Objects.Dog.typename,
-              "houseDetails": houseDetails,
-              "id": id,
-              "skinCovering": skinCovering,
-              "species": species,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(DogQuery.Data.AllAnimal.self),
-              ObjectIdentifier(DogQuery.Data.AllAnimal.AsDog.self),
-              ObjectIdentifier(DogFragment.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": AnimalKingdomAPI.Objects.Dog.typename,
+            "houseDetails": houseDetails,
+            "id": id,
+            "skinCovering": skinCovering,
+            "species": species,
+          ])
         }
       }
     }

@@ -28,21 +28,19 @@ public struct HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroDetailsFragmentConditionalInclusionQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroDetailsFragmentConditionalInclusionQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -57,6 +55,9 @@ public struct HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
         .field("__typename", String.self),
         .include(if: "includeDetails", .inlineFragment(IfIncludeDetails.self)),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroDetailsFragmentConditionalInclusionQuery.Data.Hero.self
+      ] }
 
       public var ifIncludeDetails: IfIncludeDetails? { _asInlineFragment() }
 
@@ -70,14 +71,9 @@ public struct HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
       public init(
         __typename: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroDetailsFragmentConditionalInclusionQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+        ])
       }
 
       /// Hero.IfIncludeDetails
@@ -91,6 +87,11 @@ public struct HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
         public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
         public static var __selections: [ApolloAPI.Selection] { [
           .fragment(HeroDetails.self),
+        ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroDetailsFragmentConditionalInclusionQuery.Data.Hero.self,
+          HeroDetailsFragmentConditionalInclusionQuery.Data.Hero.IfIncludeDetails.self,
+          HeroDetails.self
         ] }
 
         /// The name of the character
@@ -107,17 +108,10 @@ public struct HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
           __typename: String,
           name: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": __typename,
-              "name": name,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroDetailsFragmentConditionalInclusionQuery.Data.Hero.self),
-              ObjectIdentifier(HeroDetailsFragmentConditionalInclusionQuery.Data.Hero.IfIncludeDetails.self),
-              ObjectIdentifier(HeroDetails.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": __typename,
+            "name": name,
+          ])
         }
       }
     }

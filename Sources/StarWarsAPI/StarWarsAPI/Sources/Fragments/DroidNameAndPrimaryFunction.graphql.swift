@@ -17,6 +17,11 @@ public struct DroidNameAndPrimaryFunction: StarWarsAPI.SelectionSet, Fragment {
     .fragment(CharacterName.self),
     .fragment(DroidPrimaryFunction.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    DroidNameAndPrimaryFunction.self,
+    CharacterName.self,
+    DroidPrimaryFunction.self
+  ] }
 
   /// The name of the character
   public var name: String { __data["name"] }
@@ -35,17 +40,10 @@ public struct DroidNameAndPrimaryFunction: StarWarsAPI.SelectionSet, Fragment {
     name: String,
     primaryFunction: String? = nil
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": StarWarsAPI.Objects.Droid.typename,
-        "name": name,
-        "primaryFunction": primaryFunction,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(DroidNameAndPrimaryFunction.self),
-        ObjectIdentifier(CharacterName.self),
-        ObjectIdentifier(DroidPrimaryFunction.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": StarWarsAPI.Objects.Droid.typename,
+      "name": name,
+      "primaryFunction": primaryFunction,
+    ])
   }
 }

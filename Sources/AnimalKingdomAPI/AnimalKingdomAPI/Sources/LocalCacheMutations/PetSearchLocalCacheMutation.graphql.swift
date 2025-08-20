@@ -33,6 +33,9 @@ public struct PetSearchLocalCacheMutation: LocalCacheMutation {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("pets", [Pet].self, arguments: ["filters": .variable("filters")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      PetSearchLocalCacheMutation.Data.self
+    ] }
 
     public var pets: [Pet] {
       get { __data["pets"] }
@@ -42,15 +45,10 @@ public struct PetSearchLocalCacheMutation: LocalCacheMutation {
     public init(
       pets: [Pet]
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.Query.typename,
-          "pets": pets._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(PetSearchLocalCacheMutation.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.Query.typename,
+        "pets": pets._fieldData,
+      ])
     }
 
     /// Pet
@@ -65,6 +63,9 @@ public struct PetSearchLocalCacheMutation: LocalCacheMutation {
         .field("__typename", String.self),
         .field("id", AnimalKingdomAPI.ID.self),
         .field("humanName", String?.self),
+      ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        PetSearchLocalCacheMutation.Data.Pet.self
       ] }
 
       public var id: AnimalKingdomAPI.ID {
@@ -81,16 +82,11 @@ public struct PetSearchLocalCacheMutation: LocalCacheMutation {
         id: AnimalKingdomAPI.ID,
         humanName: String? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "id": id,
-            "humanName": humanName,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(PetSearchLocalCacheMutation.Data.Pet.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "id": id,
+          "humanName": humanName,
+        ])
       }
     }
   }

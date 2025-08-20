@@ -18,6 +18,9 @@ public struct CrocodileFragment: AnimalKingdomAPI.SelectionSet, Fragment {
     .field("age", Int.self),
     .field("tag", String?.self, arguments: ["id": "albino"]),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    CrocodileFragment.self
+  ] }
 
   public var species: String { __data["species"] }
   public var age: Int { __data["age"] }
@@ -28,16 +31,11 @@ public struct CrocodileFragment: AnimalKingdomAPI.SelectionSet, Fragment {
     age: Int,
     tag: String? = nil
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": AnimalKingdomAPI.Objects.Crocodile.typename,
-        "species": species,
-        "age": age,
-        "tag": tag,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(CrocodileFragment.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": AnimalKingdomAPI.Objects.Crocodile.typename,
+      "species": species,
+      "age": age,
+      "tag": tag,
+    ])
   }
 }
