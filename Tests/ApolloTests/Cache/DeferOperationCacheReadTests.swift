@@ -3,7 +3,7 @@ import ApolloInternalTestHelpers
 import Nimble
 import XCTest
 
-@testable import Apollo
+@testable @_spi(Execution) import Apollo
 
 private class AnimalQuery: MockQuery<AnimalQuery.AnAnimal>, @unchecked Sendable {
   class AnAnimal: MockSelectionSet, @unchecked Sendable {

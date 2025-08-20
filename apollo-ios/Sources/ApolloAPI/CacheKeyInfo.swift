@@ -1,4 +1,4 @@
-/// Contains the information needed to resolve a ``CacheReference`` in a `NormalizedCache`.
+/// Contains the information needed to resolve a cache key in a `NormalizedCache`.
 ///
 /// You can create and return a ``CacheKeyInfo`` from your implementation of the
 /// ``SchemaConfiguration/cacheKeyInfo(for:object:)`` function to configure the cache key

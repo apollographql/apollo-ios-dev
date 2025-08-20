@@ -1,10 +1,13 @@
+import ApolloAPI
+
 /// Represents a reference to a record for a GraphQL object in the cache.
 ///
 /// ``CacheReference`` is just a wrapper around a `String`. But when the value for a key in a cache
 /// `Record` is a `String`, we treat the string as the value. When the value for the key is a
 /// ``CacheReference``, the reference's ``key`` is the cache key for another referenced object
 /// that is the value.
-struct CacheReference: Sendable, Hashable {
+@_spi(Execution)
+public struct CacheReference: Sendable, Hashable {
 
   /// A CacheReference referencing the root query object.
   public static let RootQuery: CacheReference = CacheReference("QUERY_ROOT")

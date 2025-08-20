@@ -51,7 +51,7 @@ extension SchemaMetadata {
   /// 1. Map the type of the `object` using the ``graphQLType(for:)`` function.
   /// 2. Attempt to gets the `CacheKeyInfo`` using programmatic cache key configuration.
   ///  2a. Call the ``SchemaConfiguration/cacheKeyInfo(for:object:)`` function.
-  ///  2b. If `CacheKeyInfo` is found, transforms the ``CacheKeyInfo`` into the correct ``CacheReference``
+  ///  2b. If `CacheKeyInfo` is found, transforms the ``CacheKeyInfo`` into the correct cache reference
   ///  for the `NormalizedCache` and return it.
   /// 3. If no programmatic cache key is returned, attempt to resolve the `keyFields` for the object
   ///   3a. Check if the object's type has `keyFields`.

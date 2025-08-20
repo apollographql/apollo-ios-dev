@@ -1,5 +1,5 @@
 import XCTest
-@testable import Apollo
+@testable @_spi(Execution) import Apollo
 @_spi(Unsafe) import ApolloAPI
 @_spi(Unsafe) import ApolloInternalTestHelpers
 

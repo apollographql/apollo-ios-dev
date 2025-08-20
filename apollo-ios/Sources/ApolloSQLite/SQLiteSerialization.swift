@@ -1,5 +1,5 @@
 import Foundation
-@_spi(Internal) import Apollo
+@_spi(Internal) @_spi(Execution) import Apollo
 import ApolloAPI
 
 private let serializedReferenceKey = "$reference"

@@ -3,7 +3,7 @@ import ApolloInternalTestHelpers
 import Nimble
 import XCTest
 
-@testable import Apollo
+@testable @_spi(Execution) import Apollo
 
 final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
 

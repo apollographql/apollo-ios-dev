@@ -1,4 +1,4 @@
-import Apollo
+@_spi(Execution) import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
 import Nimble

@@ -2,7 +2,7 @@
 import ApolloInternalTestHelpers
 import XCTest
 
-@testable import Apollo
+@testable @_spi(Execution) import Apollo
 
 private final class MockBatchedNormalizedCache: NormalizedCache {
   private var records: RecordSet
