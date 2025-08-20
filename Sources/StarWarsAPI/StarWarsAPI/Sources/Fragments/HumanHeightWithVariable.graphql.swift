@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct HumanHeightWithVariable: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
@@ -12,12 +12,12 @@ public struct HumanHeightWithVariable: StarWarsAPI.SelectionSet, Fragment {
   @_spi(Unsafe) public let __data: DataDict
   @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("height", Double?.self, arguments: ["unit": .variable("heightUnit")]),
   ] }
-  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
     HumanHeightWithVariable.self
   ] }
 

@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct CharacterNameAndDroidPrimaryFunction: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
@@ -12,13 +12,13 @@ public struct CharacterNameAndDroidPrimaryFunction: StarWarsAPI.SelectionSet, Fr
   @_spi(Unsafe) public let __data: DataDict
   @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .inlineFragment(AsDroid.self),
     .fragment(CharacterName.self),
   ] }
-  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
     CharacterNameAndDroidPrimaryFunction.self,
     CharacterName.self
   ] }
@@ -53,11 +53,11 @@ public struct CharacterNameAndDroidPrimaryFunction: StarWarsAPI.SelectionSet, Fr
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public typealias RootEntityType = CharacterNameAndDroidPrimaryFunction
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .fragment(DroidPrimaryFunction.self),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       CharacterNameAndDroidPrimaryFunction.self,
       CharacterNameAndDroidPrimaryFunction.AsDroid.self,
       DroidPrimaryFunction.self,

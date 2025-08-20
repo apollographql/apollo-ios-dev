@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct HeroNameConditionalInclusionQuery: GraphQLQuery {
   public static let operationName: String = "HeroNameConditionalInclusion"
@@ -18,17 +18,17 @@ public struct HeroNameConditionalInclusionQuery: GraphQLQuery {
     self.includeName = includeName
   }
 
-  public var __variables: Variables? { ["includeName": includeName] }
+  @_spi(Unsafe) public var __variables: Variables? { ["includeName": includeName] }
 
   public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       HeroNameConditionalInclusionQuery.Data.self
     ] }
 
@@ -50,12 +50,12 @@ public struct HeroNameConditionalInclusionQuery: GraphQLQuery {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .include(if: "includeName", .field("name", String.self)),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         HeroNameConditionalInclusionQuery.Data.Hero.self
       ] }
 

@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct HeroNameConditionalExclusionQuery: GraphQLQuery {
   public static let operationName: String = "HeroNameConditionalExclusion"
@@ -18,17 +18,17 @@ public struct HeroNameConditionalExclusionQuery: GraphQLQuery {
     self.skipName = skipName
   }
 
-  public var __variables: Variables? { ["skipName": skipName] }
+  @_spi(Unsafe) public var __variables: Variables? { ["skipName": skipName] }
 
   public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       HeroNameConditionalExclusionQuery.Data.self
     ] }
 
@@ -50,12 +50,12 @@ public struct HeroNameConditionalExclusionQuery: GraphQLQuery {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .include(if: !"skipName", .field("name", String.self)),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         HeroNameConditionalExclusionQuery.Data.Hero.self
       ] }
 

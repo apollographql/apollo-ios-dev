@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
   public static let operationName: String = "HeroTypeDependentAliasedField"
@@ -18,17 +18,17 @@ public struct HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
     self.episode = episode
   }
 
-  public var __variables: Variables? { ["episode": episode] }
+  @_spi(Unsafe) public var __variables: Variables? { ["episode": episode] }
 
   public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       HeroTypeDependentAliasedFieldQuery.Data.self
     ] }
 
@@ -50,13 +50,13 @@ public struct HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .inlineFragment(AsHuman.self),
         .inlineFragment(AsDroid.self),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         HeroTypeDependentAliasedFieldQuery.Data.Hero.self
       ] }
 
@@ -79,11 +79,11 @@ public struct HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = HeroTypeDependentAliasedFieldQuery.Data.Hero
-        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("homePlanet", alias: "property", String?.self),
         ] }
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           HeroTypeDependentAliasedFieldQuery.Data.Hero.self,
           HeroTypeDependentAliasedFieldQuery.Data.Hero.AsHuman.self
         ] }
@@ -109,11 +109,11 @@ public struct HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = HeroTypeDependentAliasedFieldQuery.Data.Hero
-        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("primaryFunction", alias: "property", String?.self),
         ] }
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           HeroTypeDependentAliasedFieldQuery.Data.Hero.self,
           HeroTypeDependentAliasedFieldQuery.Data.Hero.AsDroid.self
         ] }

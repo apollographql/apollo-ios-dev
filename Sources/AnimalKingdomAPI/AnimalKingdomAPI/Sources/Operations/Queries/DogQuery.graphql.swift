@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct DogQuery: GraphQLQuery {
   public static let operationName: String = "DogQuery"
@@ -18,11 +18,11 @@ public struct DogQuery: GraphQLQuery {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("allAnimals", [AllAnimal].self),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       DogQuery.Data.self
     ] }
 
@@ -44,14 +44,14 @@ public struct DogQuery: GraphQLQuery {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("id", AnimalKingdomAPI.ID.self),
         .field("skinCovering", GraphQLEnum<AnimalKingdomAPI.SkinCovering>?.self),
         .inlineFragment(AsDog.self),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         DogQuery.Data.AllAnimal.self
       ] }
 
@@ -80,12 +80,12 @@ public struct DogQuery: GraphQLQuery {
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = DogQuery.Data.AllAnimal
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Dog }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Dog }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("houseDetails", AnimalKingdomAPI.Object?.self),
           .fragment(DogFragment.self),
         ] }
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           DogQuery.Data.AllAnimal.self,
           DogQuery.Data.AllAnimal.AsDog.self,
           DogFragment.self

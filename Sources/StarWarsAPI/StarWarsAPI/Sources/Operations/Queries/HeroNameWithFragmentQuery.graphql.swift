@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct HeroNameWithFragmentQuery: GraphQLQuery {
   public static let operationName: String = "HeroNameWithFragment"
@@ -19,17 +19,17 @@ public struct HeroNameWithFragmentQuery: GraphQLQuery {
     self.episode = episode
   }
 
-  public var __variables: Variables? { ["episode": episode] }
+  @_spi(Unsafe) public var __variables: Variables? { ["episode": episode] }
 
   public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       HeroNameWithFragmentQuery.Data.self
     ] }
 
@@ -51,12 +51,12 @@ public struct HeroNameWithFragmentQuery: GraphQLQuery {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .fragment(CharacterName.self),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         HeroNameWithFragmentQuery.Data.Hero.self,
         CharacterName.self
       ] }

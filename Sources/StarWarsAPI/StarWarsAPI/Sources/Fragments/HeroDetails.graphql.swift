@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
@@ -12,14 +12,14 @@ public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
   @_spi(Unsafe) public let __data: DataDict
   @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("name", String.self),
     .inlineFragment(AsHuman.self),
     .inlineFragment(AsDroid.self),
   ] }
-  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
     HeroDetails.self
   ] }
 
@@ -47,11 +47,11 @@ public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public typealias RootEntityType = HeroDetails
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("height", Double?.self),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       HeroDetails.self,
       HeroDetails.AsHuman.self
     ] }
@@ -81,11 +81,11 @@ public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public typealias RootEntityType = HeroDetails
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("primaryFunction", String?.self),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       HeroDetails.self,
       HeroDetails.AsDroid.self
     ] }

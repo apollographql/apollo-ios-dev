@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct PetDetailsMutation: AnimalKingdomAPI.MutableSelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
@@ -12,12 +12,12 @@ public struct PetDetailsMutation: AnimalKingdomAPI.MutableSelectionSet, Fragment
   @_spi(Unsafe) public var __data: DataDict
   @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("owner", Owner?.self),
   ] }
-  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
     PetDetailsMutation.self
   ] }
 
@@ -43,12 +43,12 @@ public struct PetDetailsMutation: AnimalKingdomAPI.MutableSelectionSet, Fragment
     @_spi(Unsafe) public var __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Human }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Human }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("__typename", String.self),
       .field("firstName", String.self),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       PetDetailsMutation.Owner.self
     ] }
 

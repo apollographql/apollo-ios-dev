@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct CreateReviewWithNullFieldMutation: GraphQLMutation {
   public static let operationName: String = "CreateReviewWithNullField"
@@ -18,8 +18,8 @@ public struct CreateReviewWithNullFieldMutation: GraphQLMutation {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Mutation }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Mutation }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("createReview", CreateReview?.self, arguments: [
         "episode": "JEDI",
         "review": [
@@ -28,7 +28,7 @@ public struct CreateReviewWithNullFieldMutation: GraphQLMutation {
         ]
       ]),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       CreateReviewWithNullFieldMutation.Data.self
     ] }
 
@@ -50,13 +50,13 @@ public struct CreateReviewWithNullFieldMutation: GraphQLMutation {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("stars", Int.self),
         .field("commentary", String?.self),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         CreateReviewWithNullFieldMutation.Data.CreateReview.self
       ] }
 

@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct UploadMultipleFilesToDifferentParametersMutation: GraphQLMutation {
   public static let operationName: String = "UploadMultipleFilesToDifferentParameters"
@@ -22,7 +22,7 @@ public struct UploadMultipleFilesToDifferentParametersMutation: GraphQLMutation 
     self.multipleFiles = multipleFiles
   }
 
-  public var __variables: Variables? { [
+  @_spi(Unsafe) public var __variables: Variables? { [
     "singleFile": singleFile,
     "multipleFiles": multipleFiles
   ] }
@@ -31,14 +31,14 @@ public struct UploadMultipleFilesToDifferentParametersMutation: GraphQLMutation 
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { UploadAPI.Objects.Mutation }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { UploadAPI.Objects.Mutation }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("multipleParameterUpload", [MultipleParameterUpload].self, arguments: [
         "singleFile": .variable("singleFile"),
         "multipleFiles": .variable("multipleFiles")
       ]),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       UploadMultipleFilesToDifferentParametersMutation.Data.self
     ] }
 
@@ -51,15 +51,15 @@ public struct UploadMultipleFilesToDifferentParametersMutation: GraphQLMutation 
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { UploadAPI.Objects.File }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { UploadAPI.Objects.File }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("id", UploadAPI.ID.self),
         .field("path", String.self),
         .field("filename", String.self),
         .field("mimetype", String.self),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         UploadMultipleFilesToDifferentParametersMutation.Data.MultipleParameterUpload.self
       ] }
 

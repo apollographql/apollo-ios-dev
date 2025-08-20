@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
-@_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct CreateReviewForEpisodeMutation: GraphQLMutation {
   public static let operationName: String = "CreateReviewForEpisode"
@@ -23,7 +23,7 @@ public struct CreateReviewForEpisodeMutation: GraphQLMutation {
     self.review = review
   }
 
-  public var __variables: Variables? { [
+  @_spi(Unsafe) public var __variables: Variables? { [
     "episode": episode,
     "review": review
   ] }
@@ -32,14 +32,14 @@ public struct CreateReviewForEpisodeMutation: GraphQLMutation {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Mutation }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Mutation }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("createReview", CreateReview?.self, arguments: [
         "episode": .variable("episode"),
         "review": .variable("review")
       ]),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       CreateReviewForEpisodeMutation.Data.self
     ] }
 
@@ -61,13 +61,13 @@ public struct CreateReviewForEpisodeMutation: GraphQLMutation {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("stars", Int.self),
         .field("commentary", String?.self),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         CreateReviewForEpisodeMutation.Data.CreateReview.self
       ] }
 
