@@ -75,6 +75,7 @@ public protocol GraphQLOperation: Sendable, Hashable {
   static var operationDocument: OperationDocument { get }
   static var responseFormat: ResponseFormat { get }
 
+  @_spi(Unsafe)
   var __variables: Variables? { get }
 
   associatedtype Data: RootSelectionSet
@@ -110,6 +111,7 @@ public extension GraphQLOperation where ResponseFormat == SingleResponseFormat {
 // MARK: Instance Extensions
 
 public extension GraphQLOperation {
+  @_spi(Unsafe)
   var __variables: Variables? {
     return nil
   }
@@ -171,6 +173,7 @@ public struct SubscriptionResponseFormat: OperationResponseFormat {}
 // MARK: - GraphQLOperationVariableValue
 
 public protocol GraphQLOperationVariableValue: Sendable {
+  @_spi(Internal)
   var _jsonEncodableValue: (any JSONEncodable)? { get }
 }
 
@@ -179,7 +182,10 @@ where Element: GraphQLOperationVariableValue & JSONEncodable & Hashable {}
 
 extension Dictionary: GraphQLOperationVariableValue
 where Key == String, Value == any GraphQLOperationVariableValue {
+  @_spi(Internal)
   @inlinable public var _jsonEncodableValue: (any JSONEncodable)? { _jsonEncodableObject }
+
+  @_spi(Internal)
   @inlinable public var _jsonEncodableObject: JSONEncodableDictionary {
     compactMapValues { $0._jsonEncodableValue }
   }
@@ -187,6 +193,7 @@ where Key == String, Value == any GraphQLOperationVariableValue {
 
 extension GraphQLNullable: GraphQLOperationVariableValue
 where Wrapped: GraphQLOperationVariableValue {
+  @_spi(Internal)
   @inlinable public var _jsonEncodableValue: (any JSONEncodable)? {
     switch self {
     case .none: return nil
@@ -197,6 +204,7 @@ where Wrapped: GraphQLOperationVariableValue {
 }
 
 extension JSONEncodable where Self: GraphQLOperationVariableValue {
+  @_spi(Internal)
   @inlinable public var _jsonEncodableValue: (any JSONEncodable)? { self }
 }
 

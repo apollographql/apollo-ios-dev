@@ -98,7 +98,7 @@ public struct CacheKeyInfo {
   ///                This must be a scalar type to be used as a cache id. 
   ///   - uniqueKeyGroup: An optional ``uniqueKeyGroup`` for the ``CacheKeyInfo``.
   ///     Defaults to `nil`.
-  @inlinable public init(jsonValue: (any ScalarType)?, uniqueKeyGroup: String? = nil) throws {
+  public init(jsonValue: (any ScalarType)?, uniqueKeyGroup: String? = nil) throws {
     guard let jsonValue = jsonValue else {
       throw JSONDecodingError.missingValue
     }

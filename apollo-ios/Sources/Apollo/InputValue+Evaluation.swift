@@ -1,4 +1,4 @@
-import ApolloAPI
+@_spi(Internal) import ApolloAPI
 import Foundation
 
 /// A global function that formats the the cache key for a field on an object.

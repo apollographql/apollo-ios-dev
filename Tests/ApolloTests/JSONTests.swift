@@ -1,6 +1,6 @@
 import XCTest
-@testable import Apollo
-@_spi(Unsafe) import ApolloAPI
+@testable @_spi(Internal) import Apollo
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 import ApolloInternalTestHelpers
 
 class JSONTests: XCTestCase {

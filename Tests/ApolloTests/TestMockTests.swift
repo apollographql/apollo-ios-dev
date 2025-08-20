@@ -3,7 +3,7 @@ import Nimble
 @testable import Apollo
 import ApolloTestSupport
 import ApolloInternalTestHelpers
-@_spi(Unsafe) import ApolloAPI
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 class TestMockTests: XCTestCase {
 

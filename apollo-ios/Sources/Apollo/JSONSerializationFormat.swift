@@ -1,6 +1,7 @@
 import Foundation
-import ApolloAPI
+@_spi(Internal) import ApolloAPI
 
+@_spi(Internal)
 public final class JSONSerializationFormat {
   public class func serialize(value: any JSONEncodable) throws -> Data {
     return try JSONSerialization.sortedData(withJSONObject: value._jsonValue)

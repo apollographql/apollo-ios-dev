@@ -1,7 +1,7 @@
 import Foundation
 import XCTest
 import Nimble
-@_spi(Execution) @testable import Apollo
+@_spi(Execution) @_spi(Internal) @testable import Apollo
 import ApolloAPI
 
 class NetworkResponseExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase {

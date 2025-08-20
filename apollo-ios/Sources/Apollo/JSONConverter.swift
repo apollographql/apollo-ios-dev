@@ -1,5 +1,5 @@
 import Foundation
-@_spi(Unsafe) import ApolloAPI
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 public enum JSONConverter {
   

@@ -1,6 +1,6 @@
 import XCTest
-@testable import Apollo
-import ApolloAPI
+@testable @_spi(Internal) import Apollo
+@_spi(Internal) import ApolloAPI
 import ApolloInternalTestHelpers
 import StarWarsAPI
 

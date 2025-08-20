@@ -1,7 +1,7 @@
 import XCTest
 import Nimble
 @testable import Apollo
-@_spi(Unsafe) import ApolloAPI
+@_spi(Unsafe) @_spi(Internal) import ApolloAPI
 @_spi(Unsafe) import ApolloInternalTestHelpers
 
 class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {

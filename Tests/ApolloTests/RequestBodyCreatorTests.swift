@@ -11,7 +11,7 @@ import Nimble
 import XCTest
 
 @testable import Apollo
-@testable import ApolloAPI
+@testable @_spi(Internal) import ApolloAPI
 
 class RequestBodyCreatorTests: XCTestCase {
 

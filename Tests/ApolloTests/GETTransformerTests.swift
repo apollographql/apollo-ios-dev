@@ -1,4 +1,4 @@
-import ApolloAPI
+@_spi(Internal) import ApolloAPI
 import ApolloInternalTestHelpers
 import Nimble
 import XCTest
