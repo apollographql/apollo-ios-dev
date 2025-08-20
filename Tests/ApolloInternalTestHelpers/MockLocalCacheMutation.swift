@@ -27,6 +27,7 @@ where Schema == MockSchemaMetadata {}
 
 public extension MockMutableRootSelectionSet {
   static var __parentType: any ParentType { Object.mock }
+  static var __fulfilledFragments: [any SelectionSet.Type] { [] }
 
   init() {
     self.init(_dataDict: DataDict(
@@ -38,3 +39,7 @@ public extension MockMutableRootSelectionSet {
 
 public protocol MockMutableInlineFragment: MutableSelectionSet, InlineFragment
 where Schema == MockSchemaMetadata {}
+
+public extension MockMutableInlineFragment {
+  static var __fulfilledFragments: [any SelectionSet.Type] { [] }
+}

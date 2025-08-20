@@ -142,7 +142,6 @@ extension SelectionSet {
     Set(Self.__fulfilledFragments.map(ObjectIdentifier.init))
   }
 
-  @_spi(Internal)
   public init(unsafelyWithData data: [String: DataDict.FieldValue]) {
     self.init(_dataDict: DataDict(
       data: data,
