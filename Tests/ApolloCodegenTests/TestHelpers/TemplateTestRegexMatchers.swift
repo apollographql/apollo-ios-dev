@@ -14,6 +14,7 @@ extension TemplateTestRegexMatcher {
 enum RegexMatcher {
   nonisolated(unsafe) private static let endOfSection = /\n(?:\n|\h*?}(?:\n|\Z))/
   nonisolated(unsafe) private static let startOfLine = /^\h*?/
+  nonisolated(unsafe) private static let optionalPublic = /(?:public )?/
   nonisolated(unsafe) static let match = Reference(Substring.self)
 
   enum SelectionSetTemplate: TemplateTestRegexMatcher {
@@ -30,7 +31,9 @@ enum RegexMatcher {
         return .init(Regex {
           Capture(as: match) {
             startOfLine
-            /(?:public)? static var __selections: \[ApolloAPI.Selection\] { \[\n.*?\n\h*\] }\n/
+            "@_spi(Execution) "
+            optionalPublic
+            /static var __selections: \[ApolloAPI.Selection\] { \[\n.*?\n\h*\] }\n/
           }
         })
         .anchorsMatchLineEndings()
@@ -39,7 +42,9 @@ enum RegexMatcher {
         return .init(Regex {
           Capture(as: match) {
             startOfLine
-            /(?:public)? static var __fulfilledFragments: \[any ApolloAPI\.SelectionSet\.Type\] { \[.*?] }/
+            "@_spi(Execution) "
+            optionalPublic
+            /static var __fulfilledFragments: \[any ApolloAPI\.SelectionSet\.Type\] { \[.*?] }/
           }
           endOfSection
         })

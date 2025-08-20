@@ -683,7 +683,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
           self.variable = variable
         }
 
-        public var __variables: GraphQLOperation.Variables? { ["variable": variable] }
+        @_spi(Unsafe) public var __variables: GraphQLOperation.Variables? { ["variable": variable] }
       """
 
     // when
@@ -732,7 +732,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
           self.variable3 = variable3
         }
 
-        public var __variables: GraphQLOperation.Variables? { [
+        @_spi(Unsafe) public var __variables: GraphQLOperation.Variables? { [
           "variable1": variable1,
           "variable2": variable2,
           "variable3": variable3
@@ -776,7 +776,7 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
           self.variable = variable
         }
 
-        public var __variables: GraphQLOperation.Variables? { ["variable": variable] }
+        @_spi(Unsafe) public var __variables: GraphQLOperation.Variables? { ["variable": variable] }
       """
 
     // when

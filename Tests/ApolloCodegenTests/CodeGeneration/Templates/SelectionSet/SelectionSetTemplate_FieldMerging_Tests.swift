@@ -1286,8 +1286,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         TestOperationQuery.Data.AllAnimal.Predator.self,
         PredatorDetails.Predator.self,
         PredatorName.Predator.self
@@ -1302,8 +1302,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.Predator.Predator.self,
           PredatorDetails.Predator.Predator.self,
           PredatorName.Predator.Predator.self
@@ -1389,8 +1389,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         TestOperationQuery.Data.AllAnimal.Predator.self,
         PredatorDetails.Predator.self,
         PredatorName.Predator.self
@@ -1475,8 +1475,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         TestOperationQuery.Data.AllAnimal.Predator.self,
         PredatorDetails.Predator.self,
         PredatorName.Predator.self
@@ -1493,14 +1493,14 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal.Predator
-        public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
-        public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
+        @_spi(Execution) public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           PredatorDetails.Predator.self,
           PredatorDetails.Predator.AsDog.self,
           PredatorName.Predator.self,
           PredatorName.Predator.AsDog.self
         ] }
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.Predator.self,
           TestOperationQuery.Data.AllAnimal.Predator.AsDog.self,
           PredatorDetails.Predator.self,

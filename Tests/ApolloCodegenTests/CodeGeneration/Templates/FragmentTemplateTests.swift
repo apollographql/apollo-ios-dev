@@ -206,7 +206,7 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
       """
 
     let expected = """
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
       """
 
     // when
@@ -239,7 +239,7 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
       """
 
     let expected = """
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
       """
 
     // when
@@ -276,7 +276,7 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
       """
 
     let expected = """
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Unions.Animal }
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Unions.Animal }
       """
 
     // when
@@ -314,8 +314,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
         @_spi(Unsafe) let __data: DataDict
         @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
 
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
-        static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
+        @_spi(Execution) static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestFragment.self
         ] }
       }
@@ -351,11 +351,11 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
         @_spi(Unsafe) let __data: DataDict
         @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
 
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
-        static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
+        @_spi(Execution) static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
         ] }
-        static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestFragment.self
         ] }
       }

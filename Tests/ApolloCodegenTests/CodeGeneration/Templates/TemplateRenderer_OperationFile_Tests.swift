@@ -70,20 +70,20 @@ class TemplateRenderer_OperationFile_Tests: XCTestCase {
     // given
     let expectedAPI = """
     @_exported import ApolloAPI
-    @_spi(Unsafe) import ApolloAPI
+    @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
     """
 
     let expectedAPIAndSchema = """
     @_exported import ApolloAPI
-    @_spi(Unsafe) import ApolloAPI
+    @_spi(Execution) @_spi(Unsafe) import ApolloAPI
     import TestSchema
 
     """
 
     let expectedAPIAndTarget = """
     @_exported import ApolloAPI
-    @_spi(Unsafe) import ApolloAPI
+    @_spi(Execution) @_spi(Unsafe) import ApolloAPI
     import MockApplication
 
     """

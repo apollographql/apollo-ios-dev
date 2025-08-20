@@ -50,7 +50,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case field(Int32)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .field(let value):
           return InputDict(["field": value])
@@ -93,7 +93,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case fieldOne(String)
       case fieldTwo(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .fieldOne(let value):
           return InputDict(["fieldOne": value])
@@ -136,7 +136,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case fieldOne(String)
       case fieldTwo(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .fieldOne(let value):
           return InputDict(["fieldOne": value])
@@ -179,7 +179,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case fieldOne(String)
       case fieldTwo(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .fieldOne(let value):
           return InputDict(["fieldOne": value])
@@ -222,7 +222,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case fieldOne(String)
       case fieldTwo(String)
     
-      var __data: InputDict {
+      @_spi(Unsafe) var __data: InputDict {
         switch self {
         case .fieldOne(let value):
           return InputDict(["fieldOne": value])
@@ -333,7 +333,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case InputField(Testschema.InnerInputObject)
       case inputField(Testschema.InnerInputObject)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .InputField(let value):
           return InputDict(["InputField": value])
@@ -383,7 +383,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case enumField(GraphQLEnum<Testschema.EnumValue>)
       case inputField(Testschema.InnerInputObject)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .enumField(let value):
           return InputDict(["enumField": value])
@@ -433,7 +433,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case enumField(GraphQLEnum<TESTSCHEMA.EnumValue>)
       case inputField(TESTSCHEMA.InnerInputObject)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .enumField(let value):
           return InputDict(["enumField": value])
@@ -483,7 +483,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case enumField(GraphQLEnum<TestSchema.EnumValue>)
       case inputField(TestSchema.InnerInputObject)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .enumField(let value):
           return InputDict(["enumField": value])
@@ -518,7 +518,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case listNullableItem([GraphQLEnum<Testschema.EnumValue>?])
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .listNullableItem(let value):
           return InputDict(["listNullableItem": value])
@@ -551,7 +551,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case listNullableItem([GraphQLEnum<TESTSCHEMA.EnumValue>?])
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .listNullableItem(let value):
           return InputDict(["listNullableItem": value])
@@ -584,7 +584,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case listNullableItem([GraphQLEnum<TestSchema.EnumValue>?])
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .listNullableItem(let value):
           return InputDict(["listNullableItem": value])
@@ -612,7 +612,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case field(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .field(let value):
           return InputDict(["field": value])
@@ -638,7 +638,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case field(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .field(let value):
           return InputDict(["Field": value])
@@ -664,7 +664,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case fieldname(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .fieldname(let value):
           return InputDict(["FIELDNAME": value])
@@ -764,7 +764,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case lowercaseInputField(LowercaseInnerInputObject)
       case listField([String?])
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .stringField(let value):
           return InputDict(["stringField": value])
@@ -1461,7 +1461,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case `try`(String)
       case `_`(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .`associatedtype`(let value):
           return InputDict(["associatedtype": value])
@@ -1631,7 +1631,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       // Renamed from GraphQL schema value: 'myField'
       case myCustomField(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .fieldOne(let value):
           return InputDict(["fieldOne": value])
