@@ -63,7 +63,8 @@ public protocol CacheKeyComputingExecutionSource: GraphQLExecutionSource {
 }
 
 extension CacheKeyComputingExecutionSource {
-  @_spi(Execution) public func computeCacheKey(
+  @_spi(Execution)
+  public func computeCacheKey(
     for object: RawObjectData,
     in schema: any SchemaMetadata.Type,
     inferredToImplementInterface implementedInterface: Interface?
