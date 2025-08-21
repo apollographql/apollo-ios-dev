@@ -13,7 +13,7 @@ open class MockQuery<SelectionSet: RootSelectionSet>: GraphQLQuery, @unchecked S
     .init(definition: .init("Mock Operation Definition"))
   }
 
-  @_spi(Execution) open var __variables: Variables?
+  open var __variables: Variables?
 
   public init() {}
 
