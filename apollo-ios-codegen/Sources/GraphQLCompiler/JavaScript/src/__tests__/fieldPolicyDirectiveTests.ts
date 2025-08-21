@@ -458,3 +458,68 @@ describe("given field policy with one invalid keyArg", () => {
     ).toThrow(GraphQLError);
   });
 });
+
+describe("given field policy with nested list parameter", () => {
+  const schemaSDL: string = `
+  type Query {
+    allAnimals(withIds: [[ID]!]!, andSpecies: String!): [Animal!]
+  }
+
+  type Animal {
+    id: ID!
+    name: String!
+    species: String!
+  }
+
+  extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "withIds andSpecies")
+  `;
+
+  it("should throw error for nested list", () => {
+    expect(() =>
+      loadSchemaFromSources([
+        new Source(schemaSDL, "Test Schema", { line: 1, column: 1 }),
+      ])
+    ).toThrow(GraphQLError);
+  });
+});
+
+describe("given field policy with input object", () => {
+  const schemaSDL: string = `
+  type Query {
+    allAnimals(withName: AnimalInput!, andSpecies: String!): Animal!
+  }
+
+  input AnimalInput {
+    dog: DogInput
+  }
+
+  input DogInput {
+    name: String!
+  }
+
+  type Animal {
+    id: ID!
+    name: String!
+    species: String!
+  }
+
+  extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "withName.dog.name andSpecies")
+  `;
+
+  it("should validate dot notation nested values", () => {
+    const schema: GraphQLSchema = loadSchemaFromSources([
+      new Source(schemaSDL, "Test Schema", { line: 1, column: 1 }),
+    ]);
+
+    const queryType = schema.getTypeMap()["Query"];
+    if (!queryType || !("getFields" in queryType)) throw new Error("Missing Query type.");
+
+    const queryFields = queryType.getFields();
+    for (const fieldName in queryFields) {
+      const field = queryFields[fieldName] as FieldWithMeta;
+      expect(fieldName).toEqual("allAnimals");
+      expect(field._apolloFieldPolicies).toHaveLength(2);
+      expect(field._apolloFieldPolicies).toEqual(["withName.dog.name", "andSpecies"]);
+    }
+  });
+});

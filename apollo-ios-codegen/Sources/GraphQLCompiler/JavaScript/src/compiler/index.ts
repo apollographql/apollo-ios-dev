@@ -353,6 +353,7 @@ export function compileToIR(
           description: !isMetaFieldName(name) && description ? description : undefined,
           deprecationReason: deprecationReason || undefined,
           directives: directives,
+          fieldPolicyKeys: (fieldDef as any)._apolloFieldPolicies || undefined
         };
 
         function validateFieldName(node: FieldNode, disallowedNames?: Array<string>, schemaNamespace?: string) {

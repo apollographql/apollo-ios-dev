@@ -32,7 +32,7 @@ public enum Selection {
       self.alias = alias
       self.arguments = arguments
       self.type = type
-      self.fieldPolicy = nil
+      self.fieldPolicy = fieldPolicy
     }
 
     public indirect enum OutputType {
@@ -66,6 +66,7 @@ public enum Selection {
     ) {
       self.keys = keys
     }
+    
   }
 
   // MARK: - Convenience Initializers

@@ -12,7 +12,7 @@ public class Field: Equatable, CustomDebugStringConvertible {
   public var responseKey: String { underlyingField.responseKey }
   public var type: GraphQLType { underlyingField.type }
   public var arguments: [CompilationResult.Argument]? { underlyingField.arguments }
-  public var fieldPolicyKeys: [String] { underlyingField.fieldPolicyKeys }
+  public var fieldPolicyKeys: [String]? { underlyingField.fieldPolicyKeys }
 
   fileprivate init(
     _ field: CompilationResult.Field,

@@ -347,8 +347,6 @@ public final class GraphQLField:
   public let type: GraphQLType
 
   public let arguments: [GraphQLFieldArgument]
-  
-  public let fieldPolicyKeys: [String]
 
   public let documentation: String?
 
@@ -358,14 +356,12 @@ public final class GraphQLField:
     name: String,
     type: GraphQLType,
     arguments: [GraphQLFieldArgument],
-    fieldPolicyKeys: [String] = [],
     documentation: String?,
     deprecationReason: String?
   ) {
     self.name = name
     self.type = type
     self.arguments = arguments
-    self.fieldPolicyKeys = fieldPolicyKeys
     self.documentation = documentation
     self.deprecationReason = deprecationReason
   }
@@ -378,7 +374,6 @@ public final class GraphQLField:
       name: jsValue["name"],
       type: .fromJSValue(jsValue["type"], bridge: bridge),
       arguments: .fromJSValue(jsValue["args"], bridge: bridge),
-      fieldPolicyKeys: jsValue["_apolloFieldPolicies"],
       documentation: jsValue["description"],
       deprecationReason: jsValue["deprecationReason"]
     )
@@ -388,14 +383,12 @@ public final class GraphQLField:
     hasher.combine(name)
     hasher.combine(type)
     hasher.combine(arguments)
-    hasher.combine(fieldPolicyKeys)
   }
 
   public static func == (lhs: GraphQLField, rhs: GraphQLField) -> Bool {
     lhs.name == rhs.name &&
     lhs.type == rhs.type &&
-    lhs.arguments == rhs.arguments &&
-    lhs.fieldPolicyKeys == rhs.fieldPolicyKeys
+    lhs.arguments == rhs.arguments
   }
 
   public var debugDescription: String {

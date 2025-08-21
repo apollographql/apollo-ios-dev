@@ -493,7 +493,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
 
     public let arguments: [Argument]?
     
-    public let fieldPolicyKeys: [String]
+    public let fieldPolicyKeys: [String]?
 
     public let inclusionConditions: [InclusionCondition]?
 
@@ -517,7 +517,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       name: String,
       alias: String? = nil,
       arguments: [Argument]? = nil,
-      fieldPolicyKeys: [String] = [],
+      fieldPolicyKeys: [String]? = nil,
       inclusionConditions: [InclusionCondition]? = nil,
       directives: [Directive]? = nil,
       type: GraphQLType,
@@ -538,11 +538,14 @@ public final class CompilationResult: JavaScriptObjectDecodable {
     }
 
     static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
-      self.init(
+      let name = jsValue["name"] as String
+      let fieldPolicy = jsValue["fieldPolicyKeys"]
+      
+      return self.init(
         name: jsValue["name"],
         alias: jsValue["alias"],
         arguments: .fromJSValue(jsValue["arguments"], bridge: bridge),
-        fieldPolicyKeys: jsValue["_apolloFieldPolicies"],
+        fieldPolicyKeys: jsValue["fieldPolicyKeys"],
         inclusionConditions: jsValue["inclusionConditions"],
         directives: .fromJSValue(jsValue["directives"], bridge: bridge),
         type: .fromJSValue(jsValue["type"], bridge: bridge),

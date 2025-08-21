@@ -87,46 +87,6 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     let hero = try XCTUnwrap(records["QUERY_ROOT.hero(episode:JEDI)"])
     XCTAssertEqual(hero["name"] as? String, "R2-D2")
   }
-  
-  
-  
-  
-//  func test__fieldPolicy() throws {
-//    // given
-//    class GivenSelectionSet: MockSelectionSet {
-//      override class var __selections: [Selection] {[
-//        .field("hero", Hero.self, arguments: [""])
-//      ]}
-//
-//      class Hero: MockSelectionSet {
-//        override class var __selections: [Selection] {[
-//          .field("id", String.self),
-//          .field("name", String.self)
-//        ]}
-//      }
-//    }
-//      .field(.init(name, alias: alias, type: type._asOutputType, arguments: arguments, fieldPolicy: fieldPolicy))
-//    let variables = ["episode": "JEDI"]
-//
-//    let object: JSONObject = [
-//      "hero": ["__typename": "Droid", "name": "R2-D2"]
-//    ]
-
-    // when
-    let records = try normalizeRecords(GivenSelectionSet.self, with: variables, from: object)
-
-    // then
-    XCTAssertEqual(records["QUERY_ROOT"]?["hero(episode:JEDI)"] as? CacheReference,
-                   CacheReference("QUERY_ROOT.hero(episode:JEDI)"))
-    
-    let hero = try XCTUnwrap(records["QUERY_ROOT.hero(episode:JEDI)"])
-    XCTAssertEqual(hero["name"] as? String, "R2-D2")
-  }
-  
-  
-  
-  
-  
 
   func test__execute__givenObjectWithNoCacheKey_forFieldWithEnumArgument_normalizesRecordToPathFromQueryRootIncludingArgument() throws {
     // given
