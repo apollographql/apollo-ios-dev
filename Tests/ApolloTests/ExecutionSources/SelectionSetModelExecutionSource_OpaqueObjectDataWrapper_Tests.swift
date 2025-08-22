@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 import Nimble
 @testable import Apollo
-import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 class SelectionSetModelExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase {
 

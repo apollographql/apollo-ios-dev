@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct HeroAppearsInQuery: GraphQLQuery {
   public static let operationName: String = "HeroAppearsIn"
@@ -14,14 +15,14 @@ public struct HeroAppearsInQuery: GraphQLQuery {
   public init() {}
 
   public struct Data: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       HeroAppearsInQuery.Data.self
     ] }
 
@@ -40,15 +41,15 @@ public struct HeroAppearsInQuery: GraphQLQuery {
     ///
     /// Parent Type: `Character`
     public struct Hero: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("appearsIn", [GraphQLEnum<StarWarsAPI.Episode>?].self),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         HeroAppearsInQuery.Data.Hero.self
       ] }
 

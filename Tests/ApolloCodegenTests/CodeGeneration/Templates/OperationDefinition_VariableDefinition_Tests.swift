@@ -100,7 +100,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     // given
     subject = .mock("VARIABLE", type: .string(), defaultValue: nil)
     
-    let expected = "public var __variables: Variables? { [\"VARIABLE\": variable] }"
+    let expected = "@_spi(Unsafe) public var __variables: Variables? { [\"VARIABLE\": variable] }"
     
     // when
     buildTemplate()
@@ -114,7 +114,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     // given
     subject = .mock("VariableName", type: .string(), defaultValue: nil)
     
-    let expected = "public var __variables: Variables? { [\"VariableName\": variableName] }"
+    let expected = "@_spi(Unsafe) public var __variables: Variables? { [\"VariableName\": variableName] }"
     
     // when
     buildTemplate()

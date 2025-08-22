@@ -1,7 +1,7 @@
 import XCTest
-@testable import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
+@testable @_spi(Internal) import Apollo
+@_spi(Execution) @_spi(Internal) @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 
 class JSONTests: XCTestCase {
   func testMissingValueMatchable() {

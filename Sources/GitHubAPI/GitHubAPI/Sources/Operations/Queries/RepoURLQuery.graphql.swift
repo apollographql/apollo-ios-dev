@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct RepoURLQuery: GraphQLQuery {
   public static let operationName: String = "RepoURL"
@@ -13,17 +14,17 @@ public struct RepoURLQuery: GraphQLQuery {
   public init() {}
 
   public struct Data: GitHubAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("repository", Repository?.self, arguments: [
         "owner": "apollographql",
         "name": "apollo-ios"
       ]),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       RepoURLQuery.Data.self
     ] }
 
@@ -34,15 +35,15 @@ public struct RepoURLQuery: GraphQLQuery {
     ///
     /// Parent Type: `Repository`
     public struct Repository: GitHubAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Repository }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Repository }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("url", GitHubAPI.URI.self),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         RepoURLQuery.Data.Repository.self
       ] }
 

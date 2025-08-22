@@ -273,7 +273,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     )
 
     let expected = """
-      static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
+      @_spi(Execution) static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
         switch typename {
         case "objA": return ObjectSchema.Objects.ObjA
         case "objB": return ObjectSchema.Objects.ObjB
@@ -307,7 +307,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     )
 
     let expected = """
-      static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
+      @_spi(Execution) static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
         switch typename {
         case "ObjectA": return ObjectSchema.Objects.ObjectA
         default: return nil

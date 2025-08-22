@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: GraphQLQuery {
   public static let operationName: String = "HeroFriendsDetailsUnconditionalAndConditionalInclusion"
@@ -17,17 +18,17 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
     self.includeFriendsDetails = includeFriendsDetails
   }
 
-  public var __variables: Variables? { ["includeFriendsDetails": includeFriendsDetails] }
+  @_spi(Unsafe) public var __variables: Variables? { ["includeFriendsDetails": includeFriendsDetails] }
 
   public struct Data: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.self
     ] }
 
@@ -46,15 +47,15 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
     ///
     /// Parent Type: `Character`
     public struct Hero: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("friends", [Friend?]?.self),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.self
       ] }
 
@@ -75,16 +76,16 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
       ///
       /// Parent Type: `Character`
       public struct Friend: StarWarsAPI.SelectionSet {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("name", String.self),
           .include(if: "includeFriendsDetails", .inlineFragment(IfIncludeFriendsDetails.self)),
         ] }
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.self
         ] }
 
@@ -107,16 +108,16 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
         ///
         /// Parent Type: `Character`
         public struct IfIncludeFriendsDetails: StarWarsAPI.InlineFragment {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend
-          public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-          public static var __selections: [ApolloAPI.Selection] { [
+          @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+          @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
             .field("name", String.self),
             .inlineFragment(AsDroid.self),
           ] }
-          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.self,
             HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.IfIncludeFriendsDetails.self
           ] }
@@ -140,15 +141,15 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
           ///
           /// Parent Type: `Droid`
           public struct AsDroid: StarWarsAPI.InlineFragment {
-            public let __data: DataDict
-            public init(_dataDict: DataDict) { __data = _dataDict }
+            @_spi(Unsafe) public let __data: DataDict
+            @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
             public typealias RootEntityType = HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend
-            public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
-            public static var __selections: [ApolloAPI.Selection] { [
+            @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
+            @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
               .field("primaryFunction", String?.self),
             ] }
-            public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
               HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.self,
               HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.IfIncludeFriendsDetails.self,
               HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery.Data.Hero.Friend.IfIncludeFriendsDetails.AsDroid.self

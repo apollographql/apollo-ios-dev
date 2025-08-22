@@ -2,22 +2,23 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct DroidDetails: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment DroidDetails on Droid { __typename name primaryFunction }"#
   }
 
-  public let __data: DataDict
-  public init(_dataDict: DataDict) { __data = _dataDict }
+  @_spi(Unsafe) public let __data: DataDict
+  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("name", String.self),
     .field("primaryFunction", String?.self),
   ] }
-  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
     DroidDetails.self
   ] }
 

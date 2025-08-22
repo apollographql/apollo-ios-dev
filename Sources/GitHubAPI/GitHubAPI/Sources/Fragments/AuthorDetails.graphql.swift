@@ -2,22 +2,23 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct AuthorDetails: GitHubAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment AuthorDetails on Actor { __typename login ... on User { __typename id name } }"#
   }
 
-  public let __data: DataDict
-  public init(_dataDict: DataDict) { __data = _dataDict }
+  @_spi(Unsafe) public let __data: DataDict
+  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("login", String.self),
     .inlineFragment(AsUser.self),
   ] }
-  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
     AuthorDetails.self
   ] }
 
@@ -30,16 +31,16 @@ public struct AuthorDetails: GitHubAPI.SelectionSet, Fragment {
   ///
   /// Parent Type: `User`
   public struct AsUser: GitHubAPI.InlineFragment {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public typealias RootEntityType = AuthorDetails
-    public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.User }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.User }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("id", GitHubAPI.ID.self),
       .field("name", String?.self),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       AuthorDetails.self,
       AuthorDetails.AsUser.self
     ] }

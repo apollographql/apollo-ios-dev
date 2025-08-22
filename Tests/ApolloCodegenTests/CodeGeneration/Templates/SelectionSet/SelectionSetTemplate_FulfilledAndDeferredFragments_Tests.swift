@@ -107,7 +107,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self
         ] }
       """
@@ -162,7 +162,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           TestOperationQuery.Data.AllAnimal.AsAnimalUnion.self,
           TestOperationQuery.Data.AllAnimal.AsAnimalUnion.AsDog.self
@@ -219,7 +219,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           TestOperationQuery.Data.AllAnimal.AsPet.self,
           TestOperationQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self
@@ -281,7 +281,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           TestOperationQuery.Data.AllAnimal.AsCat.self,
           TestOperationQuery.Data.AllAnimal.AsPet.self,
@@ -330,7 +330,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           AnimalDetails.self
         ] }
@@ -383,7 +383,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           AnimalDetails.self,
           Fragment2.self
@@ -437,7 +437,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           TestOperationQuery.Data.AllAnimal.AsPet.self,
           AnimalDetails.self
@@ -489,14 +489,14 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let allAnimals_expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self
         ] }
       """
 
     let allAnimals_asPet_expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           TestOperationQuery.Data.AllAnimal.AsPet.self,
           AnimalDetails.self
@@ -586,7 +586,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           Fragment1.Predator.self,
           Fragment1.Predator.AsPet.self,
           PredatorFragment.self,
@@ -662,7 +662,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           Fragment1.Predator.self,
           Fragment1.Predator.AsPet.self,
           PredatorFragment.Predator.self,
@@ -715,7 +715,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           TestOperationQuery.Data.AllAnimal.IfA.self
         ] }
@@ -765,7 +765,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           TestOperationQuery.Data.AllAnimal.IfAAndNotB.self
         ] }
@@ -817,7 +817,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           TestOperationQuery.Data.AllAnimal.IfA.self,
           TestOperationQuery.Data.AllAnimal.IfA.IfNotB.self
@@ -871,7 +871,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.IfA.Friend.self,
           TestOperationQuery.Data.AllAnimal.IfA.Friend.IfNotB.self
         ] }
@@ -925,14 +925,14 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let allAnimals_expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self
         ] }
       """
 
     let allAnimals_ifA_expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           TestOperationQuery.Data.AllAnimal.IfA.self,
           AnimalDetails.self
@@ -1005,10 +1005,10 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self
         ] }
-        public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
+        @_spi(Execution) public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
           TestOperationQuery.Data.AllAnimal.SlowSpecies.self
         ] }
       """
@@ -1053,10 +1053,10 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self
         ] }
-        public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
+        @_spi(Execution) public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
           TestOperationQuery.Data.AllAnimal.SlowSpecies.self
         ] }
       """
@@ -1106,11 +1106,11 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           TestOperationQuery.Data.AllAnimal.AsDog.self
         ] }
-        public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
+        @_spi(Execution) public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
           TestOperationQuery.Data.AllAnimal.AsDog.SlowSpecies.self
         ] }
       """
@@ -1167,11 +1167,11 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           TestOperationQuery.Data.AllAnimal.AsDog.self
         ] }
-        public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
+        @_spi(Execution) public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
           TestOperationQuery.Data.AllAnimal.AsDog.SlowSpecies.self,
           TestOperationQuery.Data.AllAnimal.AsDog.SlowGenus.self
         ] }
@@ -1239,22 +1239,22 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected_asDog =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           TestOperationQuery.Data.AllAnimal.AsDog.self
         ] }
-        public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
+        @_spi(Execution) public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
           TestOperationQuery.Data.AllAnimal.AsDog.Outer.self
         ] }
       """
 
     let expected_asDog_deferredOuter_Friend_asCat =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.AsDog.Outer.Friend.self,
           TestOperationQuery.Data.AllAnimal.AsDog.Outer.Friend.AsCat.self
         ] }
-        public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
+        @_spi(Execution) public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
           TestOperationQuery.Data.AllAnimal.AsDog.Outer.Friend.AsCat.Inner.self
         ] }
       """
@@ -1307,10 +1307,10 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self
         ] }
-        public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
+        @_spi(Execution) public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
           AnimalFragment.self
         ] }
       """
@@ -1362,11 +1362,11 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           TestOperationQuery.Data.AllAnimal.self,
           TestOperationQuery.Data.AllAnimal.AsDog.self
         ] }
-        public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
+        @_spi(Execution) public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
           DogFragment.self
         ] }
       """
@@ -1417,10 +1417,10 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           DogFragment.self
         ] }
-        public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
+        @_spi(Execution) public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
           DogFragment.SlowSpecies.self
         ] }
       """
@@ -1473,11 +1473,11 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     let expected =
       """
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           DogFragment.self,
           DogFragment.AsDog.self
         ] }
-        public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
+        @_spi(Execution) public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
           DogFragment.AsDog.SlowSpecies.self
         ] }
       """

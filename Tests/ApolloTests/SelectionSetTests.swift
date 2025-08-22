@@ -1,7 +1,7 @@
 import XCTest
 @testable import Apollo
-@testable import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) @testable @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 import Nimble
 
 class SelectionSetTests: XCTestCase {

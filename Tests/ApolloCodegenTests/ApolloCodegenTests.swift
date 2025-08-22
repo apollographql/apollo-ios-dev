@@ -2961,7 +2961,7 @@ class ApolloCodegenTests: XCTestCase {
                 __typename: String,
                 species: String? = nil
               ) {
-          """, atLine: 29, ignoringExtraLines: true))
+          """, atLine: 1, inSection: .selectionSet.initializer, ignoringExtraLines: true))
 
         expectation.fulfill()
       }

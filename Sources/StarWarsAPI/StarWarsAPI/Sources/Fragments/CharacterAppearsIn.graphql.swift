@@ -2,21 +2,22 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct CharacterAppearsIn: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment CharacterAppearsIn on Character { __typename appearsIn }"#
   }
 
-  public let __data: DataDict
-  public init(_dataDict: DataDict) { __data = _dataDict }
+  @_spi(Unsafe) public let __data: DataDict
+  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("appearsIn", [GraphQLEnum<StarWarsAPI.Episode>?].self),
   ] }
-  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
     CharacterAppearsIn.self
   ] }
 

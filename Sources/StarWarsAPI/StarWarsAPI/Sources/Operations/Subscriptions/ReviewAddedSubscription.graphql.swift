@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct ReviewAddedSubscription: GraphQLSubscription {
   public static let operationName: String = "ReviewAdded"
@@ -17,17 +18,17 @@ public struct ReviewAddedSubscription: GraphQLSubscription {
     self.episode = episode
   }
 
-  public var __variables: Variables? { ["episode": episode] }
+  @_spi(Unsafe) public var __variables: Variables? { ["episode": episode] }
 
   public struct Data: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Subscription }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Subscription }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("reviewAdded", ReviewAdded?.self, arguments: ["episode": .variable("episode")]),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       ReviewAddedSubscription.Data.self
     ] }
 
@@ -46,17 +47,17 @@ public struct ReviewAddedSubscription: GraphQLSubscription {
     ///
     /// Parent Type: `Review`
     public struct ReviewAdded: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("episode", GraphQLEnum<StarWarsAPI.Episode>?.self),
         .field("stars", Int.self),
         .field("commentary", String?.self),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         ReviewAddedSubscription.Data.ReviewAdded.self
       ] }
 

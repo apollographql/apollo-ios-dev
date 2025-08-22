@@ -48,9 +48,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
     """
@@ -85,9 +85,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -152,9 +152,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -218,9 +218,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -284,9 +284,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     struct MockInput: InputObject {
-      private(set) var __data: InputDict
+      @_spi(Unsafe) private(set) var __data: InputDict
 
-      init(_ data: InputDict) {
+      @_spi(Unsafe) init(_ data: InputDict) {
         __data = data
       }
 
@@ -1079,9 +1079,9 @@ class InputObjectTemplateTests: XCTestCase {
     let expected = """
     /// \(documentation)
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -1120,9 +1120,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -1203,9 +1203,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -1288,9 +1288,9 @@ class InputObjectTemplateTests: XCTestCase {
     let expected = """
     /// This is some great documentation!
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -1336,9 +1336,9 @@ class InputObjectTemplateTests: XCTestCase {
     let expected = """
     /// This is some great documentation!
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -1396,9 +1396,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -1487,9 +1487,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -2530,9 +2530,9 @@ class InputObjectTemplateTests: XCTestCase {
 
       let expected = """
       public struct \(keyword.firstUppercased)_InputObject: InputObject {
-        public private(set) var __data: InputDict
+        @_spi(Unsafe) public private(set) var __data: InputDict
 
-        public init(_ data: InputDict) {
+        @_spi(Unsafe) public init(_ data: InputDict) {
           __data = data
         }
       """
@@ -2571,9 +2571,9 @@ class InputObjectTemplateTests: XCTestCase {
     let expected = """
     // Renamed from GraphQL schema value: 'MyInputObject'
     public struct MyCustomInputObject: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 

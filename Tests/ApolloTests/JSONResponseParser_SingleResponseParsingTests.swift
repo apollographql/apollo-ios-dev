@@ -1,9 +1,9 @@
-import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 import Nimble
 import XCTest
 
-@testable import Apollo
+@testable @_spi(Execution) import Apollo
 
 #warning("TODO: We need a to test to make sure that there is either data or errors in the result?")
 class JSONResponseParser_SingleResponseParsingTests: XCTestCase {

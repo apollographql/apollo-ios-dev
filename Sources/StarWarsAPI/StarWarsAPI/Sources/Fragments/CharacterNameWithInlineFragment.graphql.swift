@@ -2,22 +2,23 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment CharacterNameWithInlineFragment on Character { __typename ... on Human { __typename friends { __typename appearsIn } } ... on Droid { __typename ...CharacterName ...FriendsNames } }"#
   }
 
-  public let __data: DataDict
-  public init(_dataDict: DataDict) { __data = _dataDict }
+  @_spi(Unsafe) public let __data: DataDict
+  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .inlineFragment(AsHuman.self),
     .inlineFragment(AsDroid.self),
   ] }
-  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
     CharacterNameWithInlineFragment.self
   ] }
 
@@ -36,15 +37,15 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
   ///
   /// Parent Type: `Human`
   public struct AsHuman: StarWarsAPI.InlineFragment {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public typealias RootEntityType = CharacterNameWithInlineFragment
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("friends", [Friend?]?.self),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       CharacterNameWithInlineFragment.self,
       CharacterNameWithInlineFragment.AsHuman.self
     ] }
@@ -65,15 +66,15 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
     ///
     /// Parent Type: `Character`
     public struct Friend: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("appearsIn", [GraphQLEnum<StarWarsAPI.Episode>?].self),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         CharacterNameWithInlineFragment.AsHuman.Friend.self
       ] }
 
@@ -96,16 +97,16 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
   ///
   /// Parent Type: `Droid`
   public struct AsDroid: StarWarsAPI.InlineFragment {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public typealias RootEntityType = CharacterNameWithInlineFragment
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .fragment(CharacterName.self),
       .fragment(FriendsNames.self),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       CharacterNameWithInlineFragment.self,
       CharacterNameWithInlineFragment.AsDroid.self,
       CharacterName.self,
@@ -118,8 +119,8 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
     public var friends: [Friend?]? { __data["friends"] }
 
     public struct Fragments: FragmentContainer {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
       public var characterName: CharacterName { _toFragment() }
       public var friendsNames: FriendsNames { _toFragment() }

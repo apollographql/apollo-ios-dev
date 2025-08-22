@@ -1,5 +1,5 @@
 import Apollo
-@_spi(Internal) import ApolloAPI
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 @preconcurrency import Combine
 import Foundation
 import OrderedCollections

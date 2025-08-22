@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct PetSearchQuery: GraphQLQuery {
   public static let operationName: String = "PetSearch"
@@ -27,17 +28,17 @@ public struct PetSearchQuery: GraphQLQuery {
     self.filters = filters
   }
 
-  public var __variables: Variables? { ["filters": filters] }
+  @_spi(Unsafe) public var __variables: Variables? { ["filters": filters] }
 
   public struct Data: AnimalKingdomAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("pets", [Pet].self, arguments: ["filters": .variable("filters")]),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       PetSearchQuery.Data.self
     ] }
 
@@ -56,16 +57,16 @@ public struct PetSearchQuery: GraphQLQuery {
     ///
     /// Parent Type: `Pet`
     public struct Pet: AnimalKingdomAPI.SelectionSet, Identifiable {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("id", AnimalKingdomAPI.ID.self),
         .field("humanName", String?.self),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         PetSearchQuery.Data.Pet.self
       ] }
 

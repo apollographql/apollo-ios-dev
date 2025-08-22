@@ -2,23 +2,24 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct CrocodileFragment: AnimalKingdomAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment CrocodileFragment on Crocodile { __typename species age tag(id: "albino") }"#
   }
 
-  public let __data: DataDict
-  public init(_dataDict: DataDict) { __data = _dataDict }
+  @_spi(Unsafe) public let __data: DataDict
+  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Crocodile }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Crocodile }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("species", String.self),
     .field("age", Int.self),
     .field("tag", String?.self, arguments: ["id": "albino"]),
   ] }
-  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
     CrocodileFragment.self
   ] }
 

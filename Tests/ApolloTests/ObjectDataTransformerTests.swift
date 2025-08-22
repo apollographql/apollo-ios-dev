@@ -1,6 +1,6 @@
 import XCTest
 import Nimble
-import ApolloAPI
+@_spi(Execution) import ApolloAPI
 
 class ObjectDataTransformerTests: XCTestCase {
 

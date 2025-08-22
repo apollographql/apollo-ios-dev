@@ -1,8 +1,8 @@
 import XCTest
 import Nimble
 import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 
 class DefaultInterceptorProviderTests: XCTestCase {
 

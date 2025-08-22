@@ -312,10 +312,10 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     let expected = """
         struct Data: TestSchema.SelectionSet {
-          let __data: DataDict
-          init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) let __data: DataDict
+          @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
 
-          static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
+          @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
       """
 
     // when
@@ -585,7 +585,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
           self.variable = variable
         }
 
-        public var __variables: Variables? { ["variable": variable] }
+        @_spi(Unsafe) public var __variables: Variables? { ["variable": variable] }
       """
 
     // when
@@ -634,7 +634,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
           self.variable3 = variable3
         }
 
-        public var __variables: Variables? { [
+        @_spi(Unsafe) public var __variables: Variables? { [
           "variable1": variable1,
           "variable2": variable2,
           "variable3": variable3
@@ -678,7 +678,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
           self.variable = variable
         }
 
-        public var __variables: Variables? { ["variable": variable] }
+        @_spi(Unsafe) public var __variables: Variables? { ["variable": variable] }
       """
 
     // when
@@ -718,7 +718,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
           self.variable = variable
         }
 
-        public var __variables: Variables? { ["Variable": variable] }
+        @_spi(Unsafe) public var __variables: Variables? { ["Variable": variable] }
       """
 
     // when
@@ -963,7 +963,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
           self.`while` = `while`
         }
 
-        public var __variables: Variables? { [
+        @_spi(Unsafe) public var __variables: Variables? { [
           "as": `as`,
           "associatedtype": `associatedtype`,
           "break": `break`,
@@ -1303,7 +1303,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     expect(actual).to(
       equalLineByLine(
-        "\n",
+        "",
         after: .operationDefinition.responseModel,
         ignoringExtraLines: false
       )

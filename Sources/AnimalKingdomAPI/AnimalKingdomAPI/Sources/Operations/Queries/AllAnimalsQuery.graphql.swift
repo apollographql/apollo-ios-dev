@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct AllAnimalsQuery: GraphQLQuery {
   public static let operationName: String = "AllAnimalsQuery"
@@ -14,14 +15,14 @@ public struct AllAnimalsQuery: GraphQLQuery {
   public init() {}
 
   public struct Data: AnimalKingdomAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("allAnimals", [AllAnimal].self),
     ] }
-    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
       AllAnimalsQuery.Data.self
     ] }
 
@@ -40,11 +41,11 @@ public struct AllAnimalsQuery: GraphQLQuery {
     ///
     /// Parent Type: `Animal`
     public struct AllAnimal: AnimalKingdomAPI.SelectionSet, Identifiable {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("id", AnimalKingdomAPI.ID.self),
         .field("height", Height.self),
@@ -58,7 +59,7 @@ public struct AllAnimalsQuery: GraphQLQuery {
         .inlineFragment(AsDog.self),
         .fragment(HeightInMeters.self),
       ] }
-      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         AllAnimalsQuery.Data.AllAnimal.self
       ] }
 
@@ -75,8 +76,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
       public var asDog: AsDog? { _asInlineFragment() }
 
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var heightInMeters: HeightInMeters { _toFragment() }
       }
@@ -103,16 +104,16 @@ public struct AllAnimalsQuery: GraphQLQuery {
       ///
       /// Parent Type: `Height`
       public struct Height: AnimalKingdomAPI.SelectionSet {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("feet", Int.self),
           .field("inches", Int?.self),
         ] }
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           AllAnimalsQuery.Data.AllAnimal.Height.self,
           HeightInMeters.Height.self
         ] }
@@ -139,16 +140,16 @@ public struct AllAnimalsQuery: GraphQLQuery {
       ///
       /// Parent Type: `Animal`
       public struct Predator: AnimalKingdomAPI.SelectionSet {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("species", String.self),
           .inlineFragment(AsWarmBlooded.self),
         ] }
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           AllAnimalsQuery.Data.AllAnimal.Predator.self
         ] }
 
@@ -170,17 +171,17 @@ public struct AllAnimalsQuery: GraphQLQuery {
         ///
         /// Parent Type: `WarmBlooded`
         public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal.Predator
-          public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
-          public static var __selections: [ApolloAPI.Selection] { [
+          @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
+          @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
             .field("predators", [Predator].self),
             .field("laysEggs", Bool.self),
             .fragment(WarmBloodedDetails.self),
           ] }
-          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AllAnimalsQuery.Data.AllAnimal.Predator.self,
             AllAnimalsQuery.Data.AllAnimal.Predator.AsWarmBlooded.self,
             WarmBloodedDetails.self,
@@ -194,8 +195,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
           public var height: Height { __data["height"] }
 
           public struct Fragments: FragmentContainer {
-            public let __data: DataDict
-            public init(_dataDict: DataDict) { __data = _dataDict }
+            @_spi(Unsafe) public let __data: DataDict
+            @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
             public var warmBloodedDetails: WarmBloodedDetails { _toFragment() }
             public var heightInMeters: HeightInMeters { _toFragment() }
@@ -223,15 +224,15 @@ public struct AllAnimalsQuery: GraphQLQuery {
           ///
           /// Parent Type: `Animal`
           public struct Predator: AnimalKingdomAPI.SelectionSet {
-            public let __data: DataDict
-            public init(_dataDict: DataDict) { __data = _dataDict }
+            @_spi(Unsafe) public let __data: DataDict
+            @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-            public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
-            public static var __selections: [ApolloAPI.Selection] { [
+            @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
+            @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
               .field("__typename", String.self),
               .field("species", String.self),
             ] }
-            public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
               AllAnimalsQuery.Data.AllAnimal.Predator.AsWarmBlooded.Predator.self
             ] }
 
@@ -256,15 +257,15 @@ public struct AllAnimalsQuery: GraphQLQuery {
       ///
       /// Parent Type: `WarmBlooded`
       public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment, Identifiable {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .fragment(WarmBloodedDetails.self),
         ] }
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           AllAnimalsQuery.Data.AllAnimal.self,
           AllAnimalsQuery.Data.AllAnimal.AsWarmBlooded.self,
           WarmBloodedDetails.self,
@@ -279,8 +280,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public var bodyTemperature: Int { __data["bodyTemperature"] }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var warmBloodedDetails: WarmBloodedDetails { _toFragment() }
           public var heightInMeters: HeightInMeters { _toFragment() }
@@ -310,11 +311,11 @@ public struct AllAnimalsQuery: GraphQLQuery {
         ///
         /// Parent Type: `Height`
         public struct Height: AnimalKingdomAPI.SelectionSet {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-          public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
-          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
+          @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AllAnimalsQuery.Data.AllAnimal.AsWarmBlooded.Height.self,
             AllAnimalsQuery.Data.AllAnimal.Height.self,
             HeightInMeters.Height.self
@@ -343,17 +344,17 @@ public struct AllAnimalsQuery: GraphQLQuery {
       ///
       /// Parent Type: `Pet`
       public struct AsPet: AnimalKingdomAPI.InlineFragment, Identifiable {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("height", Height.self),
           .inlineFragment(AsWarmBlooded.self),
           .fragment(PetDetails.self),
         ] }
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           AllAnimalsQuery.Data.AllAnimal.self,
           AllAnimalsQuery.Data.AllAnimal.AsPet.self,
           PetDetails.self
@@ -371,8 +372,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public var asWarmBlooded: AsWarmBlooded? { _asInlineFragment() }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var petDetails: PetDetails { _toFragment() }
           public var heightInMeters: HeightInMeters { _toFragment() }
@@ -406,16 +407,16 @@ public struct AllAnimalsQuery: GraphQLQuery {
         ///
         /// Parent Type: `Height`
         public struct Height: AnimalKingdomAPI.SelectionSet {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-          public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
-          public static var __selections: [ApolloAPI.Selection] { [
+          @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
+          @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
             .field("relativeSize", GraphQLEnum<AnimalKingdomAPI.RelativeSize>.self),
             .field("centimeters", Double.self),
           ] }
-          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AllAnimalsQuery.Data.AllAnimal.AsPet.Height.self,
             AllAnimalsQuery.Data.AllAnimal.Height.self,
             HeightInMeters.Height.self
@@ -451,15 +452,15 @@ public struct AllAnimalsQuery: GraphQLQuery {
         ///
         /// Parent Type: `WarmBlooded`
         public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment, Identifiable {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-          public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
-          public static var __selections: [ApolloAPI.Selection] { [
+          @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
+          @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
             .fragment(WarmBloodedDetails.self),
           ] }
-          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AllAnimalsQuery.Data.AllAnimal.self,
             AllAnimalsQuery.Data.AllAnimal.AsPet.self,
             AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.self,
@@ -479,8 +480,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
           public var owner: Owner? { __data["owner"] }
 
           public struct Fragments: FragmentContainer {
-            public let __data: DataDict
-            public init(_dataDict: DataDict) { __data = _dataDict }
+            @_spi(Unsafe) public let __data: DataDict
+            @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
             public var warmBloodedDetails: WarmBloodedDetails { _toFragment() }
             public var heightInMeters: HeightInMeters { _toFragment() }
@@ -517,11 +518,11 @@ public struct AllAnimalsQuery: GraphQLQuery {
           ///
           /// Parent Type: `Height`
           public struct Height: AnimalKingdomAPI.SelectionSet {
-            public let __data: DataDict
-            public init(_dataDict: DataDict) { __data = _dataDict }
+            @_spi(Unsafe) public let __data: DataDict
+            @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-            public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
-            public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
+            @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
               AllAnimalsQuery.Data.AllAnimal.AsPet.AsWarmBlooded.Height.self,
               AllAnimalsQuery.Data.AllAnimal.Height.self,
               HeightInMeters.Height.self,
@@ -560,15 +561,15 @@ public struct AllAnimalsQuery: GraphQLQuery {
       ///
       /// Parent Type: `Cat`
       public struct AsCat: AnimalKingdomAPI.InlineFragment, Identifiable {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Cat }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Cat }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("isJellicle", Bool.self),
         ] }
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           AllAnimalsQuery.Data.AllAnimal.self,
           AllAnimalsQuery.Data.AllAnimal.AsCat.self,
           AllAnimalsQuery.Data.AllAnimal.AsWarmBlooded.self,
@@ -591,8 +592,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public var owner: Owner? { __data["owner"] }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var heightInMeters: HeightInMeters { _toFragment() }
           public var warmBloodedDetails: WarmBloodedDetails { _toFragment() }
@@ -630,11 +631,11 @@ public struct AllAnimalsQuery: GraphQLQuery {
         ///
         /// Parent Type: `Height`
         public struct Height: AnimalKingdomAPI.SelectionSet {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-          public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
-          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
+          @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AllAnimalsQuery.Data.AllAnimal.AsCat.Height.self,
             AllAnimalsQuery.Data.AllAnimal.Height.self,
             HeightInMeters.Height.self,
@@ -672,15 +673,15 @@ public struct AllAnimalsQuery: GraphQLQuery {
       ///
       /// Parent Type: `ClassroomPet`
       public struct AsClassroomPet: AnimalKingdomAPI.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Unions.ClassroomPet }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Unions.ClassroomPet }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .inlineFragment(AsBird.self),
         ] }
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           AllAnimalsQuery.Data.AllAnimal.self,
           AllAnimalsQuery.Data.AllAnimal.AsClassroomPet.self,
           HeightInMeters.self
@@ -695,8 +696,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public var asBird: AsBird? { _asInlineFragment() }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var heightInMeters: HeightInMeters { _toFragment() }
         }
@@ -723,11 +724,11 @@ public struct AllAnimalsQuery: GraphQLQuery {
         ///
         /// Parent Type: `Height`
         public struct Height: AnimalKingdomAPI.SelectionSet {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-          public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
-          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
+          @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AllAnimalsQuery.Data.AllAnimal.AsClassroomPet.Height.self,
             AllAnimalsQuery.Data.AllAnimal.Height.self,
             HeightInMeters.Height.self
@@ -755,15 +756,15 @@ public struct AllAnimalsQuery: GraphQLQuery {
         ///
         /// Parent Type: `Bird`
         public struct AsBird: AnimalKingdomAPI.InlineFragment, Identifiable {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-          public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Bird }
-          public static var __selections: [ApolloAPI.Selection] { [
+          @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Bird }
+          @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
             .field("wingspan", Double.self),
           ] }
-          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AllAnimalsQuery.Data.AllAnimal.self,
             AllAnimalsQuery.Data.AllAnimal.AsClassroomPet.self,
             AllAnimalsQuery.Data.AllAnimal.AsClassroomPet.AsBird.self,
@@ -787,8 +788,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
           public var owner: Owner? { __data["owner"] }
 
           public struct Fragments: FragmentContainer {
-            public let __data: DataDict
-            public init(_dataDict: DataDict) { __data = _dataDict }
+            @_spi(Unsafe) public let __data: DataDict
+            @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
             public var heightInMeters: HeightInMeters { _toFragment() }
             public var warmBloodedDetails: WarmBloodedDetails { _toFragment() }
@@ -826,11 +827,11 @@ public struct AllAnimalsQuery: GraphQLQuery {
           ///
           /// Parent Type: `Height`
           public struct Height: AnimalKingdomAPI.SelectionSet {
-            public let __data: DataDict
-            public init(_dataDict: DataDict) { __data = _dataDict }
+            @_spi(Unsafe) public let __data: DataDict
+            @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-            public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
-            public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
+            @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
               AllAnimalsQuery.Data.AllAnimal.AsClassroomPet.AsBird.Height.self,
               AllAnimalsQuery.Data.AllAnimal.Height.self,
               HeightInMeters.Height.self,
@@ -869,16 +870,16 @@ public struct AllAnimalsQuery: GraphQLQuery {
       ///
       /// Parent Type: `Dog`
       public struct AsDog: AnimalKingdomAPI.InlineFragment, Identifiable {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = AllAnimalsQuery.Data.AllAnimal
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Dog }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Dog }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("favoriteToy", String.self),
           .field("birthdate", AnimalKingdomAPI.CustomDate?.self),
         ] }
-        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           AllAnimalsQuery.Data.AllAnimal.self,
           AllAnimalsQuery.Data.AllAnimal.AsDog.self,
           AllAnimalsQuery.Data.AllAnimal.AsWarmBlooded.self,
@@ -901,8 +902,8 @@ public struct AllAnimalsQuery: GraphQLQuery {
         public var owner: Owner? { __data["owner"] }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var heightInMeters: HeightInMeters { _toFragment() }
           public var warmBloodedDetails: WarmBloodedDetails { _toFragment() }
@@ -940,11 +941,11 @@ public struct AllAnimalsQuery: GraphQLQuery {
         ///
         /// Parent Type: `Height`
         public struct Height: AnimalKingdomAPI.SelectionSet {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-          public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
-          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Height }
+          @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AllAnimalsQuery.Data.AllAnimal.AsDog.Height.self,
             AllAnimalsQuery.Data.AllAnimal.Height.self,
             HeightInMeters.Height.self,

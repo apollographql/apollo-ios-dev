@@ -1,6 +1,6 @@
 import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Unsafe) import ApolloAPI
+@_spi(Unsafe) import ApolloInternalTestHelpers
 @preconcurrency import Combine
 import XCTest
 
