@@ -53,6 +53,10 @@ extension FileGenerator {
       data: rendered.data(using: .utf8),
       overwrite: self.overwrite
     )
+    
+    if let _ = self as? SchemaConfigurationFileGenerator {
+      print("Running default 'generate' for Schema Configuration")
+    }
 
     return errors
   }

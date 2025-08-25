@@ -39,6 +39,26 @@ public class MockSchemaMetadata: SchemaMetadata {
       testObserver.start()
     }
   }
+  
+  @MainActor
+  public static func stub_cacheKeyForField_SingleReturn(
+    _ stub: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> CacheKeyInfo?)?
+  ) {
+    _configuration.stub_cacheKeyForField_SingleReturn = stub
+    if stub != nil {
+      testObserver.start()
+    }
+  }
+  
+  @MainActor
+  public static func stub_cacheKeyForField_ListReturn(
+    _ stub: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> [CacheKeyInfo]?)?
+  ) {
+    _configuration.stub_cacheKeyForField_ListReturn = stub
+    if stub != nil {
+      testObserver.start()
+    }
+  }
 
   public static func objectType(forTypename __typename: String) -> Object? {
     if let stub = objectTypeForTypeName {
@@ -50,9 +70,21 @@ public class MockSchemaMetadata: SchemaMetadata {
 
   public class SchemaConfiguration: ApolloAPI.SchemaConfiguration {
     static var stub_cacheKeyInfoForType_Object: ((Object, ObjectData) -> CacheKeyInfo?)?
+    
+    static var stub_cacheKeyForField_SingleReturn: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> CacheKeyInfo?)?
+    
+    static var stub_cacheKeyForField_ListReturn: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> [CacheKeyInfo]?)?
 
     public static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
       stub_cacheKeyInfoForType_Object?(type, object)
+    }
+    
+    public static func cacheKey(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> CacheKeyInfo? {
+      stub_cacheKeyForField_SingleReturn?(field, variables, path)
+    }
+    
+    public static func cacheKeys(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
+      stub_cacheKeyForField_ListReturn?(field, variables, path)
     }
   }
 }
@@ -102,6 +134,14 @@ public enum MockSchema1Configuration: SchemaConfiguration {
   public static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
     CacheKeyInfo(id: "one")
   }
+  
+  public static func cacheKey(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> CacheKeyInfo? {
+    return nil
+  }
+  
+  public static func cacheKeys(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
+    return nil
+  }
 }
 
 public enum MockSchema2: SchemaMetadata {
@@ -115,5 +155,13 @@ public enum MockSchema2: SchemaMetadata {
 public enum MockSchema2Configuration: SchemaConfiguration {
   public static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
     CacheKeyInfo(id: "two")
+  }
+  
+  public static func cacheKey(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> CacheKeyInfo? {
+    return nil
+  }
+  
+  public static func cacheKeys(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
+    return nil
   }
 }

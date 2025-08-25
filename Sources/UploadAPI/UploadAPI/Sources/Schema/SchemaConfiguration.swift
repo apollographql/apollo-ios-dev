@@ -12,4 +12,12 @@ public enum SchemaConfiguration: ApolloAPI.SchemaConfiguration {
     // Implement this function to configure cache key resolution for your schema types.
     return nil
   }
+  
+  public static func cacheKey(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> CacheKeyInfo? {
+    return nil
+  }
+  
+  public static func cacheKeys(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
+    return nil
+  }
 }

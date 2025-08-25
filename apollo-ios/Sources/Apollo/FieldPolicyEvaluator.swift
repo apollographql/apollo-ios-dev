@@ -1,19 +1,14 @@
 import Foundation
 import ApolloAPI
 
+enum FieldPolicyResult {
+  case single(CacheKeyInfo)
+  case list([CacheKeyInfo])
+}
+
 struct FieldPolicyEvaluator {
   let field: Selection.Field
   let variables: GraphQLOperation.Variables?
-  
-  private var typename: String {
-    switch field.type.namedType {
-    case .object(let selectionSetType):
-      return selectionSetType.__parentType.__typename
-    default:
-      break
-    }
-    return ""
-  }
   
   init(
     field: Selection.Field,
@@ -23,7 +18,7 @@ struct FieldPolicyEvaluator {
     self.variables = variables
   }
   
-  func resolveFieldPolicy() -> [AnyHashable]? {
+  func resolveFieldPolicy() -> FieldPolicyResult? {
     guard let fieldPolicy = field.fieldPolicy,
           let arguments = field.arguments else {
       return nil
@@ -66,7 +61,7 @@ struct FieldPolicyEvaluator {
     }
 
     if let idx = listIndex {
-      var keys: [String] = []
+      var keys: [CacheKeyInfo] = []
       keys.reserveCapacity(listValues.count)
       for item in listValues {
         var parts = [String]()
@@ -80,15 +75,15 @@ struct FieldPolicyEvaluator {
             return nil
           }
         }
-        keys.append("\(typename):\(parts.joined(separator: "+"))")
+        keys.append(CacheKeyInfo(id: parts.joined(separator: "+")))
       }
-      return keys
+      return .list(keys)
     } else {
       let parts = fixedParts.compactMap { $0 }
       guard parts.count == parsed.count else {
         return nil
       }
-      return ["\(typename):\(parts.joined(separator: "+"))"]
+      return .single(CacheKeyInfo(id: parts.joined(separator: "+")))
     }
   }
   

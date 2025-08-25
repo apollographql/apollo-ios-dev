@@ -30,6 +30,16 @@ struct SchemaConfigurationTemplate: TemplateRenderer {
         return nil
       }
     }
+    
+    static func cacheKey(for field: \(config.ApolloAPITargetName).Selection.Field, variables: \(config.ApolloAPITargetName).GraphQLOperation.Variables?, path: \(config.ApolloAPITargetName).ResponsePath) -> \(config.ApolloAPITargetName).CacheKeyInfo? {
+      // Implement this function to configure cache key resolution for fields that return a single object/value
+      return nil
+    }
+    
+    static func cacheKeys(for field: \(config.ApolloAPITargetName).Selection.Field, variables: \(config.ApolloAPITargetName).GraphQLOperation.Variables?, path: \(config.ApolloAPITargetName).ResponsePath) -> [\(config.ApolloAPITargetName).CacheKeyInfo]? {
+      // Implement this function to configure cache key resolution for fields that return a list of objects/values
+      return nil
+    }
 
     """
   }
