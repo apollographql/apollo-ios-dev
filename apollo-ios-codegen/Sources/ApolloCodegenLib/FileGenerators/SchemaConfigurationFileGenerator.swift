@@ -62,11 +62,6 @@ struct SchemaConfigurationFileGenerator: FileGenerator {
   }
   
   private func insertFunction(in src: inout String, regex: String, funcDecl: TemplateString) {
-//    if !src.contains(Regex(regex)),
-//       let enumDefRange = src.range(of: "enum SchemaConfiguration"),
-//       let closeBraceIndex = src[enumDefRange.lowerBound...].lastIndex(of: "}") {
-//      src.insert(contentsOf: "\n\n\(funcDecl)\n", at: closeBraceIndex)
-//    }
     if !src.containsRegex(regex),
        let enumDefRange = src.range(of: "enum SchemaConfiguration"),
        let closeBraceIndex = src[enumDefRange.lowerBound...].lastIndex(of: "}") {
