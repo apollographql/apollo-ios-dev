@@ -54,8 +54,8 @@ extension FileGenerator {
       overwrite: self.overwrite
     )
     
-    if let _ = self as? SchemaConfigurationFileGenerator {
-      print("Running default 'generate' for Schema Configuration")
+    if let schemaConfigGenerator = self as? SchemaConfigurationFileGenerator {
+      try await schemaConfigGenerator.appendFunctions(to: filePath)
     }
 
     return errors
