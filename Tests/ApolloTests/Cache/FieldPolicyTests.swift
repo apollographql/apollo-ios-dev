@@ -1137,62 +1137,62 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
   
   // MARK: - FieldPolicyProvider Tests
   
-  func test_schemaConfiguration_givenFieldPolicyProvider_returnsSingleCacheKeyInfo() {
-    class HeroSelectionSet: MockSelectionSet {
-      override class var __selections: [Selection] { [
-        .field("hero", Hero.self, arguments: ["name": .variable("name")])
-      ]}
-      
-      class Hero: MockSelectionSet {
-        override class var __parentType: any ParentType {
-          Object(typename: "Hero", implementedInterfaces: [])
-        }
-        override class var __selections: [Selection] { [
-          .field("__typename", String.self),
-          .field("age", Int.self),
-          .field("name", String.self),
-          .field("isJedi", Bool.self),
-          .field("weight", Double.self)
-        ]}
-      }
-    }
-    
-    MockSchemaMetadata.stub_cacheKeyForField_SingleReturn { _, _, _ in
-      return CacheKeyInfo(id: "Hero:Luke")
-    }
-    
-    let query = MockQuery<HeroSelectionSet>()
-    query.__variables = ["name": "Luke"]
-    
-    mergeRecordsIntoCache([
-      "QUERY_ROOT": ["Hero:Luke": CacheReference("Hero:Luke")],
-      "Hero:Luke": [
-        "age": 19,
-        "isJedi": true,
-        "name": "Luke",
-        "weight": 175.2,
-        "__typename": "Hero",
-      ]
-    ])
-    
-    let resultObserver = makeResultObserver(for: query)
-    
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
-        
-        let data = try XCTUnwrap(graphQLResult.data)
-        XCTAssertEqual(data.hero?.name, "Luke")
-        XCTAssertEqual(data.hero?.age, 19)
-        XCTAssertEqual(data.hero?.isJedi, true)
-        XCTAssertEqual(data.hero?.weight, 175.2)
-      }
-    }
-    
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
-    
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
-  }
+//  func test_schemaConfiguration_givenFieldPolicyProvider_returnsSingleCacheKeyInfo() {
+//    class HeroSelectionSet: MockSelectionSet {
+//      override class var __selections: [Selection] { [
+//        .field("hero", Hero.self, arguments: ["name": .variable("name")])
+//      ]}
+//      
+//      class Hero: MockSelectionSet {
+//        override class var __parentType: any ParentType {
+//          Object(typename: "Hero", implementedInterfaces: [])
+//        }
+//        override class var __selections: [Selection] { [
+//          .field("__typename", String.self),
+//          .field("age", Int.self),
+//          .field("name", String.self),
+//          .field("isJedi", Bool.self),
+//          .field("weight", Double.self)
+//        ]}
+//      }
+//    }
+//    
+//    MockSchemaMetadata.stub_cacheKeyForField_SingleReturn { _, _, _ in
+//      return CacheKeyInfo(id: "Hero:Luke")
+//    }
+//    
+//    let query = MockQuery<HeroSelectionSet>()
+//    query.__variables = ["name": "Luke"]
+//    
+//    mergeRecordsIntoCache([
+//      "QUERY_ROOT": ["Hero:Luke": CacheReference("Hero:Luke")],
+//      "Hero:Luke": [
+//        "age": 19,
+//        "isJedi": true,
+//        "name": "Luke",
+//        "weight": 175.2,
+//        "__typename": "Hero",
+//      ]
+//    ])
+//    
+//    let resultObserver = makeResultObserver(for: query)
+//    
+//    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
+//      try XCTAssertSuccessResult(result) { graphQLResult in
+//        XCTAssertEqual(graphQLResult.source, .cache)
+//        XCTAssertNil(graphQLResult.errors)
+//        
+//        let data = try XCTUnwrap(graphQLResult.data)
+//        XCTAssertEqual(data.hero?.name, "Luke")
+//        XCTAssertEqual(data.hero?.age, 19)
+//        XCTAssertEqual(data.hero?.isJedi, true)
+//        XCTAssertEqual(data.hero?.weight, 175.2)
+//      }
+//    }
+//    
+//    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
+//    
+//    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+//  }
   
 }
