@@ -14,6 +14,7 @@ class SelectionSet_EquatableTests: XCTestCase {
     static let Content = Interface(name: "Content", implementingObjects: ["Character"])
     static let Human = Interface(name: "Human", implementingObjects: [])
     static let Height = Object(typename: "Height", implementedInterfaces: [])
+    static let Item = Object(typename: "Item", implementedInterfaces: [])
   }
 
   final class Hero: MockSelectionSet, @unchecked Sendable {
@@ -820,7 +821,7 @@ class SelectionSet_EquatableTests: XCTestCase {
         [HumanFragment.self]
       }
 
-      final class Height: ConcreteMockTypeCase<Hero.Height>, @unchecked Sendable {
+      final class Height: MockSelectionSet, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __parentType: any ParentType { Types.Height }
@@ -866,5 +867,156 @@ class SelectionSet_EquatableTests: XCTestCase {
     expect(selectionSet1).to(equal(selectionSet2))
     expect(selectionSet1.hashValue).to(equal(selectionSet2.hashValue))
   }
-    
+
+  // MARK: - List Fields
+
+  func test__equatable__listOfScalarsField__sameValues_returns_true() {
+    // given
+    final class HumanFragment: MockFragment, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __parentType: any ParentType { Types.Human }
+      override class var __selections: [Selection] {[
+        .field("ids", [Int].self)
+      ]}
+
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HumanFragment.self]
+      }
+    }
+
+    // when
+    let selectionSet1 = HumanFragment(_dataDict: DataDict(
+      data: [
+        "__typename": "Character",
+        "items": [1, 2, 3]
+      ],
+      fulfilledFragments: HumanFragment.__fulfilledFragmentIds
+    ))
+
+    let selectionSet2 = HumanFragment(_dataDict: DataDict(
+      data: [
+        "__typename": "Character",
+        "items": [1, 2, 3]
+      ],
+      fulfilledFragments: HumanFragment.__fulfilledFragmentIds
+    ))
+
+    // then
+    expect(selectionSet1).to(equal(selectionSet2))
+    expect(selectionSet1.hashValue).to(equal(selectionSet2.hashValue))
+  }
+
+  func test__equatable__listOfObjectsField__sameValues_returns_true() {
+    // given
+    final class HumanFragment: MockFragment, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __parentType: any ParentType { Types.Human }
+      override class var __selections: [Selection] {[
+        .field("items", [Item].self)
+      ]}
+
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HumanFragment.self]
+      }
+
+      final class Item: MockSelectionSet, @unchecked Sendable {
+        typealias Schema = MockSchemaMetadata
+
+        override class var __parentType: any ParentType { Types.Item }
+        override class var __selections: [Selection] {[
+          .field("id", Int.self)
+        ]}
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Item.self]
+        }
+      }
+    }
+
+    // when
+    let selectionSet1 = HumanFragment(_dataDict: DataDict(
+      data: [
+        "__typename": "Character",
+        "items": [
+          DataDict(data: [
+            "__typename": "Item",
+            "id": 1,
+          ], fulfilledFragments: [
+            ObjectIdentifier(HumanFragment.Item.self)
+          ])
+        ]
+      ],
+      fulfilledFragments: HumanFragment.__fulfilledFragmentIds
+    ))
+
+    let selectionSet2 = HumanFragment(_dataDict: DataDict(
+      data: [
+        "__typename": "Character",
+        "items": [
+          DataDict(data: [
+            "__typename": "Item",
+            "id": 1,
+          ], fulfilledFragments: [
+            ObjectIdentifier(HumanFragment.Item.self)
+          ])
+        ]
+      ],
+      fulfilledFragments: HumanFragment.__fulfilledFragmentIds
+    ))
+
+    // then
+    expect(selectionSet1).to(equal(selectionSet2))
+    expect(selectionSet1.hashValue).to(equal(selectionSet2.hashValue))
+  }
+
+  func test__equatable__listOfObjectsField__emptyList_returns_true() {
+    // given
+    final class HumanFragment: MockFragment, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __parentType: any ParentType { Types.Human }
+      override class var __selections: [Selection] {[
+        .field("items", [Item].self)
+      ]}
+
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HumanFragment.self]
+      }
+
+      final class Item: MockSelectionSet, @unchecked Sendable {
+        typealias Schema = MockSchemaMetadata
+
+        override class var __parentType: any ParentType { Types.Item }
+        override class var __selections: [Selection] {[
+          .field("id", Int.self)
+        ]}
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Item.self]
+        }
+      }
+    }
+
+    // when
+    let selectionSet1 = HumanFragment(_dataDict: DataDict(
+      data: [
+        "__typename": "Character",
+        "items": [] as JSONValue
+      ],
+      fulfilledFragments: HumanFragment.__fulfilledFragmentIds
+    ))
+
+    let selectionSet2 = HumanFragment(_dataDict: DataDict(
+      data: [
+        "__typename": "Character",
+        "items": [] as JSONValue
+      ],
+      fulfilledFragments: HumanFragment.__fulfilledFragmentIds
+    ))
+
+    // then
+    expect(selectionSet1).to(equal(selectionSet2))
+    expect(selectionSet1.hashValue).to(equal(selectionSet2.hashValue))
+  }
+  
 }

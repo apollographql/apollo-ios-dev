@@ -41,20 +41,7 @@ public extension SelectionSet {
     for selection in selectionSetType.__selections {
       switch selection {
       case let .field(field):
-        guard let fieldData = self.__data._data[field.responseKey] else {
-          continue
-        }
-
-        if case let .object(selectionSetType) = field.type.namedType {
-          guard let objectData = fieldData as? DataDict else {
-            assertionFailure("Expected object data for object field: \(field)")
-            return
-          }
-          fields[field.responseKey] = selectionSetType.init(_dataDict: objectData)
-        } else {
-
-          fields[field.responseKey] = fieldData
-        }
+        add(field: field, to: &fields)
 
       case let .inlineFragment(typeCase):
         self.addFulfilledSelections(of: typeCase, to: &fields)
@@ -67,6 +54,47 @@ public extension SelectionSet {
 
       case let .deferred(_, fragmentType, _):
         self.addFulfilledSelections(of: fragmentType, to: &fields)
+      }
+    }
+  }
+
+  private func add(
+    field: Selection.Field,
+    to fields: inout [String: DataDict.FieldValue]
+  ) {
+    guard let fieldData = self.__data._data[field.responseKey] else {
+      return
+    }
+    addData(for: field.type)
+
+    func addData(for type: Selection.Field.OutputType, inList: Bool = false) {
+      switch type {
+      case .scalar, .customScalar:
+        fields[field.responseKey] = fieldData
+
+      case let .nonNull(innerType):
+        addData(for: innerType, inList: inList)
+
+      case let .list(innerType):
+        addData(for: innerType, inList: true)
+
+      case let .object(selectionSetType):
+        switch inList {
+        case false:
+          guard let objectData = fieldData as? DataDict else {
+            assertionFailure("Expected object data for object field: \(field)")
+            return
+          }
+          fields[field.responseKey] = selectionSetType.init(_dataDict: objectData)
+
+        case true:
+          guard let listData = fieldData as? [DataDict] else {
+            assertionFailure("Expected object data for object field: \(field)")
+            return
+          }
+          fields[field.responseKey] = listData
+            .map { selectionSetType.init(_dataDict: $0) } as DataDict.FieldValue
+        }
       }
     }
   }
