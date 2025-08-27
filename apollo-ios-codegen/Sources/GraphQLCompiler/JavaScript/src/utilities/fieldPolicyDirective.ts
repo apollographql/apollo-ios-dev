@@ -191,37 +191,37 @@ function validateKeyArgPath(
     );
   }
 
-  let curType: GraphQLInputType = base(arg.type);
+  let currentType: GraphQLInputType = getBaseInputType(arg.type);
 
   for (let i = 0; i < path.length; i++) {
     const segment = path[i];
-    if (!isInputObjectType(curType)) {
+    if (!isInputObjectType(currentType)) {
       throw new GraphQLError(
-        `@fieldPolicy key "${keyArg}" traverses "${segment}" on non-object input type "${String(curType)}".`,
+        `@fieldPolicy key "${keyArg}" traverses "${segment}" on non-object input type "${String(currentType)}".`,
         { nodes: field.astNode }
       );
     }
-    const fieldMap = curType.getFields();
+    const fieldMap = currentType.getFields();
     const nextField = fieldMap[segment];
     if (!nextField) {
       const suggestions = Object.keys(fieldMap).join(", ");
       throw new GraphQLError(
-        `@fieldPolicy key "${keyArg}" refers to unknown input field "${segment}" on "${curType.name}". Known fields: ${suggestions}`,
+        `@fieldPolicy key "${keyArg}" refers to unknown input field "${segment}" on "${currentType.name}". Known fields: ${suggestions}`,
         { nodes: field.astNode }
       );
     }
-    curType = base(nextField.type);
+    currentType = getBaseInputType(nextField.type);
   }
 
-  if (!parts.length || isInputObjectType(curType)) {
+  if (!parts.length || isInputObjectType(currentType)) {
     throw new GraphQLError(
-      `@fieldPolicy key "${keyArg}" must resolve to a leaf input type (scalar/enum), got "${String(curType)}".`,
+      `@fieldPolicy key "${keyArg}" must resolve to a leaf input type (scalar/enum), got "${String(currentType)}".`,
       { nodes: field.astNode }
     );
   }
 }
 
-function base(type: GraphQLInputType): GraphQLInputType {
+function getBaseInputType(type: GraphQLInputType): GraphQLInputType {
   return getNamedType(type) as GraphQLInputType;
 }
 

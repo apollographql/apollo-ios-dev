@@ -348,7 +348,7 @@ struct SelectionSetTemplate {
     })\
     \(ifLet: field.fieldPolicyKeys,
       where: { !$0.isEmpty }, { keys in
-        ", fieldPolicy: .init(keys: [\"\(keys.joined(separator: "\", \""))\"])"
+        ", fieldPolicy: .init(keyArgs: [\"\(keys.joined(separator: "\", \""))\"])"
     })\
     )
     """

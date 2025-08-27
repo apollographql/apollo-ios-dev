@@ -73,39 +73,16 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     with info: FieldExecutionInfo,
     on object: Record
   ) throws -> AnyHashable? {
-    
-    let fieldTypename = typename(for: info.field)
-    
-    // Programmatic field policy checks
-    switch info.field.type {
-    case .nonNull(let innerType):
-      if case .list(_) = innerType.namedType {
-        if let cacheKeys = info.parentInfo.schema.configuration.cacheKeys(for: info.field, variables: info.parentInfo.variables, path: info.responsePath) {
-          return cacheKeys.map { "\($0.uniqueKeyGroup ?? fieldTypename):\($0.id)" }.map { object[$0] }
-        }
-      }
-      else {
-        if let cacheKey = info.parentInfo.schema.configuration.cacheKey(for: info.field, variables: info.parentInfo.variables, path: info.responsePath) {
-          return object["\(cacheKey.uniqueKeyGroup ?? fieldTypename):\(cacheKey.id)"]
-        }
-      }
-    case .list(_):
-      if let cacheKeys = info.parentInfo.schema.configuration.cacheKeys(for: info.field, variables: info.parentInfo.variables, path: info.responsePath) {
-        return cacheKeys.map { "\($0.uniqueKeyGroup ?? fieldTypename):\($0.id)" }.map { object[$0] }
-      }
-    default:
-      if let cacheKey = info.parentInfo.schema.configuration.cacheKey(for: info.field, variables: info.parentInfo.variables, path: info.responsePath) {
-        return object["\(cacheKey.uniqueKeyGroup ?? fieldTypename):\(cacheKey.id)"]
-      }
-    }
-    
-    // Directive based field policy checks
-    if let fieldPolicyResult = FieldPolicyEvaluator(field: info.field, variables: info.parentInfo.variables).resolveFieldPolicy() {
+    let fieldPolicyEvaluator = FieldPolicyEvaluator(field: info.field, variables: info.parentInfo.variables)
+    if let fieldPolicyResult = resolveProgrammaticFieldPolicy(with: info, and: info.field.type) ??
+        fieldPolicyEvaluator.resolveFieldPolicy(),
+       let returnTypename = typename(for: info.field) {
+      
       switch fieldPolicyResult {
       case .single(let key):
-        return object["\(key.uniqueKeyGroup ?? fieldTypename):\(key.id)"]
+        return object[formatCacheKey(withInfo: key, andTypename: returnTypename)]
       case .list(let keys):
-        return keys.map { object["\($0.uniqueKeyGroup ?? fieldTypename):\($0.id)"] }
+        return keys.map { object[formatCacheKey(withInfo: $0, andTypename: returnTypename)] }
       }
     }
     
@@ -113,14 +90,51 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     return object[key]
   }
   
-  private func typename(for field: Selection.Field) -> String {
+  private func resolveProgrammaticFieldPolicy(
+    with info: FieldExecutionInfo,
+    and type: Selection.Field.OutputType
+  ) -> FieldPolicyResult? {
+    guard let provider = info.parentInfo.schema.self as? (any FieldPolicyProvider.Type) else {
+      return nil
+    }
+    
+    switch type {
+    case .nonNull(let innerType):
+      return resolveProgrammaticFieldPolicy(with: info, and: innerType)
+    case .list(_):
+      if let keys = provider.cacheKeys(
+        for: info.field,
+        variables: info.parentInfo.variables,
+        path: info.responsePath
+      ) {
+        return .list(keys)
+      }
+    default:
+      if let key = provider.cacheKey(
+        for: info.field,
+        variables: info.parentInfo.variables,
+        path: info.responsePath
+      ) {
+        return .single(key)
+      }
+    }
+    return nil
+  }
+  
+  private func formatCacheKey(
+    withInfo info: CacheKeyInfo,
+    andTypename typename: String
+  ) -> String {
+    return "\(info.uniqueKeyGroup ?? typename):\(info.id)"
+  }
+  
+  private func typename(for field: Selection.Field) -> String? {
     switch field.type.namedType {
     case .object(let selectionSetType):
       return selectionSetType.__parentType.__typename
     default:
-      break
+      return nil
     }
-    return ""
   }
 
   private func deferredResolve(reference: CacheReference) -> PossiblyDeferred<Record> {

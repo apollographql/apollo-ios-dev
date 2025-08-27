@@ -59,12 +59,12 @@ public enum Selection {
   }
   
   public struct FieldPolicy: Hashable {
-    public let keys: [String]
+    public let keyArgs: [String]
     
     public init(
-      keys: [String]
+      keyArgs: [String]
     ) {
-      self.keys = keys
+      self.keyArgs = keyArgs
     }
     
   }

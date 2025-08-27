@@ -537,10 +537,7 @@ public final class CompilationResult: JavaScriptObjectDecodable {
       self.documentation = documentation
     }
 
-    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {
-      let name = jsValue["name"] as String
-      let fieldPolicy = jsValue["fieldPolicyKeys"]
-      
+    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {      
       return self.init(
         name: jsValue["name"],
         alias: jsValue["alias"],

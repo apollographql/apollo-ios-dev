@@ -12,6 +12,8 @@ public class Field: Equatable, CustomDebugStringConvertible {
   public var responseKey: String { underlyingField.responseKey }
   public var type: GraphQLType { underlyingField.type }
   public var arguments: [CompilationResult.Argument]? { underlyingField.arguments }
+  
+  /// The `keyArgs` from the `@fieldPolicy` directive applied to this field in the schema
   public var fieldPolicyKeys: [String]? { underlyingField.fieldPolicyKeys }
 
   fileprivate init(
