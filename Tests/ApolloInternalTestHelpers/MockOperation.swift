@@ -99,14 +99,7 @@ open class AbstractMockSelectionSet<F, S: SchemaMetadata>: RootSelectionSet, Has
   public subscript<T: MockSelectionSet>(dynamicMember key: String) -> T? {
     __data[key]
   }
-
-  public static func == (lhs: MockSelectionSet, rhs: MockSelectionSet) -> Bool {
-    lhs.__data == rhs.__data
-  }
-
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(__data)
-  }
+    
 }
 
 public typealias MockSelectionSet = AbstractMockSelectionSet<NoFragments, MockSchemaMetadata>
