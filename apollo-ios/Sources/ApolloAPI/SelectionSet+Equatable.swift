@@ -82,21 +82,34 @@ public extension SelectionSet {
         switch inList {
         case false:
           guard let objectData = fieldData as? DataDict else {
-            assertionFailure("Expected object data for object field: \(field)")
-            return
+            preconditionFailure("Expected object data for object field: \(field)")
           }
           fields[field.responseKey] = selectionSetType.init(_dataDict: objectData)
 
         case true:
-          guard let listData = fieldData as? [DataDict] else {
-            assertionFailure("Expected object data for object field: \(field)")
-            return
+          guard let listData = fieldData as? [DataDict.FieldValue] else {
+            preconditionFailure("Expected list data for field: \(field)")
           }
-          fields[field.responseKey] = listData
-            .map { selectionSetType.init(_dataDict: $0) } as DataDict.FieldValue
+
+          fields[field.responseKey] = convertElements(of: listData, to: selectionSetType) as DataDict.FieldValue
         }
       }
     }
+  }
+
+  private func convertElements(
+    of list: [DataDict.FieldValue],
+    to selectionSetType: any RootSelectionSet.Type
+  ) -> [DataDict.FieldValue] {
+    if let dataDictList = list as? [DataDict] {
+      return dataDictList.map { selectionSetType.init(_dataDict: $0) }
+    }
+
+    if let nestedList = list as? [[DataDict.FieldValue]] {
+      return nestedList.map { self.convertElements(of: $0, to: selectionSetType) as DataDict.FieldValue }
+    }
+
+    preconditionFailure("Expected list data to contain objects.")
   }
 
   private func addConditionalSelections(
