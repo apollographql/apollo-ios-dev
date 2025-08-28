@@ -121,6 +121,10 @@ extension SelectionSet {
   public var debugDescription: String {
     return "\(self.__data._data as AnyObject)"
   }
+  
+  public func encode(to encoder: Encoder) throws {
+    try self.__data.encode(to: encoder)
+  }
 }
 
 extension SelectionSet where Fragments: FragmentContainer {
