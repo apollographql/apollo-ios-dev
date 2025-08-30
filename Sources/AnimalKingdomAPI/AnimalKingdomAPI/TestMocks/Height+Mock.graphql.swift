@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import AnimalKingdomAPI
+@testable import AnimalKingdomAPI
 
 public class Height: MockObject {
   public static let objectType: ApolloAPI.Object = AnimalKingdomAPI.Objects.Height
@@ -20,11 +20,11 @@ public class Height: MockObject {
 
 public extension Mock where O == Height {
   convenience init(
-    centimeters: Double? = nil,
-    feet: Int? = nil,
+    centimeters: Double = 0.0,
+    feet: Int = 0,
     inches: Int? = nil,
-    meters: Int? = nil,
-    relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize>? = nil
+    meters: Int = 0,
+    relativeSize: GraphQLEnum<AnimalKingdomAPI.RelativeSize> = .case(.large)
   ) {
     self.init()
     _setScalar(centimeters, for: \.centimeters)

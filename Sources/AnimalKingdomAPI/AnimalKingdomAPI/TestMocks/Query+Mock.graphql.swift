@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import AnimalKingdomAPI
+@testable import AnimalKingdomAPI
 
 public class Query: MockObject {
   public static let objectType: ApolloAPI.Object = AnimalKingdomAPI.Objects.Query
@@ -19,10 +19,10 @@ public class Query: MockObject {
 
 public extension Mock where O == Query {
   convenience init(
-    allAnimals: [(any AnyMock)]? = nil,
+    allAnimals: [(any AnyMock)] = [],
     classroomPets: [(any AnyMock)?]? = nil,
-    findPet: [(any AnyMock)]? = nil,
-    pets: [(any AnyMock)]? = nil
+    findPet: [(any AnyMock)] = [],
+    pets: [(any AnyMock)] = []
   ) {
     self.init()
     _setList(allAnimals, for: \.allAnimals)

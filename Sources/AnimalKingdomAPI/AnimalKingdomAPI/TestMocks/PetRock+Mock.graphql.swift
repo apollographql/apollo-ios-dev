@@ -2,7 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import AnimalKingdomAPI
+@testable import AnimalKingdomAPI
 
 public class PetRock: MockObject {
   public static let objectType: ApolloAPI.Object = AnimalKingdomAPI.Objects.PetRock
@@ -19,9 +19,9 @@ public class PetRock: MockObject {
 
 public extension Mock where O == PetRock {
   convenience init(
-    favoriteToy: String? = nil,
+    favoriteToy: String = "",
     humanName: String? = nil,
-    id: AnimalKingdomAPI.ID? = nil,
+    id: AnimalKingdomAPI.ID = "",
     owner: Mock<Human>? = nil
   ) {
     self.init()
