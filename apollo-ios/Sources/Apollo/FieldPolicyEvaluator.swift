@@ -10,22 +10,29 @@ enum FieldPolicyResult {
 
 struct FieldPolicyEvaluator {
   let field: Selection.Field
+  let fieldPolicy: Selection.FieldPolicy
+  let arguments: [String: InputValue]
   let variables: GraphQLOperation.Variables?
   
-  init(
+  init?(
     field: Selection.Field,
     variables: GraphQLOperation.Variables?
   ) {
     self.field = field
     self.variables = variables
-  }
-  
-  func resolveFieldPolicy() -> FieldPolicyResult? {
-    guard let fieldPolicy = field.fieldPolicy,
-          let arguments = field.arguments else {
+    
+    guard let fieldPolicy = field.fieldPolicy else {
       return nil
     }
+    self.fieldPolicy = fieldPolicy
     
+    guard let arguments = field.arguments else {
+      return nil
+    }
+    self.arguments = arguments
+  }
+  
+  func resolveFieldPolicy() -> FieldPolicyResult? {   
     let keyArgs = parseKeyArgs(for: fieldPolicy)
 
     var singleValueArgs = [String?](repeating: nil, count: keyArgs.count)

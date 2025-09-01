@@ -9,6 +9,9 @@ public protocol SchemaMetadata {
 
   /// A ``SchemaConfiguration`` that provides custom configuration for the generated GraphQL schema.
   static var configuration: any SchemaConfiguration.Type { get }
+  
+  /// An optional ``FieldPolicyProvider`` that provides custom cache key configuration.
+  static var fieldPolicyProvider: (any FieldPolicyProvider.Type)? { get }
 
   /// Maps each object in a `GraphQLResponse` to the ``Object`` type representing the
   /// response object.
@@ -25,6 +28,10 @@ public protocol SchemaMetadata {
 
 extension SchemaMetadata {
 
+  /// Default implementation for `fieldPolicyProvider` always returns nil. This is an opt-in feature
+  /// that users can override to provide the correct type.
+  public static var fieldPolicyProvider: (any FieldPolicyProvider.Type)? { nil }
+  
   /// A convenience function for getting the ``Object`` type representing a response object.
   ///
   /// Calls the ``objectType(forTypename:)`` function with the value of the objects `__typename`
