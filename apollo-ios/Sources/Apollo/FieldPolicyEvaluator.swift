@@ -1,5 +1,7 @@
 import Foundation
+#if !COCOAPODS
 import ApolloAPI
+#endif
 
 enum FieldPolicyResult {
   case single(CacheKeyInfo)
