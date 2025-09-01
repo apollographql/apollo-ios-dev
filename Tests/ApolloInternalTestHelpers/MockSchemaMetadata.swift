@@ -21,10 +21,6 @@ public class MockSchemaMetadata: SchemaMetadata {
   public static var objectTypeForTypeName: ((String) -> Object?)? {
       _objectTypeForTypeName
   }
-  
-  public static var fieldPolicyProvider: (any FieldPolicyProvider.Type)? {
-    SchemaConfiguration.self
-  }
 
   @MainActor
   public static func stub_objectTypeForTypeName(_ stub: ((String) -> Object?)?) {

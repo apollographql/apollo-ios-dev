@@ -75,7 +75,7 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
   ) throws -> AnyHashable? {
     let fieldPolicyEvaluator = FieldPolicyEvaluator(field: info.field, variables: info.parentInfo.variables)
     if let fieldPolicyResult = resolveProgrammaticFieldPolicy(with: info, and: info.field.type) ??
-        fieldPolicyEvaluator?.resolveFieldPolicy(),
+        fieldPolicyEvaluator.resolveFieldPolicy(),
        let returnTypename = typename(for: info.field) {
       
       switch fieldPolicyResult {
@@ -94,7 +94,7 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     with info: FieldExecutionInfo,
     and type: Selection.Field.OutputType
   ) -> FieldPolicyResult? {
-    guard let provider = info.parentInfo.schema.fieldPolicyProvider else {
+    guard let provider = info.parentInfo.schema.configuration.self as? (any FieldPolicyProvider.Type) else {
       return nil
     }
     
