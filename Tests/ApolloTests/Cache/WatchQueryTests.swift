@@ -87,7 +87,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       
       watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
       
-      wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
+      wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: 4.0)
     }
     
     runActivity("Refetch from server") { _ in
@@ -117,7 +117,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       
       watcher.refetch()
       
-      wait(for: [serverRequestExpectation, refetchedWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
+      wait(for: [serverRequestExpectation, refetchedWatcherResultExpectation], timeout: 4.0)
     }
   }
   
@@ -616,7 +616,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       
       watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
       
-      wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
+      wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: 4.0)
     }
     
     runActivity("Fetch other query with list of updated keys from server") { _ in
@@ -659,7 +659,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         XCTAssertSuccessResult(result)
       }
       
-      wait(for: [serverRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
+      wait(for: [serverRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation], timeout: 4.0)
     }
   }
 
