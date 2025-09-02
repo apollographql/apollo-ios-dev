@@ -33,7 +33,7 @@ let package = Package(
         .product(name: "InflectorKit", package: "InflectorKit"),
         .product(name: "OrderedCollections", package: "swift-collections")
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [.swiftLanguageMode(.v6)]
     ),
     .target(
       name: "GraphQLCompiler",
@@ -44,7 +44,7 @@ let package = Package(
       exclude: [
         "JavaScript"
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [.swiftLanguageMode(.v6)]
     ),
     .target(
       name: "IR",
@@ -54,17 +54,17 @@ let package = Package(
         "Utilities",
         .product(name: "OrderedCollections", package: "swift-collections")        
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [.swiftLanguageMode(.v6)]
     ),
     .target(
       name: "TemplateString",
       dependencies: [],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [.swiftLanguageMode(.v6)]
     ),
     .target(
       name: "Utilities",
       dependencies: [],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [.swiftLanguageMode(.v6)]
     ),
     .executableTarget(
       name: "apollo-ios-cli",
@@ -74,7 +74,7 @@ let package = Package(
       exclude: [
         "README.md",
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [.swiftLanguageMode(.v6)]
     ),
     .target(
       name: "CodegenCLI",
@@ -82,7 +82,7 @@ let package = Package(
         "ApolloCodegenLib",
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [.swiftLanguageMode(.v6)]
     ),
   ],
   swiftLanguageModes: [.v6, .v5]
