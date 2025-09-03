@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["node", "jest"],
   },
-  "files": ["./src/__testUtils__/matchers.ts"],
+  "files": ["./src/__testUtils__/matchers.ts"]
 }

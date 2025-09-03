@@ -64,7 +64,7 @@ public class GraphQLNamedType:
   }
 }
 
-public final class GraphQLScalarType: GraphQLNamedType {
+public final class GraphQLScalarType: GraphQLNamedType, @unchecked Sendable {
   public let specifiedByURL: String?
 
   public var isCustomScalar: Bool {
@@ -95,7 +95,7 @@ public final class GraphQLScalarType: GraphQLNamedType {
 
 }
 
-public final class GraphQLEnumType: GraphQLNamedType {
+public final class GraphQLEnumType: GraphQLNamedType, @unchecked Sendable {
   public private(set) var values: [GraphQLEnumValue]!
 
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {
@@ -151,7 +151,7 @@ public struct GraphQLEnumValue: JavaScriptObjectDecodable, GraphQLNamedItem {
 
 public typealias GraphQLInputFieldDictionary = OrderedDictionary<String, GraphQLInputField>
 
-public final class GraphQLInputObjectType: GraphQLNamedType {
+public final class GraphQLInputObjectType: GraphQLNamedType, @unchecked Sendable {
   public private(set) var fields: GraphQLInputFieldDictionary!
   
   public let isOneOf: Bool
@@ -217,7 +217,7 @@ public class GraphQLInputField: JavaScriptObjectDecodable, GraphQLNamedItem {
   }
 }
 
-public class GraphQLCompositeType: GraphQLNamedType {
+public class GraphQLCompositeType: GraphQLNamedType, @unchecked Sendable {
   public override var debugDescription: String {
     "Type - \(name)"
   }
@@ -233,7 +233,7 @@ public extension GraphQLInterfaceImplementingType {
   }
 }
 
-public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImplementingType {
+public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImplementingType, @unchecked Sendable {
 
   public private(set) var fields: [String: GraphQLField]!
 
@@ -270,10 +270,10 @@ public final class GraphQLObjectType: GraphQLCompositeType, GraphQLInterfaceImpl
   }
 }
 
-public class GraphQLAbstractType: GraphQLCompositeType {
+public class GraphQLAbstractType: GraphQLCompositeType, @unchecked Sendable {
 }
 
-public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceImplementingType {
+public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceImplementingType, @unchecked Sendable {
 
   public private(set) var fields: [String: GraphQLField]!
 
@@ -315,7 +315,7 @@ public final class GraphQLInterfaceType: GraphQLAbstractType, GraphQLInterfaceIm
   }
 }
 
-public final class GraphQLUnionType: GraphQLAbstractType {
+public final class GraphQLUnionType: GraphQLAbstractType, @unchecked Sendable {
   public let types: [GraphQLObjectType]
 
   required init(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) {

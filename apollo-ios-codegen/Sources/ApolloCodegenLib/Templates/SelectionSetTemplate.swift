@@ -346,6 +346,10 @@ struct SelectionSetTemplate {
       where: { !$0.isEmpty }, { args in
         ", arguments: " + renderValue(for: args, onFieldNamed: field.name, &deprecatedArguments)
     })\
+    \(ifLet: field.fieldPolicyKeys,
+      where: { !$0.isEmpty }, { keys in
+        ", fieldPolicy: .init(keyArgs: [\"\(keys.joined(separator: "\", \""))\"])"
+    })\
     )
     """
   }

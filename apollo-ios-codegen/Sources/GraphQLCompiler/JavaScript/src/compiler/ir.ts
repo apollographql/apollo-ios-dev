@@ -63,6 +63,7 @@ export interface Field {
   deprecationReason?: string;
   selectionSet?: SelectionSet;
   directives?: Directive[];
+  fieldPolicyKeys?: string[];
 }
 
 export interface Argument {
