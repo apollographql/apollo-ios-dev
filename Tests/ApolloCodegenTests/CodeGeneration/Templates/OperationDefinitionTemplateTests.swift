@@ -690,6 +690,110 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
+  func test__generate__givenQueryWithListOfInputObjectsVariable_generatesQueryOperationWithVariable() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      type Animal {
+        species: String!
+      }
+      
+      input SearchInput {
+        species: String!
+      }
+      """
+
+    document = """
+      query TestOperation(
+        $variable: [SearchInput] = [{
+          species: "TestVar"
+        }]
+      ) {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+    let expected =
+      """
+        public var variable: GraphQLNullable<[SearchInput?]>
+
+        public init(variable: GraphQLNullable<[SearchInput?]> = [SearchInput(species: "TestVar")]) {
+          self.variable = variable
+        }
+
+        @_spi(Unsafe) public var __variables: Variables? { ["variable": variable] }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
+  }
+
+  func test__generate__givenQueryWithNestedListOfInputObjectsVariable_generatesQueryOperationWithVariable() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      type Animal {
+        species: String!
+      }
+      
+      input SearchInput {
+        nested: [NestedInput]
+      }
+      
+      input NestedInput {
+        species: String!
+      }
+      """
+
+    document = """
+      query TestOperation(
+        $variable: SearchInput = {
+          nested: [
+            { species: "TestVar" }
+          ]
+        }
+      ) {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+    let expected =
+      """
+        public var variable: GraphQLNullable<SearchInput>
+
+        public init(variable: GraphQLNullable<SearchInput> = .init(
+          SearchInput(nested: [NestedInput(species: "TestVar")])
+        )) {
+          self.variable = variable
+        }
+
+        @_spi(Unsafe) public var __variables: Variables? { ["variable": variable] }
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
+  }
+
   func test__generate__givenQueryWithCapitalizedVariable_generatesQueryOperationWithLowercaseVariable() async throws {
     // given
     schemaSDL = """
