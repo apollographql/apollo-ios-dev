@@ -346,6 +346,10 @@ struct SelectionSetTemplate {
       where: { !$0.isEmpty }, { args in
         ", arguments: " + renderValue(for: args, onFieldNamed: field.name, &deprecatedArguments)
     })\
+    \(ifLet: field.fieldPolicyKeys,
+      where: { !$0.isEmpty }, { keys in
+        ", fieldPolicy: .init(keyArgs: [\"\(keys.joined(separator: "\", \""))\"])"
+    })\
     )
     """
   }
@@ -526,12 +530,18 @@ struct SelectionSetTemplate {
   private func FragmentInitializerTemplate(
     _ selectionSet: ComputedSelectionSet
   ) -> String {
-    if let directSelections = selectionSet.direct,
-      (directSelections.inlineFragments.containsDeferredFragment
-      || directSelections.namedFragments.containsDeferredFragment)
-    {
-      return DesignatedInitializerTemplate(
-        """
+    guard
+      selectionSet.direct?.inlineFragments.containsDeferredFragment ?? false ||
+      selectionSet.direct?.namedFragments.containsDeferredFragment ?? false ||
+      selectionSet.merged.inlineFragments.containsDeferredFragment ||
+      selectionSet.merged.namedFragments.containsDeferredFragment
+    else {
+      return DesignatedInitializerTemplate()
+    }
+
+    return DesignatedInitializerTemplate(
+      """
+      \(ifLet: selectionSet.direct, { directSelections in """
         \(forEachIn: directSelections.inlineFragments.values, separator: "\n", {
           if let deferCondition = $0.typeInfo.deferCondition {
             return DeferredPropertyInitializationStatement(deferCondition.label)
@@ -546,12 +556,16 @@ struct SelectionSetTemplate {
 
           return ""
         })
-        """
-      )
+        """})
+      \(forEachIn: selectionSet.merged.namedFragments.values, separator: "\n", {
+        if let _ = $0.typeInfo.deferCondition {
+          return DeferredPropertyInitializationStatement($0.definition.name.firstLowercased)
+        }
 
-    } else {
-      return DesignatedInitializerTemplate()
-    }
+        return ""
+      })
+      """
+    )
   }
 
   private func DeferredPropertyInitializationStatement(_ propertyName: String) -> TemplateString {

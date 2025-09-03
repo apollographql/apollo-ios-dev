@@ -10,7 +10,7 @@ env:
 
 jobs:
   tuist-generation:
-    runs-on: macos-latest
+    runs-on: macos-14
     timeout-minutes: 8
     name: Run Tuist Generation
     steps:
@@ -31,7 +31,7 @@ jobs:
         key: ${{ github.run_id }}-dependencies
 
   run-swift-builds:
-    runs-on: macos-latest
+    runs-on: macos-14
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -53,7 +53,7 @@ jobs:
         cd ${{ matrix.package }} && swift build
 
   build-and-unit-test:
-    runs-on: macos-latest
+    runs-on: macos-14
     needs: tuist-generation
     timeout-minutes: 20
     strategy:
@@ -153,7 +153,7 @@ jobs:
           TestResults/ResultBundle.zip
 
   run-codegen-test-configurations:
-    runs-on: macos-latest
+    runs-on: macos-14
     timeout-minutes: 20
     name: Codegen Test Configurations - macOS
     steps:
@@ -168,7 +168,7 @@ jobs:
         ./scripts/run-test-codegen-configurations.sh -t
 
   run-cocoapods-integration-tests:
-    runs-on: macos-latest
+    runs-on: macos-14
     timeout-minutes: 20
     name: Cocoapods Integration Tests - macOS
     steps:
@@ -188,7 +188,7 @@ jobs:
       uses: ./.github/actions/run-cocoapods-integration-tests
   
   send-slack-status-notification:
-    runs-on: macos-latest
+    runs-on: macos-14
     if: ${{ always() }}
     timeout-minutes: 5
     needs: [tuist-generation, run-swift-builds, build-and-unit-test, run-codegen-test-configurations, run-cocoapods-integration-tests]

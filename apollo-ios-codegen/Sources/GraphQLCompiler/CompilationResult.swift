@@ -494,6 +494,8 @@ public final class CompilationResult: Sendable, JavaScriptObjectDecodable {
     public let type: GraphQLType
 
     public let arguments: [Argument]?
+    
+    public let fieldPolicyKeys: [String]?
 
     public let inclusionConditions: [InclusionCondition]?
 
@@ -517,6 +519,7 @@ public final class CompilationResult: Sendable, JavaScriptObjectDecodable {
       name: String,
       alias: String? = nil,
       arguments: [Argument]? = nil,
+      fieldPolicyKeys: [String]? = nil,
       inclusionConditions: [InclusionCondition]? = nil,
       directives: [Directive]? = nil,
       type: GraphQLType,
@@ -528,6 +531,7 @@ public final class CompilationResult: Sendable, JavaScriptObjectDecodable {
       self.alias = alias
       self.type = type
       self.arguments = arguments
+      self.fieldPolicyKeys = fieldPolicyKeys
       self.inclusionConditions = inclusionConditions
       self.directives = directives
       self.selectionSet = selectionSet
@@ -535,11 +539,12 @@ public final class CompilationResult: Sendable, JavaScriptObjectDecodable {
       self.documentation = documentation
     }
 
-    static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
-      self.init(
+    static func fromJSValue(_ jsValue: JSValue, bridge: isolated JavaScriptBridge) -> Self {      
+      return self.init(
         name: jsValue["name"],
         alias: jsValue["alias"],
         arguments: .fromJSValue(jsValue["arguments"], bridge: bridge),
+        fieldPolicyKeys: jsValue["fieldPolicyKeys"],
         inclusionConditions: jsValue["inclusionConditions"],
         directives: .fromJSValue(jsValue["directives"], bridge: bridge),
         type: .fromJSValue(jsValue["type"], bridge: bridge),
@@ -562,6 +567,7 @@ public final class CompilationResult: Sendable, JavaScriptObjectDecodable {
       hasher.combine(alias)
       hasher.combine(type)
       hasher.combine(arguments)
+      hasher.combine(fieldPolicyKeys)
       hasher.combine(directives)
       hasher.combine(selectionSet)
     }
@@ -571,6 +577,7 @@ public final class CompilationResult: Sendable, JavaScriptObjectDecodable {
       lhs.alias == rhs.alias &&
       lhs.type == rhs.type &&
       lhs.arguments == rhs.arguments &&
+      lhs.fieldPolicyKeys == rhs.fieldPolicyKeys &&
       lhs.directives == rhs.directives &&
       lhs.selectionSet == rhs.selectionSet
     }

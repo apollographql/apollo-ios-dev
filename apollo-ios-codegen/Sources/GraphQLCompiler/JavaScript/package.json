@@ -20,13 +20,14 @@
     "@rollup/plugin-node-resolve": "16.0.1",
     "@rollup/plugin-typescript": "12.1.4",
     "@rollup/plugin-replace": "6.0.2",
+    "@rollup/plugin-terser": "0.4.4",
     "@types/common-tags": "1.8.4",
     "@types/jest": "30.0.0",
     "common-tags": "1.8.2",
-    "jest": "30.0.4",
-    "rollup": "4.44.2",
+    "jest": "30.0.5",
+    "rollup": "4.48.0",
     "@rollup/plugin-terser": "0.4.4",
-    "ts-jest": "29.4.0",
-    "typescript": "5.8.3"
+    "ts-jest": "29.4.1",
+    "typescript": "5.9.2"
   }
 }
