@@ -83,8 +83,8 @@ public class MockSchemaMetadata: SchemaMetadata {
       stub_cacheKeyForField_SingleReturn?(field, variables, path)
     }
     
-    public static func cacheKeys(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
-      stub_cacheKeyForField_ListReturn?(field, variables, path)
+    public static func cacheKeyList(for listField: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
+      stub_cacheKeyForField_ListReturn?(listField, variables, path)
     }
   }
 }

@@ -8,7 +8,7 @@ enum FieldPolicyResult {
   case list([CacheKeyInfo])
 }
 
-struct FieldPolicyEvaluator {
+struct FieldPolicyDirectiveEvaluator {
   let field: Selection.Field
   let fieldPolicy: Selection.FieldPolicy
   let arguments: [String: InputValue]
