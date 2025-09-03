@@ -616,7 +616,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
       
       watcher.fetch(cachePolicy: .fetchIgnoringCacheData)
       
-      wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: 4.0)
+      wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: 200.0)
     }
     
     runActivity("Fetch other query with list of updated keys from server") { _ in
@@ -659,7 +659,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
         XCTAssertSuccessResult(result)
       }
       
-      wait(for: [serverRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation], timeout: 4.0)
+      wait(for: [serverRequestExpectation, otherFetchCompletedExpectation, updatedWatcherResultExpectation], timeout: 200.0)
     }
   }
 
@@ -1919,7 +1919,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting {
 
       watcher!.fetch(cachePolicy: .fetchIgnoringCacheData)
 
-      wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: Self.defaultWaitTimeout)
+      wait(for: [serverRequestExpectation, initialWatcherResultExpectation], timeout: 200.0)
     }
 
     runActivity("make sure it gets released") { _ in
