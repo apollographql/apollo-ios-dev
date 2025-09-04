@@ -3,8 +3,9 @@ import XCTest
 import ApolloAPI
 import ApolloInternalTestHelpers
 
-@MainActor
-final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
+final class FieldPolicyTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
+  var store: Apollo.ApolloStore!
+  
 
   var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
@@ -19,11 +20,10 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
   override func setUp() async throws {
     try await super.setUp()
     
-    cache = try await makeNormalizedCache()
-    let store = ApolloStore(cache: cache)
+    store = try await makeTestStore()
     
     server = MockGraphQLServer()
-    let networkTransport = MockNetworkTransport(server: server, store: store)
+    let networkTransport = MockNetworkTransport(mockServer: server, store: store)
     
     client = ApolloClient(networkTransport: networkTransport, store: store)
   }
@@ -38,19 +38,19 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
   
   // MARK: - Single Key Argument Tests
   
-  func test_fieldPolicy_withStringKeyArgument_resolvesCorrectCacheKey() throws {
-    class HeroSelectionSet: MockSelectionSet {
+  func test_fieldPolicy_withStringKeyArgument_resolvesCorrectCacheKey() async   throws {
+    class HeroSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["name": .variable("name")], fieldPolicy: .init(keyArgs: ["name"]))
       ]}
       
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
         override class var __selections: [Selection] { [
           .field("__typename", String.self),
-          .field("age", Int.self),
+          .field("age", Int32.self),
           .field("name", String.self),
           .field("isJedi", Bool.self),
           .field("weight", Double.self)
@@ -61,7 +61,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["name": "Luke"]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["Hero:Luke": CacheReference("Hero:Luke")],
       "Hero:Luke": [
         "age": 19,
