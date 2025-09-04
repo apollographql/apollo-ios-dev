@@ -35,7 +35,7 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     on object: Record
   ) -> PossiblyDeferred<JSONValue?> {
     PossiblyDeferred {
-      let value = try object[info.cacheKeyForField()]
+      let value = try resolveCacheKey(with: info, on: object)
 
       switch value {
       case let reference as CacheReference:
@@ -71,7 +71,7 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
   private func resolveCacheKey(
     with info: FieldExecutionInfo,
     on object: Record
-  ) throws -> AnyHashable? {
+  ) throws -> JSONValue? {
     if let fieldPolicyResult = resolveProgrammaticFieldPolicy(with: info, and: info.field.type) ??
         FieldPolicyDirectiveEvaluator(field: info.field, variables: info.parentInfo.variables)?.resolveFieldPolicy(),
        let returnTypename = typename(for: info.field) {
@@ -80,7 +80,13 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
       case .single(let key):
         return object[formatCacheKey(withInfo: key, andTypename: returnTypename)]
       case .list(let keys):
-        return keys.map { object[formatCacheKey(withInfo: $0, andTypename: returnTypename)] }
+        var keyList: [JSONValue] = []
+        for key in keys {
+          if let cacheKey = object[formatCacheKey(withInfo: key, andTypename: returnTypename)] {
+            keyList.append(cacheKey)
+          }
+        }
+        return keyList as JSONValue
       }
     }
     
