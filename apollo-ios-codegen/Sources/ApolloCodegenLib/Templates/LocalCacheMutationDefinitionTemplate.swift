@@ -33,6 +33,7 @@ struct LocalCacheMutationDefinitionTemplate: OperationTemplateRenderer {
         \(SelectionSetTemplate(
             definition: operation,
             generateInitializers: config.config.shouldGenerateSelectionSetInitializers(for: operation),
+            generateDecodableTypes: config.config.output.generateDecodableTypes,
             config: config,
             nonFatalErrorRecorder: nonFatalErrorRecorder,
             renderAccessControl: { accessControlModifier(for: .member) }()
