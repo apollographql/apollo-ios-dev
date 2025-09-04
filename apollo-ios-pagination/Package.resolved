@@ -1,22 +1,13 @@
 {
-  "originHash" : "6d60b71347b5e78326bc8fad112a36c4a1cc660c0b7c3a70beeeecd83f0fa016",
+  "originHash" : "bae2c042479cfa1e8dbac21f59430e1db2af9b3dd5c78c031cc6358296301a53",
   "pins" : [
     {
       "identity" : "apollo-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apollographql/apollo-ios.git",
       "state" : {
-        "revision" : "ca441856851e9ab7765387341dba76c0384f5991",
-        "version" : "2.0.0-alpha-1"
-      }
-    },
-    {
-      "identity" : "swift-atomics",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-atomics",
-      "state" : {
-        "revision" : "b601256eab081c0f92f059e12818ac1d4f178ff7",
-        "version" : "1.3.0"
+        "revision" : "c10333b1eb5f51cefc25b58fe1c9ba3068830bdb",
+        "version" : "2.0.0-alpha-2"
       }
     },
     {

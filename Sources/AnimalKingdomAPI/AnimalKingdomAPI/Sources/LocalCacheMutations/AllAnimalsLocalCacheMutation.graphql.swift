@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
   public static let operationType: GraphQLOperationType = .query
@@ -9,12 +10,15 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
   public init() {}
 
   public struct Data: AnimalKingdomAPI.MutableSelectionSet {
-    public var __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public var __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("allAnimals", [AllAnimal].self),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      AllAnimalsLocalCacheMutation.Data.self
     ] }
 
     public var allAnimals: [AllAnimal] {
@@ -25,30 +29,28 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
     public init(
       allAnimals: [AllAnimal]
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.Query.typename,
-          "allAnimals": allAnimals._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(AllAnimalsLocalCacheMutation.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.Query.typename,
+        "allAnimals": allAnimals._fieldData,
+      ])
     }
 
     /// AllAnimal
     ///
     /// Parent Type: `Animal`
     public struct AllAnimal: AnimalKingdomAPI.MutableSelectionSet {
-      public var __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public var __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("species", String.self),
         .field("skinCovering", GraphQLEnum<AnimalKingdomAPI.SkinCovering>?.self),
         .inlineFragment(AsBird.self),
+      ] }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        AllAnimalsLocalCacheMutation.Data.AllAnimal.self
       ] }
 
       public var species: String {
@@ -67,29 +69,28 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
         species: String,
         skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "species": species,
-            "skinCovering": skinCovering,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(AllAnimalsLocalCacheMutation.Data.AllAnimal.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "species": species,
+          "skinCovering": skinCovering,
+        ])
       }
 
       /// AllAnimal.AsBird
       ///
       /// Parent Type: `Bird`
       public struct AsBird: AnimalKingdomAPI.MutableInlineFragment {
-        public var __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public var __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = AllAnimalsLocalCacheMutation.Data.AllAnimal
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Bird }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Bird }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("wingspan", Double.self),
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          AllAnimalsLocalCacheMutation.Data.AllAnimal.self,
+          AllAnimalsLocalCacheMutation.Data.AllAnimal.AsBird.self
         ] }
 
         public var wingspan: Double {
@@ -110,18 +111,12 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
           species: String,
           skinCovering: GraphQLEnum<AnimalKingdomAPI.SkinCovering>? = nil
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": AnimalKingdomAPI.Objects.Bird.typename,
-              "wingspan": wingspan,
-              "species": species,
-              "skinCovering": skinCovering,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(AllAnimalsLocalCacheMutation.Data.AllAnimal.self),
-              ObjectIdentifier(AllAnimalsLocalCacheMutation.Data.AllAnimal.AsBird.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": AnimalKingdomAPI.Objects.Bird.typename,
+            "wingspan": wingspan,
+            "species": species,
+            "skinCovering": skinCovering,
+          ])
         }
       }
     }

@@ -1,6 +1,4 @@
-#if !COCOAPODS
-import ApolloAPI
-#endif
+@_spi(Execution) @_spi(Internal) @_spi(Unsafe) import ApolloAPI
 import Foundation
 
 /// An accumulator that converts executed data to the correct values for use in a selection set.

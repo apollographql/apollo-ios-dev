@@ -1,7 +1,5 @@
 import Foundation
-#if !COCOAPODS
-import ApolloAPI
-#endif
+@_spi(Internal) import ApolloAPI
 
 enum ResultNormalizerFactory {
 

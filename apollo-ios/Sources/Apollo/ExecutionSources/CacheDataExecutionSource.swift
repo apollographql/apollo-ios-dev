@@ -1,6 +1,4 @@
-#if !COCOAPODS
-import ApolloAPI
-#endif
+@_spi(Execution) import ApolloAPI
 
 /// A `GraphQLExecutionSource` configured to execute upon the data stored in a ``NormalizedCache``.
 ///

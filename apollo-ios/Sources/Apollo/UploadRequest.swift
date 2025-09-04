@@ -1,8 +1,5 @@
 import Foundation
-
-#if !COCOAPODS
-  import ApolloAPI
-#endif
+import ApolloAPI
 
 /// A request class allowing for a multipart-upload request.
 public struct UploadRequest<Operation: GraphQLOperation>: GraphQLRequest {
@@ -34,7 +31,7 @@ public struct UploadRequest<Operation: GraphQLOperation>: GraphQLRequest {
 
   public let multipartBoundary: String
 
-  public let serializationFormat = JSONSerializationFormat.self
+  let serializationFormat = JSONSerializationFormat.self
 
   /// Designated Initializer
   ///

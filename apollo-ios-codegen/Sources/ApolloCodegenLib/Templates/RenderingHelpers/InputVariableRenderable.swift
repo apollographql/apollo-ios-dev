@@ -88,7 +88,7 @@ fileprivate extension GraphQLInputObjectType {
     }
 
     return """
-    \(if: !config.output.operations.isInModule, "\(config.schemaNamespace.firstUppercased).")\(render(as: .typename))(\(list: entries))
+    \(if: !config.output.operations.isInModule, "\(config.schemaNamespace.firstUppercased).")\(render(as: .typename()))(\(list: entries))
     """
   }
 }

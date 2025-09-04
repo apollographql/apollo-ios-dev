@@ -1,8 +1,8 @@
-import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) @_spi(Unsafe) @_spi(Internal) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 import XCTest
 
-@testable import Apollo
+@testable @_spi(Internal) import Apollo
 @testable import Nimble
 
 #warning("TODO: Test if cache returns result, then server returns failed result, APQ retry still occurs")

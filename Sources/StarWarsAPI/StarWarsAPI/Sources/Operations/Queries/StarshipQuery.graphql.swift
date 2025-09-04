@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct StarshipQuery: GraphQLQuery {
   public static let operationName: String = "Starship"
@@ -14,12 +15,15 @@ public struct StarshipQuery: GraphQLQuery {
   public init() {}
 
   public struct Data: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("starship", Starship?.self, arguments: ["id": 3000]),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      StarshipQuery.Data.self
     ] }
 
     public var starship: Starship? { __data["starship"] }
@@ -27,29 +31,27 @@ public struct StarshipQuery: GraphQLQuery {
     public init(
       starship: Starship? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "starship": starship._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(StarshipQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "starship": starship._fieldData,
+      ])
     }
 
     /// Starship
     ///
     /// Parent Type: `Starship`
     public struct Starship: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Starship }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Starship }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("name", String.self),
         .field("coordinates", [[Double]]?.self),
+      ] }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        StarshipQuery.Data.Starship.self
       ] }
 
       /// The name of the starship
@@ -60,16 +62,11 @@ public struct StarshipQuery: GraphQLQuery {
         name: String,
         coordinates: [[Double]]? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": StarWarsAPI.Objects.Starship.typename,
-            "name": name,
-            "coordinates": coordinates,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(StarshipQuery.Data.Starship.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": StarWarsAPI.Objects.Starship.typename,
+          "name": name,
+          "coordinates": coordinates,
+        ])
       }
     }
   }

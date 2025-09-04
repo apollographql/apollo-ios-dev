@@ -1,17 +1,9 @@
-//
-//  RequestBodyCreatorTests.swift
-//  ApolloTests
-//
-//  Created by Kim de Vos on 16/07/2019.
-//  Copyright © 2019 Apollo GraphQL. All rights reserved.
-//
-
-import ApolloInternalTestHelpers
+@_spi(Execution) import ApolloInternalTestHelpers
 import Nimble
 import XCTest
 
 @testable import Apollo
-@testable import ApolloAPI
+@testable @_spi(Execution)  @_spi(Internal) import ApolloAPI
 
 class RequestBodyCreatorTests: XCTestCase {
 

@@ -2,42 +2,41 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct CrocodileFragment: AnimalKingdomAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment CrocodileFragment on Crocodile { __typename species age tag(id: "albino") }"#
   }
 
-  public let __data: DataDict
-  public init(_dataDict: DataDict) { __data = _dataDict }
+  @_spi(Unsafe) public let __data: DataDict
+  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Crocodile }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Crocodile }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("species", String.self),
-    .field("age", Int32.self),
+    .field("age", Int.self),
     .field("tag", String?.self, arguments: ["id": "albino"]),
+  ] }
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    CrocodileFragment.self
   ] }
 
   public var species: String { __data["species"] }
-  public var age: Int32 { __data["age"] }
+  public var age: Int { __data["age"] }
   public var tag: String? { __data["tag"] }
 
   public init(
     species: String,
-    age: Int32,
+    age: Int,
     tag: String? = nil
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": AnimalKingdomAPI.Objects.Crocodile.typename,
-        "species": species,
-        "age": age,
-        "tag": tag,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(CrocodileFragment.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": AnimalKingdomAPI.Objects.Crocodile.typename,
+      "species": species,
+      "age": age,
+      "tag": tag,
+    ])
   }
 }

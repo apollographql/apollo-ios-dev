@@ -41,8 +41,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     operationIdentifier: String? = nil,
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackage(),
     operations: ApolloCodegenConfiguration.OperationsFileOutput = .inSchemaModule,
-    operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat = .definition,
-    cocoapodsCompatibleImportStatements: Bool = false
+    operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat = .definition    
   ) async throws {
     ir = try await .mock(schema: schemaSDL, document: document)
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
@@ -51,8 +50,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     config = .mock(
       output: .mock(moduleType: moduleType, operations: operations),
       options: .init(
-        operationDocumentFormat: operationDocumentFormat,
-        cocoapodsCompatibleImportStatements: cocoapodsCompatibleImportStatements
+        operationDocumentFormat: operationDocumentFormat
       )
     )
 
@@ -295,56 +293,6 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     )
     """
     expect(actual).to(equalLineByLine(expected))
-  }
-
-  // MARK: Namespacing tests
-
-  func test__generate__givenCocoapodsCompatibleImportStatements_true_shouldUseCorrectNamespace() async throws {
-    // given
-    document =
-    """
-    query NameQuery {
-      name
-    }
-    """
-
-    try await buildSubjectAndOperation(
-      cocoapodsCompatibleImportStatements: true
-    )
-
-    // when
-    let actual = try renderDocumentType()
-
-    // then
-    let expected =
-    """
-    public static let operationDocument: Apollo.OperationDocument = .init(
-    """
-    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
-  }
-
-  func test__generate__givenCocoapodsCompatibleImportStatements_false_shouldUseCorrectNamespace() async throws {
-    // given
-    document =
-    """
-    query NameQuery {
-      name
-    }
-    """
-
-    try await buildSubjectAndOperation(
-      cocoapodsCompatibleImportStatements: false
-    )
-
-    // when
-    let actual = try renderDocumentType()
-
-    // then
-    let expected =
-    """
-    public static let operationDocument: ApolloAPI.OperationDocument = .init(
-    """
-    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
   // MARK: Access Level Tests

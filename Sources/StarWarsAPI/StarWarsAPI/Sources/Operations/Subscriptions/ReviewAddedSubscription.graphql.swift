@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct ReviewAddedSubscription: GraphQLSubscription {
   public static let operationName: String = "ReviewAdded"
@@ -17,15 +18,18 @@ public struct ReviewAddedSubscription: GraphQLSubscription {
     self.episode = episode
   }
 
-  public var __variables: Variables? { ["episode": episode] }
+  @_spi(Unsafe) public var __variables: Variables? { ["episode": episode] }
 
   public struct Data: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Subscription }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Subscription }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("reviewAdded", ReviewAdded?.self, arguments: ["episode": .variable("episode")]),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      ReviewAddedSubscription.Data.self
     ] }
 
     public var reviewAdded: ReviewAdded? { __data["reviewAdded"] }
@@ -33,55 +37,48 @@ public struct ReviewAddedSubscription: GraphQLSubscription {
     public init(
       reviewAdded: ReviewAdded? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Subscription.typename,
-          "reviewAdded": reviewAdded._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(ReviewAddedSubscription.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Subscription.typename,
+        "reviewAdded": reviewAdded._fieldData,
+      ])
     }
 
     /// ReviewAdded
     ///
     /// Parent Type: `Review`
     public struct ReviewAdded: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Review }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("episode", GraphQLEnum<StarWarsAPI.Episode>?.self),
-        .field("stars", Int32.self),
+        .field("stars", Int.self),
         .field("commentary", String?.self),
+      ] }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        ReviewAddedSubscription.Data.ReviewAdded.self
       ] }
 
       /// The movie
       public var episode: GraphQLEnum<StarWarsAPI.Episode>? { __data["episode"] }
       /// The number of stars this review gave, 1-5
-      public var stars: Int32 { __data["stars"] }
+      public var stars: Int { __data["stars"] }
       /// Comment about the movie
       public var commentary: String? { __data["commentary"] }
 
       public init(
         episode: GraphQLEnum<StarWarsAPI.Episode>? = nil,
-        stars: Int32,
+        stars: Int,
         commentary: String? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": StarWarsAPI.Objects.Review.typename,
-            "episode": episode,
-            "stars": stars,
-            "commentary": commentary,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(ReviewAddedSubscription.Data.ReviewAdded.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": StarWarsAPI.Objects.Review.typename,
+          "episode": episode,
+          "stars": stars,
+          "commentary": commentary,
+        ])
       }
     }
   }

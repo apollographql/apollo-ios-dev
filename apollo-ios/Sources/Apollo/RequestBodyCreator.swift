@@ -1,6 +1,4 @@
-#if !COCOAPODS
-import ApolloAPI
-#endif
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 public protocol JSONRequestBodyCreator: Sendable {
 

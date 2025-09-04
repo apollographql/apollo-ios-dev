@@ -56,7 +56,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             ]
           ),
           reduceGeneratedSchemaTypes: false,
-          cocoapodsCompatibleImportStatements: true,
           warningsOnDeprecatedUsage: .exclude,
           conversionStrategies:.init(
             enumCases: .none,
@@ -110,7 +109,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             }
           ],
           "appendSchemaTypeFilenameSuffix" : true,
-          "cocoapodsCompatibleImportStatements" : true,
           "conversionStrategies" : {
             "enumCases" : "none",
             "fieldAccessors" : "camelCase",
@@ -939,63 +937,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
     .to(throwError(errorType: DecodingError.self))
   }
 
-  // MARK: - APQConfig Tests
-
-  func encodedValue(_ case: ApolloCodegenConfiguration.APQConfig) -> String {
-    switch `case` {
-    case .disabled: return "\"disabled\""
-    case .automaticallyPersist: return "\"automaticallyPersist\""
-    case .persistedOperationsOnly: return "\"persistedOperationsOnly\""
-    }
-  }
-
-  @available(*, deprecated, message: "Testing deprecated APQConfig")
-  func test__decodeAPQConfig__givenDisabled_shouldReturnEnum() throws {
-    // given
-    let subject = encodedValue(.disabled).asData
-
-    // when
-    let actual = try JSONDecoder().decode(ApolloCodegenConfiguration.APQConfig.self, from: subject)
-
-    // then
-    expect(actual).to(equal(.disabled))
-  }
-
-  @available(*, deprecated, message: "Testing deprecated APQConfig")
-  func test__decodeAPQConfig__givenAutomaticallyPersist_shouldReturnEnum() throws {
-    // given
-    let subject = encodedValue(.automaticallyPersist).asData
-
-    // when
-    let actual = try JSONDecoder().decode(ApolloCodegenConfiguration.APQConfig.self, from: subject)
-
-    // then
-    expect(actual).to(equal(.automaticallyPersist))
-  }
-
-  @available(*, deprecated, message: "Testing deprecated APQConfig")
-  func test__decodeAPQConfig__givenPersistedOperationsOnly_shouldReturnEnum() throws {
-    // given
-    let subject = encodedValue(.persistedOperationsOnly).asData
-
-    // when
-    let actual = try JSONDecoder().decode(ApolloCodegenConfiguration.APQConfig.self, from: subject)
-
-    // then
-    expect(actual).to(equal(.persistedOperationsOnly))
-  }
-
-  @available(*, deprecated, message: "Testing deprecated APQConfig")
-  func test__decodeAPQConfig__givenUnknown_shouldThrow() throws {
-    // given
-    let subject = "\"unknown\"".asData
-
-    // then
-    expect(
-      try JSONDecoder().decode(ApolloCodegenConfiguration.APQConfig.self, from: subject)
-    ).to(throwError())
-  }
-
   // MARK: - Optional Tests
 
   func test__decodeTestMockFileOutput__givenAbsoluteWithAccessModifier_shouldReturnEnum() throws {
@@ -1112,7 +1053,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
         "schemaTypes": {
           "path": "./MySchema",
           "moduleType": {
-            "swiftPackageManager": {}
+            "swiftPackage": {}
           }
         },
         "operations": {
@@ -1127,8 +1068,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "localCacheMutations" : true
         },
         "queryStringLiteralFormat": "multiline",
-        "schemaDocumentation": "include",
-        "apqs": "disabled",
+        "schemaDocumentation": "include",        
         "warningsOnDeprecatedUsage": "include"
       }
     }
@@ -1256,7 +1196,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
         output: .init(
           schemaTypes: .init(
             path: "/output/path",
-            moduleType: .swiftPackageManager
+            moduleType: .swiftPackage(apolloSDKDependency: .default)
           ),
           operations: .absolute(path: "/absolute/path", accessModifier: .internal)
         )
@@ -1285,7 +1225,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1382,7 +1321,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "additionalInflectionRules" : [
 
           ],
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1413,9 +1351,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           },
           "schemaTypes" : {
             "moduleType" : {
-              "swiftPackageManager" : {
-                
-              }
+              "swiftPackage" : {}
             },
             "path" : "/output/path"
           },
@@ -1476,7 +1412,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1573,7 +1508,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "additionalInflectionRules" : [
 
           ],
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1667,7 +1601,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1770,7 +1703,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1877,7 +1809,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -1984,7 +1915,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -2091,7 +2021,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -2198,7 +2127,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",
@@ -2305,7 +2233,6 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
           ],
           "appendSchemaTypeFilenameSuffix" : false,
-          "cocoapodsCompatibleImportStatements" : false,
           "conversionStrategies" : {
             "enumCases" : "camelCase",
             "fieldAccessors" : "idiomatic",

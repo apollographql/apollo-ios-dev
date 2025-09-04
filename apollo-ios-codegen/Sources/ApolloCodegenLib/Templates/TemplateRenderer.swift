@@ -145,7 +145,7 @@ extension TemplateRenderer {
     return TemplateString(
     """
     \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
-    \(ImportStatementTemplate.SchemaType.template(for: config))
+    \(ImportStatementTemplate.SchemaType.template(for: config, type: type))
 
     \(ifLet: renderDetachedTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
     \(ifLet: namespace, {
@@ -247,7 +247,6 @@ extension TemplateRenderer {
       (.embeddedInTarget(_, .internal), .member):
         return ApolloCodegenConfiguration.AccessModifier.internal.swiftString
     case
-      (.swiftPackageManager, _),
       (.swiftPackage, _),
       (.other, _):
         return ApolloCodegenConfiguration.AccessModifier.public.swiftString
@@ -331,19 +330,28 @@ struct ImportStatementTemplate {
 
   enum SchemaType {
     static func template(
-      for config: ApolloCodegen.ConfigurationContext
+      for config: ApolloCodegen.ConfigurationContext,
+      type: TemplateTarget.SchemaFileType
     ) -> String {
-      "import \(config.ApolloAPITargetName)"
+      let apolloAPIImport = "import \(TemplateConstants.ApolloAPITargetName)"
+      switch type {
+      case .inputObject:
+        return "@_spi(Internal) @_spi(Unsafe) \(apolloAPIImport)"
+      case .enum:
+        return "@_spi(Internal) \(apolloAPIImport)"
+      default:
+        return apolloAPIImport
+      }
     }
   }
 
   enum Operation {
     static func template(
       for config: ApolloCodegen.ConfigurationContext
-    ) -> TemplateString {
-      let apolloAPITargetName = config.ApolloAPITargetName
+    ) -> TemplateString {      
       return """
-      @_exported import \(apolloAPITargetName)
+      @_exported import \(TemplateConstants.ApolloAPITargetName)
+      @_spi(Execution) @_spi(Unsafe) import \(TemplateConstants.ApolloAPITargetName)
       \(if: config.output.operations != .inSchemaModule, "import \(config.schemaModuleName)")
       """
     }
@@ -377,7 +385,7 @@ fileprivate extension ApolloCodegenConfiguration {
   var schemaModuleName: String {
     switch output.schemaTypes.moduleType {
     case let .embeddedInTarget(targetName, _): return targetName
-    case .swiftPackageManager, .swiftPackage, .other: return schemaNamespace.firstUppercased
+    case .swiftPackage, .other: return schemaNamespace.firstUppercased
     }
   }
 }

@@ -1,9 +1,10 @@
-import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 import Apollo
 import Foundation
 
 public extension SelectionSet {
 
+  @_spi(Unsafe)
   var _rawData: [String: DataDict.FieldValue] { self.__data._data }
 
   func hasNullValue(forKey key: String) -> Bool {

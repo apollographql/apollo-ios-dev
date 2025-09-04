@@ -17,7 +17,7 @@ let package = Package(
   dependencies: [
     .package(
       url: "https://github.com/apollographql/apollo-ios.git",
-      .exactItem("2.0.0-alpha-1")
+      exact: "2.0.0-beta-1"
     ),
     .package(
       url: "https://github.com/apple/swift-collections",

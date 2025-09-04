@@ -1,6 +1,4 @@
-#if !COCOAPODS
-import ApolloAPI
-#endif
+@_spi(Unsafe) import ApolloAPI
 
 extension RootSelectionSet {
 

@@ -1,6 +1,6 @@
 import XCTest
-import Apollo
-import ApolloAPI
+@_spi(Execution) import Apollo
+@_spi(Execution) import ApolloAPI
 import ApolloInternalTestHelpers
 
 fileprivate extension Selection.Field {

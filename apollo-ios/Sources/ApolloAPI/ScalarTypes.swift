@@ -18,9 +18,12 @@ public protocol AnyScalarType: Sendable, Hashable, JSONEncodable {}
 public protocol ScalarType:
   AnyScalarType,
   JSONDecodable,
-  GraphQLOperationVariableValue {}
+  GraphQLOperationVariableValue,
+  GraphQLOperationVariableListElement
+{}
 
 extension String: ScalarType {}
+extension Int: ScalarType {}
 extension Int32: ScalarType {}
 extension Bool: ScalarType {}
 extension Float: ScalarType {}
@@ -39,14 +42,9 @@ public protocol CustomScalarType:
   AnyScalarType,
   JSONDecodable,
   OutputTypeConvertible,
-  GraphQLOperationVariableValue
+  GraphQLOperationVariableValue,
+  GraphQLOperationVariableListElement
 {}
-
-extension CustomScalarType {
-  @inlinable public static var _asOutputType: Selection.Field.OutputType {
-    .nonNull(.customScalar(self))
-  }
-}
 
 extension Array: AnyScalarType where Array.Element: AnyScalarType & Hashable {}
 

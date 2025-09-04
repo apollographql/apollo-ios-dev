@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct HumanQuery: GraphQLQuery {
   public static let operationName: String = "Human"
@@ -17,15 +18,18 @@ public struct HumanQuery: GraphQLQuery {
     self.id = id
   }
 
-  public var __variables: Variables? { ["id": id] }
+  @_spi(Unsafe) public var __variables: Variables? { ["id": id] }
 
   public struct Data: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("human", Human?.self, arguments: ["id": .variable("id")]),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HumanQuery.Data.self
     ] }
 
     public var human: Human? { __data["human"] }
@@ -33,29 +37,27 @@ public struct HumanQuery: GraphQLQuery {
     public init(
       human: Human? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "human": human._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HumanQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "human": human._fieldData,
+      ])
     }
 
     /// Human
     ///
     /// Parent Type: `Human`
     public struct Human: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("name", String.self),
         .field("mass", Double?.self),
+      ] }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HumanQuery.Data.Human.self
       ] }
 
       /// What this human calls themselves
@@ -67,16 +69,11 @@ public struct HumanQuery: GraphQLQuery {
         name: String,
         mass: Double? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": StarWarsAPI.Objects.Human.typename,
-            "name": name,
-            "mass": mass,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HumanQuery.Data.Human.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": StarWarsAPI.Objects.Human.typename,
+          "name": name,
+          "mass": mass,
+        ])
       }
     }
   }

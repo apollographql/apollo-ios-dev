@@ -1,9 +1,9 @@
-import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 import Nimble
 import XCTest
 
-@testable import Apollo
+@testable @_spi(Execution) import Apollo
 
 final class ApolloClientOperationTests: XCTestCase {
 
@@ -52,7 +52,7 @@ final class ApolloClientOperationTests: XCTestCase {
       override class var __selections: [Selection] {
         [
           .field("__typename", String.self),
-          .field("stars", Int32.self),
+          .field("stars", Int.self),
           .field("commentary", String?.self),
         ]
       }

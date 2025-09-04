@@ -1,7 +1,5 @@
 import Foundation
-#if !COCOAPODS
 import ApolloAPI
-#endif
 
 /// A data structure containing telemetry metadata about the client. This is used by GraphOS Studio's
 /// [client awareness](https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation)
@@ -80,7 +78,7 @@ public struct ClientAwarenessMetadata: Sendable {
       if version.isEmpty {
         version.append(buildNumber)
       } else {
-        version.append("-\(buildNumber)")
+        version.append("+\(buildNumber)")
       }
     }
 

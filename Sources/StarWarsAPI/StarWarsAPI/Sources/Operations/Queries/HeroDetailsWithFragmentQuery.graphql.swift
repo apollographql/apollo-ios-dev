@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
   public static let operationName: String = "HeroDetailsWithFragment"
@@ -18,15 +19,18 @@ public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
     self.episode = episode
   }
 
-  public var __variables: Variables? { ["episode": episode] }
+  @_spi(Unsafe) public var __variables: Variables? { ["episode": episode] }
 
   public struct Data: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroDetailsWithFragmentQuery.Data.self
     ] }
 
     public var hero: Hero? { __data["hero"] }
@@ -34,28 +38,27 @@ public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroDetailsWithFragmentQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
     ///
     /// Parent Type: `Character`
     public struct Hero: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .fragment(HeroDetails.self),
+      ] }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroDetailsWithFragmentQuery.Data.Hero.self,
+        HeroDetails.self
       ] }
 
       /// The name of the character
@@ -65,8 +68,8 @@ public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
       public var asDroid: AsDroid? { _asInlineFragment() }
 
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var heroDetails: HeroDetails { _toFragment() }
       }
@@ -75,29 +78,29 @@ public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
         __typename: String,
         name: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "name": name,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroDetailsWithFragmentQuery.Data.Hero.self),
-            ObjectIdentifier(HeroDetails.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "name": name,
+        ])
       }
 
       /// Hero.AsHuman
       ///
       /// Parent Type: `Human`
       public struct AsHuman: StarWarsAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = HeroDetailsWithFragmentQuery.Data.Hero
-        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
-        public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
+        @_spi(Execution) public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           HeroDetailsWithFragmentQuery.Data.Hero.self,
+          HeroDetails.self,
+          HeroDetails.AsHuman.self
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroDetailsWithFragmentQuery.Data.Hero.self,
+          HeroDetailsWithFragmentQuery.Data.Hero.AsHuman.self,
           HeroDetails.self,
           HeroDetails.AsHuman.self
         ] }
@@ -108,8 +111,8 @@ public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
         public var height: Double? { __data["height"] }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var heroDetails: HeroDetails { _toFragment() }
         }
@@ -118,19 +121,11 @@ public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
           name: String,
           height: Double? = nil
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": StarWarsAPI.Objects.Human.typename,
-              "name": name,
-              "height": height,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroDetailsWithFragmentQuery.Data.Hero.self),
-              ObjectIdentifier(HeroDetailsWithFragmentQuery.Data.Hero.AsHuman.self),
-              ObjectIdentifier(HeroDetails.self),
-              ObjectIdentifier(HeroDetails.AsHuman.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": StarWarsAPI.Objects.Human.typename,
+            "name": name,
+            "height": height,
+          ])
         }
       }
 
@@ -138,13 +133,19 @@ public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
       ///
       /// Parent Type: `Droid`
       public struct AsDroid: StarWarsAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = HeroDetailsWithFragmentQuery.Data.Hero
-        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
-        public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
+        @_spi(Execution) public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           HeroDetailsWithFragmentQuery.Data.Hero.self,
+          HeroDetails.self,
+          HeroDetails.AsDroid.self
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroDetailsWithFragmentQuery.Data.Hero.self,
+          HeroDetailsWithFragmentQuery.Data.Hero.AsDroid.self,
           HeroDetails.self,
           HeroDetails.AsDroid.self
         ] }
@@ -155,8 +156,8 @@ public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
         public var primaryFunction: String? { __data["primaryFunction"] }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var heroDetails: HeroDetails { _toFragment() }
         }
@@ -165,19 +166,11 @@ public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
           name: String,
           primaryFunction: String? = nil
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": StarWarsAPI.Objects.Droid.typename,
-              "name": name,
-              "primaryFunction": primaryFunction,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroDetailsWithFragmentQuery.Data.Hero.self),
-              ObjectIdentifier(HeroDetailsWithFragmentQuery.Data.Hero.AsDroid.self),
-              ObjectIdentifier(HeroDetails.self),
-              ObjectIdentifier(HeroDetails.AsDroid.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": StarWarsAPI.Objects.Droid.typename,
+            "name": name,
+            "primaryFunction": primaryFunction,
+          ])
         }
       }
     }

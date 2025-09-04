@@ -2532,55 +2532,6 @@ class ApolloCodegenTests: XCTestCase {
     expect(try configContext.validate(compilationResult)).notTo(throwError())
   }
 
-  func test__validation__givenSchemaTypesModule_swiftPackageManager_withCocoapodsCompatibleImportStatements_true_shouldThrow() throws {
-    // given
-    let config = ApolloCodegenConfiguration.mock(
-      .swiftPackage(),
-      options: .init(cocoapodsCompatibleImportStatements: true)
-    )
-
-    // then
-    expect(try ApolloCodegen._validate(config: config))
-      .to(throwError(ApolloCodegen.Error.invalidConfiguration(message: """
-        cocoapodsCompatibleImportStatements cannot be set to 'true' when the output schema types \
-        module type is Swift Package Manager. Change the cocoapodsCompatibleImportStatements \
-        value to 'false' to resolve the conflict.
-        """)))
-  }
-
-  func test__validation__givenSchemaTypesModule_swiftPackageManager_withCocoapodsCompatibleImportStatements_false_shouldNotThrow() throws {
-    // given
-    let config = ApolloCodegenConfiguration.mock(
-      .swiftPackage(),
-      options: .init(cocoapodsCompatibleImportStatements: false)
-    )
-
-    // then
-    expect(try ApolloCodegen._validate(config: config)).notTo(throwError())
-  }
-
-  func test__validation__givenSchemaTypesModule_embeddedInTarget_withCocoapodsCompatibleImportStatements_true_shouldNotThrow() throws {
-    // given
-    let config = ApolloCodegenConfiguration.mock(
-      .embeddedInTarget(name: "TestTarget"),
-      options: .init(cocoapodsCompatibleImportStatements: true)
-    )
-
-    // then
-    expect(try ApolloCodegen._validate(config: config)).notTo(throwError())
-  }
-
-  func test__validation__givenSchemaTypesModule_other_withCocoapodsCompatibleImportStatements_true_shouldNotThrow() throws {
-    // given
-    let config = ApolloCodegenConfiguration.mock(
-      .other,
-      options: .init(cocoapodsCompatibleImportStatements: true)
-    )
-
-    // then
-    expect(try ApolloCodegen._validate(config: config)).notTo(throwError())
-  }
-
   func test__validation__selectionSet_typeConflicts_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
@@ -2926,7 +2877,7 @@ class ApolloCodegenTests: XCTestCase {
                 init(
                   allAnimals: [AllAnimal]? = nil
                 ) {
-          """, atLine: 26, ignoringExtraLines: true))
+          """, atLine: 1, inSection: .selectionSet.initializer, ignoringExtraLines: true))
 
         expectation.fulfill()
       }
@@ -3010,7 +2961,7 @@ class ApolloCodegenTests: XCTestCase {
                 __typename: String,
                 species: String? = nil
               ) {
-          """, atLine: 26, ignoringExtraLines: true))
+          """, atLine: 1, inSection: .selectionSet.initializer, ignoringExtraLines: true))
 
         expectation.fulfill()
       }

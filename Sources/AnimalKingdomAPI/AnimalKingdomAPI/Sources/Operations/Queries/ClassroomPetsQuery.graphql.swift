@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct ClassroomPetsQuery: GraphQLQuery {
   public static let operationName: String = "ClassroomPets"
@@ -14,12 +15,15 @@ public struct ClassroomPetsQuery: GraphQLQuery {
   public init() {}
 
   public struct Data: AnimalKingdomAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("classroomPets", [ClassroomPet?]?.self),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      ClassroomPetsQuery.Data.self
     ] }
 
     public var classroomPets: [ClassroomPet?]? { __data["classroomPets"] }
@@ -27,28 +31,26 @@ public struct ClassroomPetsQuery: GraphQLQuery {
     public init(
       classroomPets: [ClassroomPet?]? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.Query.typename,
-          "classroomPets": classroomPets._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(ClassroomPetsQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.Query.typename,
+        "classroomPets": classroomPets._fieldData,
+      ])
     }
 
     /// ClassroomPet
     ///
     /// Parent Type: `ClassroomPet`
     public struct ClassroomPet: AnimalKingdomAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Unions.ClassroomPet }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Unions.ClassroomPet }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .fragment(ClassroomPetDetails.self),
+      ] }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        ClassroomPetsQuery.Data.ClassroomPet.self
       ] }
 
       public var asAnimal: AsAnimal? { _asInlineFragment() }
@@ -59,8 +61,8 @@ public struct ClassroomPetsQuery: GraphQLQuery {
       public var asPetRock: AsPetRock? { _asInlineFragment() }
 
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var classroomPetDetails: ClassroomPetDetails { _toFragment() }
       }
@@ -68,35 +70,36 @@ public struct ClassroomPetsQuery: GraphQLQuery {
       public init(
         __typename: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+        ])
       }
 
       /// ClassroomPet.AsAnimal
       ///
       /// Parent Type: `Animal`
       public struct AsAnimal: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = ClassroomPetsQuery.Data.ClassroomPet
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
-        public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
+        @_spi(Execution) public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetDetails.AsAnimal.self
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetsQuery.Data.ClassroomPet.AsAnimal.self,
+          ClassroomPetDetails.self,
           ClassroomPetDetails.AsAnimal.self
         ] }
 
         public var species: String { __data["species"] }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var classroomPetDetails: ClassroomPetDetails { _toFragment() }
         }
@@ -105,18 +108,10 @@ public struct ClassroomPetsQuery: GraphQLQuery {
           __typename: String,
           species: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": __typename,
-              "species": species,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self),
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.AsAnimal.self),
-              ObjectIdentifier(ClassroomPetDetails.self),
-              ObjectIdentifier(ClassroomPetDetails.AsAnimal.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": __typename,
+            "species": species,
+          ])
         }
       }
 
@@ -124,21 +119,27 @@ public struct ClassroomPetsQuery: GraphQLQuery {
       ///
       /// Parent Type: `Pet`
       public struct AsPet: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = ClassroomPetsQuery.Data.ClassroomPet
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
-        public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
+        @_spi(Execution) public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetDetails.AsPet.self
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetsQuery.Data.ClassroomPet.AsPet.self,
+          ClassroomPetDetails.self,
           ClassroomPetDetails.AsPet.self
         ] }
 
         public var humanName: String? { __data["humanName"] }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var classroomPetDetails: ClassroomPetDetails { _toFragment() }
         }
@@ -147,18 +148,10 @@ public struct ClassroomPetsQuery: GraphQLQuery {
           __typename: String,
           humanName: String? = nil
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": __typename,
-              "humanName": humanName,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self),
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.AsPet.self),
-              ObjectIdentifier(ClassroomPetDetails.self),
-              ObjectIdentifier(ClassroomPetDetails.AsPet.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": __typename,
+            "humanName": humanName,
+          ])
         }
       }
 
@@ -166,13 +159,20 @@ public struct ClassroomPetsQuery: GraphQLQuery {
       ///
       /// Parent Type: `WarmBlooded`
       public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = ClassroomPetsQuery.Data.ClassroomPet
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
-        public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
+        @_spi(Execution) public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetDetails.AsAnimal.self,
+          ClassroomPetDetails.AsWarmBlooded.self
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetsQuery.Data.ClassroomPet.AsWarmBlooded.self,
+          ClassroomPetDetails.self,
           ClassroomPetDetails.AsAnimal.self,
           ClassroomPetDetails.AsWarmBlooded.self
         ] }
@@ -181,8 +181,8 @@ public struct ClassroomPetsQuery: GraphQLQuery {
         public var laysEggs: Bool { __data["laysEggs"] }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var classroomPetDetails: ClassroomPetDetails { _toFragment() }
         }
@@ -192,20 +192,11 @@ public struct ClassroomPetsQuery: GraphQLQuery {
           species: String,
           laysEggs: Bool
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": __typename,
-              "species": species,
-              "laysEggs": laysEggs,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self),
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.AsWarmBlooded.self),
-              ObjectIdentifier(ClassroomPetDetails.self),
-              ObjectIdentifier(ClassroomPetDetails.AsAnimal.self),
-              ObjectIdentifier(ClassroomPetDetails.AsWarmBlooded.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": __typename,
+            "species": species,
+            "laysEggs": laysEggs,
+          ])
         }
       }
 
@@ -213,13 +204,22 @@ public struct ClassroomPetsQuery: GraphQLQuery {
       ///
       /// Parent Type: `Cat`
       public struct AsCat: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = ClassroomPetsQuery.Data.ClassroomPet
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Cat }
-        public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Cat }
+        @_spi(Execution) public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetDetails.AsAnimal.self,
+          ClassroomPetDetails.AsPet.self,
+          ClassroomPetDetails.AsWarmBlooded.self,
+          ClassroomPetDetails.AsCat.self
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetsQuery.Data.ClassroomPet.AsCat.self,
+          ClassroomPetDetails.self,
           ClassroomPetDetails.AsAnimal.self,
           ClassroomPetDetails.AsPet.self,
           ClassroomPetDetails.AsWarmBlooded.self,
@@ -229,12 +229,12 @@ public struct ClassroomPetsQuery: GraphQLQuery {
         public var species: String { __data["species"] }
         public var humanName: String? { __data["humanName"] }
         public var laysEggs: Bool { __data["laysEggs"] }
-        public var bodyTemperature: Int32 { __data["bodyTemperature"] }
+        public var bodyTemperature: Int { __data["bodyTemperature"] }
         public var isJellicle: Bool { __data["isJellicle"] }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var classroomPetDetails: ClassroomPetDetails { _toFragment() }
         }
@@ -243,28 +243,17 @@ public struct ClassroomPetsQuery: GraphQLQuery {
           species: String,
           humanName: String? = nil,
           laysEggs: Bool,
-          bodyTemperature: Int32,
+          bodyTemperature: Int,
           isJellicle: Bool
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": AnimalKingdomAPI.Objects.Cat.typename,
-              "species": species,
-              "humanName": humanName,
-              "laysEggs": laysEggs,
-              "bodyTemperature": bodyTemperature,
-              "isJellicle": isJellicle,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self),
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.AsCat.self),
-              ObjectIdentifier(ClassroomPetDetails.self),
-              ObjectIdentifier(ClassroomPetDetails.AsAnimal.self),
-              ObjectIdentifier(ClassroomPetDetails.AsPet.self),
-              ObjectIdentifier(ClassroomPetDetails.AsWarmBlooded.self),
-              ObjectIdentifier(ClassroomPetDetails.AsCat.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": AnimalKingdomAPI.Objects.Cat.typename,
+            "species": species,
+            "humanName": humanName,
+            "laysEggs": laysEggs,
+            "bodyTemperature": bodyTemperature,
+            "isJellicle": isJellicle,
+          ])
         }
       }
 
@@ -272,13 +261,22 @@ public struct ClassroomPetsQuery: GraphQLQuery {
       ///
       /// Parent Type: `Bird`
       public struct AsBird: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = ClassroomPetsQuery.Data.ClassroomPet
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Bird }
-        public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Bird }
+        @_spi(Execution) public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetDetails.AsAnimal.self,
+          ClassroomPetDetails.AsPet.self,
+          ClassroomPetDetails.AsWarmBlooded.self,
+          ClassroomPetDetails.AsBird.self
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetsQuery.Data.ClassroomPet.AsBird.self,
+          ClassroomPetDetails.self,
           ClassroomPetDetails.AsAnimal.self,
           ClassroomPetDetails.AsPet.self,
           ClassroomPetDetails.AsWarmBlooded.self,
@@ -291,8 +289,8 @@ public struct ClassroomPetsQuery: GraphQLQuery {
         public var wingspan: Double { __data["wingspan"] }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var classroomPetDetails: ClassroomPetDetails { _toFragment() }
         }
@@ -303,24 +301,13 @@ public struct ClassroomPetsQuery: GraphQLQuery {
           laysEggs: Bool,
           wingspan: Double
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": AnimalKingdomAPI.Objects.Bird.typename,
-              "species": species,
-              "humanName": humanName,
-              "laysEggs": laysEggs,
-              "wingspan": wingspan,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self),
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.AsBird.self),
-              ObjectIdentifier(ClassroomPetDetails.self),
-              ObjectIdentifier(ClassroomPetDetails.AsAnimal.self),
-              ObjectIdentifier(ClassroomPetDetails.AsPet.self),
-              ObjectIdentifier(ClassroomPetDetails.AsWarmBlooded.self),
-              ObjectIdentifier(ClassroomPetDetails.AsBird.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": AnimalKingdomAPI.Objects.Bird.typename,
+            "species": species,
+            "humanName": humanName,
+            "laysEggs": laysEggs,
+            "wingspan": wingspan,
+          ])
         }
       }
 
@@ -328,13 +315,20 @@ public struct ClassroomPetsQuery: GraphQLQuery {
       ///
       /// Parent Type: `PetRock`
       public struct AsPetRock: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = ClassroomPetsQuery.Data.ClassroomPet
-        public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.PetRock }
-        public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.PetRock }
+        @_spi(Execution) public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetDetails.AsPet.self,
+          ClassroomPetDetails.AsPetRock.self
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetsQuery.Data.ClassroomPet.AsPetRock.self,
+          ClassroomPetDetails.self,
           ClassroomPetDetails.AsPet.self,
           ClassroomPetDetails.AsPetRock.self
         ] }
@@ -343,8 +337,8 @@ public struct ClassroomPetsQuery: GraphQLQuery {
         public var favoriteToy: String { __data["favoriteToy"] }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var classroomPetDetails: ClassroomPetDetails { _toFragment() }
         }
@@ -353,20 +347,11 @@ public struct ClassroomPetsQuery: GraphQLQuery {
           humanName: String? = nil,
           favoriteToy: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": AnimalKingdomAPI.Objects.PetRock.typename,
-              "humanName": humanName,
-              "favoriteToy": favoriteToy,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self),
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.AsPetRock.self),
-              ObjectIdentifier(ClassroomPetDetails.self),
-              ObjectIdentifier(ClassroomPetDetails.AsPet.self),
-              ObjectIdentifier(ClassroomPetDetails.AsPetRock.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": AnimalKingdomAPI.Objects.PetRock.typename,
+            "humanName": humanName,
+            "favoriteToy": favoriteToy,
+          ])
         }
       }
     }

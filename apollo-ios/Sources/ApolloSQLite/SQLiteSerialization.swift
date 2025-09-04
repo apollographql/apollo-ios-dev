@@ -1,8 +1,6 @@
 import Foundation
-#if !COCOAPODS
-import Apollo
+@_spi(Internal) @_spi(Execution) import Apollo
 import ApolloAPI
-#endif
 
 private let serializedReferenceKey = "$reference"
 

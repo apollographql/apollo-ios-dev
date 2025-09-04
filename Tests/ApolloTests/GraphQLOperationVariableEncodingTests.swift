@@ -1,6 +1,6 @@
 import XCTest
-@testable import Apollo
-import ApolloAPI
+@testable @_spi(Internal) import Apollo
+@_spi(Internal) import ApolloAPI
 import ApolloInternalTestHelpers
 import StarWarsAPI
 
@@ -50,7 +50,12 @@ class GraphQLOperationVariableEncodingTests: XCTestCase {
     let map: GraphQLOperation.Variables = ["appearsIn": [.jedi, .empire] as [Episode]]
     XCTAssertEqual(serializeAndDeserialize(map), ["appearsIn": ["JEDI", "EMPIRE"]])
   }
-  
+
+  func testEncodeListOfOptionalValues() {
+    let map: GraphQLOperation.Variables = ["appearsIn": [.jedi, nil] as [Episode?]]
+    XCTAssertEqual(serializeAndDeserialize(map), ["appearsIn": ["JEDI", NSNull()]])
+  }
+
   func testEncodeOptionalListWithValue() {
     let map: GraphQLOperation.Variables = ["appearsIn": GraphQLNullable<[Episode]>.some([.jedi, .empire])]
     XCTAssertEqual(serializeAndDeserialize(map), ["appearsIn": ["JEDI", "EMPIRE"]])
@@ -60,7 +65,12 @@ class GraphQLOperationVariableEncodingTests: XCTestCase {
     let map: GraphQLOperation.Variables = ["appearsIn": GraphQLNullable<[Episode]>.none]
     XCTAssertEqual(serializeAndDeserialize(map), [:])
   }
-  
+
+  func testEncodeOptionalListOfOptionalValues() {
+    let map: GraphQLOperation.Variables = ["appearsIn": GraphQLNullable<[Episode?]>.some([.jedi, nil])]
+    XCTAssertEqual(serializeAndDeserialize(map), ["appearsIn": ["JEDI", NSNull()]])
+  }
+
   func testEncodeInputObject() {
     let review = ReviewInput(stars: 5, commentary: "This is a great movie!")
     let map: GraphQLOperation.Variables = ["review": review]

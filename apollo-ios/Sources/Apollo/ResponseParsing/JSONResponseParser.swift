@@ -1,8 +1,5 @@
 import Foundation
-
-#if !COCOAPODS
-  import ApolloAPI
-#endif
+import ApolloAPI
 
 public enum JSONResponseParsingError: Swift.Error, LocalizedError {
   case couldNotParseToJSON(data: Data)
@@ -36,8 +33,8 @@ public struct JSONResponseParser: Sendable {
 
   let response: HTTPURLResponse
   let operationVariables: GraphQLOperation.Variables?
-  let multipartHeader: HTTPURLResponse.MultipartHeaderComponents
   let includeCacheRecords: Bool
+  let multipartHeader: HTTPURLResponse.MultipartHeaderComponents
 
   init(
     response: HTTPURLResponse,

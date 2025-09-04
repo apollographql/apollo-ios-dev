@@ -2,6 +2,7 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct HeroDetailsInlineConditionalInclusionQuery: GraphQLQuery {
   public static let operationName: String = "HeroDetailsInlineConditionalInclusion"
@@ -17,15 +18,18 @@ public struct HeroDetailsInlineConditionalInclusionQuery: GraphQLQuery {
     self.includeDetails = includeDetails
   }
 
-  public var __variables: Variables? { ["includeDetails": includeDetails] }
+  @_spi(Unsafe) public var __variables: Variables? { ["includeDetails": includeDetails] }
 
   public struct Data: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroDetailsInlineConditionalInclusionQuery.Data.self
     ] }
 
     public var hero: Hero? { __data["hero"] }
@@ -33,28 +37,26 @@ public struct HeroDetailsInlineConditionalInclusionQuery: GraphQLQuery {
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroDetailsInlineConditionalInclusionQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
     ///
     /// Parent Type: `Character`
     public struct Hero: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .include(if: "includeDetails", .inlineFragment(IfIncludeDetails.self)),
+      ] }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroDetailsInlineConditionalInclusionQuery.Data.Hero.self
       ] }
 
       public var ifIncludeDetails: IfIncludeDetails? { _asInlineFragment() }
@@ -62,28 +64,27 @@ public struct HeroDetailsInlineConditionalInclusionQuery: GraphQLQuery {
       public init(
         __typename: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroDetailsInlineConditionalInclusionQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+        ])
       }
 
       /// Hero.IfIncludeDetails
       ///
       /// Parent Type: `Character`
       public struct IfIncludeDetails: StarWarsAPI.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = HeroDetailsInlineConditionalInclusionQuery.Data.Hero
-        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("name", String.self),
           .field("appearsIn", [GraphQLEnum<StarWarsAPI.Episode>?].self),
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroDetailsInlineConditionalInclusionQuery.Data.Hero.self,
+          HeroDetailsInlineConditionalInclusionQuery.Data.Hero.IfIncludeDetails.self
         ] }
 
         /// The name of the character
@@ -96,17 +97,11 @@ public struct HeroDetailsInlineConditionalInclusionQuery: GraphQLQuery {
           name: String,
           appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?]
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": __typename,
-              "name": name,
-              "appearsIn": appearsIn,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroDetailsInlineConditionalInclusionQuery.Data.Hero.self),
-              ObjectIdentifier(HeroDetailsInlineConditionalInclusionQuery.Data.Hero.IfIncludeDetails.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": __typename,
+            "name": name,
+            "appearsIn": appearsIn,
+          ])
         }
       }
     }

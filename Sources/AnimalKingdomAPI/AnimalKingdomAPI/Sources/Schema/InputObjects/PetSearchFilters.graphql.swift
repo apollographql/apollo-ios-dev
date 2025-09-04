@@ -1,17 +1,17 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import ApolloAPI
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 public struct PetSearchFilters: InputObject {
-  public private(set) var __data: InputDict
+  @_spi(Unsafe) public private(set) var __data: InputDict
 
-  public init(_ data: InputDict) {
+  @_spi(Unsafe) public init(_ data: InputDict) {
     __data = data
   }
 
   public init(
-    species: [String],
+    species: GraphQLNullable<[String?]> = nil,
     size: GraphQLNullable<GraphQLEnum<RelativeSize>> = nil,
     measurements: GraphQLNullable<MeasurementsInput> = nil
   ) {
@@ -22,7 +22,7 @@ public struct PetSearchFilters: InputObject {
     ])
   }
 
-  public var species: [String] {
+  public var species: GraphQLNullable<[String?]> {
     get { __data["species"] }
     set { __data["species"] = newValue }
   }

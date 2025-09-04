@@ -1,7 +1,7 @@
 import XCTest
-@testable import Apollo
-import ApolloAPI
-@preconcurrency import ApolloInternalTestHelpers
+@testable @_spi(Execution) import Apollo
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloInternalTestHelpers
 
 class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
   

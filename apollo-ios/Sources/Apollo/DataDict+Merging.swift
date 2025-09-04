@@ -1,12 +1,10 @@
 import Foundation
-#if !COCOAPODS
-@_spi(Internal) import ApolloAPI
-#endif
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 // MARK: Internal
 
 extension DataDict {
-  enum MergeError: Error, LocalizedError, Equatable {
+  public enum MergeError: Error, LocalizedError, Equatable {
     case emptyMergePath
     case dataTypeNotAccessibleByPathComponent(PathComponent)
     case invalidPathComponentForDataType(PathComponent, String)
@@ -36,7 +34,7 @@ extension DataDict {
       }
     }
 
-    static func ==(lhs: MergeError, rhs: MergeError) -> Bool {
+    public static func ==(lhs: MergeError, rhs: MergeError) -> Bool {
       switch (lhs, rhs) {
       case
         (.emptyMergePath, .emptyMergePath),

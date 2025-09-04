@@ -1,8 +1,5 @@
 import Foundation
-
-#if !COCOAPODS
-  import ApolloAPI
-#endif
+@_spi(Unsafe) import ApolloAPI
 
 public typealias DidChangeKeysFunc = (Set<CacheKey>) -> Void
 

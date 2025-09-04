@@ -31,7 +31,7 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
           operationSearchPaths: [directoryURL.appendingPathComponent("**/*.graphql").path]
         ),
         output: .mock(
-          moduleType: .swiftPackageManager,
+          moduleType: .swiftPackage(apolloSDKDependency: .default),
           path: directoryURL.path
         ),
         options: .init(

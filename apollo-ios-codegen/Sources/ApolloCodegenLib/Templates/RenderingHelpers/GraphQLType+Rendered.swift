@@ -2,7 +2,7 @@ import GraphQLCompiler
 
 extension GraphQLType {
 
-  enum RenderContext {
+  enum RenderContext: Equatable {
     /// Renders the type for use in an operation selection set.
     case selectionSetField(forceNonNull: Bool = false)
     /// Renders the type for use in a test mock object.
@@ -140,7 +140,7 @@ extension GraphQLNamedType {
   func testMockFieldTypeName(
     _ config: ApolloCodegenConfiguration
   ) -> String {
-    let typename = render(as: .typename)
+    let typename = render(as: .typename())
     if SwiftKeywords.TestMockFieldAbstractTypeNamesToNamespace.contains(typename) &&
         self is GraphQLAbstractType {
       return "MockObject.\(typename)"
@@ -159,7 +159,7 @@ extension GraphQLNamedType {
       if case .testMockField = context {
         return newTypeName ?? testMockFieldTypeName(config)
       } else {
-        return newTypeName ?? self.render(as: .typename)
+        return newTypeName ?? self.render(as: .typename(isInputValue: context == .inputValue))
       }
     }()
 

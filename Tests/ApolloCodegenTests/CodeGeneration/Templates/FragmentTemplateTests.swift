@@ -85,8 +85,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
           #"fragment TestFragment on Query { __typename allAnimals { __typename species } }"#
         }
 
-        let __data: DataDict
-        init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) let __data: DataDict
+        @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
       """
 
     // when
@@ -104,8 +104,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let expected =
       """
       struct TestFragment: TestSchema.SelectionSet, Fragment {
-        let __data: DataDict
-        init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) let __data: DataDict
+        @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
       """
 
     // when
@@ -206,7 +206,7 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
       """
 
     let expected = """
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
       """
 
     // when
@@ -239,7 +239,7 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
       """
 
     let expected = """
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
       """
 
     // when
@@ -276,7 +276,7 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
       """
 
     let expected = """
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Unions.Animal }
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Unions.Animal }
       """
 
     // when
@@ -311,10 +311,13 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
           #"fragment TestFragment on Query { __typename }"#
         }
 
-        let __data: DataDict
-        init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) let __data: DataDict
+        @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
 
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
+        @_spi(Execution) static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          TestFragment.self
+        ] }
       }
 
       """
@@ -345,12 +348,15 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
           #"fragment TestFragment on Animal { __typename }"#
         }
 
-        let __data: DataDict
-        init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) let __data: DataDict
+        @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
 
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
-        static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
+        @_spi(Execution) static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
+        ] }
+        @_spi(Execution) static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          TestFragment.self
         ] }
       }
 
@@ -464,15 +470,10 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
         init(
           species: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": TestSchema.Objects.Animal.typename,
-              "species": species,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(TestFragment.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": TestSchema.Objects.Animal.typename,
+            "species": species,
+          ])
         }
       """
 
@@ -490,7 +491,7 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let actual = render(template)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, forSection: .selectionSet.initializer))
   }
 
   func test__render_givenNamedFragment_configIncludesSpecificFragment_rendersInitializer() async throws {
@@ -516,15 +517,10 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
         init(
           species: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": TestSchema.Objects.Animal.typename,
-              "species": species,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(TestFragment.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": TestSchema.Objects.Animal.typename,
+            "species": species,
+          ])
         }
       """
 
@@ -542,7 +538,7 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let actual = render(template)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, forSection: .selectionSet.initializer))
   }
 
   func test__render_givenNamedFragment_configDoesNotIncludeNamedFragments_doesNotRenderInitializer() async throws {
@@ -577,7 +573,13 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let actual = render(template)
 
     // then
-    expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
+    expect(actual).to(
+      equalLineByLine(
+        "",
+        after: .selectionSet.propertyAccessors(),
+        ignoringExtraLines: false
+      )
+    )
   }
 
   func test__render_givenNamedFragments_configIncludeSpecificFragmentWithOtherName_doesNotRenderInitializer()
@@ -614,7 +616,13 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let actual = render(template)
 
     // then
-    expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
+    expect(actual).to(
+      equalLineByLine(
+        "",
+        after: .selectionSet.propertyAccessors(),
+        ignoringExtraLines: false
+      )
+    )
   }
 
   func test__render_givenNamedFragments_asLocalCacheMutation_rendersInitializer() async throws {
@@ -640,15 +648,10 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
         init(
           species: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": TestSchema.Objects.Animal.typename,
-              "species": species,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(TestFragment.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": TestSchema.Objects.Animal.typename,
+            "species": species,
+          ])
         }
       """
 
@@ -666,7 +669,7 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let actual = render(template)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 20, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, forSection: .selectionSet.initializer))
   }
 
   func
@@ -716,7 +719,13 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
       let actual = render(template)
 
       // then
-      expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
+      expect(actual).to(
+        equalLineByLine(
+          "",
+          after: .selectionSet.propertyAccessors(),
+          ignoringExtraLines: false
+        )
+      )
     }
   }
 
@@ -793,14 +802,6 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
 
     let expected =
       """
-        var __data: DataDict
-        init(_dataDict: DataDict) { __data = _dataDict }
-
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
-        static var __selections: [ApolloAPI.Selection] { [
-          .field("allAnimals", [AllAnimal]?.self),
-        ] }
-
         var allAnimals: [AllAnimal]? {
           get { __data["allAnimals"] }
           set { __data["allAnimals"] = newValue }
@@ -813,7 +814,12 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let actual = render(template)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
+    expect(actual).to(
+      equalLineByLine(
+        expected,
+        forSection: .selectionSet.propertyAccessors(mutable: true)
+      )
+    )
   }
 
   // MARK: Casing

@@ -1,8 +1,5 @@
 import Foundation
-
-#if !COCOAPODS
-  @_spi(Internal) import ApolloAPI
-#endif
+@_spi(Internal) import ApolloAPI
 
 /// A request which sends JSON related to a GraphQL operation.
 public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPersistedQueryCompatibleRequest, Hashable {
@@ -119,7 +116,7 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
 
     switch httpMethod {
     case .GET:
-      let transformer = GraphQLGETTransformer(body: body, url: self.graphQLEndpoint)
+      let transformer = URLQueryParameterTransformer(body: body, url: self.graphQLEndpoint)
       if let urlForGet = transformer.createGetURL() {
         request.url = urlForGet
         request.httpMethod = GraphQLHTTPMethod.GET.rawValue

@@ -41,7 +41,8 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
             renderAccessControl: { accessControlModifier(for: .member) }()
         ).renderBody())
       }
-      \(DeferredFragmentsMetadataTemplate(
+    
+      \(section: DeferredFragmentsMetadataTemplate(
         operation: operation,
         config: config,
         renderAccessControl: { accessControlModifier(for: .parent) }()
@@ -67,7 +68,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
 
     return TemplateString("""
       \(accessControlModifier(for: .member))\
-      static let operationDocument: \(config.ApolloAPITargetName).OperationDocument = .init(
+      static let operationDocument: \(TemplateConstants.ApolloAPITargetName).OperationDocument = .init(
       \(if: config.options.operationDocumentFormat.contains(.operationId), {
         precondition(operationIdentifier != nil, "operationIdentifier is missing.")
         return """

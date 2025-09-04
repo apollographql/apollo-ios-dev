@@ -1,11 +1,11 @@
-import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Internal) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 import Nimble
 import XCTest
 
 @testable import Apollo
 
-class GETTransformerTests: XCTestCase {
+class URLQueryParameterTransformerTests: XCTestCase {
   private var requestBodyCreator: DefaultRequestBodyCreator!
   private static let url = TestURL.mockPort8080.url
 
@@ -55,7 +55,7 @@ class GETTransformerTests: XCTestCase {
       autoPersistQuery: false
     )
 
-    let transformer = GraphQLGETTransformer(body: body, url: Self.url)
+    let transformer = URLQueryParameterTransformer(body: body, url: Self.url)
 
     let url = transformer.createGetURL()
 
@@ -93,7 +93,7 @@ class GETTransformerTests: XCTestCase {
       autoPersistQuery: false
     )
 
-    let transformer = GraphQLGETTransformer(body: body, url: Self.url)
+    let transformer = URLQueryParameterTransformer(body: body, url: Self.url)
 
     let url = transformer.createGetURL()
 
@@ -131,7 +131,7 @@ class GETTransformerTests: XCTestCase {
       autoPersistQuery: false
     )
 
-    let transformer = GraphQLGETTransformer(body: body, url: Self.url)
+    let transformer = URLQueryParameterTransformer(body: body, url: Self.url)
 
     let url = transformer.createGetURL()
 
@@ -166,7 +166,7 @@ class GETTransformerTests: XCTestCase {
       "extensions": extensions,
     ]
 
-    let transformer = GraphQLGETTransformer(body: body, url: Self.url)
+    let transformer = URLQueryParameterTransformer(body: body, url: Self.url)
 
     let url = transformer.createGetURL()
 
@@ -186,7 +186,7 @@ class GETTransformerTests: XCTestCase {
       "extensions": extensions,
     ]
 
-    let transformer = GraphQLGETTransformer(body: body, url: Self.url)
+    let transformer = URLQueryParameterTransformer(body: body, url: Self.url)
 
     let url = transformer.createGetURL()
 
@@ -206,7 +206,7 @@ class GETTransformerTests: XCTestCase {
       "extensions": extensions,
     ]
 
-    let transformer = GraphQLGETTransformer(body: body, url: Self.url)
+    let transformer = URLQueryParameterTransformer(body: body, url: Self.url)
 
     let url = transformer.createGetURL()
 
@@ -236,7 +236,7 @@ class GETTransformerTests: XCTestCase {
       "extensions": extensions
     ]
 
-    let transformer = GraphQLGETTransformer(body: body, url: Self.url)
+    let transformer = URLQueryParameterTransformer(body: body, url: Self.url)
 
     let url = transformer.createGetURL()
 
@@ -274,7 +274,7 @@ class GETTransformerTests: XCTestCase {
       autoPersistQuery: false
     )
 
-    let transformer = GraphQLGETTransformer(body: body, url: Self.url)
+    let transformer = URLQueryParameterTransformer(body: body, url: Self.url)
 
     let url = transformer.createGetURL()
 
@@ -298,7 +298,7 @@ class GETTransformerTests: XCTestCase {
 
     var components = URLComponents(string: Self.url.absoluteString)!
     components.queryItems = [URLQueryItem(name: "zalgo", value: "bar")]
-    let transformer = GraphQLGETTransformer(body: body, url: components.url!)
+    let transformer = URLQueryParameterTransformer(body: body, url: components.url!)
 
     let url = transformer.createGetURL()
 
@@ -310,7 +310,7 @@ class GETTransformerTests: XCTestCase {
 
   func test__createGetURL__withEmptyQueryParameter_returnsURL() throws {
     let body: JSONEncodableDictionary = [:]
-    let transformer = GraphQLGETTransformer(body: body, url: Self.url)
+    let transformer = URLQueryParameterTransformer(body: body, url: Self.url)
     let url = transformer.createGetURL()
 
     let expected = "http://localhost:8080/graphql"

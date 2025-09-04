@@ -18,7 +18,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     fields: [GraphQLInputField] = [],
     isOneOf: Bool = true,
     documentation: String? = nil,
-    config: ApolloCodegenConfiguration = .mock(.swiftPackageManager)
+    config: ApolloCodegenConfiguration = .mock(.swiftPackage(apolloSDKDependency: .default))
   ) {
     let inputObject = GraphQLInputObjectType.mock(
       name,
@@ -50,7 +50,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case field(Int32)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .field(let value):
           return InputDict(["field": value])
@@ -84,7 +84,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
           defaultValue: nil
         )
       ],
-      config: .mock(.swiftPackageManager)
+      config: .mock(.swiftPackage(apolloSDKDependency: .default))
     )
     
     let expected = """
@@ -93,7 +93,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case fieldOne(String)
       case fieldTwo(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .fieldOne(let value):
           return InputDict(["fieldOne": value])
@@ -136,7 +136,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case fieldOne(String)
       case fieldTwo(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .fieldOne(let value):
           return InputDict(["fieldOne": value])
@@ -179,7 +179,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case fieldOne(String)
       case fieldTwo(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .fieldOne(let value):
           return InputDict(["fieldOne": value])
@@ -222,7 +222,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case fieldOne(String)
       case fieldTwo(String)
     
-      var __data: InputDict {
+      @_spi(Unsafe) var __data: InputDict {
         switch self {
         case .fieldOne(let value):
           return InputDict(["fieldOne": value])
@@ -319,7 +319,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       fields: fields,
       config: .mock(schemaNamespace: "testschema",
                     output: .mock(
-                      moduleType: .swiftPackageManager,
+                      moduleType: .swiftPackage(apolloSDKDependency: .default),
                       operations: .relative(subpath: nil)
                     ),
                     options: .init(
@@ -333,7 +333,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case InputField(Testschema.InnerInputObject)
       case inputField(Testschema.InnerInputObject)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .InputField(let value):
           return InputDict(["InputField": value])
@@ -374,7 +374,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     buildSubject(
       fields: fields,
       config: .mock(schemaNamespace: "testschema", output: .mock(
-        moduleType: .swiftPackageManager,
+        moduleType: .swiftPackage(apolloSDKDependency: .default),
         operations: .relative(subpath: nil)))
     )
 
@@ -383,7 +383,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case enumField(GraphQLEnum<Testschema.EnumValue>)
       case inputField(Testschema.InnerInputObject)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .enumField(let value):
           return InputDict(["enumField": value])
@@ -424,7 +424,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     buildSubject(
       fields: fields,
       config: .mock(schemaNamespace: "TESTSCHEMA", output: .mock(
-        moduleType: .swiftPackageManager,
+        moduleType: .swiftPackage(apolloSDKDependency: .default),
         operations: .relative(subpath: nil)))
     )
 
@@ -433,7 +433,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case enumField(GraphQLEnum<TESTSCHEMA.EnumValue>)
       case inputField(TESTSCHEMA.InnerInputObject)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .enumField(let value):
           return InputDict(["enumField": value])
@@ -474,7 +474,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     buildSubject(
       fields: fields,
       config: .mock(schemaNamespace: "TestSchema", output: .mock(
-        moduleType: .swiftPackageManager,
+        moduleType: .swiftPackage(apolloSDKDependency: .default),
         operations: .relative(subpath: nil)))
     )
 
@@ -483,7 +483,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case enumField(GraphQLEnum<TestSchema.EnumValue>)
       case inputField(TestSchema.InnerInputObject)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .enumField(let value):
           return InputDict(["enumField": value])
@@ -510,7 +510,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         defaultValue: nil)],
       config: .mock(
         schemaNamespace: "testschema",
-        output: .mock(moduleType: .swiftPackageManager, operations: .relative(subpath: nil))
+        output: .mock(moduleType: .swiftPackage(apolloSDKDependency: .default), operations: .relative(subpath: nil))
       )
     )
 
@@ -518,7 +518,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case listNullableItem([GraphQLEnum<Testschema.EnumValue>?])
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .listNullableItem(let value):
           return InputDict(["listNullableItem": value])
@@ -543,7 +543,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         defaultValue: nil)],
       config: .mock(
         schemaNamespace: "TESTSCHEMA",
-        output: .mock(moduleType: .swiftPackageManager, operations: .relative(subpath: nil))
+        output: .mock(moduleType: .swiftPackage(apolloSDKDependency: .default), operations: .relative(subpath: nil))
       )
     )
 
@@ -551,7 +551,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case listNullableItem([GraphQLEnum<TESTSCHEMA.EnumValue>?])
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .listNullableItem(let value):
           return InputDict(["listNullableItem": value])
@@ -576,7 +576,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         defaultValue: nil)],
       config: .mock(
         schemaNamespace: "TestSchema",
-        output: .mock(moduleType:.swiftPackageManager ,operations: .relative(subpath: nil))
+        output: .mock(moduleType: .swiftPackage(apolloSDKDependency: .default) ,operations: .relative(subpath: nil))
       )
     )
 
@@ -584,7 +584,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case listNullableItem([GraphQLEnum<TestSchema.EnumValue>?])
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .listNullableItem(let value):
           return InputDict(["listNullableItem": value])
@@ -612,7 +612,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case field(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .field(let value):
           return InputDict(["field": value])
@@ -638,7 +638,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case field(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .field(let value):
           return InputDict(["Field": value])
@@ -664,7 +664,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     public enum MockOneOfInput: OneOfInputObject {
       case fieldname(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .fieldname(let value):
           return InputDict(["FIELDNAME": value])
@@ -748,7 +748,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         type: .list(.scalar(.string())),
         defaultValue: nil
       )
-    ], config: .mock(.swiftPackageManager, schemaNamespace: "TestSchema"))
+    ], config: .mock(.swiftPackage(apolloSDKDependency: .default), schemaNamespace: "TestSchema"))
 
     let expected = """
     public enum MockOneOfInput: OneOfInputObject {
@@ -764,7 +764,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case lowercaseInputField(LowercaseInnerInputObject)
       case listField([String?])
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .stringField(let value):
           return InputDict(["stringField": value])
@@ -831,9 +831,9 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     """
 
     let tests: [(config: ApolloCodegenConfiguration.FileOutput, expected: String)] = [
-      (.mock(moduleType: .swiftPackageManager, operations: .relative(subpath: nil)), expectedWithNamespace),
-      (.mock(moduleType: .swiftPackageManager, operations: .absolute(path: "custom")), expectedWithNamespace),
-      (.mock(moduleType: .swiftPackageManager, operations: .inSchemaModule), expectedNoNamespace),
+      (.mock(moduleType: .swiftPackage(apolloSDKDependency: .default), operations: .relative(subpath: nil)), expectedWithNamespace),
+      (.mock(moduleType: .swiftPackage(apolloSDKDependency: .default), operations: .absolute(path: "custom")), expectedWithNamespace),
+      (.mock(moduleType: .swiftPackage(apolloSDKDependency: .default), operations: .inSchemaModule), expectedNoNamespace),
       (.mock(moduleType: .other, operations: .relative(subpath: nil)), expectedWithNamespace),
       (.mock(moduleType: .other, operations: .absolute(path: "custom")), expectedWithNamespace),
       (.mock(moduleType: .other, operations: .inSchemaModule), expectedNoNamespace),
@@ -867,7 +867,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
                                documentation: "Field Documentation!")
       ],
       documentation: documentation,
-      config: .mock(.swiftPackageManager, options: .init(schemaDocumentation: .include))
+      config: .mock(.swiftPackage(apolloSDKDependency: .default), options: .init(schemaDocumentation: .include))
     )
 
     let expected = """
@@ -895,7 +895,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
                                documentation: "Field Documentation!")
       ],
       documentation: documentation,
-      config: .mock(.swiftPackageManager, options: .init(schemaDocumentation: .exclude))
+      config: .mock(.swiftPackage(apolloSDKDependency: .default), options: .init(schemaDocumentation: .exclude))
     )
 
     let expected = """
@@ -924,7 +924,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         )
       ],
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackage(apolloSDKDependency: .default),
         options: .init(schemaDocumentation: .include, warningsOnDeprecatedUsage: .include)
       )
     )
@@ -954,7 +954,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         )
       ],
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackage(apolloSDKDependency: .default),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude)
       )
     )
@@ -986,7 +986,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       ],
       documentation: documentation,
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackage(apolloSDKDependency: .default),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .include)
       )
     )
@@ -1019,7 +1019,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       ],
       documentation: documentation,
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackage(apolloSDKDependency: .default),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude)
       )
     )
@@ -1066,7 +1066,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         )
       ],
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackage(apolloSDKDependency: .default),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .include)
       )
     )
@@ -1111,7 +1111,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
         )
       ],
       config: .mock(
-        .swiftPackageManager,
+        .swiftPackage(apolloSDKDependency: .default),
         options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude)
       )
     )
@@ -1399,7 +1399,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
 
     buildSubject(
       fields: fields,
-      config: .mock(.swiftPackageManager,
+      config: .mock(.swiftPackage(apolloSDKDependency: .default),
                     options: .init(
                       conversionStrategies: .init(inputObjects: .none)
                     ),
@@ -1461,7 +1461,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case `try`(String)
       case `_`(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .`associatedtype`(let value):
           return InputDict(["associatedtype": value])
@@ -1631,7 +1631,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       // Renamed from GraphQL schema value: 'myField'
       case myCustomField(String)
     
-      public var __data: InputDict {
+      @_spi(Unsafe) public var __data: InputDict {
         switch self {
         case .fieldOne(let value):
           return InputDict(["fieldOne": value])

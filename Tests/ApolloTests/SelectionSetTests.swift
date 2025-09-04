@@ -1,35 +1,10 @@
 import XCTest
 @testable import Apollo
-@testable import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) @testable @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 import Nimble
 
 class SelectionSetTests: XCTestCase {
-
-  // MARK: - Equatable/Hashable Tests
-
-  func test__equatable__selectionSetWithSameDataAndDifferentFulfilledFragments_returns_true() {
-    // given
-    let data: JSONObject = [
-      "__typename": "Human",
-      "name": "Johnny Tsunami"
-    ]
-
-    // when
-    let selectionSet1 = MockSelectionSet(_dataDict: DataDict(
-      data: data,
-      fulfilledFragments: [ObjectIdentifier(MockSelectionSet.self)]
-    ))
-
-    let selectionSet2 = MockSelectionSet(_dataDict: DataDict(
-      data: data,
-      fulfilledFragments: []
-    ))
-
-    // then
-    expect(selectionSet1).to(equal(selectionSet2))
-    expect(selectionSet1.hashValue).to(equal(selectionSet2.hashValue))
-  }
 
   // MARK: - Field Accessor Tests
 
