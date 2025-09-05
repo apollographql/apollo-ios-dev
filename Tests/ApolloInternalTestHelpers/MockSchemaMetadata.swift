@@ -67,7 +67,7 @@ public class MockSchemaMetadata: SchemaMetadata {
     return Object(typename: __typename, implementedInterfaces: [])
   }
 
-  public class SchemaConfiguration: ApolloAPI.SchemaConfiguration, ApolloAPI.FieldPolicyProvider {
+  public class SchemaConfiguration: ApolloAPI.SchemaConfiguration/*, ApolloAPI.FieldPolicyProvider*/ {
     fileprivate static nonisolated(unsafe) var stub_cacheKeyInfoForType_Object: ((Object, ObjectData) -> CacheKeyInfo?)?
     
     fileprivate static nonisolated(unsafe) var stub_cacheKeyForField_SingleReturn: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> CacheKeyInfo?)?
@@ -78,13 +78,13 @@ public class MockSchemaMetadata: SchemaMetadata {
       stub_cacheKeyInfoForType_Object?(type, object)
     }
     
-    public static func cacheKey(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> CacheKeyInfo? {
-      stub_cacheKeyForField_SingleReturn?(field, variables, path)
-    }
-    
-    public static func cacheKeyList(for listField: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
-      stub_cacheKeyForField_ListReturn?(listField, variables, path)
-    }
+//    public static func cacheKey(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> CacheKeyInfo? {
+//      stub_cacheKeyForField_SingleReturn?(field, variables, path)
+//    }
+//    
+//    public static func cacheKeyList(for listField: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
+//      stub_cacheKeyForField_ListReturn?(listField, variables, path)
+//    }
   }
 }
 
