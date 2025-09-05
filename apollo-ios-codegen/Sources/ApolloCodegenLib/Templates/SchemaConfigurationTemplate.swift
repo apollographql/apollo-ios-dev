@@ -30,7 +30,7 @@ struct SchemaConfigurationTemplate: TemplateRenderer {
         return nil
       }
     }
-
+    
     """
   }
 }

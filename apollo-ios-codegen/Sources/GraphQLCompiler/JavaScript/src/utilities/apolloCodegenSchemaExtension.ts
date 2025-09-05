@@ -25,6 +25,28 @@ export const directive_typePolicy: DirectiveDefinitionNode = {
   locations: [nameNode("OBJECT"), nameNode("INTERFACE")]
 }
 
+export const directive_fieldPolicy: DirectiveDefinitionNode = {
+  kind: Kind.DIRECTIVE_DEFINITION,
+  description: stringNode("A directive used by Apollo iOS to map query input data to cache keys of objects."),
+  name: nameNode("fieldPolicy"),
+  arguments: [
+    {
+      kind: Kind.INPUT_VALUE_DEFINITION,
+      description: stringNode("The field you are setting the @fieldPolicy for."),
+      name: nameNode("forField"),
+      type: nonNullNode(typeNode(GraphQLString))
+    },
+    {
+      kind: Kind.INPUT_VALUE_DEFINITION,
+      description: stringNode("Set of fields used to compute the cache key."),
+      name: nameNode("keyArgs"),
+      type: nonNullNode(typeNode(GraphQLString))
+    }
+  ],
+  repeatable: true,
+  locations: [nameNode("OBJECT"), nameNode("INTERFACE")]
+}
+
 export const directive_import_statement: DirectiveDefinitionNode = {
   kind: Kind.DIRECTIVE_DEFINITION,
   description: stringNode("A directive used by the Apollo iOS code generation engine to generate custom import statements in operation or fragment definition files. An import statement to import a module with the name provided in the `module` argument will be added to the generated definition file."),
@@ -45,6 +67,7 @@ const apolloDirectives = [
   directive_apollo_client_ios_localCacheMutation,
   directive_import_statement,
   directive_typePolicy,
+  directive_fieldPolicy
 ]
 
 export function addApolloCodegenSchemaExtensionToDocument(document: DocumentNode): DocumentNode {
