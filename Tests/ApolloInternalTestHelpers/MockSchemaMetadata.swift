@@ -133,14 +133,6 @@ public enum MockSchema1Configuration: SchemaConfiguration {
   public static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
     CacheKeyInfo(id: "one")
   }
-  
-  public static func cacheKey(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> CacheKeyInfo? {
-    return nil
-  }
-  
-  public static func cacheKeys(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
-    return nil
-  }
 }
 
 public enum MockSchema2: SchemaMetadata {
@@ -154,13 +146,5 @@ public enum MockSchema2: SchemaMetadata {
 public enum MockSchema2Configuration: SchemaConfiguration {
   public static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
     CacheKeyInfo(id: "two")
-  }
-  
-  public static func cacheKey(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> CacheKeyInfo? {
-    return nil
-  }
-  
-  public static func cacheKeys(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
-    return nil
   }
 }

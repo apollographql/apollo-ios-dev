@@ -3,7 +3,7 @@
 /// A `GraphQLExecutionSource` configured to execute upon the data stored in a ``NormalizedCache``.
 ///
 /// Each object exposed by the cache is represented as a `Record`.
-struct CacheDataExecutionSource: GraphQLExecutionSource {
+class CacheDataExecutionSource: GraphQLExecutionSource {
   typealias RawObjectData = Record
   typealias FieldCollector = CacheDataFieldSelectionCollector
 
@@ -23,9 +23,17 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
   /// there is only a single response from the cache data. Any deferred selection that was cached will
   /// be returned in the response.
   var shouldAttemptDeferredFragmentExecution: Bool { true }
+  
+  var provider: (any FieldPolicyProvider.Type)?
 
   init(transaction: ApolloStore.ReadTransaction) {
     self.transaction = transaction
+    
+//    if let provider = schema.configuration.self as? (any FieldPolicyProvider.Type) {
+//      self.provider = provider
+//    } else {
+//      self.provider = nil
+//    }
   }
 
   func resolveField(
@@ -96,9 +104,11 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     with info: FieldExecutionInfo,
     and type: Selection.Field.OutputType
   ) -> FieldPolicyResult? {
-    return nil
+    if provider == nil {
+      provider = info.parentInfo.schema.configuration.self as? (any FieldPolicyProvider.Type)
+    }
     
-    guard let provider = info.parentInfo.schema.configuration.self as? (any FieldPolicyProvider.Type) else {
+    guard let provider = provider else {
       return nil
     }
     
