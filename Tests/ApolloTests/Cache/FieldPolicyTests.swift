@@ -1,5 +1,6 @@
 import XCTest
-@_spi(Execution) @testable import Apollo
+@_spi(Execution)
+@testable import Apollo
 
 @_spi(Execution)
 @_spi(Internal)
