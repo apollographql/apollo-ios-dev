@@ -3,7 +3,7 @@
 /// A `GraphQLExecutionSource` configured to execute upon the data stored in a ``NormalizedCache``.
 ///
 /// Each object exposed by the cache is represented as a `Record`.
-struct CacheDataExecutionSource: GraphQLExecutionSource {
+class CacheDataExecutionSource: GraphQLExecutionSource {
   typealias RawObjectData = Record
   typealias FieldCollector = CacheDataFieldSelectionCollector
 
@@ -23,9 +23,15 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
   /// there is only a single response from the cache data. Any deferred selection that was cached will
   /// be returned in the response.
   var shouldAttemptDeferredFragmentExecution: Bool { true }
+  
+  var provider: (any FieldPolicyProvider.Type)? = nil
 
-  init(transaction: ApolloStore.ReadTransaction) {
+  init(transaction: ApolloStore.ReadTransaction, schema: any SchemaMetadata.Type) {
     self.transaction = transaction
+    
+    if let provider = schema.configuration.self as? (any FieldPolicyProvider.Type) {
+      self.provider = provider
+    }
   }
 
   func resolveField(
@@ -33,7 +39,7 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     on object: Record
   ) -> PossiblyDeferred<JSONValue?> {
     PossiblyDeferred {
-      let value = try object[info.cacheKeyForField()]
+      let value = try resolveCacheKey(with: info, on: object)
 
       switch value {
       case let reference as CacheReference:
@@ -63,6 +69,79 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
       default:
         return .immediate(.success(value))
       }
+    }
+  }
+  
+  private func resolveCacheKey(
+    with info: FieldExecutionInfo,
+    on object: Record
+  ) throws -> JSONValue? {
+    if let fieldPolicyResult = resolveProgrammaticFieldPolicy(with: info, and: info.field.type) ??
+        FieldPolicyDirectiveEvaluator(field: info.field, variables: info.parentInfo.variables)?.resolveFieldPolicy(),
+       let returnTypename = typename(for: info.field) {
+      
+      switch fieldPolicyResult {
+      case .single(let key):
+        return object[formatCacheKey(withInfo: key, andTypename: returnTypename)]
+      case .list(let keys):
+        var keyList: [JSONValue] = []
+        for key in keys {
+          if let cacheKey = object[formatCacheKey(withInfo: key, andTypename: returnTypename)] {
+            keyList.append(cacheKey)
+          }
+        }
+        return keyList as JSONValue
+      }
+    }
+    
+    let key = try info.cacheKeyForField()
+    return object[key]
+  }
+  
+  private func resolveProgrammaticFieldPolicy(
+    with info: FieldExecutionInfo,
+    and type: Selection.Field.OutputType
+  ) -> FieldPolicyResult? {
+    guard let provider = provider else {
+      return nil
+    }
+    
+    switch type {
+    case .nonNull(let innerType):
+      return resolveProgrammaticFieldPolicy(with: info, and: innerType)
+    case .list(_):
+      if let keys = provider.cacheKeyList(
+        for: info.field,
+        variables: info.parentInfo.variables,
+        path: info.responsePath
+      ) {
+        return .list(keys)
+      }
+    default:
+      if let key = provider.cacheKey(
+        for: info.field,
+        variables: info.parentInfo.variables,
+        path: info.responsePath
+      ) {
+        return .single(key)
+      }
+    }
+    return nil
+  }
+  
+  private func formatCacheKey(
+    withInfo info: CacheKeyInfo,
+    andTypename typename: String
+  ) -> String {
+    return "\(info.uniqueKeyGroup ?? typename):\(info.id)"
+  }
+  
+  private func typename(for field: Selection.Field) -> String? {
+    switch field.type.namedType {
+    case .object(let selectionSetType):
+      return selectionSetType.__parentType.__typename
+    default:
+      return nil
     }
   }
 
@@ -100,5 +179,3 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     }
   }
 }
-
-

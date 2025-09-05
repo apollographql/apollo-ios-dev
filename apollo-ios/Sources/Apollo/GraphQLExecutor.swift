@@ -178,7 +178,7 @@ public struct GraphQLExecutionError: Error, LocalizedError {
 /// [execution algorithm described in the GraphQL specification]
 /// (http://spec.graphql.org/draft/#sec-Execution)
 @_spi(Execution)
-public final class GraphQLExecutor<Source: GraphQLExecutionSource> {
+public struct GraphQLExecutor<Source: GraphQLExecutionSource> {
 
   private let executionSource: Source
 

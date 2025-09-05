@@ -87,3 +87,5 @@ Tests/TestCodeGenConfigurations/EmbeddedInTarget-RelativeAbsolute/PackageTwo/Sou
 !Tests/TestCodeGenConfigurations/**/SchemaConfiguration.swift
 !Tests/TestCodeGenConfigurations/Other-CustomTarget/AnimalKingdomAPI/AnimalKingdomAPI.h
 !Tests/TestCodeGenConfigurations/EmbeddedInTarget-RelativeAbsolute/PackageTwo/Sources/PackageTwo/PackageTwo.swift
+
+Sources/GraphQLCompiler/JavaScript/coverage/

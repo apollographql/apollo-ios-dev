@@ -1,6 +1,6 @@
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloInternalTestHelpers
-import Nimble
+@preconcurrency import Nimble
 import XCTest
 
 @testable import Apollo
@@ -2073,6 +2073,6 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
     server = nil
     client = nil
 
-    XCTAssertTrueEventually(weakWatcher == nil, message: "Watcher was not released.")
+    await expect(weakWatcher).toEventually(beNil())    
   }
 }

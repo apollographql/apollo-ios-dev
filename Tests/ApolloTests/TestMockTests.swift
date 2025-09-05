@@ -561,6 +561,14 @@ enum TestMockSchema: SchemaMetadata {
     static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
       return nil
     }
+    
+    static func cacheKey(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> CacheKeyInfo? {
+      return nil
+    }
+    
+    static func cacheKeys(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
+      return nil
+    }
   }
 
   struct Interfaces {

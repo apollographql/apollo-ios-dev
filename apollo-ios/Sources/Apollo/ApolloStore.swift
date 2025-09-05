@@ -183,9 +183,11 @@ public final class ApolloStore: Sendable {
       return try await _cache.loadRecords(forKeys: batchLoad)
     }
 
-    fileprivate lazy var executor = GraphQLExecutor(
-      executionSource: CacheDataExecutionSource(transaction: self)
-    )
+    private func executor(for schema: any SchemaMetadata.Type) -> GraphQLExecutor<CacheDataExecutionSource> {
+      return GraphQLExecutor(
+        executionSource: CacheDataExecutionSource(transaction: self, schema: schema)
+      )
+    }
 
     fileprivate init(store: ApolloStore) {
       self._cache = store.cache
@@ -221,6 +223,7 @@ public final class ApolloStore: Sendable {
     ) async throws -> Accumulator.FinalResult {
       let object = try await loadObject(forKey: key).get()
 
+      let executor = executor(for: type.Schema.self)
       return try await executor.execute(
         selectionSet: type,
         on: object,

@@ -95,8 +95,7 @@ private class AnimalQuery: MockQuery<AnimalQuery.AnAnimal>, @unchecked Sendable 
   }
 }
 
-class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
-  static let defaultWaitTimeout: TimeInterval = 0.5
+class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {  
 
   var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
