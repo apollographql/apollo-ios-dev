@@ -24,16 +24,14 @@ class CacheDataExecutionSource: GraphQLExecutionSource {
   /// be returned in the response.
   var shouldAttemptDeferredFragmentExecution: Bool { true }
   
-  var provider: (any FieldPolicyProvider.Type)?
+  var provider: (any FieldPolicyProvider.Type)? = nil
 
-  init(transaction: ApolloStore.ReadTransaction) {
+  init(transaction: ApolloStore.ReadTransaction, schema: any SchemaMetadata.Type) {
     self.transaction = transaction
     
-//    if let provider = schema.configuration.self as? (any FieldPolicyProvider.Type) {
-//      self.provider = provider
-//    } else {
-//      self.provider = nil
-//    }
+    if let provider = schema.configuration.self as? (any FieldPolicyProvider.Type) {
+      self.provider = provider
+    }
   }
 
   func resolveField(
@@ -104,10 +102,6 @@ class CacheDataExecutionSource: GraphQLExecutionSource {
     with info: FieldExecutionInfo,
     and type: Selection.Field.OutputType
   ) -> FieldPolicyResult? {
-    if provider == nil {
-      provider = info.parentInfo.schema.configuration.self as? (any FieldPolicyProvider.Type)
-    }
-    
     guard let provider = provider else {
       return nil
     }
