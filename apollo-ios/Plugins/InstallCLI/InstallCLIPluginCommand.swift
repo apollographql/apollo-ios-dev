@@ -40,7 +40,7 @@ extension InstallCLIPluginCommand: XcodeCommandPlugin {
     process.executableURL = URL(fileURLWithPath: toolURL.absoluteString)
 
     let downloadScriptPath = try downloadScriptPath(context: context)
-    process.arguments = [downloadScriptPath, context.xcodeProject.directoryURL.absoluteString]
+    process.arguments = [downloadScriptPath, context.xcodeProject.directoryURL.standardized.relativePath]
 
     try process.run()
     process.waitUntilExit()
@@ -61,7 +61,7 @@ extension InstallCLIPluginCommand: XcodeCommandPlugin {
       absoluteScriptPath = context.pluginWorkDirectoryURL.appending(path: "../../../../\(relativeScriptPath)")
     }
 
-    return absoluteScriptPath
+    return absoluteScriptPath.standardized.relativePath
   }
 
   /// Used to get a string representation of Xcode in the current toolchain.
