@@ -53,12 +53,12 @@ extension InstallCLIPluginCommand: XcodeCommandPlugin {
   private func downloadScriptPath(context: XcodePluginContext) throws -> String {
     let xcodeVersion = try xcodeVersion(context: context)
     let relativeScriptPath = "SourcePackages/checkouts/apollo-ios/scripts/download-cli.sh"
-    let absoluteScriptPath: String
+    let absoluteScriptPath: URL
 
     if xcodeVersion.lexicographicallyPrecedes("16.3") {
-      absoluteScriptPath = "\(context.pluginWorkDirectoryURL.absoluteString)/../../../\(relativeScriptPath)"
+      absoluteScriptPath = context.pluginWorkDirectoryURL.appending(path: "../../../\(relativeScriptPath)")
     } else {
-      absoluteScriptPath = "\(context.pluginWorkDirectoryURL.absoluteString)/../../../../\(relativeScriptPath)"
+      absoluteScriptPath = context.pluginWorkDirectoryURL.appending(path: "../../../../\(relativeScriptPath)")
     }
 
     return absoluteScriptPath
