@@ -40,25 +40,25 @@ public class MockSchemaMetadata: SchemaMetadata {
     }
   }
   
-  @MainActor
-  public static func stub_cacheKeyForField_SingleReturn(
-    _ stub: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> CacheKeyInfo?)?
-  ) {
-    _configuration.stub_cacheKeyForField_SingleReturn = stub
-    if stub != nil {
-      testObserver.start()
-    }
-  }
-  
-  @MainActor
-  public static func stub_cacheKeyForField_ListReturn(
-    _ stub: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> [CacheKeyInfo]?)?
-  ) {
-    _configuration.stub_cacheKeyForField_ListReturn = stub
-    if stub != nil {
-      testObserver.start()
-    }
-  }
+//  @MainActor
+//  public static func stub_cacheKeyForField_SingleReturn(
+//    _ stub: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> CacheKeyInfo?)?
+//  ) {
+//    _configuration.stub_cacheKeyForField_SingleReturn = stub
+//    if stub != nil {
+//      testObserver.start()
+//    }
+//  }
+//  
+//  @MainActor
+//  public static func stub_cacheKeyForField_ListReturn(
+//    _ stub: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> [CacheKeyInfo]?)?
+//  ) {
+//    _configuration.stub_cacheKeyForField_ListReturn = stub
+//    if stub != nil {
+//      testObserver.start()
+//    }
+//  }
 
   public static func objectType(forTypename __typename: String) -> Object? {
     if let stub = objectTypeForTypeName {
@@ -68,24 +68,24 @@ public class MockSchemaMetadata: SchemaMetadata {
     return Object(typename: __typename, implementedInterfaces: [])
   }
 
-  public class SchemaConfiguration: ApolloAPI.SchemaConfiguration, ApolloAPI.FieldPolicyProvider {
+  public class SchemaConfiguration: ApolloAPI.SchemaConfiguration/*, ApolloAPI.FieldPolicyProvider*/ {
     static var stub_cacheKeyInfoForType_Object: ((Object, ObjectData) -> CacheKeyInfo?)?
     
-    static var stub_cacheKeyForField_SingleReturn: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> CacheKeyInfo?)?
-    
-    static var stub_cacheKeyForField_ListReturn: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> [CacheKeyInfo]?)?
+//    static var stub_cacheKeyForField_SingleReturn: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> CacheKeyInfo?)?
+//    
+//    static var stub_cacheKeyForField_ListReturn: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> [CacheKeyInfo]?)?
 
     public static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
       stub_cacheKeyInfoForType_Object?(type, object)
     }
     
-    public static func cacheKey(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> CacheKeyInfo? {
-      stub_cacheKeyForField_SingleReturn?(field, variables, path)
-    }
-    
-    public static func cacheKeyList(for listField: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
-      stub_cacheKeyForField_ListReturn?(listField, variables, path)
-    }
+//    public static func cacheKey(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> CacheKeyInfo? {
+//      stub_cacheKeyForField_SingleReturn?(field, variables, path)
+//    }
+//    
+//    public static func cacheKeyList(for listField: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
+//      stub_cacheKeyForField_ListReturn?(listField, variables, path)
+//    }
   }
 }
 
