@@ -10,6 +10,8 @@ public class MockSchemaMetadata: SchemaMetadata {
 
   public static var _configuration: SchemaConfiguration.Type = SchemaConfiguration.self
   public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
+  
+  public static let fieldPolicyProvider: (any FieldPolicyProvider.Type)? = SchemaConfiguration.self
 
   @MainActor
   private static let testObserver = TestObserver() { _ in
