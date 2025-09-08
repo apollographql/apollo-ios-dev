@@ -11,14 +11,15 @@ public struct PetSearchLocalCacheMutation: LocalCacheMutation {
 
   public init(filters: GraphQLNullable<PetSearchFilters> = .init(
     PetSearchFilters(
-      species: ["Dog", "Cat"],
+      species: [
+        "Dog",
+        "Cat"
+      ],
       size: .init(.small),
-      measurements: .init(
-        MeasurementsInput(
-          height: 10.5,
-          weight: 5.0
-        )
-      )
+      measurements: [MeasurementsInput(
+        height: 10.5,
+        weight: 5.0
+      )]
     )
   )) {
     self.filters = filters
