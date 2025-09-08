@@ -96,7 +96,9 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
 //    guard let provider = info.parentInfo.schema.configuration.self as? (any FieldPolicyProvider.Type) else {
 //      return nil
 //    }
-    let provider = info.parentInfo.schema.configuration
+    guard let provider = info.parentInfo.schema.fieldPolicyProvider else {
+      return nil
+    }
     
     switch type {
     case .nonNull(let innerType):
