@@ -99,24 +99,26 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     let provider = info.parentInfo.schema.configuration
     
     switch type {
-    case .nonNull(let innerType):
-      return resolveProgrammaticFieldPolicy(with: info, and: innerType)
-    case .list(_):
-      if let keys = provider.cacheKeyList(
-        for: info.field,
-        variables: info.parentInfo.variables,
-        path: info.responsePath
-      ) {
-        return .list(keys)
-      }
+//    case .nonNull(let innerType):
+//      return resolveProgrammaticFieldPolicy(with: info, and: innerType)
+//    case .list(_):
+//      if let keys = provider.cacheKeyList(
+//        for: info.field,
+//        variables: info.parentInfo.variables,
+//        path: info.responsePath
+//      ) {
+//        return .list(keys)
+//      }
+//    default:
+//      if let key = provider.cacheKey(
+//        for: info.field,
+//        variables: info.parentInfo.variables,
+//        path: info.responsePath
+//      ) {
+//        return .single(key)
+//      }
     default:
-      if let key = provider.cacheKey(
-        for: info.field,
-        variables: info.parentInfo.variables,
-        path: info.responsePath
-      ) {
-        return .single(key)
-      }
+      return nil
     }
     return nil
   }
