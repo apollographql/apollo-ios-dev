@@ -109,14 +109,16 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
 //      ) {
 //        return .list(keys)
 //      }
+//    default:
+//      if let key = provider.cacheKey(
+//        for: info.field,
+//        variables: info.parentInfo.variables,
+//        path: info.responsePath
+//      ) {
+//        return .single(key)
+//      }
     default:
-      if let key = provider.cacheKey(
-        for: info.field,
-        variables: info.parentInfo.variables,
-        path: info.responsePath
-      ) {
-        return .single(key)
-      }
+      return nil
     }
     return nil
   }
