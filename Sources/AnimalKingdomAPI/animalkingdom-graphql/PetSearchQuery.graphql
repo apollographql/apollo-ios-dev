@@ -1,10 +1,17 @@
-query PetSearch($filters: PetSearchFilters = {
-  species: ["Dog", "Cat"],
-  size: SMALL,
-  measurements: {
-    height: 10.5,
-    weight: 5.0
-    }
+query PetSearch(
+  $filters: PetSearchFilters = {
+    species: ["Dog", "Cat"],
+    size: SMALL,
+    measurements: [
+      {
+        height: 10.5,
+        weight: 5.0
+      },
+      {
+        height: 10.5,
+        weight: 5.0
+      }
+    ]
   }
 ) {
   pets(filters: $filters) {

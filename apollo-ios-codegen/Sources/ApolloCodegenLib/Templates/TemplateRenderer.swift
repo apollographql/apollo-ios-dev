@@ -337,6 +337,8 @@ struct ImportStatementTemplate {
       switch type {
       case .inputObject:
         return "@_spi(Internal) @_spi(Unsafe) \(apolloAPIImport)"
+      case .customScalar:
+        return "@_spi(Internal) @_spi(Execution) \(apolloAPIImport)"
       case .enum:
         return "@_spi(Internal) \(apolloAPIImport)"
       default:
