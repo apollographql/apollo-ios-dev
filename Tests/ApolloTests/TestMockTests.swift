@@ -566,7 +566,7 @@ enum TestMockSchema: SchemaMetadata {
       return nil
     }
     
-    static func cacheKeys(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
+    static func cacheKeyList(for listField: ApolloAPI.Selection.Field, variables: [String : any ApolloAPI.GraphQLOperationVariableValue]?, path: ApolloAPI.ResponsePath) -> [ApolloAPI.CacheKeyInfo]? {
       return nil
     }
   }

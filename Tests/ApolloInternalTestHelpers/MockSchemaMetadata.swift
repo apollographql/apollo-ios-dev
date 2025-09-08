@@ -10,8 +10,6 @@ public class MockSchemaMetadata: SchemaMetadata {
 
   public static var _configuration: SchemaConfiguration.Type = SchemaConfiguration.self
   public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
-  
-  public static let fieldPolicyProvider: (any FieldPolicyProvider.Type)? = SchemaConfiguration.self
 
   @MainActor
   private static let testObserver = TestObserver() { _ in
@@ -70,7 +68,7 @@ public class MockSchemaMetadata: SchemaMetadata {
     return Object(typename: __typename, implementedInterfaces: [])
   }
 
-  public class SchemaConfiguration: ApolloAPI.SchemaConfiguration, ApolloAPI.FieldPolicyProvider {
+  public class SchemaConfiguration: ApolloAPI.SchemaConfiguration {
     static var stub_cacheKeyInfoForType_Object: ((Object, ObjectData) -> CacheKeyInfo?)?
     
     static var stub_cacheKeyForField_SingleReturn: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> CacheKeyInfo?)?
@@ -141,8 +139,8 @@ public enum MockSchema1Configuration: SchemaConfiguration {
     return nil
   }
   
-  public static func cacheKeys(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
-    return nil
+  public static func cacheKeyList(for listField: ApolloAPI.Selection.Field, variables: [String : any ApolloAPI.GraphQLOperationVariableValue]?, path: ApolloAPI.ResponsePath) -> [ApolloAPI.CacheKeyInfo]? {
+    nil
   }
 }
 
@@ -163,7 +161,7 @@ public enum MockSchema2Configuration: SchemaConfiguration {
     return nil
   }
   
-  public static func cacheKeys(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]? {
-    return nil
+  public static func cacheKeyList(for listField: ApolloAPI.Selection.Field, variables: [String : any ApolloAPI.GraphQLOperationVariableValue]?, path: ApolloAPI.ResponsePath) -> [ApolloAPI.CacheKeyInfo]? {
+    nil
   }
 }
