@@ -22,6 +22,7 @@ import {
   addExperimentalDeferDirectiveToIntrospectionSchema
 } from "./utilities/experimentalDeferDirective";
 import { addTypePolicyDirectivesToSchema } from "./utilities/typePolicyDirective";
+import { addFieldPolicyDirectivesToSchema } from "./utilities/fieldPolicyDirective";
 
 // We need to export all the classes we want to map to native objects,
 // so we have access to the constructor functions for type checks.
@@ -63,6 +64,7 @@ export function loadSchemaFromSources(sources: Source[]): GraphQLSchema {
 
     const schema = buildASTSchema(document, { assumeValid: true, assumeValidSDL: true })
     addTypePolicyDirectivesToSchema(schema)
+    addFieldPolicyDirectivesToSchema(schema)
     assertValidSchema(schema)
 
     return schema
@@ -72,7 +74,7 @@ export function loadSchemaFromSources(sources: Source[]): GraphQLSchema {
     document = addExperimentalDeferDirectiveToIntrospectionSchema(schema, document)
     schema = extendSchema(schema, document, { assumeValid: true, assumeValidSDL: true })
     addTypePolicyDirectivesToSchema(schema)
-
+    addFieldPolicyDirectivesToSchema(schema)
     assertValidSchema(schema)
 
     return schema
