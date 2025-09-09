@@ -16,6 +16,7 @@ public enum Selection {
     public let alias: String?
     public let arguments: [String: InputValue]?
     public let type: OutputType
+    public let fieldPolicy: FieldPolicy?
 
     public var responseKey: String {
       return alias ?? name
@@ -25,12 +26,14 @@ public enum Selection {
       _ name: String,
       alias: String? = nil,
       type: OutputType,
-      arguments: [String: InputValue]? = nil
+      arguments: [String: InputValue]? = nil,
+      fieldPolicy: FieldPolicy? = nil
     ) {
       self.name = name
       self.alias = alias
       self.arguments = arguments
       self.type = type
+      self.fieldPolicy = fieldPolicy
     }
 
     public indirect enum OutputType: Sendable {
@@ -55,6 +58,17 @@ public enum Selection {
       }
     }
   }
+  
+  public struct FieldPolicy: Hashable {
+    public let keyArgs: [String]
+    
+    public init(
+      keyArgs: [String]
+    ) {
+      self.keyArgs = keyArgs
+    }
+    
+  }
 
   // MARK: - Convenience Initializers
 
@@ -62,9 +76,10 @@ public enum Selection {
     _ name: String,
     alias: String? = nil,
     _ type: any OutputTypeConvertible.Type,
-    arguments: [String: InputValue]? = nil
+    arguments: [String: InputValue]? = nil,
+    fieldPolicy: FieldPolicy? = nil
   ) -> Selection {
-    .field(.init(name, alias: alias, type: type._asOutputType, arguments: arguments))
+    .field(.init(name, alias: alias, type: type._asOutputType, arguments: arguments, fieldPolicy: fieldPolicy))
   }
 
   @inlinable static public func include(

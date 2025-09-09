@@ -27,7 +27,8 @@ interface Animal {
 
 interface Pet {
   name: String!
-}`;
+}
+`;
 
   const schema: GraphQLSchema = loadSchemaFromSources([new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })]);
 
