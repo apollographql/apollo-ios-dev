@@ -1,10 +1,20 @@
 import XCTest
+@_spi(Execution)
 @testable import Apollo
+
+@_spi(Execution)
+@_spi(Internal)
+@_spi(Unsafe)
 import ApolloAPI
+
+@_spi(Execution)
+@_spi(Unsafe)
 import ApolloInternalTestHelpers
 
-@MainActor
-final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
+import Nimble
+
+final class FieldPolicyTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
+  var store: Apollo.ApolloStore!
 
   var cacheType: any TestCacheProvider.Type {
     InMemoryTestCacheProvider.self
@@ -18,13 +28,12 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
   
   override func setUp() async throws {
     try await super.setUp()
-    
-    cache = try await makeNormalizedCache()
-    let store = ApolloStore(cache: cache)
-    
+
+    store = try await makeTestStore()
+
     server = MockGraphQLServer()
-    let networkTransport = MockNetworkTransport(server: server, store: store)
-    
+    let networkTransport = MockNetworkTransport(mockServer: server, store: store)
+
     client = ApolloClient(networkTransport: networkTransport, store: store)
   }
 
@@ -38,13 +47,13 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
   
   // MARK: - Single Key Argument Tests
   
-  func test_fieldPolicy_withStringKeyArgument_resolvesCorrectCacheKey() throws {
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+  func test_fieldPolicy_withStringKeyArgument_resolvesCorrectCacheKey() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["name": .variable("name")], fieldPolicy: .init(keyArgs: ["name"]))
       ]}
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -61,7 +70,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["name": "Luke"]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["Hero:Luke": CacheReference("Hero:Luke")],
       "Hero:Luke": [
         "age": 19,
@@ -72,33 +81,25 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
-    
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
-        
-        let data = try XCTUnwrap(graphQLResult.data)
-        XCTAssertEqual(data.hero?.name, "Luke")
-        XCTAssertEqual(data.hero?.age, 19)
-        XCTAssertEqual(data.hero?.isJedi, true)
-        XCTAssertEqual(data.hero?.weight, 175.2)
-      }
-    }
-    
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
-    
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
+
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+    XCTAssertEqual(data.hero?.age, 19)
+    XCTAssertEqual(data.hero?.isJedi, true)
+    XCTAssertEqual(data.hero?.weight, 175.2)
   }
   
-  func test_fieldPolicy_withIntKeyArgument_resolvesCorrectCacheKey() throws {
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+  func test_fieldPolicy_withIntKeyArgument_resolvesCorrectCacheKey() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["age": .variable("age")], fieldPolicy: .init(keyArgs: ["age"]))
       ]}
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -115,7 +116,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["age": 19]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["Hero:19": CacheReference("Hero:19")],
       "Hero:19": [
         "age": 19,
@@ -126,33 +127,25 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
-    
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
         
-        let data = try XCTUnwrap(graphQLResult.data)
-        XCTAssertEqual(data.hero?.name, "Luke")
-        XCTAssertEqual(data.hero?.age, 19)
-        XCTAssertEqual(data.hero?.isJedi, true)
-        XCTAssertEqual(data.hero?.weight, 175.2)
-      }
-    }
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
-    
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+    XCTAssertEqual(data.hero?.age, 19)
+    XCTAssertEqual(data.hero?.isJedi, true)
+    XCTAssertEqual(data.hero?.weight, 175.2)
   }
   
-  func test_fieldPolicy_withDoubleKeyArgument_resolvesCorrectCacheKey() throws {
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+  func test_fieldPolicy_withDoubleKeyArgument_resolvesCorrectCacheKey() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["weight": .variable("weight")], fieldPolicy: .init(keyArgs: ["weight"]))
       ]}
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -169,7 +162,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["weight": 175.2]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["Hero:175.2": CacheReference("Hero:175.2")],
       "Hero:175.2": [
         "age": 19,
@@ -180,33 +173,25 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
-    
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
         
-        let data = try XCTUnwrap(graphQLResult.data)
-        XCTAssertEqual(data.hero?.name, "Luke")
-        XCTAssertEqual(data.hero?.age, 19)
-        XCTAssertEqual(data.hero?.isJedi, true)
-        XCTAssertEqual(data.hero?.weight, 175.2)
-      }
-    }
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
-    
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+    XCTAssertEqual(data.hero?.age, 19)
+    XCTAssertEqual(data.hero?.isJedi, true)
+    XCTAssertEqual(data.hero?.weight, 175.2)
   }
   
-  func test_fieldPolicy_withBoolKeyArgument_resolvesCorrectCacheKey() throws {
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+  func test_fieldPolicy_withBoolKeyArgument_resolvesCorrectCacheKey() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["isJedi": .variable("isJedi")], fieldPolicy: .init(keyArgs: ["isJedi"]))
       ]}
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -223,7 +208,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["isJedi": true]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["Hero:true": CacheReference("Hero:true")],
       "Hero:true": [
         "age": 19,
@@ -234,34 +219,26 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
-    
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
         
-        let data = try XCTUnwrap(graphQLResult.data)
-        XCTAssertEqual(data.hero?.name, "Luke")
-        XCTAssertEqual(data.hero?.age, 19)
-        XCTAssertEqual(data.hero?.isJedi, true)
-        XCTAssertEqual(data.hero?.weight, 175.2)
-      }
-    }
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
-    
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+    XCTAssertEqual(data.hero?.age, 19)
+    XCTAssertEqual(data.hero?.isJedi, true)
+    XCTAssertEqual(data.hero?.weight, 175.2)
   }
   
-  func test_fieldPolicy_withListKeyArgument_resolvesCorrectCacheKey() throws {
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+  func test_fieldPolicy_withListKeyArgument_resolvesCorrectCacheKey() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("heroes", [Hero].self, arguments: ["names": .variable("names")], fieldPolicy: .init(keyArgs: ["names"]))
       ]}
       var heroes: [Hero] { __data["heroes"] }
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -278,7 +255,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["names": ["Anakin", "Obi-Wan", "Ahsoka"]]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "Hero:Anakin": CacheReference("Hero:Anakin"),
         "Hero:Obi-Wan": CacheReference("Hero:Obi-Wan"),
@@ -307,38 +284,29 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+        
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
-        
-        let data = try XCTUnwrap(graphQLResult.data)
-        
-        XCTAssertEqual(data.heroes[0].name, "Anakin")
-        XCTAssertEqual(data.heroes[0].age, 23)
-        XCTAssertEqual(data.heroes[0].isJedi, true)
-        XCTAssertEqual(data.heroes[0].weight, 185.3)
-        
-        XCTAssertEqual(data.heroes[1].name, "Obi-Wan")
-        XCTAssertEqual(data.heroes[1].age, 30)
-        XCTAssertEqual(data.heroes[1].isJedi, true)
-        XCTAssertEqual(data.heroes[1].weight, 179.7)
-        
-        XCTAssertEqual(data.heroes[2].name, "Ahsoka")
-        XCTAssertEqual(data.heroes[2].age, 17)
-        XCTAssertEqual(data.heroes[2].isJedi, true)
-        XCTAssertEqual(data.heroes[2].weight, 138.5)
-      }
-    }
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.heroes[0].name, "Anakin")
+    XCTAssertEqual(data.heroes[0].age, 23)
+    XCTAssertEqual(data.heroes[0].isJedi, true)
+    XCTAssertEqual(data.heroes[0].weight, 185.3)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
+    XCTAssertEqual(data.heroes[1].name, "Obi-Wan")
+    XCTAssertEqual(data.heroes[1].age, 30)
+    XCTAssertEqual(data.heroes[1].isJedi, true)
+    XCTAssertEqual(data.heroes[1].weight, 179.7)
     
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    XCTAssertEqual(data.heroes[2].name, "Ahsoka")
+    XCTAssertEqual(data.heroes[2].age, 17)
+    XCTAssertEqual(data.heroes[2].isJedi, true)
+    XCTAssertEqual(data.heroes[2].weight, 138.5)
   }
   
-  func test_fieldPolicy_withObjectKeyArgument_resolvesCorrectCacheKey() {
+  func test_fieldPolicy_withObjectKeyArgument_resolvesCorrectCacheKey() async throws {
     struct HeroSearchInput: InputObject {
       public private(set) var __data: InputDict
       
@@ -358,12 +326,12 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       }
     }
     
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["input": .variable("input")], fieldPolicy: .init(keyArgs: ["input.name"]))
       ]}
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -380,7 +348,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["input": HeroSearchInput(name: "Luke")]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["Hero:Luke": CacheReference("Hero:Luke")],
       "Hero:Luke": [
         "age": 19,
@@ -391,27 +359,19 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
-    
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
         
-        let data = try XCTUnwrap(graphQLResult.data)
-        XCTAssertEqual(data.hero?.name, "Luke")
-        XCTAssertEqual(data.hero?.age, 19)
-        XCTAssertEqual(data.hero?.isJedi, true)
-        XCTAssertEqual(data.hero?.weight, 175.2)
-      }
-    }
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
-    
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+    XCTAssertEqual(data.hero?.age, 19)
+    XCTAssertEqual(data.hero?.isJedi, true)
+    XCTAssertEqual(data.hero?.weight, 175.2)
   }
   
-  func test_fieldPolicy_withNestedObjectKeyArgument_resolvesCorrectCacheKey() {
+  func test_fieldPolicy_withNestedObjectKeyArgument_resolvesCorrectCacheKey() async throws {
     struct NameInput: InputObject {
       public private(set) var __data: InputDict
       
@@ -450,12 +410,12 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       }
     }
     
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["input": .variable("input")], fieldPolicy: .init(keyArgs: ["input.nameInput.name"]))
       ]}
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -472,7 +432,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["input": HeroSearchInput(nameInput: NameInput(name: "Luke"))]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["Hero:Luke": CacheReference("Hero:Luke")],
       "Hero:Luke": [
         "age": 19,
@@ -483,27 +443,19 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
-    
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
         
-        let data = try XCTUnwrap(graphQLResult.data)
-        XCTAssertEqual(data.hero?.name, "Luke")
-        XCTAssertEqual(data.hero?.age, 19)
-        XCTAssertEqual(data.hero?.isJedi, true)
-        XCTAssertEqual(data.hero?.weight, 175.2)
-      }
-    }
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
-    
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+    XCTAssertEqual(data.hero?.age, 19)
+    XCTAssertEqual(data.hero?.isJedi, true)
+    XCTAssertEqual(data.hero?.weight, 175.2)
   }
   
-  func test_fieldPolicy_withNestedObjectListKeyArgument_resolvesCorrectCacheKey() {
+  func test_fieldPolicy_withNestedObjectListKeyArgument_resolvesCorrectCacheKey() async throws {
     struct NameInput: InputObject {
       public private(set) var __data: InputDict
       
@@ -542,13 +494,13 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       }
     }
     
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("heroes", [Hero].self, arguments: ["input": .variable("input")], fieldPolicy: .init(keyArgs: ["input.nameInput.names"]))
       ]}
       var heroes: [Hero] { __data["heroes"] }
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -565,7 +517,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["input": HeroSearchInput(nameInput: NameInput(names: ["Anakin", "Obi-Wan", "Ahsoka"]))]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "Hero:Anakin": CacheReference("Hero:Anakin"),
         "Hero:Obi-Wan": CacheReference("Hero:Obi-Wan"),
@@ -594,46 +546,37 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+        
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
-        
-        let data = try XCTUnwrap(graphQLResult.data)
-        
-        XCTAssertEqual(data.heroes[0].name, "Anakin")
-        XCTAssertEqual(data.heroes[0].age, 23)
-        XCTAssertEqual(data.heroes[0].isJedi, true)
-        XCTAssertEqual(data.heroes[0].weight, 185.3)
-        
-        XCTAssertEqual(data.heroes[1].name, "Obi-Wan")
-        XCTAssertEqual(data.heroes[1].age, 30)
-        XCTAssertEqual(data.heroes[1].isJedi, true)
-        XCTAssertEqual(data.heroes[1].weight, 179.7)
-        
-        XCTAssertEqual(data.heroes[2].name, "Ahsoka")
-        XCTAssertEqual(data.heroes[2].age, 17)
-        XCTAssertEqual(data.heroes[2].isJedi, true)
-        XCTAssertEqual(data.heroes[2].weight, 138.5)
-      }
-    }
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.heroes[0].name, "Anakin")
+    XCTAssertEqual(data.heroes[0].age, 23)
+    XCTAssertEqual(data.heroes[0].isJedi, true)
+    XCTAssertEqual(data.heroes[0].weight, 185.3)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
+    XCTAssertEqual(data.heroes[1].name, "Obi-Wan")
+    XCTAssertEqual(data.heroes[1].age, 30)
+    XCTAssertEqual(data.heroes[1].isJedi, true)
+    XCTAssertEqual(data.heroes[1].weight, 179.7)
     
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    XCTAssertEqual(data.heroes[2].name, "Ahsoka")
+    XCTAssertEqual(data.heroes[2].age, 17)
+    XCTAssertEqual(data.heroes[2].isJedi, true)
+    XCTAssertEqual(data.heroes[2].weight, 138.5)
   }
   
   // MARK: - Multiple Key Argument Tests
   
-  func test_fieldPolicy_withMultipleKeyArguments_resolvesCorrectCacheKey() {
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+  func test_fieldPolicy_withMultipleKeyArguments_resolvesCorrectCacheKey() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["name": .variable("name"), "age": .variable("age")], fieldPolicy: .init(keyArgs: ["name", "age"]))
       ]}
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -650,7 +593,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["name": "Luke", "age": 19]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["Hero:Luke+19": CacheReference("Hero:Luke+19")],
       "Hero:Luke+19": [
         "age": 19,
@@ -661,33 +604,25 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
-    
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
         
-        let data = try XCTUnwrap(graphQLResult.data)
-        XCTAssertEqual(data.hero?.name, "Luke")
-        XCTAssertEqual(data.hero?.age, 19)
-        XCTAssertEqual(data.hero?.isJedi, true)
-        XCTAssertEqual(data.hero?.weight, 175.2)
-      }
-    }
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
-    
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+    XCTAssertEqual(data.hero?.age, 19)
+    XCTAssertEqual(data.hero?.isJedi, true)
+    XCTAssertEqual(data.hero?.weight, 175.2)
   }
   
-  func test_fieldPolicy_withMultipleKeyArguments_withDifferentOrder_resolvesCorrectCacheKey() {
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+  func test_fieldPolicy_withMultipleKeyArguments_withDifferentOrder_resolvesCorrectCacheKey() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["name": .variable("name"), "age": .variable("age")], fieldPolicy: .init(keyArgs: ["age", "name"]))
       ]}
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -704,7 +639,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["name": "Luke", "age": 19]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["Hero:19+Luke": CacheReference("Hero:19+Luke")],
       "Hero:19+Luke": [
         "age": 19,
@@ -715,34 +650,26 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
-    
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
         
-        let data = try XCTUnwrap(graphQLResult.data)
-        XCTAssertEqual(data.hero?.name, "Luke")
-        XCTAssertEqual(data.hero?.age, 19)
-        XCTAssertEqual(data.hero?.isJedi, true)
-        XCTAssertEqual(data.hero?.weight, 175.2)
-      }
-    }
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
-    
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+    XCTAssertEqual(data.hero?.age, 19)
+    XCTAssertEqual(data.hero?.isJedi, true)
+    XCTAssertEqual(data.hero?.weight, 175.2)
   }
   
-  func test_fieldPolicy_withMultipleKeyArguments_includingList_resolvesCorrectCacheKey() {
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+  func test_fieldPolicy_withMultipleKeyArguments_includingList_resolvesCorrectCacheKey() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("heroes", [Hero].self, arguments: ["names": .variable("names"), "isJedi": .variable("isJedi")], fieldPolicy: .init(keyArgs: ["names", "isJedi"]))
       ]}
       var heroes: [Hero] { __data["heroes"] }
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -759,7 +686,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["names": ["Anakin", "Obi-Wan", "Ahsoka"], "isJedi": true]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "Hero:Anakin+true": CacheReference("Hero:Anakin+true"),
         "Hero:Obi-Wan+true": CacheReference("Hero:Obi-Wan+true"),
@@ -788,38 +715,29 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+        
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
-        
-        let data = try XCTUnwrap(graphQLResult.data)
-        
-        XCTAssertEqual(data.heroes[0].name, "Anakin")
-        XCTAssertEqual(data.heroes[0].age, 23)
-        XCTAssertEqual(data.heroes[0].isJedi, true)
-        XCTAssertEqual(data.heroes[0].weight, 185.3)
-        
-        XCTAssertEqual(data.heroes[1].name, "Obi-Wan")
-        XCTAssertEqual(data.heroes[1].age, 30)
-        XCTAssertEqual(data.heroes[1].isJedi, true)
-        XCTAssertEqual(data.heroes[1].weight, 179.7)
-        
-        XCTAssertEqual(data.heroes[2].name, "Ahsoka")
-        XCTAssertEqual(data.heroes[2].age, 17)
-        XCTAssertEqual(data.heroes[2].isJedi, true)
-        XCTAssertEqual(data.heroes[2].weight, 138.5)
-      }
-    }
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.heroes[0].name, "Anakin")
+    XCTAssertEqual(data.heroes[0].age, 23)
+    XCTAssertEqual(data.heroes[0].isJedi, true)
+    XCTAssertEqual(data.heroes[0].weight, 185.3)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
+    XCTAssertEqual(data.heroes[1].name, "Obi-Wan")
+    XCTAssertEqual(data.heroes[1].age, 30)
+    XCTAssertEqual(data.heroes[1].isJedi, true)
+    XCTAssertEqual(data.heroes[1].weight, 179.7)
     
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    XCTAssertEqual(data.heroes[2].name, "Ahsoka")
+    XCTAssertEqual(data.heroes[2].age, 17)
+    XCTAssertEqual(data.heroes[2].isJedi, true)
+    XCTAssertEqual(data.heroes[2].weight, 138.5)
   }
   
-  func test_fieldPolicy_withMultipleKeyArguments_includingObject_resolvesCorrectCacheKey() {
+  func test_fieldPolicy_withMultipleKeyArguments_includingObject_resolvesCorrectCacheKey() async throws {
     struct HeroSearchInput: InputObject {
       public private(set) var __data: InputDict
       
@@ -848,12 +766,12 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       }
     }
     
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["input": .variable("input")], fieldPolicy: .init(keyArgs: ["input.name", "input.isJedi"]))
       ]}
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -870,7 +788,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["input": HeroSearchInput(name: "Luke", isJedi: true)]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["Hero:Luke+true": CacheReference("Hero:Luke+true")],
       "Hero:Luke+true": [
         "age": 19,
@@ -881,27 +799,19 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
-    
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
         
-        let data = try XCTUnwrap(graphQLResult.data)
-        XCTAssertEqual(data.hero?.name, "Luke")
-        XCTAssertEqual(data.hero?.age, 19)
-        XCTAssertEqual(data.hero?.isJedi, true)
-        XCTAssertEqual(data.hero?.weight, 175.2)
-      }
-    }
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
-    
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+    XCTAssertEqual(data.hero?.age, 19)
+    XCTAssertEqual(data.hero?.isJedi, true)
+    XCTAssertEqual(data.hero?.weight, 175.2)
   }
   
-  func test_fieldPolicy_withMultipleKeyArguments_includingNestedObject_resolvesCorrectCacheKey() {
+  func test_fieldPolicy_withMultipleKeyArguments_includingNestedObject_resolvesCorrectCacheKey() async throws {
     struct NameInput: InputObject {
       public private(set) var __data: InputDict
       
@@ -951,12 +861,12 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       }
     }
     
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["input": .variable("input")], fieldPolicy: .init(keyArgs: ["input.nameInput.name", "input.isJedi"]))
       ]}
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -973,7 +883,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["input": HeroSearchInput(nameInput: NameInput(name: "Luke"), isJedi: true)]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["Hero:Luke+true": CacheReference("Hero:Luke+true")],
       "Hero:Luke+true": [
         "age": 19,
@@ -984,27 +894,19 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
-    
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
         
-        let data = try XCTUnwrap(graphQLResult.data)
-        XCTAssertEqual(data.hero?.name, "Luke")
-        XCTAssertEqual(data.hero?.age, 19)
-        XCTAssertEqual(data.hero?.isJedi, true)
-        XCTAssertEqual(data.hero?.weight, 175.2)
-      }
-    }
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
-    
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+    XCTAssertEqual(data.hero?.age, 19)
+    XCTAssertEqual(data.hero?.isJedi, true)
+    XCTAssertEqual(data.hero?.weight, 175.2)
   }
   
-  func test_fieldPolicy_withMultipleKeyArguments_includingNestedObjectList_resolvesCorrectCacheKey() {
+  func test_fieldPolicy_withMultipleKeyArguments_includingNestedObjectList_resolvesCorrectCacheKey() async throws {
     struct NameInput: InputObject {
       public private(set) var __data: InputDict
       
@@ -1052,13 +954,13 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       }
     }
     
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("heroes", [Hero].self, arguments: ["input": .variable("input")], fieldPolicy: .init(keyArgs: ["input.nameInput.names", "input.isJedi"]))
       ]}
       var heroes: [Hero] { __data["heroes"] }
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -1075,7 +977,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["input": HeroSearchInput(nameInput: NameInput(names: ["Anakin", "Obi-Wan", "Ahsoka"]), isJedi: true)]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "Hero:Anakin+true": CacheReference("Hero:Anakin+true"),
         "Hero:Obi-Wan+true": CacheReference("Hero:Obi-Wan+true"),
@@ -1104,46 +1006,37 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+        
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
-        
-        let data = try XCTUnwrap(graphQLResult.data)
-        
-        XCTAssertEqual(data.heroes[0].name, "Anakin")
-        XCTAssertEqual(data.heroes[0].age, 23)
-        XCTAssertEqual(data.heroes[0].isJedi, true)
-        XCTAssertEqual(data.heroes[0].weight, 185.3)
-        
-        XCTAssertEqual(data.heroes[1].name, "Obi-Wan")
-        XCTAssertEqual(data.heroes[1].age, 30)
-        XCTAssertEqual(data.heroes[1].isJedi, true)
-        XCTAssertEqual(data.heroes[1].weight, 179.7)
-        
-        XCTAssertEqual(data.heroes[2].name, "Ahsoka")
-        XCTAssertEqual(data.heroes[2].age, 17)
-        XCTAssertEqual(data.heroes[2].isJedi, true)
-        XCTAssertEqual(data.heroes[2].weight, 138.5)
-      }
-    }
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.heroes[0].name, "Anakin")
+    XCTAssertEqual(data.heroes[0].age, 23)
+    XCTAssertEqual(data.heroes[0].isJedi, true)
+    XCTAssertEqual(data.heroes[0].weight, 185.3)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
+    XCTAssertEqual(data.heroes[1].name, "Obi-Wan")
+    XCTAssertEqual(data.heroes[1].age, 30)
+    XCTAssertEqual(data.heroes[1].isJedi, true)
+    XCTAssertEqual(data.heroes[1].weight, 179.7)
     
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    XCTAssertEqual(data.heroes[2].name, "Ahsoka")
+    XCTAssertEqual(data.heroes[2].age, 17)
+    XCTAssertEqual(data.heroes[2].isJedi, true)
+    XCTAssertEqual(data.heroes[2].weight, 138.5)
   }
   
   // MARK: - FieldPolicyProvider Tests
   
-  func test_schemaConfiguration_givenFieldPolicyProvider_returnsSingleCacheKeyInfo() {
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+  func test_schemaConfiguration_givenFieldPolicyProvider_returnsSingleCacheKeyInfo() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero.self, arguments: ["name": .variable("name")])
       ]}
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -1157,14 +1050,14 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       }
     }
     
-    FieldPolicySchemaMetadata.stub_cacheKeyForField_SingleReturn { _, _, _ in
+    await FieldPolicySchemaMetadata.stub_cacheKeyForField_SingleReturn { _, _, _ in
       return CacheKeyInfo(id: "Luke")
     }
     
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["name": "Luke"]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": ["Hero:Luke": CacheReference("Hero:Luke")],
       "Hero:Luke": [
         "age": 19,
@@ -1175,34 +1068,26 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
-    
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
         
-        let data = try XCTUnwrap(graphQLResult.data)
-        XCTAssertEqual(data.hero?.name, "Luke")
-        XCTAssertEqual(data.hero?.age, 19)
-        XCTAssertEqual(data.hero?.isJedi, true)
-        XCTAssertEqual(data.hero?.weight, 175.2)
-      }
-    }
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
-    
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+    XCTAssertEqual(data.hero?.age, 19)
+    XCTAssertEqual(data.hero?.isJedi, true)
+    XCTAssertEqual(data.hero?.weight, 175.2)
   }
   
-  func test_schemaConfiguration_givenFieldPolicyProvider_returnsListOfCacheKeyInfo() throws {
-    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+  func test_schemaConfiguration_givenFieldPolicyProvider_returnsListOfCacheKeyInfo() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("heroes", [Hero].self, arguments: ["names": .variable("names")])
       ]}
       var heroes: [Hero] { __data["heroes"] }
       
-      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata> {
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [])
         }
@@ -1216,7 +1101,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       }
     }
     
-    FieldPolicySchemaMetadata.stub_cacheKeyForField_ListReturn { _, _, _ in
+    await FieldPolicySchemaMetadata.stub_cacheKeyForField_ListReturn { _, _, _ in
       return [
         CacheKeyInfo(id: "Anakin"),
         CacheKeyInfo(id: "Obi-Wan"),
@@ -1227,7 +1112,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     let query = MockQuery<HeroSelectionSet>()
     query.__variables = ["names": ["Anakin", "Obi-Wan", "Ahsoka"]]
     
-    mergeRecordsIntoCache([
+    try await store.publish(records: [
       "QUERY_ROOT": [
         "Hero:Anakin": CacheReference("Hero:Anakin"),
         "Hero:Obi-Wan": CacheReference("Hero:Obi-Wan"),
@@ -1256,35 +1141,26 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
       ]
     ])
     
-    let resultObserver = makeResultObserver(for: query)
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+        
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
     
-    let fetchResultFromCacheExpectation = resultObserver.expectation(description: "Received result from cache") { result in
-      try XCTAssertSuccessResult(result) { graphQLResult in
-        XCTAssertEqual(graphQLResult.source, .cache)
-        XCTAssertNil(graphQLResult.errors)
-        
-        let data = try XCTUnwrap(graphQLResult.data)
-        
-        XCTAssertEqual(data.heroes[0].name, "Anakin")
-        XCTAssertEqual(data.heroes[0].age, 23)
-        XCTAssertEqual(data.heroes[0].isJedi, true)
-        XCTAssertEqual(data.heroes[0].weight, 185.3)
-        
-        XCTAssertEqual(data.heroes[1].name, "Obi-Wan")
-        XCTAssertEqual(data.heroes[1].age, 30)
-        XCTAssertEqual(data.heroes[1].isJedi, true)
-        XCTAssertEqual(data.heroes[1].weight, 179.7)
-        
-        XCTAssertEqual(data.heroes[2].name, "Ahsoka")
-        XCTAssertEqual(data.heroes[2].age, 17)
-        XCTAssertEqual(data.heroes[2].isJedi, true)
-        XCTAssertEqual(data.heroes[2].weight, 138.5)
-      }
-    }
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.heroes[0].name, "Anakin")
+    XCTAssertEqual(data.heroes[0].age, 23)
+    XCTAssertEqual(data.heroes[0].isJedi, true)
+    XCTAssertEqual(data.heroes[0].weight, 185.3)
     
-    client.fetch(query: query, cachePolicy: .returnCacheDataDontFetch, resultHandler: resultObserver.handler)
+    XCTAssertEqual(data.heroes[1].name, "Obi-Wan")
+    XCTAssertEqual(data.heroes[1].age, 30)
+    XCTAssertEqual(data.heroes[1].isJedi, true)
+    XCTAssertEqual(data.heroes[1].weight, 179.7)
     
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    XCTAssertEqual(data.heroes[2].name, "Ahsoka")
+    XCTAssertEqual(data.heroes[2].age, 17)
+    XCTAssertEqual(data.heroes[2].isJedi, true)
+    XCTAssertEqual(data.heroes[2].weight, 138.5)
   }
   
 }
@@ -1292,7 +1168,7 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
 class FieldPolicySchemaMetadata: SchemaMetadata {
   init() { }
 
-  static var _configuration: SchemaConfiguration.Type = SchemaConfiguration.self
+  nonisolated(unsafe) static var _configuration: SchemaConfiguration.Type = SchemaConfiguration.self
   static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
 
   @MainActor
@@ -1301,7 +1177,7 @@ class FieldPolicySchemaMetadata: SchemaMetadata {
     stub_cacheKeyInfoForType_Object(nil)
   }
 
-  private static var _objectTypeForTypeName: ((String) -> Object?)?
+  private nonisolated(unsafe) static var _objectTypeForTypeName: ((String) -> Object?)?
   static var objectTypeForTypeName: ((String) -> Object?)? {
       _objectTypeForTypeName
   }
@@ -1353,11 +1229,11 @@ class FieldPolicySchemaMetadata: SchemaMetadata {
   }
   
   class SchemaConfiguration: ApolloAPI.SchemaConfiguration, ApolloAPI.FieldPolicyProvider {
-    static var stub_cacheKeyInfoForType_Object: ((Object, ObjectData) -> CacheKeyInfo?)?
+    nonisolated(unsafe) static var stub_cacheKeyInfoForType_Object: ((Object, ObjectData) -> CacheKeyInfo?)?
     
-    static var stub_cacheKeyForField_SingleReturn: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> CacheKeyInfo?)?
+    nonisolated(unsafe) static var stub_cacheKeyForField_SingleReturn: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> CacheKeyInfo?)?
     
-    static var stub_cacheKeyForField_ListReturn: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> [CacheKeyInfo]?)?
+    nonisolated(unsafe) static var stub_cacheKeyForField_ListReturn: ((Selection.Field, GraphQLOperation.Variables?, ResponsePath) -> [CacheKeyInfo]?)?
 
     public static func cacheKeyInfo(for type: Object, object: ObjectData) -> CacheKeyInfo? {
       stub_cacheKeyInfoForType_Object?(type, object)
