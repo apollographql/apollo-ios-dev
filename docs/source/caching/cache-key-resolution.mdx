@@ -87,3 +87,161 @@ This is possible if:
   A) A type is added to your schema after code generation is executed and that type implements two different interfaces with different type policies
 
   B) Implementation of an interface is added to an existing type which already implements an interface with a different type policy
+
+## The `@fieldPolicy` directive
+
+The `@fieldPolicy` directive allows you to specify how cache keys should be resolved when querying a specific field. You can apply the `@fieldPolicy` directive to `Object` and `Interface` types in your schema by extending the type in a `.graphqls` schema extension file. You can also programmatically provide cache keys by implementing the `FieldPolicyProvider` protocol on your existing `SchemaConfiguration`.
+
+The field policy feature is meant to be used in unison with type policies, meaning if you are using either the directive or programmatic field policy implementations you should be doing the same for type policy.
+
+When executing an operation the library will first check programmatic cache keys, then for directive based cache keys, and then fallback to the default cache key implementation, `Protocol > Directive > Default`.
+
+
+### Directive Usage
+
+The `@fieldPolicy` directive has a `forField` and `keyArgs` argument to provide the name of the field on the type that you are adding the field policy to. As well as which input arguments of that field should be used to resolve cache keys, and in what order they should be used in the case of multiple key arguments. The format of the resolved cache key is the same with `@typePolicy` and looks like `{type name}:{value}`, when multiple key arguments are present they are joined with a `+` separator.
+
+Given a type like this:
+```graphql
+type Query {
+  allAnimals(species: String!): Animal!
+}
+
+type Animal {
+  id: ID!
+  name: String!
+  species: String!
+}
+```
+
+You would apply this field policy like this:
+```graphql
+extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "species")
+```
+
+This results in resolved cache keys that look like `Animal:Lion` or `Animal:Tiger`.
+
+#### Multiple Key Arguments
+
+When you have multiple key arguments, the are provided to the directive with a space delimiter. So when you have a type like this:
+```graphql
+type Query {
+  allAnimals(species: String!, habitat: String!): Animal!
+}
+
+type Animal {
+  id: ID!
+  name: String!
+  species: String!
+  habitat: String!
+}
+```
+
+You would apply this field policy like this:
+```graphql
+extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "species habitat")
+```
+
+This results in resolved cache keys that look like `Animal:Lion+Savanna`.
+
+You can control the order of arguments in the cache key with the order you provide them in the directive, so this would result 
+in a cache key that looks like `Animal:Savanna+Lion`:
+```graphql
+extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "habitat species")
+```
+
+#### List Arguments
+
+The `@fieldPolicy` directive does support fields which return a list. There are a few caveats with the usage of lists:
+
+- If a field has a list return type, it must contain exactly one list input parameter.
+- Conversely if a list contains a list input parameter, it must return a list.
+- Fields cannot have more than one list input parameter.
+- Nested lists are not supported.
+- Partial cache hits are not supported, so every cache key created from the input parameters must have a cache hit or the cache read will fail.
+
+With a field like this:
+```graphql
+type Query {
+  allAnimals(species: [String!], habitat: String!): [Animal!]
+}
+
+type Animal {
+  id: ID!
+  name: String!
+  species: String!
+  habitat: String!
+}
+```
+
+You would apply this field policy like this:
+```graphql
+extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "species habitat")
+```
+
+If your inputs are `["Lion", "Elephant"]` and `Savanna` your cache keys would be `Animal:Lion+Savanna` and `Animal:Elephant+Savanna`, these
+will be used to retrieve objects from the cache and populate the list to return from the field.
+
+#### Object Arguments
+
+It is possible to use `Input Object` as the type for you input parameters on a field. In cases like this you can use a dot notation syntax to traverse
+into the structure of the object for the value you wish to have used as part of your cache key.
+
+With a type like this:
+```graphql
+type Query {
+  allAnimals(input: QueryInput!): Animal!
+}
+
+type Animal {
+  id: ID!
+  name: String!
+  species: String!
+  habitat: String!
+}
+
+input QueryInput {
+  id: ID!
+  species: String!
+}
+```
+
+You could apply a field policy like this:
+```graphql
+extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "input.species")
+```
+
+This would result in cache keys like `Animal:Lion` or `Animal:Elephant`.
+
+### Protocol Usage
+
+If your prefer to have more control over the formatting of your cache keys you can implement the `FieldPolicyProvider` protocol on your 
+existing `SchemaConfiguration`. The protocol contains two functions to implement, one for fields that return a single instance, and one 
+for fields that return a list.
+
+```swift
+static func cacheKey(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> CacheKeyInfo?
+
+static func cacheKeyList(for listField: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]?
+```
+
+The cache keys provided by these functions will be added to the typename of the return value. for instance with this field:
+```graphql
+type Query {
+  allAnimals(species: String!): Animal!
+}
+
+type Animal {
+  id: ID!
+  name: String!
+  species: String!
+}
+```
+
+The cache key would be `Animal:{your custom cache key}`.
+
+<Note>
+
+The `FieldPolicyProvider` protocol MUST be implemented on `SchemaConfiguration` or it will not work.
+
+</Note>

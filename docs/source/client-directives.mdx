@@ -36,3 +36,13 @@ See the documentation on [defining local cache mutations](./caching/cache-transa
 Adds a type policy to a type that can be used to resolve cache keys for objects of that type.
 
 This directive can be used to configure how the normalized cache operates. See the documentation on [custom cache keys](./caching/cache-key-resolution) for more information.
+
+---
+
+### `@fieldPolicy(forField: String!, keyArgs: String!)`
+
+`directive @fieldPolicy(forField: String!, keyArgs: String!) on OBJECT | INTERFACE`
+
+Adds a field policy to a field that is used to resolve cache keys when querying the field.
+
+This directive can be used to configure how the normalized cache operates for reading objects when querying a field. See the documentation on [custom cache keys](./caching/cache-key-resolution) for more information.
