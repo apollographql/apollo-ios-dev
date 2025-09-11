@@ -8,7 +8,7 @@ The normalized cache computes a **cache key** for each object that is stored in 
 
 > To learn more, read about how the cache [normalizes objects by cache key](./introduction#normalizing-objects-by-cache-key).
 
-The `@typePolicy` and `@fieldPolicy` directives discussed on this page are meant to be used together as they each support a different use case. The `@typePolicy` directive provides cache keys when **writing** objects to the cache after executing an operation. While the `@fieldPolicy` directive provides cache keys when **reading** object from the cache before executing an operation.
+The `@typePolicy` and `@fieldPolicy` directives discussed on this page are meant to be used together, as they each support a different use case. The `@typePolicy` directive provides cache keys when writing objects to the cache after executing an operation. The `@fieldPolicy` directive provides cache keys when reading an object from the cache before executing an operation
 
 For most use cases, you can configure cache keys declaratively using the methods described on this page. For advanced use cases not supported by declarative cache keys, you can configure cache keys [programmatically](./programmatic-cache-keys).
 
@@ -146,8 +146,7 @@ extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "species habitat
 
 This results in resolved cache keys that look like `Animal:Lion+Savanna`.
 
-You can control the order of arguments in the cache key with the order you provide them in the directive, which results 
-in a cache key `Animal:Savanna+Lion`:
+You can control the order of arguments in the cache key by changing their order in the directive, which results in a cache key of `Animal:Savanna+Lion`:
 ```graphql
 extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "habitat species")
 ```
@@ -180,8 +179,8 @@ You would apply this field policy like this:
 extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "species habitat")
 ```
 
-If your inputs are `["Lion", "Elephant"]` and `Savanna` your cache keys would be `Animal:Lion+Savanna` and `Animal:Elephant+Savanna`, these
-will be used to retrieve objects from the cache and populate the list to return from the field.
+If your inputs are `["Lion", "Elephant"]` and `Savanna`, your cache keys are `Animal:Lion+Savanna` and `Animal:Elephant+Savanna`. These
+are used to retrieve objects from the cache and populate the list to return from the field.
 
 #### Object arguments
 
