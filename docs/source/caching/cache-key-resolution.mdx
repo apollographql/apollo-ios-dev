@@ -8,6 +8,8 @@ The normalized cache computes a **cache key** for each object that is stored in 
 
 > To learn more, read about how the cache [normalizes objects by cache key](./introduction#normalizing-objects-by-cache-key).
 
+The `@typePolicy` and `@fieldPolicy` directives discussed on this page are meant to be used together as they each support a different use case. The `@typePolicy` directive provides cache keys when **writing** objects to the cache after executing an operation. While the `@fieldPolicy` directive provides cache keys when **reading** object from the cache before executing an operation.
+
 For most use cases, you can configure cache keys declaratively using the methods described on this page. For advanced use cases not supported by declarative cache keys, you can configure cache keys [programmatically](./programmatic-cache-keys).
 
 ## Schema extensions
@@ -211,36 +213,3 @@ extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "input.species")
 ```
 
 This results in cache keys such as `Animal:Lion` or `Animal:Elephant`.
-
-### Protocol usage
-
-For more control over formatting your cache keys, implement the `FieldPolicyProvider` protocol on your 
-existing `SchemaConfiguration`. The protocol contains two functions to implement, one for fields that return a single instance, and one 
-for fields that return a list.
-
-```swift
-static func cacheKey(for field: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> CacheKeyInfo?
-
-static func cacheKeyList(for listField: Selection.Field, variables: GraphQLOperation.Variables?, path: ResponsePath) -> [CacheKeyInfo]?
-```
-
-The cache keys that these functions provide are added to the typename of the return value. For instance, for a field like this:
-```graphql
-type Query {
-  allAnimals(species: String!): Animal!
-}
-
-type Animal {
-  id: ID!
-  name: String!
-  species: String!
-}
-```
-
-The resulting cache key is `Animal:{your custom cache key}`.
-
-<Note>
-
-You must implement the `FieldPolicyProvider` protocol on your `SchemaConfiguration` for it to work.
-
-</Note>
