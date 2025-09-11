@@ -8,7 +8,7 @@ The normalized cache computes a **cache key** for each object that is stored in 
 
 > To learn more, read about how the cache [normalizes objects by cache key](./introduction#normalizing-objects-by-cache-key).
 
-The `@typePolicy` and `@fieldPolicy` directives discussed on this page are meant to be used together, as they each support a different use case. The `@typePolicy` directive provides cache keys when writing objects to the cache after executing an operation. The `@fieldPolicy` directive provides cache keys when reading an object from the cache before executing an operation
+Use the `@typePolicy` and `@fieldPolicy` directives together, because they each support a different use case. The `@typePolicy` directive provides cache keys when writing objects to the cache after executing an operation, and the `@fieldPolicy` directive provides cache keys when reading an object from the cache before executing an operation.
 
 For most use cases, you can configure cache keys declaratively using the methods described on this page. For advanced use cases not supported by declarative cache keys, you can configure cache keys [programmatically](./programmatic-cache-keys).
 
@@ -92,7 +92,7 @@ This is possible if:
 
 ## The `@fieldPolicy` directive
 
-The `@fieldPolicy` directive allows you to specify how cache keys should be resolved when querying a specific field. You can apply the `@fieldPolicy` directive to `Object` and `Interface` types in your schema by extending the type in a `.graphqls` schema extension file. You can also programmatically provide cache keys by implementing the `FieldPolicyProvider` protocol on your existing `SchemaConfiguration`.
+The `@fieldPolicy` directive enables you to specify how cache keys should be resolved when querying a specific field. You can apply the `@fieldPolicy` directive to `Object` and `Interface` types in your schema by extending the type in a `.graphqls` schema extension file. You can also programmatically provide cache keys by implementing the `FieldPolicyProvider` protocol on your existing `SchemaConfiguration`.
 
 Use field policies in combination with type policies. If you use directives or programmatic implementations for field policies, you should use the same approach for type policies.
 
@@ -156,7 +156,7 @@ extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "habitat species
 The `@fieldPolicy` directive supports fields that return a list. When using lists, note the following requirements:
 
 - If a field has a list return type, it must contain exactly one list input parameter.
-- Conversely if a list contains a list input parameter, it must return a list.
+- Conversely, if a field has a list input parameter, it must return a list.
 - Nested lists are not supported.
 - Partial cache hits are not supported, so every cache key created from the input parameters must have a cache hit or the cache read will fail.
 
@@ -174,7 +174,7 @@ type Animal {
 }
 ```
 
-You would apply this field policy like this:
+Apply this field policy like this:
 ```graphql
 extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "species habitat")
 ```
