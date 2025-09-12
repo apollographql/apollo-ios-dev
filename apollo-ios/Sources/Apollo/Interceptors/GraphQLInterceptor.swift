@@ -36,11 +36,11 @@ public typealias InterceptorResultStream<Request: GraphQLRequest> =
 /// Both pre-flight and post-flight errors can be caught using the ``NonCopyableAsyncThrowingStream/mapErrors(_:)``
 /// function of the ``InterceptorResultStream`` returned by calling the `next` closure. This will catch any errors
 /// thrown in later steps of the ``RequestChain``, including:
-/// - Pre-flight errors thrown by ``GraphQLInterceptor``s later in the ``RequestChain``
-/// - Networking errors thrown by the ``ApolloURLSession`` or ``HTTPInterceptor``s in the ``RequestChain``
-/// - Parsing errors thrown by the ``ResponseParsingInterceptor`` of the ``RequestChain``
-/// - Post-flight errors thrown ``GraphQLInterceptor``s later in the request chain.
-/// 
+/// - Pre-flight errors thrown by ``GraphQLInterceptor``s later in the ``RequestChain``.
+/// - Networking errors thrown by the ``ApolloURLSession`` or ``HTTPInterceptor``s in the ``RequestChain``.
+/// - Parsing errors thrown by the ``ResponseParsingInterceptor`` of the ``RequestChain``.
+/// - Post-flight errors thrown by ``GraphQLInterceptor``s later in the request chain.
+///
 /// Your ``NonCopyableAsyncThrowingStream/mapErrors(_:)`` closure may rethrow the same error or a different error,
 /// which will then be passed up through the rest of the request chain. If possible, you may recover from the error
 /// by constructing and returning a ``ParsedResult``. Returning `nil` will suppress the error and terminate the
@@ -79,8 +79,6 @@ public typealias InterceptorResultStream<Request: GraphQLRequest> =
 ///   }
 /// }
 /// ```
-/// Additionally, the interceptor could modify the `request` passed into the `next(request)` closure; the `response`
-/// returned from the `.map` closure, or the error thrown from the `mapErrors` closure.
 public protocol GraphQLInterceptor: Sendable {
 
   /// A closure called to proceed to the next step in the ``RequestChain`` after performing pre-flight work.

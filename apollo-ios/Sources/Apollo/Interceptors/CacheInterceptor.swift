@@ -6,7 +6,7 @@ import ApolloAPI
 /// you require custom logic for manipulating cache data, that cannot be achieved by using the
 /// [`@typePolicy` and `@fieldPolicy` directives](https://www.apollographql.com/docs/ios/caching/cache-key-resolution)
 /// or [programmatic cache key configuration](https://www.apollographql.com/docs/ios/caching/programmatic-cache-keys),
-/// you may implement a custom ``CacheInterceptor``.
+/// you may need to implement a custom ``CacheInterceptor``.
 public protocol CacheInterceptor: Sendable {
 
   /// Reads cache data from the given ``ApolloStore`` for the request.

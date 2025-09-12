@@ -21,10 +21,10 @@ public enum JSONResponseParsingError: Swift.Error, LocalizedError {
       return errorStrings.joined(separator: " ")
 
     case .missingMultipartBoundary:
-      return "Missing multipart boundary in the response 'content-type' header."
+      return "Missing multi-part boundary in the response 'content-type' header."
 
     case .invalidMultipartProtocol:
-      return "Missing, or unknown, multipart specification protocol in the response 'content-type' header."
+      return "Missing, or unknown, multi-part specification protocol in the response 'content-type' header."
     }
   }
 }
@@ -32,16 +32,16 @@ public enum JSONResponseParsingError: Swift.Error, LocalizedError {
 /// ``JSONResponseParser`` parses JSON format GraphQL responses from raw HTTP responses into ``ParsedResult``s. This
 /// parser performs GraphQL execution over the response data using a ``GraphQLExecutor``.
 ///  
-/// ## Parsing Multipart Data
-/// Some GraphQL responses will be sent as multipart data using the `Content-Type:multipart/mixed` header.
-/// This parser currently supports parsing multiple response chunks received incrementally for the following multipart
+/// ## Parsing Multi-part Data
+/// Some GraphQL responses will be sent as multi-part data using the `Content-Type:multipart/mixed` header.
+/// This parser currently supports parsing multiple response chunks received incrementally for the following multi-part
 /// protocol specifications:
 ///  - `subscriptionSpec=1.0`: GraphQL subscriptions over HTTP. See ``MultipartResponseSubscriptionParser``
 ///  - `deferSpec=20220824`: GraphQL operations using the `@defer` directive. See ``MultipartResponseDeferParser``
 ///  
-/// For supported multipart responses, ``JSONResponseParser/parse(dataChunk:mergingIncrementalItemsInto:)`` can be
+/// For supported multi-part responses, ``JSONResponseParser/parse(dataChunk:mergingIncrementalItemsInto:)`` can be
 /// called each time a new response chunk is received, passing the previously received ``ParsedResult`` to the
-/// `mergingIncrementalItemsInto` parameter. This will parse the new incremental items from the multipart chunk and
+/// `mergingIncrementalItemsInto` parameter. This will parse the new incremental items from the multi-part chunk and
 /// merge them into the existing result, returning a new merged ``ParsedResult``. See ``JSONResponseParsingInterceptor``
 /// for an example implementation.
 public struct JSONResponseParser: Sendable {

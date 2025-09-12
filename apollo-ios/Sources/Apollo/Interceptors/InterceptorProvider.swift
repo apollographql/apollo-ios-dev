@@ -6,7 +6,7 @@ import ApolloAPI
 ///
 /// - Note: Typically, new interceptors should be created each time the functions of the ``InterceptorProvider`` are
 /// called. Interceptors commonly maintain state that is only relevant for the lifetime of a specific operation.
-/// Re-using these interceptors can cause intended behaviors.
+/// Re-using these interceptors can cause unintended behaviors.
 public protocol InterceptorProvider: Sendable {
 
   /// Provides a new array of ``GraphQLInterceptor``s for the given operation.

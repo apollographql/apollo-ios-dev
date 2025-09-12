@@ -4,9 +4,9 @@ import ApolloAPI
 /// Manages a chain of steps taken to execute a ``GraphQLRequest``. ``RequestChain`` enables customization of each step
 /// of a request by injection of ``Interceptors``.
 /// 
-/// ## Configuration via Interceptors
+/// ## Custom Functionality via Interceptors
 /// The ``RequestChain`` allows complete control over the execution of a request. It manages the flow of data through
-/// a series of steps, but the implementation logic for each step can be configured using custom interceptors.
+/// a series of steps, but the implementation logic for each step can be controlled by using custom interceptors.
 /// You can control the logic of cache reads/writes (via ``CacheInterceptor``), networking (via ``ApolloURLSession``),
 /// and response parsing/GraphQL execution (via ``ResponseParsingInterceptor``). The ``RequestChain`` also provides
 /// the ability to add additional behaviors by inspecting and/or mutating the ``GraphQLRequest`` and ``GraphQLResponse``

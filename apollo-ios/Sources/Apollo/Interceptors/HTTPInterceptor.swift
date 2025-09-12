@@ -59,7 +59,7 @@ public struct HTTPResponse: Sendable, ~Copyable {
   /// The stream of chunks received for the ``HTTPResponse/response`` as raw `Data`.
   ///
   /// Because some requests may have a multi-part response, such as subscriptions or operations using `@defer`, the
-  /// the response is processed as a stream of chunks. For requests that should have a single response chunk, the stream
+  /// response is processed as a stream of chunks. For requests that should have a single response chunk, the stream
   /// will emit a single value and then terminate.
   public let chunks: NonCopyableAsyncThrowingStream<Data>
 
