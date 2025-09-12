@@ -209,7 +209,9 @@ Programmatic cache key resolution has a few notable quirks and limitations you s
 
 ## Programmatic field policy usage
 
-For more control over formatting your field policy cache keys, implement the `FieldPolicyProvider` protocol on your existing `SchemaConfiguration`.
+When fetching a field with an argument, you can use a field policy to configure an expected cache key for the object that is derived from the values of the field's arguments. Field policies can be applied using the [`@fieldPolicy` directive](./cache-key-resolution#the-fieldpolicy-directive) or programmatically.
+
+To implement programmatic field policies, extend your existing `SchemaConfiguration` to conform to the `FieldPolicyProvider` protocol.
 The protocol requires you to implement two functions: one for fields that return a single instance and one for fields that return a list.
 
 ```swift

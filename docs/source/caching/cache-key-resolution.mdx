@@ -8,9 +8,9 @@ The normalized cache computes a **cache key** for each object that is stored in 
 
 > To learn more, read about how the cache [normalizes objects by cache key](./introduction#normalizing-objects-by-cache-key).
 
-Use the `@typePolicy` and `@fieldPolicy` directives together, because they each support a different use case. The `@typePolicy` directive provides cache keys when writing objects to the cache after executing an operation, and the `@fieldPolicy` directive provides cache keys when reading an object from the cache before executing an operation.
+The `@typePolicy` and `@fieldPolicy` directives are intended to be used together. The `@typePolicy` directive applies to types in your schema and derives cache keys from fields on a fetched object when writing to the cache. The `@fieldPolicy` directive applies to fields that have arguments on types in your schema and derives cache keys from the values of the field's arguments when reading an object from the cache.
 
-For most use cases, you can configure cache keys declaratively using the methods described on this page. For advanced use cases not supported by declarative cache keys, you can configure cache keys [programmatically](./programmatic-cache-keys).
+For most use cases, you can configure cache keys declaratively using the methods described on this page. For advanced use cases not supported by declarative cache keys, you can configure cache keys [programmatically](./programmatic-cache-keys). When executing an operation, the library first checks for programmatic cache keys, then for directive-based cache keys, and finally falls back to the default implementation.
 
 ## Schema extensions
 
@@ -92,11 +92,9 @@ This is possible if:
 
 ## The `@fieldPolicy` directive
 
-The `@fieldPolicy` directive enables you to specify how cache keys should be resolved when querying a specific field. You can apply the `@fieldPolicy` directive to `Object` and `Interface` types in your schema by extending the type in a `.graphqls` schema extension file. You can also programmatically provide cache keys by implementing the `FieldPolicyProvider` protocol on your existing `SchemaConfiguration`.
+The `@fieldPolicy` directive enables you to specify how cache keys should be resolved when querying a field with arguments. In practice, field policies should be thought of as applied to a specific field with arguments on a type in your schema. Because directives cannot be added to fields in schema extensions, you can apply the `@fieldPolicy` directive to `Object` and `Interface` types in your schema and provide a field name for the the policy to be applied to.
 
-Use field policies in combination with type policies. If you use directives or programmatic implementations for field policies, you should use the same approach for type policies.
-
-When executing an operation, the library first checks for programmatic cache keys, then for directive-based cache keys, and finally falls back to the default implementation: `Protocol > Directive > Default`.
+When fetching a field with an argument, you can use a field policy to configure an expected cache key for the object that is derived from the values of the field's arguments. Field policies are designed to be used in combination with type policies. When the cache key for an object derived by the type policy is the same as the one derived by the field policy, the field can use the cached object.
 
 
 ### Directive usage
@@ -159,6 +157,8 @@ The `@fieldPolicy` directive supports fields that return a list. When using list
 - Conversely, if a field has a list input parameter, it must return a list.
 - Nested lists are not supported.
 - Partial cache hits are not supported, so every cache key created from the input parameters must have a cache hit or the cache read will fail.
+
+If you need to apply a field policy to a field that is not supported by these restrictions, you may be able to use [programmatic field policy configuration](./programmatic-cache-keys#programmatic-field-policy-usage).
 
 With a field like this:
 ```graphql
