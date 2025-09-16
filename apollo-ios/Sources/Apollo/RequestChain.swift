@@ -3,7 +3,7 @@ import ApolloAPI
 
 /// Manages a chain of steps taken to execute a ``GraphQLRequest``. ``RequestChain`` enables customization of each step
 /// of a request by injection of ``Interceptors``.
-/// 
+///
 /// ## Custom Functionality via Interceptors
 /// The ``RequestChain`` allows complete control over the execution of a request. It manages the flow of data through
 /// a series of steps, but the implementation logic for each step can be controlled by using custom interceptors.
@@ -11,80 +11,80 @@ import ApolloAPI
 /// and response parsing/GraphQL execution (via ``ResponseParsingInterceptor``). The ``RequestChain`` also provides
 /// the ability to add additional behaviors by inspecting and/or mutating the ``GraphQLRequest`` and ``GraphQLResponse``
 /// (via ``GraphQLInterceptor``s), and the ``HTTPResponse`` and raw `Data` stream (via ``HTTPInterceptor``s).
-/// 
+///
 /// ## Response Streams
 /// Because some requests may have a multi-part response, such as subscriptions or operations using `@defer`, the
 /// results of a ``RequestChain`` are processed through ``NonCopyableAsyncThrowingStream``s. Interceptors may use the
 /// mapping functions of these streams to inspect and/or mutate the resulting elements. The transformed results
 /// returned from the mapping functions will be passed to the next step in the chain for each element. For requests
 /// that should have a single response, these streams will emit a single value and then terminate.
-/// 
+///
 /// ## Request Chain Flow
 /// The ``RequestChain`` sends a request "down" the chain of it's interceptors, executes the request, and then sends
 /// the result back "up" through the chain. This means the first interceptor will receive the request first and the
 /// response last.
-/// 
+///
 /// When ``RequestChain/kickoff(request:)`` is called, the ``RequestChain`` processes the request through each of its
 /// interceptors using the following process:
-/// 
+///
 /// **1. GraphQL Interceptors (Pre-flight)**
-/// 
+///
 /// The ``GraphQLRequest`` is passed "down" through the ``GraphQLInterceptor``s in sequential order. Each interceptor may
 /// inspect and/or mutate the request and proceeds by calling the provided `next` closure.
-/// 
+///
 /// **2. Cache Read**
-/// 
+///
 /// The ``RequestChain`` uses the ``GraphQLRequest/fetchBehavior`` of the request to determine if a pre-flight cache
 /// read is necessary. If so, it attempts a cache read by calling the provided ``CacheInterceptor``'s
 /// ``CacheInterceptor/readCacheData(from:request:)`` function.
-/// 
+///
 /// **3. URLRequest Creation**
-/// 
+///
 /// The ``RequestChain`` uses the ``GraphQLRequest/fetchBehavior`` of the request to determine if a network fetch should
 /// be executed. If so, it calls ``GraphQLRequest``.``GraphQLRequest/toURLRequest()`` to convert the request into a
 /// `URLRequest`.
-/// 
+///
 /// **4. HTTP Interceptors (Pre-flight)**
-/// 
+///
 /// The `URLRequest` is passed "down" through the ``HTTPInterceptor``s in sequential order. Each interceptor may inspect
 /// and/or mutate the request and proceeds by calling the provided `next` closure.
-/// 
+///
 /// **5. Network Fetch**
-/// 
+///
 /// The `URLRequest` is passed to the provided `urlSession`'s ``ApolloURLSession/chunks(for:)`` for fetching via
 /// the network.
-/// 
+///
 /// **6. HTTP Interceptors (Post-flight)**
-/// 
+///
 /// The received ``HTTPResponse`` is passed back "up" through the ``HTTPInterceptor``s in reverse order, starting with the
 /// last interceptor and ending with the first. As ``HTTPResponse/chunks`` are received by the stream, each
 /// ``HTTPInterceptor`` may inspect and/or mutate the raw response `Data` before proceeding.
-/// 
+///
 /// **7. Response Parsing**
-/// 
+///
 /// The ``HTTPResponse`` is passed to the provided ``ResponseParsingInterceptor``, which parses the stream of
 /// ``HTTPResponse/chunks`` as they are received and returns an ``InterceptorResultStream`` which emits
 /// ``ParsedResult``s as each chunk is parsed.
-/// 
+///
 /// **8. GraphQL Interceptors (Post-flight)**
-/// 
+///
 /// The ``InterceptorResultStream`` is passed back "up" through the ``GraphQLInterceptor``s in reverse order, starting
 /// with the last interceptor and ending with the first. As ``ParsedResult``s are received by the stream, each
 /// ``GraphQLInterceptor`` may inspect and/or mutate the result before proceeding.
-/// 
+///
 /// **9. Cache Write**
-/// 
+///
 /// The ``RequestChain`` uses the ``GraphQLRequest/fetchBehavior`` of the request to determine if a cache write
 /// should be performed. If so, it attempts a cache write by calling the provided ``CacheInterceptor``'s
 /// ``CacheInterceptor/writeCacheData(to:request:response:)`` function.
-/// 
+///
 /// **10. Return a ResultStream**
-/// 
+///
 /// The final ``GraphQLResponse`` values of the ``ParsedResult``.``ParsedResult/result`` emitted by the
 /// ``InterceptorResultStream`` are returned as an `AsyncThrowingStream` to the caller.
 public struct RequestChain<Request: GraphQLRequest>: Sendable {
 
-  /// An error that can be thrown by component of a ``RequestChain`` to indicate that the request should be retried.
+  /// An error that can be thrown by a component of a ``RequestChain`` to indicate that the request should be retried.
   ///
   /// When a ``RequestChain`` receives a thrown ``Retry`` error, it will restart from step 1 of the
   /// [Request Chain Flow](<doc:RequestChain#Request-Chain-Flow>) using the ``Retry/request`` provided by the error.
@@ -94,11 +94,11 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
   ///  as the initial request. This means that interceptors will retain their state between retries of the same request.
   ///
   /// ## Retry Loop Prevention
-  /// If an interceptor throws a ``Retry`` error again on the retried request, it will continue retry the request again.
-  /// This could lead to an infinite loop where a failing request continuously retries forever. To prevent this, we
-  /// provide a ``MaxRetryInterceptor`` that throws a ``MaxRetryInterceptor/MaxRetriesError`` if a maximum number of
-  /// retries have been performed. The ``DefaultInterceptorProvider`` contains a ``MaxRetryInterceptor`` with a default
-  /// of 3 retries allowed.
+  /// If a retried request continues to fail, an interceptor which throws a ``Retry`` error may continue to throw a
+  /// ``Retry`` error again. This could lead to an infinite loop where a failing request continuously retries forever.
+  ///  To prevent this, we provide a ``MaxRetryInterceptor`` that throws a ``MaxRetryInterceptor/MaxRetriesError`` if a
+  /// maximum number of retries have been performed. The ``DefaultInterceptorProvider`` contains a
+  /// ``MaxRetryInterceptor`` with a default of 3 retries allowed.
   ///
   /// - Important: When creating a custom ``InterceptorProvider`` it is highly recommended that you include a
   /// ``MaxRetryInterceptor`` early on in the chain.
@@ -108,7 +108,7 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
   public struct Retry: Swift.Error {
     /// The request to be retried
     public let request: Request
-    
+
     /// Designated initializer
     /// - Parameter request: The request to be retried
     public init(request: Request) {
@@ -223,7 +223,7 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
       throw ApolloClient.Error.noResults
     }
   }
-  
+
   private func execute(
     request: Request
   ) -> InterceptorResultStream<Request> {
@@ -245,7 +245,7 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
 
             // Cache miss
 
-          } catch {            
+          } catch {
             // Cache read failure
             if !fetchBehavior.shouldFetchFromNetwork(hadSuccessfulCacheRead: false) {
               throw error
