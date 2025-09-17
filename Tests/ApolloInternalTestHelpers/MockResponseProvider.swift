@@ -60,7 +60,7 @@ import Foundation
 ///     }
 ///   }
 /// ```
-public protocol MockResponseProvider {
+public protocol MockResponseProvider: SendableMetatype {
   typealias MultiResponseHandler = @Sendable (URLRequest) async throws -> (HTTPURLResponse, AsyncThrowingStream<Data, any Error>?)
   typealias SingleResponseHandler = @Sendable (URLRequest) async throws -> (response: HTTPURLResponse, Data?)
 }

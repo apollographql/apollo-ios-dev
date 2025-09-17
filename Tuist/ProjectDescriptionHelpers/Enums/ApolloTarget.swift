@@ -104,7 +104,7 @@ public enum ApolloTarget {
   }
 
   public var deploymentTargets: DeploymentTargets {
-    return DeploymentTargets.macOS(self.isUnitTestTarget ? "13.0" : "12.0")
+    return DeploymentTargets.macOS(self.isUnitTestTarget ? "14.0" : "12.0")
   }
 
   private var isUnitTestTarget: Bool {
