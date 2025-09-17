@@ -47,7 +47,7 @@ public class MockSchemaMetadata: SchemaMetadata {
     return Object(typename: __typename, implementedInterfaces: [])
   }
 
-  public class SchemaConfiguration: ApolloAPI.SchemaConfiguration {
+  public class SchemaConfiguration: ApolloAPI.SchemaConfiguration, @unchecked Sendable {
 
     fileprivate static nonisolated(unsafe) var stub_cacheKeyInfoForType_Object: ((Object, ObjectData) -> CacheKeyInfo?)?
 
