@@ -33,8 +33,7 @@ let package = Package(
         .product(name: "OrderedCollections", package: "swift-collections"),
       ],
       swiftSettings: [
-        .enableUpcomingFeature("ExistentialAny"),
-        .enableExperimentalFeature("StrictConcurrency")
+        .swiftLanguageMode(.v6)
       ]
     ),
   ],
