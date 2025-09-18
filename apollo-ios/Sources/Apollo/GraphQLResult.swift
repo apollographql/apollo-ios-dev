@@ -20,6 +20,8 @@ public struct GraphQLResult<Data: RootSelectionSet> {
   /// Source of data
   public let source: Source
 
+  /// The cache keys for the fields that were included in this response. Custom ``ApolloStoreSubscriber``s can use these
+  /// keys to understand when changes to the cache would affect the result of a specific response.
   public let dependentKeys: Set<CacheKey>?
 
   public init(
