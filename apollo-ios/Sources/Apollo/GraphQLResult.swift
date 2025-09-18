@@ -20,7 +20,7 @@ public struct GraphQLResult<Data: RootSelectionSet> {
   /// Source of data
   public let source: Source
 
-  let dependentKeys: Set<CacheKey>?
+  public let dependentKeys: Set<CacheKey>?
 
   public init(
     data: Data?,
