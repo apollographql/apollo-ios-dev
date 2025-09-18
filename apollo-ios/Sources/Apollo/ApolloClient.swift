@@ -209,7 +209,7 @@ public final class ApolloClient: Sendable {
 
   /// Watches a query by first fetching an initial result from the server or from the local cache, depending on the
   /// current contents of the cache and the specified cache policy. After the initial fetch, the returned query
-  /// watcher object will get notified whenever any of the data the query result depends on changes in the local cache,
+  /// watcher object will get notified whenever any of the data in the query result changes in the local cache,
   /// and calls the result handler again with the new result.
   ///
   /// - Parameters:
@@ -245,7 +245,7 @@ public final class ApolloClient: Sendable {
 
   /// Watches a query by first fetching an initial result from the server or from the local cache, depending on the
   /// current contents of the cache and the specified cache policy. After the initial fetch, the returned query
-  /// watcher object will get notified whenever any of the data the query result depends on changes in the local cache,
+  /// watcher object will get notified whenever any of the data in the query result changes in the local cache,
   /// and calls the result handler again with the new result.
   ///
   /// - Parameters:
@@ -276,7 +276,7 @@ public final class ApolloClient: Sendable {
 
   /// Watches a query by first fetching an initial result from the server or from the local cache, depending on the
   /// current contents of the cache and the specified cache policy. After the initial fetch, the returned query
-  /// watcher object will get notified whenever any of the data the query result depends on changes in the local cache,
+  /// watcher object will get notified whenever any of the data in the query result changes in the local cache,
   /// and calls the result handler again with the new result.
   ///
   /// - Parameters:
@@ -307,7 +307,7 @@ public final class ApolloClient: Sendable {
 
   /// Watches a query by first fetching an initial result from the server or from the local cache, depending on the
   /// current contents of the cache and the specified cache policy. After the initial fetch, the returned query
-  /// watcher object will get notified whenever any of the data the query result depends on changes in the local cache,
+  /// watcher object will get notified whenever any of the data in the query result changes in the local cache,
   /// and calls the result handler again with the new result.
   ///
   /// - Parameters:
