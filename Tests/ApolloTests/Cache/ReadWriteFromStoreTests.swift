@@ -1988,6 +1988,123 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     }
   }
 
+  @MainActor func test__objectEquality__givenTwoInstancesInMemory_shouldBeEqual() async throws {
+    // given
+    class Hero: MockSelectionSet, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("name", String?.self)
+      ]}
+
+      var name: String? { __data["name"] }
+
+      convenience init(
+        name: String? = nil
+      ) {
+        self.init(_dataDict: DataDict(data: [
+          "__typename": "Hero",
+          "name": name
+        ], fulfilledFragments: [
+          ObjectIdentifier(Self.self)
+        ]))
+      }
+    }
+
+    // when
+    let hero1 = Hero(name: "Han Solo")
+    let hero2 = Hero(name: "Han Solo")
+
+    // then
+    expect(hero1).to(equal(hero2))
+  }
+
+  @MainActor func test__objectEquality__givenTwoInstancesFromCache_shouldBeEqual() async throws {
+    // given
+    class Hero: MockSelectionSet, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("name", String?.self)
+      ]}
+
+      var name: String? { __data["name"] }
+
+      convenience init(
+        name: String? = nil
+      ) {
+        self.init(_dataDict: DataDict(data: [
+          "__typename": "Hero",
+          "name": name
+        ], fulfilledFragments: [
+          ObjectIdentifier(Self.self)
+        ]))
+      }
+    }
+
+    let hero = Hero(name: "Han Solo")
+
+    // when
+
+    try await store.withinReadWriteTransaction { transaction in
+      let query = MockQuery<Hero>()
+      try await transaction.write(data: hero, for: query)
+    }
+
+    try await store.withinReadTransaction { transaction in
+      let heroKey = "QUERY_ROOT"
+      let hero1 = try? await transaction.readObject(ofType: Hero.self, withKey: heroKey)
+      let hero2 = try? await transaction.readObject(ofType: Hero.self, withKey: heroKey)
+
+      // then
+      expect(hero1).to(equal(hero2))
+    }
+  }
+
+  @MainActor func test__objectEquality__givenInstanceInMemory_andInstanceFromCache_shouldBeEqual() async throws {
+    // given
+    class Hero: MockFragment, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("name", String?.self)
+      ]}
+
+      var name: String? { __data["name"] }
+
+      convenience init(
+        name: String?
+      ) {
+        self.init(_dataDict: DataDict(data: [
+          "__typename": "Hero",
+          "name": name
+        ], fulfilledFragments: [
+          ObjectIdentifier(Self.self)
+        ]))
+      }
+    }
+
+    let memoryHero = Hero(name: "Han Solo")
+
+    // when
+    let cacheKey = "Hero"
+
+    try await store.withinReadWriteTransaction { transaction in
+      try await transaction.write(selectionSet: memoryHero, withKey: cacheKey)
+    }
+
+    try await store.withinReadTransaction { transaction in
+      guard let cacheHero = try? await transaction.readObject(ofType: Hero.self, withKey: cacheKey) else {
+        XCTFail()
+        return
+      }
+
+      // then
+      expect(memoryHero).to(equal(cacheHero))
+    }
+  }
+
   // MARK: - Update Object With Key Tests
 
   func test_updateObjectWithKey_readAfterUpdateWithinSameTransaction_hasUpdatedValue() async throws {
