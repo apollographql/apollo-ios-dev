@@ -1547,8 +1547,9 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting {
     }
     
     FieldPolicySchemaMetadata.stub_cacheKeyForField_ListReturn { _, inputData, _ in
-      guard let isJedi = inputData["input"] as? Bool,
-            let nameInput: FieldPolicy.InputData = inputData["nameInput"],
+      guard let heroInput: FieldPolicy.InputData = inputData["input"],
+            let isJedi = heroInput["isJedi"] as? Bool,
+            let nameInput: FieldPolicy.InputData = heroInput["nameInput"],
             let names: FieldPolicy.InputListData = nameInput["names"] else {
         return nil
       }
