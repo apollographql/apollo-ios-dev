@@ -279,6 +279,8 @@ public final class ApolloClient: Sendable {
   /// `resultHandler` is called after the initial fetch and again each time the data for the watched query changes in
   /// the local cache of this client's ``ApolloClient/store``.
   ///
+  /// This function triggers a fetch on the ``GraphQLQueryWatcher`` prior to returning it.
+  ///
   /// The ``GraphQLQueryWatcher`` returned by this function is notified whenever any of the data the query result
   /// depends on changes in the local cache. The ``GraphQLQueryWatcher`` retains the provided `resultHandler` and will
   /// continue to call it until ``GraphQLQueryWatcher/cancel()`` is called. Failure to call `cancel()` before releasing

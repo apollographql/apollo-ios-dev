@@ -4,7 +4,7 @@
 /// or extension data included in the response.
 public struct GraphQLResponse<Operation: GraphQLOperation>: Sendable {
 
-  /// Represents source of data
+  /// Represents the source of the response's data
   public enum Source: Sendable, Hashable {
     /// Indicates response data was fetched from a local cache
     case cache
