@@ -10,7 +10,7 @@ The normalized cache computes a **cache key** for each object that is stored in 
 
 The `@typePolicy` and `@fieldPolicy` directives are intended to be used together. The `@typePolicy` directive applies to types in your schema and derives cache keys from fields on a fetched object when writing to the cache. The `@fieldPolicy` directive applies to fields that have arguments on types in your schema and derives cache keys from the values of the field's arguments when reading an object from the cache.
 
-For most use cases, you can configure cache keys declaratively using the methods described on this page. For advanced use cases not supported by declarative cache keys, you can use [programmatic cache key configuration](./programmatic-cache-keys). When executing an operation, the library first checks for programmatic cache keys, then for directive-based cache keys, and finally falls back to the default implementation
+For most use cases, you can configure cache keys declaratively using the methods described on this page. For advanced use cases not supported by declarative cache keys, you can use [programmatic cache key configuration](./programmatic-cache-keys). When executing an operation, the library first checks for programmatic cache keys, then for directive-based cache keys, and finally falls back to the default implementation.
 
 ## Schema extensions
 
