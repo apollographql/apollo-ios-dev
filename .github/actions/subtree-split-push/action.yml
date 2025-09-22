@@ -24,10 +24,17 @@ runs:
     env:
       PR_TITLE: ${{ inputs.pr-title }}
     run: |
+      set -euo pipefail
+      echo "git: $(git --version)"
+      echo "subtree: $(command -v git-subtree)"
+      SUBTREE=$(command -v git-subtree)
+      export GIT_TRACE=1 GIT_TRACE_SETUP=1 GIT_TRACE_PERFORMANCE=1
+      export GIT_TRACE2_EVENT=$PWD/git-trace2.json
+      export PS4='+${BASH_SOURCE##*/}:${LINENO}:${FUNCNAME[0]}: '
       git fetch ${{ inputs.remote }} ${{ inputs.target-branch }}
-      git subtree pull -P ${{ inputs.subtree }} --squash -m "pull: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE" ${{ inputs.remote }} ${{ inputs.target-branch }} 
-      splitResult=$(git subtree -P ${{ inputs.subtree }} split --squash --rejoin -m "split: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE")
+      bash -xuo pipefail "$SUBTREE" pull -P ${{ inputs.subtree }} --squash -m "pull: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE" ${{ inputs.remote }} ${{ inputs.target-branch }} 2>subtree-debug.sh.log
+      splitResult=$(bash -xuo pipefail "$SUBTREE" -P ${{ inputs.subtree }} split --squash --rejoin -m "split: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE" 2>subtree-debug.sh.log)
       if [ ! -z "$splitResult" ]
       then
-        git subtree push -P ${{ inputs.subtree }} ${{ inputs.remote }} ${{ inputs.target-branch }}
+        bash -xuo pipefail "$SUBTREE" push -P ${{ inputs.subtree }} ${{ inputs.remote }} ${{ inputs.target-branch }} 2>subtree-debug.sh.log
       fi
